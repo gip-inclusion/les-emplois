@@ -4,8 +4,21 @@ import random
 from django.conf import settings
 from django.contrib.gis.measure import D
 from django.db import models
-from django.db.models import BooleanField, Case, Count, F, FloatField, Prefetch, Q, When
-from django.db.models.functions import Cast
+from django.db.models import (
+    BooleanField,
+    Case,
+    Count,
+    Exists,
+    F,
+    FloatField,
+    OuterRef,
+    Prefetch,
+    Q,
+    Subquery,
+    Value,
+    When,
+)
+from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -63,30 +76,68 @@ class SiaeQuerySet(models.QuerySet):
         return self.filter(members=user, members__is_active=True)
 
     def with_count_recent_received_job_apps(self):
+        """
+        Count the number of recently received job applications.
+
+        The count with a `Subquery` instead of a `join` is way more performant here.
+        We generate this SQL using the Django ORM:
+
+        SELECT
+            *,
+            (
+                SELECT Count(id)
+                FROM job_applications_jobapplication AS ja
+                WHERE ja.to_siae_id = siaes_siae.id
+            ) AS count_recent_received_job_apps
+        FROM siaes_siae;
+
+        See https://github.com/martsberger/django-sql-utils
+        """
         from itou.job_applications.models import JobApplication
 
-        past_dt = timezone.now() - timezone.timedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD)
-        count = Count(
-            "job_applications_received", filter=Q(job_applications_received__created_at__gte=past_dt), distinct=True
+        sub_query = Subquery(
+            (
+                JobApplication.objects.filter(
+                    to_siae=OuterRef("id"),
+                    created_at__gte=timezone.now()
+                    - timezone.timedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD),
+                )
+                .order_by()
+                .values("to_siae")
+                .annotate(count=Count("pk"))
+                .values("count")
+            ),
+            output_field=models.IntegerField(),
         )
-
-        return self.annotate(count_recent_received_job_apps=count)
+        # `Coalesce` will return the first not null value or zero.
+        return self.annotate(count_recent_received_job_apps=Coalesce(sub_query, 0))
 
     def with_count_active_job_descriptions(self):
         count = Count("job_description_through", filter=Q(job_description_through__is_active=True), distinct=True)
+        # count = Value(2)
         return self.annotate(count_active_job_descriptions=count)
 
     def with_job_app_score(self):
+        # from itou.job_applications.models import JobApplication
+        # past_dt = timezone.now() - timezone.timedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD)
+        # count = Count(
+        #     "job_applications_received", filter=Q(job_applications_received__created_at__gte=past_dt), distinct=True
+        # )
         count_recent_received_job_apps = Cast("count_recent_received_job_apps", output_field=FloatField())
+        # count_active_job_descriptions = Cast(
+        #     Count("job_description_through", filter=Q(job_description_through__is_active=True), distinct=True), output_field=FloatField()
+        # )
         count_active_job_descriptions = Cast("count_active_job_descriptions", output_field=FloatField())
+        has_active_job_desc = Exists(SiaeJobDescription.objects.filter(siae=OuterRef("pk"), is_active=True))
+
         get_score = Cast(count_recent_received_job_apps / count_active_job_descriptions, output_field=FloatField())
         return (
             self.with_count_recent_received_job_apps()
             .with_count_active_job_descriptions()
             .annotate(
                 job_app_score=Case(
-                    When(count_active_job_descriptions__gt=0, then=get_score),
-                    When(count_active_job_descriptions=0, then=None),
+                    When(has_active_job_desc, then=get_score),
+                    default=None,
                 )
             )
         )
@@ -586,7 +637,7 @@ class SiaeJobDescription(models.Model):
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name="job_description_through")
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
-    is_active = models.BooleanField(verbose_name="Recrutement ouvert", default=True)
+    is_active = models.BooleanField(verbose_name="Recrutement ouvert", default=True, db_index=True)
     custom_name = models.CharField(verbose_name="Nom personnalisé", blank=True, max_length=255)
     description = models.TextField(verbose_name="Description", blank=True)
     # TODO: this will be used to order job description in UI.

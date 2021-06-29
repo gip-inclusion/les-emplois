@@ -60,8 +60,11 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         for department_with_district in DEPARTMENTS_WITH_DISTRICTS:
             districts += request.GET.getlist(f"districts_{department_with_district}")
 
+        # Perform a first request to only keep SIAEs within some distance
+        siaes_pks = siaes_step_1.values_list("pk", flat=True)
+
         siaes = (
-            siaes_step_1.with_job_app_score()
+            Siae.objects.filter(pk__in=siaes_pks)
             .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
             # Convert km to m (injected in SQL query)
             .annotate(distance=Distance("coords", city.coords) / 1000)
@@ -77,6 +80,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
                 )
             )
             .prefetch_job_description_through(is_active=True)
+            .with_job_app_score()
             .prefetch_related("members")
             # Sort in 4 subgroups in the following order, each subgroup being shuffled.
             # 1) has_active_members and not block_job_applications
@@ -91,7 +95,6 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             # detached members from their siae so it could still happen.
             .order_by("-has_active_members", "block_job_applications", "job_app_score")
         )
-
         if kinds:
             siaes = siaes.filter(kind__in=kinds)
 
