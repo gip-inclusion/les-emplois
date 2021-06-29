@@ -295,6 +295,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # (required for SIAEs subject to eligibility rules).
     # It is already linked to the job seeker but this double link is added
     # to easily find out which one was used for a given job application.
+    # Use `self.get_eligibility_diagnosis()` to handle business rules.
     eligibility_diagnosis = models.ForeignKey(
         "eligibility.EligibilityDiagnosis",
         verbose_name="Diagnostic d'éligibilité",
@@ -546,6 +547,18 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             if self.is_sent_by_authorized_prescriber:
                 kind = "Prescripteur habilité"
         return kind
+
+    def get_eligibility_diagnosis(self):
+        """
+        Returns the eligibility diagnosis linked to this job application or None.
+        """
+        if not self.to_siae.is_subject_to_eligibility_rules:
+            return None
+        if self.eligibility_diagnosis:
+            return self.eligibility_diagnosis
+        # As long as the job application has not been accepted, diagnosis-related
+        # business rules may still prioritize one diagnosis over another.
+        return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_siae)
 
     def get_resume_link(self):
         if self.resume_link:

@@ -518,9 +518,7 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(has_considered_valid_diagnoses)
 
         # Check diagnosis.
-        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-            job_application.job_seeker, for_siae=job_application.to_siae
-        )
+        eligibility_diagnosis = job_application.get_eligibility_diagnosis()
         self.assertEqual(eligibility_diagnosis.author, siae_user)
         self.assertEqual(eligibility_diagnosis.author_kind, EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF)
         self.assertEqual(eligibility_diagnosis.author_siae, job_application.to_siae)
