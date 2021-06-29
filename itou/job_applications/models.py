@@ -587,12 +587,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if self.is_sent_by_proxy:
             emails.append(self.email_accept_for_proxy)
 
-        # Link to the job seeker's eligibility diagnosis.
-        if self.to_siae.is_subject_to_eligibility_rules:
-            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                self.job_seeker, for_siae=self.to_siae
-            )
-
         # Approval issuance logic.
         if not self.hiring_without_approval and self.to_siae.is_subject_to_eligibility_rules:
 
@@ -629,6 +623,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 emails.append(self.email_manual_approval_delivery_required_notification(accepted_by))
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
+
+        # Link to the job seeker's eligibility diagnosis.
+        if self.to_siae.is_subject_to_eligibility_rules:
+            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                self.job_seeker, for_siae=self.to_siae
+            )
+            if not self.eligibility_diagnosis and self.approval and self.approval.originates_from_itou:
+                logger.error("An eligibility diagnosis should've been found for job application %s", self.pk)
 
         # Send emails in batch.
         connection = mail.get_connection()
