@@ -22,16 +22,20 @@ urlpatterns = [
     path("dummy-employee-records/", DummyEmployeeRecordList.as_view(), name="dummy-employee-records"),
     # OpenAPI / Swagger
     # See: https://www.django-rest-framework.org/topics/documenting-your-api/
+    # OAS 3 YAML schema (downloadable)
     path(
         "openapi/",
         get_schema_view(title="API = les emplois", version="1.0.0", description="Test"),
         name="openapi_schema",
     ),
+    # Swagger UI
     path(
-        "swagger-ui/",
+        "swagger/",
         TemplateView.as_view(template_name="api/openapi.html", extra_context={"schema_url": "v1:openapi_schema"}),
         name="swagger-ui",
     ),
+    # Needed for Browseable API (dev)
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
 ]
 
 urlpatterns += router.urls
