@@ -16,6 +16,7 @@ class PoleEmploiIndividu:
         self.last_name = last_name.upper()
         self.birthdate = birthdate.strftime("%Y-%m-%d")
         self.nir = nir
+        assert self.is_valid()
 
     def is_valid(self):
         return self.first_name != "" and self.last_name != "" and len(self.nir) == 13 and self.birthdate != ""
@@ -105,14 +106,14 @@ class PoleEmploiRechercheIndividuCertifieAPI:
     @property
     def id_national_demandeur(self):
         """Identifiant national Pôle Emploi chiffré"""
-        return self.data["idNationalDE"]
+        return self.data.get("idNationalDE")
 
     @property
     def code_sortie(self):
         """
         A value sorted in CODE_SORTIE_MAPPING
         """
-        return self.data["codeSortie"]
+        return self.data.get("codeSortie")
 
     @property
     def certification_demandeur(self):
@@ -120,7 +121,7 @@ class PoleEmploiRechercheIndividuCertifieAPI:
         Niveau de certification du DE dans la base PE
         true ou false (false par défaut ou si le DE n'est pas trouvé)
         """
-        return self.data["certifDE"]
+        return self.data.get("certifDE")
 
 
 class PoleEmploiMiseAJourPass:
@@ -202,7 +203,7 @@ class PoleEmploiMiseAJourPassIAEAPI:
     USE_PRODUCTION_ROUTE = "prod"
     USE_SANDBOX_ROUTE = "sandbox"
 
-    def __init__(self, params, token, api_production_or_sandbox):
+    def __init__(self, params, token, api_production_or_sandbox="prod"):
         """
         Token should be in the form "Bearer token_value".
         It is provided by the `get_access_token` helper.
@@ -211,7 +212,7 @@ class PoleEmploiMiseAJourPassIAEAPI:
         or PoleEmploiMiseAJourPass.approved_parameters,
 
         api_production_or_sandbox is a sad remnant of the tests in the recette environment.
-        It mightp be useful in pre-production, as well as for re-performing tests.
+        It might be useful in pre-production, as well as for re-performing tests.
         """
         self.data, self.error = self.post(params, token, api_production_or_sandbox)
 
@@ -234,11 +235,11 @@ class PoleEmploiMiseAJourPassIAEAPI:
             data = r.json()
         except httpx.HTTPError as e:
             if e.response.status_code == 401:
-                error = "CF CodeSortie Erreur pour voir le contrôle correspondant"
+                error = f"Error with code: {self.code_sortie()}"
             if e.response.status_code == 404:
                 # surprise !? PE's authentication layer can trigger 404
                 # if the scope does not allow access to this API
-                error = "Erreur d'authentification"
+                error = "Authentication error"
             else:
                 # In general when input data cannot be processed, a 500 is returned
                 logger.error("Error while fetching `%s`: %s", url, e)
@@ -255,4 +256,4 @@ class PoleEmploiMiseAJourPassIAEAPI:
          - S001 to S043 for errors
          - S100 for success
         """
-        return self.data["codeSortie"] if self.data is not None else ""
+        return self.data.get("codeSortie") if self.data is not None else ""
