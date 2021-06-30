@@ -1,6 +1,7 @@
 from rest_framework import viewsets
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
+from itou.api.employee_record_api.perms import EmployeeRecordAPIPermission
 from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.serializers import EmployeeRecordSerializer
 from itou.siaes.models import SiaeMembership
@@ -21,17 +22,25 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     (voir le endpoint `auth-token`).
     """
 
+    # Above section is in french for Swagger / OAS auto doc generation
+
     # If no queryset class parameter is given (f.i. overidding)
     # a `basename` parameter must be set on the router (see local `urls.py` file)
     # See: https://www.django-rest-framework.org/api-guide/routers/
 
     serializer_class = EmployeeRecordSerializer
+
     # Possible authentication frameworks:
     # - token auth: for external access / real world use case
     # - session auth: for dev context
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
+    # Additional / custom permission classes:
+    # Enforce the default one (IsAuthenticated)
+    permission_classes = [EmployeeRecordAPIPermission]
+
     def get_queryset(self):
+        # We only get to this point if permissions are OK
         queryset = EmployeeRecord.objects.full_fetch().sent()
 
         # Employee record API will return objects related to
