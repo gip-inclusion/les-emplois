@@ -296,7 +296,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     request,
                     mark_safe(
                         (
-                            "Votre demande de Pass IAE est en cours de vérification auprès de nos équipes.<br>"
+                            "Votre demande de PASS IAE est en cours de vérification auprès de nos équipes.<br>"
                             "Si vous souhaitez en savoir plus sur le processus de vérification, n’hésitez pas à "
                             f"{external_link}."
                         )
