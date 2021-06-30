@@ -531,12 +531,13 @@ REST_FRAMEWORK = {
     # https://www.django-rest-framework.org/api-guide/pagination/#pagenumberpagination
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
-    # Renderer
+    # Response renderers
+    # See dev template for an additional renderder for DRF browseable API
     # https://www.django-rest-framework.org/api-guide/renderers/#custom-renderers
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
-    # Default permissions for API views: must be authententicated
+    # Default permissions for API views: user must be authenticated
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
