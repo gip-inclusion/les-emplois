@@ -22,9 +22,9 @@ JOB_APPLICATION_CSV_HEADERS = [
     "Dates de fin d’embauche",
     "Motifs de refus",
     "Éligibilité IAE validée",
-    "Numéro Pass IAE",
-    "Début Pass IAE",
-    "Fin Pass IAE",
+    "Numéro PASS IAE",
+    "Début PASS IAE",
+    "Fin PASS IAE",
 ]
 
 DATE_FMT = "%d/%m/%Y"
@@ -93,9 +93,9 @@ def _job_application_as_dict(job_application):
         "Dates de fin d’embauche": _format_date(job_application.hiring_end_at),
         "Motifs de refus": job_application.get_refusal_reason_display(),
         "Éligibilité IAE validée": _get_eligibility_status(job_application),
-        "Numéro Pass IAE": numero_pass_iae,
-        "Début Pass IAE": _format_date(approval_start_date),
-        "Fin Pass IAE": _format_date(approval_end_date),
+        "Numéro PASS IAE": numero_pass_iae,
+        "Début PASS IAE": _format_date(approval_start_date),
+        "Fin PASS IAE": _format_date(approval_end_date),
     }
 
 

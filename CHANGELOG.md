@@ -320,12 +320,12 @@
 ### Modifié
 
 - Mise à jour vers Django 3.1.5
-- Le bouton "Télécharger l'attestation" devient "Télécharger le Pass IAE"
+- Le bouton "Télécharger l'attestation" devient "Télécharger le PASS IAE"
 - Le statut de candidature "Embauche pour plus tard" a été remplacé par "Candidature en liste d'attente"
 
 ### Supprimé
 
-- Pour les GEIQ et les EA, retrait de la note informative "Pass IAE et demande rétroactive"
+- Pour les GEIQ et les EA, retrait de la note informative "PASS IAE et demande rétroactive"
 
 ## [9] - 2020-12-30
 

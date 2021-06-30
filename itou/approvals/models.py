@@ -170,8 +170,8 @@ class Approval(CommonApprovalMixin):
     objects = models.Manager.from_queryset(CommonApprovalQuerySet)()
 
     class Meta:
-        verbose_name = "Pass IAE"
-        verbose_name_plural = "Pass IAE"
+        verbose_name = "PASS IAE"
+        verbose_name_plural = "PASS IAE"
         ordering = ["-created_at"]
 
     def __str__(self):
