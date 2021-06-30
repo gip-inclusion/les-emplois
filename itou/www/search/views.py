@@ -60,29 +60,20 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         for department_with_district in DEPARTMENTS_WITH_DISTRICTS:
             districts += request.GET.getlist(f"districts_{department_with_district}")
 
-        # Perform a first request to only keep SIAEs within some distance
-        siaes_pks = siaes_step_1.values_list("pk", flat=True)
-
         siaes = (
-            Siae.objects.filter(pk__in=siaes_pks)
-            .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
+            siaes_step_1
             # Convert km to m (injected in SQL query)
             .annotate(distance=Distance("coords", city.coords) / 1000)
+            .prefetch_job_description_through(is_active=True)
             # For sorting let's put siaes in only 2 buckets (boolean has_active_members).
             # If we sort naively by `-_total_active_members` we would show
             # siaes with 10 members (where 10 is the max), then siaes
             # with 9 members, then siaes with 8 members etc...
             # This is clearly not what we want. We want to show siaes with members
             # (whatever the number of members is) then siaes without members.
-            .annotate(
-                has_active_members=Case(
-                    When(_total_active_members__gte=1, then=Value(1)), default=Value(0), output_field=IntegerField()
-                )
-            )
-            .prefetch_job_description_through(is_active=True)
+            .with_has_active_members()
             .with_job_app_score()
-            .prefetch_related("members")
-            # Sort in 4 subgroups in the following order, each subgroup being shuffled.
+            # Sort in 4 subgroups in the following order, each subgroup being sorted by job_app_score.
             # 1) has_active_members and not block_job_applications
             # These are the siaes which can currently hire, and should be on top.
             # 2) has_active_members and block_job_applications

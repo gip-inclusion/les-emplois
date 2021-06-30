@@ -275,6 +275,21 @@ class SiaeQuerySetTest(TestCase):
 
         self.assertEqual(1, result.count_active_job_descriptions)
 
+    def test_with_has_active_members(self):
+        siae = SiaeWithMembershipFactory()
+        result = Siae.objects.with_has_active_members().get(pk=siae.pk)
+        self.assertTrue(result.has_active_members)
+
+        # Deactivate members
+        siae = Siae.objects.last()
+        self.assertEqual(siae.members.count(), 1)
+        membership = siae.siaemembership_set.first()
+        membership.is_active = False
+        membership.save()
+
+        result = Siae.objects.with_has_active_members().get(pk=siae.pk)
+        self.assertFalse(result.has_active_members)
+
 
 class SiaeJobDescriptionQuerySetTest(TestCase):
     def setUp(self):
