@@ -1188,9 +1188,7 @@ class ProlongationModelTest(TestCase):
         prolongation.start_at -= relativedelta(days=2)
         with self.assertRaises(ValidationError) as error:
             prolongation.clean()
-        self.assertIn(
-            "La date de début ne peut pas être différente de la date de fin du PASS IAE", error.exception.message
-        )
+        self.assertIn("La date de début doit être la même que la date de fin du PASS IAE", error.exception.message)
 
     def test_get_start_at(self):
 

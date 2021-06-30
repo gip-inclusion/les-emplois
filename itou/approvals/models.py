@@ -768,7 +768,7 @@ class Prolongation(models.Model):
 
             if self.start_at != self.get_start_at(self.approval):
                 raise ValidationError(
-                    "La date de début ne peut pas être différente de la date de fin du PASS IAE "
+                    "La date de début doit être la même que la date de fin du PASS IAE "
                     f"« {self.approval.end_at.strftime('%d/%m/%Y')} »."
                 )
 
