@@ -51,7 +51,10 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         # We only get to this point if permissions are OK
-        queryset = EmployeeRecord.objects.full_fetch().processed()
+        queryset = EmployeeRecord.objects.full_fetch()
+
+        # Get (registered) query parameters filters
+        queryset = self._filter_by_query_params(self.request, queryset)
 
         # Employee record API will return objects related to
         # all SIAE memberships of authenticated user.
@@ -61,3 +64,25 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         memberships = SiaeMembership.objects.filter(user=self.request.user).values("siae")
 
         return queryset.filter(job_application__to_siae__in=memberships).order_by("-created_at", "-updated_at")
+
+    def _filter_by_query_params(self, request, queryset):
+        """
+        Register query parameters result filtering.
+
+        Only using employee record `status` for now
+        """
+        params = request.query_params
+
+        if status := params.get("status"):
+            status_filter = {
+                "ready": EmployeeRecord.Status.READY,
+                "sent": EmployeeRecord.Status.SENT,
+                "rejected": EmployeeRecord.Status.REJECTED,
+            }.get(status.lower(), EmployeeRecord.Status.PROCESSED)
+
+            return queryset.filter(status=status_filter)
+
+        # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
+
+        # Default queryset without params
+        return queryset.processed()
