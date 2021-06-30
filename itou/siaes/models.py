@@ -20,6 +20,10 @@ from itou.utils.validators import validate_af_number, validate_naf, validate_sir
 class SiaeQuerySet(models.QuerySet):
     @property
     def active_lookup(self):
+        # Using a join is expensive.
+        # Instead of Q(convention__is_active), which would use a join,
+        # prefer a subquery.
+        has_active_convention = Exists(SiaeConvention.objects.filter(id=OuterRef("convention_id"), is_active=True))
         return (
             # GEIQ, EA, EATT, ACIPHC... have no convention logic and thus are always active.
             # `~` means NOT, similarly to dataframes.
@@ -31,19 +35,25 @@ class SiaeQuerySet(models.QuerySet):
             | Q(source=Siae.SOURCE_STAFF_CREATED)
             # ASP source siaes and user created siaes are active if and only
             # if they have an active convention.
-            | Q(convention__is_active=True)
+            | has_active_convention
         )
 
-    def active(self):
-        return self.select_related("convention").filter(self.active_lookup)
-
-    def active_or_in_grace_period(self):
+    def with_has_convention_in_grace_period(self):
         now = timezone.now()
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
-        return self.select_related("convention").filter(
+        has_convention_in_grace_period = Exists(
+            SiaeConvention.objects.filter(id=OuterRef("convention_id"), deactivated_at__gte=now - grace_period)
+        )
+        return self.annotate(has_convention_in_grace_period=has_convention_in_grace_period)
+
+    def active(self):
+        return self.filter(self.active_lookup)
+
+    def active_or_in_grace_period(self):
+        return self.with_has_convention_in_grace_period().filter(
             self.active_lookup
             # Include siaes experiencing their grace period.
-            | Q(convention__deactivated_at__gte=now - grace_period)
+            | Q(has_convention_in_grace_period=True)
         )
 
     def within(self, point, distance_km):
