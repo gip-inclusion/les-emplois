@@ -1,10 +1,35 @@
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
-from itou.api.employee_record_api.perms import EmployeeRecordAPIPermission
 from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.serializers import EmployeeRecordSerializer
+from itou.job_applications.models import JobApplication
 from itou.siaes.models import SiaeMembership
+
+from .perms import EmployeeRecordAPIPermission
+from .serializers import DummyEmployeeRecordSerializer
+
+
+class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    # API fiches salarié (FAKE)
+
+    Cette API retourne des données de fiches salarié factices et identiques
+    à des fins de test pour les éditeurs de logiciels.
+    """
+
+    serializer_class = DummyEmployeeRecordSerializer
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    # By default, permission class is IsAuthenticated
+
+    def get_queryset(self):
+        """
+        Return the same 25 job applications whatever the user.
+        The DummyEmployeeRecordSerializer will replace these objects with raw randomized jsons.
+        25 is slightly more than the page size (50) so that pagination can be tested.
+        Order by pk to solve pagination warning.
+        """
+        return JobApplication.objects.order_by("pk")[:25]
 
 
 class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
@@ -32,7 +57,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
     """
 
-    # Above section is in french for Swagger / OAS auto doc generation
+    # Above doc section is in french for Swagger / OAS auto doc generation
 
     # If no queryset class parameter is given (f.i. overidding)
     # a `basename` parameter must be set on the router (see local `urls.py` file)
@@ -42,7 +67,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
     # Possible authentication frameworks:
     # - token auth: for external access / real world use case
-    # - session auth: for dev context
+    # - session auth: for dev context and browseable API
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     # Additional / custom permission classes:
@@ -69,7 +94,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         """
         Register query parameters result filtering.
 
-        Only using employee record `status` for now
+        Only using employee record `status` is available for now
         """
         params = request.query_params
 
