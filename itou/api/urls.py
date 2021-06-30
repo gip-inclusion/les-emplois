@@ -1,5 +1,4 @@
 from django.urls import include, path
-from django.views.generic import TemplateView
 from rest_framework import routers
 from rest_framework.authtoken import views as auth_views
 from rest_framework.schemas import get_schema_view
@@ -25,19 +24,13 @@ urlpatterns = [
     # See: https://www.django-rest-framework.org/topics/documenting-your-api/
     # OAS 3 YAML schema (downloadable)
     path(
-        "openapi/",
+        "oas3/",
         get_schema_view(
             title="API = les emplois",
             version="1.0.0",
             description="Fichier Swagger/OAS3 de définition de l'API emplois.inclusion.beta.gouv.fr",
         ),
         name="openapi_schema",
-    ),
-    # Swagger UI
-    path(
-        "swagger/",
-        TemplateView.as_view(template_name="api/openapi.html", extra_context={"schema_url": "v1:openapi_schema"}),
-        name="swagger",
     ),
 ]
 
