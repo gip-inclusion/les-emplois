@@ -12,14 +12,24 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     # Fiches salarié
 
     Cette API retourne la liste des fiches salarié :
-    * dans l'état `PROCESSED`
-    * pour toutes les embauches / candidatures des SIAE liées au token d'identification
+
+    - dans l'état `PROCESSED`
+    - pour toutes les embauches / candidatures des SIAE liées au token d'identification
+    - classées par date de création et date de mise à jour (plus récent au plus ancien)
 
     Il est également possible d'obtenir le détail d'une fiche salarié par son
     identifiant (dans les mêmes conditions d'autorisation que pour la liste complète)
 
+    ## Permissions
+
     L'utilisation externe de cette API nécessite l'utilisation d'un token d'autorisation
     (voir le endpoint `auth-token`).
+
+    L'API peut également être utilisée dans un navigateur :
+
+    - seulement dans un environnement de développement
+    - si l'utilisateur connecté est membre d'une ou plusieurs SIAE éligible aux fiches salarié
+
     """
 
     # Above section is in french for Swagger / OAS auto doc generation
@@ -41,7 +51,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         # We only get to this point if permissions are OK
-        queryset = EmployeeRecord.objects.full_fetch().sent()
+        queryset = EmployeeRecord.objects.full_fetch().processed()
 
         # Employee record API will return objects related to
         # all SIAE memberships of authenticated user.
@@ -50,4 +60,4 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         # - and only when rendering a template
         memberships = SiaeMembership.objects.filter(user=self.request.user).values("siae")
 
-        return queryset.filter(job_application__to_siae__in=memberships).order_by("-created_at")
+        return queryset.filter(job_application__to_siae__in=memberships).order_by("-created_at", "-updated_at")
