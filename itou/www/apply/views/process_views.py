@@ -45,17 +45,21 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     queryset = (
         JobApplication.objects.siae_member_required(request.user)
         .not_archived()
-        .select_related("job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval")
+        .select_related(
+            "job_seeker",
+            "eligibility_diagnosis",
+            "sender",
+            "sender_siae",
+            "sender_prescriber_organization",
+            "to_siae",
+            "approval",
+        )
         .prefetch_related("selected_jobs__appellation")
     )
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
     cancellation_days = JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
-
-    eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-        job_application.job_seeker, for_siae=job_application.to_siae
-    )
 
     approval_can_be_suspended_by_siae = job_application.approval and job_application.approval.can_be_suspended_by_siae(
         job_application.to_siae
@@ -70,7 +74,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
         "approval_can_be_suspended_by_siae": approval_can_be_suspended_by_siae,
         "approval_can_be_prolonged_by_siae": approval_can_be_prolonged_by_siae,
         "cancellation_days": cancellation_days,
-        "eligibility_diagnosis": eligibility_diagnosis,
+        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "job_application": job_application,
         "transition_logs": transition_logs,
         "back_url": back_url,
@@ -89,7 +93,13 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     job_applications = get_all_available_job_applications_as_prescriber(request)
 
     queryset = job_applications.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval"
+        "job_seeker",
+        "eligibility_diagnosis",
+        "sender",
+        "sender_siae",
+        "sender_prescriber_organization",
+        "to_siae",
+        "approval",
     ).prefetch_related("selected_jobs__appellation")
     job_application = get_object_or_404(queryset, id=job_application_id)
 
@@ -103,13 +113,11 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     else:
         before_date = datetime.datetime.now()
 
-    eligibility_diagnosis = EligibilityDiagnosis.objects.last_before(job_application.job_seeker, before_date)
-
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_prescriber"))
 
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
-        "eligibility_diagnosis": eligibility_diagnosis,
+        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "job_application": job_application,
         "transition_logs": transition_logs,
         "back_url": back_url,

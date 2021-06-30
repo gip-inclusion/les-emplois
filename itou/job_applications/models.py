@@ -295,6 +295,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # (required for SIAEs subject to eligibility rules).
     # It is already linked to the job seeker but this double link is added
     # to easily find out which one was used for a given job application.
+    # Use `self.get_eligibility_diagnosis()` to handle business rules.
     eligibility_diagnosis = models.ForeignKey(
         "eligibility.EligibilityDiagnosis",
         verbose_name="Diagnostic d'éligibilité",
@@ -547,6 +548,18 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 kind = "Prescripteur habilité"
         return kind
 
+    def get_eligibility_diagnosis(self):
+        """
+        Returns the eligibility diagnosis linked to this job application or None.
+        """
+        if not self.to_siae.is_subject_to_eligibility_rules:
+            return None
+        if self.eligibility_diagnosis:
+            return self.eligibility_diagnosis
+        # As long as the job application has not been accepted, diagnosis-related
+        # business rules may still prioritize one diagnosis over another.
+        return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_siae)
+
     def get_resume_link(self):
         if self.resume_link:
             return self.resume_link
@@ -573,12 +586,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         emails = [self.email_accept_for_job_seeker]
         if self.is_sent_by_proxy:
             emails.append(self.email_accept_for_proxy)
-
-        # Link to the job seeker's eligibility diagnosis.
-        if self.to_siae.is_subject_to_eligibility_rules:
-            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                self.job_seeker, for_siae=self.to_siae
-            )
 
         # Approval issuance logic.
         if not self.hiring_without_approval and self.to_siae.is_subject_to_eligibility_rules:
@@ -616,6 +623,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 emails.append(self.email_manual_approval_delivery_required_notification(accepted_by))
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
+
+        # Link to the job seeker's eligibility diagnosis.
+        if self.to_siae.is_subject_to_eligibility_rules:
+            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                self.job_seeker, for_siae=self.to_siae
+            )
+            if not self.eligibility_diagnosis and self.approval and self.approval.originates_from_itou:
+                logger.error("An eligibility diagnosis should've been found for job application %s", self.pk)
 
         # Send emails in batch.
         connection = mail.get_connection()

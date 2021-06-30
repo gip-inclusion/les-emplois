@@ -93,28 +93,6 @@ class EligibilityDiagnosisManager(models.Manager):
 
         return last
 
-    def last_before(self, job_seeker, before, for_siae=None):
-        """
-        Retrieves the given job seeker's last diagnosis (valid or expired)
-        before the given date or None.
-
-        If the `for_siae` argument is passed, it means that we are looking for
-        a diagnosis from an employer perspective. The scope is restricted to
-        avoid showing diagnoses made by other employers.
-
-        A diagnosis made by a prescriber takes precedence even when an employer
-        diagnosis already exists.
-        """
-
-        last = None
-        query = self.for_job_seeker(job_seeker).before(before).order_by("created_at")
-
-        last = query.by_author_kind_prescriber().last()
-        if not last and for_siae:
-            last = query.authored_by_siae(for_siae).last()
-
-        return last
-
 
 class EligibilityDiagnosis(models.Model):
     """

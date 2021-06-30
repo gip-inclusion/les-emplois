@@ -68,6 +68,10 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
 
 class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
+    email = forms.EmailField(
+        label="E-mail personnel du candidat", widget=forms.TextInput(attrs={"autocomplete": "off"})
+    )
+
     def __init__(self, proxy_user, *args, **kwargs):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
@@ -105,10 +109,7 @@ class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
         ]
-        help_texts = {
-            "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
-            "phone": "Par exemple 0610203040.",
-        }
+        help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.", "phone": "Par exemple 0610203040."}
 
     def clean_email(self):
         email = self.cleaned_data["email"]

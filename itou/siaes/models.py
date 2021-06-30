@@ -213,8 +213,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     objects = models.Manager.from_queryset(SiaeQuerySet)()
 
     class Meta:
-        verbose_name = "Structure d'insertion par l'activité économique"
-        verbose_name_plural = "Structures d'insertion par l'activité économique"
+        verbose_name = "Entreprise"
+        verbose_name_plural = "Entreprises"
         unique_together = ("siret", "kind")
 
     def __str__(self):

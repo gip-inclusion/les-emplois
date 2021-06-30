@@ -11,7 +11,6 @@ from django.utils.http import urlencode
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
 from itou.approvals.models import Approval, Prolongation, Suspension
-from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
@@ -26,11 +25,13 @@ from .pdfshift_mock import BITES_FILE
 class TestDownloadApprovalAsPDF(TestCase):
     @patch("itou.utils.pdf.HtmlToPdf.html_to_bytes", return_value=BITES_FILE)
     def test_download_job_app_approval_as_pdf(self, *args, **kwargs):
+        """
+        Given an existing job application with a PASS IAE and a diagnosis,
+        when trying to download it as PDF, then it works.
+        """
         job_application = JobApplicationWithApprovalFactory()
-        siae_member = job_application.to_siae.members.first()
-        job_seeker = job_application.job_seeker
-        EligibilityDiagnosisFactory(job_seeker=job_seeker)
 
+        siae_member = job_application.to_siae.members.first()
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(
@@ -42,34 +43,34 @@ class TestDownloadApprovalAsPDF(TestCase):
 
     def test_impossible_download_when_approval_is_missing(self, *args, **kwargs):
         """
-        The button to download an approval is show only when
-        certain conditions are met.
-        Nevertheless, don't trust the client. Make sure we raise an error
-        if the same conditions are not met in this view.
+        Given an existing job application without a PASS IAE,
+        when trying to download it as PDF, then a 404 should be raised.
         """
-        # Create a job application without an approval.
         job_application = JobApplicationFactory()
-        siae_member = job_application.to_siae.members.first()
-        job_seeker = job_application.job_seeker
-        EligibilityDiagnosisFactory(job_seeker=job_seeker)
 
+        siae_member = job_application.to_siae.members.first()
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
+
         response = self.client.get(
             reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk})
         )
+        # `can_download_approval_as_pdf` should fail and trigger a 404.
         self.assertEqual(response.status_code, 404)
 
     @patch("itou.utils.pdf.HtmlToPdf.html_to_bytes", return_value=BITES_FILE)
-    @patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", False)
     def test_download_approval_even_if_diagnosis_is_missing(self, *args, **kwargs):
-        job_application = JobApplicationWithApprovalFactory()
-        siae_member = job_application.to_siae.members.first()
+        """
+        Given an existing job application with an approval delivered by Pôle emploi
+        but no diagnosis, when trying to download it as PDF, then it works.
+        """
 
         # An approval has been delivered but it does not come from Itou.
         # Therefore, the linked diagnosis exists but is not in our database.
-        # Don't create a diagnosis.
-        # EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        job_application = JobApplicationWithApprovalFactory(
+            eligibility_diagnosis=None, approval__number="625741810181"
+        )
 
+        siae_member = job_application.to_siae.members.first()
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(
@@ -79,15 +80,14 @@ class TestDownloadApprovalAsPDF(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("pdf", response.get("Content-Type"))
 
-    @patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", True)
     def test_no_download_if_missing_diagnosis(self, *args, **kwargs):
-        job_application = JobApplicationWithApprovalFactory()
+        """
+        Given an existing job application with an approval delivered by Itou but no
+        diagnosis, when trying to download it as PDF, then it raises an error.
+        """
+        job_application = JobApplicationWithApprovalFactory(eligibility_diagnosis=None)
+
         siae_member = job_application.to_siae.members.first()
-
-        # An approval has been delivered by Itou but there is no diagnosis.
-        # It should raise an error.
-        # EligibilityDiagnosisFactory(job_seeker=job_seeker)
-
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
         with self.assertRaises(ObjectDoesNotExist):
