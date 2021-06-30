@@ -9,18 +9,18 @@ from itou.siaes.models import SiaeMembership
 
 class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    # Fiches salarié
+    # API fiches salarié
 
-    Cette API retourne la liste des fiches salarié :
+    Cette API retourne la liste des fiches salarié saisies par les SIAE :
 
-    - dans l'état `PROCESSED`
+    - dans l'état `PROCESSED` (par défaut)
     - pour toutes les embauches / candidatures des SIAE liées au token d'identification
     - classées par date de création et date de mise à jour (plus récent au plus ancien)
 
     Il est également possible d'obtenir le détail d'une fiche salarié par son
     identifiant (dans les mêmes conditions d'autorisation que pour la liste complète)
 
-    ## Permissions
+    # Permissions
 
     L'utilisation externe de cette API nécessite l'utilisation d'un token d'autorisation
     (voir le endpoint `auth-token`).
