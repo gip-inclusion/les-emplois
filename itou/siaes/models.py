@@ -20,9 +20,8 @@ from itou.utils.validators import validate_af_number, validate_naf, validate_sir
 class SiaeQuerySet(models.QuerySet):
     @property
     def active_lookup(self):
-        # Using a join is expensive.
-        # Instead of Q(convention__is_active), which would use a join,
-        # prefer a subquery.
+        # Prefer a sub query to a join for performance reasons.
+        # See `self.with_count_recent_received_job_apps`.
         has_active_convention = Exists(SiaeConvention.objects.filter(id=OuterRef("convention_id"), is_active=True))
         return (
             # GEIQ, EA, EATT, ACIPHC... have no convention logic and thus are always active.
@@ -41,6 +40,8 @@ class SiaeQuerySet(models.QuerySet):
     def with_has_convention_in_grace_period(self):
         now = timezone.now()
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+        # Prefer a sub query to a join for performance reasons.
+        # See `self.with_count_recent_received_job_apps`.
         has_convention_in_grace_period = Exists(
             SiaeConvention.objects.filter(id=OuterRef("convention_id"), deactivated_at__gte=now - grace_period)
         )
@@ -76,17 +77,18 @@ class SiaeQuerySet(models.QuerySet):
         """
         Count the number of recently received job applications.
 
-        The count with a `Subquery` instead of a `join` is way more performant here.
+        The count with a `Subquery` instead of a `join` is way more efficient here.
         We generate this SQL using the Django ORM:
 
         SELECT
             *,
-            (
-                SELECT Count(id)
-                FROM job_applications_jobapplication AS ja
-                WHERE ja.to_siae_id = siaes_siae.id AND ja.created_at >= '2021-06-08 07:51:23.339137 + 00:00'
-            ) AS count_recent_received_job_apps
-        FROM siaes_siae;
+            COALESCE((
+                SELECT COUNT(U0."id") AS "count"
+                FROM "job_applications_jobapplication" U0
+                WHERE (U0."created_at" >= 2021-06-10 08:45:51.998244 + 00:00 AND U0."to_siae_id" = "siaes_siae"."id")
+                GROUP BY U0."to_siae_id"), 0) AS "count_recent_received_job_apps"
+        FROM
+            "siaes_siae"
 
         See https://github.com/martsberger/django-sql-utils
         """
@@ -99,8 +101,7 @@ class SiaeQuerySet(models.QuerySet):
                     created_at__gte=timezone.now()
                     - timezone.timedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD),
                 )
-                .order_by()
-                .values("to_siae")
+                .values("to_siae")  # group job apps by to_siae
                 .annotate(count=Count("pk"))
                 .values("count")
             ),
@@ -110,10 +111,14 @@ class SiaeQuerySet(models.QuerySet):
         return self.annotate(count_recent_received_job_apps=Coalesce(sub_query, 0))
 
     def with_count_active_job_descriptions(self):
+        """
+        Count the number of active job descriptions by SIAE.
+        """
+        # A subquery is way more efficient here than a join.
+        # See `self.with_count_recent_received_job_apps`.
         sub_query = Subquery(
             (
                 SiaeJobDescription.objects.filter(is_active=True, siae=OuterRef("id"))
-                .order_by()
                 .values("siae")
                 .annotate(count=Count("pk"))
                 .values("count")
@@ -123,13 +128,28 @@ class SiaeQuerySet(models.QuerySet):
         return self.annotate(count_active_job_descriptions=Coalesce(sub_query, 0))
 
     def with_job_app_score(self):
+        """
+        Employers search results boost SIAE which did not receive enough job applications
+        compared to their total job descriptions.
+        To do so, the following score is computed:
+        ** (total of recent job applications) / (total of active job descriptions) **
+        """
+        # Transform integer into a float to avoid any weird side effect.
+        # See self.with_count_recent_received_job_apps()
         count_recent_received_job_apps = Cast("count_recent_received_job_apps", output_field=models.FloatField())
-        count_active_job_descriptions = Cast("count_active_job_descriptions", output_field=models.FloatField())
+
+        # Check if a job description exists before computing the score.
         has_active_job_desc = Exists(SiaeJobDescription.objects.filter(siae=OuterRef("pk"), is_active=True))
 
+        # Transform integer into a float to avoid any weird side effect.
+        # See self.with_count_active_job_descriptions
+        count_active_job_descriptions = Cast("count_active_job_descriptions", output_field=models.FloatField())
+
+        # Score computing.
         get_score = Cast(
             count_recent_received_job_apps / count_active_job_descriptions, output_field=models.FloatField()
         )
+
         return (
             self.with_count_recent_received_job_apps()
             .with_count_active_job_descriptions()
@@ -142,6 +162,8 @@ class SiaeQuerySet(models.QuerySet):
         )
 
     def with_has_active_members(self):
+        # Prefer a sub query to a join for performance reasons.
+        # See `self.with_count_recent_received_job_apps`.
         return self.annotate(
             has_active_members=Exists(SiaeMembership.objects.filter(siae=OuterRef("pk"), is_active=True))
         )
@@ -572,6 +594,12 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
         if filters:
             filters = Q(**filters)
 
+        # For performance reasons, we may decide to replace this join by a sub query one day.
+        # This would be a delicate operation as selected_jobs are stored in an intermediary table.
+        # Sub queries referencing a unique parent are understandable but when it comes to a "couple",
+        # it may be easier to just write raw SQL. But then you lose the ORM benefits.
+        # Make sure it's worth the hassle.
+        # See `SiaeQuerySet.with_count_recent_received_job_apps`
         return self.annotate(
             job_applications_count=Count(
                 "jobapplication",
