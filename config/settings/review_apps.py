@@ -27,3 +27,13 @@ EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
 
 SHOW_TEST_ACCOUNTS_BANNER = True
+
+# DJANGO REST FRAMEWORK
+# ------------------------------------------------------------------------------
+
+# Adding DRF Browseable API (via renderer)
+if REST_FRAMEWORK:
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ]
