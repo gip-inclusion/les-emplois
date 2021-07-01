@@ -633,7 +633,7 @@ class SiaeJobDescription(models.Model):
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name="job_description_through")
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
-    is_active = models.BooleanField(verbose_name="Recrutement ouvert", default=True, db_index=True)
+    is_active = models.BooleanField(verbose_name="Recrutement ouvert", default=True)
     custom_name = models.CharField(verbose_name="Nom personnalisé", blank=True, max_length=255)
     description = models.TextField(verbose_name="Description", blank=True)
     # TODO: this will be used to order job description in UI.
