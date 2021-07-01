@@ -1,10 +1,7 @@
-import datetime
-import random
-
 from django.conf import settings
 from django.contrib.gis.measure import D
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, OuterRef, Prefetch, Q, Subquery, Value, When
+from django.db.models import BooleanField, Case, Count, Exists, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
 from django.utils import timezone
