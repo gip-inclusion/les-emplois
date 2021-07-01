@@ -534,7 +534,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     # Response renderers
-    # See dev template for an additional renderder for DRF browseable API
+    # See DEV template for an additional rendeder for DRF browseable API
     # https://www.django-rest-framework.org/api-guide/renderers/#custom-renderers
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",

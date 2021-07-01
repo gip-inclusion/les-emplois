@@ -29,7 +29,7 @@ class EmployeeRecordAPIPermission(IsAuthenticated):
         to the "instance" or object level (fetching a single employee record by ID):
         list level permissions are checked every time if `has_object_permission` is not implemented
         """
-        # Check wether user has done "basic" platform identification
+        # Check whether user has done "basic" platform identification
         is_authenticated = super().has_permission(request, view)
 
         if not is_authenticated:
