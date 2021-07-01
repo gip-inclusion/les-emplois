@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 from django.contrib.gis.db.models.functions import Distance
-from django.db.models import Case, Count, IntegerField, Q, Value, When
 from django.shortcuts import render
 
 from itou.prescribers.models import PrescriberOrganization
