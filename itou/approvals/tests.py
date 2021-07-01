@@ -27,7 +27,7 @@ from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNo
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory, PrescriberOrganizationFactory
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
@@ -1181,16 +1181,22 @@ class ProlongationModelTest(TestCase):
         Given an existing prolongation, when setting a wrong `start_at`
         then a call to `clean()` is rejected.
         """
-        start_at = datetime.date.today()
+
+        approval = ApprovalFactory()
+        siae = SiaeWithMembershipFactory()
+
+        start_at = approval.end_at - relativedelta(days=2)
         end_at = start_at + relativedelta(months=1)
-        prolongation = ProlongationFactory(start_at=start_at, end_at=end_at)
-        # Set a `prolongation.start_at` different from `prolongation.approval.start_at`.
-        prolongation.start_at -= relativedelta(days=2)
+
+        # We need an object without `pk` to test `clean()`, so we use `build`
+        # which provides a local object without saving it to the database.
+        prolongation = ProlongationFactory.build(
+            start_at=start_at, end_at=end_at, approval=approval, declared_by_siae=siae
+        )
+
         with self.assertRaises(ValidationError) as error:
             prolongation.clean()
-        self.assertIn(
-            "La date de début ne peut pas être différente de la date de fin du PASS IAE", error.exception.message
-        )
+        self.assertIn("La date de début doit être la même que la date de fin du PASS IAE", error.exception.message)
 
     def test_get_start_at(self):
 

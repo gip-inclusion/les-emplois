@@ -212,6 +212,10 @@ class ProlongationAdmin(admin.ModelAdmin):
     is_in_progress.boolean = True
     is_in_progress.short_description = "En cours"
 
+    def get_queryset(self, request):
+        # Speed up the list display view by fecthing related objects.
+        return super().get_queryset(request).select_related("approval", "declared_by", "validated_by")
+
     def save_model(self, request, obj, form, change):
         if change:
             obj.updated_by = request.user
