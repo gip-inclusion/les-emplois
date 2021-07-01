@@ -92,13 +92,13 @@ class EmployeeRecordAPIPermissionsTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         response = self.client.get(ENDPOINT_URL, format="json")
 
-        # Result list found but empty
+        # Result list exists, but user is not member of any SIAE
         self.assertEqual(response.status_code, 403)
 
     def test_permission_ok_with_session(self):
         """
         A session authentication is valid to use the API (same security level as token)
-        => Allows testing in dev context
+        => Allows testing in DEV context
         """
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
 
@@ -132,6 +132,9 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         siae = job_application.to_siae
         user = siae.members.first()
 
+        # Using session auth (same as token but less steps)
+        self.client.login(username=user.username, password=DEFAULT_PASSWORD)
+
         # Get list without filtering by status (PROCESSED)
         # note: there is no way to create a processed employee record
         # (and this is perfectly normal)
@@ -139,11 +142,17 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         employee_record_processed.update_as_ready()
         employee_record_processed.update_as_sent("RIAE_FS_20210410130000.json", 1)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+
+        # There should be no result at this point
+        response = self.client.get(ENDPOINT_URL, format="json")
+
+        self.assertEquals(response.status_code, 200)
+
+        result = response.json()
+
+        self.assertEqual(len(result.get("results")), 0)
+
         employee_record_processed.update_as_accepted(process_code, process_message, "{}")
-
-        # Using session auth (same as token but less steps)
-        self.client.login(username=user.username, password=DEFAULT_PASSWORD)
-
         response = self.client.get(ENDPOINT_URL, format="json")
 
         self.assertEquals(response.status_code, 200)
@@ -157,8 +166,17 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=siae)
         employee_record_sent = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_sent.update_as_ready()
-        employee_record_sent.update_as_sent("RIAE_FS_20210410130001.json", 1)
 
+        # There should be no result at this point
+        response = self.client.get(ENDPOINT_URL + "?status=SENT", format="json")
+
+        self.assertEquals(response.status_code, 200)
+
+        result = response.json()
+
+        self.assertEqual(len(result.get("results")), 0)
+
+        employee_record_sent.update_as_sent("RIAE_FS_20210410130001.json", 1)
         response = self.client.get(ENDPOINT_URL + "?status=SENT", format="json")
 
         self.assertEquals(response.status_code, 200)
@@ -173,6 +191,15 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         employee_record_rejected = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_rejected.update_as_ready()
         employee_record_rejected.update_as_sent("RIAE_FS_20210410130002.json", 1)
+
+        # There should be no result at this point
+        response = self.client.get(ENDPOINT_URL + "?status=REJECTED", format="json")
+        self.assertEquals(response.status_code, 200)
+
+        result = response.json()
+
+        self.assertEqual(len(result.get("results")), 0)
+
         err_code, err_message = "12", "JSON Invalide"
         employee_record_rejected.update_as_rejected(err_code, err_message)
 
