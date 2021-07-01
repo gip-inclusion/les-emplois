@@ -1,10 +1,8 @@
-import datetime
-import random
-
 from django.conf import settings
 from django.contrib.gis.measure import D
 from django.db import models
-from django.db.models import BooleanField, Case, Count, F, Prefetch, Q, When
+from django.db.models import BooleanField, Case, Count, Exists, OuterRef, Prefetch, Q, Subquery, When
+from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -19,6 +17,9 @@ from itou.utils.validators import validate_af_number, validate_naf, validate_sir
 class SiaeQuerySet(models.QuerySet):
     @property
     def active_lookup(self):
+        # Prefer a sub query to a join for performance reasons.
+        # See `self.with_count_recent_received_job_apps`.
+        has_active_convention = Exists(SiaeConvention.objects.filter(id=OuterRef("convention_id"), is_active=True))
         return (
             # GEIQ, EA, EATT, ACIPHC... have no convention logic and thus are always active.
             # `~` means NOT, similarly to dataframes.
@@ -30,19 +31,27 @@ class SiaeQuerySet(models.QuerySet):
             | Q(source=Siae.SOURCE_STAFF_CREATED)
             # ASP source siaes and user created siaes are active if and only
             # if they have an active convention.
-            | Q(convention__is_active=True)
+            | has_active_convention
         )
 
-    def active(self):
-        return self.select_related("convention").filter(self.active_lookup)
-
-    def active_or_in_grace_period(self):
+    def with_has_convention_in_grace_period(self):
         now = timezone.now()
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
-        return self.select_related("convention").filter(
+        # Prefer a sub query to a join for performance reasons.
+        # See `self.with_count_recent_received_job_apps`.
+        has_convention_in_grace_period = Exists(
+            SiaeConvention.objects.filter(id=OuterRef("convention_id"), deactivated_at__gte=now - grace_period)
+        )
+        return self.annotate(has_convention_in_grace_period=has_convention_in_grace_period)
+
+    def active(self):
+        return self.filter(self.active_lookup)
+
+    def active_or_in_grace_period(self):
+        return self.with_has_convention_in_grace_period().filter(
             self.active_lookup
             # Include siaes experiencing their grace period.
-            | Q(convention__deactivated_at__gte=now - grace_period)
+            | Q(has_convention_in_grace_period=True)
         )
 
     def within(self, point, distance_km):
@@ -61,38 +70,100 @@ class SiaeQuerySet(models.QuerySet):
             return self
         return self.filter(members=user, members__is_active=True)
 
-    def add_shuffled_rank(self):
+    def with_count_recent_received_job_apps(self):
         """
-        Add a shuffled rank using a determistic seed which changes every day,
-        which can then later be used to shuffle results.
+        Count the number of recently received job applications.
 
-        We may later implement a more rigorous shuffling but this will
-        require setting up a daily cronjob to rebuild the shuffling index
-        with new random values.
+        The count with a `Subquery` instead of a `join` is way more efficient here.
+        We generate this SQL using the Django ORM:
 
-        Note that we have about 3K siaes.
+        SELECT
+            *,
+            COALESCE((
+                SELECT COUNT(U0."id") AS "count"
+                FROM "job_applications_jobapplication" U0
+                WHERE (U0."created_at" >= 2021-06-10 08:45:51.998244 + 00:00 AND U0."to_siae_id" = "siaes_siae"."id")
+                GROUP BY U0."to_siae_id"), 0) AS "count_recent_received_job_apps"
+        FROM
+            "siaes_siae"
 
-        We produce a large pseudo-random integer on the fly from `id`
-        with the static PG expression `(A+id)*(B+id)`.
-
-        It is important that this large integer is far from zero to avoid
-        that id=1,2,3 always stay on the top of the list.
-        Thus we choose rather large A and B.
-
-        We then take a modulo which changes everyday.
+        See https://github.com/martsberger/django-sql-utils
         """
-        # Seed changes every day at midnight.
-        random.seed(datetime.date.today())
-        # a*b should always be larger than the largest possible value of c,
-        # so that id=1,2,3 do not always stay on top of the list.
-        # ( 1K * 1K = 1M > 10K )
-        a = random.randint(1000, 10000)
-        b = random.randint(1000, 10000)
-        # As we generally have about 100 results to shuffle, we choose c larger
-        # than this so as to avoid collisions as much as possible.
-        c = random.randint(1000, 10000)
-        shuffle_expression = (a + F("id")) * (b + F("id")) % c
-        return self.annotate(shuffled_rank=shuffle_expression)
+        from itou.job_applications.models import JobApplication
+
+        sub_query = Subquery(
+            (
+                JobApplication.objects.filter(
+                    to_siae=OuterRef("id"),
+                    created_at__gte=timezone.now()
+                    - timezone.timedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD),
+                )
+                .values("to_siae")  # group job apps by to_siae
+                .annotate(count=Count("pk"))
+                .values("count")
+            ),
+            output_field=models.IntegerField(),
+        )
+        # `Coalesce` will return the first not null value or zero.
+        return self.annotate(count_recent_received_job_apps=Coalesce(sub_query, 0))
+
+    def with_count_active_job_descriptions(self):
+        """
+        Count the number of active job descriptions by SIAE.
+        """
+        # A subquery is way more efficient here than a join.
+        # See `self.with_count_recent_received_job_apps`.
+        sub_query = Subquery(
+            (
+                SiaeJobDescription.objects.filter(is_active=True, siae=OuterRef("id"))
+                .values("siae")
+                .annotate(count=Count("pk"))
+                .values("count")
+            ),
+            output_field=models.IntegerField(),
+        )
+        return self.annotate(count_active_job_descriptions=Coalesce(sub_query, 0))
+
+    def with_job_app_score(self):
+        """
+        Employers search results boost SIAE which did not receive enough job applications
+        compared to their total job descriptions.
+        To do so, the following score is computed:
+        ** (total of recent job applications) / (total of active job descriptions) **
+        """
+        # Transform integer into a float to avoid any weird side effect.
+        # See self.with_count_recent_received_job_apps()
+        count_recent_received_job_apps = Cast("count_recent_received_job_apps", output_field=models.FloatField())
+
+        # Check if a job description exists before computing the score.
+        has_active_job_desc = Exists(SiaeJobDescription.objects.filter(siae=OuterRef("pk"), is_active=True))
+
+        # Transform integer into a float to avoid any weird side effect.
+        # See self.with_count_active_job_descriptions
+        count_active_job_descriptions = Cast("count_active_job_descriptions", output_field=models.FloatField())
+
+        # Score computing.
+        get_score = Cast(
+            count_recent_received_job_apps / count_active_job_descriptions, output_field=models.FloatField()
+        )
+
+        return (
+            self.with_count_recent_received_job_apps()
+            .with_count_active_job_descriptions()
+            .annotate(
+                job_app_score=Case(
+                    When(has_active_job_desc, then=get_score),
+                    default=None,
+                )
+            )
+        )
+
+    def with_has_active_members(self):
+        # Prefer a sub query to a join for performance reasons.
+        # See `self.with_count_recent_received_job_apps`.
+        return self.annotate(
+            has_active_members=Exists(SiaeMembership.objects.filter(siae=OuterRef("pk"), is_active=True))
+        )
 
 
 class Siae(AddressMixin):  # Do not forget the mixin!
@@ -520,6 +591,12 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
         if filters:
             filters = Q(**filters)
 
+        # For performance reasons, we may decide to replace this join by a sub query one day.
+        # This would be a delicate operation as selected_jobs are stored in an intermediary table.
+        # Sub queries referencing a unique parent are understandable but when it comes to a "couple",
+        # it may be easier to just write raw SQL. But then you lose the ORM benefits.
+        # Make sure it's worth the hassle.
+        # See `SiaeQuerySet.with_count_recent_received_job_apps`
         return self.annotate(
             job_applications_count=Count(
                 "jobapplication",
