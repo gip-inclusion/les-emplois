@@ -82,5 +82,6 @@ boto3==1.17.53  # https://github.com/boto/boto3
 # ------------------------------------------------------------------------------
 # For automatic OpenAPI schema generation
 uritemplate==3.0.1  # https://github.com/python-hyper/uritemplate  
+pyyaml==5.4.1  # https://github.com/yaml/pyyaml
 
 
