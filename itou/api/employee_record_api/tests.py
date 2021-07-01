@@ -14,14 +14,14 @@ class DummyEmployeeRecordAPITest(APITestCase):
         # Create enough fake job applications so that the dummy endpoint returns the first 25 of them.
         JobApplicationFactory.create_batch(30)
 
-        url = reverse("api:token-auth")
+        url = reverse("v1:token-auth")
         data = {"username": user.email, "password": DEFAULT_PASSWORD}
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, 200)
 
         token = response.json()["token"]
 
-        url = reverse("api:dummy-employee-records")
+        url = reverse("v1:dummy-employee-records-list")
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, 200)
@@ -38,3 +38,11 @@ class DummyEmployeeRecordAPITest(APITestCase):
         self.assertIn("passIae", employee_record_json["personnePhysique"])
         self.assertIn("adresse", employee_record_json)
         self.assertIn("situationSalarie", employee_record_json)
+
+
+class EmployeeRecordAPITest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_permissions(self):
+        pass
