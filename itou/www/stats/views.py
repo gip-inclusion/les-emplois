@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
+from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.apis.metabase import metabase_embedded_url
 from itou.utils.perms.decorators import can_view_stats_vip
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -78,9 +79,10 @@ def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
     current_org = get_current_org_or_404(request)
     if not request.user.can_view_stats_cd(current_org=current_org):
         raise PermissionDenied
+    department = current_org.department
     context = {
-        "iframeurl": metabase_embedded_url(settings.CD_STATS_DASHBOARD_ID, department=current_org.department),
-        "page_title": "Données de mon département",
+        "iframeurl": metabase_embedded_url(settings.CD_STATS_DASHBOARD_ID, department=department),
+        "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
