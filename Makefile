@@ -159,6 +159,9 @@ postgres_backup_restore:
 	docker-compose exec postgres restore $(FILE) && \
 	docker-compose stop
 
+postgres_restore_latest_backup: ./scripts/import-latest-db-backup.sh
+	./scripts/import-latest-db-backup.sh
+
 postgres_backups_clean:
 	docker-compose exec postgres clean
 
