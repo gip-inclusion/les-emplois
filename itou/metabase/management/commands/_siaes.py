@@ -43,6 +43,12 @@ def get_siae_last_month_hirings(siae):
 
 TABLE_COLUMNS = [
     {"name": "id", "type": "integer", "comment": "ID de la structure", "fn": lambda o: o.id},
+    {
+        "name": "id_asp",
+        "type": "integer",
+        "comment": "ID de la structure ASP correspondante",
+        "fn": lambda o: o.convention.asp_id if o.convention else None,
+    },
     {"name": "nom", "type": "varchar", "comment": "Nom de la structure", "fn": lambda o: o.display_name},
     {
         "name": "description",
