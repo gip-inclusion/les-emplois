@@ -21,6 +21,7 @@ from itou.asp.models import (
     LaneType,
     RSAAllocation,
 )
+from itou.prescribers.models import PrescriberOrganization
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.format import format_address
 from itou.utils.address.models import AddressMixin
@@ -261,6 +262,29 @@ class User(AbstractUser, AddressMixin):
         because not member of any SIAE.
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
+
+    def can_view_stats_dashboard_widget(self, current_org):
+        """
+        Whether a stats section should be displayed on the user's dashboard.
+        """
+        return self.can_view_stats_vip or self.can_view_stats_cd(current_org=current_org)
+
+    @property
+    def can_view_stats_vip(self):
+        return self.is_stats_vip
+
+    def can_view_stats_cd(self, current_org):
+        """
+        CD as in "Conseil Départemental".
+        """
+        return (
+            self.is_prescriber
+            and current_org is not None
+            and current_org.kind == PrescriberOrganization.Kind.DEPT
+            and current_org.is_authorized
+            and current_org.authorization_status == PrescriberOrganization.AuthorizationStatus.VALIDATED
+            and current_org.has_admin(self)
+        )
 
     @cached_property
     def last_accepted_job_application(self):
