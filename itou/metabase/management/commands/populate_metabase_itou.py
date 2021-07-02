@@ -229,6 +229,7 @@ class Command(BaseCommand):
             Siae.objects.active()
             .prefetch_related(
                 "members",
+                "convention",
                 "siaemembership_set",
                 "job_applications_received",
                 "job_applications_received__logs",
