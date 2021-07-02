@@ -59,7 +59,7 @@ def stats_vip(request, template_name=_STATS_HTML_TEMPLATE):
     """
     context = {
         "iframeurl": metabase_embedded_url(settings.VIP_STATS_DASHBOARD_ID),
-        "page_title": "Données par territoire",
+        "page_title": "Données des territoires",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
