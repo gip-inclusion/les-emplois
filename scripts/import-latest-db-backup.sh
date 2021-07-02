@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# PLEASE RUN THIS SCRIPT WITH:
+# make postgres_restore_latest_backup
+
 source .env
 
 if [ -z $PATH_TO_ITOU_BACKUPS ]; then
@@ -7,7 +10,7 @@ if [ -z $PATH_TO_ITOU_BACKUPS ]; then
   exit
 fi
 
-# # Get the latest backup filename and path
+# Get the latest backup filename and path
 ITOU_DB_BACKUP_NAME=$(ls $PATH_TO_ITOU_BACKUPS/backups | tail -n1)
 ITOU_DB_BACKUP_PATH=$PATH_TO_ITOU_BACKUPS/backups/$ITOU_DB_BACKUP_NAME
 
