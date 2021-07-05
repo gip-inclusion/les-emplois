@@ -1,7 +1,5 @@
 from rest_framework.permissions import IsAuthenticated
 
-from itou.siaes.models import SiaeMembership
-
 
 # Custom permission handler for employee record API
 
@@ -37,9 +35,15 @@ class EmployeeRecordAPIPermission(IsAuthenticated):
             return False
 
         # Now that we know that user is authenticated,
-        # we must assert they are members of one or more SIAE
+        # we must assert they are:
+        # - members of one or more active SIAE
+        # - admin
         # If a SIAE is not eligible, there will be no result available (defensive enough)
-        has_memberships = SiaeMembership.objects.filter(user=request.user).values("siae").count() > 0
+        has_memberships = (
+            request.user.siae_set.filter(siaemembership__is_active=True, siaemembership__is_siae_admin=True)
+            .active_or_in_grace_period()
+            .exists()
+        )
 
         # OK or 403
         return has_memberships
