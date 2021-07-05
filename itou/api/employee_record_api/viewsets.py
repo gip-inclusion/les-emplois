@@ -26,7 +26,7 @@ class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         """
         Return the same 25 job applications whatever the user.
         The DummyEmployeeRecordSerializer will replace these objects with raw randomized jsons.
-        25 is slightly more than the page size (50) so that pagination can be tested.
+        25 is slightly more than the default page size (20) so that pagination can be tested.
         Order by pk to solve pagination warning.
         """
         return JobApplication.objects.order_by("pk")[:25]
