@@ -9,10 +9,9 @@
  - Admin: filtrer les candidatures crées à partir d’un agrément pole emploi
  - Ajout d'un accès sécurisé pour les CD aux stats de leur département
  - Export régulier pour les comités technique d'animation (C.T.A.)
- - Fiches salarié : UI création et modification
  - Nouvelle page "Déclaration d'accessibilité"
  - Message de demande d’activation de JavaScript sur le formulaire d’upload de CV
- - Test de caracterisation test pour le comportement d’un agrément PE dont la date est dans le futur, et où on accepte la candidature maintenant
+ - Test de caracterisation pour le comportement d’un agrément PE dont la date est dans le futur, et où on accepte la candidature maintenant
  - Ajout d’une commande 'make deploy_prod'
  - Ajout d’un script de réimport de base de données
  - Génération d'un CSV à partir d'un script SQL
@@ -27,13 +26,13 @@
  - Respect des réactivations de convention par le support pendant 90 jours au lieu d'une semaine
  - Relier les diagnostics d'éligibilité aux candidatures
  - Corrections de typos (PASS IAE) et renommages divers:
-   - Renommage SIAE -> Entreprise dans l’administration
-   - Renommage Agrément -> Pass IAE dans l’administration
+   - Renommage "SIAE" devient "Entreprise" dans l’administration
+   - Renommage "Agrément" devient "Pass IAE" dans l’administration
    - Correction de l’étiquette "adresse email" lors de la création du candidat dans une candidature
 
 ### Supprimé
 
- - Désactivation des conventions sans AF 2021 [sera MEP le 28 juin]
+ - Désactivation des conventions sans AF 2021
  - Simplification du code lié aux diagnostics
  - Suppression des paramètres des `review apps` (au profit d’un Github Secret)
 
