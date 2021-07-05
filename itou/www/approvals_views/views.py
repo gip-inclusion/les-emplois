@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -248,7 +250,9 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
         return HttpResponseRedirect(application_details_url)
 
     # Otherwise, we display a search, and whenever it's possible, a matching PoleEmploiApproval
-    pe_approval = PoleEmploiApproval.objects.filter(number=str(request.GET.get("number"))).first()
+    pe_approval = PoleEmploiApproval.objects.filter(
+        number=str(request.GET.get("number")), start_at__lte=datetime.date.today()
+    ).first()
     search_form = PoleEmploiApprovalSearchForm(request.GET if pe_approval else None)
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
