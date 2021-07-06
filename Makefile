@@ -159,6 +159,11 @@ postgres_backup_restore:
 	docker-compose exec postgres restore $(FILE) && \
 	docker-compose stop
 
+# Download last prod backup and inject it locally.
+# ----------------------------------------------------
+# Prerequisites:
+# - Clone the git `itou-backups` project first and run `make build`. https://github.com/betagouv/itou-backups
+# - Copy .env.template and set correct values.
 postgres_restore_latest_backup: ./scripts/import-latest-db-backup.sh
 	./scripts/import-latest-db-backup.sh
 
