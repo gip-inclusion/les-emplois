@@ -30,7 +30,7 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     if not job_application.can_download_approval_as_pdf:
         raise Http404(("Nous sommes au regret de vous informer que vous ne pouvez pas télécharger cet agrément."))
 
-    diagnosis = job_application.eligibility_diagnosis
+    diagnosis = job_application.get_eligibility_diagnosis()
     diagnosis_author = None
     diagnosis_author_org = None
     diagnosis_author_org_name = None
