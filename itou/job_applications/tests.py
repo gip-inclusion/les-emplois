@@ -769,8 +769,7 @@ class JobApplicationWorkflowTest(TestCase):
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_in_the_future(self):
         """
         When a Pôle emploi approval already exists, it is reused.
-        Some Pole Emploi approvals have a starting date in the future, what should we do ?
-        Here is what happens today
+        Some Pole Emploi approvals have a starting date in the future, we discard them
         """
         hiring_start_at = datetime.date.today()
         start_at = datetime.date.today() + relativedelta(months=1)
@@ -786,9 +785,10 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING, hiring_start_at=hiring_start_at
         )
+        # the job application can be accepted but the approval is not attached to the PE approval
         job_application.accept(user=job_application.to_siae.members.first())
         self.assertIsNotNone(job_application.approval)
-        self.assertEqual(job_application.approval.number, pe_approval.number)
+        self.assertNotEqual(job_application.approval.number, pe_approval.number[0:12])
         pe_approval.refresh_from_db()
         # The job application is accepted
         self.assertTrue(job_application.state.is_accepted)
