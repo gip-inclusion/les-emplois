@@ -401,6 +401,22 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
 
+    def test_pe_approval_search_view_agrement_is_in_the_future(self):
+        """
+        The search for PE approval screen should display that there is no results
+        if a PE approval number was searched for but it is in the future
+        """
+        today = timezone.now().date()
+        self.pe_approval = PoleEmploiApprovalFactory(start_at=today + relativedelta(days=10))
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        params = urlencode({"number": self.pe_approval.number})
+        url = reverse("approvals:pe_approval_search")
+        url = f"{url}?{params}"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
+
     def test_pe_approval_search_view_has_matching_pass_iae(self):
         """
         The search for PE approval screen should redirect to the matching job application details screen if the

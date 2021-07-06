@@ -573,6 +573,37 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval_2)
         self.assertEqual(approvals_wrapper.merged_approvals[1], pe_approval_1)
 
+    def test_merge_approvals_discard_pe_approval_in_future(self):
+        """
+        We filter out the pole emploi approval with a starting date in the future
+        """
+        user = JobSeekerFactory()
+
+        start_at_in_the_future = timezone.now() + relativedelta(months=2)
+        end_at = start_at_in_the_future + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        # PoleEmploiApproval 1.
+        # It should be discarded since its starts in the future
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at_in_the_future,
+            end_at=end_at,
+        )
+
+        # PoleEmploiApproval 2.
+        start_at_in_the_past = timezone.now() - relativedelta(months=2)
+        pe_approval_2 = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at_in_the_past,
+            end_at=start_at_in_the_past + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS),
+        )
+
+        # Check that only one approval is taken into account
+        approvals_wrapper = ApprovalsWrapper(user)
+        self.assertEqual(len(approvals_wrapper.merged_approvals), 1)
+        self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval_2)
+
     def test_merge_approvals_pass_and_pe_valid(self):
         user = JobSeekerFactory()
         start_at = timezone.now() - relativedelta(months=2)
