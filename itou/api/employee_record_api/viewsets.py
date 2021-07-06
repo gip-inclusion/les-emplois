@@ -4,7 +4,6 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.serializers import EmployeeRecordSerializer
 from itou.job_applications.models import JobApplication
-from itou.siaes.models import SiaeMembership
 
 from .perms import EmployeeRecordAPIPermission
 from .serializers import DummyEmployeeRecordSerializer
@@ -86,9 +85,11 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         # There's something similar in context processors, but:
         # - ctx processors are called AFTER this
         # - and only when rendering a template
-        memberships = SiaeMembership.objects.filter(user=self.request.user).values("siae")
+        siaes = self.request.user.siae_set.filter(
+            siaemembership__is_active=True, siaemembership__is_siae_admin=True
+        ).active_or_in_grace_period()
 
-        return queryset.filter(job_application__to_siae__in=memberships).order_by("-created_at", "-updated_at")
+        return queryset.filter(job_application__to_siae__in=siaes).order_by("-created_at", "-updated_at")
 
     def _filter_by_query_params(self, request, queryset):
         """
