@@ -14,7 +14,7 @@
 
     {% csrf_token %}
 
-    {% bootstrap_form_errors form %}
+    {% bootstrap_form_errors form type="all" %}
 
     {% if redirect_field_value %}
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">

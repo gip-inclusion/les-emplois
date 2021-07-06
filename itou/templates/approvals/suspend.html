@@ -26,7 +26,7 @@
 
             {% csrf_token %}
 
-            {% bootstrap_form_errors form %}
+            {% bootstrap_form_errors form alert_error_type="all" %}
 
             {% for field in form %}
                 {# Display a warning message before the "reason" field. #}

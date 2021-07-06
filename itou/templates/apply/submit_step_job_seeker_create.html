@@ -14,7 +14,7 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form_errors form %}
+        {% bootstrap_form_errors form alert_error_type="all" %}
 
         {% bootstrap_field form.email %}
         {% bootstrap_field form.first_name %}

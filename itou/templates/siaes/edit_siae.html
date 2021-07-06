@@ -23,7 +23,7 @@
     </div>
 
     {% csrf_token %}
-
+    {% bootstrap_form_errors form type="all" %}
     {% bootstrap_label "Nom à afficher" label_title="a" label_for=form.brand.id  %}
     {% bootstrap_field form.brand show_label=False %}
 

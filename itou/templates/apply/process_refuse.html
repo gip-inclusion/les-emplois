@@ -13,7 +13,7 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form_errors form %}
+        {% bootstrap_form_errors form type="all" %}
 
         {# TODO: Fix incorrect rendering of form with radio buttons #}
         {# https://github.com/zostera/django-bootstrap4/issues/126 #}
