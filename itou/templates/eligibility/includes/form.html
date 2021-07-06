@@ -15,10 +15,10 @@
     {% csrf_token %}
 
     {% if form_confirm_eligibility and request.user.is_siae_staff %}
-        {% bootstrap_form_errors form_confirm_eligibility %}
+        {% bootstrap_form_errors form_confirm_eligibility type="all" %}
     {% endif %}
 
-    {% bootstrap_form_errors form_administrative_criteria %}
+    {% bootstrap_form_errors form_administrative_criteria type="all" %}
 
     {% if request.user.is_siae_staff %}
         <h3>

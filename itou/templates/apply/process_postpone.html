@@ -9,7 +9,7 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form form %}
+        {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
             <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>

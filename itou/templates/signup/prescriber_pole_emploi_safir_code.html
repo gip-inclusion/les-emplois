@@ -21,7 +21,7 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form form %}
+        {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
