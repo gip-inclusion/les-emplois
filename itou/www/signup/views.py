@@ -242,7 +242,9 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
 @push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
     """
-    Try to find pre-existing prescriber's organisation from a given SIREN.
+    Try to find a pre-existing prescriber's organization from a given SIREN.
+
+    This step makes it possible to avoid duplicates of prescriber's organizations.
     """
 
     prescribers_with_members = None
@@ -441,7 +443,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
-    initial_data = {"siret": session_data["siren"]} if "siren" in session_data else None
+    initial_data = {"siret": session_data.get("siren")}
     form = forms.PrescriberSiretForm(data=request.POST or None, initial=initial_data, kind=session_data.get("kind"))
 
     if request.method == "POST" and form.is_valid():
