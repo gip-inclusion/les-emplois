@@ -39,7 +39,9 @@
 
     </form>
 
+    {% if not form.cleaned_data %}
     <a href="{% url 'signup:prescriber_user' %}" >Je ne fais partie d'aucune organisation</a>
+    {% endif %}
 
     {% if prescribers_with_members %}
         <div class="mt-5">
