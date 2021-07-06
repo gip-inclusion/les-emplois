@@ -11,11 +11,9 @@ if [ -z $PATH_TO_ITOU_BACKUPS ]; then
 fi
 
 # Download last available backup, provided you already ran `make build` once.
-if [ $DOWNLOAD_LAST_BACKUP ]; then
-    echo "Downloading last available backup..."
-    ( cd $PATH_TO_ITOU_BACKUPS && make download )
-    echo "Download is over."
-fi
+echo "Downloading last available backup..."
+( cd $PATH_TO_ITOU_BACKUPS && make download )
+echo "Download is over."
 
 # Get the latest backup filename and path
 ITOU_DB_BACKUP_NAME=$(ls $PATH_TO_ITOU_BACKUPS/backups | tail -n1)
