@@ -104,7 +104,7 @@ class User(AbstractUser, AddressMixin):
         on_delete=models.SET_NULL,
     )
     email = CIEmailField(
-        "email address",
+        "Adresse e-mail",
         blank=True,
         db_index=True,
         # Empty values are stored as NULL if both `null=True` and `unique=True` are set.
