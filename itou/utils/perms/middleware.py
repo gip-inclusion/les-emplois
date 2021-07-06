@@ -84,6 +84,13 @@ class ItouCurrentOrganizationMiddleware:
                     # => Remove any old session entry if needed
                     del request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
 
+            elif user.is_labor_inspector:
+                current_institution_key = request.session.get(settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
+                if not current_institution_key:
+                    request.session[settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = (
+                        user.institutionmembership_set.filter(is_active=True).first().institution.pk
+                    )
+
         response = self.get_response(request)
 
         # After the view is called.

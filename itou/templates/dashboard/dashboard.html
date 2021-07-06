@@ -116,6 +116,9 @@
                 {% include "includes/icon.html" with icon="award" class="h1 align-middle" size=30 %}
             {% endif %}
         {% endif %}
+        {% if current_institution %}
+            - <span class="text-muted">{{ current_institution.name }}</span>
+        {% endif %}
     </h1>
 
     {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
@@ -384,6 +387,14 @@
             </div>
 
         {% endif %}{# end of if user.is_siae_staff #}
+
+        {% if user.is_labor_inspector %}
+            <div class="card">
+                <h5 class="card-header">
+                    Organisation <span class="ml-1 badge badge-secondary">{{ current_institution.kind }} - ID {{ current_institution.id }}</span>
+                </h5>
+            </div>
+        {% endif %} {# end of if user.is_labor_inspector #}
 
 
         {% if can_view_stats_dashboard_widget %}

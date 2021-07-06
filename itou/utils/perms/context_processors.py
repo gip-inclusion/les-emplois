@@ -13,6 +13,9 @@ def get_current_organization_and_perms(request):
 
     prescriber_organization = None
     user_prescriberorganizations = []
+    user_institutions = []
+    current_institution = None
+    user_is_institution_org_admin = None
     siae = None
     user_is_prescriber_org_admin = False
     user_is_siae_admin = False
@@ -65,11 +68,34 @@ def get_current_organization_and_perms(request):
                     prescriber_organization = membership.organization
                     user_is_prescriber_org_admin = membership.is_admin
 
+        # Institution?
+        institution_pk = request.session.get(settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
+
+        # TODO: refactor
+        if institution_pk:
+            memberships = (
+                current_user.institutionmembership_set.filter(is_active=True)
+                .order_by("created_at")
+                .select_related("institution")
+            )
+
+            for membership in memberships:
+                # Same as above:
+                # In order to avoid an extra SQL query, fetch related organizations
+                # and artificially reconstruct the list of organizations the user belongs to
+                # (and other stuff while at it)
+                user_institutions.append(membership.institution)
+                if membership.institution.pk == institution_pk:
+                    current_institution = membership.institution
+                    user_is_institution_org_admin = membership.is_admin
+
     context = {
         "current_prescriber_organization": prescriber_organization,
         "current_siae": siae,
+        "current_institution": current_institution,
         "user_is_prescriber_org_admin": user_is_prescriber_org_admin,
         "user_is_siae_admin": user_is_siae_admin,
+        "user_is_institution_org_admin": user_is_institution_org_admin,
         "user_siaes": user_siaes,
         "user_prescriberorganizations": user_prescriberorganizations,
     }
