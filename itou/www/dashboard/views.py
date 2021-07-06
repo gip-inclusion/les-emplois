@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
@@ -60,10 +61,12 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "url"
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
-    try:
-        current_org = get_current_org_or_404(request)
-    except Http404:
-        current_org = None
+    current_org = None
+    if request.user.is_prescriber:
+        try:
+            current_org = get_current_org_or_404(request)
+        except Http404:
+            current_org = None
 
     context = {
         "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
