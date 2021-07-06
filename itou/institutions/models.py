@@ -46,6 +46,8 @@ class InstitutionMembership(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    is_admin = models.BooleanField(verbose_name="Administrateur", default=False)
+    is_active = models.BooleanField("Rattachement actif", default=True)
     joined_at = models.DateTimeField(verbose_name="Date d'adhésion", default=timezone.now)
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
