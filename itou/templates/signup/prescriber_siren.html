@@ -23,7 +23,7 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form form %}
+        {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
             {% if not form.cleaned_data %}
@@ -39,7 +39,9 @@
 
     </form>
 
+    {% if not form.cleaned_data %}
     <a href="{% url 'signup:prescriber_user' %}" >Je ne fais partie d'aucune organisation</a>
+    {% endif %}
 
     {% if prescribers_with_members %}
         <div class="mt-5">
@@ -83,7 +85,7 @@
     {% if form.cleaned_data %}
     <div class="mt-4">
         <p>
-            En cas de problème contactez-nous : <a href="https://assistance.inclusion.beta.gouv.fr" rel="noopener" target="_blank">https://assistance.inclusion.beta.gouv.fr {% include "includes/icon.html" with icon="external-link" %}</a>
+            En cas de problème contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank">{{ ITOU_ASSISTANCE_URL }} {% include "includes/icon.html" with icon="external-link" %}</a>
         </p>
     </div>
     <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
