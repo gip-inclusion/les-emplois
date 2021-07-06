@@ -14,7 +14,7 @@
 
     {% csrf_token %}
 
-    {% bootstrap_form_errors select_form %}
+    {% bootstrap_form_errors select_form type="all" %}
 
     {% bootstrap_field select_form.financial_annexes %}
 

@@ -42,7 +42,7 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form form %}
+        {% bootstrap_form form alert_error_type="all" %}
 
         {% include "signup/includes/submit_rgpd.html" %}
 

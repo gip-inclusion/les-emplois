@@ -9,7 +9,7 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form form %}
+        {% bootstrap_form form alert_error_type="all" %}
 
         <p>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'email ?" %}</p>
 

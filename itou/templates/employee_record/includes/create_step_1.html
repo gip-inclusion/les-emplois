@@ -2,7 +2,7 @@
 
 <h4>Etat civil du salarié</h4>
 
-{% bootstrap_form_errors form %}
+{% bootstrap_form_errors form type="all" %}
 
 <form method="post" action="" class="js-prevent-multiple-submit">
     {% csrf_token %}
