@@ -40,6 +40,34 @@ class Institution(AddressMixin):
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
+    @property
+    def active_members(self):
+        """
+        In this context, active == has an active membership AND user is still active.
+
+        Query will be optimized later with Qs.
+        """
+        return self.members.filter(is_active=True, institutionmembership__is_active=True)
+
+    @property
+    def active_admin_members(self):
+        """
+        Active admin members:
+        active user/admin in this context means both:
+        * user.is_active: user is able to do something on the platform
+        * user.membership.is_active: is a member of this structure
+
+        Query will be optimized later with Qs.
+        """
+        return self.members.filter(
+            is_active=True, institutionmembership__is_admin=True, institutionmembership__is_active=True
+        )
+
+
+class InstitutionMembershipQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True, user__is_active=True)
+
 
 class InstitutionMembership(models.Model):
     """Intermediary model between `User` and `Institution`."""
@@ -51,6 +79,11 @@ class InstitutionMembership(models.Model):
     joined_at = models.DateTimeField(verbose_name="Date d'adhésion", default=timezone.now)
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
+
+    objects = models.Manager.from_queryset(InstitutionMembershipQuerySet)()
+
+    class Meta:
+        unique_together = ("user_id", "institution_id")
 
     def save(self, *args, **kwargs):
         if self.pk:
