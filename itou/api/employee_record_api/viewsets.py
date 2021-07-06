@@ -98,14 +98,9 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
             return queryset.filter(job_application__to_siae__in=siaes).order_by("-created_at", "-updated_at")
         finally:
             # Tracking is currently done via user-agent header
-            # Also store user ID and target SIAE ID as extra
             logger.info(
                 "User-Agent: %s",
                 self.request.headers.get("User-Agent"),
-                extra={
-                    "user": self.request.user.id,
-                    "siaes": siaes.values("id"),
-                },
             )
 
     def _filter_by_query_params(self, request, queryset):
