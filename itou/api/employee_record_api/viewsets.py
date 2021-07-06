@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
@@ -7,6 +9,9 @@ from itou.job_applications.models import JobApplication
 
 from .perms import EmployeeRecordAPIPermission
 from .serializers import DummyEmployeeRecordSerializer
+
+
+logger = logging.getLogger("api_drf")
 
 
 class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
@@ -89,7 +94,19 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
             siaemembership__is_active=True, siaemembership__is_siae_admin=True
         ).active_or_in_grace_period()
 
-        return queryset.filter(job_application__to_siae__in=siaes).order_by("-created_at", "-updated_at")
+        try:
+            return queryset.filter(job_application__to_siae__in=siaes).order_by("-created_at", "-updated_at")
+        finally:
+            # Tracking is currently done via user-agent header
+            # Also store user ID and target SIAE ID as extra
+            logger.info(
+                "User-Agent: %s",
+                self.request.headers.get("User-Agent"),
+                extra={
+                    "user": self.request.user.id,
+                    "siaes": siaes.values("id"),
+                },
+            )
 
     def _filter_by_query_params(self, request, queryset):
         """
