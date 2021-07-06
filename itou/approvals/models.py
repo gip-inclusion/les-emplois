@@ -1101,9 +1101,10 @@ class ApprovalsWrapper:
             return approvals
 
         approvals_numbers = [approval.number for approval in approvals]
+        today = datetime.date.today()
         pe_approvals = [
             pe_approval
-            for pe_approval in list(PoleEmploiApproval.objects.find_for(self.user))
+            for pe_approval in list(PoleEmploiApproval.objects.find_for(self.user).filter(start_at__lte=today))
             # A `PoleEmploiApproval` could already have been copied in `Approval`.
             if pe_approval not in approvals_numbers
         ]
