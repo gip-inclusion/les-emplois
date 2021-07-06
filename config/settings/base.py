@@ -253,6 +253,16 @@ LOGGING = {
     "handlers": {
         "console": {"class": "logging.StreamHandler"},
         "null": {"class": "logging.NullHandler"},
+        "api_console": {
+            "class": "logging.StreamHandler",
+            "formatter": "api_simple",
+        },
+    },
+    "formatters": {
+        "api_simple": {
+            "format": "{levelname} {asctime} {pathname} : {message}",
+            "style": "{",
+        },
     },
     "loggers": {
         "django": {
@@ -269,6 +279,12 @@ LOGGING = {
         "itou": {
             "handlers": ["console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "DEBUG"),
+        },
+        # Logger for DRF API application
+        # Will be "log-drained": may need to adjust format
+        "api_drf": {
+            "handlers": ["api_console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
     },
 }
