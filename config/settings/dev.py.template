@@ -80,15 +80,3 @@ LOGGING.setdefault("loggers", {})["django.db.backends"] = {
 # Le marché de l'inclusion
 # Match open regions with SIAE created by our fixtures.
 LEMARCHE_OPEN_REGIONS = ["Occitanie"]
-
-
-
-# DJANGO REST FRAMEWORK
-# ------------------------------------------------------------------------------
-
-# Adding DRF Browseable API (via renderer)
-if REST_FRAMEWORK:
-    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
-        "rest_framework.renderers.JSONRenderer",
-        "rest_framework.renderers.BrowsableAPIRenderer",
-    ]

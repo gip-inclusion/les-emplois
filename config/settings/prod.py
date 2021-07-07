@@ -31,3 +31,6 @@ DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])
 
 ALLOW_POPULATING_METABASE = True
+
+# DRF Browseable API renderer is not available in production
+REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ["rest_framework.renderers.JSONRenderer"]

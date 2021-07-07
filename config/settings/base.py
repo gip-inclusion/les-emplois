@@ -549,6 +549,8 @@ REST_FRAMEWORK = {
     # https://www.django-rest-framework.org/api-guide/renderers/#custom-renderers
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
+        # For DRF browseable API access
+        "rest_framework.renderers.BrowsableAPIRenderer",
     ],
     # Default permissions for API views: user must be authenticated
     "DEFAULT_PERMISSION_CLASSES": [
