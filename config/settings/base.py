@@ -90,6 +90,8 @@ LOCAL_APPS = [
     "itou.www.stats",
     "itou.www.welcoming_tour",
     "itou.www.employee_record_views",
+    # API
+    "itou.api",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -251,6 +253,16 @@ LOGGING = {
     "handlers": {
         "console": {"class": "logging.StreamHandler"},
         "null": {"class": "logging.NullHandler"},
+        "api_console": {
+            "class": "logging.StreamHandler",
+            "formatter": "api_simple",
+        },
+    },
+    "formatters": {
+        "api_simple": {
+            "format": "{levelname} {asctime} {pathname} : {message}",
+            "style": "{",
+        },
     },
     "loggers": {
         "django": {
@@ -267,6 +279,12 @@ LOGGING = {
         "itou": {
             "handlers": ["console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "DEBUG"),
+        },
+        # Logger for DRF API application
+        # Will be "log-drained": may need to adjust format
+        "api_drf": {
+            "handlers": ["api_console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
     },
 }
@@ -531,10 +549,17 @@ REST_FRAMEWORK = {
     # https://www.django-rest-framework.org/api-guide/pagination/#pagenumberpagination
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
-    # Renderer
+    # Response renderers
+    # See DEV template for an additional rendeder for DRF browseable API
     # https://www.django-rest-framework.org/api-guide/renderers/#custom-renderers
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
+        # For DRF browseable API access
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+    # Default permissions for API views: user must be authenticated
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }
 

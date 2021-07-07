@@ -210,8 +210,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             self.instance.user.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
         else:
             # Reset "inner" fields
-            self.cleaned_data["pole_emploi_since"] = ""
-            self.cleaned_data["pole_emploi_id"] = ""
+            self.cleaned_data["pole_emploi_since"] = self.cleaned_data["pole_emploi_id"] = ""
 
         # RSA: 3 possible options, one is handled by `rsa_allocation` value
         if self.cleaned_data["rsa_allocation"]:
