@@ -22,6 +22,8 @@ class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     à des fins de test pour les éditeurs de logiciels.
     """
 
+    # Above doc section is in french for Swagger / OAS auto doc generation
+
     serializer_class = DummyEmployeeRecordSerializer
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     # By default, permission class is IsAuthenticated
