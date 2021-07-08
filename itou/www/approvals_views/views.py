@@ -234,20 +234,19 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
     """
     siae = get_current_siae_or_404(request)
 
-    # We search if the approval already exist with this exact number,
+    # We search if the approval already exists with this exact number,
     # or if it was created from the first 12 digits of a PoleEmploiApproval's number
     approval = None
     number = request.GET.get("number")
     if number:
         approval = Approval.objects.filter(number__in=[number, number[:12]]).first()
 
-    # # If the identifier matches an existing approval, we redirection to the matching job application
+    # If the identifier matches an existing approval, we redirection to the matching job application.
     if approval:
-        job_application_id = approval.user.last_accepted_job_application.id
-        application_details_url = reverse_lazy(
-            "apply:details_for_siae", kwargs={"job_application_id": job_application_id}
-        )
-        return HttpResponseRedirect(application_details_url)
+        job_app = approval.user.last_accepted_job_application
+        if job_app.to_siae == siae:
+            application_details_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_app.pk})
+            return HttpResponseRedirect(application_details_url)
 
     # Otherwise, we display a search, and whenever it's possible, a matching PoleEmploiApproval
     pe_approval = PoleEmploiApproval.objects.filter(
