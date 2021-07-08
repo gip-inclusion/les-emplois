@@ -234,29 +234,33 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
     """
     siae = get_current_siae_or_404(request)
 
-    # We search if the approval already exists with this exact number,
-    # or if it was created from the first 12 digits of a PoleEmploiApproval's number
     approval = None
-    number = request.GET.get("number")
-    if number:
+    form = PoleEmploiApprovalSearchForm(request.GET or None)
+    number = None
+    pe_approval = None
+
+    if form.is_valid():
+
+        number = form.cleaned_data["number"]
+
+        # We search if the approval already exists with this exact number,
+        # or if it was created from the first 12 digits of a PoleEmploiApproval's number
         approval = Approval.objects.filter(number__in=[number, number[:12]]).first()
 
-    # If the identifier matches an existing approval, we redirection to the matching job application.
-    if approval:
-        job_app = approval.user.last_accepted_job_application
-        if job_app.to_siae == siae:
-            application_details_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_app.pk})
-            return HttpResponseRedirect(application_details_url)
+        # If the identifier matches an existing approval, we redirect to the matching job application.
+        if approval:
+            job_app = approval.user.last_accepted_job_application
+            # Ensure the job application belongs to the current SIAE to avoid a 404.
+            if job_app.to_siae == siae:
+                application_details_url = reverse_lazy(
+                    "apply:details_for_siae", kwargs={"job_application_id": job_app.pk}
+                )
+                return HttpResponseRedirect(application_details_url)
 
-    # Otherwise, we display a search, and whenever it's possible, a matching PoleEmploiApproval
-    pe_approval = PoleEmploiApproval.objects.filter(
-        number=str(request.GET.get("number")), start_at__lte=datetime.date.today()
-    ).first()
-    search_form = PoleEmploiApprovalSearchForm(request.GET if pe_approval else None)
+        # Otherwise, we display a search, and whenever it's possible, a matching `PoleEmploiApproval`.
+        pe_approval = PoleEmploiApproval.objects.filter(number=number, start_at__lte=datetime.date.today()).first()
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
-
-    context = {"back_url": back_url, "pe_approval": pe_approval, "form": search_form, "number": number, "siae": siae}
+    context = {"pe_approval": pe_approval, "form": form, "number": number, "siae": siae}
     return render(request, template_name, context)
 
 
