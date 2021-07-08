@@ -434,6 +434,38 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application.id})
         self.assertEqual(response.url, next_url)
 
+    def test_pe_approval_search_view_has_matching_pass_iae_that_belongs_to_another_siae(self):
+        """
+        Make sure to NOT to redirect to job applications belonging to other SIAEs.
+        """
+
+        # Create a job application with a PASS IAE created from a `PoleEmploiApproval`
+        # that belongs to another siae.
+        job_seeker = JobSeekerFactory()
+        pe_approval = PoleEmploiApprovalFactory()
+        job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval__number=pe_approval.number,
+            approval__user=job_seeker,
+            job_seeker=job_seeker,
+        )
+
+        another_siae = job_application.to_siae
+        self.assertNotEqual(another_siae, self.siae)
+
+        # This is the current user (NOT a member of `another_siae`).
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+
+        params = urlencode({"number": job_application.approval.number})
+        url = reverse("approvals:pe_approval_search")
+        url = f"{url}?{params}"
+
+        # The current user should not be redirected to the details of `job_application` because
+        # it belongs to `another_siae`. He should get a 200 instead.
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["pe_approval"], pe_approval)
+
     def test_pe_approval_search_view_unlogged_is_not_authorized(self):
         """
         It is not possible to access the search for PE approval screen unlogged
