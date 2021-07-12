@@ -393,6 +393,14 @@
                 <h5 class="card-header">
                     Organisation <span class="ml-1 badge badge-secondary">{{ current_institution.kind }} - ID {{ current_institution.id }}</span>
                 </h5>
+                <div class="card-body">
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="users" %}
+                        <a href="{% url 'institutions_views:members' %}">
+                            Gérer vos collaborateurs
+                        </a>
+                    </p>
+                </div>
             </div>
         {% endif %} {# end of if user.is_labor_inspector #}
 
