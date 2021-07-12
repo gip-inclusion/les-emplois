@@ -4,7 +4,6 @@ from django.test import TestCase
 from django.utils import timezone
 from django.utils.html import escape
 
-from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory
 from itou.invitations.models import SiaeStaffInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeMembershipFactory, SiaeWithMembershipFactory
@@ -95,25 +94,6 @@ class TestSendSingleSiaeInvitation(TestCase):
             for key, _errors in error_dict.items():
                 self.assertEqual(key, "email")
                 self.assertEqual(error_dict["email"][0], "Cet utilisateur n'est pas un employeur.")
-
-    def test_extend_expired_invitation(self):
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        ExpiredSiaeStaffInvitationFactory(
-            sender=self.sender,
-            first_name=self.guest_data["first_name"],
-            last_name=self.guest_data["last_name"],
-            email=self.guest_data["email"],
-            siae=self.siae,
-        )
-        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        self.assertContains(response, "Votre invitation a été envoyée par e-mail.")
-
-        # Make sure an email has been sent to the invited person
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn(self.guest_data["email"], mail.outbox[0].to)
-
-        # but there is still only one invitation in DB
-        self.assertEqual(SiaeStaffInvitation.objects.count(), 1)
 
     def test_two_employers_invite_the_same_guest(self):
         # SIAE 1 invites guest.
