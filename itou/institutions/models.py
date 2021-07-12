@@ -121,6 +121,16 @@ class Institution(AddressMixin):
         body = "common/emails/add_admin_email_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def remove_admin_email(self, user):
+        """
+        Send info email to a former admin of the organization (removed)
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/remove_admin_email_subject.txt"
+        body = "common/emails/remove_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
 
 class InstitutionMembershipQuerySet(models.QuerySet):
     def active(self):
@@ -155,14 +165,14 @@ class InstitutionMembership(models.Model):
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
-    # def deactivate_membership_by_user(self, user):
-    #     """
-    #     Deactivate the membership of a member (reference held by self) `user` is
-    #     the admin updating this user (`updated_by` field)
-    #     """
-    #     self.is_active = False
-    #     self.updated_by = user
-    #     return False
+    def deactivate_membership_by_user(self, user):
+        """
+        Deactivate the membership of a member (reference held by self) `user` is
+        the admin updating this user (`updated_by` field)
+        """
+        self.is_active = False
+        self.updated_by = user
+        return False
 
     def set_admin_role(self, active, user):
         """

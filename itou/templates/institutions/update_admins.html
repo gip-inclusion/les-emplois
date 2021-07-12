@@ -1,0 +1,9 @@
+{% extends "layout/content.html" %}
+
+{% block title %}Gestion des administrateurs{{ block.super }}{% endblock %}
+
+{% block content %}
+    {% with base_url="institutions_views" %}
+        {% include "includes/update_admin.html" %}
+    {% endwith %}
+{% endblock %}
