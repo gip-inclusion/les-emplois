@@ -55,6 +55,11 @@ class Institution(AddressMixin):
         return super().save(*args, **kwargs)
 
     @property
+    def display_name(self):
+        # Keep same logic as SIAE and PrescriberOrganization.
+        return self.name
+
+    @property
     def active_members(self):
         """
         In this context, active == has an active membership AND user is still active.

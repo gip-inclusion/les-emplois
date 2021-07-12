@@ -17,11 +17,16 @@ def member_list(request, template_name="institutions/members.html"):
         .all()
         .order_by("-is_admin", "joined_at")
     )
-    # pending_invitations = organization.invitations.pending()
+
+    pending_invitations = None
+    # Institution members can only be labor inspectors for the moment,
+    # but this is likely to change in the future.
+    if request.user.is_labor_inspector:
+        pending_invitations = institution.labor_inspectors_invitations.pending()
 
     context = {
         "institution": institution,
         "members": members,
-        # "pending_invitations": pending_invitations,
+        "pending_invitations": pending_invitations,
     }
     return render(request, template_name, context)
