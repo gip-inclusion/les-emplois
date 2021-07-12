@@ -61,12 +61,6 @@ class InvitationModelTest(TestCase):
         invitation = SentSiaeStaffInvitationFactory()
         self.assertTrue(invitation.can_be_accepted)
 
-    def test_extend_expiration_date(self):
-        invitation = ExpiredSiaeStaffInvitationFactory()
-        self.assertTrue(invitation.has_expired)
-        invitation.extend_expiration_date()
-        self.assertFalse(invitation.has_expired)
-
     def test_get_model_from_string(self):
         invitation_type = InvitationAbstract.get_model_from_string("siae_staff")
         self.assertEqual(invitation_type, SiaeStaffInvitation)

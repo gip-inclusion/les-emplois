@@ -108,10 +108,6 @@ class InvitationAbstract(models.Model):
         self.save()
         self.accepted_notif_sender()
 
-    def extend_expiration_date(self):
-        self.sent_at = timezone.now()
-        self.save()
-
     def send(self):
         self.sent = True
         self.sent_at = timezone.now()

@@ -83,7 +83,8 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         # Invite user (the revenge)
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         self.assertRedirects(response, INVITATION_URL)
-        self.assert_created_invitation()
+        invitations_count = PrescriberWithOrgInvitation.objects.filter(organization=self.organization).count()
+        self.assertEqual(invitations_count, 2)
 
 
 class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
