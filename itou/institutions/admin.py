@@ -11,7 +11,7 @@ class MembersInline(admin.TabularInline):
     model = models.InstitutionMembership
     extra = 1
     raw_id_fields = ("user",)
-    readonly_fields = ("is_active", "created_at", "updated_at", "joined_at")
+    readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at")
 
 
 @admin.register(models.Institution)

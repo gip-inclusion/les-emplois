@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from itou.users.models import User
 from itou.utils.address.models import AddressMixin
+from itou.utils.emails import get_email_message
 
 
 class InstitutionQuerySet(models.QuerySet):
@@ -54,6 +55,13 @@ class Institution(AddressMixin):
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
+    def has_admin(self, user):
+        return self.active_admin_members.filter(pk=user.pk).exists()
+
+    # @property
+    # def has_members(self):
+    #     return self.active_members.exists()
+
     @property
     def display_name(self):
         # Keep same logic as SIAE and PrescriberOrganization.
@@ -82,6 +90,37 @@ class Institution(AddressMixin):
             is_active=True, institutionmembership__is_admin=True, institutionmembership__is_active=True
         )
 
+    @property
+    def deactivated_members(self):
+        """
+        List of previous members of the structure, still active as user (from the model POV)
+        but deactivated by an admin at some point in time.
+
+        Query will be optimized later with Qs.
+        """
+        return self.members.filter(is_active=True, institutionmembership__is_active=False)
+
+    # E-mails
+    def member_deactivation_email(self, user):
+        """
+        Send email when an admin of the structure disables the membership of a given user (deactivation).
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/member_deactivation_email_subject.txt"
+        body = "common/emails/member_deactivation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def add_admin_email(self, user):
+        """
+        Send info email to a new admin of the organization (added)
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/add_admin_email_subject.txt"
+        body = "common/emails/add_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
 
 class InstitutionMembershipQuerySet(models.QuerySet):
     def active(self):
@@ -98,6 +137,13 @@ class InstitutionMembership(models.Model):
     joined_at = models.DateTimeField(verbose_name="Date d'adhésion", default=timezone.now)
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
+    updated_by = models.ForeignKey(
+        User,
+        related_name="updated_institutionmembership_set",
+        null=True,
+        on_delete=models.CASCADE,
+        verbose_name="Mis à jour par",
+    )
 
     objects = models.Manager.from_queryset(InstitutionMembershipQuerySet)()
 
@@ -108,3 +154,20 @@ class InstitutionMembership(models.Model):
         if self.pk:
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    # def deactivate_membership_by_user(self, user):
+    #     """
+    #     Deactivate the membership of a member (reference held by self) `user` is
+    #     the admin updating this user (`updated_by` field)
+    #     """
+    #     self.is_active = False
+    #     self.updated_by = user
+    #     return False
+
+    def set_admin_role(self, active, user):
+        """
+        Set admin role for the given user.
+        `user` is the admin updating this user (`updated_by` field)
+        """
+        self.is_admin = active
+        self.updated_by = user
