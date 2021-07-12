@@ -347,7 +347,7 @@ class LaborInspectorInvitation(InvitationAbstract):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "establishment_name": self.institution.name,
+            "establishment_name": self.institution.display_name,
         }
         subject = "invitations_views/email/accepted_notif_sender_subject.txt"
         body = "invitations_views/email/accepted_notif_establishment_sender_body.txt"
