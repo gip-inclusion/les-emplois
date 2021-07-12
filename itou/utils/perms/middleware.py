@@ -91,9 +91,21 @@ class ItouCurrentOrganizationMiddleware:
             elif user.is_labor_inspector:
                 current_institution_key = request.session.get(settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
                 if not current_institution_key:
-                    request.session[settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = (
-                        user.institutionmembership_set.filter(is_active=True).first().institution.pk
-                    )
+                    first_active_membership = user.institutionmembership_set.filter(is_active=True).first()
+                    if not first_active_membership:
+                        message = (
+                            "Nous sommes désolés, votre compte n'est "
+                            "actuellement rattaché à aucune structure.<br>"
+                            "Nous espérons cependant avoir l'occasion de vous accueillir de "
+                            "nouveau."
+                        )
+                        message = safestring.mark_safe(message)
+                        messages.warning(request, message)
+                        return redirect("account_logout")
+
+                    request.session[
+                        settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY
+                    ] = first_active_membership.institution.pk
 
         response = self.get_response(request)
 
