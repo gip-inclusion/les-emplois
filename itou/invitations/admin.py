@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import PrescriberWithOrgInvitation, SiaeStaffInvitation
+from .models import LaborInspectorInvitation, PrescriberWithOrgInvitation, SiaeStaffInvitation
 
 
 class IsValidFilter(admin.SimpleListFilter):
@@ -61,3 +61,13 @@ class PrescriberWithOrgInvitationAdmin(BaseInvitationAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("organization")
+
+
+@admin.register(LaborInspectorInvitation)
+class LaborInspectorInvitationAdmin(BaseInvitationAdmin):
+    list_display = BaseInvitationAdmin.list_display + ("institution",)
+    raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("institution",)
+    search_fields = BaseInvitationAdmin.search_fields + ("organization__name",)
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("institution")

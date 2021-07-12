@@ -10,7 +10,7 @@
     </div>
 
     <div class="alert alert-info" role="alert">
-        Vous êtes connecté en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
+        Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
     </div>
 
     {% with active_admin_members=siae.active_admin_members base_url="siaes_views" %}

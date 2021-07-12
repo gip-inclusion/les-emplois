@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.models import modelformset_factory
 
-from itou.invitations.models import PrescriberWithOrgInvitation, SiaeStaffInvitation
+from itou.invitations.models import LaborInspectorInvitation, PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 
@@ -162,6 +162,87 @@ class BaseSiaeStaffInvitationFormSet(BaseInvitationFormSet):
 #
 SiaeStaffInvitationFormSet = modelformset_factory(
     SiaeStaffInvitation, form=SiaeStaffInvitationForm, formset=BaseSiaeStaffInvitationFormSet, extra=1, max_num=30
+)
+
+#############################################################
+##################### LaborInspectorInvitation ##############
+#############################################################
+
+
+class LaborInspectorInvitationForm(forms.ModelForm):
+    class Meta:
+        fields = ["first_name", "last_name", "email"]
+        model = LaborInspectorInvitation
+
+    def __init__(self, sender, institution, *args, **kwargs):
+        self.sender = sender
+        self.institution = institution
+        super().__init__(*args, **kwargs)
+
+    def _invited_user_exists_error(self, email):
+        """
+        A labor inspector can only invite another labor inspector to join his structure.
+        """
+        user = User.objects.filter(email__iexact=email).first()
+        if user:
+            if not user.is_labor_inspector:
+                error = forms.ValidationError("Cet utilisateur n'est pas un inspecteur du travail.")
+                self.add_error("email", error)
+            else:
+                user_is_member = self.institution.active_members.filter(email=user.email).exists()
+                if user_is_member:
+                    error = forms.ValidationError("Cette personne fait déjà partie de votre structure.")
+                    self.add_error("email", error)
+
+    def _extend_expiration_date_or_error(self, email):
+        invitation_model = self.Meta.model
+        existing_invitation = invitation_model.objects.filter(
+            email__iexact=email, institution=self.institution
+        ).first()
+        if existing_invitation:
+            #
+            # WARNING The form is now bound to this instance
+            #
+            self.instance = existing_invitation
+            self.instance.extend_expiration_date()
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        self._invited_user_exists_error(email)
+        self._extend_expiration_date_or_error(email)
+        return email
+
+    def save(self, *args, **kwargs):  # pylint: disable=unused-argument
+        invitation = super().save(commit=False)
+        invitation.sender = self.sender
+        invitation.institution = self.institution
+        invitation.save()
+        return invitation
+
+
+class BaseLaborInspectorInvitationFormSet(BaseInvitationFormSet):
+    def __init__(self, *args, **kwargs):
+        """
+        By default, BaseModelFormSet show the objects stored in the DB.
+        See https://docs.djangoproject.com/en/3.0/topics/forms/modelforms/#changing-the-queryset
+        """
+        super().__init__(*args, **kwargs)
+        self.queryset = LaborInspectorInvitation.objects.none()
+        # Any access to `self.forms` must be performed after any access to `self.queryset`,
+        # otherwise `self.queryset` will have no effect.
+        # https://code.djangoproject.com/ticket/31879
+        self.forms[0].empty_permitted = False
+
+
+#
+# Formset used when a labor inspector invites other inspectors to join his structure.
+#
+LaborInspectorInvitationFormSet = modelformset_factory(
+    LaborInspectorInvitation,
+    form=LaborInspectorInvitationForm,
+    formset=BaseLaborInspectorInvitationFormSet,
+    extra=1,
+    max_num=30,
 )
 
 
