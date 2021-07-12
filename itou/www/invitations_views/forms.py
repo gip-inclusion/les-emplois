@@ -41,23 +41,10 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
                     error = forms.ValidationError("Cette personne fait déjà partie de votre organisation.")
                     self.add_error("email", error)
 
-    def _extend_expiration_date_or_error(self, email):
-        invitation_model = self.Meta.model
-        existing_invitation = invitation_model.objects.filter(
-            email__iexact=email, organization=self.organization
-        ).first()
-        if existing_invitation:
-            #
-            # WARNING The form is now bound to this instance
-            #
-            self.instance = existing_invitation
-            self.instance.extend_expiration_date()
-
     def clean_email(self):
         email = self.cleaned_data["email"]
 
         self._invited_user_exists_error(email)
-        self._extend_expiration_date_or_error(email)
         if self.organization.kind == PrescriberOrganization.Kind.PE and not email.endswith(
             settings.POLE_EMPLOI_EMAIL_SUFFIX
         ):
@@ -143,20 +130,9 @@ class SiaeStaffInvitationForm(forms.ModelForm):
                     error = forms.ValidationError("Cette personne fait déjà partie de votre structure.")
                     self.add_error("email", error)
 
-    def _extend_expiration_date_or_error(self, email):
-        invitation_model = self.Meta.model
-        existing_invitation = invitation_model.objects.filter(email__iexact=email, siae=self.siae).first()
-        if existing_invitation:
-            #
-            # WARNING The form is now bound to this instance
-            #
-            self.instance = existing_invitation
-            self.instance.extend_expiration_date()
-
     def clean_email(self):
         email = self.cleaned_data["email"]
         self._invited_user_exists_error(email)
-        self._extend_expiration_date_or_error(email)
         return email
 
     def save(self, *args, **kwargs):  # pylint: disable=unused-argument
