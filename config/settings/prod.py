@@ -34,3 +34,6 @@ ALLOW_POPULATING_METABASE = True
 
 # DRF Browseable API renderer is not available in production
 REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ["rest_framework.renderers.JSONRenderer"]
+
+# ASP: path to SSH keys for SFTP connection
+ASP_FS_SFTP_PRIVATE_KEY_PATH = "/app/certs/id_rsa_asp_sftp_prod"
