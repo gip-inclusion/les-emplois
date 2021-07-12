@@ -393,7 +393,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         """
 
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-        params = urlencode({"number": 123})
+        params = urlencode({"number": 123123123123})
         url = reverse("approvals:pe_approval_search")
         url = f"{url}?{params}"
 
@@ -436,7 +436,8 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
 
     def test_pe_approval_search_view_has_matching_pass_iae_that_belongs_to_another_siae(self):
         """
-        Make sure to NOT to redirect to job applications belonging to other SIAEs.
+        Make sure to NOT to redirect to job applications belonging to other SIAEs,
+        as this would produce a 404.
         """
 
         # Create a job application with a PASS IAE created from a `PoleEmploiApproval`
@@ -461,10 +462,15 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         url = f"{url}?{params}"
 
         # The current user should not be redirected to the details of `job_application` because
-        # it belongs to `another_siae`. He should get a 200 instead.
+        # it belongs to `another_siae`. He should get a 302 instead with an error message.
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["pe_approval"], pe_approval)
+        self.assertEqual(response.status_code, 302)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]),
+            f"Le numéro {pe_approval.number_with_spaces} est déjà utilisé par un autre employeur.",
+        )
 
     def test_pe_approval_search_view_unlogged_is_not_authorized(self):
         """
