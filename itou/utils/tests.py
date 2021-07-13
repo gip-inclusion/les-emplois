@@ -50,8 +50,22 @@ from itou.utils.validators import (
 class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
     """Test `itou.utils.perms.context_processors.get_current_organization_and_perms` processor."""
 
-    def test_siae_one_membership(self):
+    @property
+    def default_result(self):
+        return {
+            "current_prescriber_organization": None,
+            "current_siae": None,
+            "current_institution": None,
+            "user_is_admin": None,
+            "user_siaes": [],
+            "user_prescriberorganizations": [],
+            "user_institutions": [],
+            "matomo_custom_variables": OrderedDict(
+                [("is_authenticated", "yes"), ("account_type", None), ("account_sub_type", None)]
+            ),
+        }
 
+    def test_siae_one_membership(self):
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
@@ -66,14 +80,10 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = {
-                "current_prescriber_organization": None,
+            expected = self.default_result | {
                 "current_siae": siae,
-                "current_institution": None,
-                "user_is_admin": True,
                 "user_siaes": [siae],
-                "user_prescriberorganizations": [],
-                "user_institutions": [],
+                "user_is_admin": True,
                 "matomo_custom_variables": OrderedDict(
                     [("is_authenticated", "yes"), ("account_type", "employer"), ("account_sub_type", "employer_admin")]
                 ),
@@ -104,14 +114,10 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = {
-                "current_prescriber_organization": None,
+            expected = self.default_result | {
                 "current_siae": siae3,
-                "current_institution": None,
-                "user_is_admin": False,
                 "user_siaes": [siae1, siae2, siae3],
-                "user_prescriberorganizations": [],
-                "user_institutions": [],
+                "user_is_admin": False,
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
@@ -138,14 +144,10 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = {
+            expected = self.default_result | {
                 "current_prescriber_organization": organization,
-                "current_siae": None,
-                "current_institution": None,
-                "user_is_admin": True,
-                "user_siaes": [],
-                "user_institutions": [],
                 "user_prescriberorganizations": [organization],
+                "user_is_admin": True,
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
@@ -175,14 +177,10 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = {
+            expected = self.default_result | {
                 "current_prescriber_organization": organization1,
-                "current_siae": None,
-                "current_institution": None,
-                "user_is_admin": True,
-                "user_siaes": [],
-                "user_institutions": [],
                 "user_prescriberorganizations": [organization1, organization2],
+                "user_is_admin": True,
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
