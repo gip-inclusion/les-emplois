@@ -16,4 +16,5 @@ urlpatterns = [
     path(
         "switch_prescriber_organization", views.switch_prescriber_organization, name="switch_prescriber_organization"
     ),
+    path("switch_institution", views.switch_institution, name="switch_institution"),
 ]

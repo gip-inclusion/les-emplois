@@ -10,10 +10,10 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
+from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
-from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
@@ -224,6 +224,22 @@ def switch_prescriber_organization(request):
     queryset = PrescriberOrganization.objects
     prescriber_organization = get_object_or_404(queryset, pk=pk)
     request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
+
+    return HttpResponseRedirect(dashboard_url)
+
+
+@login_required
+@require_POST
+def switch_institution(request):
+    """
+    Switch prescriber organization for a user with multiple memberships.
+    """
+    dashboard_url = reverse_lazy("dashboard:index")
+
+    pk = request.POST["institution_id"]
+    queryset = Institution.objects
+    institution = get_object_or_404(queryset, pk=pk)
+    request.session[settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = institution.pk
 
     return HttpResponseRedirect(dashboard_url)
 
