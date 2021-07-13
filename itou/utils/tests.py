@@ -69,10 +69,11 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             expected = {
                 "current_prescriber_organization": None,
                 "current_siae": siae,
-                "user_is_prescriber_org_admin": False,
-                "user_is_siae_admin": True,
+                "current_institution": None,
+                "user_is_admin": True,
                 "user_siaes": [siae],
                 "user_prescriberorganizations": [],
+                "user_institutions": [],
                 "matomo_custom_variables": OrderedDict(
                     [("is_authenticated", "yes"), ("account_type", "employer"), ("account_sub_type", "employer_admin")]
                 ),
@@ -106,10 +107,11 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             expected = {
                 "current_prescriber_organization": None,
                 "current_siae": siae3,
-                "user_is_prescriber_org_admin": False,
-                "user_is_siae_admin": False,
+                "current_institution": None,
+                "user_is_admin": False,
                 "user_siaes": [siae1, siae2, siae3],
                 "user_prescriberorganizations": [],
+                "user_institutions": [],
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
@@ -139,9 +141,10 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             expected = {
                 "current_prescriber_organization": organization,
                 "current_siae": None,
-                "user_is_prescriber_org_admin": True,
-                "user_is_siae_admin": False,
+                "current_institution": None,
+                "user_is_admin": True,
                 "user_siaes": [],
+                "user_institutions": [],
                 "user_prescriberorganizations": [organization],
                 "matomo_custom_variables": OrderedDict(
                     [
@@ -175,9 +178,10 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             expected = {
                 "current_prescriber_organization": organization1,
                 "current_siae": None,
-                "user_is_prescriber_org_admin": True,
-                "user_is_siae_admin": False,
+                "current_institution": None,
+                "user_is_admin": True,
                 "user_siaes": [],
+                "user_institutions": [],
                 "user_prescriberorganizations": [organization1, organization2],
                 "matomo_custom_variables": OrderedDict(
                     [
