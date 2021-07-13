@@ -20,8 +20,7 @@ from itou.utils.iterators import chunks
 connection_options = None
 
 if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
-    connection_options = pysftp.CnOpts()
-    connection_options.hostkeys = connection_options.hostkeys.load(settings.ASP_FS_KNOWN_HOSTS)
+    connection_options = pysftp.CnOpts(knownhosts=settings.ASP_FS_KNOWN_HOSTS)
 
 
 class Command(BaseCommand):
