@@ -4,9 +4,7 @@ import factory
 import factory.fuzzy
 
 from itou.institutions import models
-
-# from itou.users.factories import ControlerFactory # TODO
-from itou.users.factories import UserFactory
+from itou.users.factories import LaborInspectorFactory
 
 
 class InstitutionFactory(factory.django.DjangoModelFactory):
@@ -31,7 +29,7 @@ class InstitutionMembershipFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.InstitutionMembership
 
-    user = factory.SubFactory(UserFactory)
+    user = factory.SubFactory(LaborInspectorFactory)
     institution = factory.SubFactory(InstitutionFactory)
     is_admin = True
     is_active = True

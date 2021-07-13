@@ -79,3 +79,7 @@ class PrescriberFactory(UserFactory):
 
 class SiaeStaffFactory(UserFactory):
     is_siae_staff = True
+
+
+class LaborInspectorFactory(UserFactory):
+    is_labor_inspector = True
