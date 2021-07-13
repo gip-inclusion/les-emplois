@@ -98,6 +98,7 @@ def get_current_organization_and_perms(request):
         "user_is_institution_org_admin": user_is_institution_org_admin,
         "user_siaes": user_siaes,
         "user_prescriberorganizations": user_prescriberorganizations,
+        "user_institutions": user_institutions,
     }
 
     context.update(
