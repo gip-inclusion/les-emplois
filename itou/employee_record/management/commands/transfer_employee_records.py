@@ -71,7 +71,7 @@ class Command(BaseCommand):
         """
         return pysftp.Connection(
             host=settings.ASP_FS_SFTP_HOST,
-            port=settings.ASP_FS_SFTP_PORT,
+            port=int(settings.ASP_FS_SFTP_PORT),
             username=settings.ASP_FS_SFTP_USER,
             private_key=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
             cnopts=connection_options,
