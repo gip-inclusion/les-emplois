@@ -17,16 +17,14 @@ class ItouCurrentOrganizationMiddleware:
     def __call__(self, request):
 
         # Before the view is called.
-
         user = request.user
-
         skip_middleware = (
             request.path
             in [
                 reverse("account_logout"),
                 reverse("account_login"),
             ]
-            or request.path.startswith("/invitations/")
+            or (request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"))
         )
         if skip_middleware:
             return self.get_response(request)
