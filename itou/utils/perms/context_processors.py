@@ -128,6 +128,9 @@ def get_matomo_context(user, prescriber_organization, user_is_admin):
     elif user.is_siae_staff:
         account_type = "employer"
         account_sub_type = "employer_admin" if user_is_admin else "employer_not_admin"
+    elif user.is_labor_inspector:
+        account_type = "labor_inspector"
+        account_sub_type = "inspector_admin" if user_is_admin else "inspector_not_admin"
     else:
         account_type = "unknown"
         account_sub_type = "unknown"
