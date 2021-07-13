@@ -107,19 +107,15 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         siae2.members.add(user)
         self.assertFalse(siae2.has_admin(user))
 
-        siae3 = SiaeFactory()
-        siae3.members.add(user)
-        self.assertFalse(siae3.has_admin(user))
-
         request = self.go_to_dashboard(
-            user=user, establishment_session_key=settings.ITOU_SESSION_CURRENT_SIAE_KEY, establishment_pk=siae3.pk
+            user=user, establishment_session_key=settings.ITOU_SESSION_CURRENT_SIAE_KEY, establishment_pk=siae2.pk
         )
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
             expected = self.default_result | {
-                "current_siae": siae3,
-                "user_siaes": [siae1, siae2, siae3],
+                "current_siae": siae2,
+                "user_siaes": [siae1, siae2],
                 "user_is_admin": False,
                 "matomo_custom_variables": OrderedDict(
                     [
