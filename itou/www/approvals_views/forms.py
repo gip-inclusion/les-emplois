@@ -144,4 +144,8 @@ class PoleEmploiApprovalSearchForm(forms.Form):
     Search for a PoleEmploiApproval by id
     """
 
-    number = forms.CharField(label="Numéro", required=True, min_length=12, max_length=15)
+    number = forms.CharField(label="Numéro", required=True, min_length=12, max_length=15, strip=True)
+
+    def clean_number(self):
+        number = self.cleaned_data.get("number", "")
+        return number.replace(" ", "")

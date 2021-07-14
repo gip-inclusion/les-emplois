@@ -8,7 +8,7 @@ from django.db import transaction
 from django.http import FileResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import SimpleTemplateResponse
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.utils.text import slugify
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
@@ -90,7 +90,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     if not approval.can_be_prolonged_by_siae(siae):
         raise PermissionDenied()
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     preview = False
 
     form = DeclareProlongationForm(approval=approval, siae=siae, data=request.POST or None)
@@ -135,7 +135,7 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
     if not approval.can_be_suspended_by_siae(siae):
         raise PermissionDenied()
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     preview = False
 
     form = SuspensionForm(approval=approval, siae=siae, data=request.POST or None)
@@ -175,7 +175,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
     form = SuspensionForm(approval=suspension.approval, siae=siae, instance=suspension, data=request.POST or None)
 
@@ -206,7 +206,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
         suspension.delete()
@@ -234,30 +234,37 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
     """
     siae = get_current_siae_or_404(request)
 
-    # We search if the approval already exist with this exact number,
-    # or if it was created from the first 12 digits of a PoleEmploiApproval's number
     approval = None
-    number = request.GET.get("number")
-    if number:
+    form = PoleEmploiApprovalSearchForm(request.GET or None)
+    number = None
+    pe_approval = None
+
+    if form.is_valid():
+
+        number = form.cleaned_data["number"]
+
+        # We search if the approval already exists with this exact number,
+        # or if it was created from the first 12 digits of a PoleEmploiApproval's number
         approval = Approval.objects.filter(number__in=[number, number[:12]]).first()
 
-    # # If the identifier matches an existing approval, we redirection to the matching job application
-    if approval:
-        job_application_id = approval.user.last_accepted_job_application.id
-        application_details_url = reverse_lazy(
-            "apply:details_for_siae", kwargs={"job_application_id": job_application_id}
-        )
-        return HttpResponseRedirect(application_details_url)
+        # If the identifier matches an existing approval…
+        if approval:
+            # …ensure that the last accepted job application belongs to the current SIAE…
+            job_app = approval.user.last_accepted_job_application
+            if job_app.to_siae == siae:
+                application_details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_app.pk})
+                return HttpResponseRedirect(application_details_url)
+            else:
+                # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
+                # has already been transformed into an `Approval`.
+                msg = f"Le numéro {approval.number_with_spaces} est déjà utilisé par un autre employeur."
+                messages.error(request, msg)
+                return HttpResponseRedirect(reverse("approvals:pe_approval_search"))
 
-    # Otherwise, we display a search, and whenever it's possible, a matching PoleEmploiApproval
-    pe_approval = PoleEmploiApproval.objects.filter(
-        number=str(request.GET.get("number")), start_at__lte=datetime.date.today()
-    ).first()
-    search_form = PoleEmploiApprovalSearchForm(request.GET if pe_approval else None)
+        # Otherwise, we display a search, and whenever it's possible, a matching `PoleEmploiApproval`.
+        pe_approval = PoleEmploiApproval.objects.filter(number=number, start_at__lte=datetime.date.today()).first()
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
-
-    context = {"back_url": back_url, "pe_approval": pe_approval, "form": search_form, "number": number, "siae": siae}
+    context = {"pe_approval": pe_approval, "form": form, "number": number, "siae": siae}
     return render(request, template_name, context)
 
 
@@ -270,7 +277,7 @@ def pe_approval_search_user(request, pe_approval_id, template_name="approvals/pe
     """
     pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
     form = UserExistsForm(data=None)
 
@@ -290,7 +297,7 @@ def pe_approval_create(request, pe_approval_id):
 
     form = UserExistsForm(data=request.POST or None)
     if request.method != "POST" or not form.is_valid():
-        next_url = reverse_lazy("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
+        next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
     # If there already is a user with this email, we take it, otherwise we create one
@@ -304,13 +311,13 @@ def pe_approval_create(request, pe_approval_id):
     if possible_matching_approval:
         messages.info(request, "Cet agrément Pôle emploi a déja été importé.")
         job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()
-        next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
 
     # It is not possible to attach an approval to a job seeker that already has a valid approval
     if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
         messages.error(request, "Le candidat associé à cette adresse email a déja un PASS IAE valide.")
-        next_url = reverse_lazy("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
+        next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
     with transaction.atomic():
@@ -338,5 +345,5 @@ def pe_approval_create(request, pe_approval_id):
     messages.success(
         request, "L'agrément Pôle emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre."
     )
-    next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)
