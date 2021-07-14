@@ -2,14 +2,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.urls import reverse_lazy
 
 from itou.users.models import User
 from itou.utils.perms.institution import get_current_institution_or_404
-
-
-# from itou.utils.urls import get_safe_url
 
 
 @login_required

@@ -1,5 +1,3 @@
-import string
-
 import factory
 import factory.fuzzy
 
