@@ -65,9 +65,9 @@ class Institution(AddressMixin):
     def has_admin(self, user):
         return self.active_admin_members.filter(pk=user.pk).exists()
 
-    # @property
-    # def has_members(self):
-    #     return self.active_members.exists()
+    @property
+    def has_members(self):
+        return self.active_members.exists()
 
     @property
     def display_name(self):
