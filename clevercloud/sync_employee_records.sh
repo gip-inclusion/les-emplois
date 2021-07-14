@@ -1,4 +1,3 @@
-
 #!/bin/bash -l
 
 # Fetch and upload files to ASP SFTP server
