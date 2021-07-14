@@ -1,11 +1,12 @@
 """
-Institutions are stakeholders groups who are neither SIAE nor PrescriberOrganizations.
-They share with SIAE and PrescriberOrganization some features, such as
-memberships, administrators rights or the Address mixin.
-For the moment, only labor inspectors (User.is_labor_inspector) can be members. They belong
-to a DDEETS, a DREETS or a DGEFP.
+Institutions are stakeholder groups who are neither SIAE nor Prescriber Organizations.
+They share with SIAE and Prescriber Organization some features,
+such as memberships, administrators rights or the Address mixin.
 The first member is imported from a CSV file. Joining a institution is possible only with
 an invitation from one of its members.
+
+For the moment, only labor inspectors (User.is_labor_inspector) can be members. 
+They belong to a DDEETS, a DREETS or a DGEFP.
 """
 
 from django.db import models
