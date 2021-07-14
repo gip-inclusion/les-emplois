@@ -12,7 +12,7 @@ from itou.utils.perms.institution import get_current_institution_or_404
 @login_required
 def member_list(request, template_name="institutions/members.html"):
     """
-    List members of a prescriber organization.
+    List members of an institution.
     """
     institution = get_current_institution_or_404(request)
 
