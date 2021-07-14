@@ -69,7 +69,6 @@ def get_current_organization_and_perms(request):
         # Institution?
         institution_pk = request.session.get(settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
 
-        # TODO: refactor
         if institution_pk:
             memberships = (
                 current_user.institutionmembership_set.filter(is_active=True)
