@@ -180,6 +180,9 @@
                                     <a class="dropdown-item" href="{% url 'account_login' %}?account_type=siae{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                                         Employeur solidaire
                                     </a>
+                                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=institution{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                                        Institution partenaire
+                                    </a>
                                 </div>
                             </div>
                         {% endif %}

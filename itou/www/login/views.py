@@ -12,6 +12,7 @@ class ItouLoginView(LoginView):
         "job_seeker": "Candidat",
         "prescriber": "Prescripteur",
         "siae": "Employeur solidaire",
+        "institution": "Institution partenaire",
     }
 
     # The reverse() method cannot be used here as it causes
@@ -30,6 +31,7 @@ class ItouLoginView(LoginView):
             account_type_display_name = ItouLoginView.ACCOUNT_TYPE_TO_DISPLAY_NAME.get(account_type)
             signup_url = reverse(ItouLoginView.ACCOUNT_TYPE_TO_SIGNUP_URL.get(account_type, "account_signup"))
             show_peamu = account_type == "job_seeker"
+            signup_allowed = account_type != "institution"
             redirect_field_value = get_safe_url(self.request, REDIRECT_FIELD_NAME)
 
             context = {
@@ -39,6 +41,7 @@ class ItouLoginView(LoginView):
                 "show_peamu": show_peamu,
                 "redirect_field_name": REDIRECT_FIELD_NAME,
                 "redirect_field_value": redirect_field_value,
+                "signup_allowed": signup_allowed,
             }
             response.context_data.update(context)
 
