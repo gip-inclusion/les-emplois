@@ -179,7 +179,7 @@ class InstitutionMembership(models.Model):
         """
         self.is_active = False
         self.updated_by = user
-        return False
+        return True
 
     def set_admin_role(self, active, user):
         """
