@@ -113,41 +113,46 @@ class SiaeModelTest(TestCase):
         self.assertFalse(siae2.has_member(user1))
 
     def test_active_members(self):
-        siae = SiaeWith2MembershipsFactory(membership2__user__is_active=False)
-        self.assertEqual(siae.members.count(), 2)
-        self.assertEqual(siae.active_members.count(), 1)
+        siae = SiaeWith2MembershipsFactory(membership2__is_active=False)
+        user_with_active_membership = siae.members.first()
+        user_with_inactive_membership = siae.members.last()
+
+        self.assertNotIn(user_with_inactive_membership, siae.active_members)
+        self.assertIn(user_with_active_membership, siae.active_members)
+
+        # Deactivate a user
+        user_with_active_membership.is_active = False
+        user_with_active_membership.save()
+
+        self.assertNotIn(user_with_active_membership, siae.active_members)
 
     def test_active_admin_members(self):
         """
-        Test that if a user is admin of siae1 and regular user
-        of siae2 it does not get considered as admin of siae2.
+        Test that if a user is admin of siae_1 and regular user
+        of siae_2 he is not considered as admin of siae_2.
         """
-        siae1 = SiaeWith4MembershipsFactory()
-        siae1_admin_user = siae1.active_admin_members.get()
-        siae2 = SiaeWith4MembershipsFactory(membership2__user=siae1_admin_user)
+        siae_1 = SiaeWithMembershipFactory()
+        siae_1_admin_user = siae_1.members.first()
+        siae_2 = SiaeWithMembershipFactory()
+        siae_2.members.add(siae_1_admin_user)
 
-        self.assertEqual(siae1.members.count(), 4)
-        self.assertEqual(siae1.active_members.count(), 2)
-        self.assertEqual(siae1.active_admin_members.count(), 1)
-
-        self.assertEqual(siae2.members.count(), 4)
-        self.assertEqual(siae2.active_members.count(), 2)
-        self.assertEqual(siae2.active_admin_members.count(), 1)
+        self.assertIn(siae_1_admin_user, siae_1.active_admin_members)
+        self.assertNotIn(siae_1_admin_user, siae_2.active_admin_members)
 
     def test_has_admin(self):
-        siae1 = SiaeWith2MembershipsFactory()
-        siae1_admin_user = siae1.active_admin_members.get()
-        siae1_regular_user = siae1.active_members.exclude(pk=siae1_admin_user.pk).get()
-        siae2 = SiaeWith4MembershipsFactory(membership2__user=siae1_admin_user)
+        siae_1 = SiaeWith2MembershipsFactory()
+        siae_1_admin_user = siae_1.active_admin_members.get()
+        siae1_regular_user = siae_1.active_members.exclude(pk=siae_1_admin_user.pk).get()
+        siae_2 = SiaeWith2MembershipsFactory(membership2__user=siae_1_admin_user)
 
-        self.assertTrue(siae1.has_member(siae1_admin_user))
-        self.assertTrue(siae1.has_admin(siae1_admin_user))
+        self.assertTrue(siae_1.has_member(siae_1_admin_user))
+        self.assertTrue(siae_1.has_admin(siae_1_admin_user))
 
-        self.assertTrue(siae1.has_member(siae1_regular_user))
-        self.assertFalse(siae1.has_admin(siae1_regular_user))
+        self.assertTrue(siae_1.has_member(siae1_regular_user))
+        self.assertFalse(siae_1.has_admin(siae1_regular_user))
 
-        self.assertTrue(siae2.has_member(siae1_admin_user))
-        self.assertFalse(siae2.has_admin(siae1_admin_user))
+        self.assertTrue(siae_2.has_member(siae_1_admin_user))
+        self.assertFalse(siae_2.has_admin(siae_1_admin_user))
 
     def test_new_signup_activation_email_to_official_contact(self):
 
