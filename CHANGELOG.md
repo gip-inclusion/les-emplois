@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## [22] - 2021-07-15
+
+### Ajouté
+
+- Affichage du lien d'invitation sur la page de gestion des collaborateurs
+- Affichage du prénom et du nom de la personne invitée dans le titre de la page cible de l'invitation
+- API d'accès aux fiches salarié
+- Création des APIs d'appel Pôle emploi RechercheIndividuCertifie et MiseAJourIAE
+- Ajout d'une plateforme expérimentale de suivi des logs (ElasticSearch + Kibana)
+- Mise en place des transferts de fichiers automatiques vers l'ASP (fiches salarié)
+
+### Modifié
+
+- Filtrage des agréments Pôle emploi qui démarrent dans le futur afin qu'ils n'apparaissent pas dans les résultats d'import
+- Traduction en français du message d'erreur produit lorsque le mot de passe est similaire à l'adresse e-mail
+- Harmonisation de l'affichage des messages d'erreurs de formulaire
+- Correction d'un bug lors du téléchargement d'un PASS IAE lorsque ce dernier n'est lié à aucun diagnostic
+- Correction sur les invitations, un membre retiré d'une structure peut désormais être réinvité
+- Correction des erreurs 404 sur la reprise d'un agrément Pôle emploi lorsque la SIAE destinataire de la dernière candidature n'est pas la SIAE connectée
+- Mise à jour du SDK sentry de la version 1.1.0 vers 1.3.0
+
 ## [21] - 2021-07-02
 
 ### Ajouté
