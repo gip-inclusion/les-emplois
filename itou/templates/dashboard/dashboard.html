@@ -36,7 +36,7 @@
             Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.<br>
             À compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.<br>
 
-            {% if user_is_admin %}
+            {% if user_is_siae_admin %}
                 Veuillez dès que possible régulariser votre situation
                 <a href="{% url 'siaes_views:show_financial_annexes' %}">en sélectionnant une annexe financière valide}</a>.<br>
             {% else %}
@@ -197,7 +197,7 @@
                     <div class="card-body">
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
-                            {% if user_is_admin %}
+                            {% if user_is_prescriber_org_admin %}
                             <a href="{% url 'prescribers_views:edit_organization' %}">
                                 Modifier les informations
                             </a>
@@ -215,7 +215,7 @@
                                 Gérer vos collaborateurs
                             </a>
                         </p>
-                        {% if current_prescriber_organization.kind == current_prescriber_organization.Kind.DEPT and user_is_admin %}
+                        {% if current_prescriber_organization.kind == current_prescriber_organization.Kind.DEPT and user_is_prescriber_org_admin %}
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="list" %}
                                 <a href="{% url 'prescribers_views:list_accredited_organizations' %}">
@@ -269,7 +269,7 @@
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
-                        {% if user_is_admin %}
+                        {% if user_is_siae_admin %}
                             <a href="{% url 'siaes_views:edit_siae' %}">
                                 Modifier les informations de l'établissement
                             </a>
@@ -307,7 +307,7 @@
                             {% endif %}
                         </p>
                     {% endif %}
-                    {% if current_siae.is_active and user_is_admin %}
+                    {% if current_siae.is_active and user_is_siae_admin %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="plus-square" %}
                             <a href="{% url 'siaes_views:create_siae' %}">Créer/rejoindre une autre structure</a>
