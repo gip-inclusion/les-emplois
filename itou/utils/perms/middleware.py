@@ -18,13 +18,15 @@ class ItouCurrentOrganizationMiddleware:
 
         # Before the view is called.
         user = request.user
-        skip_middleware = (
-            request.path
-            in [
-                reverse("account_logout"),
-                reverse("account_login"),
-            ]
-            or (request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"))
+
+        # Accepting an invitation to join a group is a two-step process.
+        # - View one: account creation or login.
+        # - View two: user is added to the group.
+        # In view two, the user is authenticated and has a flag (is_siae_staff, is_prescriber, ...)
+        # but he does not belong to any group.
+        # This raises an error so we skip the middleware only in this case.
+        skip_middleware = request.path.startswith("/invitations/") and not request.path.startswith(
+            "/invitations/invite"
         )
         if skip_middleware:
             return self.get_response(request)
