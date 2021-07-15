@@ -59,9 +59,9 @@ urlpatterns = [
     path("dashboard/", include("itou.www.dashboard.urls")),
     # Disabled feature / endpoint: uncomment at release
     # path("employee_record/", include("itou.www.employee_record_views.urls")),
+    path("institutions/", include("itou.www.institutions_views.urls")),
     path("invitations/", include("itou.www.invitations_views.urls")),
     path("prescribers/", include("itou.www.prescribers_views.urls")),
-    path("institutions/", include("itou.www.institutions_views.urls")),
     path("search/", include("itou.www.search.urls")),
     path("siae/", include("itou.www.siaes_views.urls")),
     path("signup/", include("itou.www.signup.urls")),
