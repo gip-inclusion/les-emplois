@@ -12,7 +12,7 @@ class InstitutionFactory(factory.django.DjangoModelFactory):
         model = models.Institution
 
     name = factory.Faker("name", locale="fr_FR")
-    kind = models.Institution.Kind.DDEETS
+    kind = models.Institution.Kind.DDETS
 
 
 class InstitutionMembershipFactory(factory.django.DjangoModelFactory):

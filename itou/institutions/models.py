@@ -6,7 +6,7 @@ The first member is imported from a CSV file. Joining a institution is possible 
 an invitation from one of its members.
 
 For the moment, only labor inspectors (User.is_labor_inspector) can be members.
-They belong to a DDEETS, a DREETS or a DGEFP.
+They belong to a DDETS, a DREETS or a DGEFP.
 """
 
 from django.db import models
@@ -31,7 +31,7 @@ class InstitutionQuerySet(models.QuerySet):
 
 class Institution(AddressMixin):
     class Kind(models.TextChoices):
-        DDEETS = ("DDEETS", "Direction départementale de l'économie, de l'emploi, du travail et des solidarités")
+        DDETS = ("DDETS", "Direction départementale de l'emploi, du travail et des solidarités")
         DREETS = ("DREETS", "Direction régionale de l'économie, de l'emploi, du travail et des solidarités")
         DGEFP = ("DGEFP", "Délégation générale à l'emploi et à la formation professionnelle")
         OTHER = "OTHER", "Autre"

@@ -118,9 +118,9 @@ class User(AbstractUser, AddressMixin):
     is_prescriber = models.BooleanField(verbose_name="Prescripteur", default=False)
     is_siae_staff = models.BooleanField(verbose_name="Employeur (SIAE)", default=False)
     is_stats_vip = models.BooleanField(verbose_name="Pilotage", default=False)
-    # Members of DDEETS, DREETS or DGEFP institution have their own dashboard.
+    # Members of DDETS, DREETS or DGEFP institution have their own dashboard.
     is_labor_inspector = models.BooleanField(
-        verbose_name="Inspecteur du travail (DDEETS, DREETS, DGEFP)", default=False
+        verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
     )
 
     # The two following Pôle emploi fields are reserved for job seekers.
