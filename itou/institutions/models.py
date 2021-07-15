@@ -1,8 +1,8 @@
 """
 Institutions are stakeholder groups who are neither SIAE nor Prescriber Organizations.
-They share with SIAE and Prescriber Organization some features,
+They share some features with SIAE and Prescriber Organization objects,
 such as memberships, administrators rights or the Address mixin.
-The first member is imported from a CSV file. Joining a institution is possible only with
+The first member is imported from a CSV file. Joining an institution is possible only with
 an invitation from one of its members.
 
 For the moment, only labor inspectors (User.is_labor_inspector) can be members.
