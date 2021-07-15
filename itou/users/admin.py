@@ -76,7 +76,11 @@ class PrescriberMembershipInline(admin.TabularInline):
 class InstitutionMembershipInline(admin.TabularInline):
     model = InstitutionMembership
     extra = 0
-    raw_id_fields = ("institution",)
+    raw_id_fields = (
+        "institution",
+        "user",
+        "updated_by",
+    )
     readonly_fields = (
         "institution",
         "institution_id_link",
