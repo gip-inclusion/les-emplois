@@ -1,5 +1,4 @@
 import factory
-import factory.fuzzy
 
 from itou.institutions import models
 from itou.users.factories import LaborInspectorFactory
