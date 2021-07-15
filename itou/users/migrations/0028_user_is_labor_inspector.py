@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="user",
             name="is_labor_inspector",
-            field=models.BooleanField(default=False, verbose_name="Inspecteur du travail (DDEETS, DREETS, DGEFP)"),
+            field=models.BooleanField(default=False, verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)"),
         ),
     ]

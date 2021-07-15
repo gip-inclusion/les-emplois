@@ -48,7 +48,7 @@ class InvitationAbstract(models.Model):
         (GUEST_TYPE_PRESCRIBER, "Prescripteur sans organisation"),
         (GUEST_TYPE_PRESCRIBER_WITH_ORG, "Prescripteur membre d'une organisation"),
         (GUEST_TYPE_SIAE_STAFF, "Employeur"),
-        (GUEST_TYPE_LABOR_INSPECTOR, "Inspecteur du travail (DGEFP, DDEETS, DREETS)"),
+        (GUEST_TYPE_LABOR_INSPECTOR, "Inspecteur du travail (DGEFP, DDETS, DREETS)"),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

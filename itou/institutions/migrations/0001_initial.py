@@ -170,8 +170,8 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             (
-                                "DDEETS",
-                                "Direction départementale de l'économie, de l'emploi, du travail et des solidarités",
+                                "DDETS",
+                                "Direction départementale de l'emploi, du travail et des solidarités",
                             ),
                             (
                                 "DREETS",
