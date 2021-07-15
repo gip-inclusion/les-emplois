@@ -78,8 +78,8 @@ def get_current_organization_and_perms(request):
 
             for membership in memberships:
                 # Same as above:
-                # In order to avoid an extra SQL query, fetch related organizations
-                # and artificially reconstruct the list of organizations the user belongs to
+                # In order to avoid an extra SQL query, fetch related institutions
+                # and artificially reconstruct the list of institutions the user belongs to
                 # (and other stuff while at it)
                 user_institutions.append(membership.institution)
                 if membership.institution.pk == institution_pk:
