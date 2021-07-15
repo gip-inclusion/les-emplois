@@ -16,8 +16,6 @@ class MembersInline(admin.TabularInline):
 
 @admin.register(models.Institution)
 class InstitutionAdmin(admin.ModelAdmin):
-    class Media:
-        css = {"all": ("css/itou-admin.css",)}
 
     form = InstitutionAdminForm
     fieldsets = (
