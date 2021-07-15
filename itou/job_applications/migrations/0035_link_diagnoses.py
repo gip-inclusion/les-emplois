@@ -1,4 +1,11 @@
 """
+This migration has been deactivated after its first run.
+We had to do it because adding new migrations to the User application
+was breaking this one.
+Anyway, it was made to migrate data so running it twice is useless.
+
+----
+
 After this migration (as of 2021-06-24) there are 287 cases for which
 no diagnosis is found. Here is a way to retrieve the job applications
 concerned:
@@ -110,6 +117,7 @@ def move_data_forward(apps, schema_editor):
 
     #     job_application.eligibility_diagnosis = eligibility_diagnosis
     #     job_application.save()
+    pass
 
 
 class Migration(migrations.Migration):
