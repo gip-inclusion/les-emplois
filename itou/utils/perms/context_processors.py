@@ -16,7 +16,9 @@ def get_current_organization_and_perms(request):
     user_institutions = []
     current_institution = None
     siae = None
-    user_is_admin = False
+    user_is_prescriber_org_admin = False
+    user_is_siae_admin = False
+    user_is_institution_admin = False
     user_siaes = []
 
     current_user = request.user
@@ -39,7 +41,7 @@ def get_current_organization_and_perms(request):
             for membership in memberships:
                 if membership.siae_id == siae_pk:
                     siae = membership.siae
-                    user_is_admin = membership.is_siae_admin
+                    user_is_siae_admin = membership.is_siae_admin
                     break
             if siae is None:
                 if request.path != reverse("account_logout"):
@@ -64,7 +66,7 @@ def get_current_organization_and_perms(request):
                 user_prescriberorganizations.append(membership.organization)
                 if membership.organization.pk == prescriber_org_pk:
                     prescriber_organization = membership.organization
-                    user_is_admin = membership.is_admin
+                    user_is_prescriber_org_admin = membership.is_admin
 
         # Institution?
         institution_pk = request.session.get(settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
@@ -84,13 +86,15 @@ def get_current_organization_and_perms(request):
                 user_institutions.append(membership.institution)
                 if membership.institution.pk == institution_pk:
                     current_institution = membership.institution
-                    user_is_admin = membership.is_admin
+                    user_is_institution_admin = membership.is_admin
 
     context = {
         "current_prescriber_organization": prescriber_organization,
         "current_siae": siae,
         "current_institution": current_institution,
-        "user_is_admin": user_is_admin,
+        "user_is_prescriber_org_admin": user_is_prescriber_org_admin,
+        "user_is_siae_admin": user_is_siae_admin,
+        "user_is_institution_admin": user_is_institution_admin,
         "user_siaes": user_siaes,
         "user_prescriberorganizations": user_prescriberorganizations,
         "user_institutions": user_institutions,
@@ -98,14 +102,17 @@ def get_current_organization_and_perms(request):
 
     context.update(
         get_matomo_context(
-            user=request.user, prescriber_organization=prescriber_organization, user_is_admin=user_is_admin
+            user=request.user,
+            prescriber_organization=prescriber_organization,
+            user_is_siae_admin=user_is_siae_admin,
+            user_is_institution_admin=user_is_institution_admin,
         )
     )
 
     return context
 
 
-def get_matomo_context(user, prescriber_organization, user_is_admin):
+def get_matomo_context(user, prescriber_organization, user_is_siae_admin, user_is_institution_admin):
     is_authenticated = "yes" if user.is_authenticated else "no"
 
     if not user.is_authenticated:
@@ -126,10 +133,10 @@ def get_matomo_context(user, prescriber_organization, user_is_admin):
             account_sub_type = "prescriber_without_org"
     elif user.is_siae_staff:
         account_type = "employer"
-        account_sub_type = "employer_admin" if user_is_admin else "employer_not_admin"
+        account_sub_type = "employer_admin" if user_is_siae_admin else "employer_not_admin"
     elif user.is_labor_inspector:
         account_type = "labor_inspector"
-        account_sub_type = "inspector_admin" if user_is_admin else "inspector_not_admin"
+        account_sub_type = "inspector_admin" if user_is_institution_admin else "inspector_not_admin"
     else:
         account_type = "unknown"
         account_sub_type = "unknown"
