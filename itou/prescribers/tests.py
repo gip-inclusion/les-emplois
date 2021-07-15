@@ -106,33 +106,30 @@ class PrescriberOrganizationModelTest(TestCase):
 
     def test_active_admin_members(self):
         """
-        Test that if a user is admin of org1 and regular user
-        of org2 it does not get considered as admin of org2.
+        Test that if a user is admin of org_1 and regular user
+        of org2 he is not considered as admin of org_2.
         """
-        organization1 = PrescriberOrganizationWithMembershipFactory()
-        organization1_admin_user = organization1.active_admin_members.get()
-        organization2 = PrescriberOrganizationWithMembershipFactory()
-        organization2.members.add(organization1_admin_user)
+        org_1 = PrescriberOrganizationWithMembershipFactory()
+        org_1_admin_user = org_1.members.first()
+        org_2 = PrescriberOrganizationWithMembershipFactory()
+        org_2.members.add(org_1_admin_user)
 
-        self.assertEqual(organization1.members.count(), 1)
-        self.assertEqual(organization1.active_members.count(), 1)
-        self.assertEqual(organization1.active_admin_members.count(), 1)
+        self.assertIn(org_1_admin_user, org_1.active_admin_members)
+        self.assertNotIn(org_1_admin_user, org_2.active_admin_members)
 
-        self.assertEqual(organization2.members.count(), 2)
-        self.assertEqual(organization2.active_members.count(), 2)
-        self.assertEqual(organization2.active_admin_members.count(), 1)
+    def test_active_members(self):
+        org = PrescriberOrganizationWith2MembershipFactory(membership2__is_active=False)
+        user_with_active_membership = org.members.first()
+        user_with_inactive_membership = org.members.last()
 
-    def test_active_member_with_many_memberships(self):
-        organization1 = PrescriberOrganizationWith2MembershipFactory(membership2__is_active=False)
-        user = organization1.members.filter(prescribermembership__is_admin=False).first()
-        organization2 = PrescriberOrganizationWith2MembershipFactory()
-        organization2.members.add(user)
+        self.assertNotIn(user_with_inactive_membership, org.active_members)
+        self.assertIn(user_with_active_membership, org.active_members)
 
-        self.assertFalse(user in organization1.active_members)
-        self.assertEqual(organization1.members.count(), 2)
-        self.assertEqual(organization1.active_members.count(), 1)
-        self.assertEqual(organization2.members.count(), 3)
-        self.assertEqual(organization2.active_members.count(), 3)
+        # Deactivate a user
+        user_with_active_membership.is_active = False
+        user_with_active_membership.save()
+
+        self.assertNotIn(user_with_active_membership, org.active_members)
 
     def test_merge_two_organizations(self):
         job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
