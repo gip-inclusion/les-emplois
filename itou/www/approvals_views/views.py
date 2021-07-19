@@ -252,16 +252,18 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
         # If the identifier matches an existing approval…
         if approval:
             # …ensure that the last accepted job application belongs to the current SIAE…
-            job_app = approval.user.last_accepted_job_application
-            if job_app.to_siae == siae:
-                application_details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_app.pk})
+            job_application = approval.user.last_accepted_job_application
+            if job_application.to_siae == siae:
+                application_details_url = reverse(
+                    "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
+                )
                 return HttpResponseRedirect(application_details_url)
-            else:
-                # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
-                # has already been transformed into an `Approval`.
-                msg = f"Le numéro {approval.number_with_spaces} est déjà utilisé par un autre employeur."
-                messages.error(request, msg)
-                return HttpResponseRedirect(reverse("approvals:pe_approval_search"))
+
+            # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
+            # has already been transformed into an `Approval`.
+            msg = f"Le numéro {approval.number_with_spaces} est déjà utilisé par un autre employeur."
+            messages.error(request, msg)
+            return HttpResponseRedirect(reverse("approvals:pe_approval_search"))
 
         # Otherwise, we display a search, and whenever it's possible, a matching `PoleEmploiApproval`.
         pe_approval = PoleEmploiApproval.objects.filter(number=number, start_at__lte=datetime.date.today()).first()
