@@ -244,8 +244,10 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
         number = form.cleaned_data["number"]
 
         # We search if the approval already exists with this exact number,
-        # or if it was created from the first 12 digits of a PoleEmploiApproval's number
-        approval = Approval.objects.filter(number__in=[number, number[:12]]).first()
+        approval = Approval.objects.filter(number=number).first()
+        if not approval:
+            # or if it was created from the first 12 digits of a PoleEmploiApproval's number
+            approval = Approval.objects.filter(number=number[:12]).first()
 
         # If the identifier matches an existing approval…
         if approval:
