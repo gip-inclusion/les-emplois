@@ -6,6 +6,7 @@ from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from itou.institutions.models import InstitutionMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
@@ -72,6 +73,39 @@ class PrescriberMembershipInline(admin.TabularInline):
         return mark_safe(f'<a href="{url}">{obj.organization_id}</a>')
 
 
+class InstitutionMembershipInline(admin.TabularInline):
+    model = InstitutionMembership
+    extra = 0
+    raw_id_fields = (
+        "institution",
+        "user",
+        "updated_by",
+    )
+    readonly_fields = (
+        "institution",
+        "institution_id_link",
+        "joined_at",
+        "is_admin",
+        "is_active",
+        "created_at",
+        "updated_at",
+    )
+    can_delete = False
+    fk_name = "user"
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def institution_id_link(self, obj):
+        app_label = obj.institution._meta.app_label
+        model_name = obj.institution._meta.model_name
+        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.institution_id])
+        return mark_safe(f'<a href="{url}">{obj.institution_id}</a>')
+
+
 class KindFilter(admin.SimpleListFilter):
     title = "Type"
     parameter_name = "kind"
@@ -82,6 +116,7 @@ class KindFilter(admin.SimpleListFilter):
             ("is_prescriber", "Prescripteur"),
             ("is_siae_staff", "SIAE"),
             ("is_stats_vip", "Pilotage"),
+            ("is_labor_inspector", "Inspecteur du travail"),
         )
 
     def queryset(self, request, queryset):
@@ -94,6 +129,8 @@ class KindFilter(admin.SimpleListFilter):
             queryset = queryset.filter(is_siae_staff=True)
         elif value == "is_stats_vip":
             queryset = queryset.filter(is_stats_vip=True)
+        elif value == "is_labor_inspector":
+            queryset = queryset.filter(is_labor_inspector=True)
         return queryset
 
 
@@ -119,6 +156,7 @@ class ItouUserAdmin(UserAdmin):
     inlines = UserAdmin.inlines + [
         SiaeMembershipInline,
         PrescriberMembershipInline,
+        InstitutionMembershipInline,
     ]
     list_display = (
         "pk",
@@ -163,6 +201,7 @@ class ItouUserAdmin(UserAdmin):
                     "is_prescriber",
                     "is_siae_staff",
                     "is_stats_vip",
+                    "is_labor_inspector",
                     "pole_emploi_id",
                     "lack_of_pole_emploi_id_reason",
                     "created_by",

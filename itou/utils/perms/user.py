@@ -7,6 +7,7 @@ from itou.utils.perms.siae import get_current_siae_or_404
 KIND_JOB_SEEKER = "job_seeker"
 KIND_PRESCRIBER = "prescriber"
 KIND_SIAE_STAFF = "siae_staff"
+KIND_LABOR_INSPECTOR = "labor_inspector"
 
 UserInfo = namedtuple("UserInfo", ["user", "kind", "prescriber_organization", "is_authorized_prescriber", "siae"])
 

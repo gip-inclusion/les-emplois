@@ -10,7 +10,7 @@ from django.utils.http import urlencode
 
 from itou.users.models import User
 from itou.utils.emails import get_email_message
-from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.urls import get_absolute_url
 
 
@@ -42,11 +42,13 @@ class InvitationAbstract(models.Model):
     GUEST_TYPE_PRESCRIBER = KIND_PRESCRIBER
     GUEST_TYPE_PRESCRIBER_WITH_ORG = KIND_PRESCRIBER
     GUEST_TYPE_SIAE_STAFF = KIND_SIAE_STAFF
+    GUEST_TYPE_LABOR_INSPECTOR = KIND_LABOR_INSPECTOR
     GUEST_TYPES = [
         (GUEST_TYPE_JOB_SEEKER, "Candidat"),
         (GUEST_TYPE_PRESCRIBER, "Prescripteur sans organisation"),
         (GUEST_TYPE_PRESCRIBER_WITH_ORG, "Prescripteur membre d'une organisation"),
         (GUEST_TYPE_SIAE_STAFF, "Employeur"),
+        (GUEST_TYPE_LABOR_INSPECTOR, "Inspecteur du travail (DGEFP, DDETS, DREETS)"),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -78,6 +80,8 @@ class InvitationAbstract(models.Model):
             return SiaeStaffInvitation
         elif model_string == cls.GUEST_TYPE_PRESCRIBER_WITH_ORG:
             return PrescriberWithOrgInvitation
+        elif model_string == cls.GUEST_TYPE_LABOR_INSPECTOR:
+            return LaborInspectorInvitation
         raise TypeError
 
     def __str__(self):
@@ -209,7 +213,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "sender": self.sender,
-            "org": self.organization,
+            "establishment": self.organization,
         }
         subject = "invitations_views/email/invitation_establishment_subject.txt"
         body = "invitations_views/email/invitation_establishment_body.txt"
@@ -283,7 +287,83 @@ class SiaeStaffInvitation(InvitationAbstract):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "sender": self.sender,
-            "org": self.siae,
+            "establishment": self.siae,
+        }
+        subject = "invitations_views/email/invitation_establishment_subject.txt"
+        body = "invitations_views/email/invitation_establishment_body.txt"
+        return get_email_message(to, context, subject, body)
+
+
+class LaborInspectorInvitation(InvitationAbstract):
+    SIGNIN_ACCOUNT_TYPE = "labor_inspector"
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="Parrain ou marraine",
+        on_delete=models.CASCADE,
+        related_name="institution_invitations",
+    )
+    institution = models.ForeignKey(
+        "institutions.Institution", on_delete=models.CASCADE, related_name="labor_inspectors_invitations"
+    )
+
+    class Meta:
+        verbose_name = "Invitation inspecteurs du travail"
+        verbose_name_plural = "Invitations inspecteurs du travail"
+
+    @property
+    def acceptance_link(self):
+        kwargs = {"invitation_id": self.pk, "invitation_type": self.GUEST_TYPE_LABOR_INSPECTOR}
+        signup_kwargs = {"invitation_type": self.GUEST_TYPE_LABOR_INSPECTOR, **kwargs}
+        args = {"redirect_to": reverse("invitations_views:join_institution", kwargs=kwargs)}
+        acceptance_path = "{}?{}".format(
+            reverse("invitations_views:new_user", kwargs=signup_kwargs), urlencode(args, True)
+        )
+        return get_absolute_url(acceptance_path)
+
+    def add_invited_user_to_institution(self):
+        user = User.objects.get(email=self.email)
+        self.institution.members.add(user)
+        user.save()
+        # We must be able to invite a former member of this institution
+        # however `members.add()` does not update membership status if it already exists
+        if user not in self.institution.active_members:
+            membership = user.institutionmembership_set.get(is_active=False, institution=self.institution)
+            membership.is_active = True
+            membership.save()
+
+    def guest_can_join_institution(self, request):
+        user = get_object_or_404(User, email=self.email)
+        return user == request.user and user.is_labor_inspector
+
+    def set_guest_type(self, user):
+        user.is_labor_inspector = True
+        return user
+
+    # Emails
+    @property
+    def email_accepted_notif_sender(self):
+        to = [self.sender.email]
+        context = {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "establishment_name": self.institution.display_name,
+        }
+        subject = "invitations_views/email/accepted_notif_sender_subject.txt"
+        body = "invitations_views/email/accepted_notif_establishment_sender_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_invitation(self):
+        to = [self.email]
+        context = {
+            "acceptance_link": self.acceptance_link,
+            "expiration_date": self.expiration_date,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "sender": self.sender,
+            "establishment": self.institution,
         }
         subject = "invitations_views/email/invitation_establishment_subject.txt"
         body = "invitations_views/email/invitation_establishment_body.txt"

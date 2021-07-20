@@ -142,6 +142,27 @@
                                 </div>
                             {% endif %}
 
+                            {% if user.is_labor_inspector and user_institutions|length > 1 %}
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                                        Changer de structure
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
+                                        <form action="{% url 'dashboard:switch_institution' %}" method="post">
+                                            {% csrf_token %}
+                                            {% for i in user_institutions %}
+                                                <button
+                                                    class="dropdown-item text-primary {% if i.pk == current_institution.pk %} font-weight-bold disabled{% endif %}"
+                                                    type="submit"
+                                                    name="institution_id"
+                                                    value="{{ i.pk }}">{{ i.display_name }} <span class="badge badge-primary">{{ i.kind }}</span>
+                                                </button>
+                                            {% endfor %}
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endif %}
+
                             </div>
 
                         {% else %}
@@ -158,6 +179,9 @@
                                     </a>
                                     <a class="dropdown-item" href="{% url 'account_login' %}?account_type=siae{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                                         Employeur solidaire
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=institution{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                                        Institution partenaire
                                     </a>
                                 </div>
                             </div>

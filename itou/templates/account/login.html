@@ -49,17 +49,20 @@
 
 </form>
 
-<hr>
 
-<p>Vous n'avez pas de compte ?</p>
+{% if signup_allowed %}
+    <hr>
+    <p>Vous n'avez pas de compte ?</p>
 
-<p>
-    <a class="btn btn-outline-primary" href="{{ signup_url }}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-    Créer un compte
-    {% if account_type_display_name %}
-        {{ account_type_display_name|lower }}
-    {% endif %}
-    </a>
-</p>
+    <p>
+        <a class="btn btn-outline-primary" href="{{ signup_url }}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+        Créer un compte
+        {% if account_type_display_name %}
+            {{ account_type_display_name|lower }}
+        {% endif %}
+        </a>
+    </p>
+
+{% endif %}
 
 {% endblock %}

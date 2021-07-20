@@ -17,8 +17,24 @@ class ItouCurrentOrganizationMiddleware:
     def __call__(self, request):
 
         # Before the view is called.
-
         user = request.user
+
+        # Accepting an invitation to join a group is a two-step process.
+        # - View one: account creation or login.
+        # - View two: user is added to the group.
+        # In view two, the user is authenticated and has a flag (is_siae_staff, is_prescriber, ...)
+        # but he does not belong to any group.
+        # This raises an error so we skip the middleware only in this case.
+        skip_middleware = (
+            request.path
+            in [
+                reverse("account_logout"),
+                reverse("account_login"),
+            ]
+            or (request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"))
+        )
+        if skip_middleware:
+            return self.get_response(request)
 
         if user.is_authenticated:
             if user.is_siae_staff:
@@ -33,14 +49,7 @@ class ItouCurrentOrganizationMiddleware:
                     first_siae = siae_set.active().first() or siae_set.first()
                     if first_siae:
                         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_siae.pk
-                    elif (
-                        request.path
-                        not in [
-                            reverse("account_logout"),
-                            reverse("account_login"),
-                        ]
-                        and not request.path.startswith("/invitations/")
-                    ):
+                    else:
                         # SIAE user has no active SIAE and thus must not be able to access any page,
                         # thus we force a logout with a few exceptions:
                         # - logout (to avoid infinite redirect loop)
@@ -83,6 +92,25 @@ class ItouCurrentOrganizationMiddleware:
                     # => No need to track the current org in session (none)
                     # => Remove any old session entry if needed
                     del request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
+
+            elif user.is_labor_inspector:
+                current_institution_key = request.session.get(settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
+                if not current_institution_key:
+                    first_active_membership = user.institutionmembership_set.filter(is_active=True).first()
+                    if not first_active_membership:
+                        message = (
+                            "Nous sommes désolés, votre compte n'est "
+                            "actuellement rattaché à aucune structure.<br>"
+                            "Nous espérons cependant avoir l'occasion de vous accueillir de "
+                            "nouveau."
+                        )
+                        message = safestring.mark_safe(message)
+                        messages.warning(request, message)
+                        return redirect("account_logout")
+
+                    request.session[
+                        settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY
+                    ] = first_active_membership.institution.pk
 
         response = self.get_response(request)
 

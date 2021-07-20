@@ -7,18 +7,18 @@
 <h1>Collaborateurs</h1>
 
 <h2 class="text-muted">
-    {{ organization.display_name }}
+    {{ institution.display_name }}
 </h2>
 
 <div class="alert alert-info" role="alert">
     Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
 </div>
 
-{% with active_admin_members=organization.active_admin_members base_url="prescribers_views" %}
+{% with active_admin_members=institution.active_admin_members base_url="institutions_views" %}
     {% include "includes/members.html" %}
 {% endwith %}
 
-<a href="{% url 'invitations_views:invite_prescriber_with_org' %}" class="align-self-center">
+<a href="{% url 'invitations_views:invite_labor_inspector' %}" class="align-self-center">
     <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">Inviter des collaborateurs</button>
 </a>
 

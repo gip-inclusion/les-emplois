@@ -3,7 +3,7 @@
 
 Bonjour {{ first_name|capfirst }} {{ last_name|capfirst }} !
 
-Vous avez été invité(e) à vous rattacher au compte de la structure {{ org.display_name }} sur les emplois de l'inclusion. Cliquez sur le lien ci-dessous pour vous inscrire en quelques clics. Nous sommes ravis de vous accueillir sur les emplois de l'inclusion !
+Vous avez été invité(e) à vous rattacher au compte de la structure {{ establishment.display_name }} sur les emplois de l'inclusion. Cliquez sur le lien ci-dessous pour vous inscrire en quelques clics. Nous sommes ravis de vous accueillir sur les emplois de l'inclusion !
 
 {{ acceptance_link }}
 

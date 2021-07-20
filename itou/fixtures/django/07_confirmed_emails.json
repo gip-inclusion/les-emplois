@@ -158,5 +158,15 @@
       "verified": true,
       "primary": true
    }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 17,
+   "fields": {
+      "user": 24,
+      "email": "test+dreets@inclusion.beta.gouv.fr",
+      "verified": true,
+      "primary": true
+   }
 }
 ]

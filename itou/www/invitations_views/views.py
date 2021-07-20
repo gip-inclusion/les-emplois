@@ -9,10 +9,12 @@ from django.utils import formats, safestring
 
 from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.users.models import User
+from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.invitations_views.forms import (
+    LaborInspectorInvitationFormSet,
     NewUserInvitationForm,
     PrescriberWithOrgInvitationFormSet,
     SiaeStaffInvitationFormSet,
@@ -120,6 +122,7 @@ def join_prescriber_organization(request, invitation_id):
     else:
         messages.error(request, "Cette invitation n'est plus valide.")
 
+    request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = invitation.organization.pk
     return redirect("dashboard:index")
 
 
@@ -181,4 +184,66 @@ def join_siae(request, invitation_id):
         messages.error(request, "Cette invitation n'est plus valide.")
 
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = invitation.siae.pk
+    return redirect("dashboard:index")
+
+
+@login_required
+def invite_labor_inspector(request, template_name="invitations_views/create.html"):
+    institution = get_current_institution_or_404(request)
+    form_kwargs = {"sender": request.user, "institution": institution}
+    formset = LaborInspectorInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
+    if request.POST:
+        if formset.is_valid():
+            # We don't need atomicity here (invitations are independent)
+            invitations = formset.save()
+
+            for invitation in invitations:
+                invitation.send()
+
+            count = len(formset.forms)
+            if count == 1:
+                message = (
+                    "Votre invitation a été envoyée par e-mail.<br>"
+                    "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
+                    "sur le lien de validation reçu dans le courriel.<br>"
+                )
+            else:
+                message = (
+                    "Vos invitations ont été envoyées par e-mail.<br>"
+                    "Pour rejoindre votre organisation, vos invités peuvent désormais "
+                    "cliquer sur le lien de validation reçu dans l'e-mail.<br>"
+                )
+
+            expiration_date = formats.date_format(invitations[0].expiration_date)
+            message += f"Le lien de validation est valable jusqu'au {expiration_date}."
+            message = safestring.mark_safe(message)
+            messages.success(request, message)
+
+            return redirect(request.path)
+
+    form_post_url = reverse("invitations_views:invite_labor_inspector")
+    back_url = reverse("institutions_views:members")
+    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset}
+
+    return render(request, template_name, context)
+
+
+@login_required
+def join_institution(request, invitation_type, invitation_id):
+    invitation_type = InvitationAbstract.get_model_from_string(invitation_type)
+    invitation = get_object_or_404(invitation_type, pk=invitation_id)
+    if not invitation.guest_can_join_institution(request):
+        raise PermissionDenied()
+
+    if invitation.can_be_accepted:
+        with transaction.atomic():
+            invitation.add_invited_user_to_institution()
+            invitation.accept()
+        messages.success(
+            request, f"Vous êtes désormais membre de l'organisation' {invitation.institution.display_name}."
+        )
+    else:
+        messages.error(request, "Cette invitation n'est plus valide.")
+
+    request.session[settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = invitation.institution.pk
     return redirect("dashboard:index")

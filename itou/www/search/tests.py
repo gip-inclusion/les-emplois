@@ -168,7 +168,7 @@ class SearchPrescriberTest(TestCase):
     def test_home(self):
         url = reverse("search:prescribers_home")
         response = self.client.get(url)
-        self.assertContains(response, "Rechercher des prescripteurs")
+        self.assertContains(response, "Rechercher des prescripteurs habilités")
 
     def test_results(self):
         url = reverse("search:prescribers_results")

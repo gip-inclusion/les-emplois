@@ -12,6 +12,7 @@ from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from factory import Faker
 
+from itou.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
@@ -50,29 +51,48 @@ from itou.utils.validators import (
 class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
     """Test `itou.utils.perms.context_processors.get_current_organization_and_perms` processor."""
 
-    def test_siae_one_membership(self):
+    @property
+    def default_result(self):
+        return {
+            "current_prescriber_organization": None,
+            "current_siae": None,
+            "current_institution": None,
+            "user_is_prescriber_org_admin": False,
+            "user_is_siae_admin": False,
+            "user_is_institution_admin": False,
+            "user_siaes": [],
+            "user_prescriberorganizations": [],
+            "user_institutions": [],
+            "matomo_custom_variables": OrderedDict(
+                [("is_authenticated", "yes"), ("account_type", None), ("account_sub_type", None)]
+            ),
+        }
 
-        siae = SiaeWithMembershipFactory()
-        user = siae.members.first()
-        self.assertTrue(siae.has_admin(user))
-
+    def go_to_dashboard(self, user, establishment_session_key, establishment_pk):
         factory = RequestFactory()
         request = factory.get("/")
         request.user = user
         middleware = SessionMiddleware()
         middleware.process_request(request)
-        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+        request.session[establishment_session_key] = establishment_pk
         request.session.save()
+        return request
+
+    def test_siae_one_membership(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.assertTrue(siae.has_admin(user))
+
+        request = self.go_to_dashboard(
+            user=user, establishment_session_key=settings.ITOU_SESSION_CURRENT_SIAE_KEY, establishment_pk=siae.pk
+        )
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = {
-                "current_prescriber_organization": None,
+            expected = self.default_result | {
                 "current_siae": siae,
-                "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": True,
                 "user_siaes": [siae],
-                "user_prescriberorganizations": [],
                 "matomo_custom_variables": OrderedDict(
                     [("is_authenticated", "yes"), ("account_type", "employer"), ("account_sub_type", "employer_admin")]
                 ),
@@ -89,27 +109,17 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         siae2.members.add(user)
         self.assertFalse(siae2.has_admin(user))
 
-        siae3 = SiaeFactory()
-        siae3.members.add(user)
-        self.assertFalse(siae3.has_admin(user))
-
-        factory = RequestFactory()
-        request = factory.get("/")
-        request.user = user
-        middleware = SessionMiddleware()
-        middleware.process_request(request)
-        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae3.pk
-        request.session.save()
+        request = self.go_to_dashboard(
+            user=user, establishment_session_key=settings.ITOU_SESSION_CURRENT_SIAE_KEY, establishment_pk=siae2.pk
+        )
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = {
-                "current_prescriber_organization": None,
-                "current_siae": siae3,
-                "user_is_prescriber_org_admin": False,
+
+            expected = self.default_result | {
+                "current_siae": siae2,
+                "user_siaes": [siae1, siae2],
                 "user_is_siae_admin": False,
-                "user_siaes": [siae1, siae2, siae3],
-                "user_prescriberorganizations": [],
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
@@ -121,28 +131,22 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             self.assertDictEqual(expected, result)
 
     def test_prescriber_organization_one_membership(self):
-
         organization = PrescriberOrganizationWithMembershipFactory()
         user = organization.members.first()
         self.assertTrue(user.prescribermembership_set.get(organization=organization).is_admin)
 
-        factory = RequestFactory()
-        request = factory.get("/")
-        request.user = user
-        middleware = SessionMiddleware()
-        middleware.process_request(request)
-        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = organization.pk
-        request.session.save()
+        request = self.go_to_dashboard(
+            user=user,
+            establishment_session_key=settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
+            establishment_pk=organization.pk,
+        )
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = {
+            expected = self.default_result | {
                 "current_prescriber_organization": organization,
-                "current_siae": None,
-                "user_is_prescriber_org_admin": True,
-                "user_is_siae_admin": False,
-                "user_siaes": [],
                 "user_prescriberorganizations": [organization],
+                "user_is_prescriber_org_admin": True,
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
@@ -162,28 +166,80 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         organization2 = PrescriberOrganizationWithMembershipFactory()
         organization2.members.add(user)
 
-        factory = RequestFactory()
-        request = factory.get("/")
-        request.user = user
-        middleware = SessionMiddleware()
-        middleware.process_request(request)
-        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = organization1.pk
-        request.session.save()
+        request = self.go_to_dashboard(
+            user=user,
+            establishment_session_key=settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
+            establishment_pk=organization1.pk,
+        )
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = {
+            expected = self.default_result | {
                 "current_prescriber_organization": organization1,
-                "current_siae": None,
-                "user_is_prescriber_org_admin": True,
-                "user_is_siae_admin": False,
-                "user_siaes": [],
                 "user_prescriberorganizations": [organization1, organization2],
+                "user_is_prescriber_org_admin": True,
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
                         ("account_type", "prescriber"),
                         ("account_sub_type", "prescriber_with_unauthorized_org"),
+                    ]
+                ),
+            }
+            self.assertDictEqual(expected, result)
+
+    def test_labor_inspector_one_institution(self):
+        institution = InstitutionWithMembershipFactory()
+        user = institution.members.first()
+        self.assertTrue(user.institutionmembership_set.get(institution=institution).is_admin)
+
+        request = self.go_to_dashboard(
+            user=user,
+            establishment_session_key=settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
+            establishment_pk=institution.pk,
+        )
+
+        with self.assertNumQueries(1):
+            result = get_current_organization_and_perms(request)
+            expected = self.default_result | {
+                "current_institution": institution,
+                "user_institutions": [institution],
+                "user_is_institution_admin": True,
+                "matomo_custom_variables": OrderedDict(
+                    [
+                        ("is_authenticated", "yes"),
+                        ("account_type", "labor_inspector"),
+                        ("account_sub_type", "inspector_admin"),
+                    ]
+                ),
+            }
+            self.assertDictEqual(expected, result)
+
+    def test_labor_inspector_multiple_institutions(self):
+        institution1 = InstitutionWithMembershipFactory()
+        user = institution1.members.first()
+        self.assertTrue(user.institutionmembership_set.get(institution=institution1).is_admin)
+        institution2 = InstitutionFactory()
+        institution2.members.add(user)
+        self.assertFalse(institution2.has_admin(user))
+
+        request = self.go_to_dashboard(
+            user=user,
+            establishment_session_key=settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
+            establishment_pk=institution2.pk,
+        )
+
+        with self.assertNumQueries(1):
+            result = get_current_organization_and_perms(request)
+            expected = self.default_result | {
+                "current_institution": institution2,
+                "user_institutions": [institution1, institution2],
+                "user_is_institution_admin": False,
+                "matomo_custom_variables": OrderedDict(
+                    [
+                        ("is_authenticated", "yes"),
+                        ("account_type", "labor_inspector"),
+                        ("account_sub_type", "inspector_not_admin"),
                     ]
                 ),
             }
