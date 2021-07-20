@@ -26,28 +26,28 @@
         {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
-            {% if not form.cleaned_data %}
+            {# Change the label of the submit button and the position of the return button if the form is submitted  #}
+            {% if form.cleaned_data %}
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            {% else %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
                 Retour
             </a>
             <button type="submit" class="btn btn-primary">Continuer</button>
-            {% endif %}
-            {% if form.cleaned_data %}
-            <button type="submit" class="btn btn-primary">Rechercher</button>
             {% endif %}
         {% endbuttons %}
 
     </form>
 
     {% if not form.cleaned_data %}
-    <a href="{% url 'signup:prescriber_user' %}" >Je ne fais partie d'aucune organisation</a>
+    <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
     {% endif %}
 
     {% if prescribers_with_members %}
         <div class="mt-5">
             <h3>Organisation(s) déjà inscrite(s)</h3>
             <div class="alert alert-secondary" role="info">
-                <i>Par sécurité vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</i>
+                <i>Par sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</i>
             </div>
             <ul>
                 {% for prescriber in prescribers_with_members %}
@@ -61,12 +61,10 @@
                             {% if prescriber.address_line_2 %}{{ prescriber.address_line_2 }},{% endif %}
                             {{ prescriber.post_code }} {{ prescriber.city }}
                             <br>
-                            {% if prescriber.active_admin_members %}
-                                {% with prescriber.active_admin_members.first as admin %}
-                                    {# For security, display only the first char of the last name. #}
-                                    <i>Pour obtenir une invitation, contactez {{ admin.first_name|title }} {{ admin.last_name|slice:1 }}.</i>
-                                {% endwith %}
-                            {% endif %}
+                            {% with prescriber.prescribermembership_set.first as membership %}
+                                {# For security, display only the first char of the last name. #}
+                                <i>Pour obtenir une invitation, contactez {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.</i>
+                            {% endwith %}
                         </p>
                     </li>
                 {% endfor %}
@@ -85,7 +83,7 @@
     {% if form.cleaned_data %}
     <div class="mt-4">
         <p>
-            En cas de problème contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank">{{ ITOU_ASSISTANCE_URL }} {% include "includes/icon.html" with icon="external-link" %}</a>
+            En cas de problème, contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank">{{ ITOU_ASSISTANCE_URL }} {% include "includes/icon.html" with icon="external-link" %}</a>
         </p>
     </div>
     <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">

@@ -34,7 +34,7 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
         return self.filter(coords__dwithin=(point, D(km=distance_km)))
 
     def prefetch_active_memberships(self):
-        qs = PrescriberMembership.objects.active().select_related("user")
+        qs = PrescriberMembership.objects.active().select_related("user").order_by("-is_admin", "joined_at")
         return self.prefetch_related(Prefetch("prescribermembership_set", queryset=qs))
 
 
