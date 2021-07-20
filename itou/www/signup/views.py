@@ -257,10 +257,14 @@ def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
         session_data.update({"siren": form.cleaned_data["siren"]})
         request.session.modified = True
 
-        prescribers_with_members = PrescriberOrganization.objects.filter(
-            siret__startswith=form.cleaned_data["siren"], department=form.cleaned_data["department"]
-        ).exclude(members=None)
+        prescribers_with_members = (
+            PrescriberOrganization.objects.prefetch_active_memberships()
+            .filter(siret__startswith=form.cleaned_data["siren"], department=form.cleaned_data["department"])
+            .exclude(members=None)
+        )
 
+        # Redirect to creation steps if no organization with member is found,
+        # else, display the same form with the list of organizations with first contact
         if not prescribers_with_members:
             return HttpResponseRedirect(reverse("signup:prescriber_choose_org"))
 
