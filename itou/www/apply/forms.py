@@ -22,7 +22,8 @@ class UserExistsForm(forms.Form):
         self.user = None
 
     email = forms.EmailField(
-        label="E-mail personnel du candidat", widget=forms.EmailInput(attrs={"autocomplete": "off"})
+        label="E-mail personnel du candidat",
+        widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com"}),
     )
 
     def clean_email(self):
@@ -69,7 +70,8 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
 class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
     email = forms.EmailField(
-        label="E-mail personnel du candidat", widget=forms.EmailInput(attrs={"autocomplete": "off"})
+        label="E-mail personnel du candidat",
+        widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com"}),
     )
 
     def __init__(self, proxy_user, *args, **kwargs):
