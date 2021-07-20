@@ -631,6 +631,7 @@ class Prolongation(models.Model):
                 "(12 mois maximum dans la limite de 5 ans)"
             ),
         )
+        HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire (12 mois maximum)"
 
     MAX_CUMULATIVE_DURATION = {
         Reason.COMPLETE_TRAINING.value: {
