@@ -30,7 +30,8 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     job_application = get_object_or_404(queryset, pk=job_application_id, to_siae=siae)
 
     if not job_application.can_download_approval_as_pdf:
-        raise Http404(("Nous sommes au regret de vous informer que vous ne pouvez pas télécharger cet agrément."))
+        # Message only visible in DEBUG
+        raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas télécharger cet agrément.")
 
     diagnosis = job_application.get_eligibility_diagnosis()
     diagnosis_author = None
