@@ -621,26 +621,26 @@ class Prolongation(models.Model):
     MAX_DURATION_MONTHS = 12
 
     class Reason(models.TextChoices):
-        COMPLETE_TRAINING = "COMPLETE_TRAINING", "Fin d'une formation (6 mois maximum)"
-        RQTH = "RQTH", "RQTH (12 mois maximum)"
-        SENIOR = "SENIOR", "50 ans et plus (12 mois maximum)"
+        COMPLETE_TRAINING = "COMPLETE_TRAINING", "Fin d'une formation (6 mois maximum)"
+        RQTH = "RQTH", "RQTH (12 mois maximum)"
+        SENIOR = "SENIOR", "50 ans et plus (12 mois maximum)"
         PARTICULAR_DIFFICULTIES = (
             "PARTICULAR_DIFFICULTIES",
             (
                 "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi "
-                "(12 mois maximum dans la limite de 5 ans)"
+                "(12 mois maximum dans la limite de 5 ans)"
             ),
         )
-        HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire (12 mois maximum)"
+        HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire (12 mois maximum)"
 
     MAX_CUMULATIVE_DURATION = {
         Reason.COMPLETE_TRAINING.value: {
             "duration": datetime.timedelta(days=183),  # A leap year can contain 183 days in 6 months.
-            "label": "6 mois",
+            "label": "6 mois",
         },
         Reason.PARTICULAR_DIFFICULTIES.value: {
             "duration": datetime.timedelta(days=365 * 5),
-            "label": "5 ans",
+            "label": "5 ans",
         },
     }
 
