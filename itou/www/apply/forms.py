@@ -253,9 +253,8 @@ class AcceptForm(forms.ModelForm):
         if self.errors:
             return cleaned_data
 
-        # is it the second button that submitted the form
-        if "without_approval" in self.data:
-            self.cleaned_data["hiring_without_approval"] = True
+        # True if is it the second button that submitted the form
+        self.cleaned_data["hiring_without_approval"] = "without_approval" in self.data
 
         hiring_start_at = self.cleaned_data["hiring_start_at"]
         hiring_end_at = self.cleaned_data["hiring_end_at"]
