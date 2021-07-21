@@ -239,6 +239,7 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
     form = PoleEmploiApprovalSearchForm(request.GET or None)
     number = None
     pe_approval = None
+    is_not_exact_search = False
 
     if form.is_valid():
 
@@ -247,6 +248,7 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
         # We search if the approval already exists with this exact number,
         approval = Approval.objects.filter(number=number).first()
         if not approval:
+            is_not_exact_search = True
             # or if it was created from the first 12 digits of a PoleEmploiApproval's number
             approval = Approval.objects.filter(number=number[:12]).first()
 
@@ -269,7 +271,13 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
         # Otherwise, we display a search, and whenever it's possible, a matching `PoleEmploiApproval`.
         pe_approval = PoleEmploiApproval.objects.filter(number=number, start_at__lte=datetime.date.today()).first()
 
-    context = {"pe_approval": pe_approval, "form": form, "number": number, "siae": siae}
+    context = {
+        "pe_approval": pe_approval,
+        "form": form,
+        "number": number,
+        "siae": siae,
+        "is_not_exact_search": is_not_exact_search,
+    }
     return render(request, template_name, context)
 
 
