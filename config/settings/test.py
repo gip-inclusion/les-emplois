@@ -20,3 +20,6 @@ ITOU_PROTOCOL = "http"
 ITOU_FQDN = "testserver"
 
 ASP_FS_KNOWN_HOSTS = None
+
+# Clever Cloud Cellar
+# see .env
