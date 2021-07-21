@@ -24,7 +24,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.job_seeker = self.job_application.job_seeker
         self.pe_approval = PoleEmploiApprovalFactory()
 
-    def test_pe_approval_search_view_default(self):
+    def test_search_view_default(self):
         """
         The search for PE approval screen should not crash ;)
         """
@@ -37,7 +37,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Rechercher un agrément Pôle emploi")
 
-    def test_pe_approval_search_view_nominal(self):
+    def test_search_view_nominal(self):
         """
         The search for PE approval screen should display the job seeker's name
         if the PE approval number that was searched for has a matching PE approval
@@ -50,7 +50,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Agrément trouvé")
 
-    def test_pe_approval_search_view_no_results(self):
+    def test_search_view_no_results(self):
         """
         The search for PE approval screen should display that there is no results
         if a PE approval number was searched for but nothing was found
@@ -63,7 +63,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
 
-    def test_pe_approval_search_view_agrement_is_in_the_future(self):
+    def test_search_view_agrement_is_in_the_future(self):
         """
         The search for PE approval screen should display that there is no results
         if a PE approval number was searched for but it is in the future
@@ -77,7 +77,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
 
-    def test_pe_approval_search_view_has_matching_pass_iae(self):
+    def test_search_view_has_matching_pass_iae(self):
         """
         The search for PE approval screen should redirect to the matching job application details screen if the
         number matches a PASS IAE attached to a job_application
@@ -91,7 +91,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application.id})
         self.assertEqual(response.url, next_url)
 
-    def test_pe_approval_search_view_has_matching_pass_iae_that_belongs_to_another_siae(self):
+    def test_search_view_has_matching_pass_iae_that_belongs_to_another_siae(self):
         """
         Make sure to NOT to redirect to job applications belonging to other SIAEs,
         as this would produce a 404.
@@ -126,7 +126,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
             f"Le numéro {pe_approval.number_with_spaces} est déjà utilisé par un autre employeur.",
         )
 
-    def test_pe_approval_search_view_unlogged_is_not_authorized(self):
+    def test_search_view_unlogged_is_not_authorized(self):
         """
         It is not possible to access the search for PE approval screen unlogged
         """
@@ -137,7 +137,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         next_url = reverse("account_login")
         self.assertIn(next_url, response.url)
 
-    def test_pe_approval_search_view_as_job_seeker_is_not_authorized(self):
+    def test_search_view_as_job_seeker_is_not_authorized(self):
         """
         The search for PE approval screen as job seeker is not authorized
         """
@@ -148,7 +148,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_pe_approval_search_user_nominal(self):
+    def test_search_user_nominal(self):
         """
         The search for PE approval screen should redirect to the matching job application details screen if the
         number matches a PASS IAE attached to a job_application
@@ -162,7 +162,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertContains(response, self.pe_approval.last_name)
         self.assertContains(response, self.pe_approval.first_name)
 
-    def test_pe_approval_search_user_invalid_pe_approval(self):
+    def test_search_user_invalid_pe_approval(self):
         """
         The search for PE approval screen should redirect to the matching job application details screen if the
         number matches a PASS IAE attached to a job_application
@@ -174,7 +174,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_pe_approval_create_from_new_user(self):
+    def test_create_from_new_user(self):
         """
         When the user does not exist for the suggested email, it is created as well as the approval
         """
@@ -199,7 +199,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(Approval.objects.count(), initial_approval_count + 1)
         self.assertEqual(User.objects.count(), initial_user_count + 1)
 
-    def test_pe_approval_create_from_existing_user_without_approval(self):
+    def test_create_from_existing_user_without_approval(self):
         """
         When an existing user has no valid approval, it is possible to import a Pole Emploi Approval
         """
@@ -220,7 +220,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
             "L'agrément Pôle emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
         )
 
-    def test_pe_approval_create_when_pole_emploi_approval_has_already_been_imported(self):
+    def test_create_when_pole_emploi_approval_has_already_been_imported(self):
         """
         When the PoleEmploiApproval has already been imported, we are redirected to its page
         """
@@ -242,7 +242,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), "Cet agrément Pôle emploi a déja été importé.")
 
-    def test_pe_approval_create_from_existing_user_with_approval(self):
+    def test_create_from_existing_user_with_approval(self):
         """
         When an existing user already has a valid approval, it is not possible to import a Pole Emploi Approval
         """
