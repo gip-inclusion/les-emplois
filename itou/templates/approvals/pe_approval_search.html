@@ -12,7 +12,7 @@
         {% if pe_approval.is_valid %}
 
             <div class="alert alert-success pb-0" role="alert">
-                <p>Agrément trouvé !</p>
+                <p>Agrément trouvé{% if is_not_exact_search %} mais en utilisant seulement les 12 premiers chiffres{% endif %} !</p>
                 <p>L'agrément <strong>{{ pe_approval.number }}</strong> est associé à <strong>{{ pe_approval.first_name }} {{ pe_approval.last_name }}</strong>.</p>
                 <p>Est-ce bien l'agrément que vous souhaitez prolonger ou suspendre ?</p>
             </div>
@@ -39,7 +39,7 @@
         <h2>Pas de résultat</h2>
 
         <div class="alert alert-danger pb-0" role="alert">
-            <p>Nous n'avons pas trouvé d'agrément avec comme numéro <strong>{{ number }}</strong>.</p>
+            <p>Nous n'avons pas trouvé d'agrément avec le numéro <strong>{{ number }}</strong>.</p>
             <p>S'il s'agit bien d'un numéro d'agrément Pole Emploi, vous pouvez <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">contacter le support {% include "includes/icon.html" with icon="external-link" %}</a>.</p>
         </div>
 
