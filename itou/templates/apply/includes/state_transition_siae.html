@@ -109,9 +109,9 @@
     {% endif %}
 
 
-    {# Possible next steps when the state is obsolete or refused ------------------------------------------------------ #}
+    {# Possible next steps when the state is obsolete, refused or cancelled --------------------------------- #}
 
-    {% if job_application.state.is_obsolete or job_application.state.is_refused %}
+    {% if job_application.state.is_obsolete or job_application.state.is_refused or job_application.state.is_cancelled %}
 
         <hr>
 
