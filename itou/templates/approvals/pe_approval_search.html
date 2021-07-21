@@ -12,7 +12,7 @@
         {% if pe_approval.is_valid %}
 
             <div class="alert alert-success pb-0" role="alert">
-                <p>Agrément trouvé{% if is_not_exact_search %} mais en utilisant seulement les 12 premiers chiffres{% endif %} !</p>
+                <p>Agrément trouvé !</p>
                 <p>L'agrément <strong>{{ pe_approval.number }}</strong> est associé à <strong>{{ pe_approval.first_name }} {{ pe_approval.last_name }}</strong>.</p>
                 <p>Est-ce bien l'agrément que vous souhaitez prolonger ou suspendre ?</p>
             </div>
