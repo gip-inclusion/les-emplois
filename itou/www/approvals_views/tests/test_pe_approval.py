@@ -3,7 +3,6 @@ from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import urlencode
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
@@ -45,11 +44,9 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         """
 
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-        params = urlencode({"number": self.pe_approval.number})
         url = reverse("approvals:pe_approval_search")
-        url = f"{url}?{params}"
 
-        response = self.client.get(url)
+        response = self.client.get(url, {"number": self.pe_approval.number})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Agrément trouvé")
 
@@ -60,11 +57,9 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         """
 
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-        params = urlencode({"number": 123123123123})
         url = reverse("approvals:pe_approval_search")
-        url = f"{url}?{params}"
 
-        response = self.client.get(url)
+        response = self.client.get(url, {"number": 123123123123})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
 
@@ -76,11 +71,9 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         today = timezone.now().date()
         self.pe_approval = PoleEmploiApprovalFactory(start_at=today + relativedelta(days=10))
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-        params = urlencode({"number": self.pe_approval.number})
         url = reverse("approvals:pe_approval_search")
-        url = f"{url}?{params}"
 
-        response = self.client.get(url)
+        response = self.client.get(url, {"number": self.pe_approval.number})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
 
@@ -90,12 +83,9 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         number matches a PASS IAE attached to a job_application
         """
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-
-        params = urlencode({"number": self.approval.number})
         url = reverse("approvals:pe_approval_search")
-        url = f"{url}?{params}"
 
-        response = self.client.get(url)
+        response = self.client.get(url, {"number": self.approval.number})
         self.assertEqual(response.status_code, 302)
 
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application.id})
@@ -123,14 +113,11 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
 
         # This is the current user (NOT a member of `another_siae`).
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-
-        params = urlencode({"number": job_application.approval.number})
         url = reverse("approvals:pe_approval_search")
-        url = f"{url}?{params}"
 
         # The current user should not be redirected to the details of `job_application` because
         # it belongs to `another_siae`. He should get a 302 instead with an error message.
-        response = self.client.get(url)
+        response = self.client.get(url, {"number": job_application.approval.number})
         self.assertEqual(response.status_code, 302)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
