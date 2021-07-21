@@ -619,6 +619,6 @@ EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED = os.environ.get("EMPLOYEE_RECORD_PR
 # selection of progressive opening eligible SIAE
 # Will be updated throughout the process via environment vars on production instance.
 EMPLOYEE_RECORD_ASP_ID_MODULO = int(os.environ.get("EMPLOYEE_RECORD_ASP_ID_MODULO ", 2))
-# Allows a manual / custom selection of some SIAE:
-# add SIAE id in list
-EMPLOYEE_RECORD_CUSTOM_ASP_ID_LIST = [56]
+# Allows a manual / custom selection of some SIAEs as "VIP users":
+# add SIAE IDs in list
+EMPLOYEE_RECORD_CUSTOM_ASP_ID_LIST = []
