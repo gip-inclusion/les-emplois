@@ -36,6 +36,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             and settings.EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED
             and progressive_opening_eligibility
         )
+        can_show_deployment_message = (
+            siae.can_use_employee_record and settings.EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED
+        )
 
         job_applications_categories = [
             {
@@ -82,7 +85,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_show_employee_records": can_show_employee_records,
         "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(current_org=current_org),
         "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
-        "can_show_deployment_message": True,
+        "can_show_deployment_message": can_show_deployment_message,
     }
 
     return render(request, template_name, context)
