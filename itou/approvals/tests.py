@@ -1262,6 +1262,11 @@ class ProlongationModelTest(TestCase):
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         self.assertEqual(max_end_at, expected_max_end_at)
 
+        reason = Prolongation.Reason.HEALTH_CONTEXT.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
     def test_time_boundaries(self):
         """
         Test that the upper bound of preceding time interval is the lower bound of the next.
