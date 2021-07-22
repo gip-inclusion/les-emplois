@@ -26,6 +26,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     can_show_financial_annexes = False
     can_show_employee_records = False
     job_applications_categories = []
+    can_show_deployment_message = False
 
     if request.user.is_siae_staff:
         siae = get_current_siae_or_404(request)
