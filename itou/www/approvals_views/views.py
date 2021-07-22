@@ -322,6 +322,7 @@ def pe_approval_create(request, pe_approval_id):
         job_seeker = User.create_job_seeker_from_pole_emploi_approval(request.user, email, pe_approval)
 
     # If the PoleEmploiApproval has already been imported, it is not possible to import it again
+    # FIXME Review the rules used to find the approval (ApprovalsWrapper?)
     possible_matching_approval = Approval.objects.filter(number=pe_approval.number[:12]).first()
     if possible_matching_approval:
         messages.info(request, "Cet agrément Pôle emploi a déja été importé.")
