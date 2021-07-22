@@ -59,6 +59,28 @@ class DashboardViewTest(TestCase):
         expected_message = "votre compte n'est malheureusement plus actif"
         self.assertContains(response, expected_message)
 
+    # Temporary tests: progressive deploiement of employee record
+
+    def test_show_progressive_deployment_message(self):
+        # Shown if user is logged in with an eligible SIAE
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertContains(response, "en cours de déploiement")
+
+    def test_hide_progressive_deployment_message(self):
+        # Message hidden if user is logged in with a non-eligible SIAE
+        siae = SiaeWithMembershipFactory(kind="EITI")
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertNotContains(response, "en cours de déploiement")
+
 
 class EditUserInfoViewTest(TestCase):
     def test_edit(self):

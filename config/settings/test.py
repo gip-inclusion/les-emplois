@@ -21,5 +21,5 @@ ITOU_FQDN = "testserver"
 
 ASP_FS_KNOWN_HOSTS = None
 
-# Clever Cloud Cellar
-# see .env
+# Temporary: employee record deployment
+EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED = True
