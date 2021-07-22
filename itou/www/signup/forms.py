@@ -230,8 +230,6 @@ class PrescriberSirenForm(forms.Form):
     siren = forms.CharField(
         label="Numéro SIREN de votre organisation",
         min_length=9,
-        max_length=9,
-        validators=[validate_siren],
         help_text="Le numéro SIREN contient 9 chiffres.",
     )
 
@@ -239,6 +237,12 @@ class PrescriberSirenForm(forms.Form):
         label="Département",
         choices=DEPARTMENTS.items(),
     )
+
+    def clean_siren(self):
+        # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
+        siren = self.cleaned_data["siren"].replace(" ", "")
+        validate_siren(siren)
+        return siren
 
 
 class PrescriberChooseOrgKindForm(forms.Form):
