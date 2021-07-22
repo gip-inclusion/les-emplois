@@ -416,11 +416,11 @@ class PrescriberSignupTest(TestCase):
 
         # Step 2: ask the user his SIREN number and department
 
-        post_data = {
+        get_data = {
             "siren": siret[:9],
             "department": "67",
         }
-        response = self.client.post(url, data=post_data)
+        response = self.client.get(url, data=get_data)
         self.assertEqual(response.status_code, 302)
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
@@ -544,11 +544,11 @@ class PrescriberSignupTest(TestCase):
 
         # Step 2: ask the user his SIREN number and department
 
-        post_data = {
+        get_data = {
             "siren": siret[:9],
             "department": "67",
         }
-        response = self.client.post(url, data=post_data)
+        response = self.client.get(url, data=get_data)
         self.assertEqual(response.status_code, 302)
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
@@ -666,11 +666,11 @@ class PrescriberSignupTest(TestCase):
 
         # Step 2: ask the user his SIREN number and department
 
-        post_data = {
+        get_data = {
             "siren": siret[:9],
             "department": "67",
         }
-        response = self.client.post(url, data=post_data)
+        response = self.client.get(url, data=get_data)
         self.assertEqual(response.status_code, 302)
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
@@ -778,11 +778,11 @@ class PrescriberSignupTest(TestCase):
 
         # Step 2: ask the user his SIREN number and department
 
-        post_data = {
+        get_data = {
             "siren": siret[:9],
             "department": "67",
         }
-        response = self.client.post(url, data=post_data)
+        response = self.client.get(url, data=get_data)
         self.assertEqual(response.status_code, 302)
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
@@ -814,11 +814,11 @@ class PrescriberSignupTest(TestCase):
 
         # Step 2: ask the user his SIREN number and department
 
-        post_data = {
+        get_data = {
             "siren": siret[:9],
             "department": "67",
         }
-        response = self.client.post(url, data=post_data)
+        response = self.client.get(url, data=get_data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, existing_org_with_siret.display_name)
 
@@ -853,11 +853,11 @@ class PrescriberSignupTest(TestCase):
 
         # Step 2: ask the user his SIREN number and department
 
-        post_data = {
+        get_data = {
             "siren": siret[:9],
             "department": "67",
         }
-        response = self.client.post(url, data=post_data)
+        response = self.client.get(url, data=get_data)
         self.assertEqual(response.status_code, 302)
 
         url = reverse("signup:prescriber_choose_org")

@@ -249,9 +249,9 @@ def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
 
     prescribers_with_members = None
 
-    form = forms.PrescriberSirenForm(data=request.POST or None)
+    form = forms.PrescriberSirenForm(data=request.GET or None)
 
-    if request.method == "POST" and form.is_valid():
+    if request.method == "GET" and form.is_valid():
 
         session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         session_data.update({"siren": form.cleaned_data["siren"]})
@@ -264,7 +264,8 @@ def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
         )
 
         # Redirect to creation steps if no organization with member is found,
-        # else, display the same form with the list of organizations with first contact
+        # else, displays the same form with the list of organizations with first member
+        # to indicate which person to request an invitation from
         if not prescribers_with_members:
             return HttpResponseRedirect(reverse("signup:prescriber_choose_org"))
 
