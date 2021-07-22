@@ -49,6 +49,19 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Agrément trouvé")
 
+    def test_number_length(self):
+        """
+        Only two forms of approval numbers are accepted
+        """
+        siae = SiaeMembershipFactory()
+        self.client.login(username=siae.user.email, password=DEFAULT_PASSWORD)
+
+        invalid_number = "1234567890123"
+        assert len(invalid_number) == 13
+
+        response = self.client.get(self.url, {"number": invalid_number})
+        self.assertContains(response, "Seuls les numéros d'agrément de 12 ou 15 chiffres sont valides.", html=True)
+
     def test_no_results(self):
         """
         The search for PE approval screen should display that there is no results
