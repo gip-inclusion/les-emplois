@@ -256,7 +256,8 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
 
             # …ensure that the last accepted job application belongs to the current SIAE…
             # We are sure to have one approval.
-            job_application = approvals_wrapper.merged_approvals[0].user.last_accepted_job_application
+            approval = approvals_wrapper.merged_approvals[0] if approvals_wrapper.merged_approvals else None
+            job_application = approval.user.last_accepted_job_application
             if job_application.to_siae == siae:
                 application_details_url = reverse(
                     "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
@@ -265,16 +266,24 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
 
             # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
             # has already been transformed into an `Approval`.
-            msg = f"Le numéro {approval.number_with_spaces} est déjà utilisé par un autre employeur."
-            messages.error(request, msg)
-            return HttpResponseRedirect(reverse("approvals:pe_approval_search"))
+            # In this case, the user can obtain the approval by the step_job_seeker.
+            # A link is offered in the template.
 
         # Otherwise, we display a search, and whenever it's possible, a matching `PoleEmploiApproval`.
         # Here number can be 12 digits + S01 (etc).
         pe_approval = PoleEmploiApproval.objects.filter(number=number, start_at__lte=datetime.date.today()).first()
 
+        if approval or pe_approval:
+            context = {
+                "approval": approval,
+                "pe_approval": pe_approval,
+                "form": form,
+                "number": number,
+                "siae": siae,
+            }
+            return render(request, "approvals/pe_approval_search_found.html", context)
+
     context = {
-        "pe_approval": pe_approval,
         "form": form,
         "number": number,
         "siae": siae,
