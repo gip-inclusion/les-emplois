@@ -19,15 +19,13 @@
         </a>
     </div>
 
-    <form method="post" action="" class="js-prevent-multiple-submit">
-
-        {% csrf_token %}
+    <form method="get" action="" class="js-prevent-multiple-submit">
 
         {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
-            {# Change the label of the submit button and the position of the return button if the form is submitted  #}
-            {% if form.cleaned_data %}
+            {# Change the label of the submit button and the position of the return button if the form is submitted #}
+            {% if prescribers_with_members %}
             <button type="submit" class="btn btn-primary">Rechercher</button>
             {% else %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
@@ -39,13 +37,9 @@
 
     </form>
 
-    {% if not form.cleaned_data %}
-    <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
-    {% endif %}
-
     {% if prescribers_with_members %}
         <div class="mt-5">
-            <h3>Organisation(s) déjà inscrite(s)</h3>
+            <h3>Organisations déjà inscrites</h3>
             <div class="alert alert-secondary" role="info">
                 <i>Par sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</i>
             </div>
@@ -58,7 +52,11 @@
                             {{ prescriber.display_name }}
                             <br>
                             {{ prescriber.address_line_1 }},
-                            {% if prescriber.address_line_2 %}{{ prescriber.address_line_2 }},{% endif %}
+                            {% if prescriber.address_line_2 %}
+                                <br>
+                                {{ prescriber.address_line_2 }},
+                            {% endif %}
+                            <br>
                             {{ prescriber.post_code }} {{ prescriber.city }}
                             <br>
                             {% with prescriber.prescribermembership_set.first as membership %}
@@ -78,9 +76,6 @@
                 <a href="{% url 'signup:prescriber_choose_org' %}" class="btn btn-primary mt-3">Ajouter mon organisation</a>
             </p>
         </div>
-    {% endif %}
-
-    {% if form.cleaned_data %}
     <div class="mt-4">
         <p>
             En cas de problème, contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank">{{ ITOU_ASSISTANCE_URL }} {% include "includes/icon.html" with icon="external-link" %}</a>
@@ -89,6 +84,7 @@
     <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
         Retour
     </a>
+    {% else %}
+    <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
     {% endif %}
-
 {% endblock %}
