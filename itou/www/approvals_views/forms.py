@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
@@ -141,11 +142,14 @@ class SuspensionForm(forms.ModelForm):
 
 class PoleEmploiApprovalSearchForm(forms.Form):
     """
-    Search for a PoleEmploiApproval by id
+    Search for a PoleEmploiApproval by number
     """
 
     number = forms.CharField(label="Numéro", required=True, min_length=12, max_length=15, strip=True)
 
     def clean_number(self):
-        number = self.cleaned_data.get("number", "")
-        return number.replace(" ", "")
+        number = self.cleaned_data.get("number", "").replace(" ", "")
+        if len(number) not in (12, 15):
+            raise ValidationError("Seuls les numéros d'agrément de 12 ou 15 chiffres sont valides.")
+
+        return number
