@@ -1,0 +1,47 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+
+{% block title %}Rechercher un agrément Pôle emploi{{ block.super }}{% endblock %}
+
+{% block content %}
+    {% if approval %}
+        <h2>PASS IAE trouvé !</h2>
+
+        <p>
+            Vous pouvez utiliser le PASS IAE <strong>{{ number }}</strong> de {{ approval.user.get_full_name|title }} au
+            sein de votre structure « {{ siae.name }} » en cliquant sur le bouton.
+            <form method="POST" action="{% url 'apply:step_eligibility' siae.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="email" value="{{ approval.user.email }}">
+                <button type="submit" class="btn btn-primary">Utiliser le PASS IAE</button>
+            </form>
+        </p>
+    {% else %}
+        <h2>Prolonger ou suspendre un agrément</h2>
+
+        {% if pe_approval.is_valid %}
+
+            <div class="alert alert-success pb-0" role="alert">
+                <p>Agrément trouvé !</p>
+                <p>L'agrément <strong>{{ pe_approval.number }}</strong> est associé à <strong>{{ pe_approval.first_name }} {{ pe_approval.last_name }}</strong>.</p>
+                <p>Est-ce bien l'agrément que vous souhaitez prolonger ou suspendre ?</p>
+            </div>
+
+            <p>
+                <a class="btn btn-outline-primary" href="{% url 'approvals:pe_approval_search_user' pe_approval.id %}">
+                    Oui. Je souhaite prolonger ou suspendre l'agrément de {{ pe_approval.first_name }} {{ pe_approval.last_name }}
+                </a>
+            </p>
+
+        {% else %}
+
+            <div class="alert alert-danger pb-0" role="alert">
+                <p>L'agrément <strong>{{ pe_approval.number }}</strong> est expiré depuis le {{ pe_approval.end_at|date:"d/m/Y" }}.</p>
+                <p>Vous ne pouvez pas le prolonger ou le suspendre.</p>
+            </div>
+
+        {% endif %}
+
+        <hr>
+    {% endif %}
+{% endblock %}
