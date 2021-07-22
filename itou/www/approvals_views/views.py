@@ -11,8 +11,9 @@ from django.template.response import SimpleTemplateResponse
 from django.urls import reverse
 from django.utils.text import slugify
 
-from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
+from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -250,8 +251,13 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
 
         # If the identifier matches an existing approval…
         if approval:
+            # Extract the user and search again to find the current approval for
+            # that user (could be this one).
+            approvals_wrapper = ApprovalsWrapper(user=approval.user)
+
             # …ensure that the last accepted job application belongs to the current SIAE…
-            job_application = approval.user.last_accepted_job_application
+            # We are sure to have one approval.
+            job_application = approvals_wrapper.merged_approvals[0].user.last_accepted_job_application
             if job_application.to_siae == siae:
                 application_details_url = reverse(
                     "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
