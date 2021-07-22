@@ -13,7 +13,6 @@ from django.utils.text import slugify
 
 from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
