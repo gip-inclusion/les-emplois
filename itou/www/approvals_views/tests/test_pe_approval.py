@@ -34,7 +34,6 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.login(username=siae.user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Rechercher un agrément Pôle emploi")
 
     def test_nominal(self):
@@ -46,7 +45,6 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url, {"number": self.pe_approval.number})
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Agrément trouvé")
 
     def test_number_length(self):
@@ -71,7 +69,6 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.login(username=siae.user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url, {"number": 123123123123})
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
 
     def test_approval_in_the_future(self):
@@ -88,7 +85,6 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url, {"number": pe_approval.number})
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
 
     def test_has_matching_pass_iae(self):
@@ -181,7 +177,6 @@ class PoleEmploiApprovalSearchUserTest(TestCase):
         url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": self.pe_approval.id})
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.pe_approval.last_name)
         self.assertContains(response, self.pe_approval.first_name)
 
