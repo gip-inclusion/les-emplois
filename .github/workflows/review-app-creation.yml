@@ -14,13 +14,11 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+  REVIEW_APPS_ORGANIZATION_NAME: ${{ secrets.CLEVER_REVIEW_APPS_ORG }}
   ORGANIZATION_NAME: ${{ secrets.CLEVER_ORGANIZATION_NAME }}
   CONFIGURATION_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_CONFIGURATION_ADDON }}
-  DB_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_DATABASE_ADDON }}
   S3_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_S3_ADDON }}
   BRANCH: ${{ github.head_ref }}
-  POSTGRESQL_ADDON_URI: ${{ secrets.POSTGRESQL_ADDON_URI }}
-  POSTGRESQL_ADDON_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
 
 jobs:
   create:
@@ -41,7 +39,7 @@ jobs:
       run:
         echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g'`" >> $GITHUB_ENV
 
-    - name: 🏷 Set database name
+    - name: 🏷 Set database addon name
       run:
         echo "REVIEW_APP_DB_NAME=`echo $REVIEW_APP_NAME | sed -r 's/-/_/g'`" >> $GITHUB_ENV
 
@@ -55,31 +53,23 @@ jobs:
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI create $REVIEW_APP_NAME -t python --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
+        $CLEVER_CLI create $REVIEW_APP_NAME -t python --org $REVIEW_APPS_ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
 
-    - name: 🤝 Link databases addon
+    - name: 🗃 Create database addon
       run: |
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
-        $CLEVER_CLI service link-addon $DB_ADDON
+        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon $REVIEW_APP_DB_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
 
     - name: 🤝 Link S3 addon
       run: |
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
-        $CLEVER_CLI service link-addon $S3_ADDON
-
-    - name: 🗃 Create a brand new database
-      run: |
-        echo "Creating database $REVIEW_APP_DB_NAME"
-        psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
-          CREATE DATABASE $REVIEW_APP_DB_NAME WITH OWNER $POSTGRESQL_ADDON_USER TEMPLATE template1;
-        EOSQL
-        echo "Database created successfully!"
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon $S3_ADDON --org $ORGANIZATION_NAME
 
     - name: 🗺 Add environment variables to the review app
       run: |
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
         $CLEVER_CLI service link-addon $CONFIGURATION_ADDON
         $CLEVER_CLI env import-vars REVIEW_APP_DB_NAME
         $CLEVER_CLI env import-vars DEPLOY_URL
