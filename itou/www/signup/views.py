@@ -447,10 +447,14 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    siren = session_data["siren"]
+    form = forms.PrescriberSiretForm(
+        kind=session_data["kind"],
+        siren=siren,
+        data=request.POST or None,
+    )
 
-    initial_data = {"siret": session_data.get("siren")}
-    form = forms.PrescriberSiretForm(data=request.POST or None, initial=initial_data, kind=session_data.get("kind"))
-
+    # Request Sirene API to validate SIRET
     if request.method == "POST" and form.is_valid():
         session_data["prescriber_org_data"] = form.org_data
         request.session.modified = True
@@ -459,6 +463,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     context = {
         "form": form,
+        "siren": siren,
         "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)

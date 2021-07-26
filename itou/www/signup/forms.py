@@ -291,23 +291,18 @@ class PrescriberSiretForm(forms.Form):
     Retrieve info about an organization from a given SIRET.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, kind, siren, **kwargs):
         # We need the kind of the SIAE to check constraint on SIRET number
-        self.kind = kwargs.pop("kind", None)
-
-        super().__init__(*args, **kwargs)
+        self.kind = kind
+        self.siren = siren
         self.org_data = None
+        super().__init__(**kwargs)
 
-    siret = forms.CharField(
-        label="Numéro SIRET de votre organisation",
-        min_length=14,
-        help_text="Le numéro SIRET contient 14 chiffres.",
-    )
+    # On rendering, the SIREN is displayed just before this input
+    partial_siret = forms.CharField(label="Numéro SIRET de votre organisation", min_length=5, max_length=5)
 
-    def clean_siret(self):
-
-        # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
-        siret = self.cleaned_data["siret"].replace(" ", "")
+    def clean_partial_siret(self):
+        siret = self.siren + self.cleaned_data["partial_siret"]
 
         validate_siret(siret)
 
