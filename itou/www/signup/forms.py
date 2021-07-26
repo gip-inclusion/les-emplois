@@ -326,7 +326,7 @@ class PrescriberSiretForm(forms.Form):
             raise forms.ValidationError(etablissement.error)
 
         if etablissement.is_closed:
-            raise forms.ValidationError(etablissement.ERROR_IS_CLOSED)
+            raise forms.ValidationError("La base Sirene indique quel'établissement est fermé.")
 
         # Perform another API call to fetch geocoding data.
         address_fields = [
