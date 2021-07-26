@@ -135,6 +135,12 @@ TABLE_COLUMNS = [
         "fn": lambda o: o.is_peamu,
     },
     {
+        "name": "pe_inscrit",
+        "type": "boolean",
+        "comment": "Le candidat a un identifiant PE",
+        "fn": lambda o: o.pole_emploi_id is not None and o.pole_emploi_id != "",
+    },
+    {
         "name": "date_dernière_connexion",
         "type": "date",
         "comment": "Date de dernière connexion au service du candidat",

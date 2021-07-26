@@ -150,6 +150,7 @@ class ApplyAsJobSeekerTest(TestCase):
 
         # Form fields
         self.assertContains(response, s3_form_endpoint)
+        s3_form_values.pop("x-amz-date")  # Flaky test.
         for _, value in s3_form_values.items():
             self.assertContains(response, value)
 

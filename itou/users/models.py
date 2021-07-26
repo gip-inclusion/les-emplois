@@ -3,7 +3,7 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import CIEmailField
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils import timezone
@@ -281,6 +281,8 @@ class User(AbstractUser, AddressMixin):
         """
         CD as in "Conseil Départemental".
         """
+        if self.is_stats_vip:
+            return True
         return (
             self.is_prescriber
             and current_org is not None
@@ -288,7 +290,21 @@ class User(AbstractUser, AddressMixin):
             and current_org.is_authorized
             and current_org.authorization_status == PrescriberOrganization.AuthorizationStatus.VALIDATED
             and current_org.has_admin(self)
+            and current_org.department is not None
+            and current_org.department != ""
         )
+
+    def get_stats_cd_department(self, current_org):
+        """
+        Get department that the user has the permission to see for the CD stats page.
+        CD as in "Conseil Départemental".
+        """
+        if not self.can_view_stats_cd(current_org=current_org):
+            raise PermissionDenied
+        if self.is_stats_vip:
+            # VIP users always and only see departement 01, as an example.
+            return "01"
+        return current_org.department
 
     @cached_property
     def last_accepted_job_application(self):
