@@ -27,8 +27,6 @@ class EtablissementAPI:
     https://doc.entreprise.api.gouv.fr/?json#etablissements-v2
     """
 
-    ERROR_IS_CLOSED = "La base Sirene indique que l'état administratif de l'établissement est fermé."
-
     def __init__(self, siret, reason="Inscription aux emplois de l'inclusion"):
         self.etablissement, self.error = self.get(siret=siret, reason=reason)
 
