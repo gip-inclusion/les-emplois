@@ -606,16 +606,20 @@ class ProcessViewsTest(TestCase):
         self.assertFalse(job_application.state.is_cancelled)
 
     def test_accept_after_cancel(self):
-        job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_CANCELLED)
+        # A canceled job application is not linked to an approval
+        # unless the job seeker has an accepted job application.
+        create_test_cities(["54", "57"], num_per_department=2)
+        city = City.objects.first()
+        job_seeker = JobSeekerWithAddressFactory(city=city.name)
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_CANCELLED, job_seeker=job_seeker
+        )
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         hiring_start_at = timezone.now().date()
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
-        create_test_cities(["54", "57"], num_per_department=2)
-        city = City.objects.first()
-        job_seeker = JobSeekerWithAddressFactory(city=city.name)
         post_data = {
             "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
             "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
@@ -632,7 +636,12 @@ class ProcessViewsTest(TestCase):
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
+        self.assertEqual(job_seeker.approvals.count(), 1)
+        approval = job_seeker.approvals.first()
+        self.assertEqual(approval.start_at, job_application.hiring_start_at)
+
         job_application.refresh_from_db()
+
         self.assertTrue(job_application.state.is_accepted)
 
     def test_archive(self):
@@ -785,6 +794,33 @@ class ProcessTemplatesTest(TestCase):
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertContains(response, self.url_accept)
+
+    def test_details_template_for_state_canceled(self):
+        """Test actions available for other states."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_CANCELLED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+
+    def test_details_template_for_state_canceled_valid_diagnosis(self):
+        """Test actions available for other states."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        self.job_application.state = JobApplicationWorkflow.STATE_CANCELLED
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
