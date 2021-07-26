@@ -68,7 +68,7 @@ redis==3.5.3  # https://github.com/andymccurdy/redis-py
 PyJWT==2.0.1  # https://github.com/jpadilla/pyjwt
 
 # Requests alternative including a default time out
-httpx==0.17.1  # https://github.com/encode/httpx/
+httpx==0.18.2  # https://github.com/encode/httpx/
 
 # SFTP file transfer for ASP
 pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
@@ -81,7 +81,5 @@ boto3==1.17.53  # https://github.com/boto/boto3
 # API
 # ------------------------------------------------------------------------------
 # For automatic OpenAPI schema generation
-uritemplate==3.0.1  # https://github.com/python-hyper/uritemplate  
+uritemplate==3.0.1  # https://github.com/python-hyper/uritemplate
 pyyaml==5.4.1  # https://github.com/yaml/pyyaml
-
-
