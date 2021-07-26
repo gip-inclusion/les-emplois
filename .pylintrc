@@ -3,7 +3,7 @@ load-plugins=pylint_django
 django-settings-module=config.settings.dev
 
 [MESSAGES CONTROL]
-disable=missing-docstring,invalid-name,duplicate-code,bad-continuation,arguments-differ,too-few-public-methods,no-self-use
+disable=missing-docstring,invalid-name,duplicate-code,bad-continuation,arguments-differ,too-few-public-methods,no-self-use,no-member
 
 [FORMAT]
 
