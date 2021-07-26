@@ -118,10 +118,8 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:process", kwargs={"job_application_id": job_application.pk})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_processing)
@@ -150,10 +148,8 @@ class ProcessViewsTest(TestCase):
             "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_refused)
@@ -174,10 +170,8 @@ class ProcessViewsTest(TestCase):
 
         post_data = {"answer": ""}
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_postponed)
@@ -218,10 +212,8 @@ class ProcessViewsTest(TestCase):
                 **address,
             }
             response = self.client.post(url, data=post_data)
-            self.assertEqual(response.status_code, 302)
-
             next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-            self.assertEqual(response.url, next_url)
+            self.assertRedirects(response, next_url)
 
             job_application = JobApplication.objects.get(pk=job_application.pk)
             self.assertEqual(job_application.hiring_start_at, hiring_start_at)
@@ -330,7 +322,8 @@ class ProcessViewsTest(TestCase):
             "answer": "",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
@@ -506,10 +499,8 @@ class ProcessViewsTest(TestCase):
             "confirm": "true",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
@@ -580,9 +571,8 @@ class ProcessViewsTest(TestCase):
             "confirm": "true",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         self.assertTrue(job_application.state.is_cancelled)
@@ -599,9 +589,9 @@ class ProcessViewsTest(TestCase):
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
+
         job_application.refresh_from_db()
         self.assertFalse(job_application.state.is_cancelled)
 
@@ -631,17 +621,13 @@ class ProcessViewsTest(TestCase):
             "city_slug": city.slug,
         }
         response = self.client.post(url_accept, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
+        job_application.refresh_from_db()
         self.assertEqual(job_seeker.approvals.count(), 1)
         approval = job_seeker.approvals.first()
         self.assertEqual(approval.start_at, job_application.hiring_start_at)
-
-        job_application.refresh_from_db()
-
         self.assertTrue(job_application.state.is_accepted)
 
     def test_archive(self):
@@ -668,9 +654,7 @@ class ProcessViewsTest(TestCase):
         qs = urlencode(args, doseq=True)
         url = reverse("apply:list_for_siae")
         next_url = f"{url}?{qs}"
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         self.assertTrue(job_application.hidden_for_siae)
