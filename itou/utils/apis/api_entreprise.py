@@ -17,10 +17,10 @@ class EtablissementAPI:
 
     ERROR_IS_CLOSED = "La base Sirene indique que l'état administratif de l'établissement est fermé."
 
-    def __init__(self, siret, object="Inscription aux emplois de l'inclusion"):
-        self.data, self.error = self.get(siret, object)
+    def __init__(self, siret, reason="Inscription aux emplois de l'inclusion"):
+        self.data, self.error = self.get(siret=siret, reason=reason)
 
-    def get(self, siret, object):
+    def get(self, siret, reason):
 
         data = None
         error = None
@@ -29,7 +29,7 @@ class EtablissementAPI:
             {
                 "recipient": settings.API_ENTREPRISE_RECIPIENT,
                 "context": settings.API_ENTREPRISE_CONTEXT,
-                "object": object,
+                "object": reason,
             }
         )
 
