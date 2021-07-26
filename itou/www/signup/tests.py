@@ -53,7 +53,6 @@ class SiaeSignupTest(TestCase):
         user_first_name = "Jacques"
         user_email = "jacques.doe@siae.com"
         user_secondary_email = "jacques.doe@hotmail.com"
-        password = "!*p4ssw0rd123-"
 
         siae = SiaeFactory(kind=Siae.KIND_ETTI)
         self.assertEqual(0, siae.members.count())
@@ -102,8 +101,8 @@ class SiaeSignupTest(TestCase):
                 "first_name": user_first_name,
                 "last_name": "Doe",
                 "email": user_secondary_email,
-                "password1": password,
-                "password2": password,
+                "password1": DEFAULT_PASSWORD,
+                "password2": DEFAULT_PASSWORD,
             }
             response = self.client.post(url, data=post_data)
             self.assertEqual(response.status_code, 302)
@@ -148,7 +147,7 @@ class SiaeSignupTest(TestCase):
             self.assertContains(response, escape(expected_message))
 
             # User cannot log in until confirmation.
-            post_data = {"login": user.email, "password": password}
+            post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
             url = reverse("account_login")
             response = self.client.post(url, data=post_data)
             self.assertEqual(response.status_code, 302)
@@ -223,7 +222,6 @@ class JobSeekerSignupTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        password = "!*p4ssw0rd123-"
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
         city = City.objects.first()
@@ -233,8 +231,8 @@ class JobSeekerSignupTest(TestCase):
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@siae.com",
-            "password1": password,
-            "password2": password,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
             "address_line_1": address_line_1,
             "address_line_2": address_line_2,
             "post_code": post_code,
@@ -269,7 +267,7 @@ class JobSeekerSignupTest(TestCase):
         self.assertEqual(email.to[0], user.email)
 
         # User cannot log in until confirmation.
-        post_data = {"login": user.email, "password": password}
+        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         url = reverse("account_login")
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -332,13 +330,12 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
 
-        password = "!*p4ssw0rd123-"
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
-            "password1": password,
-            "password2": password,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -372,7 +369,7 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(email.to[0], user.email)
 
         # User cannot log in until confirmation.
-        post_data = {"login": user.email, "password": password}
+        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         url = reverse("account_login")
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -448,14 +445,12 @@ class PrescriberSignupTest(TestCase):
         mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 5: user info.
-
-        password = "!*p4ssw0rd123-"
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
-            "password1": password,
-            "password2": password,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -500,7 +495,7 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(email.to[0], user.email)
 
         # User cannot log in until confirmation.
-        post_data = {"login": user.email, "password": password}
+        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         url = reverse("account_login")
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -528,8 +523,7 @@ class PrescriberSignupTest(TestCase):
 
         siret = "11122233300001"
 
-        # Step 1: Does the user work  for PE?
-
+        # Step 1: Does the user work for PE?
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -543,7 +537,6 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, url)
 
         # Step 2: ask the user his SIREN number and department
-
         get_data = {
             "siren": siret[:9],
             "department": "67",
@@ -553,8 +546,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
 
-        # Step 3: ask the user to choose the organization he's working for in a pre-existing list.
-
+        # Step 3: ask the user to choose the organization he's working for in a pre-existing list
         post_data = {
             "kind": PrescriberOrganization.Kind.OTHER.value,
         }
@@ -563,7 +555,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_choose_kind")
         self.assertRedirects(response, url)
 
-        # Step 4: ask the user his kind of prescriber.
+        # Step 4: ask the user his kind of prescriber
         post_data = {
             "kind": PrescriberChooseKindForm.KIND_AUTHORIZED_ORG,
         }
@@ -572,8 +564,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_confirm_authorization")
         self.assertRedirects(response, url)
 
-        # Step 5: ask the user to confirm the "authorized" character of his organization.
-
+        # Step 5: ask the user to confirm the "authorized" character of his organization
         post_data = {
             "confirm_authorization": 1,
         }
@@ -582,8 +573,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
 
-        # Step 6: ask the user his SIRET number.
-
+        # Step 6: ask the user his SIRET number
         post_data = {
             "siret": siret,
         }
@@ -594,21 +584,19 @@ class PrescriberSignupTest(TestCase):
         mock_api_entreprise.assert_called_once()
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 7: user info.
-
-        password = "!*p4ssw0rd123-"
+        # Step 7: user info
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
-            "password1": password,
-            "password2": password,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # Check `User` state.
+        # Check `User` state
         user = User.objects.get(email=post_data["email"])
         # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
@@ -650,8 +638,7 @@ class PrescriberSignupTest(TestCase):
 
         siret = "11122233300001"
 
-        # Step 1: Does the user work  for PE?
-
+        # Step 1: Does the user work for PE?
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -665,7 +652,6 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, url)
 
         # Step 2: ask the user his SIREN number and department
-
         get_data = {
             "siren": siret[:9],
             "department": "67",
@@ -675,8 +661,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
 
-        # Step 3: ask the user to choose the organization he's working for in a pre-existing list.
-
+        # Step 3: ask the user to choose the organization he's working for in a pre-existing list
         post_data = {
             "kind": PrescriberOrganization.Kind.OTHER.value,
         }
@@ -685,8 +670,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_choose_kind")
         self.assertRedirects(response, url)
 
-        # Step 4: ask the user his kind of prescriber.
-
+        # Step 4: ask the user his kind of prescriber
         post_data = {
             "kind": PrescriberChooseKindForm.KIND_UNAUTHORIZED_ORG,
         }
@@ -695,8 +679,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
 
-        # Step 5: ask the user his SIRET number.
-
+        # Step 5: ask the user his SIRET number
         post_data = {
             "siret": siret,
         }
@@ -708,14 +691,12 @@ class PrescriberSignupTest(TestCase):
         mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 6: user info.
-
-        password = "!*p4ssw0rd123-"
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
-            "password1": password,
-            "password2": password,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -890,14 +871,12 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Step 3: user info.
-
-        password = "!*p4ssw0rd123-"
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
-            "password1": password,
-            "password2": password,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(user_info_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -944,7 +923,6 @@ class PrescriberSignupTest(TestCase):
 
         # same SIRET as mock
         siret = "26570134200148"
-        password = "!*p4ssw0rd123-"
 
         existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.ML)
         existing_org_with_siret.save()
@@ -961,8 +939,8 @@ class PrescriberSignupTest(TestCase):
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@ma-plie.fr",
-            "password1": password,
-            "password2": password,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
         url = reverse("signup:prescriber_choose_org")
@@ -1054,13 +1032,13 @@ class PasswordResetTest(TestCase):
         password_change_url = reverse("account_reset_password_from_key", kwargs={"uidb36": uidb36, "key": key})
         response = self.client.get(password_change_url)
         password_change_url_with_hidden_key = response.url
-        post_data = {"password1": "Mlkjhgf!sq2", "password2": "Mlkjhgf!sq2"}
+        post_data = {"password1": DEFAULT_PASSWORD, "password2": DEFAULT_PASSWORD}
         response = self.client.post(password_change_url_with_hidden_key, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_reset_password_from_key_done"))
 
         # User can log in with his new password.
-        self.assertTrue(self.client.login(username=user.email, password="Mlkjhgf!sq2"))
+        self.assertTrue(self.client.login(username=user.email, password=DEFAULT_PASSWORD))
         self.client.logout()
 
     def test_password_reset_with_nonexistent_email(self):
@@ -1091,12 +1069,13 @@ class PasswordChangeTest(TestCase):
         url = reverse("account_change_password")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        post_data = {"oldpassword": DEFAULT_PASSWORD, "password1": "Mlkjhgf!sq2", "password2": "Mlkjhgf!sq2"}
+        new_password = "Mlkjhgf!sq2"
+        post_data = {"oldpassword": DEFAULT_PASSWORD, "password1": new_password, "password2": new_password}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # User can log in with his new password.
         self.client.logout()
-        self.assertTrue(self.client.login(username=user.email, password="Mlkjhgf!sq2"))
+        self.assertTrue(self.client.login(username=user.email, password=new_password))
         self.client.logout()
