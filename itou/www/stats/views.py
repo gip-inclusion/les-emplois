@@ -76,7 +76,10 @@ def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
     "Intégrer ce dashboard dans une application" then inside "Paramètres" on the right, make sure the relevant
     parameter "Département" is "Verrouillé" and "Région" is "Désactivé".
     """
-    current_org = get_current_org_or_404(request)
+    if request.user.is_stats_vip:
+        current_org = None
+    else:
+        current_org = get_current_org_or_404(request)
     if not request.user.can_view_stats_cd(current_org=current_org):
         raise PermissionDenied
     department = request.user.get_stats_cd_department(current_org=current_org)
