@@ -58,6 +58,7 @@ class EtablissementAPI:
             else:
                 logger.error("Error while fetching `%s`: %s", url, e)
                 error = "Problème de connexion à la base Sirene. Essayez ultérieurement."
+            return None, error
 
         if data and data.get("errors"):
             error = data["errors"][0]
