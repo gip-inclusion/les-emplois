@@ -337,6 +337,9 @@ def get_fluxiae_df(
         quoting=csv.QUOTE_NONE,
         nrows=nrows,
         **kwargs,
+        # Fix DtypeWarning (Columns have mixed types) and avoid error when field value in later rows contradicts
+        # the field data format guessed on first rows.
+        low_memory=False,
     )
 
     # If there is only one column, something went wrong, let's break early.
