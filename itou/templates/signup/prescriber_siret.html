@@ -29,7 +29,32 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form form alert_error_type="all" %}
+        {% bootstrap_label "Numéro SIRET de votre organisation *" %}
+        <div class="form-group form-group-required row{% if form.errors %} is-invalid{% endif %}">
+            <div class="col-md-2 p-2 text-right">
+                <span class="text-muted">{{ siren }}</span>
+            </div>
+
+            <div class="col-md-3">
+                <input type="text"
+                    class="form-control{% if form.errors %} is-invalid{% endif %}"
+                    name="{{ form.partial_siret.name }}"
+                    value="{{ form.partial_siret.value|default_if_none:'' }}"
+                    maxlength="5" minlength="5"
+                    placeholder="00000"
+                    required
+                    id="id_{{ form.partial_siret.name }}"
+                >
+            </div>
+            {% if form.partial_siret.errors %}
+            <div class="col-md-12">
+                <div class="invalid-feedback d-block">{{ form.partial_siret.errors|join:", " }}</div>
+            </div>
+            {% endif %}
+            <div class="col-md-12">
+                <small class="form-text text-muted">Complétez le numéro SIREN avec les 5 derniers chiffres du SIRET de votre organisation.</small>
+            </div>
+        </div>
 
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">

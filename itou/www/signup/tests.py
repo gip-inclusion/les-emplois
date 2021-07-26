@@ -410,7 +410,6 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, url)
 
         # Step 4: ask the user his SIRET number.
-
         post_data = {
             "siret": siret,
         }
