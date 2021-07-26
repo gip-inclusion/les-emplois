@@ -15,7 +15,6 @@ env:
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   REVIEW_APPS_ORGANIZATION_NAME: ${{ secrets.CLEVER_REVIEW_APPS_ORG }}
-  ORGANIZATION_NAME: ${{ secrets.CLEVER_ORGANIZATION_NAME }}
   CONFIGURATION_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_CONFIGURATION_ADDON }}
   S3_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_S3_ADDON }}
   BRANCH: ${{ github.head_ref }}
@@ -60,12 +59,12 @@ jobs:
     - name: 🗃 Create database addon
       run: |
         $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
-        $CLEVER_CLI service link-addon $REVIEW_APP_DB_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon $REVIEW_APP_DB_NAME
 
     - name: 🤝 Link S3 addon
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
-        $CLEVER_CLI service link-addon $S3_ADDON --org $ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon $S3_ADDON
 
     - name: 🗺 Add environment variables to the review app
       run: |
