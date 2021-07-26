@@ -4,6 +4,7 @@ from rest_framework import routers
 from rest_framework.authtoken import views as auth_views
 
 from .employee_record_api.viewsets import DummyEmployeeRecordViewSet, EmployeeRecordViewSet
+from .siae_api.viewsets import SiaeViewSet
 
 
 # High level app for API
@@ -14,6 +15,7 @@ app_name = "itou.api"
 router = routers.DefaultRouter()
 router.register(r"employee-records", EmployeeRecordViewSet, basename="employee-records")
 router.register(r"dummy-employee-records", DummyEmployeeRecordViewSet, basename="dummy-employee-records")
+router.register(r"siaes", SiaeViewSet, basename="siaes")
 
 
 urlpatterns = [
