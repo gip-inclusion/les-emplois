@@ -843,12 +843,13 @@ class PrescriberSignupTest(TestCase):
         existing_org_with_siret.save()
 
         # Step 1: the user doesn't work for PE
-
         url = reverse("signup:prescriber_is_pole_emploi")
         post_data = {
             "is_pole_emploi": 0,
             "kind": PrescriberOrganization.Kind.PLIE.value,
-            "siret": siret,
+            "siren": siret[:9],
+            "department": "67",
+            "partial_siret": siret[-5:],
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@ma-plie.fr",
@@ -856,16 +857,22 @@ class PrescriberSignupTest(TestCase):
             "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
+
+        url = reverse("signup:prescriber_siren")
+        response = self.client.get(url, data=post_data)
+
         url = reverse("signup:prescriber_choose_org")
         response = self.client.post(url, data=post_data)
+
         url = reverse("signup:prescriber_siret")
         response = self.client.post(url, data=post_data)
+
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # Check new org is ok:
+        # Check new org is ok
         same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).order_by("kind").all()
         self.assertEqual(2, len(same_siret_orgs))
         org1, org2 = same_siret_orgs
@@ -891,12 +898,15 @@ class PrescriberSignupTest(TestCase):
         post_data = {
             "is_pole_emploi": 0,
             "kind": PrescriberOrganization.Kind.PLIE.value,
-            "siret": siret,
+            "siren": siret[:9],
+            "partial_siret": siret[-5:],
         }
 
         url = reverse("signup:prescriber_is_pole_emploi")
-        response = self.client.get(url)
         response = self.client.post(url, data=post_data)
+
+        url = reverse("signup:prescriber_siren")
+        response = self.client.get(url, data=post_data)
 
         url = reverse("signup:prescriber_choose_org")
         response = self.client.post(url, data=post_data)
@@ -904,9 +914,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siret")
         response = self.client.post(url, data=post_data)
 
-        # Should not be able to go further (not a distinct kind,siret pair)
-        # Must not redirect
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
 
 class PasswordResetTest(TestCase):
