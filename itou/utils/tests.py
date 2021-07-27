@@ -708,7 +708,7 @@ class UtilsEmailsSplitRecipientTest(TestCase):
     def test_dont_split_emails(self):
         recipients = []
         # Only one email is needed
-        for i in range(49):
+        for _ in range(49):
             recipients.append(Faker("email", locale="fr_FR"))
 
         message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
@@ -720,7 +720,7 @@ class UtilsEmailsSplitRecipientTest(TestCase):
     def test_must_split_emails(self):
         # 2 emails are needed; one with 50 the other with 25
         recipients = []
-        for i in range(75):
+        for _ in range(75):
             recipients.append(Faker("email", locale="fr_FR"))
 
         message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)

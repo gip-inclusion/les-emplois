@@ -412,7 +412,7 @@ class PrescriberSignupTest(TestCase):
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         post_data = {
-            "siret": siret,
+            "partial_siret": siret[-5:],
         }
         response = self.client.post(url, data=post_data)
         url = reverse("signup:prescriber_user")
@@ -537,7 +537,7 @@ class PrescriberSignupTest(TestCase):
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         post_data = {
-            "siret": siret,
+            "partial_siret": siret[-5:],
         }
         response = self.client.post(url, data=post_data)
         url = reverse("signup:prescriber_user")
@@ -632,7 +632,7 @@ class PrescriberSignupTest(TestCase):
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         post_data = {
-            "siret": siret,
+            "partial_siret": siret[-5:],
         }
         response = self.client.post(url, data=post_data)
         url = reverse("signup:prescriber_user")
