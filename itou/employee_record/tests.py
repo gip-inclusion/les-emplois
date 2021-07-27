@@ -1,4 +1,5 @@
 import json
+import random
 from unittest import mock
 
 from django.core.exceptions import ValidationError
@@ -13,6 +14,7 @@ from itou.employee_record.mocks.transfer_employee_records import (
     SFTPGoodConnectionMock,
 )
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
+from itou.employee_record.utils import siae_eligible_for_progressive_opening
 from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
     JobApplicationWithApprovalNotCancellableFactory,
@@ -21,6 +23,8 @@ from itou.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.siaes.factories import SiaeFactory
+from itou.siaes.models import Siae
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
@@ -405,3 +409,43 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
         employee_record.refresh_from_db()
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
+
+
+# Temporary test: progressive opening
+
+
+class EmployeeRecordProgressiveOpeningTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Create 100 SIAE for testing modulo
+        for _ in range(1, 100):
+            SiaeFactory(kind="EI")
+
+    def test_modulo_asp_id(self):
+        # Check all modulos
+        for idx, siae in enumerate(Siae.objects.filter(kind="EI"), start=1):
+            result = siae_eligible_for_progressive_opening(siae, modulo=idx)
+            self.assertTrue(result)
+
+        # Check 10 random SIAE with ID under 50
+        random_ids = random.sample(range(1, 50), 10)
+        for id in random_ids:
+            self.assertTrue(siae_eligible_for_progressive_opening(Siae.objects.get(id=id), modulo=50))
+
+        # Check 10 random SIAE with ID under 20
+        random_ids = random.sample(range(1, 21), 10)
+        for id in random_ids:
+            self.assertTrue(siae_eligible_for_progressive_opening(Siae.objects.get(id=id), modulo=20))
+
+        # Check for SIAE not in modulo
+        random_siae_id = random.randint(21, 100)
+        self.assertFalse(siae_eligible_for_progressive_opening(Siae.objects.get(id=random_siae_id), modulo=20))
+
+    def test_manually_added_siae(self):
+        # Test "curated" SIAE
+        curated_siae = Siae.objects.get(id=42)
+        curated_siae_asp_id = curated_siae.convention.asp_id
+        self.assertFalse(siae_eligible_for_progressive_opening(curated_siae, modulo=20))
+        self.assertTrue(
+            siae_eligible_for_progressive_opening(curated_siae, modulo=20, curated_siae_asp_ids=[curated_siae_asp_id])
+        )
