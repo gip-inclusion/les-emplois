@@ -1,6 +1,8 @@
 import uuid
 from unittest import mock
 
+import httpx
+import respx
 from allauth.account.forms import default_token_generator
 from allauth.account.models import EmailConfirmationHMAC
 from allauth.account.utils import user_pk_to_url_str
@@ -373,13 +375,9 @@ class PrescriberSignupTest(TestCase):
         user_email = user.emailaddress_set.first()
         self.assertTrue(user_email.verified)
 
-    @mock.patch(
-        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
-    )
+    @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_user_prescriber_with_authorized_org_of_known_kind(
-        self, mock_api_entreprise, mock_call_ban_geocoding_api
-    ):
+    def test_create_user_prescriber_with_authorized_org_of_known_kind(self, mock_call_ban_geocoding_api):
         """
         Test the creation of a user of type prescriber with an authorized organization of *known* kind.
         """
@@ -409,14 +407,16 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
 
-        # Step 4: ask the user his SIRET number.
+        # Step 4: fill the SIRET number.
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
         post_data = {
             "siret": siret,
         }
         response = self.client.post(url, data=post_data)
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
-        mock_api_entreprise.assert_called_once()
         mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 5: user information
@@ -483,13 +483,9 @@ class PrescriberSignupTest(TestCase):
         user_email = user.emailaddress_set.first()
         self.assertTrue(user_email.verified)
 
-    @mock.patch(
-        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
-    )
+    @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_user_prescriber_with_authorized_org_of_unknown_kind(
-        self, mock_api_entreprise, mock_call_ban_geocoding_api
-    ):
+    def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, mock_call_ban_geocoding_api):
         """
         Test the creation of a user of type prescriber with an authorized organization of *unknown* kind.
         """
@@ -536,14 +532,17 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
 
-        # Step 6: ask the user his SIRET number
+        # Step 6: fill the SIRET number
+        api_entreprise_route = respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
         post_data = {
             "siret": siret,
         }
         response = self.client.post(url, data=post_data)
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
-        mock_api_entreprise.assert_called_once()
+        self.assertTrue(api_entreprise_route.called)
         mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 7: fill the user information
@@ -588,11 +587,9 @@ class PrescriberSignupTest(TestCase):
         subject = mail.outbox[1].subject
         self.assertIn("Confirmez votre adresse e-mail", subject)
 
-    @mock.patch(
-        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
-    )
+    @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_user_prescriber_with_unauthorized_org(self, mock_api_entreprise, mock_call_ban_geocoding_api):
+    def test_create_user_prescriber_with_unauthorized_org(self, mock_call_ban_geocoding_api):
         """
         Test the creation of a user of type prescriber with an unauthorized organization.
         """
@@ -630,14 +627,18 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
 
-        # Step 5: ask the user his SIRET number
+        # Step 5: fill the SIRET number
+        api_entreprise_route = respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
         post_data = {
             "siret": siret,
         }
         response = self.client.post(url, data=post_data)
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
-        mock_api_entreprise.assert_called_once()
+
+        self.assertTrue(api_entreprise_route.called)
         mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 6: user information
@@ -819,13 +820,9 @@ class PrescriberSignupTest(TestCase):
         subject = mail.outbox[0].subject
         self.assertIn("Confirmez votre adresse e-mail", subject)
 
-    @mock.patch(
-        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
-    )
+    @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_user_prescriber_with_same_siret_and_different_kind(
-        self, mock_api_entreprise, mock_call_ban_geocoding_api
-    ):
+    def test_create_user_prescriber_with_same_siret_and_different_kind(self, mock_call_ban_geocoding_api):
         """
         A user can create a new prescriber organization with an existing SIRET number,
         provided that:
@@ -839,7 +836,9 @@ class PrescriberSignupTest(TestCase):
 
         # same SIRET as mock
         siret = "26570134200148"
-
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
         existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.ML)
         existing_org_with_siret.save()
 
@@ -873,13 +872,9 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(PrescriberOrganization.Kind.ML.value, org1.kind)
         self.assertEqual(PrescriberOrganization.Kind.PLIE.value, org2.kind)
 
-    @mock.patch(
-        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
-    )
+    @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_user_prescriber_with_same_siret_and_same_kind(
-        self, mock_api_entreprise, mock_call_ban_geocoding_api
-    ):
+    def test_create_user_prescriber_with_same_siret_and_same_kind(self, mock_call_ban_geocoding_api):
         """
         A user can't create a new prescriber organization with an existing SIRET number if:
         * the kind of the new organization is the same as an existing one
@@ -888,6 +883,9 @@ class PrescriberSignupTest(TestCase):
 
         # same SIRET as mock but with same expected kind
         siret = "26570134200148"
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
         PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.PLIE).save()
 
         post_data = {

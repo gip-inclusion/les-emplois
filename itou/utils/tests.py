@@ -2,6 +2,8 @@ import datetime
 from collections import OrderedDict
 from unittest import mock
 
+import httpx
+import respx
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
@@ -18,7 +20,7 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
-from itou.utils.apis.api_entreprise import EtablissementAPI
+from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.pole_emploi import PoleEmploiRechercheIndividuCertifieAPI
 from itou.utils.emails import sanitize_mailjet_recipients
@@ -644,17 +646,22 @@ class CnilCompositionPasswordValidatorTest(SimpleTestCase):
 
 
 class ApiEntrepriseTest(SimpleTestCase):
-    @mock.patch(
-        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
-    )
-    def test_etablissement_api(self, mock_api_entreprise):
-        etablissement = EtablissementAPI("26570134200148")
+    @respx.mock
+    def test_etablissement_api(self):
+        siret = "26570134200148"
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
 
+        etablissement, error = etablissement_get_or_error(siret)
+
+        self.assertIsNone(error)
         self.assertEqual(etablissement.name, "CENTRE COMMUNAL D'ACTION SOCIALE")
         self.assertEqual(etablissement.address_line_1, "22 RUE DU WAD BILLY")
         self.assertEqual(etablissement.address_line_2, "22-24")
         self.assertEqual(etablissement.post_code, "57000")
         self.assertEqual(etablissement.city, "METZ")
+        self.assertEqual(etablissement.department, "57")
         self.assertFalse(etablissement.is_closed)
 
 
