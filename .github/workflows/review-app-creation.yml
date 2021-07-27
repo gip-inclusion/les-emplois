@@ -58,7 +58,7 @@ jobs:
 
     - name: 🗃 Create database addon
       run: |
-        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org $REVIEW_APPS_ORGANIZATION_NAME --plan xxs_sml --yes
         $CLEVER_CLI service link-addon $REVIEW_APP_DB_NAME
 
     - name: 🤝 Link S3 addon
