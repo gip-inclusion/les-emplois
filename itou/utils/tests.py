@@ -400,6 +400,15 @@ class UtilsTemplateFiltersTestCase(TestCase):
         self.assertEqual(dict_filters.get_dict_item(my_dict, "key1"), "value1")
         self.assertEqual(dict_filters.get_dict_item(my_dict, "key2"), "value2")
 
+    def test_format_siret(self):
+        # Don't format invalid SIRET
+        self.assertEqual(format_filters.format_siret("1234"), "1234")
+        self.assertEqual(format_filters.format_siret(None), "None")
+        # SIREN
+        self.assertEqual(format_filters.format_siret("123456789"), "123 456 789")
+        # SIRET
+        self.assertEqual(format_filters.format_siret("12345678912345"), "123 456 789 12345")
+
 
 class UtilsEmailsTestCase(TestCase):
     def test_get_safe_url(self):
