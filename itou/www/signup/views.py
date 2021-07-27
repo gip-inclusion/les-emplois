@@ -232,12 +232,10 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
 
     if request.method == "POST" and form.is_valid():
 
-        next_url = reverse("signup:prescriber_siren")
-
         if form.cleaned_data["is_pole_emploi"]:
-            next_url = reverse("signup:prescriber_pole_emploi_safir_code")
+            return HttpResponseRedirect(reverse("signup:prescriber_pole_emploi_safir_code"))
 
-        return HttpResponseRedirect(next_url)
+        return HttpResponseRedirect(reverse("signup:prescriber_siren"))
 
     context = {"form": form}
     return render(request, template_name, context)

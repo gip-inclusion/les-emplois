@@ -286,6 +286,25 @@ class JobSeekerSignupTest(TestCase):
 
 
 class PrescriberSignupTest(TestCase):
+    def test_prescriber_is_pole_emploi(self):
+        # GET
+        self.assertNotIn("prescriber_signup", list(self.client.session.keys()))
+
+        url = reverse("signup:prescriber_is_pole_emploi")
+        response = self.client.get(url)
+        self.assertContains(response, "Travaillez-vous pour Pôle emploi ?")
+
+        # Data stored in session (on GET 🤦)
+        self.assertIn("prescriber_signup", list(self.client.session.keys()))
+
+        # POST Yes
+        response = self.client.post(url, data={"is_pole_emploi": 1})
+        self.assertRedirects(response, reverse("signup:prescriber_pole_emploi_safir_code"))
+
+        # POST No
+        response = self.client.post(url, data={"is_pole_emploi": 0})
+        self.assertRedirects(response, reverse("signup:prescriber_siren"))
+
     def test_create_user_prescriber_member_of_pole_emploi(self):
         """
         Test the creation of a user of type prescriber and his joining to a Pole emploi agency.
