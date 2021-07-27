@@ -8,6 +8,7 @@ from django.utils.http import urlsafe_base64_decode
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
+from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
@@ -224,6 +225,26 @@ class PrescriberIsPoleEmploiForm(forms.Form):
     )
 
 
+class PrescriberSirenForm(forms.Form):
+
+    siren = forms.CharField(
+        label="Numéro SIREN de votre organisation",
+        min_length=9,
+        help_text="Le numéro SIREN contient 9 chiffres.",
+    )
+
+    department = forms.ChoiceField(
+        label="Département",
+        choices=DEPARTMENTS.items(),
+    )
+
+    def clean_siren(self):
+        # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
+        siren = self.cleaned_data["siren"].replace(" ", "")
+        validate_siren(siren)
+        return siren
+
+
 class PrescriberChooseOrgKindForm(forms.Form):
 
     kind = forms.ChoiceField(
@@ -237,12 +258,10 @@ class PrescriberChooseKindForm(forms.Form):
 
     KIND_AUTHORIZED_ORG = "authorized_org"
     KIND_UNAUTHORIZED_ORG = "unauthorized_org"
-    KIND_SOLO = "solo"
 
     KIND_CHOICES = (
         (KIND_AUTHORIZED_ORG, "Pour une organisation habilitée par le Préfet"),
         (KIND_UNAUTHORIZED_ORG, "Pour une organisation non-habilitée"),
-        (KIND_SOLO, "Seul (sans organisation)"),
     )
 
     kind = forms.ChoiceField(
