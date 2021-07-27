@@ -1,6 +1,8 @@
 """
 Handle multiple user types sign up with django-allauth.
 """
+import logging
+
 from allauth.account.views import PasswordResetView, SignupView
 from django.conf import settings
 from django.contrib import messages
@@ -19,6 +21,9 @@ from itou.siaes.models import Siae
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
+
+
+logger = logging.getLogger(__name__)
 
 
 class ItouPasswordResetView(PasswordResetView):
@@ -447,7 +452,16 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-    siren = session_data["siren"]
+    kind = session_data.get("kind")
+    siren = session_data.get("siren")
+
+    if not kind or not siren:
+        # The user didn't use the right workflow
+        logger.error(
+            "User has reached step3 of the worflow w/o the required information (kind=%s, siren=%s)", kind, siren
+        )
+        return HttpResponseRedirect(reverse("signup:prescriber_is_pole_emploi"))
+
     form = forms.PrescriberSiretForm(
         kind=session_data["kind"],
         siren=siren,
