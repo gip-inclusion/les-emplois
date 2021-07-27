@@ -9,7 +9,7 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
 from itou.utils.address.departments import DEPARTMENTS
-from itou.utils.apis.api_entreprise import EtablissementAPI
+from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
@@ -320,10 +320,9 @@ class PrescriberSiretForm(forms.Form):
             raise forms.ValidationError(error)
 
         # Fetch name and address from API entreprise.
-        etablissement = EtablissementAPI(siret)
-
-        if etablissement.error:
-            raise forms.ValidationError(etablissement.error)
+        etablissement, error = etablissement_get_or_error(siret)
+        if error:
+            raise forms.ValidationError(error)
 
         if etablissement.is_closed:
             raise forms.ValidationError("La base Sirene indique quel'établissement est fermé.")
