@@ -18,6 +18,11 @@ def siae_eligible_for_progressive_opening(
     Check if SIAE parameter is:
     - within a modulo range on the `convention.asp_id` field (a value of 100 will get all values)
     - within a set of manually chosen SIAE ("curated")
+
+    Example values for modulo:
+    - 100 will get all values
+    - 50 will get 50% of all values
+    - 1 will get 1% of all values
     """
 
     # Modulo 100 on asp_id part:
