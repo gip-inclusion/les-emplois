@@ -1,6 +1,7 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 {% load static %}
+{% load format_filters %}
 
 {% block title %}Prescripteur/Orienteur - Inscription{{ block.super }}{% endblock %}
 
@@ -31,8 +32,9 @@
 
         {% bootstrap_label "Numéro SIRET de votre organisation *" %}
         <div class="form-group form-group-required row{% if form.errors %} is-invalid{% endif %}">
+
             <div class="col-md-2 p-2 text-right">
-                <span class="text-muted">{{ siren }}</span>
+                <span class="text-muted">{{ siren|format_siret }}</span>
             </div>
 
             <div class="col-md-3">

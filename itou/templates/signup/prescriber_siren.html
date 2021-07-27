@@ -1,6 +1,7 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 {% load static %}
+{% load format_filters %}
 
 {% block title %}Prescripteur/Orienteur - Inscription{{ block.super }}{% endblock %}
 
@@ -47,7 +48,7 @@
                 {% for prescriber in prescribers_with_members %}
                     <li>
                         <p>
-                            <b>{{ prescriber.siret|slice:":9" }} {{ prescriber.siret|slice:"9:" }}</b> - {{ prescriber.kind }}
+                            <b>{{ prescriber.siret|format_siret }}</b> - {{ prescriber.kind }}
                             <br>
                             {{ prescriber.display_name }}
                             <br>
