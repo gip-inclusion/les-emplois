@@ -243,6 +243,7 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
     return render(request, template_name, context)
 
 
+# FIXME GET method with side-effect (session update)
 @valid_prescriber_signup_session_required
 @push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
@@ -470,6 +471,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     # Request Sirene API to validate SIRET
     if request.method == "POST" and form.is_valid():
+
         session_data["prescriber_org_data"] = form.org_data
         request.session.modified = True
         next_url = reverse("signup:prescriber_user")
