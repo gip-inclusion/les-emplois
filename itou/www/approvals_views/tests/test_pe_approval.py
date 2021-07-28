@@ -8,7 +8,7 @@ from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.factories import SiaeMembershipFactory
+from itou.siaes.factories import SiaeMembershipFactory, SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
 
@@ -17,17 +17,23 @@ class PoleEmploiApprovalSearchTest(TestCase):
     def setUp(self):
         self.url = reverse("approvals:pe_approval_search")
 
-    def set_up_pe_approval(self):
+    def set_up_pe_approval(self, with_job_application=True):
         # pylint: disable=attribute-defined-outside-init
         self.pe_approval = PoleEmploiApprovalFactory()
-        self.job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
-            approval__number=self.pe_approval.number,
-        )
-        self.siae = self.job_application.to_siae
-        self.siae_user = self.job_application.to_siae.members.first()
-        self.approval = self.job_application.approval
-        self.job_seeker = self.job_application.job_seeker
+
+        self.siae = SiaeWithMembershipFactory()
+        self.siae_user = self.siae.members.first()
+        if with_job_application:
+            self.job_application = JobApplicationWithApprovalFactory(
+                to_siae=self.siae,
+                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                approval__number=self.pe_approval.number,
+            )
+            self.approval = self.job_application.approval
+            self.job_seeker = self.job_application.job_seeker
+        else:
+            self.approval = None
+            self.job_seeker = None
 
     def test_default(self):
         """
@@ -43,8 +49,9 @@ class PoleEmploiApprovalSearchTest(TestCase):
         """
         The search for PE approval screen should display the job seeker's name
         if the PE approval number that was searched for has a matching PE approval
+        but not PASS IAE.
         """
-        self.set_up_pe_approval()
+        self.set_up_pe_approval(with_job_application=False)
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url, {"number": self.pe_approval.number})
