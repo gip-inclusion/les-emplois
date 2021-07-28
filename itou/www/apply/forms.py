@@ -213,9 +213,12 @@ class AcceptForm(forms.ModelForm):
             self.fields[field].required = True
             self.fields[field].widget = DatePickerField()
             self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
-        if self.instance.state.is_refused:
-            # Erase the refusal message to start from new.
-            self.initial["answer"] = ""
+        # Job applications can be accepted twice if they have been cancelled.
+        # They also can be accepted after a refusal.
+        # That's why some fields are already filled in with obsolete data.
+        # Erase them now to start from new.
+        for field in ["answer", "hiring_start_at", "hiring_end_at"]:
+            self.initial[field] = ""
 
     class Meta:
         model = JobApplication
@@ -253,9 +256,8 @@ class AcceptForm(forms.ModelForm):
         if self.errors:
             return cleaned_data
 
-        # is it the second button that submitted the form
-        if "without_approval" in self.data:
-            self.cleaned_data["hiring_without_approval"] = True
+        # True if is it the second button that submitted the form
+        self.cleaned_data["hiring_without_approval"] = "without_approval" in self.data
 
         hiring_start_at = self.cleaned_data["hiring_start_at"]
         hiring_end_at = self.cleaned_data["hiring_end_at"]
