@@ -19,12 +19,15 @@ class PoleEmploiApprovalSearchTest(TestCase):
 
     def set_up_pe_approval(self):
         # pylint: disable=attribute-defined-outside-init
-        self.job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        self.pe_approval = PoleEmploiApprovalFactory()
+        self.job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval__number=self.pe_approval.number,
+        )
         self.siae = self.job_application.to_siae
         self.siae_user = self.job_application.to_siae.members.first()
         self.approval = self.job_application.approval
         self.job_seeker = self.job_application.job_seeker
-        self.pe_approval = PoleEmploiApprovalFactory()
 
     def test_default(self):
         """
@@ -108,10 +111,11 @@ class PoleEmploiApprovalSearchTest(TestCase):
         as this would produce a 404.
         """
 
-        # Create a job application with a PASS IAE created from a `PoleEmploiApproval`
-        # that belongs to another siae.
+        # Initial approvals (PE and PASS)
         self.set_up_pe_approval()
 
+        # Create a job application with a PASS IAE created from a `PoleEmploiApproval`
+        # that belongs to another siae.
         job_seeker = JobSeekerFactory()
         pe_approval = PoleEmploiApprovalFactory()
         job_application = JobApplicationWithApprovalFactory(
@@ -127,16 +131,9 @@ class PoleEmploiApprovalSearchTest(TestCase):
         # This is the current user (NOT a member of `another_siae`).
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
 
-        # The current user should not be redirected to the details of `job_application` because
-        # it belongs to `another_siae`. He should get a 302 instead with an error message.
+        # The current user should be able to use the PASS IAE used by another SIAE
         response = self.client.get(self.url, {"number": job_application.approval.number})
-        self.assertEqual(response.status_code, 302)
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            str(messages[0]),
-            f"Le numéro {pe_approval.number_with_spaces} est déjà utilisé par un autre employeur.",
-        )
+        self.assertContains(response, "Utiliser le PASS IAE")
 
     def test_unlogged_is_not_authorized(self):
         """
