@@ -241,7 +241,9 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
     return render(request, template_name, context)
 
 
-# FIXME GET method with side-effect (session update)
+# TODO 2021-07-28 GET method with side-effect (session update), to rewrite as:
+# - POST but not a very choice for search view
+# - GET with params w/o session update
 @valid_prescriber_signup_session_required
 @push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
@@ -467,7 +469,10 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
         data=request.POST or None,
     )
 
-    # Request Sirene API to validate SIRET
+    # `PrescriberSiretForm` performs several API calls:
+    # - to SIRENE API to validate the SIRET existence and the status of the organisation
+    # - get geolocalisation from Adresse API
+    # See PrescriberSiretForm.clean_partial_siret.
     if request.method == "POST" and form.is_valid():
 
         session_data["prescriber_org_data"] = form.org_data

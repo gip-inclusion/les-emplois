@@ -66,11 +66,11 @@ class SiaeSignupTest(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
-            # Find an SIAE by SIREN
+            # Find an SIAE by SIREN.
             response = self.client.get(url, {"siren": siae.siret[:9]})
             self.assertEqual(response.status_code, 200)
 
-            # Choose an SIAE between results
+            # Choose an SIAE between results.
             post_data = {"siaes": siae.pk}
             # Pass `siren` in request.GET
             response = self.client.post(f"{url}?siren={siae.siret[:9]}", data=post_data)
@@ -85,11 +85,11 @@ class SiaeSignupTest(TestCase):
             response = self.client.get(magic_link)
             self.assertEqual(response.status_code, 200)
 
-            # No error when opening magic link a second time
+            # No error when opening magic link a second time.
             response = self.client.get(magic_link)
             self.assertEqual(response.status_code, 200)
 
-            # Create user
+            # Create user.
             url = siae.signup_magic_link
             post_data = {
                 # Hidden fields
@@ -113,30 +113,30 @@ class SiaeSignupTest(TestCase):
             self.assertFalse(User.objects.filter(email=user_email).exists())
             user = User.objects.get(email=user_secondary_email)
 
-            # Check `User` state
+            # Check `User` state.
             self.assertFalse(user.is_job_seeker)
             self.assertFalse(user.is_prescriber)
             self.assertTrue(user.is_siae_staff)
             self.assertTrue(user.is_active)
             self.assertTrue(siae.has_admin(user))
             self.assertEqual(1, siae.members.count())
-            # `username` should be a valid UUID, see `User.generate_unique_username()`
+            # `username` should be a valid UUID, see `User.generate_unique_username()`.
             self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
             self.assertEqual(user.first_name, user_first_name)
             self.assertEqual(user.last_name, post_data["last_name"])
             self.assertEqual(user.email, user_secondary_email)
-            # Check `EmailAddress` state
+            # Check `EmailAddress` state.
             self.assertEqual(user.emailaddress_set.count(), 1)
             user_email = user.emailaddress_set.first()
             self.assertFalse(user_email.verified)
 
-            # Check sent email
+            # Check sent email.
             self.assertEqual(len(mail.outbox), 2)
             subjects = [email.subject for email in mail.outbox]
             self.assertIn("[Action requise] Un nouvel utilisateur souhaite rejoindre votre structure !", subjects)
             self.assertIn("Confirmez votre adresse e-mail", subjects)
 
-            # Magic link is no longer valid because siae.members.count() has changed
+            # Magic link is no longer valid because siae.members.count() has changed.
             response = self.client.get(magic_link, follow=True)
             redirect_url, status_code = response.redirect_chain[-1]
             self.assertEqual(status_code, 302)
@@ -148,14 +148,14 @@ class SiaeSignupTest(TestCase):
             )
             self.assertContains(response, escape(expected_message))
 
-            # User cannot log in until confirmation
+            # User cannot log in until confirmation.
             post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
             url = reverse("account_login")
             response = self.client.post(url, data=post_data)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response.url, reverse("account_email_verification_sent"))
 
-            # Confirm email + auto login
+            # Confirm email + auto login.
             confirmation_token = EmailConfirmationHMAC(user_email).key
             confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
             response = self.client.post(confirm_email_url)
@@ -174,19 +174,19 @@ class JobSeekerSignupTest(TestCase):
         Test the redirects according to the chosen situations
         """
 
-        # Check if the form page is displayed correctly
+        # Check if the form page is displayed correctly.
         url = reverse("signup:job_seeker_situation")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        # Check if none of the boxes are checked
-        # 'some data' needed to raise form error
+        # Check if none of the boxes are checked 'some data' needed to raise
+        # form error.
         post_data = {"some": "data"}
         response = self.client.post(url, post_data)
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, "form", "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
 
-        # Check if one of eligibility criterion is checked
+        # Check if one of eligibility criterion is checked.
         next_url = reverse("signup:job_seeker")
         for choice in JobSeekerSituationForm.ELIGIBLE_SITUATION:
             post_data = {"situation": [choice]}
@@ -199,20 +199,20 @@ class JobSeekerSignupTest(TestCase):
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, next_url)
 
-        # Check if all the eligibility criteria are checked
+        # Check if all the eligibility criteria are checked.
         post_data = {"situation": JobSeekerSituationForm.ELIGIBLE_SITUATION}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, next_url)
 
-        # Check if "Autre" is the only one checked
+        # Check if "Autre" is the only one checked.
         post_data = {"situation": "autre"}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         next_url = reverse("signup:job_seeker_situation_not_eligible")
         self.assertRedirects(response, next_url)
 
-        # Check not eligible destination page
+        # Check not eligible destination page.
         url = reverse("signup:job_seeker_situation_not_eligible")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -246,20 +246,20 @@ class JobSeekerSignupTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # Check `User` state
+        # Check `User` state.
         user = User.objects.get(email=post_data["email"])
-        # `username` should be a valid UUID, see `User.generate_unique_username()`
+        # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertTrue(user.is_job_seeker)
         self.assertFalse(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
-        # Check `EmailAddress` state
+        # Check `EmailAddress` state.
         self.assertEqual(user.emailaddress_set.count(), 1)
         user_email = user.emailaddress_set.first()
         self.assertFalse(user_email.verified)
 
-        # Check sent email
+        # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Confirmez votre adresse e-mail", email.subject)
@@ -268,14 +268,14 @@ class JobSeekerSignupTest(TestCase):
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], user.email)
 
-        # User cannot log in until confirmation
+        # User cannot log in until confirmation.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         url = reverse("account_login")
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("account_email_verification_sent"))
 
-        # Confirm email + auto login
+        # Confirm email + auto login.
         confirmation_token = EmailConfirmationHMAC(user_email).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         response = self.client.post(confirm_email_url)
@@ -294,14 +294,14 @@ class PrescriberSignupTest(TestCase):
         response = self.client.get(url)
         self.assertContains(response, "Travaillez-vous pour Pôle emploi ?")
 
-        # Data stored in session (on GET 🤦)
+        # Data stored in session (on GET 🤦).
         self.assertIn("prescriber_signup", list(self.client.session.keys()))
 
-        # POST Yes
+        # POST Yes.
         response = self.client.post(url, data={"is_pole_emploi": 1})
         self.assertRedirects(response, reverse("signup:prescriber_pole_emploi_safir_code"))
 
-        # POST No
+        # POST No.
         response = self.client.post(url, data={"is_pole_emploi": 0})
         self.assertRedirects(response, reverse("signup:prescriber_siren"))
 
@@ -312,11 +312,11 @@ class PrescriberSignupTest(TestCase):
 
         organization = PrescriberPoleEmploiFactory()
 
-        # Step 1: the user works for PE
+        # Step 1: the user works for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(url, data={"is_pole_emploi": 1})
 
-        # Step 2: fill the SAFIR code
+        # Step 2: fill the SAFIR code.
         url = reverse("signup:prescriber_pole_emploi_safir_code")
         self.assertRedirects(response, url)
         post_data = {
@@ -361,15 +361,15 @@ class PrescriberSignupTest(TestCase):
         user_email = user_emails[0]
         self.assertFalse(user_email.verified)
 
-        # Check organization
+        # Check organization.
         self.assertTrue(organization.is_authorized)
         self.assertEqual(organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
 
-        # Check membership
+        # Check membership.
         self.assertIn(user, organization.members.all())
         self.assertEqual(1, user.prescriberorganization_set.count())
 
-        # Check sent email
+        # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Confirmez votre adresse e-mail", email.subject)
@@ -401,11 +401,11 @@ class PrescriberSignupTest(TestCase):
 
         siret = "11122233300001"
 
-        # Step 1: the user doesn't work for PE
+        # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(url, data={"is_pole_emploi": 0})
 
-        # Step 2: search organisations with SIREN and department
+        # Step 2: search organisations with SIREN and department.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
         get_data = {
@@ -422,7 +422,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 4: fill the SIRET number
+        # Step 4: fill the SIRET number.
         respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
@@ -434,7 +434,7 @@ class PrescriberSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 5: user information
+        # Step 5: user information.
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         post_data = {
@@ -447,7 +447,7 @@ class PrescriberSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # Check `User` state
+        # Check `User` state.
         user = User.objects.get(email=post_data["email"])
         # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
@@ -455,30 +455,30 @@ class PrescriberSignupTest(TestCase):
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
-        # Check `EmailAddress` state
+        # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
         self.assertEqual(len(user_emails), 1)
         user_email = user_emails[0]
         self.assertFalse(user_email.verified)
 
-        # Check organization
+        # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
         self.assertFalse(org.is_authorized)
         self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
 
-        # Check membership
+        # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
         membership = user.prescribermembership_set.get(organization=org)
         self.assertTrue(membership.is_admin)
 
-        # Check sent email
+        # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
 
-        # Check email has been sent to support (validation/refusal of authorisation needed)
+        # Check email has been sent to support (validation/refusal of authorisation needed).
         email = mail.outbox[0]
         self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", email.subject)
 
-        # Check email has been sent to confirm the user's email
+        # Check email has been sent to confirm the user's email.
         email = mail.outbox[1]
         self.assertIn("Confirmez votre adresse e-mail", email.subject)
         self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
@@ -486,13 +486,13 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], user.email)
 
-        # User cannot log in until confirmation
+        # User cannot log in until confirmation.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         url = reverse("account_login")
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.url, reverse("account_email_verification_sent"))
 
-        # Confirm email + auto login
+        # Confirm email + auto login.
         confirmation_token = EmailConfirmationHMAC(user_email).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         response = self.client.post(confirm_email_url)
@@ -509,11 +509,11 @@ class PrescriberSignupTest(TestCase):
 
         siret = "11122233300001"
 
-        # Step 1: the user doesn't work for PE
+        # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(url, data={"is_pole_emploi": 0})
 
-        # Step 2: search organisations with SIREN and department
+        # Step 2: search organisations with SIREN and department.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
         get_data = {
@@ -522,7 +522,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.get(url, data=get_data)
 
-        # Step 3: set 'other' organisation
+        # Step 3: set 'other' organisation.
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
         post_data = {
@@ -530,7 +530,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 4: ask the user his kind of prescriber
+        # Step 4: ask the user his kind of prescriber.
         url = reverse("signup:prescriber_choose_kind")
         self.assertRedirects(response, url)
         post_data = {
@@ -538,7 +538,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 5: ask the user to confirm the "authorized" character of his organization
+        # Step 5: ask the user to confirm the "authorized" character of his organization.
         url = reverse("signup:prescriber_confirm_authorization")
         self.assertRedirects(response, url)
         post_data = {
@@ -546,7 +546,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 6: fill the SIRET number
+        # Step 6: fill the SIRET number.
         api_entreprise_route = respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
@@ -559,7 +559,7 @@ class PrescriberSignupTest(TestCase):
         self.assertTrue(api_entreprise_route.called)
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 7: fill the user information
+        # Step 7: fill the user information.
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         post_data = {
@@ -572,7 +572,7 @@ class PrescriberSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # Check `User` state
+        # Check `User` state.
         user = User.objects.get(email=post_data["email"])
         # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
@@ -580,26 +580,26 @@ class PrescriberSignupTest(TestCase):
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
-        # Check `EmailAddress` state
+        # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
         self.assertEqual(len(user_emails), 1)
         self.assertFalse(user_emails[0].verified)
 
-        # Check org
+        # Check org.
         org = PrescriberOrganization.objects.get(siret=siret)
         self.assertFalse(org.is_authorized)
         self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
 
-        # Check membership
+        # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
         membership = user.prescribermembership_set.get(organization=org)
         self.assertTrue(membership.is_admin)
 
-        # Check email has been sent to support (validation/refusal of authorisation needed)
+        # Check email has been sent to support (validation/refusal of authorisation needed).
         self.assertEqual(len(mail.outbox), 2)
         subject = mail.outbox[0].subject
         self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
-        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`
+        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`.
         subject = mail.outbox[1].subject
         self.assertIn("Confirmez votre adresse e-mail", subject)
 
@@ -612,20 +612,20 @@ class PrescriberSignupTest(TestCase):
 
         siret = "11122233300001"
 
-        # Step 1: the user doesn't work for PE
+        # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(url, data={"is_pole_emploi": 0})
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
 
-        # Step 2: search organisations with SIREN and department
+        # Step 2: search organisations with SIREN and department.
         get_data = {
             "siren": siret[:9],
             "department": "67",
         }
         response = self.client.get(url, data=get_data)
 
-        # Step 3: select kind of organisation
+        # Step 3: select kind of organisation.
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
         post_data = {
@@ -633,7 +633,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 4: select the kind of prescriber 'UNAUTHORIZED'
+        # Step 4: select the kind of prescriber 'UNAUTHORIZED'.
         url = reverse("signup:prescriber_choose_kind")
         self.assertRedirects(response, url)
         post_data = {
@@ -641,7 +641,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 5: fill the SIRET number
+        # Step 5: fill the SIRET number.
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
         api_entreprise_route = respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
@@ -654,7 +654,7 @@ class PrescriberSignupTest(TestCase):
         self.assertTrue(api_entreprise_route.called)
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 6: user information
+        # Step 6: user information.
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         post_data = {
@@ -667,7 +667,7 @@ class PrescriberSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # Check `User` state
+        # Check `User` state.
         user = User.objects.get(email=post_data["email"])
         # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
@@ -680,17 +680,17 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(len(user_emails), 1)
         self.assertFalse(user_emails[0].verified)
 
-        # Check organization
+        # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
         self.assertFalse(org.is_authorized)
         self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED)
 
-        # Check membership
+        # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
         membership = user.prescribermembership_set.get(organization=org)
         self.assertTrue(membership.is_admin)
 
-        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`
+        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`.
         self.assertEqual(len(mail.outbox), 1)
         subject = mail.outbox[0].subject
         self.assertIn("Confirmez votre adresse e-mail", subject)
@@ -702,17 +702,17 @@ class PrescriberSignupTest(TestCase):
 
         siret = "26570134200148"
 
-        # PrescriberOrganizationWithMembershipFactory
+        # PrescriberOrganizationWithMembershipFactory.
         existing_org_with_siret = PrescriberOrganizationWithMembershipFactory(
             siret=siret, kind=PrescriberOrganization.Kind.SPIP, department="01"
         )
         existing_org_with_siret.save()
 
-        # Step 1: the user doesn't work for PE
+        # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(url, data={"is_pole_emploi": 0})
 
-        # Step 2: ask the user the SIREN number and departement of the organization
+        # Step 2: ask the user the SIREN number and departement of the organization.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
         get_data = {
@@ -734,11 +734,11 @@ class PrescriberSignupTest(TestCase):
         )
         existing_org_with_siret.save()
 
-        # Step 1: the user doesn't work for PE
+        # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(url, data={"is_pole_emploi": 0})
 
-        # Step 2: search organisations with SIREN and department
+        # Step 2: search organisations with SIREN and department.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
         get_data = {
@@ -748,7 +748,7 @@ class PrescriberSignupTest(TestCase):
         response = self.client.get(url, data=get_data)
         self.assertContains(response, existing_org_with_siret.display_name)
 
-        # new organisation link
+        # New organisation link.
         self.assertContains(response, reverse("signup:prescriber_choose_org"))
 
     def test_create_user_prescriber_with_existing_siren_without_member(self):
@@ -763,14 +763,14 @@ class PrescriberSignupTest(TestCase):
         )
         existing_org_with_siret.save()
 
-        # Step 1: the user doesn't work for PE
+        # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(
             url,
             data={"is_pole_emploi": 0},
         )
 
-        # Step 2: search organisations with SIREN and department
+        # Step 2: search organisations with SIREN and department.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
         get_data = {
@@ -786,25 +786,26 @@ class PrescriberSignupTest(TestCase):
         Test the creation of a user of type prescriber without organization.
         """
 
-        # Step 1: the user doesn't work for PE
+        # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(
             url,
             data={"is_pole_emploi": 0},
         )
 
-        # Step 2: redirected on search
+        # Step 2: redirected on search.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
 
-        # Step 3: the user clicks on "No organization" in search of organisation (SIREN and department)
+        # Step 3: the user clicks on "No organization" in search of organisation
+        # (SIREN and department).
         response = self.client.get(url)
         user_info_url = reverse("signup:prescriber_user")
         self.assertContains(response, user_info_url)
         response = self.client.get(user_info_url)
         self.assertEqual(response.status_code, 200)
 
-        # Step 3: fill the user information
+        # Step 3: fill the user information.
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
@@ -815,23 +816,24 @@ class PrescriberSignupTest(TestCase):
         response = self.client.post(user_info_url, data=post_data)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # Check `User` state
+        # Check `User` state.
         user = User.objects.get(email=post_data["email"])
-        # `username` should be a valid UUID, see `User.generate_unique_username()`
+        # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
-        # Check `EmailAddress` state
+        # Check `EmailAddress` state.
         self.assertEqual(user.emailaddress_set.count(), 1)
         user_email = user.emailaddress_set.first()
         self.assertFalse(user_email.verified)
 
-        # Check membership
+        # Check membership.
         self.assertEqual(0, user.prescriberorganization_set.count())
 
-        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`
+        # Full email validation process is tested in
+        # `test_create_user_prescriber_with_authorized_org_of_known_kind`.
         self.assertEqual(len(mail.outbox), 1)
         subject = mail.outbox[0].subject
         self.assertIn("Confirmez votre adresse e-mail", subject)
@@ -850,7 +852,7 @@ class PrescriberSignupTest(TestCase):
         - user can create a PLIE and a ML with the same SIRET
         """
 
-        # same SIRET as mock
+        # Same SIRET as mock.
         siret = "26570134200148"
         respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
@@ -858,7 +860,7 @@ class PrescriberSignupTest(TestCase):
         existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.ML)
         existing_org_with_siret.save()
 
-        # Step 1: the user doesn't work for PE
+        # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
         post_data = {
             "is_pole_emploi": 0,
@@ -894,7 +896,7 @@ class PrescriberSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # Check new org is ok
+        # Check new org is OK.
         same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).order_by("kind").all()
         self.assertEqual(2, len(same_siret_orgs))
         org1, org2 = same_siret_orgs
@@ -910,7 +912,7 @@ class PrescriberSignupTest(TestCase):
         * there is no duplicate of the (kind, siret) pair
         """
 
-        # same SIRET as mock but with same expected kind
+        # Same SIRET as mock but with same expected kind.
         siret = "26570134200148"
         respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
