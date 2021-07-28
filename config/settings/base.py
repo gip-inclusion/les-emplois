@@ -615,10 +615,9 @@ STORAGE_UPLOAD_KINDS = {
 # (to be removed after complete production)
 # ------------------------------------------------------------------------------
 EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED = os.environ.get("EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED", False)
-# Use a 100 modulo on SIAE asp_id field:
-# selection of progressive opening eligible SIAE
+# Use a percentage of eligible SIAEs for progressive opening
 # Will be updated throughout the process via environment vars on production instance.
-EMPLOYEE_RECORD_ASP_ID_MODULO = int(os.environ.get("EMPLOYEE_RECORD_ASP_ID_MODULO ", 1))
+EMPLOYEE_RECORD_OPENING_PERCENTAGE = int(os.environ.get("EMPLOYEE_RECORD_OPENING_PERCENTAGE", 1))
 # Allows a manual / custom selection of some SIAEs as "VIP users":
-# Add selected SIAE.convention.asp_id in list below:
-EMPLOYEE_RECORD_CUSTOM_ASP_ID_LIST = []
+# Add selected SIAE ASP_IDs in list below:
+EMPLOYEE_RECORD_CUSTOM_SIAE_ID_LIST = []
