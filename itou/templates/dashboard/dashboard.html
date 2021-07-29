@@ -196,18 +196,22 @@
                     </h5>
                     <div class="card-body">
                         <p class="card-text">
-                            {% include "includes/icon.html" with icon="bookmark" %}
-                            {% if user_is_prescriber_org_admin %}
-                            <a href="{% url 'prescribers_views:edit_organization' %}">
-                                Modifier les informations
-                            </a>
-                                {% if current_prescriber_organization.get_card_url %} / {% endif %}
-                            {% endif %}
-                            {% if current_prescriber_organization.get_card_url %}
-                                <a href="{{ current_prescriber_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                                    Voir la fiche
-                                </a>
-                            {% endif %}
+                            {% with card_url=current_prescriber_organization.get_card_url %}
+                                {% if user_is_prescriber_org_admin or card_url %}
+                                    {% include "includes/icon.html" with icon="bookmark" %}
+                                    {% if user_is_prescriber_org_admin %}
+                                    <a href="{% url 'prescribers_views:edit_organization' %}">
+                                        Modifier les informations
+                                    </a>
+                                        {% if card_url %} / {% endif %}
+                                    {% endif %}
+                                    {% if card_url %}
+                                        <a href="{{ card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                            Voir la fiche
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            {% endwith %}
                         </p>
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="users" %}
@@ -329,7 +333,7 @@
                         {% endif %}
                     {% endfor %}
 
-                   
+
                     {# Commenté le temps du dev #}
                     {% comment %}
                     {% if can_show_employee_records %}
@@ -361,9 +365,9 @@
                         {% include "includes/icon.html" with icon="settings" %}
                         <a href="{% url 'siaes_views:block_job_applications' %}">
                             {% if current_siae.block_job_applications %}
-                                Recevoir de nouvelles candidatures 
+                                Recevoir de nouvelles candidatures
                             {% else %}
-                                Bloquer les nouvelles candidatures 
+                                Bloquer les nouvelles candidatures
                             {% endif%}
                         </a>
                     </p>
