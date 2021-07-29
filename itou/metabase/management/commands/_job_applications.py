@@ -92,8 +92,8 @@ def get_ja_time_spent_from_new_to_accepted_or_refused(ja):
 def get_ja_hiring_date(ja):
     # We have to do all this in python to benefit from prefetch_related.
     logs = [log for log in ja.logs.all() if log.transition == JobApplicationWorkflow.TRANSITION_ACCEPT]
-    assert len(logs) in [0, 1]
-    if len(logs) == 1:
+    # Job applications can be accepted more than once (e.g. 401b0ee1-d977-4338-b436-77839a9ed12c).
+    if len(logs) >= 1:
         transition_timestamp = logs[0].timestamp
         return transition_timestamp
     return None
