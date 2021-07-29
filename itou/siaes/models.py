@@ -10,12 +10,12 @@ from django.utils.http import urlencode, urlsafe_base64_encode
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
-from itou.utils.memberships.models import MembershipAbstract
+from itou.utils.structures.models import MembershipAbstract, StructureQuerySet
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
 
-class SiaeQuerySet(models.QuerySet):
+class SiaeQuerySet(StructureQuerySet):
     @property
     def active_lookup(self):
         # Prefer a sub query to a join for performance reasons.
@@ -65,11 +65,6 @@ class SiaeQuerySet(models.QuerySet):
             .select_related("appellation__rome")
         )
         return self.prefetch_related(Prefetch("job_description_through", queryset=qs))
-
-    def member_required(self, user):
-        if user.is_superuser:
-            return self
-        return self.filter(members=user, members__is_active=True)
 
     def with_count_recent_received_job_apps(self):
         """
