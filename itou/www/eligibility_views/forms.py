@@ -29,7 +29,7 @@ class AdministrativeCriteriaForm(forms.Form):
     OBJECTS = {}
 
     NAME_SENIOR = "Senior (+50 ans)"
-    NAME_JUNIOR = "Jeunes (-26 ans)"
+    NAME_JUNIOR = "Jeune (-26 ans)"
     NAME_DETLD_24 = "DETLD (+ 24 mois)"
     NAME_DELD_12 = "DELD (12-24 mois)"
     NAMES = [NAME_SENIOR, NAME_JUNIOR, NAME_DETLD_24, NAME_DELD_12]
