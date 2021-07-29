@@ -11,6 +11,7 @@ from django.utils.http import urlencode
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
+from itou.utils.memberships.models import MembershipAbstract
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
@@ -387,21 +388,10 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         return get_email_message(to, context, subject, body)
 
 
-class PrescriberMembershipQuerySet(models.QuerySet):
-    def active(self):
-        return self.filter(is_active=True, user__is_active=True)
-
-
-class PrescriberMembership(models.Model):
+class PrescriberMembership(MembershipAbstract):
     """Intermediary model between `User` and `PrescriberOrganization`."""
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE)
-    joined_at = models.DateTimeField(verbose_name="Date d'adhésion", default=timezone.now)
-    is_admin = models.BooleanField(verbose_name="Administrateur de la structure d'accompagnement", default=False)
-    is_active = models.BooleanField("Rattachement actif", default=True)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="updated_prescribermembership_set",
@@ -410,40 +400,18 @@ class PrescriberMembership(models.Model):
         verbose_name="Mis à jour par",
     )
 
-    objects = models.Manager.from_queryset(PrescriberMembershipQuerySet)()
-
     class Meta:
         unique_together = ("user_id", "organization_id")
 
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
-
-    def deactivate_membership_by_user(self, user):
-        """
-        Deactivate the membership of a member (reference held by self) `user` is
-        the admin updating this user (`updated_by` field)
-        """
-        self.is_active = False
-        self.updated_by = user
-        return True
-
-    def set_admin_role(self, active, user):
-        """
-        Set admin role for the given user.
-        `user` is the admin updating this user (`updated_by` field)
-        """
-        self.is_admin = active
-        self.updated_by = user
-
     def request_for_invitation(self, requestor: dict):
         """
-        A new user can ask for an invitation to join an organization.
+        A new user can ask for an invitation to join a prescriber organization.
         The list of members is sorted by:
         - admin
         - date joined
         and the first member of the list will be contacted.
+        This feature is only available for prescribers but it should
+        be common to every organization.
         """
         to_user = self.user
         to = [to_user.email]
