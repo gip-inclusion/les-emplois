@@ -90,7 +90,7 @@ class CreateSiaeForm(forms.ModelForm):
         siae.convention = self.current_siae.convention
         siae.save()
 
-        SiaeMembership.objects.create(siae=siae, is_siae_admin=True, user=request.user)
+        SiaeMembership.objects.create(siae=siae, is_admin=True, user=request.user)
 
         return siae
 

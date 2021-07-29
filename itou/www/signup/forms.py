@@ -169,7 +169,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         membership.user = user
         membership.siae = siae
         # Only the first member becomes an admin.
-        membership.is_siae_admin = siae.active_members.count() == 0
+        membership.is_admin = siae.active_members.count() == 0
         membership.save()
 
         return user
