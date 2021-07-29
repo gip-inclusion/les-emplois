@@ -3,7 +3,6 @@ from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -11,16 +10,11 @@ from django.utils.http import urlencode
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
-from itou.utils.memberships.models import MembershipAbstract
+from itou.utils.structures.models import MembershipAbstract, StructureQuerySet
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
-class PrescriberOrganizationQuerySet(models.QuerySet):
-    def member_required(self, user):
-        if user.is_superuser:
-            return self
-        return self.filter(members=user, members__is_active=True)
-
+class PrescriberOrganizationQuerySet(StructureQuerySet):
     def autocomplete(self, search_string, limit=10):
         queryset = (
             self.annotate(similarity=TrigramSimilarity("name", search_string))
@@ -34,10 +28,6 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
 
     def within(self, point, distance_km):
         return self.filter(coords__dwithin=(point, D(km=distance_km)))
-
-    def prefetch_active_memberships(self):
-        qs = PrescriberMembership.objects.active().select_related("user").order_by("-is_admin", "joined_at")
-        return self.prefetch_related(Prefetch("prescribermembership_set", queryset=qs))
 
 
 class PrescriberOrganizationManager(models.Manager):

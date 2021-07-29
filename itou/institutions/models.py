@@ -16,18 +16,7 @@ from django.utils import timezone
 from itou.users.models import User
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
-from itou.utils.memberships.models import MembershipAbstract
-
-
-class InstitutionQuerySet(models.QuerySet):
-    def member_required(self, user):
-        if user.is_superuser:
-            return self
-        return self.filter(members=user, members__is_active=True)
-
-    def prefetch_active_memberships(self):
-        qs = InstitutionMembership.objects.active().select_related("user")
-        return self.prefetch_related(Prefetch("institutionmembership_set", queryset=qs))
+from itou.utils.structures.models import MembershipAbstract, StructureQuerySet
 
 
 class Institution(AddressMixin):
@@ -53,7 +42,7 @@ class Institution(AddressMixin):
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
 
-    objects = models.Manager.from_queryset(InstitutionQuerySet)()
+    objects = models.Manager.from_queryset(StructureQuerySet)()
 
     def __str__(self):
         return f"{self.name}"

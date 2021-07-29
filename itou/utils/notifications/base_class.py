@@ -1,6 +1,6 @@
 from django.db.models import Q
 
-from itou.utils.memberships.models import MembershipQuerySet
+from itou.utils.structures.models import MembershipQuerySet
 
 
 class BaseNotification:

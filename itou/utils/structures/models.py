@@ -1,6 +1,24 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Prefetch
 from django.utils import timezone
+
+
+class StructureQuerySet(models.QuerySet):
+    """
+    Common methods used by Siae, PrescriberOrganization and Institution models querysets.
+    """
+
+    def member_required(self, user):
+        if user.is_superuser:
+            return self
+        return self.filter(members=user, members__is_active=True)
+
+    def prefetch_active_memberships(self):
+        membership_model = self.model.members.through
+        qs = membership_model.objects.active().select_related("user").order_by("-is_admin", "joined_at")
+        reverse_membership_set_name = membership_model.user.field.remote_field.get_accessor_name()
+        return self.prefetch_related(Prefetch(reverse_membership_set_name, queryset=qs))
 
 
 class MembershipQuerySet(models.QuerySet):
