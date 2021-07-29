@@ -35,6 +35,7 @@ django-admin-logs==1.0.1  # https://pypi.org/project/django-admin-logs/
 # Test & Mock
 # ------------------------------------------------------------------------------
 requests-mock==1.8.0  # https://github.com/jamielennox/requests-mock
+respx==0.17.1  # https://lundberg.github.io/respx/
 
 # Data extracts
 # ------------------------------------------------------------------------------

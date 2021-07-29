@@ -74,6 +74,7 @@ def start(request, siae_pk):
 
     # Refuse all applications except those issued by the SIAE
     if siae.block_job_applications and not siae.has_member(request.user):
+        # Message only visible in DEBUG
         raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
     # Start a fresh session.

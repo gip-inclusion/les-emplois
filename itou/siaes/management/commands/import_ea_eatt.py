@@ -94,13 +94,13 @@ def get_ea_eatt_df():
     df["department"] = df.post_code.apply(department_from_postcode)
 
     missing_emails_count = len(df[df.auth_email.isnull()])
-    assert missing_emails_count <= 20
+    assert missing_emails_count <= 20, f"Too many missing emails: {missing_emails_count}"
 
     # Drop rows without auth_email.
     df = df[~df.auth_email.isnull()]
 
     assert df.siret.is_unique
-    assert len(df) >= 600  # Export usually has 700+ ea/eatt structures.
+    assert len(df) >= 600, f"Export usually has 700+ EA/EATT structures (only {len(df)})."
 
     return df
 
