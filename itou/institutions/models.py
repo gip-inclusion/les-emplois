@@ -16,6 +16,7 @@ from django.utils import timezone
 from itou.users.models import User
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
+from itou.utils.memberships.models import MembershipAbstract
 
 
 class InstitutionQuerySet(models.QuerySet):
@@ -144,16 +145,10 @@ class InstitutionMembershipQuerySet(models.QuerySet):
         return self.filter(is_active=True, user__is_active=True)
 
 
-class InstitutionMembership(models.Model):
+class InstitutionMembership(MembershipAbstract):
     """Intermediary model between `User` and `Institution`."""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
-    is_admin = models.BooleanField(verbose_name="Administrateur", default=False)
-    is_active = models.BooleanField("Rattachement actif", default=True)
-    joined_at = models.DateTimeField(verbose_name="Date d'adhésion", default=timezone.now)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
     updated_by = models.ForeignKey(
         User,
         related_name="updated_institutionmembership_set",
@@ -162,29 +157,5 @@ class InstitutionMembership(models.Model):
         verbose_name="Mis à jour par",
     )
 
-    objects = models.Manager.from_queryset(InstitutionMembershipQuerySet)()
-
     class Meta:
         unique_together = ("user_id", "institution_id")
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
-
-    def deactivate_membership_by_user(self, user):
-        """
-        Deactivate the membership of a member (reference held by self) `user` is
-        the admin updating this user (`updated_by` field)
-        """
-        self.is_active = False
-        self.updated_by = user
-        return True
-
-    def set_admin_role(self, active, user):
-        """
-        Set admin role for the given user.
-        `user` is the admin updating this user (`updated_by` field)
-        """
-        self.is_admin = active
-        self.updated_by = user
