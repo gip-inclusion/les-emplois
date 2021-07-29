@@ -410,7 +410,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         The `self` reference is mandatory even if confusing (many SIAE memberships possible for a given member).
         Will be optimized later with Qs.
         """
-        return self.members.filter(is_active=True, siaemembership__is_active=True, siaemembership__is_siae_admin=True)
+        return self.members.filter(is_active=True, siaemembership__is_active=True, siaemembership__is_admin=True)
 
     @property
     def signup_magic_link(self):

@@ -55,7 +55,7 @@ class NotificationsBaseClassTest(TestCase):
         )
 
     def test_inactive_user_not_in_recipients(self):
-        SiaeMembershipFactory(siae=self.siae, user__is_active=False, is_siae_admin=False)
+        SiaeMembershipFactory(siae=self.siae, user__is_active=False, is_admin=False)
         self.assertEqual(self.siaemembership_set.count(), 2)
 
         recipients = self.notification.get_recipients()
@@ -63,7 +63,7 @@ class NotificationsBaseClassTest(TestCase):
 
     def test_get_recipients_default_send_to_unset_recipients(self):
         # Unset recipients are present in get_recipients if SEND_TO_UNSET_RECIPIENTS = True
-        SiaeMembershipFactory(siae=self.siae, user__is_active=False, is_siae_admin=False)
+        SiaeMembershipFactory(siae=self.siae, user__is_active=False, is_admin=False)
         recipients = self.notification.get_recipients()
 
         self.assertEqual(self.siaemembership_set.count(), 2)

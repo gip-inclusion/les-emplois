@@ -41,7 +41,7 @@ def get_current_organization_and_perms(request):
             for membership in memberships:
                 if membership.siae_id == siae_pk:
                     siae = membership.siae
-                    user_is_siae_admin = membership.is_siae_admin
+                    user_is_siae_admin = membership.is_admin
                     break
             if siae is None:
                 if request.path != reverse("account_logout"):
