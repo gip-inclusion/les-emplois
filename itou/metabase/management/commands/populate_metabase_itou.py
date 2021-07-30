@@ -114,13 +114,18 @@ class Command(BaseCommand):
         self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
         self.commit()
 
-    def inject_chunk(self, table_columns, chunk, insert_query):
+    def inject_chunk(self, table_columns, chunk, new_table_name):
         """
         Insert chunk of objects into table.
         """
-        data = [[c["fn"](o) for c in table_columns] for o in chunk]
-        # FIXME prevent SQL injections.
-        psycopg2_extras.execute_values(self.cur, insert_query, data, template=None)
+        insert_query = sql.SQL("insert into {new_table_name} ({fields}) values %s;").format(
+            new_table_name=sql.Identifier(new_table_name),
+            fields=sql.SQL(",").join(
+                [sql.Identifier(c["name"]) for c in table_columns],
+            ),
+        )
+        dataset = [[c["fn"](o) for c in table_columns] for o in chunk]
+        psycopg2_extras.execute_values(self.cur, insert_query, dataset, template=None)
         self.commit()
 
     def populate_table(self, table_name, table_columns, queryset=None, querysets=None, extra_object=None):
@@ -136,6 +141,9 @@ class Command(BaseCommand):
 
         if self.dry_run:
             table_name = f"{table_name}_dry_run"
+        new_table_name = f"{table_name}_new"
+        old_table_name = f"{table_name}_old"
+
         self.cleanup_tables(table_name)
 
         if self.dry_run:
@@ -164,9 +172,14 @@ class Command(BaseCommand):
         self.log(f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:")
 
         # Create table.
-        statement = ", ".join([f'{c["name"]} {c["type"]}' for c in table_columns])
-        # FIXME prevent SQL injections.
-        self.cur.execute(f"CREATE TABLE {table_name}_new ({statement});")
+        create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields});").format(
+            fields=sql.SQL(",").join(
+                [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table_columns]
+            ),
+            new_table_name=sql.Identifier(new_table_name),
+        )
+        self.cur.execute(create_table_query)
+
         self.commit()
 
         # Add comments on table columns.
@@ -174,18 +187,18 @@ class Command(BaseCommand):
             assert set(c.keys()) == set(["name", "type", "comment", "fn"])
             column_name = c["name"]
             column_comment = c["comment"]
-            # FIXME prevent SQL injections.
-            self.cur.execute(f"comment on column {table_name}_new.{column_name} is '{column_comment}';")
-        self.commit()
+            comment_query = sql.SQL("comment on column {new_table_name}.{column_name} is {column_comment};").format(
+                new_table_name=sql.Identifier(new_table_name),
+                column_name=sql.Identifier(column_name),
+                column_comment=sql.Literal(column_comment),
+            )
+            self.cur.execute(comment_query)
 
-        # Insert rows by batch of settings.METABASE_INSERT_BATCH_SIZE.
-        column_names = [f'{c["name"]}' for c in table_columns]
-        statement = ", ".join(column_names)
-        insert_query = f"insert into {table_name}_new ({statement}) values %s"
+        self.commit()
 
         if extra_object:
             # Insert extra object without counter/tqdm for simplicity.
-            self.inject_chunk(table_columns=table_columns, chunk=[extra_object], insert_query=insert_query)
+            self.inject_chunk(table_columns=table_columns, chunk=[extra_object], new_table_name=new_table_name)
 
         with tqdm(total=total_rows) as progress_bar:
             for queryset in querysets:
@@ -194,11 +207,12 @@ class Command(BaseCommand):
                 if self.dry_run:
                     total_injections = min(total_injections, settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET)
 
+                # Insert rows by batch of settings.METABASE_INSERT_BATCH_SIZE.
                 for chunk_qs in chunked_queryset(queryset, chunk_size=settings.METABASE_INSERT_BATCH_SIZE):
                     injections_left = total_injections - injections
                     if chunk_qs.count() > injections_left:
                         chunk_qs = chunk_qs[:injections_left]
-                    self.inject_chunk(table_columns=table_columns, chunk=chunk_qs, insert_query=insert_query)
+                    self.inject_chunk(table_columns=table_columns, chunk=chunk_qs, new_table_name=new_table_name)
                     injections += chunk_qs.count()
                     progress_bar.update(chunk_qs.count())
 
@@ -208,16 +222,14 @@ class Command(BaseCommand):
         # Swap new and old table nicely to minimize downtime.
         self.cur.execute(
             sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
-                sql.Identifier(table_name), sql.Identifier(f"{table_name}_old")
+                sql.Identifier(table_name), sql.Identifier(old_table_name)
             )
         )
         self.cur.execute(
-            sql.SQL("ALTER TABLE {} RENAME TO {}").format(
-                sql.Identifier(f"{table_name}_new"), sql.Identifier(table_name)
-            )
+            sql.SQL("ALTER TABLE {} RENAME TO {}").format(sql.Identifier(new_table_name), sql.Identifier(table_name))
         )
         self.commit()
-        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
         self.commit()
         self.log("")
 
