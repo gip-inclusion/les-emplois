@@ -158,9 +158,13 @@ def check_convention_data_consistency():
     but also vs user created siaes.
     """
     for convention in SiaeConvention.objects.prefetch_related("siaes").all():
-        # Check that each convention has exactly one siae of ASP source.
+        # Check that each active convention has exactly one siae of ASP source.
+        # Unfortunately some inactive conventions have lost their ASP siae.
         asp_siaes = [siae for siae in convention.siaes.all() if siae.source == Siae.SOURCE_ASP]
-        assert len(asp_siaes) == 1
+        if convention.is_active:
+            assert len(asp_siaes) == 1
+        else:
+            assert len(asp_siaes) in [0, 1]
 
         if not convention.is_active:
             # Check that each inactive convention has a grace period start date.
