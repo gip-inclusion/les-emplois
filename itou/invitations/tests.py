@@ -86,7 +86,7 @@ class InvitationEmailsTest(TestCase):
         self.assertIn(capfirst(invitation.last_name), email.body)
         self.assertIn(invitation.acceptance_link, email.body)
 
-        self.assertIn(str(invitation.expiration_date.day), email.body)
+        self.assertIn(str(timezone.localdate(invitation.expiration_date).day), email.body)
 
         # To
         self.assertIn(invitation.email, email.to)

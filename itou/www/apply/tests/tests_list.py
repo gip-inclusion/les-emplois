@@ -191,7 +191,12 @@ class ProcessListSiaeTest(ProcessListTest):
 
         # Negative indexing is not allowed in querysets
         end_date = jobs_in_range[len(jobs_in_range) - 1].created_at
-        query = urlencode({"start_date": start_date.strftime(date_format), "end_date": end_date.strftime(date_format)})
+        query = urlencode(
+            {
+                "start_date": timezone.localdate(start_date).strftime(date_format),
+                "end_date": timezone.localdate(end_date).strftime(date_format),
+            }
+        )
         url = f"{self.siae_base_url}?{query}"
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list

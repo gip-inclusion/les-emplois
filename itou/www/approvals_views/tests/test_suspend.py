@@ -17,7 +17,7 @@ class ApprovalSuspendViewTest(TestCase):
         Test the creation of a suspension.
         """
 
-        today = timezone.now().date()
+        today = timezone.localdate()
 
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
@@ -76,7 +76,7 @@ class ApprovalSuspendViewTest(TestCase):
         Test the update of a suspension.
         """
 
-        today = timezone.now().date()
+        today = timezone.localdate()
 
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
@@ -126,7 +126,7 @@ class ApprovalSuspendViewTest(TestCase):
         Test the deletion of a suspension.
         """
 
-        today = timezone.now().date()
+        today = timezone.localdate()
 
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
