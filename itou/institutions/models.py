@@ -12,14 +12,14 @@ They belong to a DDETS, a DREETS or a DGEFP.
 from django.db import models
 
 from itou.users.models import User
-from itou.utils.structures.models import MembershipAbstract, Structure, StructureQuerySet
+from itou.utils.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 
 
-class InstitutionQuerySet(StructureQuerySet):
+class InstitutionQuerySet(OrganizationQuerySet):
     pass
 
 
-class Institution(Structure):
+class Institution(OrganizationAbstract):
     class Kind(models.TextChoices):
         DDETS = ("DDETS", "Direction départementale de l'emploi, du travail et des solidarités")
         DREETS = ("DREETS", "Direction régionale de l'économie, de l'emploi, du travail et des solidarités")
