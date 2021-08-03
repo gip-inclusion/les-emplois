@@ -19,5 +19,7 @@ class MetabaseDatabaseCursor:
         return self.cursor, self.connection
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.cursor.close()
-        self.connection.close()
+        if self.cursor:
+            self.cursor.close()
+        if self.connection:
+            self.connection.close()
