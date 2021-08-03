@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import OuterRef, Prefetch, Q, Subquery
 from django.utils import timezone
+
+from itou.utils.address.models import AddressMixin
+from itou.utils.emails import get_email_message
 
 
 class StructureQuerySet(models.QuerySet):
@@ -15,15 +18,161 @@ class StructureQuerySet(models.QuerySet):
         return self.filter(members=user, members__is_active=True)
 
     def prefetch_active_memberships(self):
+        """
+        Impossible to use self.model.membership_set_related_name because the class has to
+        be instantiated to access properties.
+        """
         membership_model = self.model.members.through
+        membership_set_related_name = membership_model.user.field.remote_field.get_accessor_name()
         qs = membership_model.objects.active().select_related("user").order_by("-is_admin", "joined_at")
-        reverse_membership_set_name = membership_model.user.field.remote_field.get_accessor_name()
-        return self.prefetch_related(Prefetch(reverse_membership_set_name, queryset=qs))
+        return self.prefetch_related(Prefetch(membership_set_related_name, queryset=qs))
+
+
+class Structure(AddressMixin):
+    """
+    TODO
+    """
+
+    name = models.CharField(verbose_name="Nom", max_length=255)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
+    # Child class should have a "members" attribute, for example:
+    # members = models.ManyToManyField(
+    #     settings.AUTH_USER_MODEL,
+    #     verbose_name="Membres",
+    #     through="PrescriberMembership",
+    #     blank=True,
+    #     through_fields=("organization", "user"),
+    # )
+    objects = models.Manager.from_queryset(StructureQuerySet)()
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    @property
+    def membership_qs(self):
+        membership_model = self.members.through
+        membership_set_related_name = membership_model.user.field.remote_field.get_accessor_name()
+        return getattr(self, membership_set_related_name)
+
+    @property
+    def display_name(self):
+        return self.name.capitalize()
+
+    @property
+    def has_members(self):
+        return self.active_members.exists()
+
+    def has_member(self, user):
+        return self.active_members.filter(pk=user.pk).exists()
+
+    def has_admin(self, user):
+        return self.active_admin_members.filter(pk=user.pk).exists()
+
+    @property
+    def active_members(self):
+        """
+        In this context, active == has an active membership AND user is still active.
+        """
+        membership_qs = self.membership_qs.active()
+        return MembershipQuerySet.to_users_qs(membership_qs=membership_qs)
+
+    @property
+    def deactivated_members(self):
+        """
+        List of previous members of the structure, still active as user (from the model POV)
+        but deactivated by an admin at some point in time.
+        """
+        membership_qs = self.membership_qs.inactive()
+        return MembershipQuerySet.to_users_qs(membership_qs=membership_qs)
+
+    @property
+    def active_admin_members(self):
+        """
+        Active admin members:
+        active user/admin in this context means both:
+        * user.is_active: user is able to do something on the platform
+        * user.membership.is_active: is a member of this structure
+        """
+        membership_qs = self.membership_qs.active_admin()
+        return MembershipQuerySet.to_users_qs(membership_qs=membership_qs)
+
+    def get_admins(self):
+        membership_qs = self.membership_qs.admin()
+        return MembershipQuerySet.to_users_qs(membership_qs=membership_qs)
+
+    def member_deactivation_email(self, user):
+        """
+        Send email when an admin of the structure disables the membership of a given user (deactivation).
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/member_deactivation_email_subject.txt"
+        body = "common/emails/member_deactivation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def add_admin_email(self, user):
+        """
+        Send info email to a new admin of the organization (added)
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/add_admin_email_subject.txt"
+        body = "common/emails/add_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def remove_admin_email(self, user):
+        """
+        Send info email to a former admin of the organization (removed)
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/remove_admin_email_subject.txt"
+        body = "common/emails/remove_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
 
 
 class MembershipQuerySet(models.QuerySet):
+    @property
+    def active_lookup(self):
+        return Q(is_active=True)
+
+    @property
+    def admin_lookup(self):
+        # Active or inactive admins
+        return Q(is_admin=True, user__is_active=True)
+
     def active(self):
-        return self.filter(is_active=True, user__is_active=True)
+        return self.filter(user__is_active=True).filter(self.active_lookup)
+
+    def inactive(self):
+        return self.filter(user__is_active=True).exclude(self.active_lookup)
+
+    def admin(self):
+        return self.filter(self.admin_lookup)
+
+    def active_admin(self):
+        return self.active().filter(self.admin_lookup)
+
+    @staticmethod
+    def to_users_qs(membership_qs):
+        """
+        TODO
+        # Return a UserQuerySet
+        """
+        # Avoid circular imports
+        from itou.users.models import User  # pylint: disable=import-outside-toplevel
+
+        membership_qs = membership_qs.filter(user=OuterRef("pk"))
+        return User.objects.filter(pk=Subquery(membership_qs.values("user")))
 
 
 class MembershipAbstract(models.Model):

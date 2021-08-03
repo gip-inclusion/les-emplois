@@ -8,9 +8,8 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlencode, urlsafe_base64_encode
 
-from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
-from itou.utils.structures.models import MembershipAbstract, StructureQuerySet
+from itou.utils.structures.models import MembershipAbstract, Structure, StructureQuerySet
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
@@ -85,7 +84,7 @@ class SiaeQuerySet(StructureQuerySet):
 
         See https://github.com/martsberger/django-sql-utils
         """
-        from itou.job_applications.models import JobApplication
+        from itou.job_applications.models import JobApplication  # pylint: disable=import-outside-toplevel
 
         sub_query = Subquery(
             (
@@ -162,7 +161,7 @@ class SiaeQuerySet(StructureQuerySet):
         )
 
 
-class Siae(AddressMixin):  # Do not forget the mixin!
+class Siae(Structure):
     """
     Structures d'insertion par l'activité économique.
 
@@ -226,7 +225,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name="Naf", max_length=5, validators=[validate_naf], blank=True)
     kind = models.CharField(verbose_name="Type", max_length=6, choices=KIND_CHOICES, default=KIND_EI)
-    name = models.CharField(verbose_name="Nom", max_length=255)
     # `brand` (or `enseigne` in French) is used to override `name` if needed.
     brand = models.CharField(verbose_name="Enseigne", max_length=255, blank=True)
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
@@ -259,8 +257,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         blank=True,
         on_delete=models.SET_NULL,
     )
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
 
     # Ability to block new job applications
     block_job_applications = models.BooleanField(verbose_name="Blocage des candidatures", default=False)
@@ -283,14 +279,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         verbose_name = "Entreprise"
         verbose_name_plural = "Entreprises"
         unique_together = ("siret", "kind")
-
-    def __str__(self):
-        return f"{self.siret} {self.display_name}"
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
 
     @property
     def accept_survey_url(self):
@@ -334,10 +322,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return None
 
     @property
-    def has_members(self):
-        return self.active_members.exists()
-
-    @property
     def obfuscated_auth_email(self):
         """
         Used during the SIAE secure signup process to avoid
@@ -350,12 +334,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         """
         m = self.auth_email.split("@")
         return f'{m[0][0]}{"*"*(len(m[0])-2)}{m[0][-1]}@{m[1]}'
-
-    def has_member(self, user):
-        return self.active_members.filter(pk=user.pk).exists()
-
-    def has_admin(self, user):
-        return self.active_admin_members.filter(pk=user.pk).exists()
 
     @property
     def siren(self):
@@ -379,34 +357,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
-
-    @property
-    def active_members(self):
-        """
-        In this context, active == has an active membership AND user is still active
-        """
-        return self.members.filter(is_active=True, siaemembership__is_active=True)
-
-    @property
-    def deactivated_members(self):
-        """
-        List of previous members of the structure, still active as user (from the model POV)
-        but deactivated by an admin at some point in time.
-        """
-        return self.members.filter(is_active=True, siaemembership__is_active=False)
-
-    @property
-    def active_admin_members(self):
-        """
-        Active admin members:
-        active user/admin in this context means both:
-        * user.is_active: user is able to do something on the platform
-        * user.membership.is_active: is a member of this structure
-
-        The `self` reference is mandatory even if confusing (many SIAE memberships possible for a given member).
-        Will be optimized later with Qs.
-        """
-        return self.members.filter(is_active=True, siaemembership__is_active=True, siaemembership__is_admin=True)
 
     @property
     def signup_magic_link(self):
@@ -434,36 +384,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         context = {"siae": self, "signup_magic_link": signup_magic_link}
         subject = "siaes/email/new_signup_activation_email_to_official_contact_subject.txt"
         body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def member_deactivation_email(self, user):
-        """
-        Send email when an admin of the structure disables the membership of a given user (deactivation).
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/member_deactivation_email_subject.txt"
-        body = "common/emails/member_deactivation_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def add_admin_email(self, user):
-        """
-        Send info email to a new admin of the SIAE (added)
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/add_admin_email_subject.txt"
-        body = "common/emails/add_admin_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def remove_admin_email(self, user):
-        """
-        Send info email to a former admin of the SIAE (removed)
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/remove_admin_email_subject.txt"
-        body = "common/emails/remove_admin_email_body.txt"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -567,7 +487,7 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
 
     def with_annotation_is_popular(self):
         # Avoid an infinite loop
-        from itou.job_applications.models import JobApplicationWorkflow
+        from itou.job_applications.models import JobApplicationWorkflow  # pylint: disable=import-outside-toplevel
 
         job_apps_filters = {"jobapplication__state__in": JobApplicationWorkflow.PENDING_STATES}
         annotation = self.with_job_applications_count(filters=job_apps_filters).annotate(

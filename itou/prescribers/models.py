@@ -4,13 +4,11 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
-from itou.utils.structures.models import MembershipAbstract, StructureQuerySet
+from itou.utils.structures.models import MembershipAbstract, Structure, StructureQuerySet
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
@@ -40,7 +38,7 @@ class PrescriberOrganizationManager(models.Manager):
         return self.none()
 
 
-class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
+class PrescriberOrganization(Structure):
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
 
@@ -134,7 +132,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         default=False,
         help_text="Indique si l'organisme est conventionné par le conseil départemental pour le suivi des BRSA.",
     )
-    name = models.CharField(verbose_name="Nom", max_length=255)
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
     email = models.EmailField(verbose_name="E-mail", blank=True)
     website = models.URLField(verbose_name="Site web", blank=True)
@@ -170,8 +167,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         blank=True,
         on_delete=models.SET_NULL,
     )
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
 
     authorization_status = models.CharField(
         verbose_name="Statut de l'habilitation",
@@ -202,14 +197,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         # NOK => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret="12345678900000")
         unique_together = ("siret", "kind")
 
-    def __str__(self):
-        return f"{self.name}"
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
-
     def clean(self, *args, **kwargs):
         super().clean()
         self.clean_code_safir_pole_emploi()
@@ -233,17 +220,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
                 raise ValidationError({"siret": "Ce SIRET est déjà utilisé."})
 
     @property
-    def display_name(self):
-        return self.name.capitalize()
-
-    @property
-    def has_members(self):
-        return self.active_members.exists()
-
-    def has_admin(self, user):
-        return self.active_admin_members.filter(pk=user.pk).exists()
-
-    @property
     def accept_survey_url(self):
         """
         Returns the typeform's satisfaction survey URL to be sent after a successful hiring.
@@ -256,39 +232,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         }
         qs = urlencode(args)
         return f"{settings.TYPEFORM_URL}/to/EDHZSU7p?{qs}"
-
-    @property
-    def active_members(self):
-        """
-        In this context, active == has an active membership AND user is still active.
-
-        Query will be optimized later with Qs.
-        """
-        return self.members.filter(is_active=True, prescribermembership__is_active=True)
-
-    @property
-    def deactivated_members(self):
-        """
-        List of previous members of the structure, still active as user (from the model POV)
-        but deactivated by an admin at some point in time.
-
-        Query will be optimized later with Qs.
-        """
-        return self.members.filter(is_active=True, prescribermembership__is_active=False)
-
-    @property
-    def active_admin_members(self):
-        """
-        Active admin members:
-        active user/admin in this context means both:
-        * user.is_active: user is able to do something on the platform
-        * user.membership.is_active: is a member of this structure
-
-        Query will be optimized later with Qs.
-        """
-        return self.members.filter(
-            is_active=True, prescribermembership__is_admin=True, prescribermembership__is_active=True
-        )
 
     def get_card_url(self):
         if not self.is_authorized:
@@ -309,9 +252,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         An unknown organization claiming to be authorized must provide a written proof.
         """
         return self.kind == self.Kind.OTHER and self.authorization_status == self.AuthorizationStatus.NOT_SET
-
-    def get_admins(self):
-        return self.members.filter(is_active=True, prescribermembership__is_admin=True)
 
     def validated_prescriber_organization_email(self):
         """
@@ -345,36 +285,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         context = {"organization": self}
         subject = "prescribers/email/must_validate_prescriber_organization_email_subject.txt"
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def member_deactivation_email(self, user):
-        """
-        Send email when an admin of the structure disables the membership of a given user (deactivation).
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/member_deactivation_email_subject.txt"
-        body = "common/emails/member_deactivation_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def add_admin_email(self, user):
-        """
-        Send info email to a new admin of the organization (added)
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/add_admin_email_subject.txt"
-        body = "common/emails/add_admin_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def remove_admin_email(self, user):
-        """
-        Send info email to a former admin of the organization (removed)
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/remove_admin_email_subject.txt"
-        body = "common/emails/remove_admin_email_body.txt"
         return get_email_message(to, context, subject, body)
 
 
