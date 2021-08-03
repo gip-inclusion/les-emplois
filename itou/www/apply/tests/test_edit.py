@@ -109,9 +109,7 @@ class EditContractTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        future_start_date = (
-            timezone.now() + relativedelta(days=JobApplication.MAX_CONTRACT_POSTPONE_IN_DAYS + 1)
-        ).date()
+        future_start_date = timezone.localdate() + relativedelta(days=JobApplication.MAX_CONTRACT_POSTPONE_IN_DAYS + 1)
 
         post_data = {
             "hiring_start_at": future_start_date.strftime("%d/%m/%Y"),
