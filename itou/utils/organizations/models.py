@@ -7,7 +7,7 @@ from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
 
 
-class StructureQuerySet(models.QuerySet):
+class OrganizationQuerySet(models.QuerySet):
     """
     Common methods used by Siae, PrescriberOrganization and Institution models querysets.
     """
@@ -28,7 +28,7 @@ class StructureQuerySet(models.QuerySet):
         return self.prefetch_related(Prefetch(membership_set_related_name, queryset=qs))
 
 
-class Structure(AddressMixin):
+class OrganizationAbstract(AddressMixin):
     """
     TODO
     """
@@ -44,7 +44,7 @@ class Structure(AddressMixin):
     #     blank=True,
     #     through_fields=("organization", "user"),
     # )
-    objects = models.Manager.from_queryset(StructureQuerySet)()
+    objects = models.Manager.from_queryset(OrganizationQuerySet)()
 
     class Meta:
         abstract = True

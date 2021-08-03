@@ -9,12 +9,12 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlencode, urlsafe_base64_encode
 
 from itou.utils.emails import get_email_message
-from itou.utils.structures.models import MembershipAbstract, Structure, StructureQuerySet
+from itou.utils.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
 
-class SiaeQuerySet(StructureQuerySet):
+class SiaeQuerySet(OrganizationQuerySet):
     @property
     def active_lookup(self):
         # Prefer a sub query to a join for performance reasons.
@@ -161,7 +161,7 @@ class SiaeQuerySet(StructureQuerySet):
         )
 
 
-class Siae(Structure):
+class Siae(OrganizationAbstract):
     """
     Structures d'insertion par l'activité économique.
 

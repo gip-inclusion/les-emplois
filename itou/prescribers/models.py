@@ -8,11 +8,11 @@ from django.utils.http import urlencode
 
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
-from itou.utils.structures.models import MembershipAbstract, Structure, StructureQuerySet
+from itou.utils.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
-class PrescriberOrganizationQuerySet(StructureQuerySet):
+class PrescriberOrganizationQuerySet(OrganizationQuerySet):
     def autocomplete(self, search_string, limit=10):
         queryset = (
             self.annotate(similarity=TrigramSimilarity("name", search_string))
@@ -38,7 +38,7 @@ class PrescriberOrganizationManager(models.Manager):
         return self.none()
 
 
-class PrescriberOrganization(Structure):
+class PrescriberOrganization(OrganizationAbstract):
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
 
