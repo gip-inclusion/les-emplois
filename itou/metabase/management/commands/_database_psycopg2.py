@@ -15,6 +15,5 @@ class MetabaseDatabaseCursor:
         return self.cur, self.conn
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.conn.commit()
         self.cur.close()
         self.conn.close()
