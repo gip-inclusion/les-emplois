@@ -106,6 +106,9 @@ class Command(BaseCommand):
 
         This is why we instead do small and frequent commits, so that the db
         stays available throughout the script.
+
+        Note that psycopg2 will always automatically open a new transaction when none is open. Thus it will open
+        a new one after each such commit.
         """
         self.conn.commit()
 
