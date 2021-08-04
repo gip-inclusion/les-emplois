@@ -175,10 +175,10 @@ class Command(BaseCommand):
 
         # Create table.
         create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields});").format(
+            new_table_name=sql.Identifier(new_table_name),
             fields=sql.SQL(",").join(
                 [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table_columns]
             ),
-            new_table_name=sql.Identifier(new_table_name),
         )
         self.cur.execute(create_table_query)
 
