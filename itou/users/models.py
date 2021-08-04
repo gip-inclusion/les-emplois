@@ -249,6 +249,12 @@ class User(AbstractUser, AddressMixin):
     def has_jobseeker_profile(self):
         return self.is_job_seeker and hasattr(self, "jobseeker_profile")
 
+    @cached_property
+    def has_valid_diagnosis(self):
+        from itou.eligibility.models import EligibilityDiagnosis
+
+        return EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self)
+
     def joined_recently(self):
         time_since_date_joined = timezone.now() - self.date_joined
         return time_since_date_joined.days < 7

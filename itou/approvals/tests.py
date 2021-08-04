@@ -24,9 +24,14 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
+from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory, PrescriberOrganizationFactory
+from itou.prescribers.factories import (
+    AuthorizedPrescriberOrganizationFactory,
+    PrescriberOrganizationFactory,
+    PrescriberOrganizationWithMembershipFactory,
+)
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
@@ -714,6 +719,27 @@ class ApprovalsWrapperTest(TestCase):
                 siae=SiaeFactory(kind=Siae.KIND_GEIQ), sender_prescriber_organization=PrescriberOrganizationFactory()
             )
         )
+
+        # Waiting period is bypassed if a valid diagnosis made by an authorized prescriber exists.
+        diag = EligibilityDiagnosisFactory(job_seeker=approvals_wrapper.user)
+        self.assertFalse(
+            approvals_wrapper.cannot_bypass_waiting_period(
+                siae=SiaeFactory(kind=Siae.KIND_ETTI),
+                sender_prescriber_organization=None,
+            )
+        )
+        diag.delete()
+
+        # Waiting period cannot be bypassed if a valid diagnosis exists
+        # but was not made by an authorized prescriber.
+        diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=approvals_wrapper.user)
+        self.assertTrue(
+            approvals_wrapper.cannot_bypass_waiting_period(
+                siae=SiaeFactory(kind=Siae.KIND_ETTI),
+                sender_prescriber_organization=None,
+            )
+        )
+        diag.delete()
 
 
 class AutomaticApprovalAdminViewsTest(TestCase):
