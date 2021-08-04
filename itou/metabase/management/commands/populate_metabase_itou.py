@@ -120,7 +120,7 @@ class Command(BaseCommand):
         """
         Insert chunk of objects into table.
         """
-        insert_query = sql.SQL("insert into {new_table_name} ({fields}) values %s;").format(
+        insert_query = sql.SQL("insert into {new_table_name} ({fields}) values %s").format(
             new_table_name=sql.Identifier(new_table_name),
             fields=sql.SQL(",").join(
                 [sql.Identifier(c["name"]) for c in table_columns],
@@ -174,7 +174,7 @@ class Command(BaseCommand):
         self.log(f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:")
 
         # Create table.
-        create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields});").format(
+        create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields})").format(
             new_table_name=sql.Identifier(new_table_name),
             fields=sql.SQL(",").join(
                 [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table_columns]
@@ -189,7 +189,7 @@ class Command(BaseCommand):
             assert set(c.keys()) == set(["name", "type", "comment", "fn"])
             column_name = c["name"]
             column_comment = c["comment"]
-            comment_query = sql.SQL("comment on column {new_table_name}.{column_name} is {column_comment};").format(
+            comment_query = sql.SQL("comment on column {new_table_name}.{column_name} is {column_comment}").format(
                 new_table_name=sql.Identifier(new_table_name),
                 column_name=sql.Identifier(column_name),
                 column_comment=sql.Literal(column_comment),
