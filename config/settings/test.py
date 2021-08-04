@@ -23,3 +23,6 @@ ITOU_PROTOCOL = "http"
 ITOU_FQDN = "testserver"
 
 ASP_FS_KNOWN_HOSTS = None
+
+# Temporary: employee record deployment
+EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED = True
