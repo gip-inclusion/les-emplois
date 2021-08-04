@@ -101,11 +101,10 @@ class Command(BaseCommand):
 
     def commit(self):
         """
-        A single final commit freezes the itou-metabase-db temporarily,
-        making our GUI unable to connect to the db during this commit.
+        A single final commit freezes the itou-metabase-db temporarily, making our GUI unable to connect to the db
+        during this commit.
 
-        This is why we instead do small and frequent commits, so that the db
-        stays available throughout the script.
+        This is why we instead do small and frequent commits, so that the db stays available throughout the script.
 
         Note that psycopg2 will always automatically open a new transaction when none is open. Thus it will open
         a new one after each such commit.
