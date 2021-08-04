@@ -344,6 +344,7 @@ class Command(BaseCommand):
         # Run some updates a second time.
         update_existing_conventions()
         self.update_siret_and_auth_email_of_existing_siaes()
+        self.delete_conventions()
 
         # Final checks.
         check_convention_data_consistency()

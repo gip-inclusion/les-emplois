@@ -50,11 +50,11 @@ pandas==1.3.1  # https://github.com/pandas-dev/pandas
 # Eye candy progress bar
 tqdm==4.61.2  # https://github.com/tqdm/tqdm
 
-# Read Excel files with Pandas
-xlrd==1.2.0  # https://pypi.org/project/xlrd/
+# Read Excel files with Pandas (pandas.read_excel)
+xlrd==2.0.1  # https://pypi.org/project/xlrd/
 
-# sqlalchemy.create_engine is required for pandas.to_sql used in populate_metabase_fluxiae and populate_metabase_itou
-sqlalchemy==1.3.20  # https://github.com/sqlalchemy/sqlalchemy
+# sqlalchemy.create_engine is required for pandas.to_sql used in both populate_metabase_* commands
+sqlalchemy==1.4.22  # https://github.com/sqlalchemy/sqlalchemy
 
 # Third-party applications
 # ------------------------------------------------------------------------------
