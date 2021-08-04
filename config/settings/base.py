@@ -610,3 +610,14 @@ STORAGE_UPLOAD_KINDS = {
         "max_files": 1,
     },
 }
+
+# Employee records progressive opening settings
+# (to be removed after complete production)
+# ------------------------------------------------------------------------------
+EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED = os.environ.get("EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED", False)
+# Use a percentage of eligible SIAEs for progressive opening
+# Will be updated throughout the process via environment vars on production instance.
+EMPLOYEE_RECORD_OPENING_PERCENTAGE = int(os.environ.get("EMPLOYEE_RECORD_OPENING_PERCENTAGE", 1))
+# Allows a manual / custom selection of some SIAEs as "VIP users":
+# Add selected SIAE ASP_IDs in list below:
+EMPLOYEE_RECORD_CUSTOM_SIAE_ID_LIST = []

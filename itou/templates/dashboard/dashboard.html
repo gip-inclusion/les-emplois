@@ -67,6 +67,22 @@
     {% if user.joined_recently %}
         {% include "welcoming_tour/includes/message.html" %}
     {% endif %}
+
+
+    {# Employee record progressive opening notification #}
+    {% if can_show_deployment_message %}
+        <div class="alert alert-info pb-0">
+            <p>
+                Les fonctionnalités de gestion des fiches salarié ASP sont actuellement en cours de déploiement.
+            </p>
+            <p>
+                Dès que ces fonctionnalités seront disponibles pour votre structure, vous pourrez y accéder via un lien
+                dans la section <b>"Mes candidatures"</b> du tableau de bord.
+            </p>
+        </div>
+    {% endif %}
+
+
 {% endblock %}
 
 {% block content %}
@@ -333,9 +349,6 @@
                         {% endif %}
                     {% endfor %}
 
-
-                    {# Commenté le temps du dev #}
-                    {% comment %}
                     {% if can_show_employee_records %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="file" %}
@@ -343,7 +356,6 @@
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
-                    {% endcomment %}
 
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="log-in" %}

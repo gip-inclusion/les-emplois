@@ -100,7 +100,8 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
         self.client.get(url)
 
-        data = {"financial_annex": self.siae.convention.financial_annexes.first().number}
+        # Do not use financial annex number om ModelChoiceField: must pass an ID !
+        data = {"financial_annex": self.siae.convention.financial_annexes.first().id}
         response = self.client.post(url, data)
 
         self.assertEqual(response.status_code, 302)
