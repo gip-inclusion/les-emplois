@@ -162,7 +162,7 @@ class ApplyAsJobSeekerTest(TestCase):
         post_data = {
             "selected_jobs": [siae.job_description_through.first().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-            "resume_link": "https://server.com/rockie-balboa.pdf",
+            "resume_link": "https://server.com/rocky-balboa.pdf",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
