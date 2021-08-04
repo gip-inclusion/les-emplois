@@ -43,11 +43,9 @@ Compose`. Si ce n'est pas encore le cas :
 - [Installer Docker Compose](https://docs.docker.com/compose/install/)
 
 Vous pouvez également personnaliser la configuration Compose en créant [un
-fichier `.env`](https://docs.docker.com/compose/env-file/) au même niveau que le
-fichier `README.md`, puis y configurer les variables d'environnement suivantes :
-
-    DJANGO_PORT_ON_DOCKER_HOST=8080
-    POSTGRES_PORT_ON_DOCKER_HOST=5433
+fichier `.env`](https://docs.docker.com/compose/env-file/) à partir d'une copie
+du fichier racine `.env.template`. Le fichier `.env` doit être au même niveau
+que le fichier `README.md`.
 
 ### Développement dans un Virtualenv
 
