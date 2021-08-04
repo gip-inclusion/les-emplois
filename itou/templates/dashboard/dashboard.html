@@ -191,9 +191,13 @@
                             </div>
                             {% if approvals_wrapper.has_in_waiting_period %}
                                 <p class="card-text">
+                                    {% if user.has_valid_diagnosis %}
+                                        <p>Un prescripteur habilité a réalisé un diagnostic d'éligibilité. <b>Vous pouvez donc commencer un nouveau parcours.</b></p>
+                                    {% else %}
                                     <small>
                                         {{ user.approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER }}
                                     </small>
+                                    {% endif %}
                                 </p>
                             {% endif %}
                         </div>

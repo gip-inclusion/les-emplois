@@ -1131,11 +1131,14 @@ class ApprovalsWrapper:
         An approval in waiting period can only be bypassed if the prescriber is authorized
         or if the structure is not a SIAE.
         """
+        from itou.eligibility.models import EligibilityDiagnosis
+
         is_sent_by_authorized_prescriber = (
             sender_prescriber_organization is not None and sender_prescriber_organization.is_authorized
         )
+        valid_diagnosis_exists = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.user)
         return (
             self.has_in_waiting_period
             and siae.is_subject_to_eligibility_rules
-            and not is_sent_by_authorized_prescriber
+            and not (is_sent_by_authorized_prescriber or valid_diagnosis_exists)
         )
