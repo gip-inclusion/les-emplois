@@ -260,10 +260,14 @@ class ModelTest(TestCase):
         CD as in "Conseil Départemental".
         """
         # Admin prescriber of authorized CD can access.
-        org = AuthorizedPrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
+        org = AuthorizedPrescriberOrganizationWithMembershipFactory(
+            kind=PrescriberOrganization.Kind.DEPT, department="02"
+        )
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertEqual(user.get_stats_cd_department(current_org=org), org.department)
+        self.assertNotEqual(user.get_stats_cd_department(current_org=org), "01")
 
         # Non admin prescriber cannot access.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
@@ -290,6 +294,13 @@ class ModelTest(TestCase):
         user = PrescriberFactory()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+
+        # VIP user can always access, even without a CD.
+        org = None
+        user = UserFactory(is_stats_vip=True)
+        self.assertTrue(user.can_view_stats_cd(current_org=org))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertEqual(user.get_stats_cd_department(current_org=org), "01")
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):

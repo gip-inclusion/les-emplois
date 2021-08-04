@@ -6,7 +6,8 @@
 
     <h1>
         {% if request.user.is_siae_staff %}
-            <span class="text-muted">{{ siae.display_name }}</span>
+            <span class="text-muted">{{ siae.display_name }} </span>
+            <span class="badge badge-primary">{{ siae.kind }}</span>
         {% else %}
             Postuler
             {% if job_seeker %}pour <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>{% endif %}

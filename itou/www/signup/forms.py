@@ -8,7 +8,8 @@ from django.utils.http import urlsafe_base64_decode
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
-from itou.utils.apis.api_entreprise import EtablissementAPI
+from itou.utils.address.departments import DEPARTMENTS
+from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
@@ -224,6 +225,26 @@ class PrescriberIsPoleEmploiForm(forms.Form):
     )
 
 
+class PrescriberSirenForm(forms.Form):
+
+    siren = forms.CharField(
+        label="Numéro SIREN de votre organisation",
+        min_length=9,
+        help_text="Le numéro SIREN contient 9 chiffres.",
+    )
+
+    department = forms.ChoiceField(
+        label="Département",
+        choices=DEPARTMENTS.items(),
+    )
+
+    def clean_siren(self):
+        # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
+        siren = self.cleaned_data["siren"].replace(" ", "")
+        validate_siren(siren)
+        return siren
+
+
 class PrescriberChooseOrgKindForm(forms.Form):
 
     kind = forms.ChoiceField(
@@ -237,12 +258,10 @@ class PrescriberChooseKindForm(forms.Form):
 
     KIND_AUTHORIZED_ORG = "authorized_org"
     KIND_UNAUTHORIZED_ORG = "unauthorized_org"
-    KIND_SOLO = "solo"
 
     KIND_CHOICES = (
         (KIND_AUTHORIZED_ORG, "Pour une organisation habilitée par le Préfet"),
         (KIND_UNAUTHORIZED_ORG, "Pour une organisation non-habilitée"),
-        (KIND_SOLO, "Seul (sans organisation)"),
     )
 
     kind = forms.ChoiceField(
@@ -272,30 +291,25 @@ class PrescriberSiretForm(forms.Form):
     Retrieve info about an organization from a given SIRET.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, kind, siren, **kwargs):
         # We need the kind of the SIAE to check constraint on SIRET number
-        self.kind = kwargs.pop("kind", None)
-
-        super().__init__(*args, **kwargs)
+        self.kind = kind
+        self.siren = siren
         self.org_data = None
+        super().__init__(**kwargs)
 
-    siret = forms.CharField(
-        label="Numéro SIRET de votre organisation",
-        min_length=14,
-        help_text="Le numéro SIRET contient 14 chiffres.",
-    )
+    # On rendering, the SIREN is displayed just before this input
+    partial_siret = forms.CharField(label="Numéro SIRET de votre organisation", min_length=5, max_length=5)
 
-    def clean_siret(self):
-
-        # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
-        siret = self.cleaned_data["siret"].replace(" ", "")
+    def clean_partial_siret(self):
+        siret = self.siren + self.cleaned_data["partial_siret"]
 
         validate_siret(siret)
 
         # Does an org with this SIRET already exist?
         org = PrescriberOrganization.objects.filter(siret=siret, kind=self.kind).first()
         if org:
-            error = f'"{org.display_name}" utilise déjà ce SIRET.'
+            error = f"« {org.display_name} » utilise déjà ce SIRET."
             admin = org.get_admins().first()
             if admin:
                 error += (
@@ -306,13 +320,12 @@ class PrescriberSiretForm(forms.Form):
             raise forms.ValidationError(error)
 
         # Fetch name and address from API entreprise.
-        etablissement = EtablissementAPI(siret)
-
-        if etablissement.error:
-            raise forms.ValidationError(etablissement.error)
+        etablissement, error = etablissement_get_or_error(siret)
+        if error:
+            raise forms.ValidationError(error)
 
         if etablissement.is_closed:
-            raise forms.ValidationError(etablissement.ERROR_IS_CLOSED)
+            raise forms.ValidationError("La base Sirene indique que l'établissement est fermé.")
 
         # Perform another API call to fetch geocoding data.
         address_fields = [

@@ -2,6 +2,8 @@ import datetime
 from collections import OrderedDict
 from unittest import mock
 
+import httpx
+import respx
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
@@ -18,7 +20,7 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
-from itou.utils.apis.api_entreprise import EtablissementAPI
+from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.pole_emploi import PoleEmploiRechercheIndividuCertifieAPI
 from itou.utils.emails import sanitize_mailjet_recipients
@@ -398,6 +400,15 @@ class UtilsTemplateFiltersTestCase(TestCase):
         self.assertEqual(dict_filters.get_dict_item(my_dict, "key1"), "value1")
         self.assertEqual(dict_filters.get_dict_item(my_dict, "key2"), "value2")
 
+    def test_format_siret(self):
+        # Don't format invalid SIRET
+        self.assertEqual(format_filters.format_siret("1234"), "1234")
+        self.assertEqual(format_filters.format_siret(None), "None")
+        # SIREN
+        self.assertEqual(format_filters.format_siret("123456789"), "123 456 789")
+        # SIRET
+        self.assertEqual(format_filters.format_siret("12345678912345"), "123 456 789 12345")
+
 
 class UtilsEmailsTestCase(TestCase):
     def test_get_safe_url(self):
@@ -644,17 +655,22 @@ class CnilCompositionPasswordValidatorTest(SimpleTestCase):
 
 
 class ApiEntrepriseTest(SimpleTestCase):
-    @mock.patch(
-        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
-    )
-    def test_etablissement_api(self, mock_api_entreprise):
-        etablissement = EtablissementAPI("26570134200148")
+    @respx.mock
+    def test_etablissement_api(self):
+        siret = "26570134200148"
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
 
+        etablissement, error = etablissement_get_or_error(siret)
+
+        self.assertIsNone(error)
         self.assertEqual(etablissement.name, "CENTRE COMMUNAL D'ACTION SOCIALE")
         self.assertEqual(etablissement.address_line_1, "22 RUE DU WAD BILLY")
         self.assertEqual(etablissement.address_line_2, "22-24")
         self.assertEqual(etablissement.post_code, "57000")
         self.assertEqual(etablissement.city, "METZ")
+        self.assertEqual(etablissement.department, "57")
         self.assertFalse(etablissement.is_closed)
 
 
@@ -701,7 +717,7 @@ class UtilsEmailsSplitRecipientTest(TestCase):
     def test_dont_split_emails(self):
         recipients = []
         # Only one email is needed
-        for i in range(49):
+        for _ in range(49):
             recipients.append(Faker("email", locale="fr_FR"))
 
         message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
@@ -713,7 +729,7 @@ class UtilsEmailsSplitRecipientTest(TestCase):
     def test_must_split_emails(self):
         # 2 emails are needed; one with 50 the other with 25
         recipients = []
-        for i in range(75):
+        for _ in range(75):
             recipients.append(Faker("email", locale="fr_FR"))
 
         message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)

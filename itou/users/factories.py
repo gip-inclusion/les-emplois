@@ -12,7 +12,7 @@ from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK
 
 
-DEFAULT_PASSWORD = "p4ssw0rd"
+DEFAULT_PASSWORD = "P4ssw0rd!*"
 
 # Register ASP fakers
 factory.Faker.add_provider(INSEECommuneProvider)

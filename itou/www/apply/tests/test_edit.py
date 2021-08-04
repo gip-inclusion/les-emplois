@@ -69,10 +69,8 @@ class EditContractTest(TestCase):
         }
 
         response = self.client.post(self.url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application_1.id})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()
 
@@ -140,10 +138,8 @@ class EditContractTest(TestCase):
         }
 
         response = self.client.post(self.url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application_1.id})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()
 

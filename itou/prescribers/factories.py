@@ -5,6 +5,7 @@ import factory.fuzzy
 
 from itou.prescribers import models
 from itou.users.factories import PrescriberFactory
+from itou.utils.address.departments import DEPARTMENTS
 
 
 class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
@@ -19,6 +20,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
     kind = models.PrescriberOrganization.Kind.PE
+    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
 
 
 class AuthorizedPrescriberOrganizationFactory(PrescriberOrganizationFactory):

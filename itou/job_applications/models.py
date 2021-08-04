@@ -64,7 +64,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_RENDER_OBSOLETE, "Rendre obsolete la candidature"),
     )
 
-    CAN_BE_ACCEPTED_STATES = [STATE_PROCESSING, STATE_POSTPONED, STATE_OBSOLETE, STATE_REFUSED]
+    CAN_BE_ACCEPTED_STATES = [STATE_PROCESSING, STATE_POSTPONED, STATE_OBSOLETE, STATE_REFUSED, STATE_CANCELLED]
 
     transitions = (
         (TRANSITION_PROCESS, STATE_NEW, STATE_PROCESSING),
@@ -418,9 +418,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name = "Candidature"
         verbose_name_plural = "Candidatures"
         ordering = ["-created_at"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)

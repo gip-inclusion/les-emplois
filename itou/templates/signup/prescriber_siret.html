@@ -1,6 +1,7 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 {% load static %}
+{% load format_filters %}
 
 {% block title %}Prescripteur/Orienteur - Inscription{{ block.super }}{% endblock %}
 
@@ -17,7 +18,7 @@
         <li>Vos informations</li>
     </ul>
 
-    <div class="alert alert-secondary" role="alert">
+    <div class="alert alert-info" role="alert">
         Retrouvez facilement votre numéro SIRET à partir du nom de votre organisation sur le site
         <a href="https://sirene.fr/" rel="noopener" target="_blank">
             sirene.fr
@@ -29,7 +30,42 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form form alert_error_type="all" %}
+        <div class="form-group form-group-required{% if form.errors %} is-invalid{% endif %}">
+            {% bootstrap_label "Numéro SIRET de votre organisation" %}
+
+            <div class="row ml-2">
+                <div class="py-2 text-right">
+                    <span class="text-muted">{{ siren|format_siret }}</span>
+                </div>
+
+                <div class="col-md-3">
+                    <input type="text"
+                        class="form-control{% if form.errors %} is-invalid{% endif %}"
+                        name="{{ form.partial_siret.name }}"
+                        value="{{ form.partial_siret.value|default_if_none:'' }}"
+                        maxlength="5" minlength="5"
+                        placeholder="00000"
+                        required
+                        id="id_{{ form.partial_siret.name }}"
+                    >
+                </div>
+            </div>
+
+            <div class="row">
+                {% if form.partial_siret.errors %}
+                    <div class="col-md-12">
+                        <div class="invalid-feedback d-block">{{ form.partial_siret.errors|join:", " }}</div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <small class="form-text text-muted">Complétez le numéro SIREN avec les 5 derniers chiffres du SIRET de votre organisation.</small>
+                </div>
+            </div>
+
+        </div>
 
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">

@@ -23,6 +23,11 @@ urlpatterns = [
         name="prescriber_is_pole_emploi",
     ),
     path(
+        "prescriber/siren",
+        views.prescriber_siren,
+        name="prescriber_siren",
+    ),
+    path(
         "prescriber/choose_org",
         views.prescriber_choose_org,
         name="prescriber_choose_org",

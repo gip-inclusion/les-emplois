@@ -1,6 +1,8 @@
 """
 Handle multiple user types sign up with django-allauth.
 """
+import logging
+
 from allauth.account.views import PasswordResetView, SignupView
 from django.conf import settings
 from django.contrib import messages
@@ -19,6 +21,9 @@ from itou.siaes.models import Siae
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
+
+
+logger = logging.getLogger(__name__)
 
 
 class ItouPasswordResetView(PasswordResetView):
@@ -227,14 +232,54 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
 
     if request.method == "POST" and form.is_valid():
 
-        next_url = reverse("signup:prescriber_choose_org")
-
         if form.cleaned_data["is_pole_emploi"]:
-            next_url = reverse("signup:prescriber_pole_emploi_safir_code")
+            return HttpResponseRedirect(reverse("signup:prescriber_pole_emploi_safir_code"))
 
-        return HttpResponseRedirect(next_url)
+        return HttpResponseRedirect(reverse("signup:prescriber_siren"))
 
     context = {"form": form}
+    return render(request, template_name, context)
+
+
+# TODO 2021-07-28 GET method with side-effect (session update), to rewrite as:
+# - POST but not a very choice for search view
+# - GET with params w/o session update
+@valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
+    """
+    Try to find a pre-existing prescriber's organization from a given SIREN.
+
+    This step makes it possible to avoid duplicates of prescriber's organizations.
+    """
+
+    prescribers_with_members = None
+
+    form = forms.PrescriberSirenForm(data=request.GET or None)
+
+    if request.method == "GET" and form.is_valid():
+
+        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        session_data.update({"siren": form.cleaned_data["siren"]})
+        request.session.modified = True
+
+        prescribers_with_members = (
+            PrescriberOrganization.objects.prefetch_active_memberships()
+            .filter(siret__startswith=form.cleaned_data["siren"], department=form.cleaned_data["department"])
+            .exclude(members=None)
+        )
+
+        # Redirect to creation steps if no organization with member is found,
+        # else, displays the same form with the list of organizations with first member
+        # to indicate which person to request an invitation from
+        if not prescribers_with_members:
+            return HttpResponseRedirect(reverse("signup:prescriber_choose_org"))
+
+    context = {
+        "prescribers_with_members": prescribers_with_members,
+        "form": form,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
     return render(request, template_name, context)
 
 
@@ -308,10 +353,6 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
             authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
             kind = PrescriberOrganization.Kind.OTHER.value
             next_url = reverse("signup:prescriber_siret")
-
-        elif prescriber_kind == form.KIND_SOLO:
-            # Go to sign up screen without organization.
-            next_url = reverse("signup:prescriber_user")
 
         session_data.update(
             {
@@ -412,10 +453,28 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    kind = session_data.get("kind")
+    siren = session_data.get("siren")
 
-    form = forms.PrescriberSiretForm(data=request.POST or None, kind=session_data.get("kind"))
+    if not kind or not siren:
+        # The user didn't use the right workflow
+        logger.error(
+            "User has reached step3 of the worflow w/o the required information (kind=%s, siren=%s)", kind, siren
+        )
+        return HttpResponseRedirect(reverse("signup:prescriber_is_pole_emploi"))
 
+    form = forms.PrescriberSiretForm(
+        kind=session_data["kind"],
+        siren=siren,
+        data=request.POST or None,
+    )
+
+    # `PrescriberSiretForm` performs several API calls:
+    # - to SIRENE API to validate the SIRET existence and the status of the organisation
+    # - get geolocalisation from Adresse API
+    # See PrescriberSiretForm.clean_partial_siret.
     if request.method == "POST" and form.is_valid():
+
         session_data["prescriber_org_data"] = form.org_data
         request.session.modified = True
         next_url = reverse("signup:prescriber_user")
@@ -423,6 +482,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     context = {
         "form": form,
+        "siren": siren,
         "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)

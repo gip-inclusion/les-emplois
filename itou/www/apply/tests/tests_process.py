@@ -1,8 +1,7 @@
-import datetime
-
 from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlencode
 
 from itou.approvals.models import Approval
@@ -119,10 +118,8 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:process", kwargs={"job_application_id": job_application.pk})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_processing)
@@ -151,10 +148,8 @@ class ProcessViewsTest(TestCase):
             "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_refused)
@@ -175,10 +170,8 @@ class ProcessViewsTest(TestCase):
 
         post_data = {"answer": ""}
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_postponed)
@@ -207,7 +200,7 @@ class ProcessViewsTest(TestCase):
             self.assertEqual(response.status_code, 200)
 
             # Good duration.
-            hiring_start_at = datetime.date.today()
+            hiring_start_at = timezone.now().date()
             hiring_end_at = Approval.get_default_end_date(hiring_start_at)
             post_data = {
                 # Data for `JobSeekerPoleEmploiStatusForm`.
@@ -219,10 +212,8 @@ class ProcessViewsTest(TestCase):
                 **address,
             }
             response = self.client.post(url, data=post_data)
-            self.assertEqual(response.status_code, 302)
-
             next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-            self.assertEqual(response.url, next_url)
+            self.assertRedirects(response, next_url)
 
             job_application = JobApplication.objects.get(pk=job_application.pk)
             self.assertEqual(job_application.hiring_start_at, hiring_start_at)
@@ -236,7 +227,7 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         # Wrong dates.
-        hiring_start_at = datetime.date.today()
+        hiring_start_at = timezone.now().date()
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         # Force `hiring_start_at` in past.
         hiring_start_at = hiring_start_at - relativedelta(days=1)
@@ -250,7 +241,7 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
 
         # Wrong dates: end < start.
-        hiring_start_at = datetime.date.today()
+        hiring_start_at = timezone.now().date()
         hiring_end_at = hiring_start_at - relativedelta(days=1)
         post_data = {
             "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
@@ -262,7 +253,7 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
 
         # Duration too long.
-        hiring_start_at = datetime.date.today()
+        hiring_start_at = timezone.now().date()
         max_end_at = Approval.get_default_end_date(hiring_start_at)
         hiring_end_at = max_end_at + relativedelta(days=1)
         post_data = {
@@ -282,7 +273,7 @@ class ProcessViewsTest(TestCase):
         )
         url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        hiring_start_at = datetime.date.today()
+        hiring_start_at = timezone.now().date()
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         post_data = {
             # Data for `JobSeekerPoleEmploiStatusForm`.
@@ -326,12 +317,13 @@ class ProcessViewsTest(TestCase):
             "city": city.name,
             "city_slug": city.slug,
             # Data for `AcceptForm`.
-            "hiring_start_at": datetime.date.today().strftime("%d/%m/%Y"),
-            "hiring_end_at": (datetime.date.today() + datetime.timedelta(days=360)).strftime("%d/%m/%Y"),
+            "hiring_start_at": timezone.now().date().strftime("%d/%m/%Y"),
+            "hiring_end_at": (timezone.now().date() + relativedelta(days=360)).strftime("%d/%m/%Y"),
             "answer": "",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
@@ -380,7 +372,7 @@ class ProcessViewsTest(TestCase):
             "pole_emploi_id": job_seeker.pole_emploi_id,
             "answer": "",
         }
-        hiring_start_at = datetime.date.today() + relativedelta(months=2)
+        hiring_start_at = timezone.now().date() + relativedelta(months=2)
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
 
@@ -507,10 +499,8 @@ class ProcessViewsTest(TestCase):
             "confirm": "true",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
@@ -559,18 +549,14 @@ class ProcessViewsTest(TestCase):
             self.assertEqual(response.status_code, 200)
             self.client.logout()
 
-        # Wrong states
-        for state in [
-            JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_CANCELLED,
-        ]:
-            job_application.state = state
-            job_application.save()
-            self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
-            url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 404)
-            self.client.logout()
+        # Wrong state
+        job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+        job_application.save()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        self.client.logout()
 
     def test_cancel(self):
         # Hiring date is today: cancellation should be possible.
@@ -585,15 +571,14 @@ class ProcessViewsTest(TestCase):
             "confirm": "true",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         self.assertTrue(job_application.state.is_cancelled)
 
     def test_cannot_cancel(self):
-        cancellation_period_end = datetime.date.today() - relativedelta(
+        cancellation_period_end = timezone.now().date() - relativedelta(
             days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
         )
         job_application = JobApplicationWithApprovalFactory(
@@ -604,11 +589,46 @@ class ProcessViewsTest(TestCase):
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
+
         job_application.refresh_from_db()
         self.assertFalse(job_application.state.is_cancelled)
+
+    def test_accept_after_cancel(self):
+        # A canceled job application is not linked to an approval
+        # unless the job seeker has an accepted job application.
+        create_test_cities(["54", "57"], num_per_department=2)
+        city = City.objects.first()
+        job_seeker = JobSeekerWithAddressFactory(city=city.name)
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_CANCELLED, job_seeker=job_seeker
+        )
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        hiring_start_at = timezone.now().date()
+        hiring_end_at = Approval.get_default_end_date(hiring_start_at)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "answer": "",
+            "address_line_1": job_seeker.address_line_1,
+            "post_code": job_seeker.post_code,
+            "city": city.name,
+            "city_slug": city.slug,
+        }
+        response = self.client.post(url_accept, data=post_data)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        self.assertRedirects(response, next_url)
+
+        job_application.refresh_from_db()
+        self.assertEqual(job_seeker.approvals.count(), 1)
+        approval = job_seeker.approvals.first()
+        self.assertEqual(approval.start_at, job_application.hiring_start_at)
+        self.assertTrue(job_application.state.is_accepted)
 
     def test_archive(self):
         """Ensure that when an SIAE archives a job_application, the hidden_for_siae flag is updated."""
@@ -634,9 +654,7 @@ class ProcessViewsTest(TestCase):
         qs = urlencode(args, doseq=True)
         url = reverse("apply:list_for_siae")
         next_url = f"{url}?{qs}"
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, next_url)
+        self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
         self.assertTrue(job_application.hidden_for_siae)
@@ -760,6 +778,33 @@ class ProcessTemplatesTest(TestCase):
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertContains(response, self.url_accept)
+
+    def test_details_template_for_state_canceled(self):
+        """Test actions available for other states."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_CANCELLED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+
+    def test_details_template_for_state_canceled_valid_diagnosis(self):
+        """Test actions available for other states."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        self.job_application.state = JobApplicationWorkflow.STATE_CANCELLED
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.

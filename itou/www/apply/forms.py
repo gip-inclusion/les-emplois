@@ -22,7 +22,8 @@ class UserExistsForm(forms.Form):
         self.user = None
 
     email = forms.EmailField(
-        label="E-mail personnel du candidat", widget=forms.TextInput(attrs={"autocomplete": "off"})
+        label="E-mail personnel du candidat",
+        widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com"}),
     )
 
     def clean_email(self):
@@ -69,14 +70,13 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
 class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
     email = forms.EmailField(
-        label="E-mail personnel du candidat", widget=forms.TextInput(attrs={"autocomplete": "off"})
+        label="E-mail personnel du candidat",
+        widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com", "readonly": True}),
     )
 
     def __init__(self, proxy_user, *args, **kwargs):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
-        self.fields["email"].required = True
-        self.fields["email"].widget.attrs["readonly"] = True
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
 
@@ -213,9 +213,12 @@ class AcceptForm(forms.ModelForm):
             self.fields[field].required = True
             self.fields[field].widget = DatePickerField()
             self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
-        if self.instance.state.is_refused:
-            # Erase the refusal message to start from new.
-            self.initial["answer"] = ""
+        # Job applications can be accepted twice if they have been cancelled.
+        # They also can be accepted after a refusal.
+        # That's why some fields are already filled in with obsolete data.
+        # Erase them now to start from new.
+        for field in ["answer", "hiring_start_at", "hiring_end_at"]:
+            self.initial[field] = ""
 
     class Meta:
         model = JobApplication
@@ -253,9 +256,8 @@ class AcceptForm(forms.ModelForm):
         if self.errors:
             return cleaned_data
 
-        # is it the second button that submitted the form
-        if "without_approval" in self.data:
-            self.cleaned_data["hiring_without_approval"] = True
+        # True if is it the second button that submitted the form
+        self.cleaned_data["hiring_without_approval"] = "without_approval" in self.data
 
         hiring_start_at = self.cleaned_data["hiring_start_at"]
         hiring_end_at = self.cleaned_data["hiring_end_at"]

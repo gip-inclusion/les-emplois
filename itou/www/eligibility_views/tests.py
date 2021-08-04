@@ -126,7 +126,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         user = PrescriberFactory()
 
         criterion1 = AdministrativeCriteria.objects.get(name="Senior (+50 ans)")
-        criterion2 = AdministrativeCriteria.objects.get(name="Jeunes (-26 ans)")
+        criterion2 = AdministrativeCriteria.objects.get(name="Jeune (-26 ans)")
 
         form_data = {
             f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion1.pk}": "true",

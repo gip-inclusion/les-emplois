@@ -11,7 +11,7 @@ from django.template.response import SimpleTemplateResponse
 from django.urls import reverse
 from django.utils.text import slugify
 
-from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
+from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils.pdf import HtmlToPdf
@@ -30,7 +30,8 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     job_application = get_object_or_404(queryset, pk=job_application_id, to_siae=siae)
 
     if not job_application.can_download_approval_as_pdf:
-        raise Http404(("Nous sommes au regret de vous informer que vous ne pouvez pas télécharger cet agrément."))
+        # Message only visible in DEBUG
+        raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas télécharger cet agrément.")
 
     diagnosis = job_application.get_eligibility_diagnosis()
     diagnosis_author = None
@@ -243,28 +244,50 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
 
         number = form.cleaned_data["number"]
 
-        # We search if the approval already exists with this exact number,
-        # or if it was created from the first 12 digits of a PoleEmploiApproval's number
-        approval = Approval.objects.filter(number__in=[number, number[:12]]).first()
+        # Truncate the number to remove any 'S01' or 'P01' suffix because the
+        # number is limited to 12 digits in Approval table.
+        approval = Approval.objects.filter(number=number[:12]).first()
 
         # If the identifier matches an existing approval…
         if approval:
+            # Extract the user and search again to find the current approval for
+            # that user (could be this one).
+            approvals_wrapper = ApprovalsWrapper(user=approval.user)
+
             # …ensure that the last accepted job application belongs to the current SIAE…
-            job_app = approval.user.last_accepted_job_application
-            if job_app.to_siae == siae:
-                application_details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_app.pk})
+            # We are sure to have one approval.
+            approval = approvals_wrapper.merged_approvals[0] if approvals_wrapper.merged_approvals else None
+            job_application = approval.user.last_accepted_job_application
+            if job_application.to_siae == siae:
+                application_details_url = reverse(
+                    "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
+                )
                 return HttpResponseRedirect(application_details_url)
-            else:
-                # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
-                # has already been transformed into an `Approval`.
-                msg = f"Le numéro {approval.number_with_spaces} est déjà utilisé par un autre employeur."
-                messages.error(request, msg)
-                return HttpResponseRedirect(reverse("approvals:pe_approval_search"))
+
+            # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
+            # has already been transformed into an `Approval`.
+            # In this case, the user can obtain the approval by the step_job_seeker.
+            # A link is offered in the template.
 
         # Otherwise, we display a search, and whenever it's possible, a matching `PoleEmploiApproval`.
+        # Here number can be 12 digits + S01 (etc).
         pe_approval = PoleEmploiApproval.objects.filter(number=number, start_at__lte=datetime.date.today()).first()
 
-    context = {"pe_approval": pe_approval, "form": form, "number": number, "siae": siae}
+        if approval or pe_approval:
+            context = {
+                "approval": approval,
+                "pe_approval": pe_approval,
+                "form": form,
+                "number": number,
+                "siae": siae,
+            }
+            return render(request, "approvals/pe_approval_search_found.html", context)
+
+    context = {
+        "form": form,
+        "number": number,
+        "siae": siae,
+    }
     return render(request, template_name, context)
 
 
@@ -307,7 +330,7 @@ def pe_approval_create(request, pe_approval_id):
         job_seeker = User.create_job_seeker_from_pole_emploi_approval(request.user, email, pe_approval)
 
     # If the PoleEmploiApproval has already been imported, it is not possible to import it again
-    possible_matching_approval = Approval.objects.filter(number=pe_approval.number[:12]).first()
+    possible_matching_approval = Approval.objects.filter(number=pe_approval.number[:12]).order_by("-start_at").first()
     if possible_matching_approval:
         messages.info(request, "Cet agrément Pôle emploi a déja été importé.")
         job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()

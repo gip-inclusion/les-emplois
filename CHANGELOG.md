@@ -1,5 +1,44 @@
 # Journal des modifications
 
+## [23] - 2021-07-29
+
+### Ajouté
+
+- Nouveau workflow vers « Obtenir un PASS IAE » lorsque l'agrément à prolonger ou suspendre
+  est utilisé par une autre structure
+- Ajout d'un message d'aide et d'un lien vers le support en cas d'erreur 500
+- Le prescripteur doit saisir le SIREN et le département de son organisation
+  lors de l'inscription pour qu'il puisse vérifier qu'un création est nécessaire
+  afin de réduire les doublons.
+- Mise en forme du SIRET (ex. 123 456 789 00001)
+- Nouvelle application pour les institutions
+- Nouvelle variables Matomo pour les inspecteurs du travail
+- Les utilisateurs VIP peuvent consulter les statistiques des Conseils Départementaux
+
+### Modifié
+
+- Recherche du dernier PASS IAE lors de la recherche via le numéro d'agrément
+- Affichage du type de la structure au moment de la candidature pour éviter les confusions
+  car de nombreuses structures portent le même nom
+- Renommage du critère « Jeunes (-26 ans) » au singulier
+- Message d'aide pour le indiquer le format du numéro d'agrément attendu
+- Nouvelle organisation des tests sur les agréments et réduction du temps de traitement de 10 %
+- Utilisation du champ de type e-mail pour faciliter la saisie sur mobile (et la vérification côté
+  client).
+- Affichage du résultat de recherche envoyé à l'API Sirene en cas d'erreur
+- Le champ de SIRET devient un libellé avec les 9 premiers chiffres et 5 chiffres déterminant
+  l'établissement en saisie pour réutiliser le SIREN de la première étape
+- Ajout de contrôles lors du tunnel d'inscription
+- Modification du traitement des données à l'utilisation de l'API Sirene
+- L'instance de démo utilise un addon PostgreSQL dédié
+- Transfert des ressources utilisées par les recettes jetables dans une
+  organisation Clever Cloud dédiée
+- Possibilité d'accepter une candidature précédemment annulée
+- Changement du libellé « Continuer avec un CV » par « Continuer »
+- DDEETS devient DDETS
+- L'affichage de l'icône « Marque-page » est seulement affiché si nécessaire
+  dans le Tableau de bord
+
 ## [22] - 2021-07-15
 
 ### Ajouté

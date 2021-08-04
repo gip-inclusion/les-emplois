@@ -1,0 +1,91 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load static %}
+{% load format_filters %}
+
+{% block title %}Prescripteur/Orienteur - Inscription{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        Inscription
+        <small class="text-muted">Prescripteur/Orienteur</small>
+    </h1>
+
+    <div class="alert alert-info" role="alert">
+        Retrouvez facilement votre numéro SIREN à partir du nom de votre organisation sur le site
+        <a href="https://sirene.fr/" rel="noopener" target="_blank">
+            sirene.fr
+            {% include "includes/icon.html" with icon="external-link" %}
+        </a>
+    </div>
+
+    <form method="get" action="" class="js-prevent-multiple-submit">
+
+        {% bootstrap_form form alert_error_type="all" %}
+
+        {% buttons %}
+            {# Change the label of the submit button and the position of the return button if the form is submitted #}
+            {% if prescribers_with_members %}
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            {% else %}
+            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
+                Retour
+            </a>
+            <button type="submit" class="btn btn-primary">Continuer</button>
+            {% endif %}
+        {% endbuttons %}
+
+    </form>
+
+    {% if prescribers_with_members %}
+        <div class="mt-5">
+            <h3>Organisations déjà inscrites</h3>
+            <div class="alert alert-secondary" role="info">
+                <i>Par sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</i>
+            </div>
+            <ul>
+                {% for prescriber in prescribers_with_members %}
+                    <li>
+                        <p>
+                            <b>{{ prescriber.siret|format_siret }}</b> - {{ prescriber.kind }}
+                            <br>
+                            {{ prescriber.display_name }}
+                            <br>
+                            {{ prescriber.address_line_1 }},
+                            {% if prescriber.address_line_2 %}
+                                <br>
+                                {{ prescriber.address_line_2 }},
+                            {% endif %}
+                            <br>
+                            {{ prescriber.post_code }} {{ prescriber.city }}
+                            <br>
+                            {% with prescriber.prescribermembership_set.first as membership %}
+                                {# For security, display only the first char of the last name. #}
+                                <i>Pour obtenir une invitation, contactez {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.</i>
+                            {% endwith %}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="alert alert-warning mt-4" role="alert">
+            <p>
+                <small>
+                    Si vous ne retrouvez pas votre organisation dans cette liste, vous pouvez la créer.
+                </small>
+                <a href="{% url 'signup:prescriber_choose_org' %}" class="btn btn-primary mt-3">Ajouter mon organisation</a>
+            </p>
+        </div>
+    <div class="mt-4">
+        <p>
+            En cas de problème, contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank">{{ ITOU_ASSISTANCE_URL }} {% include "includes/icon.html" with icon="external-link" %}</a>
+        </p>
+    </div>
+    <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
+        Retour
+    </a>
+    {% else %}
+    <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
+    {% endif %}
+{% endblock %}
