@@ -27,12 +27,14 @@ def switch_table_atomically(table_name):
         conn.commit()
 
 
-def store_df(df, table_name, dry_run):
+def store_df(df, table_name, dry_run, max_attempts=5):
     """
     Store dataframe in database.
 
     Do this chunk by chunk to solve
     psycopg2.OperationalError "server closed the connection unexpectedly" error.
+
+    Try up to `max_attempts` times.
     """
     if dry_run:
         table_name += "_dry_run"
@@ -43,21 +45,35 @@ def store_df(df, table_name, dry_run):
     df_chunks = [df[i : i + rows_per_chunk] for i in range(0, df.shape[0], rows_per_chunk)]
 
     print(f"Storing {table_name} in {len(df_chunks)} chunks of (max) {rows_per_chunk} rows each ...")
-    if_exists = "replace"  # For the 1st chunk, drop old existing table if needed.
-    for df_chunk in tqdm(df_chunks):
-        pg_engine = get_pg_engine()
-        df_chunk.to_sql(
-            name=f"{table_name}_new",
-            # Use a new connection for each chunk to avoid random disconnections.
-            con=pg_engine,
-            if_exists=if_exists,
-            index=False,
-            chunksize=1000,
-            # INSERT by batch and not one by one. Increases speed x100.
-            method="multi",
-        )
-        pg_engine.dispose()
-        if_exists = "append"  # For all other chunks, append to table in progress.
+
+    attempts = 0
+
+    while attempts < max_attempts:
+        try:
+            if_exists = "replace"  # For the 1st chunk, drop old existing table if needed.
+            for df_chunk in tqdm(df_chunks):
+                pg_engine = get_pg_engine()
+                df_chunk.to_sql(
+                    name=f"{table_name}_new",
+                    # Use a new connection for each chunk to avoid random disconnections.
+                    con=pg_engine,
+                    if_exists=if_exists,
+                    index=False,
+                    chunksize=1000,
+                    # INSERT by batch and not one by one. Increases speed x100.
+                    method="multi",
+                )
+                pg_engine.dispose()
+                if_exists = "append"  # For all other chunks, append to table in progress.
+            break
+        except Exception as e:
+            # Catching all exceptions is a generally a code smell but we eventually reraise it so it's ok.
+            attempts += 1
+            print(f"Attempt #{attempts} failed with exception {repr(e)}.")
+            if attempts == max_attempts:
+                print("No more attemps left, giving up and raising the exception.")
+                raise
+            print("New attempt started...")
 
     switch_table_atomically(table_name=table_name)
     print(f"Stored {table_name} in database ({len(df)} rows).")

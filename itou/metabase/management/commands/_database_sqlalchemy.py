@@ -26,4 +26,8 @@ def get_pg_engine():
         # Reduce likelyhood of random disconnections.
         # See https://docs.sqlalchemy.org/en/13/core/pooling.html#pool-disconnects
         pool_pre_ping=True,
+        # Set short timeout so that new attempts are started faster.
+        # See https://stackoverflow.com/a/35640876
+        # and https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS
+        connect_args={"connect_timeout": 10},
     )

@@ -125,7 +125,12 @@ def remap_columns(df, column_mapping):
 
 
 def could_siae_be_deleted(siae):
-    return siae.members.count() == 0 and siae.job_applications_received.count() == 0
+    if siae.members.count() >= 1 or siae.job_applications_received.count() >= 1:
+        return False
+    # An ASP siae can only be deleted when all its antennas have been deleted.
+    if siae.source == Siae.SOURCE_ASP:
+        return siae.convention.siaes.count() == 1
+    return True
 
 
 def geocode_siae(siae):

@@ -24,7 +24,7 @@ def get_geiq_df():
     df = pd.read_excel(filename, converters={"siret": str, "zip": str})
 
     column_mapping = {
-        "Geiq": "name",
+        "name": "name",
         "street": "address_line_1",
         "street2": "address_line_2",
         "zip": "post_code",
