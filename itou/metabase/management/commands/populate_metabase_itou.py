@@ -174,9 +174,9 @@ class Command(BaseCommand):
         self.log(f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:")
 
         # Create table.
-        create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields})").format(
+        create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields_with_type})").format(
             new_table_name=sql.Identifier(new_table_name),
-            fields=sql.SQL(",").join(
+            fields_with_type=sql.SQL(",").join(
                 [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table_columns]
             ),
         )
