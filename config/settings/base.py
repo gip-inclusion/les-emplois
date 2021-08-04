@@ -522,6 +522,7 @@ HUEY = {
 ANYMAIL = {
     "MAILJET_API_KEY": os.environ.get("API_MAILJET_KEY"),
     "MAILJET_SECRET_KEY": os.environ.get("API_MAILJET_SECRET"),
+    "WEBHOOK_SECRET": os.environ.get("MAILJET_WEBHOOK_SECRET"),
 }
 
 MAILJET_API_URL = "https://api.mailjet.com/v3.1"
