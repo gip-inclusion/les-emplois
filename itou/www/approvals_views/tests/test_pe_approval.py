@@ -141,6 +141,16 @@ class PoleEmploiApprovalSearchTest(TestCase):
         # The current user should be able to use the PASS IAE used by another SIAE
         response = self.client.get(self.url, {"number": job_application.approval.number})
         self.assertContains(response, "Utiliser le PASS IAE")
+        # It should be possible to apply to this PASS by going directly to the eligibility phase
+        # while skipping most of the initial "apply:step_*" steps
+        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": self.siae.pk})
+        self.assertContains(response, next_url)
+
+        response = self.client.get(next_url)
+        application_url = reverse("apply:step_application", kwargs={"siae_pk": self.siae.pk})
+        # the eligibility page is skipped since the approval is already granted, but we perform the skip anyway
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, application_url)
 
     def test_unlogged_is_not_authorized(self):
         """
