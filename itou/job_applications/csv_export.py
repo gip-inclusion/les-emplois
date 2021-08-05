@@ -1,7 +1,5 @@
 import csv
 
-from itou.eligibility.models import EligibilityDiagnosis
-
 
 JOB_APPLICATION_CSV_HEADERS = [
     "Nom candidat",
@@ -52,7 +50,8 @@ def _get_selected_jobs(job_application):
 
 def _get_eligibility_status(job_application):
     eligibility = "non"
-    if EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_application.job_seeker):
+    # Eligibility diagnoses made by SIAE are ignored.
+    if job_application.job_seeker.has_valid_diagnosis():
         eligibility = "oui"
 
     return eligibility
