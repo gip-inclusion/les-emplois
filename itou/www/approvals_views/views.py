@@ -16,6 +16,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import UserExistsForm
 from itou.www.approvals_views.forms import DeclareProlongationForm, PoleEmploiApprovalSearchForm, SuspensionForm
@@ -263,11 +264,31 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
                     "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
                 )
                 return HttpResponseRedirect(application_details_url)
+            else:
+                # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
+                # has already been transformed into an `Approval`.
+                # In this case, the user can obtain the approval by the step_job_seeker.
+                # A link is offered in the template.
+                #
+                # Since we redirect in the middle of the "apply:step_*" process,
+                # we have to fill the session data which should have normally been filled before
+                siae_user_info = get_user_info(request)
 
-            # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
-            # has already been transformed into an `Approval`.
-            # In this case, the user can obtain the approval by the step_job_seeker.
-            # A link is offered in the template.
+                request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
+                    "job_seeker_pk": approval.user.pk,
+                    "to_siae_pk": siae.pk,
+                    "sender_pk": siae_user_info.user.pk,
+                    "sender_kind": siae.kind,
+                    "sender_siae_pk": siae.pk,
+                    "sender_prescriber_organization_pk": None,
+                    "job_description_id": None,
+                }
+                if siae_user_info.prescriber_organization:
+                    request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY][
+                        "sender_prescriber_organization_pk"
+                    ] = siae_user_info.prescriber_organization.pk
+
+                request.session.modified = True
 
         # Otherwise, we display a search, and whenever it's possible, a matching `PoleEmploiApproval`.
         # Here number can be 12 digits + S01 (etc).
