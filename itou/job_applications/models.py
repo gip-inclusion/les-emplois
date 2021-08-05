@@ -589,9 +589,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
             approvals_wrapper = self.job_seeker.approvals_wrapper
 
-            if approvals_wrapper.has_in_waiting_period and not self.is_sent_by_authorized_prescriber:
-                # Security check: it's supposed to be blocked upstream.
-                raise xwf_models.AbortTransition("Job seeker has an approval in waiting period.")
+            if approvals_wrapper.has_in_waiting_period:
+                if approvals_wrapper.cannot_bypass_waiting_period(
+                    siae=self.to_siae, sender_prescriber_organization=self.sender_prescriber_organization
+                ):
+                    # Security check: it's supposed to be blocked upstream.
+                    raise xwf_models.AbortTransition("Job seeker has an approval in waiting period.")
 
             if approvals_wrapper.has_valid:
                 # Automatically reuse an existing valid Itou or PE approval.

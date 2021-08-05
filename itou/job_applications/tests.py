@@ -12,7 +12,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.csv_export import generate_csv_export
 from itou.job_applications.factories import (
@@ -645,6 +645,11 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
 class JobApplicationWorkflowTest(TestCase):
     """Test JobApplication workflow."""
 
+    def setUp(self):
+        self.sent_pass_email_subject = "PASS IAE pour"
+        self.accept_email_subject_proxy = "Candidature acceptée et votre avis sur les emplois de l'inclusion"
+        self.accept_email_subject_job_seeker = "Candidature acceptée"
+
     def test_accept_job_application_sent_by_job_seeker_and_make_others_obsolete(self):
         """
         When a job seeker's application is accepted, the others are marked obsolete.
@@ -671,9 +676,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
         # Email sent to the job seeker.
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
         # Email sent to the employer.
-        self.assertIn("PASS IAE pour", mail.outbox[1].subject)
+        self.assertIn(self.sent_pass_email_subject, mail.outbox[1].subject)
 
     def test_accept_obsolete(self):
         """
@@ -703,9 +708,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
         # Email sent to the job seeker.
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
         # Email sent to the employer.
-        self.assertIn("PASS IAE pour", mail.outbox[1].subject)
+        self.assertIn(self.sent_pass_email_subject, mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval(self):
         """
@@ -726,9 +731,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
         # Email sent to the job seeker.
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
         # Email sent to the employer.
-        self.assertIn("PASS IAE pour", mail.outbox[1].subject)
+        self.assertIn(self.sent_pass_email_subject, mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_in_the_future(self):
         """
@@ -777,8 +782,8 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         # Email sent to the job seeker.
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        # Email sent to the employer.
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
+        # Email sent to the team.
         self.assertIn("PASS IAE requis sur Itou", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_prescriber(self):
@@ -797,11 +802,11 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 3)
         # Email sent to the job seeker.
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
         # Email sent to the proxy.
-        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
+        self.assertIn(self.accept_email_subject_proxy, mail.outbox[1].subject)
         # Email sent to the employer.
-        self.assertIn("PASS IAE pour", mail.outbox[2].subject)
+        self.assertIn(self.sent_pass_email_subject, mail.outbox[2].subject)
 
     def test_accept_job_application_sent_by_authorized_prescriber(self):
         """
@@ -820,11 +825,11 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 3)
         # Email sent to the job seeker.
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
         # Email sent to the proxy.
-        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
+        self.assertIn(self.accept_email_subject_proxy, mail.outbox[1].subject)
         # Email sent to the employer.
-        self.assertIn("PASS IAE pour", mail.outbox[2].subject)
+        self.assertIn(self.sent_pass_email_subject, mail.outbox[2].subject)
 
     def test_accept_job_application_sent_by_authorized_prescriber_with_approval_in_waiting_period(self):
         """
@@ -850,11 +855,11 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent emails.
         self.assertEqual(len(mail.outbox), 3)
         # Email sent to the job seeker.
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
         # Email sent to the proxy.
-        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
+        self.assertIn(self.accept_email_subject_proxy, mail.outbox[1].subject)
         # Email sent to the employer.
-        self.assertIn("PASS IAE pour", mail.outbox[2].subject)
+        self.assertIn(self.sent_pass_email_subject, mail.outbox[2].subject)
 
     def test_accept_job_application_sent_by_prescriber_with_approval_in_waiting_period(self):
         """
@@ -874,6 +879,37 @@ class JobApplicationWorkflowTest(TestCase):
         with self.assertRaises(xwf_models.AbortTransition):
             job_application.accept(user=job_application.to_siae.members.first())
 
+    def test_accept_job_application_sent_by_job_seeker_in_waiting_period_valid_diagnosis(self):
+        """
+        A job seeker with a valid diagnosis can start an IAE path
+        even if he's in a waiting period.
+        """
+        user = JobSeekerFactory()
+        # Ended 1 year ago.
+        end_at = datetime.date.today() - relativedelta(years=1)
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
+        )
+        self.assertTrue(approval.is_in_waiting_period)
+
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=user)
+        self.assertTrue(diagnosis.is_valid)
+
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=user, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertIsNotNone(job_application.approval)
+        self.assertTrue(job_application.approval_number_sent_by_email)
+        self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC)
+        # Check sent emails.
+        self.assertEqual(len(mail.outbox), 2)
+        # Email sent to the job seeker.
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
+        # Email sent to the employer.
+        self.assertIn(self.sent_pass_email_subject, mail.outbox[1].subject)
+
     def test_accept_job_application_by_siae_with_no_approval(self):
         """
         A SIAE can hire somebody without getting approval if they don't want one
@@ -891,9 +927,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email (no notification of approval).
         self.assertEqual(len(mail.outbox), 2)
         # Email sent to the job seeker.
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
         # Email sent to the proxy.
-        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
+        self.assertIn(self.accept_email_subject_proxy, mail.outbox[1].subject)
 
     def test_accept_job_application_by_siae_not_subject_to_eligibility_rules(self):
         """
@@ -910,9 +946,9 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
         # Email sent to the job seeker.
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
         # Email sent to the proxy.
-        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
+        self.assertIn(self.accept_email_subject_proxy, mail.outbox[1].subject)
 
     def test_accept_has_link_to_eligibility_diagnosis(self):
         """
