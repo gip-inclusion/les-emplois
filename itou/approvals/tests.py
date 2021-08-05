@@ -27,11 +27,7 @@ from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNo
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.prescribers.factories import (
-    AuthorizedPrescriberOrganizationFactory,
-    PrescriberOrganizationFactory,
-    PrescriberOrganizationWithMembershipFactory,
-)
+from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory, PrescriberOrganizationFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
