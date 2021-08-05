@@ -113,7 +113,7 @@
                                                     class="dropdown-item text-primary {% if s.pk == current_siae.pk %} font-weight-bold disabled{% endif %}"
                                                     type="submit"
                                                     name="siae_id"
-                                                    value="{{ s.pk }}">{{ s.display_name }} <span class="badge badge-primary">{{ s.kind }}</span>
+                                                    value="{{ s.pk }}"><span class="badge badge-primary">{{ s.kind }}</span> {{ s.display_name }}
                                                 </button>
                                             {% endfor %}
                                         </form>

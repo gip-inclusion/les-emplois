@@ -10,6 +10,12 @@
             {% include "includes/icon.html" with icon="arrow-right" %}
             <a href="{% url related_link %}">{{ related_title }}</a>
         </div>
+        <div class="mb-4">
+            {% include "includes/icon.html" with icon="arrow-right" %}
+            <a href="https://pilotage.inclusion.beta.gouv.fr/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                Accès au site pilotage de l'inclusion
+            </a>
+        </div>
     {% endif %}
 
     <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
