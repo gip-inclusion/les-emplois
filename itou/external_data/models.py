@@ -109,7 +109,7 @@ class JobSeekerExternalData(models.Model):
 class RejectedEmailEventData(models.Model):
     class Meta:
         verbose_name = "Donnée collectée par le webhook en cas d’erreur d’envoi d’email"
-        verbose_name = "Données collectées par le webhook en cas d’erreur d’envoi d’email"
+        verbose_name_plural = "Données collectées par le webhook en cas d’erreur d’envoi d’email"
 
     REASON_INVALID = "invalid"
     REASON_BOUNCED = "bounced"
@@ -124,7 +124,7 @@ class RejectedEmailEventData(models.Model):
         (REASON_BOUNCED, "Adresse préalablement 'bounced' par notre ESP"),
         (REASON_TIMED_OUT, "Trop de tentatives d’envoi en erreur sur ce destinataire"),
         (REASON_BLOCKED, "La politique de notre ESP interdit ce destinataire"),
-        (REASON_SPAM, "Le destinataire ne souhaite plus recevoir ces emails"),
+        (REASON_SPAM, "Le destinataire nous a taggué comme spammeurs"),
         (REASON_UNSUBSCRIBED, "Le destinataire ne souhaite plus recevoir ces emails"),
         (REASON_OTHER, "Non précisé par l’ESP"),
     )
