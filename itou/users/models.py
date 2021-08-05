@@ -117,7 +117,7 @@ class User(AbstractUser, AddressMixin):
     is_job_seeker = models.BooleanField(verbose_name="Demandeur d'emploi", default=False)
     is_prescriber = models.BooleanField(verbose_name="Prescripteur", default=False)
     is_siae_staff = models.BooleanField(verbose_name="Employeur (SIAE)", default=False)
-    is_stats_vip = models.BooleanField(verbose_name="Pilotage", default=False)
+    is_stats_vip = models.BooleanField(verbose_name="Pilotage (VIP)", default=False)
     # Members of DDETS, DREETS or DGEFP institution have their own dashboard.
     is_labor_inspector = models.BooleanField(
         verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
