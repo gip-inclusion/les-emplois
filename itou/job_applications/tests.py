@@ -251,42 +251,6 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
 
-class JobApplicationFactoriesTest(TestCase):
-    def test_job_application_factory(self):
-        create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
-        job_application = JobApplicationFactory(selected_jobs=Appellation.objects.all())
-        self.assertEqual(job_application.selected_jobs.count(), 2)
-
-    def test_job_application_sent_by_job_seeker_factory(self):
-        job_application = JobApplicationSentByJobSeekerFactory()
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_JOB_SEEKER)
-        self.assertEqual(job_application.job_seeker, job_application.sender)
-
-    def test_job_application_sent_by_prescriber_factory(self):
-        job_application = JobApplicationSentByPrescriberFactory()
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
-        self.assertNotEqual(job_application.job_seeker, job_application.sender)
-        self.assertIsNone(job_application.sender_prescriber_organization)
-
-    def test_job_application_sent_by_prescriber_organization_factory(self):
-        job_application = JobApplicationSentByPrescriberOrganizationFactory()
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
-        self.assertNotEqual(job_application.job_seeker, job_application.sender)
-        sender = job_application.sender
-        sender_prescriber_organization = job_application.sender_prescriber_organization
-        self.assertIn(sender, sender_prescriber_organization.members.all())
-        self.assertFalse(sender_prescriber_organization.is_authorized)
-
-    def test_job_application_sent_by_authorized_prescriber_organization_factory(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
-        self.assertNotEqual(job_application.job_seeker, job_application.sender)
-        sender = job_application.sender
-        sender_prescriber_organization = job_application.sender_prescriber_organization
-        self.assertIn(sender, sender_prescriber_organization.members.all())
-        self.assertTrue(sender_prescriber_organization.is_authorized)
-
-
 class JobApplicationNotificationsTest(TestCase):
     """
     Test JobApplication notifications: emails content and receivers.
