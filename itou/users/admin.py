@@ -115,7 +115,7 @@ class KindFilter(admin.SimpleListFilter):
             ("is_job_seeker", "Demandeur d'emploi"),
             ("is_prescriber", "Prescripteur"),
             ("is_siae_staff", "SIAE"),
-            ("is_stats_vip", "Pilotage"),
+            ("is_stats_vip", "Pilotage (VIP)"),
             ("is_labor_inspector", "Inspecteur du travail"),
         )
 
