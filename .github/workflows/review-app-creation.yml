@@ -112,5 +112,9 @@ jobs:
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
 
+    - name: ⏭ Skip fixtures
+      run:
+        $CLEVER_CLI env set SKIP_FIXTURES true
+
     - name: 🚀 Deploy to Clever Cloud
       run: $CLEVER_CLI deploy --branch $BRANCH --force
