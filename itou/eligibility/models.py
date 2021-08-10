@@ -36,6 +36,9 @@ class EligibilityDiagnosisQuerySet(models.QuerySet):
     def by_author_kind_prescriber(self):
         return self.filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER)
 
+    def by_author_kind_prescriber_or_siae(self, for_siae):
+        return self.filter(models.Q(author_kind=self.model.AUTHOR_KIND_PRESCRIBER) | models.Q(author_siae=for_siae))
+
     def for_job_seeker(self, job_seeker):
         return self.filter(job_seeker=job_seeker).select_related(
             "author", "author_siae", "author_prescriber_organization"
@@ -90,6 +93,27 @@ class EligibilityDiagnosisManager(models.Manager):
             last = query.valid().by_author_kind_prescriber().last()
             if not last and for_siae:
                 last = query.valid().authored_by_siae(for_siae).last()
+
+        return last
+
+    def last_considered_expired(self, job_seeker, for_siae=None):
+        """
+        Retrieves the given job seeker's last considered expired diagnosis or None.
+
+        Return None if last diagnosis is considered valid.
+        """
+
+        last = None
+        query = self.for_job_seeker(job_seeker).order_by("created_at")
+
+        # check if no diagnosis has considered valid
+        if not self.has_considered_valid(job_seeker=job_seeker, for_siae=for_siae):
+            if for_siae:
+                # get the last one made by this siae or a prescriber
+                last = query.expired().by_author_kind_prescriber_or_siae(for_siae=for_siae).last()
+            else:
+                # get the last one no matter who did it
+                last = query.expired().last()
 
         return last
 
