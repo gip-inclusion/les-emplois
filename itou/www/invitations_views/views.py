@@ -19,6 +19,7 @@ from itou.www.invitations_views.forms import (
     PrescriberWithOrgInvitationFormSet,
     SiaeStaffInvitationFormSet,
 )
+from itou.www.signup import forms as signup_forms
 
 
 def new_user(request, invitation_type, invitation_id, template_name="invitations_views/new_user.html"):
@@ -68,7 +69,25 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
 def invite_prescriber_with_org(request, template_name="invitations_views/create.html"):
     organization = get_current_org_or_404(request)
     form_kwargs = {"sender": request.user, "organization": organization}
-    formset = PrescriberWithOrgInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
+
+    # Initial data can be passed by GET params to ease invitation of new members
+    request_invitation_form = signup_forms.PrescriberRequestInvitationForm(data=request.GET)
+    if request_invitation_form.is_valid():
+        # The prescriber has accepted the request for an invitation of an external user.
+        # The form will be pre-filled with the new user information.
+        initial_data = [
+            {
+                "first_name": request_invitation_form.cleaned_data.get("first_name"),
+                "last_name": request_invitation_form.cleaned_data.get("last_name"),
+                "email": request_invitation_form.cleaned_data.get("email"),
+            }
+        ]
+    else:
+        initial_data = None
+
+    formset = PrescriberWithOrgInvitationFormSet(
+        data=request.POST or None, initial=initial_data, form_kwargs=form_kwargs
+    )
     if request.POST:
         if formset.is_valid():
             # We don't need atomicity here (invitations are independent)
