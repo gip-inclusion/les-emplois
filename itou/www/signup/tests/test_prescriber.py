@@ -441,10 +441,9 @@ class PrescriberSignupTest(TestCase):
         siret = "26570134200148"
 
         # PrescriberOrganizationWithMembershipFactory.
-        existing_org_with_siret = PrescriberOrganizationWithMembershipFactory(
+        PrescriberOrganizationWithMembershipFactory(
             siret=siret, kind=PrescriberOrganization.Kind.SPIP, department="01"
         )
-        existing_org_with_siret.save()
 
         # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
@@ -470,7 +469,6 @@ class PrescriberSignupTest(TestCase):
         existing_org_with_siret = PrescriberOrganizationWithMembershipFactory(
             siret=siret, kind=PrescriberOrganization.Kind.SPIP, department="67"
         )
-        existing_org_with_siret.save()
 
         # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
@@ -512,7 +510,6 @@ class PrescriberSignupTest(TestCase):
         existing_org_with_siret = PrescriberOrganizationFactory(
             siret=siret, kind=PrescriberOrganization.Kind.SPIP, department="67"
         )
-        existing_org_with_siret.save()
 
         # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
@@ -608,8 +605,7 @@ class PrescriberSignupTest(TestCase):
         respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
-        existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.ML)
-        existing_org_with_siret.save()
+        PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.ML)
 
         # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
