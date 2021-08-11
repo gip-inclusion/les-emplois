@@ -72,15 +72,18 @@ class HtmlToPdf:
 class PDFShiftUsage:
     """
     For internal usage: retrieve PDFShift credits usage.
-    A credit is counted per 5Mb chunks.
+    https://docs.pdfshift.io/#credits-usage
 
-    Doc:
-        https://docs.pdfshift.io/#credits-usage
+    One credit is counted per PDF conversion, but if we exceed 5MB per document
+    it will be 1 credit per 5MB chunks.
 
     Usage:
         from itou.utils.pdf import PDFShiftUsage
-        usage = PDFShiftUsage()
-        usage.number_of_approval_pdf_delivered
+        pdfshift = PDFShiftUsage()
+        pdfshift.base
+        pdfshift.total
+        pdfshift.used
+        pdfshift.remaining
     """
 
     base: int
@@ -97,9 +100,3 @@ class PDFShiftUsage:
         r = httpx.get(f"{settings.PDFSHIFT_API_BASE_URL}/credits/usage", auth=("api", settings.PDFSHIFT_API_KEY))
         r.raise_for_status()
         return r.json()
-
-    @property
-    def number_of_approval_pdf_delivered(self):
-        # A credit is counted per 5Mb chunks.
-        # 1 PDF == 150K
-        return (self.used * 5000) // 150
