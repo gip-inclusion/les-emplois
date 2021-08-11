@@ -268,7 +268,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         # Only "authorized prescribers" can perform an eligibility diagnosis.
         not user_info.is_authorized_prescriber
         # Eligibility diagnosis already performed.
-        or EligibilityDiagnosis.objects.has_considered_valid(job_seeker)
+        or job_seeker.has_valid_diagnosis()
     )
 
     if skip:

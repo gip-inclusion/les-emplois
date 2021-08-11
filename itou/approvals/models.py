@@ -1134,8 +1134,11 @@ class ApprovalsWrapper:
         is_sent_by_authorized_prescriber = (
             sender_prescriber_organization is not None and sender_prescriber_organization.is_authorized
         )
+
+        # Only diagnoses made by authorized prescribers are taken into account.
+        has_valid_diagnosis = self.user.has_valid_diagnosis()
         return (
             self.has_in_waiting_period
             and siae.is_subject_to_eligibility_rules
-            and not is_sent_by_authorized_prescriber
+            and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
         )

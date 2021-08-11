@@ -249,6 +249,9 @@ class User(AbstractUser, AddressMixin):
     def has_jobseeker_profile(self):
         return self.is_job_seeker and hasattr(self, "jobseeker_profile")
 
+    def has_valid_diagnosis(self, for_siae=None):
+        return self.eligibility_diagnoses.has_considered_valid(job_seeker=self, for_siae=for_siae)
+
     def joined_recently(self):
         time_since_date_joined = timezone.now() - self.date_joined
         return time_since_date_joined.days < 7
