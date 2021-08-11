@@ -4,10 +4,9 @@
 
 Bonjour {{ to.first_name|capfirst }} {{ to.last_name|capfirst }},
 
-{{ requestor.first_name|capfirst }} {{ requestor.last_name|capfirst }} a demandé à
-rejoindre votre organisation « {{ structure.display_name }} ».
+{{ requestor.first_name|capfirst }} {{ requestor.last_name|capfirst }} a demandé à rejoindre votre organisation « {{ organization.display_name }} ».
 
-Si vous acceptez d'inviter cette personne dans votre organisation, cliquer sur le lien <a href=""></a>.
+Si vous acceptez d'inviter cette personne dans votre organisation, cliquer sur le lien <a href="{{ invitation_url }}"></a>.
 Vous avez aussi la possibilité de contacter cette personne via son adresse e-mail <a href="mailto:{{ requestor.email }}">{{ requestor.email }}</a>.
 
 En cas de refus, vous pouvez simplement ignorer ce mail.

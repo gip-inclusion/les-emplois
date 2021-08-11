@@ -1,0 +1,27 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load static %}
+{% load format_filters %}
+
+{% block title %}Prescripteur/Orienteur - Inscription{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        Inscription
+        <small class="text-muted">Prescripteur/Orienteur</small>
+    </h1>
+
+    <div class="alert alert-info" role="alert">
+        Renseignez vos coordonnées afin d'être invité par {{ prescriber.first_name|title }} {{ prescriber.last_name|slice:1 }}. de l'organisation « {{ organization.display_name }} ».
+    </div>
+
+    <form method="post" class="js-prevent-multiple-submit">{% csrf_token %}
+
+        {% bootstrap_form form alert_error_type="all" %}
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">Envoyer la demande</button>
+        {% endbuttons %}
+    </form>
+{% endblock %}

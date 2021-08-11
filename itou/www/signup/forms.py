@@ -245,6 +245,20 @@ class PrescriberSirenForm(forms.Form):
         return siren
 
 
+class PrescriberRequestInvitationForm(FullnameFormMixin):
+    email = forms.EmailField(
+        label="E-mail",
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "placeholder": "jeandupont@exemple.com",
+                "autocomplete": "off",
+            }
+        ),
+    )
+
+
 class PrescriberChooseOrgKindForm(forms.Form):
 
     kind = forms.ChoiceField(
