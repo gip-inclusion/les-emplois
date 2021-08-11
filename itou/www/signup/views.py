@@ -470,7 +470,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
     )
 
     # `PrescriberSiretForm` performs several API calls:
-    # - to SIRENE API to validate the SIRET existence and the status of the organisation
+    # - to SIRENE API to validate the SIRET existence and the status of the organization
     # - get geolocalisation from Adresse API
     # See PrescriberSiretForm.clean_partial_siret.
     if request.method == "POST" and form.is_valid():
