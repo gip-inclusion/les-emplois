@@ -14,7 +14,7 @@ from itou.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiFactory,
 )
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
@@ -485,6 +485,19 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.get(url, data=get_data)
         self.assertContains(response, existing_org_with_siret.display_name)
+
+        # Request for an invitation link.
+        prescriber_membership = (
+            PrescriberMembership.objects.filter(organization=existing_org_with_siret)
+            .active()
+            .select_related("user")
+            .order_by("-is_admin", "joined_at")
+            .first()
+        )
+        self.assertContains(
+            response,
+            reverse("signup:prescriber_request_invitation", kwargs={"membership_id": prescriber_membership.id}),
+        )
 
         # New organization link.
         self.assertContains(response, reverse("signup:prescriber_choose_org"))
