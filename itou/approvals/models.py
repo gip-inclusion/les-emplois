@@ -1135,7 +1135,7 @@ class ApprovalsWrapper:
             sender_prescriber_organization is not None and sender_prescriber_organization.is_authorized
         )
 
-        # Only diagnosis made by authorized prescribers are taken into account.
+        # Only diagnoses made by authorized prescribers are taken into account.
         has_valid_diagnosis = self.user.has_valid_diagnosis()
         return (
             self.has_in_waiting_period
