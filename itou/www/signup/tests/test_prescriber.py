@@ -507,9 +507,7 @@ class PrescriberSignupTest(TestCase):
 
         siret = "26570134200148"
 
-        existing_org_with_siret = PrescriberOrganizationFactory(
-            siret=siret, kind=PrescriberOrganization.Kind.SPIP, department="67"
-        )
+        PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.SPIP, department="67")
 
         # Step 1: the user doesn't work for PE.
         url = reverse("signup:prescriber_is_pole_emploi")
@@ -691,3 +689,11 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertContains(response, f"« {prescriber_organization.display_name} » utilise déjà ce SIRET.")
+
+    def test_form_to_request_for_an_invitation(self):
+        prescriber_org = PrescriberOrganizationWithMembershipFactory()
+        prescriber_membership = prescriber_org.prescribermembership_set.first()
+
+        url = reverse("signup:prescriber_request_invitation", kwargs={"membership_id": prescriber_membership.id})
+        response = self.client.get(url)
+        self.assertContains(response, prescriber_org.display_name)
