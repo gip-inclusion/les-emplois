@@ -233,50 +233,27 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
     Redirects to the existing Pass if it exists.
     If not, it will ask you to search for an user in order to import the "agrément" as a "PASS IAE".
     """
-    siae = get_current_siae_or_404(request)
-
     approval = None
     form = PoleEmploiApprovalSearchForm(request.GET or None)
     number = None
-    pe_approval = None
+    siae = get_current_siae_or_404(request)
 
     if form.is_valid():
-
         number = form.cleaned_data["number"]
+        approvals_wrapper = ApprovalsWrapper(number=number)
+        approval = approvals_wrapper.latest_approval
 
-        # Truncate the number to remove any 'S01' or 'P01' suffix because the
-        # number is limited to 12 digits in Approval table.
-        approval = Approval.objects.filter(number=number[:12]).first()
-
-        # If the identifier matches an existing approval…
         if approval:
-            # Extract the user and search again to find the current approval for
-            # that user (could be this one).
-            approvals_wrapper = ApprovalsWrapper(user=approval.user)
+            if approval.is_pass_iae:
+                job_application = approval.user.last_accepted_job_application
+                if job_application.to_siae == siae:
+                    application_details_url = reverse(
+                        "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
+                    )
+                    return HttpResponseRedirect(application_details_url)
 
-            # …ensure that the last accepted job application belongs to the current SIAE…
-            # We are sure to have one approval.
-            approval = approvals_wrapper.merged_approvals[0] if approvals_wrapper.merged_approvals else None
-            job_application = approval.user.last_accepted_job_application
-            if job_application.to_siae == siae:
-                application_details_url = reverse(
-                    "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
-                )
-                return HttpResponseRedirect(application_details_url)
-
-            # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
-            # has already been transformed into an `Approval`.
-            # In this case, the user can obtain the approval by the step_job_seeker.
-            # A link is offered in the template.
-
-        # Otherwise, we display a search, and whenever it's possible, a matching `PoleEmploiApproval`.
-        # Here number can be 12 digits + S01 (etc).
-        pe_approval = PoleEmploiApproval.objects.filter(number=number, start_at__lte=datetime.date.today()).first()
-
-        if approval or pe_approval:
             context = {
                 "approval": approval,
-                "pe_approval": pe_approval,
                 "form": form,
                 "number": number,
                 "siae": siae,
