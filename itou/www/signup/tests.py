@@ -405,7 +405,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(url, data={"is_pole_emploi": 0})
 
-        # Step 2: search organisations with SIREN and department.
+        # Step 2: search organizations with SIREN and department.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
         get_data = {
@@ -513,7 +513,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(url, data={"is_pole_emploi": 0})
 
-        # Step 2: search organisations with SIREN and department.
+        # Step 2: search organizations with SIREN and department.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
         get_data = {
@@ -522,7 +522,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.get(url, data=get_data)
 
-        # Step 3: set 'other' organisation.
+        # Step 3: set 'other' organization.
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
         post_data = {
@@ -618,14 +618,14 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
 
-        # Step 2: search organisations with SIREN and department.
+        # Step 2: search organizations with SIREN and department.
         get_data = {
             "siren": siret[:9],
             "department": "67",
         }
         response = self.client.get(url, data=get_data)
 
-        # Step 3: select kind of organisation.
+        # Step 3: select kind of organization.
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
         post_data = {
@@ -738,7 +738,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.post(url, data={"is_pole_emploi": 0})
 
-        # Step 2: search organisations with SIREN and department.
+        # Step 2: search organizations with SIREN and department.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
         get_data = {
@@ -748,7 +748,7 @@ class PrescriberSignupTest(TestCase):
         response = self.client.get(url, data=get_data)
         self.assertContains(response, existing_org_with_siret.display_name)
 
-        # New organisation link.
+        # New organization link.
         self.assertContains(response, reverse("signup:prescriber_choose_org"))
 
     def test_create_user_prescriber_with_existing_siren_without_member(self):
@@ -770,7 +770,7 @@ class PrescriberSignupTest(TestCase):
             data={"is_pole_emploi": 0},
         )
 
-        # Step 2: search organisations with SIREN and department.
+        # Step 2: search organizations with SIREN and department.
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
         get_data = {
@@ -797,7 +797,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
 
-        # Step 3: the user clicks on "No organization" in search of organisation
+        # Step 3: the user clicks on "No organization" in search of organization
         # (SIREN and department).
         response = self.client.get(url)
         user_info_url = reverse("signup:prescriber_user")
@@ -917,7 +917,7 @@ class PrescriberSignupTest(TestCase):
         respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
-        prescriber_organisation = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.PLIE)
+        prescriber_organization = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.PLIE)
 
         post_data = {
             "is_pole_emploi": 0,
@@ -943,7 +943,7 @@ class PrescriberSignupTest(TestCase):
             "partial_siret": siret[-5:],
         }
         response = self.client.post(url, data=post_data)
-        self.assertContains(response, f"« {prescriber_organisation.display_name} » utilise déjà ce SIRET.")
+        self.assertContains(response, f"« {prescriber_organization.display_name} » utilise déjà ce SIRET.")
 
 
 class PasswordResetTest(TestCase):

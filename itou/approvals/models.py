@@ -912,7 +912,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
     at the time of issuance.
     """
 
-    # Matches prescriber_organisation.code_safir_pole_emploi.
+    # Matches prescriber_organization.code_safir_pole_emploi.
     pe_structure_code = models.CharField("Code structure Pôle emploi", max_length=5)
 
     # The normal length of a number is 12 chars.

@@ -54,7 +54,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     A "prescriber" is always represented by a User object with the `is_prescriber` flag set to `True`.
 
-    The "prescriber" has the possibility of being a member of an organisation represented by a
+    The "prescriber" has the possibility of being a member of an organization represented by a
     `PrescriberOrganization` object through `PrescriberMembership`.
 
     However it is not required for a "prescriber" to be a member of an organization.
