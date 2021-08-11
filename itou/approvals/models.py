@@ -106,6 +106,17 @@ class CommonApprovalMixin(models.Model):
     def get_extended_covid_end_at(end_at):
         return end_at + relativedelta(months=CommonApprovalMixin.LOCKDOWN_EXTENSION_DELAY_MONTHS)
 
+    @staticmethod
+    def sort_approvals(approvals):
+        approvals = list(approvals)
+        # Sort by the most distant `end_at`, then by the earliest `start_at`.
+        # This allows to always choose the longest and most recent approval.
+        # Dates are converted to timestamp so that the subtraction operator
+        # can be used in the lambda.
+        return sorted(
+            approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
+        )
+
 
 class CommonApprovalQuerySet(models.QuerySet):
     """
@@ -1094,29 +1105,26 @@ class ApprovalsWrapper:
         """
         Returns a list of merged unique `Approval` and `PoleEmploiApproval` objects.
         """
-        approvals = list(Approval.objects.filter(user=self.user).order_by("-start_at"))
+        approvals = Approval.objects.filter(user=self.user).order_by("-start_at")
 
         # If an ongoing PASS IAE exists, consider it's the latest valid approval
         # even if a PoleEmploiApproval is more recent.
-        if any(approval.is_valid() for approval in approvals):
+        if approvals.valid().exists():
             return approvals
 
-        approvals_numbers = [approval.number for approval in approvals]
         today = datetime.date.today()
-        pe_approvals = [
-            pe_approval
-            for pe_approval in list(PoleEmploiApproval.objects.find_for(self.user).filter(start_at__lte=today))
-            # A `PoleEmploiApproval` could already have been copied in `Approval`.
-            if pe_approval not in approvals_numbers
-        ]
-        merged_approvals = approvals + pe_approvals
-        # Sort by the most distant `end_at`, then by the earliest `start_at`.
-        # This allows to always choose the longest and most recent approval.
-        # Dates are converted to timestamp so that the subtraction operator
-        # can be used in the lambda.
-        return sorted(
-            merged_approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
+        approvals_numbers = []
+        if approvals:
+            approvals_numbers = approvals.values_list("number", flat=True)
+
+        pe_approvals = (
+            PoleEmploiApproval.objects.find_for(self.user)
+            .filter(start_at__lte=today)
+            .exclude(number__in=approvals_numbers)
         )
+
+        merged_approvals = list(approvals) + list(pe_approvals)
+        return CommonApprovalMixin.sort_approvals(merged_approvals)
 
     @property
     def has_valid_pole_emploi_eligibility_diagnosis(self):
