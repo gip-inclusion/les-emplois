@@ -38,6 +38,13 @@ class ExpiredEligibilityDiagnosisFactory(EligibilityDiagnosisFactory):
     )
 
 
+class ExpiredEligibilityDiagnosisMadeBySiaeFactory(EligibilityDiagnosisMadeBySiaeFactory):
+
+    created_at = factory.LazyAttribute(
+        lambda self: models.EligibilityDiagnosis.get_expiration_dt() - timezone.timedelta(days=1)
+    )
+
+
 class AdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
     """
     The AdministrativeCriteria table is automatically populated with a fixture at the end of
