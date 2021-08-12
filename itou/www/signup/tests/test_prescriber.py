@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.http import urlencode
 
 from itou.prescribers.factories import (
     PrescriberOrganizationFactory,
@@ -697,3 +698,17 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_request_invitation", kwargs={"membership_id": prescriber_membership.id})
         response = self.client.get(url)
         self.assertContains(response, prescriber_org.display_name)
+
+        response = self.client.post(url, data={"first_name": "Bertrand", "last_name": "Martin", "email": "beber"})
+        self.assertContains(response, "Saisissez une adresse e-mail valide.")
+
+        requestor = {"first_name": "Bertrand", "last_name": "Martin", "email": "bertand@wahoo.fr"}
+        response = self.client.post(url, data=requestor)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(len(mail.outbox), 1)
+        mail_body = mail.outbox[0].body
+        self.assertIn(prescriber_membership.user.first_name.capitalize(), mail_body)
+        self.assertIn(prescriber_membership.organization.display_name, mail_body)
+        invitation_url = "%s?%s" % (reverse("invitations_views:invite_prescriber_with_org"), urlencode(requestor))
+        self.assertIn(invitation_url, mail_body)

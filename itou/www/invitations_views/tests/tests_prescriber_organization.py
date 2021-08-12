@@ -50,6 +50,13 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.assertRedirects(response, INVITATION_URL)
         self.assert_created_invitation()
 
+    def test_invite_not_existing_user_with_prefill(self):
+        response = self.client.get(
+            INVITATION_URL, data={"first_name": "Emma", "last_name": "Watson", "email": "emma@example.com"}
+        )
+        # The form is prefilled with GET params (if valid)
+        self.assertContains(response, "Emma")
+
     def test_invite_existing_user_is_prescriber_without_org(self):
         guest = PrescriberFactory()
         self.post_data["form-0-first_name"] = guest.first_name
