@@ -5,8 +5,8 @@
 ### Ajouté
 - Affichage d'un message informatif sur la page de détails d'une candidature si le diagnostic d'éligibilité est expiré.
 - Écran d'auto-prescription des employeurs : ajout du nom du candidat dans le titre.
-- Le push sur une branche qui a l'étiquette "recette-jetable" déclenche un nouveau déploiement.
-- Page de statistiques: ajout d'un lien vers le pilotage de l'inclusion.
+- Le _push_ sur une branche qui a l'étiquette « recette-jetable » déclenche un nouveau déploiement.
+- Page de statistiques : ajout d'un lien vers le pilotage de l'inclusion.
 
 ### Modifié
 - Menu supérieur droit des employeurs : l'étiquette du type de structure est désormais à gauche.
