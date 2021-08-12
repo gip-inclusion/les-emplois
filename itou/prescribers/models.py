@@ -10,6 +10,7 @@ from django.utils.http import urlencode
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
+from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
@@ -451,7 +452,7 @@ class PrescriberMembership(models.Model):
             "to": to_user,
             "organization": self.organization,
             "requestor": requestor,
-            "invitation_url": invitation_url,
+            "invitation_url": get_absolute_url(invitation_url),
         }
         subject = "common/emails/request_for_invitation_subject.txt"
         body = "common/emails/request_for_invitation_body.txt"
