@@ -18,6 +18,7 @@ from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.perms.user import get_user_info
 from itou.utils.storage.s3 import S3Upload
+from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
@@ -77,9 +78,16 @@ def start(request, siae_pk):
         # Message only visible in DEBUG
         raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
+    # This job application process is used in two workflows:
+    # - a normal job application
+    # - when retrieving an existing approval without a job application.
+    # In this case, we want to create a job application for an existing user
+    # whose PK we already have.
+    job_seeker_pk = get_safe_url(request, "job_seeker_pk")
+
     # Start a fresh session.
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
-        "job_seeker_pk": None,
+        "job_seeker_pk": job_seeker_pk or None,
         "to_siae_pk": siae.pk,
         "sender_pk": None,
         "sender_kind": None,
@@ -124,6 +132,11 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
+
+    # We are creating a job application from a existing approval.
+    # See `apply:start` view.
+    if session_data.get("job_seeker_pk"):
+        return HttpResponseRedirect(next_url)
 
     # The user submit an application for himself.
     if request.user.is_job_seeker:
