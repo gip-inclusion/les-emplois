@@ -1128,7 +1128,7 @@ class ApprovalsWrapper:
         # number is limited to 12 digits in Approval table.
         approvals = Approval.objects.filter(number=self.number[:12])
 
-        # If a PASS IAE exists, consider it's the latest valid approval
+        # If a PASS IAE exists, consider it's the latest approval
         # even if a PoleEmploiApproval is more recent.
         if approvals.exists():
             return approvals.order_by("-start_at")
@@ -1166,6 +1166,11 @@ class ApprovalsWrapper:
 
     @staticmethod
     def sort_approvals(approvals):
+        """
+        Returns a list of sorted approvals. The first one is the longest and the most recent.
+        ---
+        approvals: Queryset or list of Approval objects.
+        """
         approvals = list(approvals)
         # Sort by the most distant `end_at`, then by the earliest `start_at`.
         # This allows to always choose the longest and most recent approval.

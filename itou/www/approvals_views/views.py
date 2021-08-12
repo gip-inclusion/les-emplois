@@ -247,10 +247,14 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
             if approval.is_pass_iae:
                 job_application = approval.user.last_accepted_job_application
                 if job_application.to_siae == siae:
+                    # Suspensions and prolongations are available in the job application details page.
                     application_details_url = reverse(
                         "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
                     )
                     return HttpResponseRedirect(application_details_url)
+                # To use this approval, a job application is needed.
+                # Start the job application process at the "eligibility" step.
+                # A link is offered in the template.
 
             context = {
                 "approval": approval,
