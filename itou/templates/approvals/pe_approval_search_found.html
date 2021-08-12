@@ -10,11 +10,11 @@
         <p>
             Vous pouvez utiliser le PASS IAE <strong>{{ number }}</strong> de {{ approval.user.get_full_name|title }} au
             sein de votre structure « {{ siae.name }} » en cliquant sur le bouton.
-            <form method="POST" action="{% url 'apply:step_eligibility' siae.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="email" value="{{ approval.user.email }}">
-                <button type="submit" class="btn btn-primary">Utiliser le PASS IAE</button>
-            </form>
+        </p>
+        <p>
+            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.id %}?job_seeker_pk={{ approval.user.pk }}">
+                Utiliser le PASS IAE
+            </a>
         </p>
     {% else %}
         <h2>Prolonger ou suspendre un agrément</h2>

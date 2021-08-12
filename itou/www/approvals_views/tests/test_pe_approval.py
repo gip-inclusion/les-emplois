@@ -142,6 +142,15 @@ class PoleEmploiApprovalSearchTest(TestCase):
         response = self.client.get(self.url, {"number": job_application.approval.number})
         self.assertContains(response, "Utiliser le PASS IAE")
 
+        next_url = reverse("apply:start", kwargs={"siae_pk": self.siae.pk})
+        next_url = f"{next_url}?job_seeker_pk={job_seeker.pk}"
+        self.assertContains(response, next_url)
+
+        # Every step should be successful until asking for the job application details.
+        response = self.client.get(next_url, follow=True)
+        application_url = reverse("apply:step_application", kwargs={"siae_pk": self.siae.pk})
+        self.assertEqual(response.wsgi_request.path, application_url)
+
     def test_unlogged_is_not_authorized(self):
         """
         It is not possible to access the search for PE approval screen unlogged
