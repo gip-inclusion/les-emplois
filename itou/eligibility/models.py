@@ -96,9 +96,9 @@ class EligibilityDiagnosisManager(models.Manager):
 
         return last
 
-    def last_considered_expired(self, job_seeker, for_siae=None):
+    def last_expired(self, job_seeker, for_siae=None):
         """
-        Retrieves the given job seeker's last considered expired diagnosis or None.
+        Retrieves the given job seeker's last expired diagnosis or None.
 
         Return None if last diagnosis is considered valid.
         """
