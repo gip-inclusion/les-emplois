@@ -14,3 +14,9 @@ class ExternalDataImportAdmin(admin.ModelAdmin):
 class JobSeekerExternalDataAdmin(admin.ModelAdmin):
     raw_id_fields = ("user",)
     list_display = ("pk", "data_import", "created_at")
+
+
+@admin.register(models.RejectedEmailEventData)
+class RejectedEmailEventDataAdmin(admin.ModelAdmin):
+    list_filter = ("reason",)
+    list_display = ("pk", "recipient", "reason", "created_at")
