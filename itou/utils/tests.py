@@ -672,6 +672,7 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(etablissement.city, "METZ")
         self.assertEqual(etablissement.department, "57")
         self.assertFalse(etablissement.is_closed)
+        self.assertTrue(etablissement.is_head_office)
 
 
 class PoleEmploiTest(SimpleTestCase):

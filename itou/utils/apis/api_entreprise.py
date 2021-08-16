@@ -19,6 +19,7 @@ class Etablissement:
     post_code: str
     city: str
     department: str
+    is_head_office: bool
     is_closed: bool
 
 
@@ -73,6 +74,7 @@ def etablissement_get_or_error(siret, reason="Inscription aux emplois de l'inclu
         city=address["localite"],
         department=department_from_postcode(address["code_postal"]),
         is_closed=data["etablissement"]["etat_administratif"]["value"] == "F",
+        is_head_office=data["etablissement"].get("siege_social", False),
     )
 
     return etablissement, None
