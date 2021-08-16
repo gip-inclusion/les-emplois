@@ -157,6 +157,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "kind",
         "is_brsa",
         "department",
+        "is_head_office",
     )
     raw_id_fields = ("created_by",)
     readonly_fields = (
