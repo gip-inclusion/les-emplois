@@ -133,6 +133,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     # prior to the mandatory siret).
     # See https://docs.djangoproject.com/en/3.1/ref/models/fields/#null
     siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], null=True, blank=True)
+    is_head_office = models.BooleanField(verbose_name="Siège de l'entreprise", default=False)
     kind = models.CharField(verbose_name="Type", max_length=20, choices=Kind.choices, default=Kind.OTHER)
     is_brsa = models.BooleanField(
         verbose_name="Conventionné pour le suivi des BRSA",
