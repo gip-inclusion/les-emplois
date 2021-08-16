@@ -150,6 +150,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     list_display_links = ("pk", "name")
     list_filter = (
         AuthorizationValidationRequired,
+        "is_head_office",
         TmpMissingSiretFilter,
         TmpCanBeDeletedFilter,
         HasMembersFilter,
@@ -157,7 +158,6 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "kind",
         "is_brsa",
         "department",
-        "is_head_office",
     )
     raw_id_fields = ("created_by",)
     readonly_fields = (
