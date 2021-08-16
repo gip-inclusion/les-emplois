@@ -66,6 +66,9 @@ urlpatterns = [
     path("signup/", include("itou.www.signup.urls")),
     path("stats/", include("itou.www.stats.urls")),
     path("versions/", include("itou.www.releases.urls")),
+    # Enable Anymail’s status tracking
+    # https://anymail.readthedocs.io/en/stable/esps/mailjet/#status-tracking-webhooks
+    re_path(r'^webhooks/anymail/', include('anymail.urls')),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
     # Static pages.
     path("accessibility/", TemplateView.as_view(template_name="static/accessibility.html"), name="accessibility"),

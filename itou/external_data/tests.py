@@ -7,7 +7,8 @@ import itou.external_data.apis.pe_connect as pec
 from itou.users.factories import JobSeekerFactory
 
 from .apis.pe_connect import import_user_pe_data
-from .models import ExternalDataImport
+from .models import ExternalDataImport, RejectedEmailEventData
+from .signals import store_rejected_email_event
 
 
 # Test data import status (All ok, failed, partial)
@@ -222,3 +223,28 @@ class JobSeekerExternalDataTest(TestCase):
 
         self.assertTrue(user1.has_external_data)
         self.assertFalse(user2.has_external_data)
+
+
+class MockEmailWebhookEvent:
+    def __init__(self, event_type, recipient, reason):
+        self.event_type = event_type
+        self.recipient = recipient
+        self.reject_reason = reason
+
+
+class AnymailHookTests(TestCase):
+    def test_rejected_event(self):
+        """
+        we store information about rejected events in order to be able to do some analytics about errors
+        """
+        recipient = "idont@exi.st"
+        initial_count = RejectedEmailEventData.objects.count()
+        store_rejected_email_event(MockEmailWebhookEvent("rejected", recipient, "invalid"))
+        self.assertEqual(RejectedEmailEventData.objects.count(), initial_count + 1)
+
+    def test_accepted_event(self):
+        """we do not store information about accepted emails"""
+        recipient = "ido@exi.st"
+        initial_count = RejectedEmailEventData.objects.count()
+        store_rejected_email_event(MockEmailWebhookEvent("accepted", recipient, ""))
+        self.assertEqual(RejectedEmailEventData.objects.count(), initial_count)
