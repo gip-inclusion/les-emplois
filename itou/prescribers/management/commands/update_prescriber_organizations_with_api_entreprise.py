@@ -60,8 +60,7 @@ class Command(BaseCommand):
 
         prescriber_orgs = PrescriberOrganization.objects.filter(
             Q(updated_at__lte=timezone.now() - datetime.timedelta(days=days)) | Q(updated_at__isnull=True),
-            siret__isnull=False,
-        )[:n_organizations]
+        ).exclude(siret__isnull=True)[:n_organizations]
         for prescriber_org in prescriber_orgs:
             self.logger.info("ID %s - SIRET %s - %s", prescriber_org.pk, prescriber_org.siret, prescriber_org.name)
             etablissement, error = etablissement_get_or_error(
