@@ -106,6 +106,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                 "fields": (
                     "pk",
                     "siret",
+                    "is_head_office",
                     "kind",
                     "is_brsa",
                     "name",
