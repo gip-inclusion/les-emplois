@@ -1099,17 +1099,15 @@ class ApprovalsWrapper:
         """
         Returns a list of merged unique `Approval` and `PoleEmploiApproval` objects.
         """
-        approvals = Approval.objects.filter(user=self.user)
+        approvals = Approval.objects.filter(user=self.user).order_by("-start_at")
 
         # If an ongoing PASS IAE exists, consider it's the latest valid approval
         # even if a PoleEmploiApproval is more recent.
         if approvals.valid().exists():
-            return approvals.order_by("-start_at")
+            return approvals
 
         today = datetime.date.today()
-        approvals_numbers = []
-        if approvals:
-            approvals_numbers = approvals.values_list("number", flat=True)
+        approvals_numbers = [approval.number for approval in approvals] if approvals else []
 
         pe_approvals = (
             PoleEmploiApproval.objects.find_for(self.user)
@@ -1126,12 +1124,12 @@ class ApprovalsWrapper:
         """
         # Truncate the number to remove any 'S01' or 'P01' suffix because the
         # number is limited to 12 digits in Approval table.
-        approvals = Approval.objects.filter(number=self.number[:12])
+        approvals = Approval.objects.filter(number=self.number[:12]).order_by("-start_at")
 
         # If a PASS IAE exists, consider it's the latest approval
         # even if a PoleEmploiApproval is more recent.
         if approvals.exists():
-            return approvals.order_by("-start_at")
+            return approvals
 
         today = datetime.date.today()
         pe_approvals = PoleEmploiApproval.objects.filter(number__startswith=self.number, start_at__lte=today)
