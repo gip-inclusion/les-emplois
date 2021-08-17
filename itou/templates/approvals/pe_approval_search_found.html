@@ -12,7 +12,7 @@
             sein de votre structure « {{ siae.name }} » en cliquant sur le bouton.
         </p>
         <p>
-            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.id %}?job_seeker_pk={{ approval.user.pk }}">
+            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_seeker_pk={{ approval.user.pk }}">
                 Utiliser le PASS IAE
             </a>
         </p>
@@ -28,7 +28,7 @@
             </div>
 
             <p>
-                <a class="btn btn-outline-primary" href="{% url 'approvals:pe_approval_search_user' approval.id %}">
+                <a class="btn btn-outline-primary" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">
                     Oui. Je souhaite prolonger ou suspendre l'agrément de {{ approval.first_name }} {{ approval.last_name }}
                 </a>
             </p>

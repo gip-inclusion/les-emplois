@@ -1163,13 +1163,13 @@ class ApprovalsWrapper:
         )
 
     @staticmethod
-    def sort_approvals(approvals):
+    def sort_approvals(common_approvals):
         """
         Returns a list of sorted approvals. The first one is the longest and the most recent.
         ---
-        approvals: Queryset or list of Approval objects.
+        common_approvals: Queryset or list of Approval or PoleEmploiApproval objects.
         """
-        approvals = list(approvals)
+        approvals = list(common_approvals)
         # Sort by the most distant `end_at`, then by the earliest `start_at`.
         # This allows to always choose the longest and most recent approval.
         # Dates are converted to timestamp so that the subtraction operator
