@@ -274,6 +274,14 @@ class Command(BaseCommand):
         for batch in chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
+    def prune(self, sftp, dry_run):
+        """
+        Prune old employee record data:
+        record is not deleted but `archived_json` field is erased if employee record has been
+        in `PROCESSED` status for more than EMPLOYEE_RECORD_PRUNING_DELAY_IN_MONTHS
+        """
+        # TBD
+
     def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, **options):
         """
         Employee Record Management Command
