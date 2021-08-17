@@ -1,8 +1,7 @@
 from django.urls import include, path
-from django.views.generic import TemplateView
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView
 from rest_framework import routers
 from rest_framework.authtoken import views as auth_views
-from rest_framework.schemas import get_schema_view
 
 from .employee_record_api.viewsets import DummyEmployeeRecordViewSet, EmployeeRecordViewSet
 
@@ -16,6 +15,7 @@ router = routers.DefaultRouter()
 router.register(r"employee-records", EmployeeRecordViewSet, basename="employee-records")
 router.register(r"dummy-employee-records", DummyEmployeeRecordViewSet, basename="dummy-employee-records")
 
+
 urlpatterns = [
     # TokenAuthentication endpoint to get token from login/password.
     path("token-auth/", auth_views.obtain_auth_token, name="token-auth"),
@@ -26,16 +26,12 @@ urlpatterns = [
     # OAS 3 YAML schema (downloadable)
     path(
         "oas3/",
-        get_schema_view(
-            title="API - Les emplois de l'inclusion",
-            version="v1",
-            description="Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
-        ),
+        SpectacularAPIView.as_view(),
         name="openapi_schema",
     ),
     path(
         "redoc/",
-        TemplateView.as_view(template_name="api/openapi.html", extra_context={"schema_url": "v1:openapi_schema"}),
+        SpectacularRedocView.as_view(url_name="v1:openapi_schema"),
         name="redoc",
     ),
 ]
