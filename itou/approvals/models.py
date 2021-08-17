@@ -1128,6 +1128,7 @@ class ApprovalsWrapper:
 
         # If a PASS IAE exists, consider it's the latest approval
         # even if a PoleEmploiApproval is more recent.
+        # Return valid and expired approvals.
         if approvals.exists():
             return approvals
 
