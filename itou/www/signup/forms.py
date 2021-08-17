@@ -340,6 +340,7 @@ class PrescriberSiretForm(forms.Form):
 
         self.org_data = {
             "siret": siret,
+            "is_head_office": etablissement.is_head_office,
             "name": etablissement.name,
             "address_line_1": etablissement.address_line_1,
             "address_line_2": etablissement.address_line_2,
