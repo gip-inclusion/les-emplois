@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from django.utils import timezone
 
 from itou.prescribers.models import PrescriberOrganization
@@ -58,7 +59,8 @@ class Command(BaseCommand):
         self.set_logger(verbosity)
 
         prescriber_orgs = PrescriberOrganization.objects.filter(
-            updated_at__lte=timezone.now() - datetime.timedelta(days=days), siret__isnull=False
+            Q(updated_at__lte=timezone.now() - datetime.timedelta(days=days)) | Q(updated_at__isnull=True),
+            siret__isnull=False,
         )[:n_organizations]
         for prescriber_org in prescriber_orgs:
             self.logger.info("ID %s - SIRET %s - %s", prescriber_org.pk, prescriber_org.siret, prescriber_org.name)
