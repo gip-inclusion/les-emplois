@@ -1,47 +1,56 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 
-{% block title %}Rechercher un agrément Pôle emploi{{ block.super }}{% endblock %}
+{% block title %}Prolonger ou suspendre un agrément émis par Pôle emploi{{ block.super }}{% endblock %}
 
 {% block content %}
-    {% if approval.is_pass_iae %}
-        <h2>PASS IAE trouvé !</h2>
+    <h2>Prolonger ou suspendre un agrément émis par Pôle emploi</h2>
 
-        <p>
-            Vous pouvez utiliser le PASS IAE <strong>{{ number }}</strong> de {{ approval.user.get_full_name|title }} au
-            sein de votre structure « {{ siae.name }} » en cliquant sur le bouton.
-        </p>
-        <p>
-            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_seeker_pk={{ approval.user.pk }}">
-                Utiliser le PASS IAE
-            </a>
-        </p>
-    {% else %}
-        <h2>Prolonger ou suspendre un agrément</h2>
-
-        {% if approval.is_valid %}
-
-            <div class="alert alert-success pb-0" role="alert">
-                <p>Agrément trouvé !</p>
-                <p>L'agrément <strong>{{ approval.number }}</strong> est associé à <strong>{{ approval.first_name|title }} {{ approval.last_name|title }}</strong>.</p>
-                <p>Est-ce bien l'agrément que vous souhaitez prolonger ou suspendre ?</p>
-            </div>
-
+    {% if approval.is_valid %}
+        {% if approval.originates_from_itou %}
             <p>
-                <a class="btn btn-outline-primary" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">
-                    Oui. Je souhaite prolonger ou suspendre l'agrément de {{ approval.first_name }} {{ approval.last_name }}
-                </a>
+                Le PASS IAE <strong>{{ number }}</strong> a été délivré par la plateforme.
             </p>
+            <p>
+                Afin de le prolonger ou de le suspendre, rendez-vous sur la page de candidature.
+            </p>
+            <p>
+                Vous souhaitez l'utiliser ? <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">Réalisez une auto-prescription</a>, il sera automatiquement importé dans votre compte.
+            </p>
+            <a class="btn btn-secondary" href="{{ back_url }}">Retour</a>
 
         {% else %}
-
-            <div class="alert alert-danger pb-0" role="alert">
-                <p>L'agrément <strong>{{ approval.number }}</strong> est expiré depuis le {{ approval.end_at|date:"d/m/Y" }}.</p>
-                <p>Vous ne pouvez pas le prolonger ou le suspendre.</p>
-            </div>
-
+            {% if approval.is_pass_iae %}
+                {% comment %}
+                    The approval has been issued by Pôle emploi and transformed into an Approval.
+                    A redirection is made upstream if the current SIAE can prolong or suspend it.
+                    It means another SIAE is using it right now.
+                {% endcomment %}
+                <p>
+                    Ce numéro d'agrément a déjà été utilisé dans la plateforme. Afin de le prolonger ou de le suspendre, vous pouvez <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>.
+                </p>
+            {% else %}
+                <p>
+                    L'agrément <strong>{{ approval.number }}</strong> a été délivré pour <strong>{{ approval.first_name|title }} {{ approval.last_name|title }}</strong>.
+                </p>
+                <p>
+                    Nous allons l'importer dans votre compte pour vous permettre de le suspendre ou de le prolonger.
+                </p>
+                <p>
+                    Mais avant, nous avons besoin de connaître l'adresse e-mail de votre salarié.
+                </p>
+                    <a class="btn btn-secondary" href="{{ back_url }}">Annuler</a>
+                    <a class="btn btn-primary" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">
+                        Continuer
+                    </a>
+            {% endif %}
         {% endif %}
 
-        <hr>
+    {% else %}
+        <p>L'agrément <strong>{{ approval.number }}</strong> est expiré depuis le {{ approval.end_at|date:"d/m/Y" }}.<br>
+        Vous ne pouvez pas le prolonger ou le suspendre.</p>
+        <p>Afin d'obtenir un PASS IAE, nous vous invitons à <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>.</p>
+        <a class="btn btn-primary" href="{{ back_url }}">Nouvelle recherche</a>
     {% endif %}
+
 {% endblock %}

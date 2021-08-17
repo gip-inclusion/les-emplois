@@ -235,6 +235,7 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
     form = PoleEmploiApprovalSearchForm(request.GET or None)
     number = None
     siae = get_current_siae_or_404(request)
+    back_url = reverse("approvals:pe_approval_search")
 
     if form.is_valid():
         number = form.cleaned_data["number"]
@@ -245,17 +246,18 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
             if approval.is_pass_iae:
                 job_application = approval.user.last_accepted_job_application
                 if job_application.to_siae == siae:
-                    # Suspensions and prolongations are available in the job application details page.
+                    # Suspensions and prolongations links are available in the job application details page.
                     application_details_url = reverse(
                         "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
                     )
                     return HttpResponseRedirect(application_details_url)
-                # To use this approval, a job application is needed.
-                # Start the job application process at the "eligibility" step.
+                # The employer cannot handle the PASS as it's already used by another one.
+                # Suggest him to make an auto-prescription.
                 # A link is offered in the template.
 
             context = {
                 "approval": approval,
+                "back_url": back_url,
                 "form": form,
                 "number": number,
                 "siae": siae,
@@ -308,17 +310,17 @@ def pe_approval_create(request, pe_approval_id):
     if not job_seeker:
         job_seeker = User.create_job_seeker_from_pole_emploi_approval(request.user, email, pe_approval)
 
-    # If the PoleEmploiApproval has already been imported, it is not possible to import it again
+    # If the PoleEmploiApproval has already been imported, it is not possible to import it again.
     possible_matching_approval = Approval.objects.filter(number=pe_approval.number[:12]).order_by("-start_at").first()
     if possible_matching_approval:
-        messages.info(request, "Cet agrément Pôle emploi a déja été importé.")
+        messages.info(request, "Cet agrément a déja été importé.")
         job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
 
-    # It is not possible to attach an approval to a job seeker that already has a valid approval
+    # It is not possible to attach an approval to a job seeker that already has a valid approval.
     if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
-        messages.error(request, "Le candidat associé à cette adresse email a déja un PASS IAE valide.")
+        messages.error(request, "Le candidat associé à cette adresse e-mail a déja un PASS IAE valide.")
         next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
@@ -341,11 +343,12 @@ def pe_approval_create(request, pe_approval_id):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval=approval_from_pe,
             created_from_pe_approval=True,  # This flag is specific to this process.
+            sender=request.user,
+            sender_kind=JobApplication.SENDER_KIND_SIAE_STAFF,
+            sender_siae=siae,
         )
         job_application.save()
 
-    messages.success(
-        request, "L'agrément Pôle emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre."
-    )
+    messages.success(request, "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.")
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)
