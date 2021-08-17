@@ -152,15 +152,14 @@ class PoleEmploiApprovalSearchForm(forms.Form):
         min_length=12,
         max_length=15,
         strip=True,
-        help_text=(
-            "Le numéro d'agrément est composé de 12 chiffres (ex. 123456789012) "
-            "ou 15 caractères (ex. 123456789012S01)."
-        ),
+        help_text=("Le numéro d'agrément est composé de 12 chiffres (ex. 123456789012)."),
     )
 
     def clean_number(self):
         number = self.cleaned_data.get("number", "").replace(" ", "")
-        if len(number) not in (12, 15):
-            raise ValidationError("Seuls les numéros d'agrément de 12 ou 15 chiffres sont valides.")
+        if len(number) != 12:
+            raise ValidationError(
+                "Merci d'indiquer les 12 premiers caractères du numéro d'agrément. Exemple : 123456789012 si le numéro d'origine est 123456789012P01."
+            )
 
         return number
