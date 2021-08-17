@@ -269,14 +269,14 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                         "https://www.pole-emploi.fr/employeur/aides-aux-recrutements/"
                         "les-aides-a-lembauche/insertion-par-lactivite-economiq.html"
                     ),
-                    text="demander l’aide spécifique de Pôle emploi ici",
+                    text="l’aide spécifique de Pôle emploi",
                 )
                 messages.success(
                     request,
                     mark_safe(
                         (
-                            "Embauche acceptée ! (Pour un contrat de professionnalisation vous pouvez "
-                            f"soit introduire une demande d’aide au poste ou {external_link}."
+                            "Embauche acceptée ! Pour un contrat de professionnalisation, vous pouvez "
+                            f"demander l'aide au poste ou {external_link}."
                         )
                     ),
                 )
