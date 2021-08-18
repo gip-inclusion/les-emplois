@@ -6,18 +6,30 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('employee_record', '0008_update_status'),
+        ("employee_record", "0008_update_status"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='employeerecord',
-            name='processed_at',
+            model_name="employeerecord",
+            name="processed_at",
             field=models.DateTimeField(null=True, verbose_name="Date d'intégration"),
         ),
         migrations.AlterField(
-            model_name='employeerecord',
-            name='status',
-            field=models.CharField(choices=[('NEW', 'Nouvelle'), ('READY', 'Complétée'), ('SENT', 'Envoyée'), ('REJECTED', 'En erreur'), ('PROCESSED', 'Intégrée'), ('ARCHIVED', 'Archivée')], default='NEW', max_length=10, verbose_name='Statut'),
+            model_name="employeerecord",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("NEW", "Nouvelle"),
+                    ("READY", "Complétée"),
+                    ("SENT", "Envoyée"),
+                    ("REJECTED", "En erreur"),
+                    ("PROCESSED", "Intégrée"),
+                    ("ARCHIVED", "Archivée"),
+                ],
+                default="NEW",
+                max_length=10,
+                verbose_name="Statut",
+            ),
         ),
     ]
