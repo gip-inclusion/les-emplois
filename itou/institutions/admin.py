@@ -1,21 +1,18 @@
 from django.contrib import admin
 from django.contrib.gis import forms as gis_forms
 from django.contrib.gis.db import models as gis_models
-from django.db.models import Count
 
 from itou.institutions import models
 from itou.institutions.admin_forms import InstitutionAdminForm
+from itou.utils.organizations.admin import MembersInline, OrganizationAdmin
 
 
-class MembersInline(admin.TabularInline):
+class InstitutionMembersInline(MembersInline):
     model = models.InstitutionMembership
-    extra = 1
-    raw_id_fields = ("user",)
-    readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at")
 
 
 @admin.register(models.Institution)
-class InstitutionAdmin(admin.ModelAdmin):
+class InstitutionAdmin(OrganizationAdmin):
 
     form = InstitutionAdminForm
     fieldsets = (
@@ -54,7 +51,7 @@ class InstitutionAdmin(admin.ModelAdmin):
             },
         ),
     )
-    inlines = (MembersInline,)
+    inlines = (InstitutionMembersInline,)
     list_display = ("pk", "name", "kind", "post_code", "city", "department", "member_count")
     list_display_links = ("pk", "name")
     list_filter = (
@@ -79,15 +76,9 @@ class InstitutionAdmin(admin.ModelAdmin):
         gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
     }
 
-    def member_count(self, obj):
-        return obj._member_count
-
-    member_count.admin_order_field = "_member_count"
-
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.annotate(_member_count=Count("members", distinct=True))
-        return queryset
+        # OrganizationAdmin adds some useful annotations.
+        return super().get_queryset(request)
 
     def save_model(self, request, obj, form, change):
         if not change:

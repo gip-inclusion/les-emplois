@@ -3,19 +3,16 @@ import datetime
 from django.contrib import admin, messages
 from django.contrib.gis import forms as gis_forms
 from django.contrib.gis.db import models as gis_models
-from django.db.models import Count
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from itou.siaes import models
 from itou.siaes.admin_forms import SiaeAdminForm
+from itou.utils.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 
 
-class MembersInline(admin.TabularInline):
+class SiaeMembersInline(MembersInline):
     model = models.Siae.members.through
-    extra = 1
-    raw_id_fields = ("user",)
-    readonly_fields = ("is_active", "created_at", "updated_at", "updated_by")
 
 
 class JobsInline(admin.TabularInline):
@@ -64,27 +61,11 @@ class SiaesInline(admin.TabularInline):
         return mark_safe(f'<a href="{url}">{obj.id}</a>')
 
 
-class SiaeHasMembersFilter(admin.SimpleListFilter):
-    title = "A des membres"
-    parameter_name = "has_members"
-
-    def lookups(self, request, model_admin):
-        return (("yes", "Oui"), ("no", "Non"))
-
-    def queryset(self, request, queryset):
-        value = self.value()
-        if value == "yes":
-            return queryset.filter(_member_count__gt=0)
-        if value == "no":
-            return queryset.exclude(_member_count__gt=0)
-        return queryset
-
-
 @admin.register(models.Siae)
-class SiaeAdmin(admin.ModelAdmin):
+class SiaeAdmin(OrganizationAdmin):
     form = SiaeAdminForm
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
-    list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
+    list_filter = (HasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by", "convention")
     readonly_fields = (
         "pk",
@@ -138,21 +119,15 @@ class SiaeAdmin(admin.ModelAdmin):
         ),
     )
     search_fields = ("pk", "siret", "name", "city", "department", "post_code", "address_line_1")
-    inlines = (MembersInline, JobsInline)
+    inlines = (SiaeMembersInline, JobsInline)
     formfield_overrides = {
         # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/forms-api/#widget-classes
         gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
     }
 
-    def member_count(self, obj):
-        return obj._member_count
-
-    member_count.admin_order_field = "_member_count"
-
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.annotate(_member_count=Count("members", distinct=True))
-        return queryset
+        # OrganizationAdmin adds some useful annotations.
+        return super().get_queryset(request)
 
     def save_model(self, request, obj, form, change):
         if not change:
