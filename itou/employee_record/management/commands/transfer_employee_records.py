@@ -274,15 +274,32 @@ class Command(BaseCommand):
         for batch in chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def prune(self, sftp, dry_run):
+    def archive(self, dry_run):
         """
-        Prune old employee record data:
-        record is not deleted but `archived_json` field is erased if employee record has been
-        in `PROCESSED` status for more than EMPLOYEE_RECORD_PRUNING_DELAY_IN_MONTHS
+        Archive old employee record data:
+        records are not deleted but their `archived_json` field is erased if employee record has been
+        in `PROCESSED` status for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
         """
-        # TBD
+        self.logger.info(
+            f"Archiving old employee records (more than {settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS} months old)"
+        )
+        archivable = EmployeeRecord.objects.archivable()
 
-    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, **options):
+        if cnt := archivable.count() > 0:
+            self.logger.info(f"Found {cnt} archivable employee records")
+            if dry_run:
+                return
+            archived_cnt = 0
+            for er in archivable:
+                try:
+                    er.update_as_archived()
+                    archived_cnt += 1
+                except Exception as ex:
+                    self.logger.error(ex)
+
+            self.logger.info(f"Archived {archived_cnt} employee record(s) (on {cnt})")
+
+    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, archive=False, **options):
         """
         Employee Record Management Command
         """
@@ -305,5 +322,8 @@ class Command(BaseCommand):
             # Fetch results from ASP
             if download:
                 self.download(sftp, dry_run)
+
+        if self.archive:
+            self.archive(dry_run)
 
         self.logger.info("Employee records processing done!")
