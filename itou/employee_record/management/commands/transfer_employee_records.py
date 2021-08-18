@@ -281,7 +281,7 @@ class Command(BaseCommand):
         in `PROCESSED` status for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
         """
         self.logger.info(
-            f"Archiving old employee records (more than {settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS} months old)"
+            f"Archiving employee records (more than {settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS} months old)"
         )
         archivable = EmployeeRecord.objects.archivable()
 
