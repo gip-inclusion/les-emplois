@@ -612,9 +612,9 @@ STORAGE_UPLOAD_KINDS = {
     },
 }
 
-# Employee record data pruning:
+# Employee record data archiving / pruning:
 # "Proof of record" model field is erased after this delay (in months)
-EMPLOYEE_RECORD_PRUNING_DELAY_IN_MONTHS = int(os.environ.get("EMPLOYEE_RECORD_PRUNING_DELAY_IN_MONTHS", 13))
+EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS = int(os.environ.get("EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS", 13))
 
 # Employee records progressive opening settings
 # (to be removed after complete production)
