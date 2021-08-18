@@ -8,6 +8,25 @@ from django import forms
 from itou.utils.validators import get_max_birthdate, get_min_birthdate
 
 
+class DuetDatePickerWidget(forms.DateInput):
+    """
+    Custom form widget for Duet Date Picker.
+    https://duetds.github.io/date-picker/
+    https://github.com/duetds/date-picker#installation
+    """
+
+    template_name = "utils/widgets/duet_date_picker.html"
+
+    class Media:
+        css = {
+            "all": ("https://cdn.jsdelivr.net/npm/@duetds/date-picker@1.4.0/dist/duet/themes/default.css",),
+        }
+        js = (
+            "https://cdn.jsdelivr.net/npm/@duetds/date-picker@1.4.0/dist/duet/duet.js",
+            "js/duet_date_picker_config.js",
+        )
+
+
 class DatePickerField(DatePickerInput):
     """
     Initializes a JS datepicker in a date field.
