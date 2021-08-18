@@ -13,7 +13,7 @@
     </h1>
 
     <div class="alert alert-info" role="alert">
-        Renseignez vos coordonnées afin d'être invité par {{ prescriber.first_name|title }} {{ prescriber.last_name|slice:1 }}. de l'organisation « {{ organization.display_name }} ».
+        Renseignez vos coordonnées afin d'être invité par {{ prescriber.first_name|title }} {{ prescriber.last_name|slice:1 }} de l'organisation « {{ organization.display_name }} ».
     </div>
 
     <form method="post" class="js-prevent-multiple-submit">{% csrf_token %}
