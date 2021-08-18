@@ -161,15 +161,15 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
             count = len(formset.forms)
             if count == 1:
                 message = (
-                    "Votre invitation a été envoyée par e-mail.<br>"
+                    "Votre invitation a été envoyée par courriel.<br>"
                     "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
                     "sur le lien de validation reçu dans le courriel.<br>"
                 )
             else:
                 message = (
-                    "Vos invitations ont été envoyées par e-mail.<br>"
+                    "Vos invitations ont été envoyées par courriel.<br>"
                     "Pour rejoindre votre organisation, vos invités peuvent désormais "
-                    "cliquer sur le lien de validation reçu dans l'e-mail.<br>"
+                    "cliquer sur le lien de validation reçu dans le courriel.<br>"
                 )
 
             expiration_date = formats.date_format(invitations[0].expiration_date)
@@ -222,15 +222,15 @@ def invite_labor_inspector(request, template_name="invitations_views/create.html
             count = len(formset.forms)
             if count == 1:
                 message = (
-                    "Votre invitation a été envoyée par e-mail.<br>"
+                    "Votre invitation a été envoyée par courriel.<br>"
                     "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
                     "sur le lien de validation reçu dans le courriel.<br>"
                 )
             else:
                 message = (
-                    "Vos invitations ont été envoyées par e-mail.<br>"
+                    "Vos invitations ont été envoyées par courriel.<br>"
                     "Pour rejoindre votre organisation, vos invités peuvent désormais "
-                    "cliquer sur le lien de validation reçu dans l'e-mail.<br>"
+                    "cliquer sur le lien de validation reçu dans le courriel.<br>"
                 )
 
             expiration_date = formats.date_format(invitations[0].expiration_date)
