@@ -708,7 +708,7 @@ class PrescriberSignupTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 1)
         mail_body = mail.outbox[0].body
-        self.assertIn(prescriber_membership.user.first_name.capitalize(), mail_body)
+        self.assertIn(prescriber_membership.user.get_full_name().title(), mail_body)
         self.assertIn(prescriber_membership.organization.display_name, mail_body)
         invitation_url = "%s?%s" % (reverse("invitations_views:invite_prescriber_with_org"), urlencode(requestor))
         self.assertIn(invitation_url, mail_body)
