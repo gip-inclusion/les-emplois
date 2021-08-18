@@ -159,7 +159,8 @@ class PoleEmploiApprovalSearchForm(forms.Form):
         number = self.cleaned_data.get("number", "").replace(" ", "")
         if len(number) != 12:
             raise ValidationError(
-                "Merci d'indiquer les 12 premiers caractères du numéro d'agrément. Exemple : 123456789012 si le numéro d'origine est 123456789012P01."
+                "Merci d'indiquer les 12 premiers caractères du numéro d'agrément. "
+                "Exemple : 123456789012 si le numéro d'origine est 123456789012P01."
             )
 
         return number

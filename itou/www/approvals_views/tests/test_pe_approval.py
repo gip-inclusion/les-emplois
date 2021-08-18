@@ -43,11 +43,11 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.login(username=siae.user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url)
-        self.assertContains(response, "Rechercher un agrément Pôle emploi")
+        self.assertContains(response, "Rechercher")
 
     def test_nominal(self):
         """
-        The search for PE approval screen should display the job seeker's name
+        The search for PE approval screen should be successful
         if the PE approval number that was searched for has a matching PE approval
         but not PASS IAE.
         """
@@ -55,20 +55,17 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url, {"number": self.pe_approval.number})
-        self.assertContains(response, "Agrément trouvé")
+        self.assertContains(response, "Continuer")
 
     def test_number_length(self):
         """
-        Only two forms of approval numbers are accepted
+        Don't accept approval suffixes (example: 1234567890123P01).
         """
         siae = SiaeMembershipFactory()
         self.client.login(username=siae.user.email, password=DEFAULT_PASSWORD)
 
-        invalid_number = "1234567890123"
-        assert len(invalid_number) == 13
-
-        response = self.client.get(self.url, {"number": invalid_number})
-        self.assertContains(response, "Seuls les numéros d'agrément de 12 ou 15 chiffres sont valides.", html=True)
+        response = self.client.get(self.url, {"number": "1234567890123P01"})
+        self.assertFalse(response.context["form"].is_valid())
 
     def test_no_results(self):
         """
@@ -79,7 +76,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.login(username=siae.user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url, {"number": 123123123123})
-        self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
+        self.assertNotContains(response, "Continuer")
 
     def test_approval_in_the_future(self):
         """
@@ -95,7 +92,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url, {"number": pe_approval.number})
-        self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
+        self.assertNotContains(response, "Continuer")
 
     def test_has_matching_pass_iae(self):
         """
@@ -138,18 +135,9 @@ class PoleEmploiApprovalSearchTest(TestCase):
         # This is the current user (NOT a member of `another_siae`).
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
 
-        # The current user should be able to use the PASS IAE used by another SIAE
+        # The current user should not be able to use the PASS IAE used by another SIAE.
         response = self.client.get(self.url, {"number": job_application.approval.number})
-        self.assertContains(response, "Utiliser le PASS IAE")
-
-        next_url = reverse("apply:start", kwargs={"siae_pk": self.siae.pk})
-        next_url = f"{next_url}?job_seeker_pk={job_seeker.pk}"
-        self.assertContains(response, next_url)
-
-        # Every step should be successful until asking for the job application details.
-        response = self.client.get(next_url, follow=True)
-        application_url = reverse("apply:step_application", kwargs={"siae_pk": self.siae.pk})
-        self.assertEqual(response.wsgi_request.path, application_url)
+        self.assertNotContains(response, "Continuer")
 
     def test_unlogged_is_not_authorized(self):
         """
@@ -242,7 +230,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
 
     def test_from_existing_user_without_approval(self):
         """
-        When an existing user has no valid approval, it is possible to import a Pole Emploi Approval
+        When an existing user has no valid approval, it is possible to import a Pôle emploi Approval
         """
         initial_approval_count = Approval.objects.count()
         job_seeker = JobSeekerFactory()
@@ -258,7 +246,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             str(messages[0]),
-            "L'agrément Pôle emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
+            "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
         )
 
     def test_when_pole_emploi_approval_has_already_been_imported(self):
@@ -281,7 +269,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         self.assertEqual(Approval.objects.count(), initial_approval_count)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Cet agrément Pôle emploi a déja été importé.")
+        self.assertEqual(str(messages[0]), "Cet agrément a déjà été importé.")
 
     def test_from_existing_user_with_approval(self):
         """
@@ -303,4 +291,4 @@ class PoleEmploiApprovalCreateTest(TestCase):
         self.assertEqual(response.url, next_url)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Le candidat associé à cette adresse email a déja un PASS IAE valide.")
+        self.assertEqual(str(messages[0]), "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide.")
