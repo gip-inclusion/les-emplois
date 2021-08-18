@@ -1,8 +1,10 @@
 import json
 from unittest import mock
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils import timezone
 
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.management.commands.transfer_employee_records import Command
@@ -151,6 +153,30 @@ class EmployeeRecordModelTest(TestCase):
 
         self.assertEqual(result.id, employee_record.id)
 
+    def test_archivable(self):
+        """
+        Check queryset lookup of archived employee records
+        """
+        filename = "RIAE_FS_20210817130000.json"
+        employee_record = EmployeeRecordFactory(
+            asp_batch_file=filename,
+            asp_batch_line_number=2,
+            status=EmployeeRecord.Status.PROCESSED,
+            processed_at=timezone.now(),
+        )
+
+        # Processed to recently, should not be found
+        self.assertEqual(EmployeeRecord.objects.archivable().count(), 0)
+
+        # Fake older date
+        employee_record.processed_at = timezone.now() - timezone.timedelta(
+            days=30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
+        )
+
+        employee_record.save()
+
+        self.assertEqual(EmployeeRecord.objects.archivable().count(), 1)
+
 
 class EmployeeRecordBatchTest(TestCase):
     """
@@ -230,7 +256,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
-    def test_state_accepted(self, _mock):
+    def test_state_processed(self, _mock):
         filename = "RIAE_FS_20210410130001.json"
         self.employee_record.update_as_sent(filename, 1)
 
@@ -240,6 +266,43 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.PROCESSED)
         self.assertEqual(self.employee_record.asp_processing_code, process_code)
         self.assertEqual(self.employee_record.asp_processing_label, process_message)
+
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_state_archived(self, _mock):
+        filename = "RIAE_FS_20210816130001.json"
+        self.employee_record.update_as_sent(filename, 1)
+
+        # No processing date at the moment
+        self.assertIsNone(self.employee_record.processed_at)
+
+        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+
+        # Can't archive, too recent
+        with self.assertRaises(ValidationError):
+            self.employee_record.update_as_archived()
+
+        # Fake old date, but not to old
+        self.employee_record.processed_at = timezone.now() - timezone.timedelta(
+            days=(30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS) - 1
+        )
+
+        with self.assertRaises(ValidationError):
+            self.employee_record.update_as_archived()
+
+        # Fake a date older than archiving delay
+        self.employee_record.processed_at = timezone.now() - timezone.timedelta(
+            days=30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
+        )
+
+        self.employee_record.update_as_archived()
+
+        # Check correct status and empty archived JSON
+        self.assertEqual(self.employee_record.status, EmployeeRecord.Status.ARCHIVED)
+        self.assertIsNone(self.employee_record.archived_json)
 
 
 class EmployeeRecordManagementCommandTest(TestCase):
