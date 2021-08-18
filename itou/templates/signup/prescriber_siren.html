@@ -61,7 +61,7 @@
                             {{ prescriber_org.post_code }} {{ prescriber_org.city }}
                             <br>
                             {% with prescriber_org.prescribermembership_set.first as membership %}
-                                {# Ordered by -is_admin and date_joined. #}
+                                {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
                                 {# For security, display only the first char of the last name. #}
                                 <i>
                                     Demandez une invitation à
