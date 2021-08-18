@@ -1,5 +1,8 @@
+import httpx
+import respx
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 from django.test import TestCase
 
 from itou.job_applications import factories as job_applications_factories, models as job_applications_models
@@ -11,6 +14,7 @@ from itou.prescribers.factories import (
 )
 from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
+from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 
 
 class PrescriberOrganizationManagerTest(TestCase):
@@ -144,3 +148,33 @@ class PrescriberOrganizationModelTest(TestCase):
         organization_merge_into(organization_1.id, organization_2.id)
         self.assertEqual(count_job_applications, job_applications_models.JobApplication.objects.count())
         self.assertEqual(PrescriberOrganization.objects.count(), 1)
+
+    @respx.mock
+    def test_update_prescriber_with_api_entreprise(self):
+        siret = ETABLISSEMENT_API_RESULT_MOCK["etablissement"]["siret"]
+        organization = PrescriberOrganizationFactory(siret=siret, is_head_office=False)
+
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
+
+        # updated_at is empty, an update is required
+        self.assertIsNone(organization.updated_at)
+        call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=7)
+        organization.refresh_from_db()
+        self.assertIsNotNone(organization.updated_at)
+        self.assertTrue(organization.is_head_office)
+
+        old_updated_at = organization.updated_at
+
+        # No update required
+        call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=7)
+        organization.refresh_from_db()
+        self.assertEqual(old_updated_at, organization.updated_at)
+        self.assertTrue(organization.is_head_office)
+
+        # Force updated of latest records
+        call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=0)
+        organization.refresh_from_db()
+        self.assertNotEqual(old_updated_at, organization.updated_at)
+        self.assertTrue(organization.is_head_office)

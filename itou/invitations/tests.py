@@ -78,8 +78,7 @@ class InvitationEmailsTest(TestCase):
         email = invitation.email_invitation
 
         # Subject
-        self.assertIn(capfirst(invitation.sender.first_name), email.subject)
-        self.assertIn(capfirst(invitation.sender.last_name), email.subject)
+        self.assertIn(invitation.sender.get_full_name().title(), email.subject)
 
         # Body
         self.assertIn(capfirst(invitation.first_name), email.body)
