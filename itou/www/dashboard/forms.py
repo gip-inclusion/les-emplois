@@ -7,7 +7,7 @@ from itou.job_applications.notifications import (
 )
 from itou.users.models import User
 from itou.utils.address.forms import AddressFormMixin
-from itou.utils.widgets import DatePickerField, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
+from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
 class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
@@ -33,16 +33,12 @@ class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
         else:
             self.fields["phone"].required = True
             self.fields["birthdate"].required = True
-            self.fields["birthdate"].widget = DatePickerField(
-                {
-                    "viewMode": "years",
-                    "minDate": DatePickerField.min_birthdate().strftime("%Y/%m/%d"),
-                    "maxDate": DatePickerField.max_birthdate().strftime("%Y/%m/%d"),
-                    "useCurrent": False,
-                    "allowInputToggle": False,
+            self.fields["birthdate"].widget = DuetDatePickerWidget(
+                attrs={
+                    "min": DuetDatePickerWidget.min_birthdate().strftime("%Y-%m-%d"),
+                    "max": DuetDatePickerWidget.max_birthdate().strftime("%Y-%m-%d"),
                 }
             )
-            self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
         model = User
