@@ -429,7 +429,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
-    def test_employee_record_archive(self, _mock):
+    def test_employee_record_proof(self, _mock):
         """
         Check that "proof" of validated employee record is OK
         """
@@ -471,6 +471,37 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
         employee_record.refresh_from_db()
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
+
+    @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_archive(self, _mock):
+        """
+        Check archiving old processed employee records
+        """
+        # Create an old PROCESSED employee record
+        filename = "RIAE_FS_20210819100001.json"
+        self.employee_record.update_as_sent(filename, 1)
+        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+
+        # Fake a date older than archiving delay
+        self.employee_record.processed_at = timezone.now() - timezone.timedelta(
+            days=30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
+        )
+
+        self.employee_record.update_as_archived()
+
+        command = Command()
+        command.handle(archive=True)
+
+        self.employee_record.refresh_from_db()
+
+        # Check correct status and empty archived JSON
+        self.assertEqual(self.employee_record.status, EmployeeRecord.Status.ARCHIVED)
+        self.assertIsNone(self.employee_record.archived_json)
 
 
 # Temporary test: progressive opening
