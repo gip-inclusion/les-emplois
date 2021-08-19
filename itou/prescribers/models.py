@@ -7,8 +7,8 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 from itou.utils.emails import get_email_message
-from itou.utils.urls import get_absolute_url
 from itou.utils.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
+from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
