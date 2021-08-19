@@ -36,7 +36,7 @@ with missions as (
         *
     from "fluxIAE_Missions"
 )
- select
+select
     m.code_operation,
     TO_DATE(m.mission_date_creation, 'DD/MM/YYYY') as mission_date_creation,
     TO_DATE(m.mission_date_modification, 'DD/MM/YYYY') as mission_date_modification,
@@ -89,4 +89,4 @@ from
         on cm.contrat_id_structure = s.structure_id_siae
     left outer join "codes_rome" r
         on m.mission_code_rome = r.code_rome
-where m.code_operation in ('AIEHPAD', 'AIPH','AIRESTO','ETTIRESTO')          
+where m.code_operation in ('AIEHPAD', 'AIPH', 'AIRESTO', 'ETTIRESTO')          
