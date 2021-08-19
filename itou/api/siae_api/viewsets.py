@@ -36,6 +36,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = SiaePagination
     filter_backends = [OrderingFilter]
     ordering_fields = ["block_job_applications", "type", "city", "post_code", "department", "siret", "raison_sociale"]
+    ordering = ["-created_at", "-updated_at"]
 
     # Possible authentication frameworks:
     # - token auth: for external access / real world use case
