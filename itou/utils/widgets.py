@@ -16,7 +16,7 @@ class DuetDatePickerWidget(forms.DateInput):
     https://github.com/duetds/date-picker
     """
 
-    template_name = "utils/widgets/duet_date_picker.html"
+    template_name = "utils/widgets/duet_date_picker_widget.html"
 
     class Media:
         css = {
