@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("prescribers", "0030_remove_brsa_kind"),
+        ("prescribers", "0031_prescriberorganization_is_head_office"),
     ]
 
     operations = [
