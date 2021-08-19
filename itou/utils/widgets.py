@@ -40,10 +40,10 @@ class DuetDatePickerWidget(forms.DateInput):
         Check that dates are in IS0-8601 format: YYYY-MM-DD.
         """
         # Dates can be passed as date objects…
-        if isinstance(value, datetime.date):
+        if value and isinstance(value, datetime.date):
             return value.strftime(self.INPUT_DATE_FORMAT)
         # …or as strings (YYYY-MM-DD).
-        if isinstance(value, str):
+        if value and isinstance(value, str):
             try:
                 datetime.datetime.strptime(value, self.INPUT_DATE_FORMAT)
                 return value
