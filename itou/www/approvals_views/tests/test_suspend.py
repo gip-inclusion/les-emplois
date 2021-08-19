@@ -9,6 +9,7 @@ from itou.approvals.models import Suspension
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.factories import DEFAULT_PASSWORD
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 class ApprovalSuspendViewTest(TestCase):
@@ -46,8 +47,8 @@ class ApprovalSuspendViewTest(TestCase):
         end_at = today + relativedelta(days=10)
 
         post_data = {
-            "start_at": start_at.strftime("%d/%m/%Y"),
-            "end_at": end_at.strftime("%d/%m/%Y"),
+            "start_at": start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "reason": Suspension.Reason.SICKNESS,
             "reason_explanation": "",
             # Preview.
@@ -106,8 +107,8 @@ class ApprovalSuspendViewTest(TestCase):
         new_end_at = end_at + relativedelta(days=30)
 
         post_data = {
-            "start_at": suspension.start_at.strftime("%d/%m/%Y"),
-            "end_at": new_end_at.strftime("%d/%m/%Y"),
+            "start_at": suspension.start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "end_at": new_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "reason": suspension.reason,
             "reason_explanation": suspension.reason_explanation,
         }

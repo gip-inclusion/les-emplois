@@ -10,6 +10,7 @@ from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD
+from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import DeclareProlongationForm
 
 
@@ -77,7 +78,7 @@ class ApprovalProlongationTest(TestCase):
         end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
 
         post_data = {
-            "end_at": end_at.strftime("%d/%m/%Y"),
+            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "reason": reason,
             "reason_explanation": "Reason explanation is required.",
             "email": self.prescriber.email,

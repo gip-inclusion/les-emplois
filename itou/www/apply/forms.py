@@ -342,7 +342,6 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["birthdate"].required = True
         self.fields["birthdate"].widget = DuetDatePickerWidget(
             attrs={
                 "min": DuetDatePickerWidget.min_birthdate(),
