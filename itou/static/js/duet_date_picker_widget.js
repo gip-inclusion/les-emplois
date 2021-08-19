@@ -4,9 +4,9 @@ const picker = document.querySelectorAll("duet-date-picker")
 
 const DATE_FORMAT = /^(\d{2})\/(\d{2})\/(\d{4})$/
 
-picker.forEach(picker_instance => {
+picker.forEach(pickerInstance => {
 
-  picker_instance.dateAdapter = {
+  pickerInstance.dateAdapter = {
 
     parse(value = "", createDate) {
       const matches = value.match(DATE_FORMAT)
@@ -23,9 +23,20 @@ picker.forEach(picker_instance => {
 
   }
 
-  picker_instance.localization = {
+  // Automatically insert slashes '/' in date fields.
+  pickerInstance.addEventListener("keyup", event => {
+    // Do nothing when backspace was pressed.
+    if (event.which !== 8) {
+      const numChars = event.target.value.length
+      if (numChars === 2 || numChars === 5) {
+        event.target.value = `${event.target.value}/`
+      }
+    }
+  })
+
+  pickerInstance.localization = {
     buttonLabel: "Choisir une date",
-    placeholder: "JJ-MM-AAAA",
+    placeholder: "JJ/MM/AAAA",
     selectedDateMessage: "La date sélectionnée est",
     prevMonthLabel: "Mois précédent",
     nextMonthLabel: "Mois suivant",

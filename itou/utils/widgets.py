@@ -23,7 +23,7 @@ class DuetDatePickerWidget(forms.DateInput):
         }
         js = (
             "https://cdn.jsdelivr.net/npm/@duetds/date-picker@1.4.0/dist/duet/duet.js",
-            "js/duet_date_picker_config.js",
+            "js/duet_date_picker_widget.js",
         )
 
 
