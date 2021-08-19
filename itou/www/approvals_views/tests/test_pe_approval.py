@@ -178,8 +178,8 @@ class PoleEmploiApprovalSearchUserTest(TestCase):
         url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": self.pe_approval.id})
 
         response = self.client.get(url)
-        self.assertContains(response, self.pe_approval.last_name)
-        self.assertContains(response, self.pe_approval.first_name)
+        self.assertContains(response, self.pe_approval.last_name.title())
+        self.assertContains(response, self.pe_approval.first_name.title())
 
     def test_invalid_pe_approval(self):
         """
