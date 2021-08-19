@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 
 from itou.approvals.models import Prolongation, Suspension
 from itou.users.models import User
-from itou.utils.widgets import DatePickerField
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 class DeclareProlongationForm(forms.ModelForm):
@@ -40,10 +40,9 @@ class DeclareProlongationForm(forms.ModelForm):
 
         self.fields["reason_explanation"].required = True  # Optional in admin but required for SIAEs.
 
-        min_end_at_str = self.instance.start_at.strftime("%Y/%m/%d")
-        max_end_at_str = Prolongation.get_max_end_at(self.instance.start_at).strftime("%Y/%m/%d")
-        self.fields["end_at"].widget = DatePickerField({"minDate": min_end_at_str, "maxDate": max_end_at_str})
-        self.fields["end_at"].input_formats = [DatePickerField.DATE_FORMAT]
+        self.fields["end_at"].widget = DuetDatePickerWidget(
+            {"min": self.instance.start_at, "max": Prolongation.get_max_end_at(self.instance.start_at)}
+        )
         self.fields["end_at"].label = f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au'
 
     email = forms.EmailField(
@@ -72,7 +71,7 @@ class DeclareProlongationForm(forms.ModelForm):
             "email",
         ]
         widgets = {
-            "end_at": DatePickerField(),
+            "end_at": DuetDatePickerWidget(),
             "reason": forms.RadioSelect(),
         }
         help_texts = {
@@ -104,15 +103,12 @@ class SuspensionForm(forms.ModelForm):
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
         today = timezone.now().date()
-        min_start_at_str = Suspension.next_min_start_at(self.approval).strftime("%Y/%m/%d")
-        max_end_at_str = Suspension.get_max_end_at(today).strftime("%Y/%m/%d")
-        today_str = today.strftime("%Y/%m/%d")
+        min_start_at = Suspension.next_min_start_at(self.approval)
         # A suspension is backdatable but cannot start in the future.
-        self.fields["start_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": today_str})
-        self.fields["end_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": max_end_at_str})
-
-        for field in ["start_at", "end_at"]:
-            self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
+        self.fields["start_at"].widget = DuetDatePickerWidget({"min": min_start_at, "max": today})
+        self.fields["end_at"].widget = DuetDatePickerWidget(
+            {"min": min_start_at, "max": Suspension.get_max_end_at(today)}
+        )
 
     class Meta:
         model = Suspension
@@ -125,8 +121,8 @@ class SuspensionForm(forms.ModelForm):
         ]
         widgets = {
             "reason": forms.RadioSelect(),
-            "start_at": DatePickerField(),
-            "end_at": DatePickerField(),
+            "start_at": DuetDatePickerWidget(),
+            "end_at": DuetDatePickerWidget(),
         }
         help_texts = {
             "start_at": mark_safe(
