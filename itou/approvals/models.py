@@ -1015,8 +1015,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
 class ApprovalsWrapper:
     """
-    Wrapper that manipulates both `Approval` and `PoleEmploiApproval` models
-    for a given user.
+    Wrapper that manipulates both `Approval` and `PoleEmploiApproval` models.
 
     This should be the only way to access approvals for a given job seeker.
 
@@ -1067,11 +1066,17 @@ class ApprovalsWrapper:
         )
     )
 
-    def __init__(self, user):
+    def __init__(self, user=None, number=None):
 
         self.user = user
+        self.number = number
         self.latest_approval = None
-        self.merged_approvals = self._merge_approvals()
+        if user:
+            self.merged_approvals = self._merge_approvals_for_user()
+        elif number:
+            self.merged_approvals = self._merge_approvals_for_number()
+        else:
+            raise KeyError("A user or a number is required.")
 
         if not self.merged_approvals:
             self.status = self.NONE_FOUND
@@ -1090,33 +1095,48 @@ class ApprovalsWrapper:
         self.has_valid = self.status == self.VALID
         self.has_in_waiting_period = self.status == self.IN_WAITING_PERIOD
 
-    def _merge_approvals(self):
+    def _merge_approvals_for_user(self):
         """
         Returns a list of merged unique `Approval` and `PoleEmploiApproval` objects.
         """
-        approvals = list(Approval.objects.filter(user=self.user).order_by("-start_at"))
+        approvals = Approval.objects.filter(user=self.user).order_by("-start_at")
 
         # If an ongoing PASS IAE exists, consider it's the latest valid approval
         # even if a PoleEmploiApproval is more recent.
-        if any(approval.is_valid() for approval in approvals):
+        if approvals.valid().exists():
             return approvals
 
-        approvals_numbers = [approval.number for approval in approvals]
         today = datetime.date.today()
-        pe_approvals = [
-            pe_approval
-            for pe_approval in list(PoleEmploiApproval.objects.find_for(self.user).filter(start_at__lte=today))
-            # A `PoleEmploiApproval` could already have been copied in `Approval`.
-            if pe_approval not in approvals_numbers
-        ]
-        merged_approvals = approvals + pe_approvals
-        # Sort by the most distant `end_at`, then by the earliest `start_at`.
-        # This allows to always choose the longest and most recent approval.
-        # Dates are converted to timestamp so that the subtraction operator
-        # can be used in the lambda.
-        return sorted(
-            merged_approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
+        approvals_numbers = [approval.number for approval in approvals] if approvals else []
+
+        pe_approvals = (
+            PoleEmploiApproval.objects.find_for(self.user)
+            .filter(start_at__lte=today)
+            .exclude(number__in=approvals_numbers)
         )
+
+        merged_approvals = list(approvals) + list(pe_approvals)
+        return self.sort_approvals(merged_approvals)
+
+    def _merge_approvals_for_number(self):
+        """
+        Returns a list of merged unique `Approval` and `PoleEmploiApproval` objects.
+        """
+        # Truncate the number to remove any 'S01' or 'P01' suffix because the
+        # number is limited to 12 digits in Approval table.
+        approvals = Approval.objects.filter(number=self.number[:12]).order_by("-start_at")
+
+        # If a PASS IAE exists, consider it's the latest approval
+        # even if a PoleEmploiApproval is more recent.
+        # Return valid and expired approvals.
+        if approvals.exists():
+            return approvals
+
+        today = datetime.date.today()
+        pe_approvals = PoleEmploiApproval.objects.filter(number__startswith=self.number, start_at__lte=today)
+
+        merged_approvals = list(approvals) + list(pe_approvals)
+        return self.sort_approvals(merged_approvals)
 
     @property
     def has_valid_pole_emploi_eligibility_diagnosis(self):
@@ -1141,4 +1161,20 @@ class ApprovalsWrapper:
             self.has_in_waiting_period
             and siae.is_subject_to_eligibility_rules
             and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
+        )
+
+    @staticmethod
+    def sort_approvals(common_approvals):
+        """
+        Returns a list of sorted approvals. The first one is the longest and the most recent.
+        ---
+        common_approvals: Queryset or list of Approval or PoleEmploiApproval objects.
+        """
+        approvals = list(common_approvals)
+        # Sort by the most distant `end_at`, then by the earliest `start_at`.
+        # This allows to always choose the longest and most recent approval.
+        # Dates are converted to timestamp so that the subtraction operator
+        # can be used in the lambda.
+        return sorted(
+            approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
         )
