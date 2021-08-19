@@ -21,6 +21,14 @@ with missions as (
                 or mission_descriptif ilike '%AIEPAHD%'
                 or mission_descriptif ilike '%AIHEPAD%'
             then 'AIEHPAD'
+            when mission_descriptif ilike '%AIRESTO%'
+                or mission_descriptif ilike '%AI RESTO%'
+                or mission_descriptif ilike '%AI-RESTO%'
+            then 'AIRESTO'
+            when mission_descriptif ilike '%ETTIRESTO%'
+                or mission_descriptif ilike '%ETTI RESTO%'
+                or mission_descriptif ilike '%ETTI-RESTO%'
+            then 'ETTIRESTO'
             when mission_descriptif ilike '%AIPH%'
             then 'AIPH'
             else 'AUTRE'
@@ -81,4 +89,4 @@ from
         on cm.contrat_id_structure = s.structure_id_siae
     left outer join "codes_rome" r
         on m.mission_code_rome = r.code_rome
-where m.code_operation in ('AIEHPAD', 'AIPH')
+where m.code_operation in ('AIEHPAD', 'AIPH', 'AIRESTO', 'ETTIRESTO')          

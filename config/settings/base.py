@@ -56,6 +56,7 @@ THIRD_PARTY_APPS = [
     "huey.contrib.djhuey",
     "rest_framework",  # DRF (Django Rest Framework).
     "rest_framework.authtoken",  # Required for DRF TokenAuthentication.
+    "drf_spectacular",
 ]
 
 
@@ -560,10 +561,19 @@ REST_FRAMEWORK = {
         # For DRF browseable API access
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     # Default permissions for API views: user must be authenticated
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+}
+
+# DRF Spectacular
+# ------------------------------------------------------------------------------
+SPECTACULAR_SETTINGS = {
+    'TITLE': "API - Les emplois de l'inclusion",
+    'DESCRIPTION': "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
+    'VERSION': '1.0.0',
 }
 
 # Requests
