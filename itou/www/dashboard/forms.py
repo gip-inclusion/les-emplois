@@ -35,8 +35,8 @@ class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
             self.fields["birthdate"].required = True
             self.fields["birthdate"].widget = DuetDatePickerWidget(
                 attrs={
-                    "min": DuetDatePickerWidget.min_birthdate().strftime("%Y-%m-%d"),
-                    "max": DuetDatePickerWidget.max_birthdate().strftime("%Y-%m-%d"),
+                    "min": DuetDatePickerWidget.min_birthdate(),
+                    "max": DuetDatePickerWidget.max_birthdate(),
                 }
             )
 
