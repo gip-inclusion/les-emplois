@@ -58,6 +58,9 @@ class Command(BaseCommand):
             "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
         )
         parser.add_argument(
+            "--archive", dest="archive", action="store_true", help="Archive old processed employee records"
+        )
+        parser.add_argument(
             "--test",
             dest="asp_test",
             action="store_true",
@@ -285,11 +288,15 @@ class Command(BaseCommand):
         )
         archivable = EmployeeRecord.objects.archivable()
 
-        if cnt := archivable.count() > 0:
-            self.logger.info(f"Found {cnt} archivable employee records")
+        if (cnt := archivable.count()) > 0:
+            self.logger.info(f"Found {cnt} archivable employee record(s)")
             if dry_run:
                 return
             archived_cnt = 0
+
+            # A bulk update will increase performance if there are a lot of employee records to update.
+            # However, if there is no performance issue, it is preferable to keep the archiving
+            # and validation logic in the model (update_as_archived).
             for er in archivable:
                 try:
                     er.update_as_archived()
@@ -297,7 +304,9 @@ class Command(BaseCommand):
                 except Exception as ex:
                     self.logger.error(ex)
 
-            self.logger.info(f"Archived {archived_cnt} employee record(s) (on {cnt})")
+            self.logger.info(f"Archived {archived_cnt}/{cnt} employee record(s)")
+        else:
+            self.logger.info("No archivable employee record found, exiting.")
 
     def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, archive=False, **options):
         """
