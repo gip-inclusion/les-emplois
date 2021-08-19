@@ -61,6 +61,21 @@ class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
             "phone": "Par exemple 0610203040",
         }
 
+    def clean_birthdate(self):
+        birthdate = self.cleaned_data.get("birthdate")
+        if birthdate:
+            min_birthdate = DuetDatePickerWidget.min_birthdate()
+            if birthdate < min_birthdate:
+                raise ValidationError(
+                    f"La plus petite date de naissance possible est le {min_birthdate.strftime('%d/%m/%Y')}"
+                )
+            max_birthdate = DuetDatePickerWidget.max_birthdate()
+            if birthdate > max_birthdate:
+                raise ValidationError(
+                    f"La plus grande date de naissance possible est le {max_birthdate.strftime('%d/%m/%Y')}"
+                )
+        return birthdate
+
     def clean(self):
         super().clean()
         if self.instance.is_job_seeker:
