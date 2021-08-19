@@ -28,6 +28,11 @@ urlpatterns = [
         name="prescriber_siren",
     ),
     path(
+        "prescriber/request_invitation/<int:membership_id>",
+        views.prescriber_request_invitation,
+        name="prescriber_request_invitation",
+    ),
+    path(
         "prescriber/choose_org",
         views.prescriber_choose_org,
         name="prescriber_choose_org",

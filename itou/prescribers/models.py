@@ -10,6 +10,7 @@ from django.utils.http import urlencode
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
+from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
@@ -54,7 +55,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     A "prescriber" is always represented by a User object with the `is_prescriber` flag set to `True`.
 
-    The "prescriber" has the possibility of being a member of an organisation represented by a
+    The "prescriber" has the possibility of being a member of an organization represented by a
     `PrescriberOrganization` object through `PrescriberMembership`.
 
     However it is not required for a "prescriber" to be a member of an organization.
@@ -133,6 +134,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     # prior to the mandatory siret).
     # See https://docs.djangoproject.com/en/3.1/ref/models/fields/#null
     siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], null=True, blank=True)
+    is_head_office = models.BooleanField(
+        verbose_name="Siège de l'entreprise", default=False, help_text="Information obtenue via API Entreprise."
+    )
     kind = models.CharField(verbose_name="Type", max_length=20, choices=Kind.choices, default=Kind.OTHER)
     is_brsa = models.BooleanField(
         verbose_name="Conventionné pour le suivi des BRSA",
@@ -432,3 +436,24 @@ class PrescriberMembership(models.Model):
         """
         self.is_admin = active
         self.updated_by = user
+
+    def request_for_invitation(self, requestor: dict):
+        """
+        A new user can ask for an invitation to join an organization.
+        The list of members is sorted by:
+        - admin
+        - date joined
+        and the first member of the list will be contacted.
+        """
+        to_user = self.user
+        to = [to_user.email]
+        invitation_url = "%s?%s" % (reverse("invitations_views:invite_prescriber_with_org"), urlencode(requestor))
+        context = {
+            "to": to_user,
+            "organization": self.organization,
+            "requestor": requestor,
+            "invitation_url": get_absolute_url(invitation_url),
+        }
+        subject = "common/emails/request_for_invitation_subject.txt"
+        body = "common/emails/request_for_invitation_body.txt"
+        return get_email_message(to, context, subject, body)
