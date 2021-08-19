@@ -10,5 +10,4 @@ app_name = "home"
 urlpatterns = [
     path("", views.home, name="hp"),
     path("sentry-debug/", views.trigger_error, name="sentry_debug"),
-    path("duet-date-picker/", views.duet_date_picker, name="duet_date_picker"),
 ]

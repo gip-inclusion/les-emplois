@@ -15,6 +15,9 @@ class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
     Edit a user profile.
     """
 
+    MIN_BIRTHDATE = DuetDatePickerWidget.min_birthdate()
+    MAX_BIRTHDATE = DuetDatePickerWidget.max_birthdate()
+
     email = forms.EmailField(label="Adresse électronique", widget=forms.TextInput(attrs={"autocomplete": "off"}))
 
     def __init__(self, *args, **kwargs):
@@ -35,8 +38,8 @@ class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
             self.fields["birthdate"].required = True
             self.fields["birthdate"].widget = DuetDatePickerWidget(
                 attrs={
-                    "min": DuetDatePickerWidget.min_birthdate(),
-                    "max": DuetDatePickerWidget.max_birthdate(),
+                    "min": self.MIN_BIRTHDATE,
+                    "max": self.MAX_BIRTHDATE,
                 }
             )
 
@@ -64,15 +67,13 @@ class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
     def clean_birthdate(self):
         birthdate = self.cleaned_data.get("birthdate")
         if birthdate:
-            min_birthdate = DuetDatePickerWidget.min_birthdate()
-            if birthdate < min_birthdate:
+            if birthdate < self.MIN_BIRTHDATE:
                 raise ValidationError(
-                    f"La plus petite date de naissance possible est le {min_birthdate.strftime('%d/%m/%Y')}"
+                    f"La plus petite date de naissance possible est le {self.MIN_BIRTHDATE.strftime('%d/%m/%Y')}"
                 )
-            max_birthdate = DuetDatePickerWidget.max_birthdate()
-            if birthdate > max_birthdate:
+            if birthdate > self.MAX_BIRTHDATE:
                 raise ValidationError(
-                    f"La plus grande date de naissance possible est le {max_birthdate.strftime('%d/%m/%Y')}"
+                    f"La plus grande date de naissance possible est le {self.MAX_BIRTHDATE.strftime('%d/%m/%Y')}"
                 )
         return birthdate
 
