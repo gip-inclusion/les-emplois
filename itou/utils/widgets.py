@@ -1,6 +1,7 @@
 """
 Specific widgets used in forms.
 """
+import datetime
 
 from bootstrap_datepicker_plus import DatePickerInput
 from django import forms
@@ -12,7 +13,7 @@ class DuetDatePickerWidget(forms.DateInput):
     """
     Custom form widget for Duet Date Picker.
     https://duetds.github.io/date-picker/
-    https://github.com/duetds/date-picker#installation
+    https://github.com/duetds/date-picker
     """
 
     template_name = "utils/widgets/duet_date_picker.html"
@@ -25,6 +26,20 @@ class DuetDatePickerWidget(forms.DateInput):
             "https://cdn.jsdelivr.net/npm/@duetds/date-picker@1.4.0/dist/duet/duet.js",
             "js/duet_date_picker_widget.js",
         )
+
+    def format_value(self, value):
+        if isinstance(value, datetime.date):
+            # Iniital values must be passed in IS0-8601 format: YYYY-MM-DD.
+            return value.strftime("%Y-%m-%d")
+        return value
+
+    @classmethod
+    def max_birthdate(cls):
+        return get_max_birthdate()
+
+    @classmethod
+    def min_birthdate(cls):
+        return get_min_birthdate()
 
 
 class DatePickerField(DatePickerInput):
