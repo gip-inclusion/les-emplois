@@ -1,11 +1,10 @@
 from django.conf import settings
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
 from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.apis.metabase import metabase_embedded_url
-from itou.utils.perms.decorators import can_view_stats_vip
 from itou.utils.perms.prescriber import get_current_org_or_404
 
 
@@ -45,21 +44,6 @@ def public_advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
         "page_title": "Statistiques avancées",
         "related_link": "stats:public_basic_stats",
         "related_title": "Vers les statistiques simplifiées",
-        "stats_base_url": settings.METABASE_SITE_URL,
-    }
-    return render(request, template_name, context)
-
-
-@login_required
-@user_passes_test(can_view_stats_vip, login_url="/dashboard")
-def stats_vip(request, template_name=_STATS_HTML_TEMPLATE):
-    """
-    Legacy stats only available to vip users.
-    Will most likely be dropped soon.
-    """
-    context = {
-        "iframeurl": metabase_embedded_url(settings.VIP_STATS_DASHBOARD_ID),
-        "page_title": "Données des territoires",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)

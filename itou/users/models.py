@@ -273,12 +273,10 @@ class User(AbstractUser, AddressMixin):
     def can_view_stats_dashboard_widget(self, current_org):
         """
         Whether a stats section should be displayed on the user's dashboard.
-        """
-        return self.can_view_stats_vip or self.can_view_stats_cd(current_org=current_org)
 
-    @property
-    def can_view_stats_vip(self):
-        return self.is_stats_vip
+        It should be displayed if one or more stats sections are available for the user.
+        """
+        return self.can_view_stats_cd(current_org=current_org)
 
     def can_view_stats_cd(self, current_org):
         """
