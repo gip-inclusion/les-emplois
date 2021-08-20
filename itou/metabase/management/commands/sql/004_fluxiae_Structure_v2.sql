@@ -9,11 +9,11 @@ with structure_ASP as (
        /* l'ASP préconise l'utilisation de l'adresse administrative pour récupérer la commune de la structure */
 	   case
            when  trim (substr (trim (structure.structure_adresse_admin_code_insee), 1,char_length (structure.structure_adresse_admin_code_insee)-2)) like  ('%97%') 
-           THEN  trim (substr (trim (structure.structure_adresse_admin_code_insee), 1,char_length (structure.structure_adresse_admin_code_insee)-2)) 
-           WHEN  trim (substr (trim (structure.structure_adresse_admin_code_insee), 1,char_length (structure.structure_adresse_admin_code_insee)-2)) like  ('%98%') 
-           THEN  trim (substr (trim (structure.structure_adresse_admin_code_insee), 1,char_length (structure.structure_adresse_admin_code_insee)-2)) 
-           ELSE  trim (substr (trim (structure.structure_adresse_admin_code_insee), 1,char_length (structure.structure_adresse_admin_code_insee)-3))
-        END code_departement,
+           then  trim (substr (trim (structure.structure_adresse_admin_code_insee), 1,char_length (structure.structure_adresse_admin_code_insee)-2)) 
+           when  trim (substr (trim (structure.structure_adresse_admin_code_insee), 1,char_length (structure.structure_adresse_admin_code_insee)-2)) like  ('%98%') 
+           then  trim (substr (trim (structure.structure_adresse_admin_code_insee), 1,char_length (structure.structure_adresse_admin_code_insee)-2)) 
+           else  trim (substr (trim (structure.structure_adresse_admin_code_insee), 1,char_length (structure.structure_adresse_admin_code_insee)-3))
+        end code_departement,
         * 
      from 
          "fluxIAE_Structure" as structure
