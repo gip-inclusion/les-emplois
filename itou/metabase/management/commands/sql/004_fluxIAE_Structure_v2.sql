@@ -7,8 +7,8 @@ L'objectif est de rajouter le nom du département et la région de la structure 
 with structure_asp as (
     select 
         /* l'ASP préconise l'utilisation de l'adresse administrative pour récupérer la commune de la structure */
-	    case
-            when trim(substr(trim(structure.structure_adresse_admin_code_insee), 1, char_length(structure.structure_adresse_admin_code_insee)-2)) like ('%97%') 
+	case
+           when trim(substr(trim(structure.structure_adresse_admin_code_insee), 1, char_length(structure.structure_adresse_admin_code_insee)-2)) like ('%97%') 
             then trim(substr(trim(structure.structure_adresse_admin_code_insee), 1, char_length(structure.structure_adresse_admin_code_insee)-2)) 
             when trim(substr(trim(structure.structure_adresse_admin_code_insee), 1, char_length(structure.structure_adresse_admin_code_insee)-2)) like ('%98%') 
             then trim(substr(trim(structure.structure_adresse_admin_code_insee), 1, char_length(structure.structure_adresse_admin_code_insee)-2)) 
