@@ -244,15 +244,12 @@ class ModelTest(TestCase):
         user.emailaddress_set.create(email=user.email, verified=True)
         self.assertTrue(user.has_verified_email)
 
-    def test_can_view_stats_vip(self):
+    def test_vip_user_can_view_all_stats(self):
         user = UserFactory()
-        self.assertFalse(user.can_view_stats_vip)
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None))
         user = UserFactory(is_stats_vip=True)
-        self.assertTrue(user.can_view_stats_vip)
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None))
         user = UserFactory(is_superuser=True)
-        self.assertFalse(user.can_view_stats_vip)
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None))
 
     def test_can_view_stats_cd(self):

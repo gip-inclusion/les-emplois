@@ -438,12 +438,6 @@
                         {% include "includes/icon.html" with icon="activity" %}
                         <a href="{% url 'stats:public_advanced_stats' %}">Voir les statistiques avancées France entière</a>
                     </p>
-                    {% if user.can_view_stats_vip %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_vip' %}">Voir les données des territoires</a>
-                        </p>
-                    {% endif %}
                     {% if can_view_stats_cd %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
