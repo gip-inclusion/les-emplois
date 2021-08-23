@@ -37,7 +37,7 @@ jobs:
     # https://www.clever-cloud.com/doc/develop/build-hooks/
     - name: 🏷 Setup post-deployment hook
       run:
-        echo 'CC_RUN_SUCCEEDED_HOOK=./manage.py populate_metabase_itou --verbosity 2 --dry-run' >> $GITHUB_ENV
+        echo 'CC_RUN_SUCCEEDED_HOOK=./manage.py populate_metabase_itou --verbosity 2' >> $GITHUB_ENV
 
     - name: 🧫 Create a cron app on Clever Cloud on a strong machine
       run: |
