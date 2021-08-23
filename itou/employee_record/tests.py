@@ -2,12 +2,12 @@ import json
 from unittest import mock
 
 from django.conf import settings
+from django.core import management
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.management.commands.transfer_employee_records import Command
 from itou.employee_record.mocks.transfer_employee_records import (
     SFTPBadConnectionMock,
     SFTPConnectionMock,
@@ -329,18 +329,15 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download(self):
-        command = Command()
-        command.handle(download=True)
+        management.call_command("transfer_employee_records", download=True)
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_upload(self):
-        command = Command()
-        command.handle(upload=True)
+        management.call_command("transfer_employee_records", upload=True)
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download_and_upload(self):
-        command = Command()
-        command.handle()
+        management.call_command("transfer_employee_records")
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
@@ -351,12 +348,11 @@ class EmployeeRecordManagementCommandTest(TestCase):
         employee_record = self.employee_record
 
         # Upload with dry run
-        command = Command()
-        command.handle(upload=True, dryrun=True)
+        management.call_command("transfer_employee_records", upload=True, dry_run=True)
 
         # Then download "for real", should work but leave
         # employee record untouched
-        command.handle(upload=False, download=True)
+        management.call_command("transfer_employee_records", upload=False, download=True)
 
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
 
@@ -369,30 +365,27 @@ class EmployeeRecordManagementCommandTest(TestCase):
         employee_record = self.employee_record
 
         # Upload "for real"
-        command = Command()
-        command.handle(upload=True)
+        management.call_command("transfer_employee_records", upload=True)
 
         # Then download dry run, should work but leave
         # employee record untouched
-        command.handle(upload=False, download=True, dryrun=True)
+        management.call_command("transfer_employee_records", upload=False, download=True, dry_run=True)
 
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
 
     @mock.patch("pysftp.Connection", SFTPBadConnectionMock)
     def test_upload_failure(self):
         employee_record = self.employee_record
-        command = Command()
         with self.assertRaises(Exception):
-            command.handle(upload=True)
+            management.call_command("transfer_employee_records", upload=True)
 
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
 
     @mock.patch("pysftp.Connection", SFTPBadConnectionMock)
     def test_download_failure(self):
         employee_record = self.employee_record
-        command = Command()
         with self.assertRaises(Exception):
-            command.handle(download=True)
+            management.call_command("transfer_employee_records", download=True)
 
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
 
@@ -410,15 +403,14 @@ class EmployeeRecordManagementCommandTest(TestCase):
         """
         employee_record = self.employee_record
 
-        command = Command()
-        command.handle(upload=True, download=False)
+        management.call_command("transfer_employee_records", upload=True, download=False)
         employee_record.refresh_from_db()
 
         self.assertEqual(employee_record.status, EmployeeRecord.Status.SENT)
         self.assertEqual(employee_record.batch_line_number, 1)
         self.assertIsNotNone(employee_record.asp_batch_file)
 
-        command.handle(upload=False, download=True)
+        management.call_command("transfer_employee_records", upload=False, download=True)
         employee_record.refresh_from_db()
 
         self.assertEqual(employee_record.status, EmployeeRecord.Status.PROCESSED)
@@ -435,10 +427,10 @@ class EmployeeRecordManagementCommandTest(TestCase):
         """
         employee_record = self.employee_record
 
-        command = Command()
-        command.handle()
+        management.call_command("transfer_employee_records", upload=True, download=True)
         employee_record.refresh_from_db()
 
+        self.assertEqual(EmployeeRecord.Status.PROCESSED, employee_record.status)
         self.assertIsNotNone(employee_record.archived_json)
 
         employee_record_json = json.loads(employee_record.archived_json)
@@ -454,20 +446,18 @@ class EmployeeRecordManagementCommandTest(TestCase):
     def test_random_connection_failure(self, _mock):
         employee_record = self.employee_record
 
-        # Randowm upload failure
+        # Random upload failure
         for _ in range(10):
-            command = Command()
             with self.assertRaises(Exception):
-                command.handle(upload=True, download=False)
+                management.call_command("transfer_employee_records", upload=True, download=False)
 
         # Employee record must be in the same status
         employee_record.refresh_from_db()
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
 
         for _ in range(10):
-            command = Command()
             with self.assertRaises(Exception):
-                command.handle(upload=False, download=True)
+                management.call_command("transfer_employee_records", upload=False, download=True)
 
         employee_record.refresh_from_db()
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
@@ -494,8 +484,8 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
         self.employee_record.update_as_archived()
 
-        command = Command()
-        command.handle(archive=True)
+        # Nicer syntax:
+        management.call_command("transfer_employee_records", archive=True)
 
         self.employee_record.refresh_from_db()
 
