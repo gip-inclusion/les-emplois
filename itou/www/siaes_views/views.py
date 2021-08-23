@@ -10,6 +10,7 @@ from django.urls import reverse
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
+from itou.utils.organizations.views import deactivate_org_member
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import (
@@ -285,31 +286,9 @@ def members(request, template_name="siaes/members.html"):
 @login_required
 def deactivate_member(request, user_id, template_name="siaes/deactivate_member.html"):
     siae = get_current_siae_or_404(request)
-    user = request.user
     target_member = User.objects.get(pk=user_id)
-    user_is_admin = siae.has_admin(user)
 
-    if not user_is_admin:
-        raise PermissionDenied
-
-    if target_member not in siae.active_members:
-        raise PermissionDenied
-
-    membership = target_member.siaemembership_set.get(siae=siae)
-
-    if request.method == "POST":
-        if user != target_member and user_is_admin:
-            if membership.is_active:
-                membership.deactivate_membership_by_user(user)
-                membership.save()
-                messages.success(
-                    request,
-                    "%(name)s a été retiré(e) des membres actifs de cette structure."
-                    % {"name": target_member.get_full_name()},
-                )
-                siae.member_deactivation_email(membership.user).send()
-        else:
-            raise PermissionDenied
+    if deactivate_org_member(request=request, target_member=target_member, organization=siae):
         return HttpResponseRedirect(reverse("siaes_views:members"))
 
     context = {
