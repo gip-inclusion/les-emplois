@@ -224,13 +224,17 @@ class MembershipAbstract(models.Model):
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
-    def deactivate_membership_by_user(self, user):
+    def deactivate_membership_by_user(self, updated_by):
         """
-        Deactivates the membership of a member (reference held by self)
-        `user` is the admin updating this user (`updated_by` field)
+        Deleting the membership was a possibility but we would have lost
+        the member activity history. We need it to show to other members
+        which job applications this user was managing before leaving the organization.
         """
         self.is_active = False
-        self.updated_by = user
+        # If this member is invited again, he should no still be an administrator.
+        # Remove admin rights as a precaution.
+        self.is_admin = False
+        self.updated_by = updated_by
         return True
 
     def set_admin_role(self, active, user):

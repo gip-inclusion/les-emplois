@@ -16,7 +16,7 @@ def deactivate_org_member(request, organization, target_member):
     if request.method == "POST":
         if request.user != target_member and user_is_admin:
             if membership.is_active:
-                # Only membership is modified
+                # Deactivate the membership without deleting it.
                 membership.deactivate_membership_by_user(request.user)
                 membership.save()
                 messages.success(
