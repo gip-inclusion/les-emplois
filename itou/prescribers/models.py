@@ -233,14 +233,6 @@ class PrescriberOrganization(OrganizationAbstract):
         qs = urlencode(args)
         return f"{settings.TYPEFORM_URL}/to/EDHZSU7p?{qs}"
 
-    @property
-    def memberships(self):
-        """
-        Some OrganizationAbstract methods need a common way to query
-        membership objects. Return the relation name.
-        """
-        return self.prescribermembership_set
-
     def get_card_url(self):
         if not self.is_authorized:
             return None
