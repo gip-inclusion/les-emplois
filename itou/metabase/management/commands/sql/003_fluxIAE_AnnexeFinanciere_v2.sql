@@ -45,7 +45,7 @@ with "AnnexeFinanciere_v1" as (
                 af_numero_annexe_financiere_v3 from 1 for 3 
             ) as af_numero_annexe_financiere_v4,
             *
-            from
+        from
             "AnnexeFinanciere_v2" af 
 ),
     "AnnexeFinanciere_v4" as (
@@ -59,7 +59,7 @@ with "AnnexeFinanciere_v1" as (
                     ) = '0' 
                 then 
                     substring(
-                    trim(af_numero_annexe_financiere_v4) from 2 for 2
+                        trim(af_numero_annexe_financiere_v4) from 2 for 2
                     )
                 /* Exemple pour ACI971160010 on récupère 971, pour un numéro de département qui ne commence pas par 0 
                 on garde les 3 caractères du af_numero_annexe_financiere_v4 */
