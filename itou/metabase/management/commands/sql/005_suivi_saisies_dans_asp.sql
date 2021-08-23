@@ -18,19 +18,17 @@ select
     dans l'extranet ASP sous le format MM/YYYY */
     to_char(
         max(
-            make_date(cast(emi.emi_sme_annee as integer), cast(emi.emi_sme_mois as integer), 01)
+            make_date(cast(emi.emi_sme_annee as integer), cast(emi.emi_sme_mois as integer), 1)
         ), 'MM/YYYY'
     ) as dernier_mois_saisi_asp,
     /* Calculer le nombre de mois de retard de saisie de la sructure 
     dans l'extranet ASP par rapport au mois en cours */
-    date_part('month', current_date )-max(emi.emi_sme_mois)-1 as retard_en_mois,
+    date_part('month', current_date ) - max(emi.emi_sme_mois) - 1 as retard_en_mois,
     af.type_siae, 
     af.af_id_annexe_financiere,
     af_numero_annexe_financiere, 
     af.af_numero_convention,
-    /* Département de l’annexe financière */
     af.nom_departement_af,
-    /* Région de l’annexe financière */
     af.nom_region_af,
     structure.structure_denomination,
     structure.structure_adresse_admin_commune, 
