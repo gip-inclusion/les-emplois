@@ -474,7 +474,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def accepted_by(self):
         if not self.state.is_accepted:
             return None
-        return self.logs.select_related("user").get(to_state=JobApplicationWorkflow.STATE_ACCEPTED).user
+        return self.logs.select_related("user").filter(to_state=JobApplicationWorkflow.STATE_ACCEPTED).last().user
 
     @property
     def can_download_approval_as_pdf(self):

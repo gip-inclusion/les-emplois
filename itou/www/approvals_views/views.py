@@ -1,5 +1,3 @@
-import datetime
-
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -233,50 +231,32 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
     Redirects to the existing Pass if it exists.
     If not, it will ask you to search for an user in order to import the "agrément" as a "PASS IAE".
     """
-    siae = get_current_siae_or_404(request)
-
     approval = None
     form = PoleEmploiApprovalSearchForm(request.GET or None)
     number = None
-    pe_approval = None
+    siae = get_current_siae_or_404(request)
+    back_url = reverse("approvals:pe_approval_search")
 
     if form.is_valid():
-
         number = form.cleaned_data["number"]
+        approvals_wrapper = ApprovalsWrapper(number=number)
+        approval = approvals_wrapper.latest_approval
 
-        # Truncate the number to remove any 'S01' or 'P01' suffix because the
-        # number is limited to 12 digits in Approval table.
-        approval = Approval.objects.filter(number=number[:12]).first()
-
-        # If the identifier matches an existing approval…
         if approval:
-            # Extract the user and search again to find the current approval for
-            # that user (could be this one).
-            approvals_wrapper = ApprovalsWrapper(user=approval.user)
+            if approval.is_pass_iae:
+                job_application = approval.user.last_accepted_job_application
+                if job_application.to_siae == siae:
+                    # Suspensions and prolongations links are available in the job application details page.
+                    application_details_url = reverse(
+                        "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
+                    )
+                    return HttpResponseRedirect(application_details_url)
+                # The employer cannot handle the PASS as it's already used by another one.
+                # Suggest him to make a self-prescription. A link is offered in the template.
 
-            # …ensure that the last accepted job application belongs to the current SIAE…
-            # We are sure to have one approval.
-            approval = approvals_wrapper.merged_approvals[0] if approvals_wrapper.merged_approvals else None
-            job_application = approval.user.last_accepted_job_application
-            if job_application.to_siae == siae:
-                application_details_url = reverse(
-                    "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
-                )
-                return HttpResponseRedirect(application_details_url)
-
-            # …and if the job application belongs to another SIAE, it means that the `PoleEmploiApproval`
-            # has already been transformed into an `Approval`.
-            # In this case, the user can obtain the approval by the step_job_seeker.
-            # A link is offered in the template.
-
-        # Otherwise, we display a search, and whenever it's possible, a matching `PoleEmploiApproval`.
-        # Here number can be 12 digits + S01 (etc).
-        pe_approval = PoleEmploiApproval.objects.filter(number=number, start_at__lte=datetime.date.today()).first()
-
-        if approval or pe_approval:
             context = {
                 "approval": approval,
-                "pe_approval": pe_approval,
+                "back_url": back_url,
                 "form": form,
                 "number": number,
                 "siae": siae,
@@ -329,17 +309,17 @@ def pe_approval_create(request, pe_approval_id):
     if not job_seeker:
         job_seeker = User.create_job_seeker_from_pole_emploi_approval(request.user, email, pe_approval)
 
-    # If the PoleEmploiApproval has already been imported, it is not possible to import it again
+    # If the PoleEmploiApproval has already been imported, it is not possible to import it again.
     possible_matching_approval = Approval.objects.filter(number=pe_approval.number[:12]).order_by("-start_at").first()
     if possible_matching_approval:
-        messages.info(request, "Cet agrément Pôle emploi a déja été importé.")
+        messages.info(request, "Cet agrément a déjà été importé.")
         job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
 
-    # It is not possible to attach an approval to a job seeker that already has a valid approval
+    # It is not possible to attach an approval to a job seeker that already has a valid approval.
     if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
-        messages.error(request, "Le candidat associé à cette adresse email a déja un PASS IAE valide.")
+        messages.error(request, "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide.")
         next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
@@ -362,11 +342,12 @@ def pe_approval_create(request, pe_approval_id):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval=approval_from_pe,
             created_from_pe_approval=True,  # This flag is specific to this process.
+            sender=request.user,
+            sender_kind=JobApplication.SENDER_KIND_SIAE_STAFF,
+            sender_siae=siae,
         )
         job_application.save()
 
-    messages.success(
-        request, "L'agrément Pôle emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre."
-    )
+    messages.success(request, "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.")
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)

@@ -80,3 +80,5 @@ LOGGING.setdefault("loggers", {})["django.db.backends"] = {
 # Le marché de l'inclusion
 # Match open regions with SIAE created by our fixtures.
 LEMARCHE_OPEN_REGIONS = ["Occitanie"]
+
+ASP_ITOU_PREFIX = "XXXXX"
