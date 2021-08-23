@@ -451,7 +451,7 @@ class Siae(OrganizationAbstract):
 
 
 class SiaeMembership(MembershipAbstract):
-    #     """Intermediary model between `User` and `Siae`."""
+    """Intermediary model between `User` and `Siae`."""
 
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
     updated_by = models.ForeignKey(
