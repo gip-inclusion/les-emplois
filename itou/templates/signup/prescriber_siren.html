@@ -26,7 +26,7 @@
 
         {% buttons %}
             {# Change the label of the submit button and the position of the return button if the form is submitted #}
-            {% if prescribers_with_members %}
+            {% if prescriber_orgs_with_members %}
             <button type="submit" class="btn btn-primary">Rechercher</button>
             {% else %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
@@ -38,31 +38,39 @@
 
     </form>
 
-    {% if prescribers_with_members %}
+    {% if prescriber_orgs_with_members %}
         <div class="mt-5">
             <h3>Organisations déjà inscrites</h3>
             <div class="alert alert-secondary" role="info">
                 <i>Par sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</i>
             </div>
             <ul>
-                {% for prescriber in prescribers_with_members %}
+                {% for prescriber_org in prescriber_orgs_with_members %}
                     <li>
                         <p>
-                            <b>{{ prescriber.siret|format_siret }}</b> - {{ prescriber.kind }}
+                            <b>{{ prescriber_org.siret|format_siret }}</b> - {{ prescriber_org.kind }}
                             <br>
-                            {{ prescriber.display_name }}
+                            {{ prescriber_org.display_name }}
                             <br>
-                            {{ prescriber.address_line_1 }},
-                            {% if prescriber.address_line_2 %}
+                            {{ prescriber_org.address_line_1 }},
+                            {% if prescriber_org.address_line_2 %}
                                 <br>
-                                {{ prescriber.address_line_2 }},
+                                {{ prescriber_org.address_line_2 }},
                             {% endif %}
                             <br>
-                            {{ prescriber.post_code }} {{ prescriber.city }}
+                            {{ prescriber_org.post_code }} {{ prescriber_org.city }}
                             <br>
-                            {% with prescriber.prescribermembership_set.first as membership %}
+                            {% with prescriber_org.prescribermembership_set.first as membership %}
+                                {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
                                 {# For security, display only the first char of the last name. #}
-                                <i>Pour obtenir une invitation, contactez {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.</i>
+                                <i>
+                                    Demandez une invitation à
+                                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
+                                    afin de rejoindre cette organisation.
+                                </i>
+                                <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
+                                    Demander une invitation
+                                </a>
                             {% endwith %}
                         </p>
                     </li>

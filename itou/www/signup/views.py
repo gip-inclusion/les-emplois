@@ -10,13 +10,13 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.views.decorators.http import require_GET
 
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.urls import get_safe_url
@@ -253,7 +253,7 @@ def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
     This step makes it possible to avoid duplicates of prescriber's organizations.
     """
 
-    prescribers_with_members = None
+    prescriber_orgs_with_members = None
 
     form = forms.PrescriberSirenForm(data=request.GET or None)
 
@@ -263,7 +263,7 @@ def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
         session_data.update({"siren": form.cleaned_data["siren"]})
         request.session.modified = True
 
-        prescribers_with_members = (
+        prescriber_orgs_with_members = (
             PrescriberOrganization.objects.prefetch_active_memberships()
             .filter(siret__startswith=form.cleaned_data["siren"], department=form.cleaned_data["department"])
             .exclude(members=None)
@@ -272,13 +272,46 @@ def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
         # Redirect to creation steps if no organization with member is found,
         # else, displays the same form with the list of organizations with first member
         # to indicate which person to request an invitation from
-        if not prescribers_with_members:
+        if not prescriber_orgs_with_members:
             return HttpResponseRedirect(reverse("signup:prescriber_choose_org"))
 
     context = {
-        "prescribers_with_members": prescribers_with_members,
+        "prescriber_orgs_with_members": prescriber_orgs_with_members,
         "form": form,
         "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
+    return render(request, template_name, context)
+
+
+def prescriber_request_invitation(request, membership_id, template_name="signup/prescriber_request_invitation.html"):
+
+    prescriber_membership = get_object_or_404(
+        PrescriberMembership.objects.select_related("organization", "user"), pk=membership_id
+    )
+
+    form = forms.PrescriberRequestInvitationForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        requestor = {
+            "first_name": form.cleaned_data["first_name"],
+            "last_name": form.cleaned_data["last_name"],
+            "email": form.cleaned_data["email"],
+        }
+        # Send e-mail to the member of the organization
+        prescriber_membership.request_for_invitation(requestor).send()
+
+        message = (
+            f"Votre demande d'invitation à rejoindre « {prescriber_membership.organization.display_name} »"
+            " a été envoyée par courriel."
+        )
+        messages.success(request, message)
+
+        return redirect("home:hp")
+
+    context = {
+        "prescriber": prescriber_membership.user,
+        "organization": prescriber_membership.organization,
+        "form": form,
     }
     return render(request, template_name, context)
 
@@ -470,7 +503,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
     )
 
     # `PrescriberSiretForm` performs several API calls:
-    # - to SIRENE API to validate the SIRET existence and the status of the organisation
+    # - to SIRENE API to validate the SIRET existence and the status of the organization
     # - get geolocalisation from Adresse API
     # See PrescriberSiretForm.clean_partial_siret.
     if request.method == "POST" and form.is_valid():

@@ -26,6 +26,10 @@ django-xworkflows==1.0.0  # https://github.com/rbarrois/django_xworkflows
 # DRF (Django Rest Framework)
 djangorestframework==3.12.2  # https://www.django-rest-framework.org/
 
+# DRF-Spectacular (Django Rest Framework Spectacular, open API schema browser)
+drf-spectacular==0.17.3  # https://github.com/tfranzel/drf-spectacular
+
+
 # Front-end
 # ------------------------------------------------------------------------------
 
