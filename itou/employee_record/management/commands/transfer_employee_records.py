@@ -281,10 +281,10 @@ class Command(BaseCommand):
         """
         Archive old employee record data:
         records are not deleted but their `archived_json` field is erased if employee record has been
-        in `PROCESSED` status for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
+        in `PROCESSED` status for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS days
         """
         self.logger.info(
-            f"Archiving employee records (more than {settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS} months old)"
+            f"Archiving employee records (more than {settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS} days old)"
         )
         archivable = EmployeeRecord.objects.archivable()
 

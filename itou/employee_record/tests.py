@@ -170,7 +170,7 @@ class EmployeeRecordModelTest(TestCase):
 
         # Fake older date
         employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
+            days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
         )
 
         employee_record.save()
@@ -287,7 +287,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         # Fake old date, but not to old
         self.employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=(30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS) - 1
+            days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS - 1
         )
 
         with self.assertRaises(ValidationError):
@@ -295,7 +295,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         # Fake a date older than archiving delay
         self.employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
+            days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
         )
 
         self.employee_record.update_as_archived()
@@ -489,7 +489,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
         # Fake a date older than archiving delay
         self.employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
+            days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
         )
 
         self.employee_record.update_as_archived()

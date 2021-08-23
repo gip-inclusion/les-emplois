@@ -21,6 +21,11 @@ def validate_asp_batch_filename(value):
     raise ValidationError(f"Le format du nom de fichier ASP est incorrect: {value}")
 
 
+# Oddly enough, no month param for timedeltas
+# => approximate 1 month to 30 days (see base settings)
+ARCHIVING_DELTA = timezone.timedelta(days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS)
+
+
 class EmployeeRecordQuerySet(models.QuerySet):
     """
     Queryset functions for EmployeeRecord model
@@ -85,13 +90,9 @@ class EmployeeRecordQuerySet(models.QuerySet):
 
     def archivable(self):
         """
-        Fetch employee records in PROCESSED state for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS
+        Fetch employee records in PROCESSED state for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
         """
-        now = timezone.now()
-        # Oddly enough, no month param for timedeltas
-        # => approximate 1 month to 30 days
-        processed_delta = timezone.timedelta(days=30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS)
-        return self.processed().filter(processed_at__lte=now - processed_delta)
+        return self.processed().filter(processed_at__lte=timezone.now() - ARCHIVING_DELTA)
 
 
 class EmployeeRecord(models.Model):
@@ -319,9 +320,7 @@ class EmployeeRecord(models.Model):
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         # Check that we are past archiving delay before ... archiving
-        now = timezone.now()
-        processed_delta = timezone.timedelta(days=30 * settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_MONTHS)
-        if self.processed_at >= now - processed_delta:
+        if self.processed_at >= timezone.now() - ARCHIVING_DELTA:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         # Remove proof of processing after delay
