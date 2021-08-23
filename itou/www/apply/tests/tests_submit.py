@@ -148,11 +148,9 @@ class ApplyAsJobSeekerTest(TestCase):
         s3_form_endpoint = s3_upload.form_values["url"]
         s3_form_values = s3_upload.form_values["fields"]
 
-        # Form fields
+        # Don't test S3 form fields as it led to flaky tests and
+        # it's already done by the Boto library.
         self.assertContains(response, s3_form_endpoint)
-        s3_form_values.pop("x-amz-date")  # Flaky test.
-        for _, value in s3_form_values.items():
-            self.assertContains(response, value)
 
         # Config variables
         resume_config.pop("upload_expiration")
