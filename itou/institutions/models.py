@@ -41,6 +41,14 @@ class Institution(OrganizationAbstract):
 
     objects = models.Manager.from_queryset(InstitutionQuerySet)()
 
+    @property
+    def memberships(self):
+        """
+        Some OrganizationAbstract methods need a common way to query
+        membership objects. Return the relation name.
+        """
+        return self.institutionmembership_set
+
 
 class InstitutionMembership(MembershipAbstract):
     """Intermediary model between `User` and `Institution`."""
