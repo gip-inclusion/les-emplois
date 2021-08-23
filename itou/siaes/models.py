@@ -355,6 +355,14 @@ class Siae(OrganizationAbstract):
     def is_asp_managed(self):
         return self.kind in self.ASP_MANAGED_KINDS
 
+    @property
+    def memberships(self):
+        """
+        Some OrganizationAbstract methods need a common way to query
+        membership objects. Return the relation name.
+        """
+        return self.siaemembership_set
+
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
 

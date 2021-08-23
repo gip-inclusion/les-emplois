@@ -139,6 +139,13 @@ class OrganizationAbstract(AddressMixin):
         body = "common/emails/remove_admin_email_body.txt"
         return get_email_message(to, context, subject, body)
 
+    @property
+    def memberships(self):
+        """
+        Membership queryset
+        """
+        raise NotImplementedError
+
 
 class MembershipQuerySet(models.QuerySet):
     @property
