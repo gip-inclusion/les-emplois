@@ -9,7 +9,7 @@ from itou.utils.emails import get_email_message
 
 class OrganizationQuerySet(models.QuerySet):
     """
-    Common methods used by Siae, PrescriberOrganization and Institution models querysets.
+    Common methods used by Siae, PrescriberOrganization and Institution models query sets.
     """
 
     def member_required(self, user):
@@ -19,8 +19,7 @@ class OrganizationQuerySet(models.QuerySet):
 
     def prefetch_active_memberships(self):
         """
-        Impossible to use self.model.membership_set_related_name because the class has to
-        be instantiated to access properties.
+        Impossible to use self.memberships because the class has to be instantiated to access properties.
         """
         membership_model = self.model.members.through
         membership_set_related_name = membership_model.user.field.remote_field.get_accessor_name()
@@ -30,7 +29,7 @@ class OrganizationQuerySet(models.QuerySet):
 
 class OrganizationAbstract(AddressMixin):
     """
-    TODO
+    Base model for Siae, Prescriber Organization and Institution models.
     """
 
     name = models.CharField(verbose_name="Nom", max_length=255)
@@ -58,7 +57,18 @@ class OrganizationAbstract(AddressMixin):
         return f"{self.name}"
 
     @property
-    def membership_qs(self):
+    def memberships(self):
+        """
+        Get memberships linked to this organization.
+        At this level, we don't know the organization model as it's defined later in the child class.
+        Using self.members.though is a trap as it returns the model Manager and not a query set!
+        `self.members.through.objects.get(user=user.pk)` returns every membership for that user
+        but NOT for a couple user / organization.
+        ---
+        Usage
+        ---
+        self.memberships.get(user=user.pk) is the same as siae.siaemembership_set.get(user=user.pk)
+        """
         membership_model = self.members.through
         membership_set_related_name = membership_model.user.field.remote_field.get_accessor_name()
         return getattr(self, membership_set_related_name)
@@ -82,8 +92,8 @@ class OrganizationAbstract(AddressMixin):
         """
         In this context, active == has an active membership AND user is still active.
         """
-        membership_qs = self.membership_qs.active()
-        return MembershipQuerySet.to_users_qs(membership_qs=membership_qs)
+        memberships = self.memberships.active()
+        return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
     def deactivated_members(self):
@@ -91,8 +101,8 @@ class OrganizationAbstract(AddressMixin):
         List of previous members of the structure, still active as user (from the model POV)
         but deactivated by an admin at some point in time.
         """
-        membership_qs = self.membership_qs.inactive()
-        return MembershipQuerySet.to_users_qs(membership_qs=membership_qs)
+        memberships = self.memberships.inactive()
+        return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
     def active_admin_members(self):
@@ -102,12 +112,12 @@ class OrganizationAbstract(AddressMixin):
         * user.is_active: user is able to do something on the platform
         * user.membership.is_active: is a member of this structure
         """
-        membership_qs = self.membership_qs.active_admin()
-        return MembershipQuerySet.to_users_qs(membership_qs=membership_qs)
+        memberships = self.memberships.active_admin()
+        return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     def get_admins(self):
-        membership_qs = self.membership_qs.admin()
-        return MembershipQuerySet.to_users_qs(membership_qs=membership_qs)
+        memberships = self.memberships.admin()
+        return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     def member_deactivation_email(self, user):
         """
@@ -139,13 +149,6 @@ class OrganizationAbstract(AddressMixin):
         body = "common/emails/remove_admin_email_body.txt"
         return get_email_message(to, context, subject, body)
 
-    @property
-    def memberships(self):
-        """
-        Membership queryset
-        """
-        raise NotImplementedError
-
 
 class MembershipQuerySet(models.QuerySet):
     @property
@@ -170,7 +173,7 @@ class MembershipQuerySet(models.QuerySet):
         return self.active().filter(self.admin_lookup)
 
     @staticmethod
-    def to_users_qs(membership_qs):
+    def to_users_qs(memberships):
         """
         TODO
         # Return a UserQuerySet
@@ -178,8 +181,8 @@ class MembershipQuerySet(models.QuerySet):
         # Avoid circular imports
         from itou.users.models import User  # pylint: disable=import-outside-toplevel
 
-        membership_qs = membership_qs.filter(user=OuterRef("pk"))
-        return User.objects.filter(pk=Subquery(membership_qs.values("user")))
+        memberships = memberships.filter(user=OuterRef("pk"))
+        return User.objects.filter(pk=Subquery(memberships.values("user")))
 
 
 class MembershipAbstract(models.Model):
