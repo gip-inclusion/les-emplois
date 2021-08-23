@@ -89,29 +89,19 @@ class OrganizationAbstract(AddressMixin):
 
     @property
     def active_members(self):
-        """
-        In this context, active == has an active membership AND user is still active.
-        """
         memberships = self.memberships.active()
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
     def deactivated_members(self):
         """
-        List of previous members of the structure, still active as user (from the model POV)
-        but deactivated by an admin at some point in time.
+        List of organization removed members but still active as users.
         """
         memberships = self.memberships.inactive()
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
     def active_admin_members(self):
-        """
-        Active admin members:
-        active user/admin in this context means both:
-        * user.is_active: user is able to do something on the platform
-        * user.membership.is_active: is a member of this structure
-        """
         memberships = self.memberships.active_admin()
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
@@ -161,6 +151,10 @@ class MembershipQuerySet(models.QuerySet):
         return Q(is_admin=True, user__is_active=True)
 
     def active(self):
+        """
+        * user.is_active: user is able to do something on the platform.
+        * user.membership.is_active: is a member of this structure.
+        """
         return self.filter(user__is_active=True).filter(self.active_lookup)
 
     def inactive(self):
@@ -175,8 +169,7 @@ class MembershipQuerySet(models.QuerySet):
     @staticmethod
     def to_users_qs(memberships):
         """
-        TODO
-        # Return a UserQuerySet
+        Return a User QuerySet. Useful to iterate over User objects instead of Membership ones.
         """
         # Avoid circular imports
         from itou.users.models import User  # pylint: disable=import-outside-toplevel
@@ -237,10 +230,10 @@ class MembershipAbstract(models.Model):
         self.updated_by = updated_by
         return True
 
-    def set_admin_role(self, active, user):
+    def set_admin_role(self, is_admin, updated_by):
         """
         Set admin role for the given user.
         `user` is the admin updating this user (`updated_by` field)
         """
-        self.is_admin = active
-        self.updated_by = user
+        self.is_admin = is_admin
+        self.updated_by = updated_by

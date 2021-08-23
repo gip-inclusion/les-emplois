@@ -43,7 +43,7 @@ def update_org_admin_role(request, organization, target_member, action):
     if request.method == "POST":
         if request.user != target_member and user_is_admin and membership.is_active:
             if action == "add":
-                membership.set_admin_role(True, request.user)
+                membership.set_admin_role(is_admin=True, updated_by=request.user)
                 messages.success(
                     request,
                     "%(name)s a été ajouté(e) aux administrateurs de cette structure."
@@ -51,7 +51,7 @@ def update_org_admin_role(request, organization, target_member, action):
                 )
                 organization.add_admin_email(target_member).send()
             if action == "remove":
-                membership.set_admin_role(False, request.user)
+                membership.set_admin_role(is_admin=False, updated_by=request.user)
                 messages.success(
                     request,
                     "%(name)s a été retiré(e) des administrateurs de cette structure."
