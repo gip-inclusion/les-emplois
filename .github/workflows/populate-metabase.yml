@@ -1,0 +1,73 @@
+name: Populate metabase
+
+# Runs "populate_itou_metabase".
+# A github action takes care of the cron task that:
+# - creates a machine on demand
+# - runs the desired command through CC_RUN_SUCCEEDED_HOOK
+# - destroys the machine once the update is done
+on:
+  schedule:
+    - cron: '12 0 * * *' # Run this workflow at 0:12am every day
+
+env:
+  CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+  CLEVER_TAR_FILE: clever-tools-latest_linux.tar.gz
+  CLEVER_CLI: clever-tools-latest_linux/clever
+  CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+  CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+  CRON_APPS_ORGANIZATION_NAME: ${{ secrets.CLEVER_CRON_APPS_ORGANIZATION_NAME }}
+  CONFIGURATION_ADDON: ${{ secrets.CLEVER_CRON_APPS_CONFIGURATION_ADDON }}
+  DATABASE_ADDON: ${{ secrets.CLEVER_CRON_APPS_DATABASE_ADDON }}
+  REDIS_ADDON: ${{ secrets.CLEVER_CRON_APPS_REDIS_ADDON }}
+  BUCKET_ADDON: ${{ secrets.CLEVER_CRON_APPS_BUCKET_ADDON }}
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout to the latest version
+      uses: actions/checkout@v2
+
+    - name: 🏷 Setup app name
+      run:
+        echo "CRON_TASK_APP_NAME=`echo \"c1-cron-populate-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
+
+    # The command we want to run once the app is started
+    # https://www.clever-cloud.com/doc/develop/build-hooks/
+    - name: 🏷 Setup post-deployment hook
+      run:
+        echo 'CC_RUN_SUCCEEDED_HOOK=./manage.py populate_metabase_itou --verbosity 2 --dry-run' >> $GITHUB_ENV
+
+    - name: 🧫 Create a cron app on Clever Cloud on a strong machine
+      run: |
+        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
+        tar -xvf $CLEVER_TAR_FILE
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        # Create a new application on Clever Cloud.
+        # -t: application type (Python).
+        # --org: organization name.
+        # --region: server location ("par" means Paris).
+        # --alias: custom application name, used to find it with the CLI.
+        $CLEVER_CLI create $CRON_TASK_APP_NAME -t python --region par --alias $CRON_TASK_APP_NAME --org Itou
+        $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI scale --flavor XL
+
+    - name: 🗺 Add environment variables and addons to the app
+      run: |
+        $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon $CONFIGURATION_ADDON
+        $CLEVER_CLI service link-addon $DATABASE_ADDON
+        $CLEVER_CLI service link-addon $BUCKET_ADDON
+        $CLEVER_CLI service link-addon $REDIS_ADDON
+
+    - name: "Deploy post-deploy hook to Clever"
+      run: $CLEVER_CLI env import-vars CC_RUN_SUCCEEDED_HOOK
+
+    - name: 🚀 Deploy to Clever Cloud
+      run: $CLEVER_CLI deploy --branch $BRANCH --force
+
+    - name: 🗑 Delete the app once the work is done
+      run: |
+        $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI delete --yes
