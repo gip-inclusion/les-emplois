@@ -15,10 +15,6 @@ from itou.users.models import User
 from itou.utils.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 
 
-class InstitutionQuerySet(OrganizationQuerySet):
-    pass
-
-
 class Institution(OrganizationAbstract):
     class Kind(models.TextChoices):
         DDETS = ("DDETS", "Direction départementale de l'emploi, du travail et des solidarités")
@@ -39,7 +35,7 @@ class Institution(OrganizationAbstract):
         through_fields=("institution", "user"),
     )
 
-    objects = models.Manager.from_queryset(InstitutionQuerySet)()
+    objects = models.Manager.from_queryset(OrganizationQuerySet)()
 
     @property
     def memberships(self):
