@@ -3,7 +3,7 @@ from django.db.models import Count
 
 
 class MembersInline(admin.TabularInline):
-    # Remember to specify the model in child class.
+    # Remember to specify the model in child class. Example:
     # model = models.Siae.members.through
     extra = 1
     raw_id_fields = ("user",)

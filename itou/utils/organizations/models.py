@@ -56,30 +56,9 @@ class OrganizationAbstract(AddressMixin):
     def __str__(self):
         return f"{self.name}"
 
-    @property
-    def memberships(self):
-        """
-        Get memberships linked to this organization.
-        At this level, we don't know the organization model as it's defined later in the child class.
-        Using self.members.though is a trap as it returns the model Manager and not a query set!
-        `self.members.through.objects.get(user=user.pk)` returns every membership for that user
-        but NOT for a couple user / organization.
-        ---
-        Usage
-        ---
-        self.memberships.get(user=user.pk) is the same as siae.siaemembership_set.get(user=user.pk)
-        """
-        membership_model = self.members.through
-        membership_set_related_name = membership_model.user.field.remote_field.get_accessor_name()
-        return getattr(self, membership_set_related_name)
-
-    @property
-    def display_name(self):
-        return self.name.capitalize()
-
-    @property
-    def has_members(self):
-        return self.active_members.exists()
+    def get_admins(self):
+        memberships = self.memberships.admin()
+        return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     def has_member(self, user):
         return self.active_members.filter(pk=user.pk).exists()
@@ -93,6 +72,11 @@ class OrganizationAbstract(AddressMixin):
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
+    def active_admin_members(self):
+        memberships = self.memberships.active_admin()
+        return MembershipQuerySet.to_users_qs(memberships=memberships)
+
+    @property
     def deactivated_members(self):
         """
         List of organization removed members but still active as users.
@@ -101,27 +85,33 @@ class OrganizationAbstract(AddressMixin):
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
-    def active_admin_members(self):
-        memberships = self.memberships.active_admin()
-        return MembershipQuerySet.to_users_qs(memberships=memberships)
+    def display_name(self):
+        return self.name.capitalize()
 
-    def get_admins(self):
-        memberships = self.memberships.admin()
-        return MembershipQuerySet.to_users_qs(memberships=memberships)
+    @property
+    def has_members(self):
+        return self.active_members.exists()
 
-    def member_deactivation_email(self, user):
+    @property
+    def memberships(self):
         """
-        Send email when an admin of the structure disables the membership of a given user (deactivation).
+        Get memberships linked to this organization.
+        In short, self.memberships.get(user=user.pk)
+        is the same as siae.siaemembership_set.get(user=user.pk).
+        ---
+        At this level, we don't know the organization model as it is defined later in the child class.
+        Using self.members.though is a trap as it returns the model Manager and not a query set!
+        `self.members.through.objects.get(user=user.pk)` returns every membership for that user
+        but NOT for a couple user / organization.
         """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/member_deactivation_email_subject.txt"
-        body = "common/emails/member_deactivation_email_body.txt"
-        return get_email_message(to, context, subject, body)
+        membership_model = self.members.through
+        membership_set_related_name = membership_model.user.field.remote_field.get_accessor_name()
+        return getattr(self, membership_set_related_name)
 
+    #### Emails ####
     def add_admin_email(self, user):
         """
-        Send info email to a new admin of the organization (added)
+        Tell a member he is an administrator now.
         """
         to = [user.email]
         context = {"structure": self}
@@ -131,12 +121,22 @@ class OrganizationAbstract(AddressMixin):
 
     def remove_admin_email(self, user):
         """
-        Send info email to a former admin of the organization (removed)
+        Tell a member he is no longer an administrator.
         """
         to = [user.email]
         context = {"structure": self}
         subject = "common/emails/remove_admin_email_subject.txt"
         body = "common/emails/remove_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def member_deactivation_email(self, user):
+        """
+        Tell a user he is no longer a member of this organization.
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/member_deactivation_email_subject.txt"
+        body = "common/emails/member_deactivation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
 
@@ -231,9 +231,5 @@ class MembershipAbstract(models.Model):
         return True
 
     def set_admin_role(self, is_admin, updated_by):
-        """
-        Set admin role for the given user.
-        `user` is the admin updating this user (`updated_by` field)
-        """
         self.is_admin = is_admin
         self.updated_by = updated_by
