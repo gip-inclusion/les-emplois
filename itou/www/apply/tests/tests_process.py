@@ -19,6 +19,7 @@ from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.users.models import User
+from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
@@ -180,6 +181,7 @@ class ProcessViewsTest(TestCase):
         """Test the `accept` transition."""
         create_test_cities(["54", "57"], num_per_department=2)
         city = City.objects.first()
+        today = timezone.localdate()
 
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
         address = {
@@ -200,14 +202,14 @@ class ProcessViewsTest(TestCase):
             self.assertEqual(response.status_code, 200)
 
             # Good duration.
-            hiring_start_at = timezone.now().date()
+            hiring_start_at = today
             hiring_end_at = Approval.get_default_end_date(hiring_start_at)
             post_data = {
                 # Data for `JobSeekerPoleEmploiStatusForm`.
                 "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
                 # Data for `AcceptForm`.
-                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+                "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                 "answer": "",
                 **address,
             }
@@ -227,13 +229,13 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         # Wrong dates.
-        hiring_start_at = timezone.now().date()
+        hiring_start_at = today
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         # Force `hiring_start_at` in past.
         hiring_start_at = hiring_start_at - relativedelta(days=1)
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
             **address,
         }
@@ -241,11 +243,11 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
 
         # Wrong dates: end < start.
-        hiring_start_at = timezone.now().date()
+        hiring_start_at = today
         hiring_end_at = hiring_start_at - relativedelta(days=1)
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
             **address,
         }
@@ -253,12 +255,12 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
 
         # Duration too long.
-        hiring_start_at = timezone.now().date()
+        hiring_start_at = today
         max_end_at = Approval.get_default_end_date(hiring_start_at)
         hiring_end_at = max_end_at + relativedelta(days=1)
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
             **address,
         }
@@ -273,14 +275,14 @@ class ProcessViewsTest(TestCase):
         )
         url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        hiring_start_at = timezone.now().date()
+        hiring_start_at = today
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         post_data = {
             # Data for `JobSeekerPoleEmploiStatusForm`.
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
             # Data for `AcceptForm`.
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
         }
         with self.assertRaises(KeyError):
@@ -317,8 +319,10 @@ class ProcessViewsTest(TestCase):
             "city": city.name,
             "city_slug": city.slug,
             # Data for `AcceptForm`.
-            "hiring_start_at": timezone.now().date().strftime("%d/%m/%Y"),
-            "hiring_end_at": (timezone.now().date() + relativedelta(days=360)).strftime("%d/%m/%Y"),
+            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
+                DuetDatePickerWidget.INPUT_DATE_FORMAT
+            ),
             "answer": "",
         }
         response = self.client.post(url, data=post_data)
@@ -347,8 +351,8 @@ class ProcessViewsTest(TestCase):
         hiring_start_at = max_end_at - relativedelta(months=6)
         hiring_end_at = max_end_at + relativedelta(days=1)
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
             "address_line_1": job_application.job_seeker.address_line_1,
             "post_code": job_application.job_seeker.post_code,
@@ -372,7 +376,7 @@ class ProcessViewsTest(TestCase):
             "pole_emploi_id": job_seeker.pole_emploi_id,
             "answer": "",
         }
-        hiring_start_at = timezone.now().date() + relativedelta(months=2)
+        hiring_start_at = timezone.localdate() + relativedelta(months=2)
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
 
@@ -393,8 +397,8 @@ class ProcessViewsTest(TestCase):
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             **base_for_post_data,
         }
         response = self.client.post(url_accept, data=post_data)
@@ -421,8 +425,8 @@ class ProcessViewsTest(TestCase):
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_app_starting_earlier.pk})
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             **base_for_post_data,
         }
         response = self.client.post(url_accept, data=post_data)
@@ -448,8 +452,8 @@ class ProcessViewsTest(TestCase):
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_app_starting_later.pk})
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             **base_for_post_data,
         }
         response = self.client.post(url_accept, data=post_data)
@@ -578,7 +582,7 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_application.state.is_cancelled)
 
     def test_cannot_cancel(self):
-        cancellation_period_end = timezone.now().date() - relativedelta(
+        cancellation_period_end = timezone.localdate() - relativedelta(
             days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
         )
         job_application = JobApplicationWithApprovalFactory(
@@ -608,11 +612,11 @@ class ProcessViewsTest(TestCase):
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        hiring_start_at = timezone.now().date()
+        hiring_start_at = timezone.localdate()
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
             "answer": "",
             "address_line_1": job_seeker.address_line_1,

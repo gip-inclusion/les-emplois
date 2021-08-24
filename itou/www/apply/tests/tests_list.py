@@ -12,7 +12,7 @@ from itou.prescribers.factories import (
 )
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD
-from itou.utils.widgets import DatePickerField
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 class ProcessListTest(TestCase):
@@ -184,14 +184,19 @@ class ProcessListSiaeTest(ProcessListTest):
         Eddie wants to see job applications sent at a specific date.
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
-        date_format = DatePickerField().DATE_FORMAT
+        date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
         job_applications = self.hit_pit.job_applications_received.not_archived().order_by("created_at")
         jobs_in_range = job_applications[3:]
         start_date = jobs_in_range[0].created_at
 
         # Negative indexing is not allowed in querysets
         end_date = jobs_in_range[len(jobs_in_range) - 1].created_at
-        query = urlencode({"start_date": start_date.strftime(date_format), "end_date": end_date.strftime(date_format)})
+        query = urlencode(
+            {
+                "start_date": timezone.localdate(start_date).strftime(date_format),
+                "end_date": timezone.localdate(end_date).strftime(date_format),
+            }
+        )
         url = f"{self.siae_base_url}?{query}"
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list

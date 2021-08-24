@@ -224,6 +224,19 @@ body:after {
     display: block !important;
 }
 
+/*
+Force the display of `.invalid-feedback` for Duet Date Picker with Bootstrap 4.
+See also `duet_date_picker.html`.
+https://getbootstrap.com/docs/4.6/components/forms/#server-side
+*/
+duet-date-picker.is-invalid ~ .invalid-feedback {
+    display:block
+}
+
+.duet-date__input {
+    border-color: #ced4da;  /* Match with colors of Bootstrap 4. */
+}
+
 /* Welcoming tour */
 
 #welcoming_tour .carousel-indicators {

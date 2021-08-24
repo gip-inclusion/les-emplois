@@ -8,6 +8,7 @@ from itou.job_applications.factories import JobApplicationWithApprovalNotCancell
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithMockedAddressFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 # Helper functions
@@ -16,7 +17,7 @@ def get_sample_form_data(user):
         "title": "M",
         "first_name": user.first_name,
         "last_name": user.last_name,
-        "birthdate": user.birthdate.strftime("%d/%m/%Y"),
+        "birthdate": user.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         "birth_country": 91,
         "insee_commune_code": 67152,
     }
@@ -155,7 +156,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         data = {
             "first_name": self.job_seeker.first_name,
             "last_name": self.job_seeker.last_name,
-            "birthdate": self.job_seeker.birthdate.strftime("%d/%m/%Y"),
+            "birthdate": self.job_seeker.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "birth_country": 91,
             "insee_commune_code": 62152,
         }

@@ -195,6 +195,8 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
 
     # Placeholder: not the final position in the JSON result
     passIae = serializers.CharField(source="approval_number")
+    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="approval.start_at")
+    passDateFin = serializers.DateField(format="%d/%m/%Y", source="approval.end_at")
 
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
@@ -215,6 +217,8 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         model = EmployeeRecord
         fields = [
             "passIae",
+            "passDateDeb",
+            "passDateFin",
             "numLigne",
             "typeMouvement",
             "numeroAnnexe",
@@ -242,6 +246,11 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         # and stick it into the personnePhysique JSON object
         person = result["personnePhysique"]
         person["passIae"] = result.pop("passIae")
+
+        # Update from ASP : v1.0.2
+        # Adding start and end date of approval in the "Person" section
+        person["passDateDeb"] = result.pop("passDateDeb")
+        person["passDateFin"] = result.pop("passDateFin")
 
         # At first position (this is an OrderedDict)
         person.move_to_end("passIae", last=False)

@@ -8,7 +8,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.siaes.models import SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
-from itou.utils.widgets import DatePickerField
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):
@@ -74,16 +74,12 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         for field_name in self.REQUIRED_FIELDS:
             self.fields[field_name].required = True
 
-        self.fields["birthdate"].widget = DatePickerField(
+        self.fields["birthdate"].widget = DuetDatePickerWidget(
             {
-                "viewMode": "years",
-                "minDate": DatePickerField.min_birthdate().strftime("%Y/%m/%d"),
-                "maxDate": DatePickerField.max_birthdate().strftime("%Y/%m/%d"),
-                "useCurrent": False,
-                "allowInputToggle": False,
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
             }
         )
-        self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
         # Init ASP commune
         if self.instance.birth_place:
