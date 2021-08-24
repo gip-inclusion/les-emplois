@@ -1,5 +1,3 @@
-Le titre et la description sont en français et au format texte.
-
 ### Quoi ?
 
 Résumé des changements apportés.
@@ -22,11 +20,3 @@ Utile pour les changements liés à l'UI.
 - être explicite sur le délai attendu pour une revue de code
 - être explicite sur la qualité attendue pour la revue de code
 - etc.
-
----
-
-Liens intéressant :
-
-- https://www.pullrequest.com/blog/writing-a-great-pull-request-description/
-- https://github.blog/2015-01-21-how-to-write-the-perfect-pull-request/
-- https://gist.github.com/mikepea/863f63d6e37281e329f8
