@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -18,6 +19,11 @@ def validate_asp_batch_filename(value):
     if value and value.startswith("RIAE_FS_") and value.endswith(".json") and len(value) == 27:
         return
     raise ValidationError(f"Le format du nom de fichier ASP est incorrect: {value}")
+
+
+# Oddly enough, no month param for timedeltas
+# => approximate 1 month to 30 days (see base settings)
+ARCHIVING_DELTA = timezone.timedelta(days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS)
 
 
 class EmployeeRecordQuerySet(models.QuerySet):
@@ -82,6 +88,12 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
 
+    def archivable(self):
+        """
+        Fetch employee records in PROCESSED state for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
+        """
+        return self.processed().filter(processed_at__lte=timezone.now() - ARCHIVING_DELTA)
+
 
 class EmployeeRecord(models.Model):
     """
@@ -120,9 +132,11 @@ class EmployeeRecord(models.Model):
         SENT = "SENT", "Envoyée"
         REJECTED = "REJECTED", "En erreur"
         PROCESSED = "PROCESSED", "Intégrée"
+        ARCHIVED = "ARCHIVED", "Archivée"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
+    processed_at = models.DateTimeField(verbose_name=("Date d'intégration"), null=True)
     status = models.CharField(max_length=10, verbose_name="Statut", choices=Status.choices, default=Status.NEW)
 
     # Job application has references on many mandatory parts of the E.R.:
@@ -292,10 +306,33 @@ class EmployeeRecord(models.Model):
 
         self.clean()
         self.status = EmployeeRecord.Status.PROCESSED
+        self.processed_at = timezone.now()
         self.asp_processing_code = code
         self.asp_processing_label = label
         self.archived_json = archive
         self.save()
+
+    def update_as_archived(self, save=True):
+        """
+        Can only archive employee record if already PROCESSED
+        `save` parameter is for bulk updates in management command
+        """
+        if self.status != EmployeeRecord.Status.PROCESSED:
+            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+
+        # Check that we are past archiving delay before ... archiving
+        if self.processed_at >= timezone.now() - ARCHIVING_DELTA:
+            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+
+        # Remove proof of processing after delay
+        self.status = EmployeeRecord.Status.ARCHIVED
+        self.archived_json = None
+
+        if save:
+            self.save()
+        else:
+            # Override .save() update of `updated_at` when using bulk updates
+            self.updated_at = timezone.now()
 
     @property
     def is_archived(self):

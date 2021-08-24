@@ -58,6 +58,9 @@ class Command(BaseCommand):
             "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
         )
         parser.add_argument(
+            "--archive", dest="archive", action="store_true", help="Archive old processed employee records"
+        )
+        parser.add_argument(
             "--test",
             dest="asp_test",
             action="store_true",
@@ -274,7 +277,43 @@ class Command(BaseCommand):
         for batch in chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, **options):
+    def archive(self, dry_run):
+        """
+        Archive old employee record data:
+        records are not deleted but their `archived_json` field is erased if employee record has been
+        in `PROCESSED` status for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS days
+        """
+        self.logger.info(
+            f"Archiving employee records (more than {settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS} days old)"
+        )
+        archivable = EmployeeRecord.objects.archivable()
+
+        if (cnt := archivable.count()) > 0:
+            self.logger.info(f"Found {cnt} archivable employee record(s)")
+            if dry_run:
+                return
+            archived_cnt = 0
+
+            # A bulk update will increase performance if there are a lot of employee records to update.
+            # However, if there is no performance issue, it is preferable to keep the archiving
+            # and validation logic in the model (update_as_archived).
+            # Update: let's bulk, with a batch size of 100 records
+            for er in archivable:
+                try:
+                    # Do not trigger a save() call on the object
+                    er.update_as_archived(save=False)
+                    archived_cnt += 1
+                except Exception as ex:
+                    self.logger.error(ex)
+
+            # Bulk update (100 records block):
+            EmployeeRecord.objects.bulk_update(archivable, ["status", "updated_at", "archived_json"], batch_size=100)
+
+            self.logger.info(f"Archived {archived_cnt}/{cnt} employee record(s)")
+        else:
+            self.logger.info("No archivable employee record found, exiting.")
+
+    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, archive=False, **options):
         """
         Employee Record Management Command
         """
@@ -298,4 +337,7 @@ class Command(BaseCommand):
             if download:
                 self.download(sftp, dry_run)
 
-        self.logger.info("Employee records processing done!")
+        if archive:
+            self.archive(dry_run)
+
+        self.logger.info("Employee records processing done")
