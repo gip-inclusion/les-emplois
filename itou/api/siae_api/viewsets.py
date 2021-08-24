@@ -2,16 +2,13 @@ import logging
 
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
-from rest_framework import pagination, permissions, viewsets
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework import pagination, viewsets
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.filters import OrderingFilter
 
 from itou.cities.models import City
 from itou.siaes.models import Siae
 from itou.siaes.serializers import SiaeSerializer
-
-from .perms import SiaeAPIPermission
 
 
 logger = logging.getLogger("api_drf")
@@ -35,18 +32,22 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SiaeSerializer
     pagination_class = SiaePagination
     filter_backends = [OrderingFilter]
-    ordering_fields = ["block_job_applications", "type", "city", "post_code", "department", "siret", "raison_sociale"]
+    ordering_fields = [
+        "block_job_applications",
+        "type",
+        "city",
+        "post_code",
+        "department",
+        "siret",
+        "raison_sociale",
+        "created_at",
+        "updated_at",
+    ]
     ordering = ["-created_at", "-updated_at"]
 
-    # Possible authentication frameworks:
-    # - token auth: for external access / real world use case
-    # - session auth: for dev context and browseable API
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-
-    # Additional / custom permission classes:
-    # Enforce the default one (IsAuthenticated)
-    # Add Pole-emploi-specific access rules
-    permission_classes = [SiaeAPIPermission]
+    # No authentication is required on this API and everybody can query anything − it’s read-only.
+    authentication_classes = []
+    permission_classes = []
 
     NOT_FOUND_RESPONSE = OpenApiExample(
         "Not Found",
@@ -61,7 +62,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
             OpenApiParameter(name=CODE_INSEE_PARAM_NAME, description="Filter by city", required=False, type=str),
             OpenApiParameter(name=DISTANCE_PARAM_NAME, description="Filter by distance", required=False, type=str),
         ],
-        responses={200: SiaeSerializer, 401: None, 403: None, 404: OpenApiTypes.OBJECT},
+        responses={200: SiaeSerializer, 404: OpenApiTypes.OBJECT},
         examples=[
             NOT_FOUND_RESPONSE,
         ],
