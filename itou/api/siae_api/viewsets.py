@@ -1,10 +1,11 @@
 import logging
 
+# from django_filters.filters import OrderingFilter
+# from django_filters import FilterSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
-from rest_framework import pagination, viewsets
+from rest_framework import filters, viewsets
 from rest_framework.exceptions import NotFound, ValidationError
-from rest_framework.filters import OrderingFilter
 
 from itou.cities.models import City
 from itou.siaes.models import Siae
@@ -13,37 +14,45 @@ from itou.siaes.serializers import SiaeSerializer
 
 logger = logging.getLogger("api_drf")
 CODE_INSEE_PARAM_NAME = "code_insee"
-DISTANCE_PARAM_NAME = "distance_max_km"
-
-
-class SiaePagination(pagination.PageNumberPagination):
-    """
-    Pole Emploi requests a per-page pagination, with the possibility to customize the page size per-request.
-    Initial values are conservatives, they could be increased if the load allows it
-    https://www.django-rest-framework.org/api-guide/pagination/#pagenumberpagination
-    """
-
-    page_size = 20
-    page_size_query_param = "page_size"
-    max_page_size = 50
+DISTANCE_FROM_CODE_INSEE_PARAM_NAME = "distance_max_km"
 
 
 class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    # Liste des SIAE
+
+    La plateforme renvoie une liste de SIAE à proximité d’une ville (déterminée par son code INSEE)
+    et d’un rayon de recherche en kilomètres autour de cette ville.
+
+
+    Chaque SIAE est accompagnée d’un certain nombre de métadonnées:
+
+     - SIRET
+     - Type
+     - Raison Sociale
+     - Enseigne
+     - Site web
+     - Description de la SIAE
+     - Blocage de toutes les candidatures OUI/NON
+     - Adresse de la SIAE
+     - Complément d’adresse
+     - Code Postal
+     - Ville
+     - Département
+
+    Chaque SIAE peut proposer 0, 1 ou plusieurs postes. Pour chaque poste renvoyé, les métadonnées fournies sont :
+
+     - Appellation ROME
+     - Date de création
+     - Date de modification
+     - Recrutement ouvert OUI/NON
+     - Description du poste
+     - Appellation modifiée
+    """
+
     serializer_class = SiaeSerializer
-    pagination_class = SiaePagination
-    filter_backends = [OrderingFilter]
-    ordering_fields = [
-        "block_job_applications",
-        "type",
-        "city",
-        "post_code",
-        "department",
-        "siret",
-        "raison_sociale",
-        "created_at",
-        "updated_at",
-    ]
-    ordering = ["-created_at", "-updated_at"]
+    filter_backend = [filters.OrderingFilter]
+    ordering = ["-cree_le", "-mis_a_jour_le"]
 
     # No authentication is required on this API and everybody can query anything − it’s read-only.
     authentication_classes = []
@@ -59,8 +68,10 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(name=CODE_INSEE_PARAM_NAME, description="Filter by city", required=False, type=str),
-            OpenApiParameter(name=DISTANCE_PARAM_NAME, description="Filter by distance", required=False, type=str),
+            OpenApiParameter(name=CODE_INSEE_PARAM_NAME, description="Filtre par ville", required=False, type=str),
+            OpenApiParameter(
+                name=DISTANCE_FROM_CODE_INSEE_PARAM_NAME, description="Filtre par distance", required=False, type=str
+            ),
         ],
         responses={200: SiaeSerializer, 404: OpenApiTypes.OBJECT},
         examples=[
@@ -68,7 +79,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
         ],
     )
     def list(self, request):
-        # your non-standard behaviour
+        # we need this despite the default behavior because of the documentation annotations
         return super().list(request)
 
     def get_queryset(self):
@@ -90,10 +101,13 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     def _filter_by_query_params(self, request, queryset):
         params = request.query_params
         code_insee = params.get(CODE_INSEE_PARAM_NAME)
-        if params.get(DISTANCE_PARAM_NAME) and code_insee:
-            distance_filter = int(params.get(DISTANCE_PARAM_NAME))
+        t = f"Les paramètres `{CODE_INSEE_PARAM_NAME}` et `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` sont obligatoires."
+        if params.get(DISTANCE_FROM_CODE_INSEE_PARAM_NAME) and code_insee:
+            distance_filter = int(params.get(DISTANCE_FROM_CODE_INSEE_PARAM_NAME))
             if distance_filter < 0 or distance_filter > 100:
-                raise ValidationError(f"{DISTANCE_PARAM_NAME} doit être entre 0 et 100")
+                raise ValidationError(
+                    f"Le paramètre `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` doit être compris entre 0 et 100."
+                )
 
             try:
                 city = City.objects.get(code_insee=code_insee)
@@ -103,6 +117,6 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
                 # with get_object_or_404
                 raise NotFound(f"Pas de ville avec pour code_insee {code_insee}")
         else:
-            raise ValidationError(f"{CODE_INSEE_PARAM_NAME} et {DISTANCE_PARAM_NAME} sont des paramètres obligatoires")
+            raise ValidationError(t)
 
         return queryset

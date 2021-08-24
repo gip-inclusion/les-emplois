@@ -4,29 +4,19 @@ from itou.siaes.models import Siae, SiaeJobDescription
 
 
 class _JobDescriptionSerializer(serializers.ModelSerializer):
-    """
-    Pour chaque poste renvoyé par « Les emplois de l’inclusion » à Pôle emploi
-    les données à afficher sont les suivantes :
-
-    Appellation ROME
-    Date de création
-    Date de modification
-    Recrutement ouvert OUI/NON
-    Description du poste
-    Appellation modifiée
-    """
-
     rome = serializers.CharField(source="appellation.rome")
     recrutement_ouvert = serializers.CharField(source="is_active")
     appellation_modifiee = serializers.CharField(source="custom_name")
+    cree_le = serializers.DateTimeField(source="created_at")
+    mis_a_jour_le = serializers.DateTimeField(source="updated_at")
 
     class Meta:
         model = SiaeJobDescription
         fields = [
             "id",
             "rome",
-            "created_at",
-            "updated_at",
+            "cree_le",
+            "mis_a_jour_le",
             "recrutement_ouvert",
             "description",
             "appellation_modifiee",
@@ -35,49 +25,37 @@ class _JobDescriptionSerializer(serializers.ModelSerializer):
 
 
 class SiaeSerializer(serializers.ModelSerializer):
-    """
-    « Les emplois de l’inclusion » renvoie une liste de SIAE.
-
-    Chaque SIAE peut proposer 0, 1 ou plusieurs postes.
-
-    Pour chaque SIAE renvoyée à Pôle emploi les données à afficher sont les suivantes :
-
-    SIRET
-    Type
-    Raison Sociale
-    Enseigne
-    Site web
-    Description de la SIAE
-    Blocage de toutes les candidatures OUI/NON
-    Adresse de la SIAE
-    Complément d’adresse
-    Code Postal
-    Ville
-    Département
-    """
-
+    cree_le = serializers.DateTimeField(source="created_at")
+    mis_a_jour_le = serializers.DateTimeField(source="updated_at")
     type = serializers.CharField(source="kind")
     ville = serializers.CharField(source="city")
+    code_postal = serializers.CharField(source="post_code")
+    addresse_line_1 = serializers.CharField(source="address_line_1")
+    addresse_line_2 = serializers.CharField(source="address_line_2")
+    departement = serializers.CharField(source="department")
     raison_sociale = serializers.CharField(source="name")
     enseigne = serializers.SerializerMethodField()
-    job_descriptions = _JobDescriptionSerializer(source="job_description_through", many=True)
+    bloque_candidatures = serializers.BooleanField(source="block_job_applications")
+    candidatures = _JobDescriptionSerializer(source="job_description_through", many=True)
 
     class Meta:
         model = Siae
         fields = [
+            "cree_le",
+            "mis_a_jour_le",
             "siret",
             "type",
             "raison_sociale",
             "enseigne",
             "website",
             "description",
-            "block_job_applications",
-            "address_line_1",
-            "address_line_2",
-            "post_code",
+            "bloque_candidatures",
+            "addresse_line_1",
+            "addresse_line_2",
+            "code_postal",
             "ville",
-            "department",
-            "job_descriptions",
+            "departement",
+            "candidatures",
         ]
         read_only_fields = fields
 

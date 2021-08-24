@@ -31,7 +31,9 @@ class SiaeAPIFetchListTest(APITestCase):
         """
         response = self.client.get(ENDPOINT_URL, format="json")
 
-        self.assertEquals(response.status_code, 400)
+        self.assertContains(
+            response, "Les paramètres `code_insee` et `distance_max_km` sont obligatoires.", status_code=400
+        )
 
     def test_fetch_siae_list_with_too_high_distance(self):
         """
@@ -40,7 +42,9 @@ class SiaeAPIFetchListTest(APITestCase):
         query_params = {"code_insee": 44056, "distance_max_km": 200}
         response = self.client.get(ENDPOINT_URL, query_params, format="json")
 
-        self.assertContains(response, "distance_max_km doit être entre 0 et 100", status_code=400)
+        self.assertContains(
+            response, "Le paramètre `distance_max_km` doit être compris entre 0 et 100", status_code=400
+        )
 
     def test_fetch_siae_list_with_negative_distance(self):
         """
@@ -49,7 +53,9 @@ class SiaeAPIFetchListTest(APITestCase):
         query_params = {"code_insee": 44056, "distance_max_km": -10}
         response = self.client.get(ENDPOINT_URL, query_params, format="json")
 
-        self.assertContains(response, "distance_max_km doit être entre 0 et 100", status_code=400)
+        self.assertContains(
+            response, "Le paramètre `distance_max_km` doit être compris entre 0 et 100", status_code=400
+        )
 
     def test_fetch_siae_list_with_invalid_code_insee(self):
         """

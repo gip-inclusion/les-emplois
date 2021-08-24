@@ -549,7 +549,7 @@ REST_FRAMEWORK = {
     "ALLOWED_VERSIONS": ["v1"],
     # Pagination.
     # https://www.django-rest-framework.org/api-guide/pagination/#pagenumberpagination
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "itou.api.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     # Response renderers
     # See DEV template for an additional rendeder for DRF browseable API
