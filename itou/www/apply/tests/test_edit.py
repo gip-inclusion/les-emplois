@@ -7,6 +7,7 @@ from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 class EditContractTest(TestCase):
@@ -64,8 +65,8 @@ class EditContractTest(TestCase):
         future_end_date = (timezone.now() + relativedelta(days=15)).date()
 
         post_data = {
-            "hiring_start_at": future_start_date.strftime("%d/%m/%Y"),
-            "hiring_end_at": future_end_date.strftime("%d/%m/%Y"),
+            "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": future_end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
         response = self.client.post(self.url, data=post_data)
@@ -90,8 +91,8 @@ class EditContractTest(TestCase):
         future_start_date = (timezone.now() - relativedelta(days=10)).date()
 
         post_data = {
-            "hiring_start_at": future_start_date.strftime("%d/%m/%Y"),
-            "hiring_end_at": self.job_application_1.hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": self.job_application_1.hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
         response = self.client.post(self.url, data=post_data)
@@ -112,8 +113,8 @@ class EditContractTest(TestCase):
         future_start_date = timezone.localdate() + relativedelta(days=JobApplication.MAX_CONTRACT_POSTPONE_IN_DAYS + 1)
 
         post_data = {
-            "hiring_start_at": future_start_date.strftime("%d/%m/%Y"),
-            "hiring_end_at": self.job_application_1.hiring_end_at.strftime("%d/%m/%Y"),
+            "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": self.job_application_1.hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
         response = self.client.post(url, data=post_data)
@@ -131,8 +132,8 @@ class EditContractTest(TestCase):
         future_end_date = (timezone.now() + relativedelta(days=60)).date()
 
         post_data = {
-            "hiring_start_at": future_start_date.strftime("%d/%m/%Y"),
-            "hiring_end_at": future_end_date.strftime("%d/%m/%Y"),
+            "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": future_end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
         response = self.client.post(self.url, data=post_data)
@@ -156,8 +157,8 @@ class EditContractTest(TestCase):
         future_end_date = (timezone.now() + relativedelta(days=60)).date()
 
         post_data = {
-            "hiring_start_at": future_start_date.strftime("%d/%m/%Y"),
-            "hiring_end_at": future_end_date.strftime("%d/%m/%Y"),
+            "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": future_end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
         response = self.client.post(self.old_url, data=post_data)
@@ -179,8 +180,8 @@ class EditContractTest(TestCase):
         future_end_date = future_start_date + relativedelta(days=60)
 
         post_data = {
-            "hiring_start_at": future_start_date.strftime("%d/%m/%Y"),
-            "hiring_end_at": future_end_date.strftime("%d/%m/%Y"),
+            "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": future_end_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
         response = self.client.post(self.old_url, data=post_data)

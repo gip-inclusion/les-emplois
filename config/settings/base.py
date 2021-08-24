@@ -51,7 +51,6 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "anymail",
     "bootstrap4",
-    "bootstrap_datepicker_plus",
     "django_select2",
     "huey.contrib.djhuey",
     "rest_framework",  # DRF (Django Rest Framework).

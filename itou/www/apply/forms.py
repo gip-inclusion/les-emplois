@@ -13,7 +13,7 @@ from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.address.forms import AddressFormMixin
 from itou.utils.resume.forms import ResumeFormMixin
-from itou.utils.widgets import DatePickerField
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 class UserExistsForm(forms.Form):
@@ -46,14 +46,12 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["birthdate"].required = True
-        self.fields["birthdate"].widget = DatePickerField(
+        self.fields["birthdate"].widget = DuetDatePickerWidget(
             {
-                "viewMode": "years",
-                "minDate": DatePickerField.min_birthdate().strftime("%Y/%m/%d"),
-                "maxDate": DatePickerField.max_birthdate().strftime("%Y/%m/%d"),
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
             }
         )
-        self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
         model = User
@@ -82,16 +80,12 @@ class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
 
         # Birth date
         self.fields["birthdate"].required = True
-        self.fields["birthdate"].widget = DatePickerField(
+        self.fields["birthdate"].widget = DuetDatePickerWidget(
             {
-                "viewMode": "years",
-                "minDate": DatePickerField.min_birthdate().strftime("%Y/%m/%d"),
-                "maxDate": DatePickerField.max_birthdate().strftime("%Y/%m/%d"),
-                "useCurrent": False,
-                "allowInputToggle": False,
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
             }
         )
-        self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
         model = User
@@ -211,8 +205,7 @@ class AcceptForm(forms.ModelForm):
         self.fields["hiring_without_approval"].widget = forms.HiddenInput()
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].required = True
-            self.fields[field].widget = DatePickerField()
-            self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
+            self.fields[field].widget = DuetDatePickerWidget()
         # Job applications can be accepted twice if they have been cancelled.
         # They also can be accepted after a refusal.
         # That's why some fields are already filled in with obsolete data.
@@ -291,8 +284,7 @@ class EditHiringDateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].required = True
-            self.fields[field].widget = DatePickerField()
-            self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
+            self.fields[field].widget = DuetDatePickerWidget()
 
     class Meta:
         model = JobApplication
@@ -350,8 +342,12 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["birthdate"].widget = DatePickerField()
-        self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
+        self.fields["birthdate"].widget = DuetDatePickerWidget(
+            attrs={
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
+            }
+        )
 
     class Meta:
         model = User
@@ -389,16 +385,14 @@ class FilterJobApplicationsForm(forms.Form):
     )
     pass_iae_suspended = forms.BooleanField(label="PASS IAE suspendu", required=False)
     start_date = forms.DateField(
-        input_formats=[DatePickerField.DATE_FORMAT],
         label="Début",
         required=False,
-        widget=DatePickerField(),
+        widget=DuetDatePickerWidget(),
     )
     end_date = forms.DateField(
-        input_formats=[DatePickerField.DATE_FORMAT],
         label="Fin",
         required=False,
-        widget=DatePickerField(),
+        widget=DuetDatePickerWidget(),
     )
 
     def clean_start_date(self):

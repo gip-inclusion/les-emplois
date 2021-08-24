@@ -1,0 +1,14 @@
+<duet-date-picker
+    identifier="{{ widget.attrs.id }}"
+    {% if widget.attrs.required %}required{% endif %}
+    name="{{ widget.name }}"
+    {% if widget.attrs.min %}min="{{ widget.attrs.min }}"{% endif %}
+    {% if widget.attrs.max %}max="{{ widget.attrs.max }}"{% endif %}
+    {% if widget.value != None %}value="{{ widget.value }}"{% endif %}
+    {% comment %}
+        Force the display of `.invalid-feedback` for Duet Date Picker with Bootstrap 4.
+        See also `itou.css`.
+        https://getbootstrap.com/docs/4.6/components/forms/#server-side
+    {% endcomment %}
+    {% if "is-invalid" in widget.attrs.class %}class="is-invalid"{% endif %}
+    ></duet-date-picker>
