@@ -559,7 +559,7 @@ REST_FRAMEWORK = {
         # For DRF browseable API access
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Default permissions for API views: user must be authenticated
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -569,9 +569,9 @@ REST_FRAMEWORK = {
 # DRF Spectacular
 # ------------------------------------------------------------------------------
 SPECTACULAR_SETTINGS = {
-    'TITLE': "API - Les emplois de l'inclusion",
-    'DESCRIPTION': "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
-    'VERSION': '1.0.0',
+    "TITLE": "API - Les emplois de l'inclusion",
+    "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
+    "VERSION": "1.0.0",
 }
 
 # Requests
@@ -619,6 +619,10 @@ STORAGE_UPLOAD_KINDS = {
         "max_files": 1,
     },
 }
+
+# Employee record data archiving / pruning:
+# "Proof of record" model field is erased after this delay (in days)
+EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS = int(os.environ.get("EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS", 13 * 30))
 
 # Employee records progressive opening settings
 # (to be removed after complete production)
