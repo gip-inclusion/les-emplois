@@ -2,46 +2,12 @@ from django.contrib.gis.geos import Point
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
 from itou.cities.models import City
 from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithJobsFactory
 from itou.siaes.models import Siae
-
-
-def create_city_saint_andre():
-    return City.objects.create(
-        name="Saint-André-des-Eaux",
-        slug="saint-andre-des-eaux-44",
-        department="44",
-        coords=Point(-2.3140436, 47.3618584),
-        post_codes=["44117"],
-        code_insee="44117",
-    )
-
-
-def create_city_guerande():
-    return City.objects.create(
-        name="Guérande",
-        slug="guerande-44",
-        department="44",
-        coords=Point(-2.4747713, 47.3358576),
-        # Dummy
-        post_codes=["44350"],
-        code_insee="44350",
-    )
-
-
-def create_city_vannes():
-    return City.objects.create(
-        name="Vannes",
-        slug="vannes-56",
-        department="56",
-        coords=Point(-2.8186843, 47.657641),
-        # Dummy
-        post_codes=["56000"],
-        code_insee="56000",
-    )
 
 
 class SearchSiaeTest(TestCase):
