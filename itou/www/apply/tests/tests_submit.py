@@ -146,7 +146,6 @@ class ApplyAsJobSeekerTest(TestCase):
         s3_upload = S3Upload(kind="resume")
         resume_config = s3_upload.config
         s3_form_endpoint = s3_upload.form_values["url"]
-        s3_form_values = s3_upload.form_values["fields"]
 
         # Don't test S3 form fields as it led to flaky tests and
         # it's already done by the Boto library.
