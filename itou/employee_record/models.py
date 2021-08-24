@@ -312,9 +312,10 @@ class EmployeeRecord(models.Model):
         self.archived_json = archive
         self.save()
 
-    def update_as_archived(self):
+    def update_as_archived(self, save=True):
         """
         Can only archive employee record if already PROCESSED
+        `save` parameter is for bulk updates in management command
         """
         if self.status != EmployeeRecord.Status.PROCESSED:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
@@ -326,7 +327,9 @@ class EmployeeRecord(models.Model):
         # Remove proof of processing after delay
         self.status = EmployeeRecord.Status.ARCHIVED
         self.archived_json = None
-        self.save()
+
+        if save:
+            self.save()
 
     @property
     def is_archived(self):

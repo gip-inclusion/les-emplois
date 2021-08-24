@@ -297,12 +297,17 @@ class Command(BaseCommand):
             # A bulk update will increase performance if there are a lot of employee records to update.
             # However, if there is no performance issue, it is preferable to keep the archiving
             # and validation logic in the model (update_as_archived).
+            # Update: let's bulk, with a batch size of 100 records
             for er in archivable:
                 try:
-                    er.update_as_archived()
+                    # Do not trigger a save() call on the object
+                    er.update_as_archived(save=False)
                     archived_cnt += 1
                 except Exception as ex:
                     self.logger.error(ex)
+
+            # Bulk update (100 records block):
+            EmployeeRecord.objects.bulk_update(archivable, ["status", "archived_json"], batch_size=100)
 
             self.logger.info(f"Archived {archived_cnt}/{cnt} employee record(s)")
         else:
@@ -332,7 +337,7 @@ class Command(BaseCommand):
             if download:
                 self.download(sftp, dry_run)
 
-        if self.archive:
+        if archive:
             self.archive(dry_run)
 
-        self.logger.info("Employee records processing done!")
+        self.logger.info("Employee records processing done")
