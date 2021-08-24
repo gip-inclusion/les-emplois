@@ -170,11 +170,9 @@ class MembershipQuerySet(models.QuerySet):
         """
         Return a User QuerySet. Useful to iterate over User objects instead of Membership ones.
         """
-        # Avoid circular imports
-        from itou.users.models import User  # pylint: disable=import-outside-toplevel
-
         memberships = memberships.filter(user=OuterRef("pk"))
-        return User.objects.filter(pk=Subquery(memberships.values("user")))
+        user_model = memberships.model._meta.get_field("user").related_model
+        return user_model.objects.filter(pk=Subquery(memberships.values("user")))
 
 
 class MembershipAbstract(models.Model):
