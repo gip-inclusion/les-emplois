@@ -307,7 +307,7 @@ class Command(BaseCommand):
                     self.logger.error(ex)
 
             # Bulk update (100 records block):
-            EmployeeRecord.objects.bulk_update(archivable, ["status", "archived_json"], batch_size=100)
+            EmployeeRecord.objects.bulk_update(archivable, ["status", "updated_at", "archived_json"], batch_size=100)
 
             self.logger.info(f"Archived {archived_cnt}/{cnt} employee record(s)")
         else:

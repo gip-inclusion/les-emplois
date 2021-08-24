@@ -330,6 +330,9 @@ class EmployeeRecord(models.Model):
 
         if save:
             self.save()
+        else:
+            # Override .save() update of `updated_at` when using bulk updates
+            self.updated_at = timezone.now()
 
     @property
     def is_archived(self):
