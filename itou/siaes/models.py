@@ -85,14 +85,15 @@ class SiaeQuerySet(OrganizationQuerySet):
 
         See https://github.com/martsberger/django-sql-utils
         """
-        from itou.job_applications.models import JobApplication  # pylint: disable=import-outside-toplevel
+        # Avoid a circular import
+        job_application_model = self.model._meta.get_field("jobapplication").related_model
 
         sub_query = Subquery(
             (
-                JobApplication.objects.filter(
+                job_application_model.objects.filter(
                     to_siae=OuterRef("id"),
                     created_at__gte=timezone.now()
-                    - timezone.timedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD),
+                    - timezone.timedelta(weeks=job_application_model.WEEKS_BEFORE_CONSIDERED_OLD),
                 )
                 .values("to_siae")  # group job apps by to_siae
                 .annotate(count=Count("pk"))
@@ -487,7 +488,7 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
         )
 
     def with_annotation_is_popular(self):
-        # Avoid an infinite loop
+        # Avoid a circular import
         from itou.job_applications.models import JobApplicationWorkflow  # pylint: disable=import-outside-toplevel
 
         job_apps_filters = {"jobapplication__state__in": JobApplicationWorkflow.PENDING_STATES}
