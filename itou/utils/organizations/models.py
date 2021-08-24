@@ -3,7 +3,6 @@ from django.db import models
 from django.db.models import OuterRef, Prefetch, Q, Subquery
 from django.utils import timezone
 
-from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
 
 
@@ -27,7 +26,7 @@ class OrganizationQuerySet(models.QuerySet):
         return self.prefetch_related(Prefetch(membership_set_related_name, queryset=qs))
 
 
-class OrganizationAbstract(AddressMixin):
+class OrganizationAbstract(models.Model):
     """
     Base model for Siae, Prescriber Organization and Institution models.
     """
