@@ -268,7 +268,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertEqual(self.employee_record.asp_processing_label, process_message)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_state_archived(self, _mock):
@@ -464,7 +464,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_archive(self, _mock):
