@@ -67,11 +67,11 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from psycopg2 import sql
 
+from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._dataframes import store_df, switch_table_atomically
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
 from itou.siaes.models import Siae
-from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))

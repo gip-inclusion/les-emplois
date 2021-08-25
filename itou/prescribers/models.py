@@ -6,8 +6,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.http import urlencode
 
-from itou.common.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
-from itou.utils.address.models import AddressMixin
+from itou.common_apps.address.models import AddressMixin
+from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_code_safir, validate_siret

@@ -4,7 +4,7 @@ from django.contrib.gis.db import models as gis_models
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from itou.utils.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
+from itou.common_apps.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.validators import validate_post_code
 

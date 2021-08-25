@@ -3,9 +3,9 @@ from collections import defaultdict
 from django.contrib.gis.db.models.functions import Distance
 from django.shortcuts import render
 
+from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
-from itou.utils.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.utils.pagination import pager
 from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
 

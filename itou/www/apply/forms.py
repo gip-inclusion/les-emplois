@@ -7,11 +7,11 @@ from django.utils import timezone
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
+from itou.common_apps.address.forms import AddressFormMixin
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import User
-from itou.utils.address.forms import AddressFormMixin
 from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.widgets import DuetDatePickerWidget
 

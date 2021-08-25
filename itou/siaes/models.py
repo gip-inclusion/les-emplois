@@ -8,8 +8,8 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlencode, urlsafe_base64_encode
 
-from itou.common.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
-from itou.utils.address.models import AddressMixin
+from itou.common_apps.address.models import AddressMixin
+from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret

@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from django.template.defaultfilters import slugify
 
 from itou.cities.models import City
-from itou.utils.address.departments import DEPARTMENTS, department_from_postcode
+from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))

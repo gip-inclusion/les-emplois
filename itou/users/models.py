@@ -21,10 +21,10 @@ from itou.asp.models import (
     LaneType,
     RSAAllocation,
 )
+from itou.common_apps.address.departments import department_from_postcode
+from itou.common_apps.address.format import format_address
+from itou.common_apps.address.models import AddressMixin
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.address.departments import department_from_postcode
-from itou.utils.address.format import format_address
-from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
 
 

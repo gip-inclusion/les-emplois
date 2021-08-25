@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from itou.common.organizations.views import deactivate_org_member, update_org_admin_role
+from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User

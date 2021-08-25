@@ -333,7 +333,7 @@ class JobSeekerProfileModelTest(TestCase):
         self.profile.clean()
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_update_hexa_address(self, _mock):
@@ -345,7 +345,7 @@ class JobSeekerProfileModelTest(TestCase):
         self.profile.clean()
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_job_seeker_hexa_address_complete(self, _mock):

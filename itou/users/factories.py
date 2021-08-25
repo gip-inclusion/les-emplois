@@ -7,8 +7,8 @@ import factory.fuzzy
 
 from itou.asp.mocks.providers import INSEECommuneProvider, INSEECountryProvider
 from itou.asp.models import AllocationDuration, EducationLevel
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.users import models
-from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK
 
 

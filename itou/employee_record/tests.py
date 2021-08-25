@@ -91,7 +91,7 @@ class EmployeeRecordModelTest(TestCase):
         self.assertIsNotNone(employee_record)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_prepare_successful(self, _mock):
@@ -210,7 +210,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
     fixtures = ["test_INSEE_communes.json"]
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def setUp(self, mock):
@@ -220,14 +220,14 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_ready()
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_state_ready(self, _mock):
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.READY)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_state_sent(self, _mock):
@@ -238,7 +238,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.SENT)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_state_rejected(self, _mock):
@@ -253,7 +253,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertEqual(self.employee_record.asp_processing_label, err_message)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_state_processed(self, _mock):
@@ -316,7 +316,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
     fixtures = ["test_INSEE_communes.json", "test_asp_INSEE_countries.json"]
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def setUp(self, _mock):
@@ -341,7 +341,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_dryrun_upload(self, _mock):
@@ -358,7 +358,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_dryrun_download(self, _mock):
@@ -391,7 +391,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_upload_and_download_success(self, _mock):
@@ -418,7 +418,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_employee_record_proof(self, _mock):
@@ -440,7 +440,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPEvilConnectionMock)
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_random_connection_failure(self, _mock):
