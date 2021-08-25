@@ -17,9 +17,6 @@ class OrganizationQuerySet(models.QuerySet):
         return self.filter(members=user, members__is_active=True)
 
     def prefetch_active_memberships(self):
-        """
-        Impossible to use self.memberships because the class has to be instantiated to access properties.
-        """
         membership_model = self.model.members.through
         membership_set_related_name = membership_model.user.field.remote_field.get_accessor_name()
         qs = membership_model.objects.active().select_related("user").order_by("-is_admin", "joined_at")
