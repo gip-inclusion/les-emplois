@@ -3,9 +3,9 @@ import string
 import factory
 import factory.fuzzy
 
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers import models
 from itou.users.factories import PrescriberFactory
-from itou.utils.address.departments import DEPARTMENTS
 
 
 class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):

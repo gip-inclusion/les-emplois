@@ -3,7 +3,7 @@ import time
 import jwt
 from django.conf import settings
 
-from itou.utils.address.departments import DEPARTMENTS
+from itou.common_apps.address.departments import DEPARTMENTS
 
 
 # Metabase private / signed URLs

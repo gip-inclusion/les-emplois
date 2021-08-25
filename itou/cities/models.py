@@ -4,8 +4,8 @@ from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.template.defaultfilters import slugify
 
+from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
 from itou.siaes.models import Siae
-from itou.utils.address.departments import DEPARTMENTS, REGIONS
 
 
 class City(models.Model):

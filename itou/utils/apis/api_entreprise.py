@@ -5,7 +5,7 @@ import httpx
 from django.conf import settings
 from django.utils.http import urlencode
 
-from itou.utils.address.departments import department_from_postcode
+from itou.common_apps.address.departments import department_from_postcode
 
 
 logger = logging.getLogger(__name__)

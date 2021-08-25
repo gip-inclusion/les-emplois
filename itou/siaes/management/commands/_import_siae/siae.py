@@ -5,11 +5,11 @@ SIAE object logic used by the import_siae.py script is gathered here.
 All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 
 """
+from itou.common_apps.address.departments import department_from_postcode
 from itou.siaes.management.commands._import_siae.utils import geocode_siae
 from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.siaes.management.commands._import_siae.vue_structure import SIRET_TO_ASP_ID
 from itou.siaes.models import Siae
-from itou.utils.address.departments import department_from_postcode
 
 
 def does_siae_have_an_active_convention(siae):

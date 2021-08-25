@@ -5,11 +5,11 @@ from django.test import TestCase
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
+from itou.common_apps.address.departments import department_from_postcode
+from itou.common_apps.address.forms import AddressFormMixin
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
-from itou.utils.address.departments import department_from_postcode
-from itou.utils.address.forms import AddressFormMixin
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
 

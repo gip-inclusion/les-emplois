@@ -4,8 +4,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 
+from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
 
 def convert_boolean_to_int(b):

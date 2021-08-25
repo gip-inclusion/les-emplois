@@ -32,6 +32,7 @@ from tqdm import tqdm
 
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.cities.models import City
+from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
 from itou.metabase.management.commands import (
@@ -50,7 +51,6 @@ from itou.metabase.management.commands._utils import anonymize, chunked_queryset
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
-from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:

@@ -4,7 +4,7 @@ from django.contrib.gis.db import models as gis_models
 from django.core.exceptions import PermissionDenied
 from django.utils.timezone import now
 
-from itou.common.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
+from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.prescribers import models
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
 

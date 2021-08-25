@@ -3,8 +3,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
-from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.urls import get_external_link_markup
 
 

@@ -4,9 +4,9 @@ import os
 
 from django.core.management.base import BaseCommand
 
+from itou.common.address.departments import DEPARTMENTS
+from itou.common_apps.apis.geocoding import get_geocoding_data
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.address.departments import DEPARTMENTS
-from itou.utils.apis.geocoding import get_geocoding_data
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
