@@ -6,7 +6,7 @@ from django.test import TestCase
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
-from itou.common_apps.address.forms import AddressFormMixin
+from itou.common_apps.address.forms import OptionalAddressFormMixin
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
@@ -107,9 +107,9 @@ class UtilsDepartmentsTest(TestCase):
             self.assertEqual(department_from_postcode(post_code), post_code[:2])
 
 
-class DummyUserModelForm(AddressFormMixin, forms.ModelForm):
+class DummyUserModelForm(OptionalAddressFormMixin, forms.ModelForm):
     """
-    A dummy `ModelForm` using `AddressFormMixin` to be used in `UtilsAddressFormMixinTest`.
+    A dummy `ModelForm` using `OptionalAddressFormMixin` to be used in `UtilsOptionalAddressFormMixinTest`.
     """
 
     class Meta:
@@ -123,9 +123,9 @@ class DummyUserModelForm(AddressFormMixin, forms.ModelForm):
         ]
 
 
-class UtilsAddressFormMixinTest(TestCase):
+class UtilsOptionalAddressFormMixinTest(TestCase):
     """
-    Test `AddressFormMixin`.
+    Test `OptionalAddressFormMixin`.
     """
 
     def test_empty_form(self):
@@ -133,7 +133,7 @@ class UtilsAddressFormMixinTest(TestCase):
         An empty form is OK.
         """
         form_data = {}
-        form = AddressFormMixin(data=form_data)
+        form = OptionalAddressFormMixin(data=form_data)
         self.assertTrue(form.is_valid())
         expected_cleaned_data = {
             "city_slug": "",
@@ -155,7 +155,7 @@ class UtilsAddressFormMixinTest(TestCase):
             "address_line_2": "11 rue des pixels cassés",
             "post_code": "",
         }
-        form = AddressFormMixin(data=form_data)
+        form = OptionalAddressFormMixin(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors["address_line_1"][0], "Adresse : ce champ est obligatoire.")
         self.assertEqual(form.errors["post_code"][0], "Code postal : ce champ est obligatoire.")
@@ -177,7 +177,7 @@ class UtilsAddressFormMixinTest(TestCase):
             "post_code": "67000",
         }
 
-        form = AddressFormMixin(data=form_data)
+        form = OptionalAddressFormMixin(data=form_data)
 
         with self.assertNumQueries(1):
             self.assertTrue(form.is_valid())

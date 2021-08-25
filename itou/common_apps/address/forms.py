@@ -5,7 +5,7 @@ from itou.cities.models import City
 from itou.users.models import User
 
 
-class AddressFormMixin(forms.Form):
+class OptionalAddressFormMixin(forms.Form):
 
     ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
@@ -49,7 +49,7 @@ class AddressFormMixin(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Needed for proper auto-completion when `AddressFormMixin` is used with
+        # Needed for proper auto-completion when `OptionalAddressFormMixin` is used with
         # a ModelForm which has an instance existing in DB.
         if hasattr(self, "instance") and hasattr(self.instance, "city") and hasattr(self.instance, "department"):
             self.initial["city"] = self.instance.city
