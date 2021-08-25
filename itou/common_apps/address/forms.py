@@ -6,6 +6,9 @@ from itou.users.models import User
 
 
 class OptionalAddressFormMixin(forms.Form):
+    """
+    Form mixin that allows to enter an optional address.
+    """
 
     ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
@@ -87,3 +90,20 @@ class OptionalAddressFormMixin(forms.Form):
                 self.add_error("post_code", "Code postal : ce champ est obligatoire.")
             if not city_slug:
                 self.add_error("city", "Ville : ce champ est obligatoire.")
+
+
+class MandatoryAddressFormMixin(OptionalAddressFormMixin):
+    """
+    Form mixin that requires an address.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["address_line_1"].required = True
+        self.fields["post_code"].required = True
+        self.fields["city"].required = True
+
+    def clean(self):
+        if self.errors:
+            return  # An error here means that some required fields were left blank.
+        super().clean()
