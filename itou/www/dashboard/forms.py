@@ -7,7 +7,6 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.users.models import User
-from itou.utils.address.forms import AddressFormMixin
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
