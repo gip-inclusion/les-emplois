@@ -6,9 +6,9 @@ from django.contrib.gis.db import models as gis_models
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from itou.common.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.siaes import models
 from itou.siaes.admin_forms import SiaeAdminForm
-from itou.utils.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 
 
 class SiaeMembersInline(MembersInline):

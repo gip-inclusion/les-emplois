@@ -2,9 +2,9 @@ from django.contrib import admin
 from django.contrib.gis import forms as gis_forms
 from django.contrib.gis.db import models as gis_models
 
+from itou.common.organizations.admin import MembersInline, OrganizationAdmin
 from itou.institutions import models
 from itou.institutions.admin_forms import InstitutionAdminForm
-from itou.utils.organizations.admin import MembersInline, OrganizationAdmin
 
 
 class InstitutionMembersInline(MembersInline):

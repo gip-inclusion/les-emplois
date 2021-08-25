@@ -7,10 +7,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
+from itou.common.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
-from itou.utils.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import (
