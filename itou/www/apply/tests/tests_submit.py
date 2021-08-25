@@ -12,6 +12,7 @@ from django.utils.http import urlencode
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import ApprovalsWrapper, PoleEmploiApproval
 from itou.cities.factories import create_test_cities
+from itou.cities.models import City
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -211,6 +212,10 @@ class ApplyAsJobSeekerTest(TestCase):
 
 
 class ApplyAsAuthorizedPrescriberTest(TestCase):
+    def setUp(self):
+        create_test_cities(["57"], num_per_department=1)
+        self.city = City.objects.first()
+
     def test_apply_as_authorized_prescriber(self):
         """Apply as authorized prescriber."""
 
@@ -292,6 +297,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "birthdate": "20/12/1978",
             "phone": "0610200305",
             "pole_emploi_id": "12345678",
+            "address_line_1": "36, rue du 6 Mai 1956",
+            "post_code": self.city.post_codes[0],
+            "city": self.city.name,
+            "city_slug": self.city.slug,
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -478,6 +487,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "birthdate": "20/12/1978",
             "phone": "0610200305",
             "pole_emploi_id": "12345678",
+            "address_line_1": "36, rue du 6 Mai 1956",
+            "post_code": self.city.post_codes[0],
+            "city": self.city.name,
+            "city_slug": self.city.slug,
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -728,6 +741,10 @@ class ApplyAsPrescriberTest(TestCase):
 
 
 class ApplyAsSiaeTest(TestCase):
+    def setUp(self):
+        create_test_cities(["57"], num_per_department=1)
+        self.city = City.objects.first()
+
     def test_perms_for_siae(self):
         """An SIAE can postulate only for itself."""
         siae1 = SiaeWithMembershipFactory()
@@ -820,6 +837,10 @@ class ApplyAsSiaeTest(TestCase):
             "birthdate": "20/12/1978",
             "phone": "0610200305",
             "pole_emploi_id": "12345678",
+            "address_line_1": "36, rue du 6 Mai 1956",
+            "post_code": self.city.post_codes[0],
+            "city": self.city.name,
+            "city_slug": self.city.slug,
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)

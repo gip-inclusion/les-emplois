@@ -269,7 +269,7 @@ class ProcessViewsTest(TestCase):
             response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG % max_end_at.strftime("%d/%m/%Y")
         )
 
-        # No address provided
+        # No address provided.
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae=siae
         )
@@ -285,8 +285,10 @@ class ProcessViewsTest(TestCase):
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
         }
-        with self.assertRaises(KeyError):
-            response = self.client.post(url, data=post_data)
+        response = self.client.post(url, data=post_data)
+        self.assertFormError(response, "form_user_address", "address_line_1", "Ce champ est obligatoire.")
+        self.assertFormError(response, "form_user_address", "city", "Ce champ est obligatoire.")
+        self.assertFormError(response, "form_user_address", "post_code", "Ce champ est obligatoire.")
 
     def test_accept_with_manual_approval_delivery(self):
         """
