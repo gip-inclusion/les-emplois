@@ -3,8 +3,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 
+from itou.common.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.users.models import User
-from itou.utils.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.utils.perms.institution import get_current_institution_or_404
 
 

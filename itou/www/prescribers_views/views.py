@@ -5,9 +5,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 
+from itou.common.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
-from itou.utils.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm

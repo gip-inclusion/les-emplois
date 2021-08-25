@@ -11,9 +11,9 @@ They belong to a DDETS, a DREETS or a DGEFP.
 
 from django.db import models
 
+from itou.common.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.users.models import User
 from itou.utils.address.models import AddressMixin
-from itou.utils.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 
 
 class Institution(AddressMixin, OrganizationAbstract):
