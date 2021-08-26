@@ -245,7 +245,7 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
         if approval:
             if approval.is_pass_iae:
                 job_application = approval.user.last_accepted_job_application
-                if job_application.to_siae == siae:
+                if job_application and job_application.to_siae == siae:
                     # Suspensions and prolongations links are available in the job application details page.
                     application_details_url = reverse(
                         "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
