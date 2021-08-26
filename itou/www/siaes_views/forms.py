@@ -3,8 +3,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
-from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.urls import get_external_link_markup
 
 
@@ -90,7 +90,7 @@ class CreateSiaeForm(forms.ModelForm):
         siae.convention = self.current_siae.convention
         siae.save()
 
-        SiaeMembership.objects.create(siae=siae, is_siae_admin=True, user=request.user)
+        SiaeMembership.objects.create(siae=siae, is_admin=True, user=request.user)
 
         return siae
 

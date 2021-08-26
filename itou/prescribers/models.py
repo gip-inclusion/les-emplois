@@ -3,23 +3,17 @@ from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Prefetch
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.utils.address.models import AddressMixin
+from itou.common_apps.address.models import AddressMixin
+from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
-class PrescriberOrganizationQuerySet(models.QuerySet):
-    def member_required(self, user):
-        if user.is_superuser:
-            return self
-        return self.filter(members=user, members__is_active=True)
-
+class PrescriberOrganizationQuerySet(OrganizationQuerySet):
     def autocomplete(self, search_string, limit=10):
         queryset = (
             self.annotate(similarity=TrigramSimilarity("name", search_string))
@@ -34,10 +28,6 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
     def within(self, point, distance_km):
         return self.filter(coords__dwithin=(point, D(km=distance_km)))
 
-    def prefetch_active_memberships(self):
-        qs = PrescriberMembership.objects.active().select_related("user").order_by("-is_admin", "joined_at")
-        return self.prefetch_related(Prefetch("prescribermembership_set", queryset=qs))
-
 
 class PrescriberOrganizationManager(models.Manager):
     def get_accredited_orgs_for(self, org):
@@ -49,7 +39,7 @@ class PrescriberOrganizationManager(models.Manager):
         return self.none()
 
 
-class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
+class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
 
@@ -143,7 +133,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         default=False,
         help_text="Indique si l'organisme est conventionné par le conseil départemental pour le suivi des BRSA.",
     )
-    name = models.CharField(verbose_name="Nom", max_length=255)
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
     email = models.EmailField(verbose_name="E-mail", blank=True)
     website = models.URLField(verbose_name="Site web", blank=True)
@@ -179,8 +168,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         blank=True,
         on_delete=models.SET_NULL,
     )
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
 
     authorization_status = models.CharField(
         verbose_name="Statut de l'habilitation",
@@ -211,14 +198,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         # NOK => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret="12345678900000")
         unique_together = ("siret", "kind")
 
-    def __str__(self):
-        return f"{self.name}"
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
-
     def clean(self, *args, **kwargs):
         super().clean()
         self.clean_code_safir_pole_emploi()
@@ -242,17 +221,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
                 raise ValidationError({"siret": "Ce SIRET est déjà utilisé."})
 
     @property
-    def display_name(self):
-        return self.name.capitalize()
-
-    @property
-    def has_members(self):
-        return self.active_members.exists()
-
-    def has_admin(self, user):
-        return self.active_admin_members.filter(pk=user.pk).exists()
-
-    @property
     def accept_survey_url(self):
         """
         Returns the typeform's satisfaction survey URL to be sent after a successful hiring.
@@ -265,39 +233,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         }
         qs = urlencode(args)
         return f"{settings.TYPEFORM_URL}/to/EDHZSU7p?{qs}"
-
-    @property
-    def active_members(self):
-        """
-        In this context, active == has an active membership AND user is still active.
-
-        Query will be optimized later with Qs.
-        """
-        return self.members.filter(is_active=True, prescribermembership__is_active=True)
-
-    @property
-    def deactivated_members(self):
-        """
-        List of previous members of the structure, still active as user (from the model POV)
-        but deactivated by an admin at some point in time.
-
-        Query will be optimized later with Qs.
-        """
-        return self.members.filter(is_active=True, prescribermembership__is_active=False)
-
-    @property
-    def active_admin_members(self):
-        """
-        Active admin members:
-        active user/admin in this context means both:
-        * user.is_active: user is able to do something on the platform
-        * user.membership.is_active: is a member of this structure
-
-        Query will be optimized later with Qs.
-        """
-        return self.members.filter(
-            is_active=True, prescribermembership__is_admin=True, prescribermembership__is_active=True
-        )
 
     def get_card_url(self):
         if not self.is_authorized:
@@ -318,9 +253,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         An unknown organization claiming to be authorized must provide a written proof.
         """
         return self.kind == self.Kind.OTHER and self.authorization_status == self.AuthorizationStatus.NOT_SET
-
-    def get_admins(self):
-        return self.members.filter(is_active=True, prescribermembership__is_admin=True)
 
     def validated_prescriber_organization_email(self):
         """
@@ -356,52 +288,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def member_deactivation_email(self, user):
-        """
-        Send email when an admin of the structure disables the membership of a given user (deactivation).
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/member_deactivation_email_subject.txt"
-        body = "common/emails/member_deactivation_email_body.txt"
-        return get_email_message(to, context, subject, body)
 
-    def add_admin_email(self, user):
-        """
-        Send info email to a new admin of the organization (added)
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/add_admin_email_subject.txt"
-        body = "common/emails/add_admin_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def remove_admin_email(self, user):
-        """
-        Send info email to a former admin of the organization (removed)
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/remove_admin_email_subject.txt"
-        body = "common/emails/remove_admin_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
-
-class PrescriberMembershipQuerySet(models.QuerySet):
-    def active(self):
-        return self.filter(is_active=True, user__is_active=True)
-
-
-class PrescriberMembership(models.Model):
+class PrescriberMembership(MembershipAbstract):
     """Intermediary model between `User` and `PrescriberOrganization`."""
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE)
-    joined_at = models.DateTimeField(verbose_name="Date d'adhésion", default=timezone.now)
-    is_admin = models.BooleanField(verbose_name="Administrateur de la structure d'accompagnement", default=False)
-    is_active = models.BooleanField("Rattachement actif", default=True)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="updated_prescribermembership_set",
@@ -410,40 +301,18 @@ class PrescriberMembership(models.Model):
         verbose_name="Mis à jour par",
     )
 
-    objects = models.Manager.from_queryset(PrescriberMembershipQuerySet)()
-
     class Meta:
         unique_together = ("user_id", "organization_id")
 
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
-
-    def deactivate_membership_by_user(self, user):
-        """
-        Deactivate the membership of a member (reference held by self) `user` is
-        the admin updating this user (`updated_by` field)
-        """
-        self.is_active = False
-        self.updated_by = user
-        return True
-
-    def set_admin_role(self, active, user):
-        """
-        Set admin role for the given user.
-        `user` is the admin updating this user (`updated_by` field)
-        """
-        self.is_admin = active
-        self.updated_by = user
-
     def request_for_invitation(self, requestor: dict):
         """
-        A new user can ask for an invitation to join an organization.
+        A new user can ask for an invitation to join a prescriber organization.
         The list of members is sorted by:
         - admin
         - date joined
         and the first member of the list will be contacted.
+        This feature is only available for prescribers but it should
+        be common to every organization.
         """
         to_user = self.user
         to = [to_user.email]

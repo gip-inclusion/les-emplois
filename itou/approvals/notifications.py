@@ -1,5 +1,5 @@
+from itou.common_apps.notifications.base_class import BaseNotification
 from itou.utils.emails import get_email_message
-from itou.utils.notifications.base_class import BaseNotification
 
 
 class NewProlongationToAuthorizedPrescriberNotification(BaseNotification):

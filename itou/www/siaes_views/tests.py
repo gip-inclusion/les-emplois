@@ -264,7 +264,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_asp_source_siae_non_admin_cannot_see_nor_select_af(self):
-        siae = SiaeWithMembershipFactory(membership__is_siae_admin=False)
+        siae = SiaeWithMembershipFactory(membership__is_admin=False)
         user = siae.members.first()
         self.assertFalse(siae.has_admin(user))
         self.assertTrue(siae.is_asp_managed)
@@ -614,7 +614,7 @@ class EditSiaeViewTest(TestCase):
 
         # Only admin members should be allowed to edit SIAE's details
         membership = user.siaemembership_set.first()
-        membership.is_siae_admin = False
+        membership.is_admin = False
         membership.save()
         url = reverse("siaes_views:edit_siae")
         response = self.client.get(url)
@@ -701,7 +701,7 @@ class UserMembershipDeactivationTest(TestCase):
         (must be done by another admin)
         """
         siae = SiaeWithMembershipFactory()
-        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
+        admin = siae.members.filter(siaemembership__is_admin=True).first()
         memberships = admin.siaemembership_set.all()
         membership = memberships.first()
 
@@ -721,8 +721,8 @@ class UserMembershipDeactivationTest(TestCase):
         Everything should be fine ...
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
-        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
+        admin = siae.members.filter(siaemembership__is_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         membership = guest.siaemembership_set.first()
         self.assertFalse(guest in siae.active_admin_members)
@@ -752,7 +752,7 @@ class UserMembershipDeactivationTest(TestCase):
         Non-admin user can't change memberships
         """
         siae = SiaeWith2MembershipsFactory()
-        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
+        guest = siae.members.filter(siaemembership__is_admin=False).first()
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
@@ -766,8 +766,8 @@ class UserMembershipDeactivationTest(TestCase):
         are activated/invited again, they will be able to log in.
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
-        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
+        admin = siae.members.filter(siaemembership__is_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
@@ -823,8 +823,8 @@ class SIAEAdminMembersManagementTest(TestCase):
         Check the ability for an admin to add another admin to the siae
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
-        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
+        admin = siae.members.filter(siaemembership__is_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
@@ -852,11 +852,11 @@ class SIAEAdminMembersManagementTest(TestCase):
         Check the ability for an admin to remove another admin
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
-        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
+        admin = siae.members.filter(siaemembership__is_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         membership = guest.siaemembership_set.first()
-        membership.is_siae_admin = True
+        membership.is_admin = True
         membership.save()
         self.assertTrue(guest in siae.active_admin_members)
 
@@ -889,8 +889,8 @@ class SIAEAdminMembersManagementTest(TestCase):
         Non-admin users can't update admin members
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
-        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
+        admin = siae.members.filter(siaemembership__is_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
@@ -918,8 +918,8 @@ class SIAEAdminMembersManagementTest(TestCase):
         """
         suspicious_action = "h4ckm3"
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
-        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
+        admin = siae.members.filter(siaemembership__is_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         # update: less test with RE_PATH

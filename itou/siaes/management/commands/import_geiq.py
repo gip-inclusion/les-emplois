@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from django.core.management.base import BaseCommand
 
+from itou.common_apps.address.departments import department_from_postcode
 from itou.siaes.management.commands._import_siae.utils import (
     clean_string,
     geocode_siae,
@@ -13,7 +14,6 @@ from itou.siaes.management.commands._import_siae.utils import (
     timeit,
 )
 from itou.siaes.models import Siae
-from itou.utils.address.departments import department_from_postcode
 from itou.utils.validators import validate_siret
 
 

@@ -259,7 +259,7 @@ def join_institution(request, invitation_type, invitation_id):
             invitation.add_invited_user_to_institution()
             invitation.accept()
         messages.success(
-            request, f"Vous êtes désormais membre de l'organisation' {invitation.institution.display_name}."
+            request, f"Vous êtes désormais membre de l'organisation {invitation.institution.display_name}."
         )
     else:
         messages.error(request, "Cette invitation n'est plus valide.")

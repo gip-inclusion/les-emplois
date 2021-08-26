@@ -93,7 +93,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         # - ctx processors are called AFTER this
         # - and only when rendering a template
         siaes = self.request.user.siae_set.filter(
-            siaemembership__is_active=True, siaemembership__is_siae_admin=True
+            siaemembership__is_active=True, siaemembership__is_admin=True
         ).active_or_in_grace_period()
 
         try:

@@ -12,8 +12,8 @@ from time import time
 import pandas as pd
 from django.utils import timezone
 
+from itou.common_apps.address.models import AddressMixin
 from itou.siaes.models import Siae
-from itou.utils.address.models import AddressMixin
 from itou.utils.apis.geocoding import get_geocoding_data
 
 

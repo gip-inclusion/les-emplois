@@ -3,8 +3,8 @@ from unittest import mock
 from django.test import TestCase
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
+from itou.common_apps.address.format import format_address
 from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
-from itou.utils.address.format import format_address
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
 
@@ -21,7 +21,7 @@ def mock_get_geocoding_data(address, post_code=None, limit=1):
 
 
 @mock.patch(
-    "itou.utils.address.format.get_geocoding_data",
+    "itou.common_apps.address.format.get_geocoding_data",
     side_effect=mock_get_geocoding_data,
 )
 class FormatASPAdresses(TestCase):
@@ -169,7 +169,7 @@ class LaneTypeTest(TestCase):
 
 
 @mock.patch(
-    "itou.utils.address.format.get_geocoding_data",
+    "itou.common_apps.address.format.get_geocoding_data",
     side_effect=mock_get_geocoding_data,
 )
 class LaneExtensionTest(TestCase):

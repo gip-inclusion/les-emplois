@@ -20,7 +20,7 @@ class SiaeMembershipInline(admin.TabularInline):
         "siae",
         "siae_id_link",
         "joined_at",
-        "is_siae_admin",
+        "is_admin",
         "is_active",
         "created_at",
         "updated_at",

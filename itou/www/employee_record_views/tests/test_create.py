@@ -64,7 +64,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.assertTrue(self.job_seeker.has_jobseeker_profile)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def pass_step_2(self, _mock):
@@ -238,7 +238,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         self.assertEqual(response.status_code, 200)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_valid_address(self, _mock):
@@ -322,7 +322,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
     # "Basic" folds : check invalidation of hidden fields
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_fold_pole_emploi(self, _mock):

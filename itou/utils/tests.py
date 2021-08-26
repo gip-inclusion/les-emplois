@@ -14,6 +14,7 @@ from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from factory import Faker
 
+from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
@@ -33,7 +34,6 @@ from itou.utils.mocks.pole_emploi import (
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
-from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import get_absolute_url, get_external_link_markup, get_safe_url

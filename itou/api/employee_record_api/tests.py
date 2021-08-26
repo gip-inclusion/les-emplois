@@ -121,7 +121,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
     ]
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data",
+        "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_fetch_employee_record_list(self, _mock):

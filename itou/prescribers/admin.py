@@ -2,9 +2,9 @@ from django.contrib import admin
 from django.contrib.gis import forms as gis_forms
 from django.contrib.gis.db import models as gis_models
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
 from django.utils.timezone import now
 
+from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.prescribers import models
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
 
@@ -54,22 +54,6 @@ class TmpCanBeDeletedFilter(admin.SimpleListFilter):
         return queryset
 
 
-class HasMembersFilter(admin.SimpleListFilter):
-    title = "A des membres"
-    parameter_name = "has_members"
-
-    def lookups(self, request, model_admin):
-        return (("yes", "Oui"), ("no", "Non"))
-
-    def queryset(self, request, queryset):
-        value = self.value()
-        if value == "yes":
-            return queryset.filter(_member_count__gt=0)
-        if value == "no":
-            return queryset.exclude(_member_count__gt=0)
-        return queryset
-
-
 class AuthorizationValidationRequired(admin.SimpleListFilter):
     title = "Validation de l'habilitation requise"
     parameter_name = "authorization_validation_required"
@@ -85,15 +69,12 @@ class AuthorizationValidationRequired(admin.SimpleListFilter):
         return queryset
 
 
-class MembersInline(admin.TabularInline):
+class PrescriberOrganizationMembersInline(MembersInline):
     model = models.PrescriberOrganization.members.through
-    extra = 1
-    raw_id_fields = ("user",)
-    readonly_fields = ("is_active", "created_at", "updated_at", "updated_by")
 
 
 @admin.register(models.PrescriberOrganization)
-class PrescriberOrganizationAdmin(admin.ModelAdmin):
+class PrescriberOrganizationAdmin(OrganizationAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 
@@ -146,7 +127,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
             },
         ),
     )
-    inlines = (MembersInline,)
+    inlines = (PrescriberOrganizationMembersInline,)
     list_display = ("pk", "siret", "name", "kind", "post_code", "city", "department", "is_authorized", "member_count")
     list_display_links = ("pk", "name")
     list_filter = (
@@ -187,15 +168,9 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
     }
 
-    def member_count(self, obj):
-        return obj._member_count
-
-    member_count.admin_order_field = "_member_count"
-
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.annotate(_member_count=Count("members", distinct=True))
-        return queryset
+        # OrganizationAdmin adds some useful annotations.
+        return super().get_queryset(request)
 
     def save_model(self, request, obj, form, change):
 

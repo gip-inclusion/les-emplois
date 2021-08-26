@@ -3,11 +3,11 @@ import string
 import factory.fuzzy
 from django.utils import timezone
 
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
 from itou.users.factories import SiaeStaffFactory
-from itou.utils.address.departments import DEPARTMENTS
 
 
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
@@ -78,7 +78,7 @@ class SiaeMembershipFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(SiaeStaffFactory)
     siae = factory.SubFactory(SiaeFactory)
-    is_siae_admin = True
+    is_admin = True
 
 
 class SiaeWithMembershipFactory(SiaeFactory):
@@ -97,7 +97,7 @@ class SiaeWith2MembershipsFactory(SiaeFactory):
     """
 
     membership1 = factory.RelatedFactory(SiaeMembershipFactory, "siae")
-    membership2 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_siae_admin=False)
+    membership2 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_admin=False)
 
 
 class SiaeWith4MembershipsFactory(SiaeFactory):
@@ -109,11 +109,11 @@ class SiaeWith4MembershipsFactory(SiaeFactory):
     # active admin user
     membership1 = factory.RelatedFactory(SiaeMembershipFactory, "siae")
     # active normal user
-    membership2 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_siae_admin=False)
+    membership2 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_admin=False)
     # inactive admin user
     membership3 = factory.RelatedFactory(SiaeMembershipFactory, "siae", user__is_active=False)
     # inactive normal user
-    membership4 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_siae_admin=False, user__is_active=False)
+    membership4 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_admin=False, user__is_active=False)
 
 
 class SiaeWithJobsFactory(SiaeFactory):

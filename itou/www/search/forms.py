@@ -3,8 +3,8 @@ from django.urls import reverse_lazy
 from django.utils.datastructures import MultiValueDict
 
 from itou.cities.models import City
+from itou.common_apps.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
 from itou.siaes.models import Siae
-from itou.utils.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
 
 
 class SiaeSearchForm(forms.Form):

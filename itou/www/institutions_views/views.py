@@ -1,10 +1,9 @@
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 
+from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.users.models import User
 from itou.utils.perms.institution import get_current_institution_or_404
 
@@ -40,32 +39,9 @@ def member_list(request, template_name="institutions/members.html"):
 @login_required
 def deactivate_member(request, user_id, template_name="institutions/deactivate_member.html"):
     institution = get_current_institution_or_404(request)
-    user = request.user
     target_member = User.objects.get(pk=user_id)
-    user_is_admin = institution.has_admin(user)
 
-    if not user_is_admin:
-        raise PermissionDenied
-
-    if target_member not in institution.active_members:
-        raise PermissionDenied
-
-    membership = target_member.institutionmembership_set.get(institution=institution)
-
-    if request.method == "POST":
-        if user != target_member and user_is_admin:
-            if membership.is_active:
-                # Only membership is modified
-                membership.deactivate_membership_by_user(user)
-                membership.save()
-                messages.success(
-                    request,
-                    "%(name)s a été retiré(e) des membres actifs de cette structure."
-                    % {"name": target_member.get_full_name()},
-                )
-                institution.member_deactivation_email(membership.user).send()
-        else:
-            raise PermissionDenied
+    if deactivate_org_member(request=request, target_member=target_member, organization=institution):
         return HttpResponseRedirect(reverse_lazy("institutions_views:members"))
 
     context = {
@@ -79,39 +55,9 @@ def deactivate_member(request, user_id, template_name="institutions/deactivate_m
 @login_required
 def update_admin_role(request, action, user_id, template_name="institutions/update_admins.html"):
     institution = get_current_institution_or_404(request)
-    user = request.user
     target_member = User.objects.get(pk=user_id)
-    user_is_admin = institution.has_admin(user)
 
-    if not user_is_admin:
-        raise PermissionDenied
-
-    if target_member not in institution.active_members:
-        raise PermissionDenied
-
-    membership = target_member.institutionmembership_set.get(institution=institution)
-
-    if request.method == "POST":
-        if user != target_member and user_is_admin and membership.is_active:
-            if action == "add":
-                membership.set_admin_role(True, user)
-                messages.success(
-                    request,
-                    "%(name)s a été ajouté(e) aux administrateurs de cette structure."
-                    % {"name": target_member.get_full_name()},
-                )
-                institution.add_admin_email(target_member).send()
-            if action == "remove":
-                membership.set_admin_role(False, user)
-                messages.success(
-                    request,
-                    "%(name)s a été retiré(e) des administrateurs de cette structure."
-                    % {"name": target_member.get_full_name()},
-                )
-                institution.remove_admin_email(target_member).send()
-            membership.save()
-        else:
-            raise PermissionDenied
+    if update_org_admin_role(request=request, organization=institution, target_member=target_member, action=action):
         return HttpResponseRedirect(reverse_lazy("institutions_views:members"))
 
     context = {

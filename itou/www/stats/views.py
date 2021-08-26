@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
-from itou.utils.address.departments import DEPARTMENTS
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.utils.apis.metabase import metabase_embedded_url
 from itou.utils.perms.prescriber import get_current_org_or_404
 

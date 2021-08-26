@@ -3,8 +3,8 @@ import logging
 
 from django.core.management.base import BaseCommand
 
+from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.address.departments import DEPARTMENTS, department_from_postcode
 
 
 class Command(BaseCommand):
