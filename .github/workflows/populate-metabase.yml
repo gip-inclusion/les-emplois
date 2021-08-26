@@ -25,6 +25,7 @@ env:
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   CRON_APPS_ORGANIZATION_NAME: ${{ secrets.CLEVER_CRON_APPS_ORGANIZATION_NAME }}
+  DEPLOY_BRANCH: master_clever
 
 jobs:
   populate_metabase:
@@ -78,7 +79,7 @@ jobs:
 # - run what’s in CC_RUN_SUCCEEDED_HOOK
 # - destroy the app once the task is over
     - name: 🚀 Deploy to Clever Cloud
-      run: $CLEVER_CLI deploy --branch $BRANCH --force
+      run: $CLEVER_CLI deploy --branch $DEPLOY_BRANCH --force
 
     - name: 🗑 Delete the app once the work is done
       run:

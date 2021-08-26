@@ -7,7 +7,7 @@ from django.utils import timezone
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
-from itou.common_apps.address.forms import AddressFormMixin
+from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
@@ -66,7 +66,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
+class CreateJobSeekerForm(MandatoryAddressFormMixin, forms.ModelForm):
     email = forms.EmailField(
         label="E-mail personnel du candidat",
         widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com", "readonly": True}),
@@ -359,16 +359,10 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class UserAddressForm(AddressFormMixin, forms.ModelForm):
+class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
     """
     Add job seeker address in the job application process.
     """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        for field in ["address_line_1", "post_code", "city"]:
-            self.fields[field].required = True
 
     class Meta:
         model = User

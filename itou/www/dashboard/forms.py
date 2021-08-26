@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from itou.common_apps.address.forms import AddressFormMixin
+from itou.common_apps.address.forms import OptionalAddressFormMixin
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
@@ -10,7 +10,7 @@ from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
-class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
+class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
     """
     Edit a user profile.
     """
