@@ -311,7 +311,10 @@ class User(AbstractUser, AddressMixin):
     def last_accepted_job_application(self):
         if not self.is_job_seeker:
             return None
-        return self.job_applications.accepted().latest("created_at")
+        queryset = self.job_applications.accepted()
+        if queryset.exists():
+            return queryset.latest("created_at")
+        return None
 
     @cached_property
     def jobseeker_hash_id(self):
