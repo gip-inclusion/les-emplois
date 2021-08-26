@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("siaes", "0047_alter_siae_options"),
+        ("siaes", "0049_alter_siaemembership_is_admin"),
     ]
 
     operations = [
