@@ -18,11 +18,11 @@ Un filtre est appliqué pour ne récupérer que les données de la région Île-
 
 SELECT 
     emi.emi_pph_id  as identifiant_salarie,
-    emi."emi_nb_heures_travail" as nombre_heures_travaillees,
+    emi.emi_nb_heures_travail as nombre_heures_travaillees,
     emi.emi_part_etp as nombre_etp,
     emi.emi_sme_annee as annee_saisie,
     emi.emi_sme_mois as mois_saisie,
-    make_date(cast (emi.emi_sme_annee as integer), cast(emi.emi_sme_mois as integer ), 1) as date_saisie,
+    make_date(cast(emi.emi_sme_annee as integer), cast(emi.emi_sme_mois as integer), 1) as date_saisie,
     case 
         when salarie.salarie_rci_libelle = 'M.' then 'Homme'
         else 'Femme'
@@ -61,21 +61,21 @@ SELECT
     af.type_siae,
     ept.etablissement_Public_Territorial
 from
-    "public"."fluxIAE_EtatMensuelIndiv" as emi
-    left join  public."fluxIAE_ContratMission"  as ctr_mis
+    "fluxIAE_EtatMensuelIndiv" as emi
+    left join "fluxIAE_ContratMission"  as ctr_mis
         on emi.emi_ctr_id = ctr_mis.contrat_id_ctr 
-        and emi."emi_nb_heures_travail" > 0 
+        and emi.emi_nb_heures_travail > 0 
     left join (
         select 
-            distinct salarie_id  , 
+            distinct salarie_id, 
             salarie_rci_libelle
         from 
             "fluxIAE_Salarie"  
     ) as salarie
         on emi.emi_pph_id = salarie.salarie_id 
-        and emi."emi_nb_heures_travail" > 0
+        and emi.emi_nb_heures_travail > 0
     left join 
-        public."fluxIAE_RefNiveauFormation" as niv_formation 
+        "fluxIAE_RefNiveauFormation" as niv_formation 
         on ctr_mis."contrat_niveau_de_formation_id" = niv_formation.rnf_id
     left join "fluxIAE_AnnexeFinanciere_v2" af
         on emi.emi_afi_id = af.af_id_annexe_financiere
@@ -86,6 +86,6 @@ from
     left join sa_ept ept on ept.code_comm = structure.structure_adresse_admin_code_insee
 where
     /* on prend uniquement les salariés ayant travaillé au moins une heure dans la structure */
-    emi."emi_nb_heures_travail" > 0
+    emi.emi_nb_heures_travail > 0
     /* le département de l'expérimentation en cours est le 93 */
     and structure.nom_region_structure = 'Île-de-France'
