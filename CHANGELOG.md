@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## [25] - 2021-08-26
+
+### Ajouté
+- Ajout d'un bouton pour demander à rejoindre la structure lors de l'inscription d'un prescripteur.
+- Ajout de l'information de l'entreprise siège.
+- Ajout des dates du PASS IAE dans les fiches salarié.
+- Ajout d'une fonctionnalité au processus périodique de transfert des fiches salarié qui permettra d'effacer les données après 13 mois.
+
+### Modifié
+- Remplacement technique du composant permettant de saisir des dates afin de permettre la saisie à la main ou par l'intermédiaire d'un calendrier.
+- Factorisation technique du code des organisations, des structures et des institutions.
+- Résolution d'un bug du formulaire que le candidat utilise pour postuler.
+- Simplification du message d'information qui apparaît lors de l'acceptation d'une candidature.
+- Résolution d'un bug dans le module de reprise d'agrément s'il a déjà été repris par un autre employeur avant.
+- Résolution d'une erreur 500 à la délivrance d'un PASS IAE si la candidature a été acceptée plus d'une fois.
+- Résolution d'une erreur 500 à l'import d'un agrément PE si le candidat a déjà un PASS IAE mais n'a aucune candidature acceptée.
+- Les tests unitaires fonctionnent maintenant même entre minuit et 2h du matin sur les candidatures.
+- Les champs concernant l'adresse d'un candidat deviennent obligatoires dans le tunnel de candidature (avec ajout d'astérisques).
+- Dans les menus de sélection du département, la liste commence désormais par leur numéro afin de pouvoir utiliser le clavier pour aller plus vite.
+- Correction de la balise META du logo dans l'en-tête HTML pour utiliser le nouveau logo.
+- Préparation de l'ouverture progressive de la fonctionnalité des fiches salarié.
+
 ## [24] - 2021-08-12
 
 ### Ajouté
