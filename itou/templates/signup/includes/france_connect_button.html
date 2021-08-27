@@ -1,0 +1,13 @@
+{% load static %}
+<p class="text-center">
+    <a
+        href="{% url 'france_connect:authorize' %}"
+        aria-label="S'identifier avec FranceConnect"
+        class="itou-france-connect matomo-event btn mt-4"
+        data-matomo-category="inscription-candidat"
+        data-matomo-action="clic"
+        data-matomo-option="se-connecter-avec-france-connect">
+    </a>
+    <br>
+    <a href="https://app.franceconnect.gouv.fr/en-savoir-plus">Qu’est-ce que FranceConnect ?</a>
+</p>
