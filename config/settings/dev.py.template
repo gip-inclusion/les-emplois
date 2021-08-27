@@ -82,3 +82,9 @@ LOGGING.setdefault("loggers", {})["django.db.backends"] = {
 LEMARCHE_OPEN_REGIONS = ["Occitanie"]
 
 ASP_ITOU_PREFIX = "XXXXX"
+
+# France Connect.
+# ------------------------------------------------------------------------------
+
+# Integration platform and associated public key (non confidential)
+FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
