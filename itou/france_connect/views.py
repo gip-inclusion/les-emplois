@@ -205,6 +205,11 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
 
     # Contains access_token, token_type, expires_in, id_token
     token_data = response.json()
+    print(token_data)
+
+    access_token = token_data.get("access_token")
+    if not access_token:
+        return JsonResponse({"message": "Aucun champ « access_token » dans la réponse FranceConnect."}, status=400)
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
@@ -212,7 +217,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     response = httpx.get(
         url,
         params={"schema": "openid"},
-        headers={"Authorization": "Bearer " + token_data["access_token"]},
+        headers={"Authorization": "Bearer " + access_token},
         timeout=60,
     )
     if response.status_code != 200:
