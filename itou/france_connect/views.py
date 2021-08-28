@@ -205,7 +205,6 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
 
     # Contains access_token, token_type, expires_in, id_token
     token_data = response.json()
-    print(token_data)
 
     access_token = token_data.get("access_token")
     if not access_token:
@@ -248,17 +247,23 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
 
 
 def france_connect_logout(request):
-    if request.user.is_anonymous:
-        return JsonResponse({"message": "L'utilisateur n'est pas authentifié."})
-
+    # The user can be authentified on FC w/o a session on itou.
     id_token = request.GET.get("id_token")
+
     if not id_token:
         return JsonResponse({"message": "Le paramètre « id_token » est manquant."}, status=400)
 
     params = {
         "id_token_hint": id_token,
-        "state": "itou",
-        "post_logout_redirect_uri": settings.FRANCE_CONNECT_URL_POST_LOGOUT,
+        "state": crypto.get_random_string(length=12),
+        "post_logout_redirect_uri": get_absolute_url(reverse("home:hp")),
     }
-    redirect_url = settings.FRANCE_CONNECT_URLS["logout"] + "/?" + urlencode(params)
-    return JsonResponse({"url": redirect_url}, status=302)
+    url = settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_LOGOUT
+    response = httpx.post(url, params=params)
+    if response.status_code != 302:
+        return JsonResponse(
+            {"message": "Impossible de déconnecter l'utilisateur de FranceConnect."},
+            status=400,
+        )
+
+    return JsonResponse({"message": "L'utilisateur a été déconnecté de FranceConnect."})
