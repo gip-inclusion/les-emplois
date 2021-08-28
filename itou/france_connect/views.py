@@ -26,7 +26,8 @@ def get_callback_redirect_uri(request):
         redirect_uri += f"?next={next_url}"
 
     # The redirect_uri should be defined in the FC settings to be allowed
-    return "http://localhost:8080/callback"
+    # The integration platform allows "http://localhost:8080/callback" so an associated endpoint
+    # should be set in itou.
     return redirect_uri
 
 
@@ -182,8 +183,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     if not state_is_valid(state):
         return JsonResponse({"message": "Le paramètre « state » n'est pas valide."}, status=400)
 
-    # redirect_uri = get_callback_redirect_uri(request)
-    redirect_uri = "http://localhost:8080/callback"
+    redirect_uri = get_callback_redirect_uri(request)
 
     data = {
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
