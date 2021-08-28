@@ -19,7 +19,7 @@ from itou.utils.urls import get_absolute_url
 from .models import FranceConnectState
 
 
-def get_callback_redirect_uri(request):
+def get_callback_redirect_uri(request) -> str:
     redirect_uri = get_absolute_url(reverse("france_connect:callback"))
     next_url = request.GET.get("next")
     if next_url:
@@ -31,7 +31,7 @@ def get_callback_redirect_uri(request):
     return redirect_uri
 
 
-def state_new():
+def state_new() -> str:
     # Generate CSRF and save the state for further verification
     signer = signing.Signer()
     csrf = crypto.get_random_string(length=12)
@@ -41,7 +41,7 @@ def state_new():
     return csrf_signed
 
 
-def state_is_valid(csrf_signed):
+def state_is_valid(csrf_signed: str) -> bool:
     if not csrf_signed:
         return False
 
@@ -81,7 +81,7 @@ def france_connect_authorize(request):
 
 
 @dataclasses.dataclass
-class FranceConnectUserData:
+class FranceConnectUserData:  # pylint: disable=too-many-instance-attributes
     username: str
     first_name: str
     last_name: str
@@ -94,7 +94,7 @@ class FranceConnectUserData:
     country: Optional[str] = None
 
 
-def load_user_data(user_data):
+def load_user_data(user_data: dict) -> dict:
     user_model_dict = {
         "username": user_data["sub"],
         "first_name": user_data.get("given_name", ""),
@@ -119,7 +119,7 @@ def load_user_data(user_data):
     return user_model_dict
 
 
-def set_fields_from_user_data(user, fc_user_data):
+def set_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData):
     # birth_country_id from user_data["birthcountry"]
     # birth_place_id from user_data["birthplace"]
     provider_json = {}
@@ -137,7 +137,7 @@ def set_fields_from_user_data(user, fc_user_data):
     user.provider_json = provider_json
 
 
-def update_fields_from_user_data(user, fc_user_data, provider_json):
+def update_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData, provider_json: dict):
     now = timezone.now()
 
     # Not very smart
