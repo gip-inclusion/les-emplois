@@ -1,23 +1,20 @@
-name: Populate metabase
+name: Imports ASP
 
-# Runs "populate_itou_metabase".
+# Runs the various ASP data imports.
 # A github action takes care of the cron task that:
 # - creates a machine on demand
-# - runs the desired command through CC_RUN_SUCCEEDED_HOOK
+# - runs the desired shell script through CC_RUN_SUCCEEDED_HOOK
 # - destroys the machine once the update is done
 on:
-  workflow_dispatch: # allows us to run this action manually
-  schedule:
-    - cron: '12 0 * * *' # Run this workflow at 0:12am every day
+  workflow_dispatch: # this is voluntarily empty; it allows to trigger the task manually
 
 # How to run this:
 # Locally:
 # - download and install locally "act" (https://github.com/nektos/act)
 # - create a file "act.secrets" with all the necessary secrets (see the env variables below)
-# - "act --secret-file ./act.secrets -j populate_metabase" will run the job populate_metabase with the specified environment variables
+# - "act --secret-file ./act.secrets -j imports_asp" will run the job imports_asp with the specified environment variables
 # In production:
-# - automatically, as a cron job configured above
-# - with github cli (https://cli.github.com/manual/): gh workflow run populate-metabase.yml
+# - with github cli (https://cli.github.com/manual/): gh workflow run imports-asp.yml
 # - with github’s web UI: https://github.com/betagouv/itou/actions
 env:
   CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
@@ -25,25 +22,23 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
-  CRON_APPS_ORGANIZATION_NAME: ${{ secrets.CLEVER_CRON_APPS_ORGANIZATION_NAME }}
+  ITOU_ORGANIZATION_NAME: ${{ secrets.CLEVER_ITOU_ORGANIZATION_NAME }}
   DEPLOY_BRANCH: master_clever
 
 jobs:
-  populate_metabase:
+  imports_asp:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 📥 Checkout to the latest version on $DEPLOY_BRANCH
+    - name: 📥 Checkout to the latest version
       uses: actions/checkout@v2
-      with:
-        ref: ${{ env.DEPLOY_BRANCH }}
 
     - name: 📥 Fetch git branches
       run: git fetch --prune --unshallow
 
     - name: 🏷 Setup app name
       run:
-        echo "CRON_TASK_APP_NAME=`echo \"c1-cron-populate-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
+        echo "IMPORT_APP_NAME=`echo \"c1-imports-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
 
     # CC_RUN_SUCCEEDED_HOOK is a clever-cloud-specific environment variable.
     # We set the command we want to run once the app is started
@@ -51,7 +46,7 @@ jobs:
     # https://www.clever-cloud.com/doc/develop/build-hooks/
     - name: 🏷 Setup post-deployment hook
       run:
-        echo 'CC_RUN_SUCCEEDED_HOOK=./manage.py populate_metabase_itou --verbosity 2' >> $GITHUB_ENV
+        echo 'CC_RUN_SUCCEEDED_HOOK=./scripts/imports-asp.sh' >> $GITHUB_ENV
 
     - name: 🧫 Create a cron app on Clever Cloud on a strong machine
       run: |
@@ -63,15 +58,16 @@ jobs:
         # --org: organization name.
         # --region: server location ("par" means Paris).
         # --alias: custom application name, used to find it with the CLI.
-        $CLEVER_CLI create $CRON_TASK_APP_NAME -t python --region par --alias $CRON_TASK_APP_NAME --org Itou
-        $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI create $IMPORT_APP_NAME -t python --region par --alias $IMPORT_APP_NAME --org Itou
+        $CLEVER_CLI link $IMPORT_APP_NAME --org $ITOU_ORGANIZATION_NAME
         $CLEVER_CLI scale --flavor XL
 
     # We need at the minimum a database and redis in order to boot the app, as well as all the necessary
     # environment variables a configuration addon provides us
     - name: 🗺 Add environment variables and addons to the app
       run: |
-        $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI link $IMPORT_APP_NAME --org $ITOU_ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon c1-imports-config
         $CLEVER_CLI service link-addon c1-prod-config
         $CLEVER_CLI service link-addon c1-prod-database-encrypted
         $CLEVER_CLI service link-addon c1-itou-redis
