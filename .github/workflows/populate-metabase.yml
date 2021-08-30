@@ -38,6 +38,9 @@ jobs:
       with:
         ref: ${{ env.DEPLOY_BRANCH }}
 
+    - name: 📥 Fetch git branches
+      run: git fetch --prune --unshallow
+
     - name: 🏷 Setup app name
       run:
         echo "CRON_TASK_APP_NAME=`echo \"c1-cron-populate-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
