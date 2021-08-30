@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("users", "0029_alter_user_is_stats_vip"),
+        ("users", "0030_alter_user_department"),
     ]
 
     operations = [
