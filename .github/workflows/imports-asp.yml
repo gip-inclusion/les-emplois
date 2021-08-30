@@ -22,7 +22,7 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
-  ITOU_ORGANIZATION_NAME: ${{ secrets.CLEVER_ITOU_ORGANIZATION_NAME }}
+  ITOU_ORGANIZATION_NAME: ${{ secrets.CLEVER_ORGANIZATION_NAME }}
   DEPLOY_BRANCH: master_clever
 
 jobs:
