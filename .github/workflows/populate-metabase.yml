@@ -33,8 +33,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 📥 Checkout to the latest version
+    - name: 📥 Checkout to the latest version on $DEPLOY_BRANCH
       uses: actions/checkout@v2
+      with:
+        ref: ${{ env.DEPLOY_BRANCH }}
 
     - name: 🏷 Setup app name
       run:
