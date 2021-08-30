@@ -32,6 +32,8 @@ jobs:
     steps:
     - name: 📥 Checkout to the latest version
       uses: actions/checkout@v2
+      with:
+        ref: ${{ env.DEPLOY_BRANCH }}
 
     - name: 📥 Fetch git branches
       run: git fetch --prune --unshallow
