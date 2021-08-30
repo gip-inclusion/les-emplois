@@ -81,7 +81,7 @@ jobs:
 # - run what’s in CC_RUN_SUCCEEDED_HOOK
 # - destroy the app once the task is over
     - name: 🚀 Deploy to Clever Cloud
-      run: $CLEVER_CLI deploy --alias $CRON_TASK_APP_NAME --branch $DEPLOY_BRANCH --force
+      run: $CLEVER_CLI deploy --alias $IMPORT_APP_NAME --branch $DEPLOY_BRANCH --force
 
     - name: 🗑 Delete the app once the work is done
       run:
