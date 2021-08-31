@@ -10,8 +10,8 @@ select
     case 
         /* On calcule la moyenne des etp consommés depuis le début de l'année et on la compare avec le nombre d'etp 
         subventionné */
-        when (sum(emi.emi_part_etp) / max(emi.emi_sme_mois) ) < max(af.af_etp_postes_insertion) then 'sous-consommation'
-        when (sum(emi.emi_part_etp) / max(emi.emi_sme_mois) ) > max(af.af_etp_postes_insertion) then 'sur-consommation'
+        when (sum(emi.emi_part_etp) / max(emi.emi_sme_mois)) < max(af.af_etp_postes_insertion) then 'sous-consommation'
+        when (sum(emi.emi_part_etp) / max(emi.emi_sme_mois)) > max(af.af_etp_postes_insertion) then 'sur-consommation'
         else 'conforme'
     end consommation_ETP,
     sum(emi.emi_nb_heures_travail) as nb_heures_travaillees_depuis_debut_annee,
@@ -30,7 +30,7 @@ select
     af.nom_departement_af,
     af.nom_region_af,
     max(af.af_etp_postes_insertion) as nb_etp_subventionne
-FROM suivi_saisies_dans_asp saisie_asp 
+from suivi_saisies_dans_asp saisie_asp 
     left join "fluxIAE_EtatMensuelIndiv" emi 
         on saisie_asp.af_id_annexe_financiere = emi_afi_id  
     left join "fluxIAE_AnnexeFinanciere_v2" as af
