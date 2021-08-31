@@ -66,7 +66,7 @@ class FranceConnectTest(TestCase):
         self.assertTrue(created)
         self.assertEqual(user.last_name, user_data["family_name"])
         self.assertEqual(user.first_name, user_data["given_name"])
-        self.assertEqual(user.provider_json["last_name"]["source"], "fc")
+        self.assertEqual(user.provider_json["last_name"]["source"], "france_connect")
 
         # Update user
         fc_user_data.last_name = "DUPUIS"

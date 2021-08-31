@@ -124,7 +124,7 @@ def set_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData):
     # birth_place_id from user_data["birthplace"]
     provider_json = {}
     now = timezone.now()
-    provider_info = {"source": "fc", "created_at": now}
+    provider_info = {"source": "france_connect", "created_at": now}
     for field in ["username", "first_name", "last_name", "birthdate", "email", "phone"]:
         setattr(user, field, getattr(fc_user_data, field))
         provider_json[field] = provider_info
@@ -142,7 +142,7 @@ def update_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData
 
     # Not very smart
     def is_fc_source(field):
-        return provider_json.get(field) and provider_json[field]["source"] == "fc"
+        return provider_json.get(field) and provider_json[field]["source"] == "france_connect"
 
     def update_time(field):
         provider_json[field]["created_at"] = now
