@@ -48,7 +48,9 @@ class DuetDatePickerWidget(forms.DateInput):
                 datetime.datetime.strptime(value, self.INPUT_DATE_FORMAT)
                 return value
             except ValueError:
-                raise ValueError(f'Date format of {value} must be "{self.INPUT_DATE_FORMAT}".')
+                # `value` isn't guaranteed to be valid input. Error handling is delegated
+                # to the `forms.Field` instance to which this widget is assigned.
+                pass
         return value
 
     def build_attrs(self, base_attrs, extra_attrs=None):
