@@ -82,7 +82,7 @@ jobs:
       run: $CLEVER_CLI deploy --branch $BRANCH --force
 
     - name: 🍻 Add link to pull request
-      uses: thollander/actions-comment-pull-request@master
+      uses: thollander/actions-comment-pull-request@main
       with:
         message: "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
