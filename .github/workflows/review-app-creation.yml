@@ -18,6 +18,7 @@ env:
   CONFIGURATION_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_CONFIGURATION_ADDON }}
   S3_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_S3_ADDON }}
   BRANCH: ${{ github.head_ref }}
+  ELASTIC_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_ELASTIC_ADDON }}
 
 jobs:
   create:
@@ -70,6 +71,11 @@ jobs:
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
         $CLEVER_CLI service link-addon $S3_ADDON
+
+    - name: 🤝 Link Elastic addon
+      run: |
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon $ELASTIC_ADDON
 
     - name: 🗺 Add environment variables to the review app
       run: |
