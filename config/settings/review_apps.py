@@ -27,3 +27,17 @@ EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
 
 SHOW_TEST_ACCOUNTS_BANNER = True
+
+# Active APM metrics
+INSTALLED_APPS += ["elasticapm.contrib.django"]  # noqa F405
+
+# Active APM tracing
+MIDDLEWARE += ["elasticapm.contrib.django.middleware.TracingMiddleware"]  # noqa F405
+
+ELASTIC_APM = {
+   'SERVICE_NAME': 'itou-django-review',
+   'SERVER_URL': os.environ.get("ES_ADDON_APM_HOST"),
+   'SECRET_TOKEN': os.environ.get("ES_ADDON_APM_AUTH_TOKEN"),
+   'ENVIRONMENT': 'review',
+   'DJANGO_TRANSACTION_NAME_FROM_ROUTE': True,
+}
