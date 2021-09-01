@@ -5,8 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from . import views as france_connect_views
-from .models import FranceConnectState
+from . import models as france_connect_models, views as france_connect_views
 
 
 FRANCE_CONNECT_USERINFO = {
@@ -31,9 +30,9 @@ FRANCE_CONNECT_USERINFO = {
 
 class FranceConnectTest(TestCase):
     def test_state_delete(self):
-        state = FranceConnectState.objects.create(csrf="foo")
+        state = france_connect_models.FranceConnectState.objects.create(csrf="foo")
 
-        FranceConnectState.objects.cleanup()
+        france_connect_models.FranceConnectState.objects.cleanup()
 
         state.refresh_from_db()
         self.assertIsNotNone(state)
@@ -42,9 +41,9 @@ class FranceConnectTest(TestCase):
         state.created_at = timezone.now() - settings.FRANCE_CONNECT_STATE_EXPIRATION * 2
         state.save()
 
-        FranceConnectState.objects.cleanup()
+        france_connect_models.FranceConnectState.objects.cleanup()
 
-        with self.assertRaises(FranceConnectState.DoesNotExist):
+        with self.assertRaises(france_connect_models.FranceConnectState.DoesNotExist):
             state.refresh_from_db()
 
     def test_state_verification(self):
@@ -61,8 +60,8 @@ class FranceConnectTest(TestCase):
 
     def test_create_user_from_user_data(self):
         user_data = FRANCE_CONNECT_USERINFO
-        fc_user_data = france_connect_views.FranceConnectUserData(**france_connect_views.load_user_data(user_data))
-        user, created = france_connect_views.create_or_update_user(fc_user_data)
+        fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+        user, created = france_connect_models.create_or_update_user(fc_user_data)
         self.assertTrue(created)
         self.assertEqual(user.last_name, user_data["family_name"])
         self.assertEqual(user.first_name, user_data["given_name"])
@@ -70,7 +69,7 @@ class FranceConnectTest(TestCase):
 
         # Update user
         fc_user_data.last_name = "DUPUIS"
-        user, created = france_connect_views.create_or_update_user(fc_user_data)
+        user, created = france_connect_models.create_or_update_user(fc_user_data)
         self.assertFalse(created)
         self.assertEqual(user.last_name, "DUPUIS")
 
