@@ -6,7 +6,9 @@ from django.utils import timezone
 
 class FranceConnectQuerySet(models.QuerySet):
     def cleanup(self):
-        return self.filter(created_at__lte=timezone.now() - datetime.timedelta(hours=1)).delete()
+        return self.filter(
+            created_at__lte=timezone.now() - datetime.timedelta(hours=settings.FRANCE_CONNECT_STATE_EXPIRATION)
+        ).delete()
 
 
 class FranceConnectState(models.Model):

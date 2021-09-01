@@ -54,15 +54,15 @@ def state_is_valid(csrf_signed: str) -> bool:
     except signing.BadSignature:
         return False
 
+    # Cleanup old states if any
+    FranceConnectState.objects.cleanup()
+
     france_connect_state = FranceConnectState.objects.filter(csrf=csrf).first()
     if not france_connect_state:
         return False
 
     # One-time use
     france_connect_state.delete()
-
-    # Cleanup old states if any
-    FranceConnectState.objects.cleanup()
 
     return True
 
