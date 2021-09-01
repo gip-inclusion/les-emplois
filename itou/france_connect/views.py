@@ -1,11 +1,11 @@
 import dataclasses
 import datetime
 import json
+import logging
 from typing import Optional
 from urllib.parse import unquote
 
 import httpx
-import sentry_sdk
 from django.conf import settings
 from django.core import signing
 from django.http import HttpResponseRedirect, JsonResponse
@@ -17,6 +17,9 @@ from itou.users.models import User
 from itou.utils.urls import get_absolute_url
 
 from .models import FranceConnectState
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_callback_redirect_uri(request) -> str:
@@ -199,7 +202,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
 
     if response.status_code != 200:
         message = "Impossible d'obtenir le jeton de FranceConnect."
-        sentry_sdk.capture_message(f"{message}\n{response.content}")
+        logger.error("%s : %s", message, response.content)
         # The response is certainly ignored by FC but it's convenient for our tests
         return JsonResponse({"message": message}, status=response.status_code)
 
@@ -221,7 +224,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     )
     if response.status_code != 200:
         message = "Impossible d'obtenir les informations utilisateur de FranceConnect."
-        sentry_sdk.capture_message(message)
+        logger.error(message)
         return JsonResponse({"message": message}, status=response.status_code)
 
     try:
