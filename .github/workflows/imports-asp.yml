@@ -22,7 +22,7 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
-  ITOU_ORGANIZATION_NAME: ${{ secrets.CLEVER_ITOU_ORGANIZATION_NAME }}
+  ITOU_ORGANIZATION_NAME: ${{ secrets.CLEVER_ORGANIZATION_NAME }}
   DEPLOY_BRANCH: master_clever
 
 jobs:
@@ -32,6 +32,8 @@ jobs:
     steps:
     - name: 📥 Checkout to the latest version
       uses: actions/checkout@v2
+      with:
+        ref: ${{ env.DEPLOY_BRANCH }}
 
     - name: 📥 Fetch git branches
       run: git fetch --prune --unshallow
@@ -81,7 +83,7 @@ jobs:
 # - run what’s in CC_RUN_SUCCEEDED_HOOK
 # - destroy the app once the task is over
     - name: 🚀 Deploy to Clever Cloud
-      run: $CLEVER_CLI deploy --alias $CRON_TASK_APP_NAME --branch $DEPLOY_BRANCH --force
+      run: $CLEVER_CLI deploy --alias $IMPORT_APP_NAME --branch $DEPLOY_BRANCH --force
 
     - name: 🗑 Delete the app once the work is done
       run:
