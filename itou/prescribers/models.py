@@ -317,10 +317,13 @@ class PrescriberMembership(MembershipAbstract):
         to_user = self.user
         to = [to_user.email]
         invitation_url = "%s?%s" % (reverse("invitations_views:invite_prescriber_with_org"), urlencode(requestor))
+        # requestor is not a User, get_full_name can't be used in template
+        requestor_fullname = requestor["first_name"] + " " + requestor["last_name"]
         context = {
             "to": to_user,
             "organization": self.organization,
             "requestor": requestor,
+            "requestor_fullname": requestor_fullname,
             "invitation_url": get_absolute_url(invitation_url),
         }
         subject = "common/emails/request_for_invitation_subject.txt"
