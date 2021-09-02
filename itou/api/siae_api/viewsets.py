@@ -15,6 +15,7 @@ from itou.siaes.serializers import SiaeSerializer
 logger = logging.getLogger("api_drf")
 CODE_INSEE_PARAM_NAME = "code_insee"
 DISTANCE_FROM_CODE_INSEE_PARAM_NAME = "distance_max_km"
+MAX_DISTANCE_RADIUS_KM = 100
 
 
 class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -68,10 +69,16 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(name=CODE_INSEE_PARAM_NAME, description="Filtre par ville", required=False, type=str),
             OpenApiParameter(
-                name=DISTANCE_FROM_CODE_INSEE_PARAM_NAME, description="Filtre par distance", required=False, type=str
+                name=CODE_INSEE_PARAM_NAME, description="Filtre par code INSEE de la ville", required=True, type=str
             ),
+            OpenApiParameter(
+                name=DISTANCE_FROM_CODE_INSEE_PARAM_NAME,
+                description=f"Filtre par rayon de recherche autour de la ville, en kilomètres. Maximum {MAX_DISTANCE_RADIUS_KM} kilomètres",  # noqa: E501
+                required=True,
+                type=str,
+            ),
+            OpenApiParameter(name="format", description="Format de sortie", required=False, enum=["json", "api"]),
         ],
         responses={200: SiaeSerializer, 404: OpenApiTypes.OBJECT},
         examples=[
@@ -104,9 +111,9 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
         t = f"Les paramètres `{CODE_INSEE_PARAM_NAME}` et `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` sont obligatoires."
         if params.get(DISTANCE_FROM_CODE_INSEE_PARAM_NAME) and code_insee:
             distance_filter = int(params.get(DISTANCE_FROM_CODE_INSEE_PARAM_NAME))
-            if distance_filter < 0 or distance_filter > 100:
+            if distance_filter < 0 or distance_filter > MAX_DISTANCE_RADIUS_KM:
                 raise ValidationError(
-                    f"Le paramètre `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` doit être compris entre 0 et 100."
+                    f"Le paramètre `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` doit être compris entre 0 et {MAX_DISTANCE_RADIUS_KM}."  # noqa: E501
                 )
 
             try:
