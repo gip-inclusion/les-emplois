@@ -195,11 +195,9 @@ class Command(BaseCommand):
             if not siae.grace_period_has_expired:
                 continue
             if could_siae_be_deleted(siae):
-                self.log(f"siae.id={siae.id} is past grace period thus will be deleted")
                 self.delete_siae(siae)
                 deletions += 1
                 continue
-            self.log(f"siae.id={siae.id} is past grace period but cannot be deleted")
             blocked_deletions += 1
 
         self.log(f"{deletions} siaes past their grace period will be deleted")

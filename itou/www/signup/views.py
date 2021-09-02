@@ -614,9 +614,7 @@ class PrescriberUserSignupView(SignupView):
         if sum([join_as_orienteur_without_org, join_as_orienteur_with_org, join_authorized_org]) != 1:
             raise PermissionDenied
 
-        try:
-            kind = PrescriberOrganization.Kind[kind]
-        except KeyError:
+        if kind not in PrescriberOrganization.Kind.values:
             kind = None
 
         try:
@@ -651,6 +649,7 @@ class PrescriberUserSignupView(SignupView):
                 "join_as_orienteur_without_org": self.join_as_orienteur_without_org,
                 "join_authorized_org": self.join_authorized_org,
                 "kind": self.kind,
+                "kind_is_other": self.kind == PrescriberOrganization.Kind.OTHER.value,
                 "prescriber_org_data": self.prescriber_org_data,
                 "prev_url": get_prev_url_from_history(self.request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
             }
