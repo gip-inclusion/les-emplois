@@ -57,7 +57,10 @@ class DeclareProlongationForm(forms.ModelForm):
         email = self.cleaned_data["email"]
         self.validated_by = User.objects.filter(email=email).first()
         if not self.validated_by or not self.validated_by.is_prescriber_with_authorized_org:
-            error = "Ce prescripteur n'a pas de compte sur les emplois de l'inclusion. Merci de renseigner l'e-mail d'un conseiller inscrit sur le service."
+            error = (
+                "Ce prescripteur n'a pas de compte sur les emplois de l'inclusion. "
+                "Merci de renseigner l'e-mail d'un conseiller inscrit sur le service."
+            )
             raise forms.ValidationError(error)
         return email
 
