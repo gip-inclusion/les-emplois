@@ -60,7 +60,9 @@ class Command(BaseCommand):
         )
 
         # Find duplicated `users`.
-        users = User.objects.filter(pole_emploi_id__in=duplicated_pole_emploi_ids).prefetch_related("approvals")
+        users = User.objects.filter(pole_emploi_id__in=duplicated_pole_emploi_ids).prefetch_related(
+            "approvals", "emailaddress_set"
+        )
 
         # Group users using the same `pole_emploi_id`:
         # {
@@ -75,22 +77,45 @@ class Command(BaseCommand):
         count_easy_cases = 0
         count_hard_cases = 0
 
-        for pe_id, duplicated_users in users_using_same_pe_id.items():
+        for pe_id, duplicates in users_using_same_pe_id.items():
 
-            same_birthdate = all(user.birthdate == duplicated_users[0].birthdate for user in duplicated_users)
+            same_birthdate = all(user.birthdate == duplicates[0].birthdate for user in duplicates)
 
             # Users using the same `birthdate`/`pole_emploi_id` are guaranteed to be duplicates.
             if same_birthdate:
 
-                users_with_approval = [u for u in duplicated_users if u.approvals.exists()]
+                users_with_approval = [u for u in duplicates if u.approvals.exists()]
 
+                # Easy cases.
+                # None or 1 PASS IAE was issued for the same person with multiple accounts.
+                # Keep the user holding the PASS IAE.
                 if len(users_with_approval) <= 1:
-                    # None or 1 PASS IAE was issued for the same person with multiple accounts.
-                    # Keep the user holding the PASS IAE.
+
                     count_easy_cases += 1
 
+                    user_with_approval = next((u for u in duplicates if u.approvals.exists()), None)
+
+                    # Merge duplicates into the one having a PASS IAE.
+                    if user_with_approval:
+                        self.merge(duplicates, into=user_with_approval)
+
+                    # Duplicates without PASS IAE.
+                    else:
+
+                        # Give priority to users who already logged in.
+                        first_autonomous_user = next((u for u in duplicates if u.last_login), None)
+
+                        # Merge duplicates into the first autonomous user.
+                        if first_autonomous_user:
+                            self.merge(duplicates, into=first_autonomous_user)
+
+                        # Choose an arbitrary user to merge others into.
+                        else:
+                            self.merge(duplicates, into=duplicates[0])
+
+                # Hard cases.
+                # More than one PASS IAE was issued for the same person.
                 elif len(users_with_approval) > 1:
-                    # More than one PASS IAE was issued for the same person.
                     count_hard_cases += 1
 
         self.stdout.write("-" * 80)
@@ -99,3 +124,8 @@ class Command(BaseCommand):
 
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
+
+    def merge(self, duplicates, into):
+        print("-" * 80)
+        print(into)
+        print(duplicates)
