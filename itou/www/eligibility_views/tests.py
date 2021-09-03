@@ -111,13 +111,13 @@ class AdministrativeCriteriaFormTest(TestCase):
         form_data = {f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "false"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
-        self.assertIn(form.ERROR_CRITERIA_NUMBER_ETTI, form.errors["__all__"])
+        self.assertIn(form.ERROR_CRITERIA_NUMBER_ETTI_AI, form.errors["__all__"])
 
         # Only one level 2 criterion.
         form_data = {f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
-        self.assertIn(form.ERROR_CRITERIA_NUMBER_ETTI, form.errors["__all__"])
+        self.assertIn(form.ERROR_CRITERIA_NUMBER_ETTI_AI, form.errors["__all__"])
 
     def test_error_senior_junior(self):
         """
