@@ -281,6 +281,16 @@ class User(AbstractUser, AddressMixin):
     def can_view_stats_cd(self, current_org):
         """
         CD as in "Conseil Départemental".
+
+        All users, not just the admins, of a real CD can see the confidential CD stats, and for their department only.
+
+        Unfortunately the `PrescriberOrganization.Kind.DEPT` kind contains not only the real CD but also some random
+        organizations authorized by some CD.
+        When such a random non-CD org is registered, it is not authorized yet, thus will be filtered out correctly.
+        Later, our staff will authorize the random non-CD org, flag it as `is_brsa` and change its kind to `OTHER`.
+        Sometimes our staff makes human errors and forgets to flag it as `is_brsa` or to change its kind.
+        Hence we take extra precautions to filter out these edge cases to ensure we never ever show sensitive stats to
+        a non-CD organization of the `DEPT` kind.
         """
         if self.is_stats_vip:
             return True
@@ -290,7 +300,7 @@ class User(AbstractUser, AddressMixin):
             and current_org.kind == PrescriberOrganization.Kind.DEPT
             and current_org.is_authorized
             and current_org.authorization_status == PrescriberOrganization.AuthorizationStatus.VALIDATED
-            and current_org.has_admin(self)
+            and not current_org.is_brsa
             and current_org.department is not None
             and current_org.department != ""
         )
