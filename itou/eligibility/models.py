@@ -251,7 +251,7 @@ class AdministrativeCriteria(models.Model):
     They can be created and updated using the admin.
 
     The table is automatically populated with a fixture at the end of
-    eligibility's migration #0003.
+    eligibility's migration #0003 and extended with #0007.
     """
 
     MAX_UI_RANK = 32767
@@ -266,6 +266,9 @@ class AdministrativeCriteria(models.Model):
     written_proof = models.CharField(verbose_name="Justificatif", max_length=255, blank=True)
     written_proof_url = models.URLField(
         verbose_name="Lien d'aide à propos du justificatif", max_length=200, blank=True
+    )
+    written_proof_validity = models.CharField(
+        verbose_name="Durée de validité du justificatif", max_length=255, blank=True
     )
     # Used to rank criteria in UI. Should be set by level (LEVEL_1: 1, 2, 3… LEVEL_2: 1, 2, 3…).
     # Default value is MAX_UI_RANK so that it's pushed at the end if `ui_rank` is forgotten.
