@@ -27,7 +27,9 @@ Structure
 ~5K
 
 Contract
-No dedicated table so the total number of contracts is unknown but most likely ~1M based on other tables.
+~1M
+Contracts are stored in the ContratMission table, which is badly named and should be named Contrat instead imho.
+This table contains one row per contract, its primary key is ctr_id. It has absolutely nothing to do with missions.
 
 "Etat Mensuel Individuel" aka EMI aka DSM
 ~7M
@@ -44,10 +46,6 @@ employer, they do input a Mission attached to their EMI.
 Mission-EMI aka MEI
 ~3M
 Store associations between EMI and Missions.
-
-Contract-Mission
-~1M
-Store associations between Contracts and Missions.
 
 4) Relationships between models.
 
