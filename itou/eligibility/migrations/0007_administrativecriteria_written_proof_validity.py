@@ -38,19 +38,25 @@ def migrate_data_forward(apps, schema_editor):
         written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE"
     )
     AdministrativeCriteria.objects.filter(name="Travailleur handicapé").update(
-        written_proof_validity="Attestation valide au moment du recrutement"
+        written_proof_validity="Décision valide au moment du recrutement"
     )
     AdministrativeCriteria.objects.filter(name="Parent isolé").update(
         written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE"
     )
     AdministrativeCriteria.objects.filter(
         name="Personne sans hébergement ou hébergée ou ayant un parcours de rue"
-    ).update(written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE")
+    ).update(
+        written_proof="Certificat de domiciliation. "
+        "A défaut : déclaration sur l'honneur d'un travailleur social ou d'une association",
+        written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+    )
     AdministrativeCriteria.objects.filter(
         name="Primo arrivant (personne récemment arrivée en France avec un contrat d'intégration"
         " républicaine de moins de 24 mois)"
     ).update(
         name="Réfugiés statutaires, protégés subsidiaires ou demandeurs d'asile",
+        written_proof="Titre de séjour valide ou demande de renouvellement du titre de séjour. "
+        "Pour les demandeurs d’asile : autorisation temporaire de travail",
         written_proof_validity="Titre valide au moment de la délivrance du PASS IAE",
     )
     AdministrativeCriteria.objects.filter(name="Résident ZRR").update(
@@ -67,7 +73,8 @@ def migrate_data_backward(apps, schema_editor):
         name="Réfugiés statutaires, protégés subsidiaires ou demandeurs d'asile",
     ).update(
         name="Primo arrivant (personne récemment arrivée en France avec un contrat d'intégration"
-        " républicaine de moins de 24 mois)"
+        " républicaine de moins de 24 mois)",
+        written_proof="Contrat d'intégration républicaine de moins de 24 mois",
     )
 
 
