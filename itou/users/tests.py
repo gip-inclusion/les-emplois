@@ -266,13 +266,13 @@ class ModelTest(TestCase):
         self.assertEqual(user.get_stats_cd_department(current_org=org), org.department)
         self.assertNotEqual(user.get_stats_cd_department(current_org=org), "01")
 
-        # Non admin prescriber cannot access.
+        # Non admin prescriber can access as well.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
             kind=PrescriberOrganization.Kind.DEPT, membership__is_admin=False
         )
         user = org.members.get()
-        self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertTrue(user.can_view_stats_cd(current_org=org))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Non authorized organization does not give access.
         org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
