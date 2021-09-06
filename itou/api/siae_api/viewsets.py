@@ -1,7 +1,5 @@
 import logging
 
-# from django_filters.filters import OrderingFilter
-# from django_filters import FilterSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework import filters, viewsets
@@ -23,10 +21,12 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     # Liste des SIAE
 
     La plateforme renvoie une liste de SIAE à proximité d’une ville (déterminée par son code INSEE)
-    et d’un rayon de recherche en kilomètres autour de cette ville.
+    et dans un rayon de recherche en kilomètres autour du centre de cette ville.
+
+    Les coordonnées des centre villes sont issus de [https://geo.api.gouv.fr](https://geo.api.gouv.fr/)
 
 
-    Chaque SIAE est accompagnée d’un certain nombre de métadonnées:
+    Chaque SIAE est accompagnée d’un certain nombre de métadonnées :
 
      - SIRET
      - Type
