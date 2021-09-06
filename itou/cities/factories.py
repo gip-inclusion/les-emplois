@@ -1,7 +1,7 @@
 import json
 import os
 
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Point
 from django.template.defaultfilters import slugify
 
 from itou.cities.models import City
@@ -52,3 +52,38 @@ def create_test_cities(selected_departments, num_per_department=None):
                 code_insee=item["code"],
                 coords=GEOSGeometry(f"{coords}"),  # Feed `GEOSGeometry` with GeoJSON.
             )
+
+
+def create_city_saint_andre():
+    return City.objects.create(
+        name="Saint-André-des-Eaux",
+        slug="saint-andre-des-eaux-44",
+        department="44",
+        coords=Point(-2.3140436, 47.3618584),
+        post_codes=["44117"],
+        code_insee="44117",
+    )
+
+
+def create_city_guerande():
+    return City.objects.create(
+        name="Guérande",
+        slug="guerande-44",
+        department="44",
+        coords=Point(-2.4747713, 47.3358576),
+        # Dummy
+        post_codes=["44350"],
+        code_insee="44350",
+    )
+
+
+def create_city_vannes():
+    return City.objects.create(
+        name="Vannes",
+        slug="vannes-56",
+        department="56",
+        coords=Point(-2.8186843, 47.657641),
+        # Dummy
+        post_codes=["56000"],
+        code_insee="56000",
+    )
