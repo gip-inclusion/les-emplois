@@ -43,8 +43,8 @@
             {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
         {% endif %}
     {% endfor %}
-
     {% if form_confirm_eligibility and request.user.is_siae_staff %}
+        <hr>
         {% bootstrap_form form_confirm_eligibility %}
     {% endif %}
 

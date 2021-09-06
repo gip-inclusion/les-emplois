@@ -6,80 +6,8 @@ from django.core.management import call_command
 from django.db import migrations, models
 
 
-def migrate_data_forward(apps, schema_editor):
-    """
-    Set written proof validity for existing administrative criterion
-    """
-    AdministrativeCriteria = apps.get_model("eligibility", "AdministrativeCriteria")
-
-    # level 1 criterion
-    AdministrativeCriteria.objects.filter(name="Bénéficiaire du RSA (socle)").update(
-        written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE"
-    )
-    AdministrativeCriteria.objects.filter(name="Allocataire ASS").update(
-        written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE"
-    )
-    AdministrativeCriteria.objects.filter(name="Allocataire AAH").update(
-        written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE"
-    )
-    AdministrativeCriteria.objects.filter(name="DETLD (+ 24 mois)").update(
-        written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE"
-    )
-
-    # level 2 criterion
-    AdministrativeCriteria.objects.filter(name="Niveau d'étude 3 (CAP, BEP) ou infra").update(
-        written_proof_validity="Attestation sur l'honneur datant de moins de "
-        "3 mois avant la date de délivrance du PASS IAE"
-    )
-    AdministrativeCriteria.objects.filter(name="Sortant de l'ASE").update(
-        written_proof_validity="Datant de moins de 12 mois avant la date de délivrance du PASS IAE"
-    )
-    AdministrativeCriteria.objects.filter(name="DELD (12-24 mois)").update(
-        written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE"
-    )
-    AdministrativeCriteria.objects.filter(name="Travailleur handicapé").update(
-        written_proof_validity="Décision valide au moment du recrutement"
-    )
-    AdministrativeCriteria.objects.filter(name="Parent isolé").update(
-        written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE"
-    )
-    AdministrativeCriteria.objects.filter(
-        name="Personne sans hébergement ou hébergée ou ayant un parcours de rue"
-    ).update(
-        written_proof="Certificat de domiciliation. "
-        "A défaut : déclaration sur l'honneur d'un travailleur social ou d'une association",
-        written_proof_validity="Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
-    )
-    AdministrativeCriteria.objects.filter(
-        name="Primo arrivant (personne récemment arrivée en France avec un contrat d'intégration"
-        " républicaine de moins de 24 mois)"
-    ).update(
-        name="Réfugiés statutaires, protégés subsidiaires ou demandeurs d'asile",
-        written_proof="Titre de séjour valide ou demande de renouvellement du titre de séjour. "
-        "Pour les demandeurs d’asile : autorisation temporaire de travail",
-        written_proof_validity="Titre valide au moment de la délivrance du PASS IAE",
-    )
-    AdministrativeCriteria.objects.filter(name="Résident ZRR").update(
-        written_proof_validity="Datant de moins de 6 mois avant la date de délivrance du PASS IAE"
-    )
-    AdministrativeCriteria.objects.filter(name="Résident QPV").update(
-        written_proof_validity="Datant de moins de 6 mois avant la date de délivrance du PASS IAE"
-    )
-
-
-def migrate_data_backward(apps, schema_editor):
-    AdministrativeCriteria = apps.get_model("eligibility", "AdministrativeCriteria")
-    AdministrativeCriteria.objects.filter(
-        name="Réfugiés statutaires, protégés subsidiaires ou demandeurs d'asile",
-    ).update(
-        name="Primo arrivant (personne récemment arrivée en France avec un contrat d'intégration"
-        " républicaine de moins de 24 mois)",
-        written_proof="Contrat d'intégration républicaine de moins de 24 mois",
-    )
-
-
 def import_data(apps, schema_editor):
-    json_fixture = os.path.join(settings.APPS_DIR, "eligibility/data/administrative_criteria_extend.json")
+    json_fixture = os.path.join(settings.APPS_DIR, "eligibility/data/administrative_criteria.json")
     call_command("loaddata", json_fixture)
 
 
@@ -93,8 +21,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="administrativecriteria",
             name="written_proof_validity",
-            field=models.CharField(blank=True, max_length=255, verbose_name="Durée de validité du justificatif"),
+            field=models.CharField(
+                blank=True, default="", max_length=255, verbose_name="Durée de validité du justificatif"
+            ),
         ),
-        migrations.RunPython(migrate_data_forward, migrate_data_backward),
         migrations.RunPython(import_data, migrations.RunPython.noop),
     ]
