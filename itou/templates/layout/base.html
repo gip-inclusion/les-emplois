@@ -384,6 +384,11 @@
         {% if ITOU_ENVIRONMENT == "DEMO" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
         tarteaucitron.user.HotjarSv = 6;
 
+        // Matomo :
+        tarteaucitron.user.matomoId = 117;
+        tarteaucitron.user.matomoHost = "https://stats.data.gouv.fr/";
+        (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
+            
         // livestorm
         const tablet_width = 750;
         tarteaucitron.services.livestorm = {
