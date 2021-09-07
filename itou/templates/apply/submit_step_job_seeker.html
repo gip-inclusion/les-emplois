@@ -14,9 +14,59 @@
         <p>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</p>
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">Continuer</button>
+            {# Reload this page and show a modal containing more information about the job seeker. #}
+            <button type="submit" name="preview" value="1" class="btn btn-primary">
+                Continuer
+            </button>
         {% endbuttons %}
 
+        {% if preview_mode %}
+            <!-- Modal -->
+            <div class="modal" id="email-confirmation-modal" tabindex="-1" aria-labelledby="email-confirmation-label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="email-confirmation-label">Email existant</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Vous allez postuler pour <b>{{ job_seeker_name }}</b>.</p>
+                            <p>
+                                L'identité du candidat est une information clé pour la structure.
+                                Si cette candidature n'est pas pour <b>{{ job_seeker_name }}</b>, cliquez sur
+                                « Ce n'est pas mon candidat » afin de fournir à la structure <b>{{ siae.display_name }}</b>
+                                les informations personnelles du candidat pour lequel vous allez postuler.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            {% buttons %}
+                                {# Reload this page with a new form. #}
+                                <button type="submit" name="cancel" value="1" class="btn btn-secondary">
+                                    Ce n'est pas mon candidat
+                                </button>
+                                {# Go to the next step. #}
+                                <button type="submit" name="save" value="1" class="btn btn-primary">
+                                    Continuer
+                                </button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </form>
 
+{% endblock %}
+
+{% block script %}
+    {% if preview_mode %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script type="text/javascript">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            $("#email-confirmation-modal").modal("show");
+        </script>
+    {% endif %}
 {% endblock %}
