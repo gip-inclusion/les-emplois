@@ -276,7 +276,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"email": "new.job.seeker@test.com"}
+        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -398,7 +398,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
-        post_data = {"email": job_seeker.email}
+        post_data = {"email": job_seeker.email, "save": "1"}
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the eligibility step which should trigger a 200 OK.
@@ -466,7 +466,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"email": "new.job.seeker@test.com"}
+        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -617,7 +617,7 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"email": "new.job.seeker@test.com"}
+        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -730,7 +730,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
-        post_data = {"email": job_seeker.email}
+        post_data = {"email": job_seeker.email, "save": "1"}
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the expected 403.
@@ -816,7 +816,7 @@ class ApplyAsSiaeTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"email": "new.job.seeker@test.com"}
+        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -927,7 +927,7 @@ class ApplyAsSiaeTest(TestCase):
         self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
-        post_data = {"email": job_seeker.email}
+        post_data = {"email": job_seeker.email, "save": "1"}
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the expected 403.
