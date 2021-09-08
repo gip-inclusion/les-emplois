@@ -42,7 +42,7 @@ class ManagerTest(TestCase):
         expected_result = ["6666666B", "7777777C"]
         self.assertCountEqual(duplicated_pole_emploi_ids, expected_result)
 
-    def test_get_duplicated_users_grouped_by_same_pole_emploi_id(self):
+    def test_get_duplicates_by_pole_emploi_id(self):
 
         # 2 users using the same `pole_emploi_id` and different birthdates.
         user1 = JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
@@ -59,13 +59,17 @@ class ManagerTest(TestCase):
         # + 1 user using the same `pole_emploi_id` but a different birthdate.
         user8 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
 
-        duplicated_users = User.objects.get_duplicated_users_grouped_by_same_pole_emploi_id()
+        duplicated_users = User.objects.get_duplicates_by_pole_emploi_id()
 
         expected_result = {
             "7777777B": [user3, user4],
             "8888888C": [user5, user6, user7],
         }
         self.assertDictEqual(duplicated_users, expected_result)
+
+        self.assertNotIn(duplicated_users, user1)
+        self.assertNotIn(duplicated_users, user2)
+        self.assertNotIn(duplicated_users, user8)
 
 
 class ModelTest(TestCase):

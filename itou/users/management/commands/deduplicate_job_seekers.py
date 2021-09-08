@@ -44,7 +44,11 @@ class Command(BaseCommand):
         count_easy_cases = 0
         count_hard_cases = 0
 
-        for pe_id, duplicates in User.objects.get_duplicated_users_grouped_by_same_pole_emploi_id().items():
+        duplicates_dict = User.objects.get_duplicates_by_pole_emploi_id(
+            prefetch_related_lookups=["approvals", "emailaddress_set"]
+        )
+
+        for pe_id, duplicates in duplicates_dict.items():
 
             users_with_approval = [u for u in duplicates if u.approvals.exists()]
 

@@ -1,5 +1,4 @@
 import uuid
-from collections import Counter
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -37,7 +36,7 @@ class ItouUserManager(UserManager):
 
             ['6666666A', '7777777B', '8888888C', '...']
 
-        Performs this kind of SQL with extra filters:
+        Performs this kind of SQL (with extra filters):
 
             select pole_emploi_id, count(*)
             from users_user
@@ -58,10 +57,10 @@ class ItouUserManager(UserManager):
             .values_list("pole_emploi_id", flat=True)
         )
 
-    def get_duplicated_users_grouped_by_same_pole_emploi_id(self):
+    def get_duplicates_by_pole_emploi_id(self, prefetch_related_lookups=None):
         """
-        Groups users using the same `pole_emploi_id` and `birthdate` (they are
-        guaranteed to be duplicates) and returns a dict:
+        Find duplicates with the same `pole_emploi_id` and `birthdate`
+        and returns a dict:
 
             {
                 '5589555S': [<User: a>, <User: b>],
@@ -69,9 +68,10 @@ class ItouUserManager(UserManager):
                 ...
             }
         """
-        users = self.filter(pole_emploi_id__in=self.get_duplicated_pole_emploi_ids()).prefetch_related(
-            "approvals", "emailaddress_set"
-        )
+        users = self.filter(pole_emploi_id__in=self.get_duplicated_pole_emploi_ids())
+
+        if prefetch_related_lookups:
+            users = users.prefetch_related(*prefetch_related_lookups)
 
         result = dict()
         for user in users:
