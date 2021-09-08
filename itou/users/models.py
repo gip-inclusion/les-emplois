@@ -1,4 +1,5 @@
 import uuid
+from collections import Counter
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -69,7 +70,6 @@ class ItouUserManager(UserManager):
             }
         """
         users = self.filter(pole_emploi_id__in=self.get_duplicated_pole_emploi_ids())
-
         if prefetch_related_lookups:
             users = users.prefetch_related(*prefetch_related_lookups)
 
@@ -92,13 +92,22 @@ class ItouUserManager(UserManager):
                     continue
 
                 # Keep only users with the same most common birthdate.
-                most_common_birthdate = max(set([u.birthdate for u in duplicates]), key=duplicates.count)
+                list_of_birthdates = [u.birthdate for u in duplicates]
+                c = Counter(list_of_birthdates)
+                most_common_birthdate = c.most_common(1)[0][0]
                 result[pe_id] = [u for u in duplicates if u.birthdate == most_common_birthdate]
 
         for pe_id in pe_id_to_remove:
             del result[pe_id]
 
         return result
+
+    def merge(self, duplicates, target):
+        users_to_delete = [u for u in duplicates if u != target]
+
+        print("-" * 80)
+        print(target)
+        print(users_to_delete)
 
 
 class User(AbstractUser, AddressMixin):

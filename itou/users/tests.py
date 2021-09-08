@@ -45,31 +45,27 @@ class ManagerTest(TestCase):
     def test_get_duplicates_by_pole_emploi_id(self):
 
         # 2 users using the same `pole_emploi_id` and different birthdates.
-        user1 = JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
-        user2 = JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
+        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
+        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
 
         # 2 users using the same `pole_emploi_id` and the same birthdates.
-        user3 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
-        user4 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+        user1 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+        user2 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
 
         # 3 users using the same `pole_emploi_id` and the same birthdates.
+        user3 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user4 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
         user5 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
-        user6 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
-        user7 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
         # + 1 user using the same `pole_emploi_id` but a different birthdate.
-        user8 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
+        JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
 
         duplicated_users = User.objects.get_duplicates_by_pole_emploi_id()
 
         expected_result = {
-            "7777777B": [user3, user4],
-            "8888888C": [user5, user6, user7],
+            "7777777B": [user1, user2],
+            "8888888C": [user3, user4, user5],
         }
         self.assertDictEqual(duplicated_users, expected_result)
-
-        self.assertNotIn(duplicated_users, user1)
-        self.assertNotIn(duplicated_users, user2)
-        self.assertNotIn(duplicated_users, user8)
 
 
 class ModelTest(TestCase):

@@ -52,8 +52,8 @@ class Command(BaseCommand):
 
             users_with_approval = [u for u in duplicates if u.approvals.exists()]
 
-            same_birthdate = all(user.birthdate == duplicates[0].birthdate for user in duplicates)
-            assert same_birthdate
+            # Ensure all users have the same birthdate.
+            assert all(user.birthdate == duplicates[0].birthdate for user in duplicates)
 
             # Easy cases.
             # None or 1 PASS IAE was issued for the same person with multiple accounts.
@@ -66,7 +66,7 @@ class Command(BaseCommand):
 
                 # Merge duplicates into the one having a PASS IAE.
                 if user_with_approval:
-                    self.merge(duplicates, into=user_with_approval)
+                    User.objects.merge(duplicates, target=user_with_approval)
 
                 # Duplicates without PASS IAE.
                 else:
@@ -76,11 +76,11 @@ class Command(BaseCommand):
 
                     # Merge duplicates into the first autonomous user.
                     if first_autonomous_user:
-                        self.merge(duplicates, into=first_autonomous_user)
+                        User.objects.merge(duplicates, target=first_autonomous_user)
 
                     # Choose an arbitrary user to merge others into.
                     else:
-                        self.merge(duplicates, into=duplicates[0])
+                        User.objects.merge(duplicates, target=duplicates[0])
 
             # Hard cases.
             # More than one PASS IAE was issued for the same person.
@@ -93,8 +93,3 @@ class Command(BaseCommand):
 
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
-
-    def merge(self, duplicates, into):
-        print("-" * 80)
-        print(into)
-        print(duplicates)
