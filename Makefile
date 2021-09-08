@@ -34,17 +34,6 @@ coverage:
 coverage_venv:
 	coverage run ./manage.py test itou --settings=config.settings.test && coverage html
 
-setup_git_pre_commit_hook:
-	touch .git/hooks/pre-commit
-	chmod +x .git/hooks/pre-commit
-	echo -e "\
-	docker exec -t itou_django black itou\n\
-	docker exec -t itou_django isort itou\n\
-	" > .git/hooks/pre-commit
-
-setup_git_pre_commit_hook_venv:
-	pre-commit install
-
 # Django.
 # =============================================================================
 
