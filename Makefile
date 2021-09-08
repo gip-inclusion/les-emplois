@@ -15,18 +15,14 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality:
-	docker exec -ti itou_django black --check itou
-	docker exec -ti itou_django isort --check-only itou
+	docker exec -ti itou_django black itou
+	docker exec -ti itou_django isort itou
 	docker exec -ti itou_django flake8 itou
 
 quality_venv:
-	black --check itou
-	isort --check-only itou
+	black itou
+	isort itou
 	flake8 itou
-
-style:
-	docker exec -ti itou_django black itou
-	docker exec -ti itou_django isort itou
 
 pylint:
 	docker exec -ti itou_django pylint itou
