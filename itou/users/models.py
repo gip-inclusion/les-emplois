@@ -1,11 +1,13 @@
 import uuid
+from collections import Counter
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
+from django.db.models import Count
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
@@ -26,6 +28,77 @@ from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
+
+
+class ItouUserManager(UserManager):
+    def get_duplicated_pole_emploi_ids(self):
+        """
+        Returns an array of `pole_emploi_id` used more than once:
+
+            ['6666666A', '7777777B', '8888888C', '...']
+
+        Performs this kind of SQL with extra filters:
+
+            select pole_emploi_id, count(*)
+            from users_user
+            group by pole_emploi_id, birthdate
+            having count(*) > 1
+        """
+        return (
+            self.values("pole_emploi_id")
+            .filter(is_job_seeker=True)
+            # Skip empty `pole_emploi_id`.
+            .exclude(pole_emploi_id="")
+            # Skip 31 cases where `00000000` was used as the `pole_emploi_id`.
+            .exclude(pole_emploi_id="00000000")
+            # Group by.
+            .values("pole_emploi_id")
+            .annotate(num_of_duplications=Count("pole_emploi_id"))
+            .filter(num_of_duplications__gt=1)
+            .values_list("pole_emploi_id", flat=True)
+        )
+
+    def get_duplicated_users_grouped_by_same_pole_emploi_id(self):
+        """
+        Groups users using the same `pole_emploi_id` and `birthdate` (they are
+        guaranteed to be duplicates) and returns a dict:
+
+            {
+                '5589555S': [<User: a>, <User: b>],
+                '7744222A': [<User: x>, <User: y>, <User: z>],
+                ...
+            }
+        """
+        users = self.filter(pole_emploi_id__in=self.get_duplicated_pole_emploi_ids()).prefetch_related(
+            "approvals", "emailaddress_set"
+        )
+
+        result = dict()
+        for user in users:
+            result.setdefault(user.pole_emploi_id, []).append(user)
+
+        pe_id_to_remove = []
+
+        for pe_id, duplicates in result.items():
+
+            same_birthdate = all(user.birthdate == duplicates[0].birthdate for user in duplicates)
+
+            if not same_birthdate:
+
+                # Two users with the same `pole_emploi_id` but a different
+                # `birthdate` are not guaranteed to be duplicates.
+                if len(duplicates) == 2:
+                    pe_id_to_remove.append(pe_id)
+                    continue
+
+                # Keep only users with the same most common birthdate.
+                most_common_birthdate = max(set([u.birthdate for u in duplicates]), key=duplicates.count)
+                result[pe_id] = [u for u in duplicates if u.birthdate == most_common_birthdate]
+
+        for pe_id in pe_id_to_remove:
+            del result[pe_id]
+
+        return result
 
 
 class User(AbstractUser, AddressMixin):
@@ -163,6 +236,8 @@ class User(AbstractUser, AddressMixin):
         null=True,
         blank=True,
     )
+
+    objects = ItouUserManager()
 
     def __str__(self):
         return str(self.email)

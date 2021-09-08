@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from unittest import mock
 
@@ -19,6 +20,52 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
+
+
+class ManagerTest(TestCase):
+    def test_get_duplicated_pole_emploi_ids(self):
+
+        # Unique user.
+        JobSeekerFactory(pole_emploi_id="5555555A")
+
+        # 2 users using the same `pole_emploi_id`.
+        JobSeekerFactory(pole_emploi_id="6666666B")
+        JobSeekerFactory(pole_emploi_id="6666666B")
+
+        # 3 users using the same `pole_emploi_id`.
+        JobSeekerFactory(pole_emploi_id="7777777C")
+        JobSeekerFactory(pole_emploi_id="7777777C")
+        JobSeekerFactory(pole_emploi_id="7777777C")
+
+        duplicated_pole_emploi_ids = User.objects.get_duplicated_pole_emploi_ids()
+
+        expected_result = ["6666666B", "7777777C"]
+        self.assertCountEqual(duplicated_pole_emploi_ids, expected_result)
+
+    def test_get_duplicated_users_grouped_by_same_pole_emploi_id(self):
+
+        # 2 users using the same `pole_emploi_id` and different birthdates.
+        user1 = JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
+        user2 = JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
+
+        # 2 users using the same `pole_emploi_id` and the same birthdates.
+        user3 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+        user4 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+
+        # 3 users using the same `pole_emploi_id` and the same birthdates.
+        user5 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user6 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user7 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        # + 1 user using the same `pole_emploi_id` but a different birthdate.
+        user8 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
+
+        duplicated_users = User.objects.get_duplicated_users_grouped_by_same_pole_emploi_id()
+
+        expected_result = {
+            "7777777B": [user3, user4],
+            "8888888C": [user5, user6, user7],
+        }
+        self.assertDictEqual(duplicated_users, expected_result)
 
 
 class ModelTest(TestCase):
