@@ -102,13 +102,6 @@ class ItouUserManager(UserManager):
 
         return result
 
-    def merge(self, duplicates, target):
-        users_to_delete = [u for u in duplicates if u != target]
-
-        print("-" * 80)
-        print(target)
-        print(users_to_delete)
-
 
 class User(AbstractUser, AddressMixin):
     """
