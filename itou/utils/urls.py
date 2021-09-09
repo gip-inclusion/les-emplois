@@ -3,9 +3,9 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.safestring import mark_safe
 
 
-def get_safe_url(request, param_name, fallback_url=None):
+def get_safe_url(request, param_name=None, fallback_url=None, url=None):
 
-    url = request.GET.get(param_name) or request.POST.get(param_name)
+    url = url or request.GET.get(param_name) or request.POST.get(param_name)
 
     allowed_hosts = settings.ALLOWED_HOSTS
     require_https = request.is_secure()
