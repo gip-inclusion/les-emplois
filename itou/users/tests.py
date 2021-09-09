@@ -3,6 +3,7 @@ import uuid
 from unittest import mock
 
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 
@@ -72,56 +73,64 @@ class ManagerTest(TestCase):
         }
         self.assertDictEqual(duplicated_users, expected_result)
 
-    # TODO: test this in the context of the management command.
-    # def test_merge_easy_cases(self):
-    #
-    #     # Create 3 users with the same `pole_emploi_id` and `birthdate`.
-    #
-    #     kwargs = {
-    #         "job_seeker__pole_emploi_id": "6666666B",
-    #         "job_seeker__birthdate": datetime.date(2002, 12, 12),
-    #     }
-    #
-    #     # Create `user1`.
-    #     job_app1 = JobApplicationWithCompleteJobSeekerProfileFactory(**kwargs)
-    #     user1 = job_app1.job_seeker
-    #
-    #     self.assertEqual(1, user1.job_applications.count())
-    #     self.assertEqual(1, user1.eligibility_diagnoses.count())
-    #     self.assertEqual(1, user1.approvals.count())
-    #
-    #     # Create `user2`.
-    #     job_app2 = JobApplicationWithEligibilityDiagnosis(**kwargs)
-    #     user2 = job_app2.job_seeker
-    #
-    #     self.assertEqual(0, user2.approvals.count())
-    #     self.assertEqual(1, user2.job_applications.count())
-    #     self.assertEqual(1, user2.eligibility_diagnoses.count())
-    #
-    #     # Create `user3`.
-    #     job_app3 = JobApplicationWithEligibilityDiagnosis(**kwargs)
-    #     user3 = job_app3.job_seeker
-    #
-    #     self.assertEqual(0, user3.approvals.count())
-    #     self.assertEqual(1, user3.job_applications.count())
-    #     self.assertEqual(1, user3.eligibility_diagnoses.count())
-    #
-    #     # Merge all users into `user1`.
-    #
-    #     User.objects.merge_easy_cases([user1, user2, user3], user1)
-    #
-    #     self.assertEqual(3, user1.job_applications.count())
-    #     self.assertEqual(3, user1.eligibility_diagnoses.count())
-    #     self.assertEqual(1, user1.approvals.count())
-    #
-    #     self.assertEqual(0, User.objects.filter(email=user2.email).count())
-    #     self.assertEqual(0, User.objects.filter(email=user3.email).count())
-    #
-    #     self.assertEqual(0, JobApplication.objects.filter(job_seeker=user2).count())
-    #     self.assertEqual(0, JobApplication.objects.filter(job_seeker=user3).count())
-    #
-    #     self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user2).count())
-    #     self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user3).count())
+
+class ManagementCommandsTest(TestCase):
+    def test_deduplicate_job_seekers_easy_case(self):
+        """
+        Test the deduplication of several users with the same `pole_emploi_id`
+        and `birthdate`.
+
+        The scenario is an easy case : among all the duplicates, only one has
+        a PASS IAE.
+        """
+
+        # Create 3 users with the same `pole_emploi_id` and `birthdate`.
+
+        kwargs = {
+            "job_seeker__pole_emploi_id": "6666666B",
+            "job_seeker__birthdate": datetime.date(2002, 12, 12),
+        }
+
+        # Create `user1`.
+        job_app1 = JobApplicationWithCompleteJobSeekerProfileFactory(**kwargs)
+        user1 = job_app1.job_seeker
+
+        self.assertEqual(1, user1.job_applications.count())
+        self.assertEqual(1, user1.eligibility_diagnoses.count())
+        self.assertEqual(1, user1.approvals.count())
+
+        # Create `user2`.
+        job_app2 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        user2 = job_app2.job_seeker
+
+        self.assertEqual(0, user2.approvals.count())
+        self.assertEqual(1, user2.job_applications.count())
+        self.assertEqual(1, user2.eligibility_diagnoses.count())
+
+        # Create `user3`.
+        job_app3 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        user3 = job_app3.job_seeker
+
+        self.assertEqual(0, user3.approvals.count())
+        self.assertEqual(1, user3.job_applications.count())
+        self.assertEqual(1, user3.eligibility_diagnoses.count())
+
+        # Merge all users into `user1`.
+
+        call_command("deduplicate_job_seekers", verbosity=0)
+
+        self.assertEqual(3, user1.job_applications.count())
+        self.assertEqual(3, user1.eligibility_diagnoses.count())
+        self.assertEqual(1, user1.approvals.count())
+
+        self.assertEqual(0, User.objects.filter(email=user2.email).count())
+        self.assertEqual(0, User.objects.filter(email=user3.email).count())
+
+        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user2).count())
+        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user3).count())
+
+        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user2).count())
+        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user3).count())
 
 
 class ModelTest(TestCase):

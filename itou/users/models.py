@@ -43,6 +43,9 @@ class ItouUserManager(UserManager):
             from users_user
             group by pole_emploi_id, birthdate
             having count(*) > 1
+
+        Used in the `deduplicate_job_seekers` management command.
+        Implemented as a manager method to make unit testing easier.
         """
         return (
             self.values("pole_emploi_id")
@@ -68,6 +71,9 @@ class ItouUserManager(UserManager):
                 '7744222A': [<User: x>, <User: y>, <User: z>],
                 ...
             }
+
+        Used in the `deduplicate_job_seekers` management command.
+        Implemented as a manager method to make unit testing easier.
         """
         users = self.filter(pole_emploi_id__in=self.get_duplicated_pole_emploi_ids())
         if prefetch_related_lookups:
