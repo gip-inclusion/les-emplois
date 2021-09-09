@@ -38,7 +38,7 @@ class AdministrativeCriteriaForm(forms.Form):
         "Vous devez sélectionner au moins un critère administratif de niveau 1 "
         "ou le cumul d'au moins trois critères de niveau 2."
     )
-    ERROR_CRITERIA_NUMBER_ETTI = (
+    ERROR_CRITERIA_NUMBER_ETTI_AI = (
         "Vous devez sélectionner au moins un critère administratif de niveau 1 "
         "ou le cumul d'au moins deux critères de niveau 2."
     )
@@ -90,16 +90,15 @@ class AdministrativeCriteriaForm(forms.Form):
         level_1 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_1]
         level_2 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_2]
 
-        # For EI, AI, ACI: 1 criterion level 1 OR 3 level 2 criteria.
-        if self.siae.kind != self.siae.KIND_ETTI:
+        # For ETTI and AI: 1 criterion level 1 OR 2 level 2 criteria.
+        if self.siae.kind == self.siae.KIND_ETTI or self.siae.kind == self.siae.KIND_AI:
+            len_valid = len(level_1) or len(level_2) >= 2
+            if not len_valid:
+                raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER_ETTI_AI)
+        # Other: 1 criterion level 1 OR 3 level 2 criteria.
+        else:
             len_valid = len(level_1) or len(level_2) >= 3
             if not len_valid:
                 raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER)
-
-        # For ETTI: 1 criterion level 1 OR 2 level 2 criteria.
-        if self.siae.kind == self.siae.KIND_ETTI:
-            len_valid = len(level_1) or len(level_2) >= 2
-            if not len_valid:
-                raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER_ETTI)
 
         return selected_objects
