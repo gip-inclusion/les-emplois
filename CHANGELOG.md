@@ -10,7 +10,6 @@
 - Ajout d'évènements Matomo sur les liens de la page de résultats employeurs.
 
 ### Modifié
-- La branche principale sur Github est désormais `main`.
 - Correction des erreurs Sentry relatives au format de dates (`datepicker`).
 - Correction du message de notification lors d'une demande d'invitation.
 - Correction de l'affichage du type de prescripteur.
