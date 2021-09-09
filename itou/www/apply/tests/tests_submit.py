@@ -353,7 +353,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:list_for_prescriber")
+        next_url = reverse("apply:step_application_sent")
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
@@ -538,7 +538,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:list_for_prescriber")
+        next_url = reverse("apply:step_application_sent")
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
@@ -689,7 +689,7 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:list_for_prescriber")
+        next_url = reverse("apply:step_application_sent")
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)

@@ -111,7 +111,7 @@
                                 </a>
                                 <small>Cet employeur n'accepte plus de candidatures pour le moment</small>
                             {% else %}
-                                <a class="btn btn-sm btn-outline-primary matomo-event" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-bt-postuler">
+                                <a class="btn btn-sm btn-outline-primary matomo-event" href="{% url 'apply:start' siae_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-bt-postuler">
                                     {% include "includes/icon.html" with icon="message-square" %} Postuler
                                 </a>
                             {% endif %}
