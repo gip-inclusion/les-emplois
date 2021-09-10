@@ -56,6 +56,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",  # DRF (Django Rest Framework).
     "rest_framework.authtoken",  # Required for DRF TokenAuthentication.
     "drf_spectacular",
+    "django_filters",
 ]
 
 
