@@ -1,8 +1,10 @@
 import logging
 
+from django_filters.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
-from rest_framework import filters, viewsets
+from rest_framework import viewsets
 from rest_framework.exceptions import NotFound, ValidationError
 
 from itou.cities.models import City
@@ -14,6 +16,30 @@ logger = logging.getLogger("api_drf")
 CODE_INSEE_PARAM_NAME = "code_insee"
 DISTANCE_FROM_CODE_INSEE_PARAM_NAME = "distance_max_km"
 MAX_DISTANCE_RADIUS_KM = 100
+
+SIAE_ORDERING_FILTER_MAPPING = {
+    "created_at": "cree_le",
+    "updated_at": "mis_a_jour_le",
+    "kind": "type",
+    "city": "ville",
+    "post_code": "code_postal",
+    "address_line_1": "addresse_ligne_1",
+    "address_line_2": "addresse_ligne_2",
+    "department": "departement",
+    "name": "raison_sociale",
+    "display_name": "enseigne",
+    "block_job_applications": "bloque_candidatures",
+    "siret": "siret",
+    "website": "site_web",
+}
+
+
+class SiaeOrderingFilter(FilterSet):
+    # Mapping of the model property names -> query parameter names used to order the results:
+    # - keys: the name of the property in the model in order to order the results
+    # - values: the name of the ordering criterion in the query parameter
+    # If you want to query https://some_api?o=cree_le, it will perform queryset.order_by("created_at")
+    o = OrderingFilter(fields=SIAE_ORDERING_FILTER_MAPPING)
 
 
 class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -52,8 +78,8 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     serializer_class = SiaeSerializer
-    filter_backend = [filters.OrderingFilter]
-    ordering = ["-cree_le", "-mis_a_jour_le"]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = SiaeOrderingFilter
 
     # No authentication is required on this API and everybody can query anything − it’s read-only.
     authentication_classes = []
@@ -79,6 +105,9 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
                 type=str,
             ),
             OpenApiParameter(name="format", description="Format de sortie", required=False, enum=["json", "api"]),
+            OpenApiParameter(
+                name="o", description="Critère de tri", required=False, enum=SIAE_ORDERING_FILTER_MAPPING.values()
+            ),
         ],
         responses={200: SiaeSerializer, 404: OpenApiTypes.OBJECT},
         examples=[
