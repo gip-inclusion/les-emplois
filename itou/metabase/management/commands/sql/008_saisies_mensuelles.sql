@@ -157,18 +157,32 @@ from
     left join salarie
         on emi.emi_pph_id = salarie.salarie_id 
         and emi.emi_sme_annee >= (date_part('year', current_date) - 2) 
-    left join commune_GPS as commune_salarie 
+    left join(
+        select distinct 
+            code_insee,
+            latitude,
+            longitude 
+        from 
+            commune_GPS
+    ) as commune_salarie  
         on salarie.salarie_codeinseecom = commune_salarie.code_insee
     left join "fluxIAE_RefMotifSort" as sortie 
         on emi.Emi_motif_sortie_id = sortie.rms_id
     left  join "fluxIAE_AnnexeFinanciere_v2" as af 
         on emi.emi_afi_id=af.af_id_annexe_financiere 
-        and af_etat_annexe_financiere_code in ('VALIDE', 'SAISI', 'PROVISOIRE' ,'CLOTURE')
+        and af_etat_annexe_financiere_code in ('VALIDE', 'SAISI', 'PROVISOIRE')
         and emi.emi_sme_annee >= (date_part('year', current_date) - 2) 
     left join "fluxIAE_Structure_v2" as structure
         on af.af_id_structure = structure.structure_id_siae  
-    left join commune_GPS as commune_structure 
+    left join(
+        select distinct 
+            code_insee,
+            latitude,
+            longitude 
+        from 
+            commune_GPS
+    ) as commune_structure  
         on structure.structure_adresse_admin_code_insee = commune_structure.code_insee
 /* On récupère le découpage établissement public territorial */   
     left join sa_ept ept on ept.code_comm = structure.structure_adresse_admin_code_insee
-where emi.emi_sme_annee >= (date_part('year', current_date) - 2 )
+where emi.emi_sme_annee >= (date_part('year', current_date) - 2)
