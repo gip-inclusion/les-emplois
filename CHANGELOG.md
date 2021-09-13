@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## [26] - 2021-09-09
+
+### Ajouté
+- Automatisation des imports de données de l'ASP.
+- Refonte et réorganisation de la documentation technique.
+- Integration du nouveau `datepicker` au thème
+- Ajout d'une option de suppression du suivi Matomo (opt-in / `tarteaucitron`).
+- Ajout d'évènements Matomo sur les liens de la page de résultats employeurs.
+- Ajout d’une API `/api/v1/siaes` (et sa documentation) pour obtenir la liste des SIAE à proximité d’une ville.
+
+### Modifié
+- Correction des erreurs Sentry relatives au format de dates (`datepicker`).
+- Correction du message de notification lors d'une demande d'invitation.
+- Correction de l'affichage du type de prescripteur.
+- Modification d'un message d'erreur lors d'une prolongation de PASS IAE.
+- Modification du bouton de déconnexion.
+- Mise à jour de l'accès aux statistiques des conseils départementaux.
+- Mise à jour des scripts de formatage et de vérification du code.
+- Mise à jour des critères d'éligibilité.
+- Mise à jour de la liste des prescripteurs habilités.
+- Mise à jour vers Django v3.2.7
+
 ## [25] - 2021-08-26
 
 ### Ajouté
