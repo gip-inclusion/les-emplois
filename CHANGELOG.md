@@ -8,6 +8,7 @@
 - Integration du nouveau `datepicker` au thème
 - Ajout d'une option de suppression du suivi Matomo (opt-in / `tarteaucitron`).
 - Ajout d'évènements Matomo sur les liens de la page de résultats employeurs.
+- Ajout d’une API `/api/v1/siaes` (et sa documentation) pour obtenir la liste des SIAE à proximité d’une ville.
 
 ### Modifié
 - Correction des erreurs Sentry relatives au format de dates (`datepicker`).
