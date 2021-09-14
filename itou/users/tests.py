@@ -71,7 +71,7 @@ class ManagerTest(TestCase):
             "7777777B": [user1, user2],
             "8888888C": [user3, user4, user5],
         }
-        self.assertDictEqual(duplicated_users, expected_result)
+        self.assertCountEqual(duplicated_users, expected_result)
 
 
 class ManagementCommandsTest(TestCase):
