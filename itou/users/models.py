@@ -101,7 +101,14 @@ class ItouUserManager(UserManager):
                 list_of_birthdates = [u.birthdate for u in duplicates]
                 c = Counter(list_of_birthdates)
                 most_common_birthdate = c.most_common(1)[0][0]
-                result[pe_id] = [u for u in duplicates if u.birthdate == most_common_birthdate]
+
+                duplicates_with_same_birthdate = [u for u in duplicates if u.birthdate == most_common_birthdate]
+
+                if len(duplicates_with_same_birthdate) == 1:
+                    # We stop if there is only one user left.
+                    pe_id_to_remove.append(pe_id)
+                else:
+                    result[pe_id] = duplicates_with_same_birthdate
 
         for pe_id in pe_id_to_remove:
             del result[pe_id]
