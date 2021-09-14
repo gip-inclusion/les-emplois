@@ -1,12 +1,14 @@
-{% extends "apply/submit_base.html" %}
+{% extends "layout/content_small.html" %}
 
 {% block content %}
 
     {{ block.super }}
 
     {# This template is shown only to prescribers. #}
+    <h1>Candidature envoyée</h1>
 
-    <p>La candidature a bien été envoyée.</p>
+    <p>La candidature pour <b>{{ job_seeker.get_full_name }}</b> a bien été envoyée
+        chez <b>{{ siae.display_name }}</b>.</p>
 
     {% if back_url %}
         <a class="btn btn-primary" href="{{ back_url }}">Revenir à la recherche</a>
