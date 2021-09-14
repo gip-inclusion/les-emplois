@@ -18,19 +18,13 @@ DISTANCE_FROM_CODE_INSEE_PARAM_NAME = "distance_max_km"
 MAX_DISTANCE_RADIUS_KM = 100
 
 SIAE_ORDERING_FILTER_MAPPING = {
-    "created_at": "cree_le",
-    "updated_at": "mis_a_jour_le",
-    "kind": "type",
-    "city": "ville",
-    "post_code": "code_postal",
-    "address_line_1": "addresse_ligne_1",
-    "address_line_2": "addresse_ligne_2",
-    "department": "departement",
-    "name": "raison_sociale",
-    "display_name": "enseigne",
     "block_job_applications": "bloque_candidatures",
+    "kind": "type",
+    "department": "departement",
+    "post_code": "code_postal",
+    "city": "ville",
     "siret": "siret",
-    "website": "site_web",
+    "name": "raison_sociale",
 }
 
 
@@ -92,6 +86,13 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
         response_only=True,
         status_codes=["404"],
     )
+    sort_description = """
+Critère de tri.
+
+On peut spécifier la direction de tri :
+ - o=critère pour l’ordre croissant
+ - o=-critère pour l’ordre décroissant
+    """
 
     @extend_schema(
         parameters=[
@@ -106,7 +107,10 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
             ),
             OpenApiParameter(name="format", description="Format de sortie", required=False, enum=["json", "api"]),
             OpenApiParameter(
-                name="o", description="Critère de tri", required=False, enum=SIAE_ORDERING_FILTER_MAPPING.values()
+                name="o",
+                description=sort_description,
+                required=False,
+                enum=SIAE_ORDERING_FILTER_MAPPING.values(),
             ),
         ],
         responses={200: SiaeSerializer, 404: OpenApiTypes.OBJECT},
