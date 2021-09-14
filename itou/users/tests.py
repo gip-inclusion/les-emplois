@@ -12,7 +12,7 @@ from itou.asp.models import AllocationDuration, EmployerType
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
-    JobApplicationWithCompleteJobSeekerProfileFactory,
+    JobApplicationWithApprovalFactory,
     JobApplicationWithEligibilityDiagnosis,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -92,7 +92,7 @@ class ManagementCommandsTest(TestCase):
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationWithCompleteJobSeekerProfileFactory(**kwargs)
+        job_app1 = JobApplicationWithApprovalFactory(**kwargs)
         user1 = job_app1.job_seeker
 
         self.assertEqual(1, user1.job_applications.count())
