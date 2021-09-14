@@ -706,7 +706,8 @@ class JobSeekerProfile(models.Model):
 
     @property
     def is_employed(self):
-        return not self.unemployed_since and self.previous_employer_kind
+        # `previous_employer_kind` field is not needed for ASP processing
+        return not self.unemployed_since
 
     @property
     def has_ass_allocation(self):
