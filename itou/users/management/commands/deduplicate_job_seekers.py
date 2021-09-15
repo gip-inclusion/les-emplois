@@ -1,6 +1,8 @@
 import logging
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.urls import reverse
 
 from itou.users.models import User
 
@@ -44,7 +46,13 @@ class Command(BaseCommand):
 
         users_to_delete = [u for u in duplicates if u != target]
 
-        self.logger.debug(f"{', '.join([u.email for u in users_to_delete])} => {target.email}")
+        user_admin_path = reverse("admin:users_user_change", args=[target.pk])
+        user_admin_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{user_admin_path}"
+        self.logger.debug("<tr>")
+        self.logger.debug(f'<td><a href="{user_admin_url}">{target.email}</a></td>')
+        self.logger.debug(f"<td>{len(users_to_delete)}</td>")
+        self.logger.debug(f"<td>{' ; '.join([u.email for u in users_to_delete])}</td>")
+        self.logger.debug("</tr>")
 
         for user in users_to_delete:
 
@@ -70,6 +78,16 @@ class Command(BaseCommand):
         duplicates_dict = User.objects.get_duplicates_by_pole_emploi_id(
             prefetch_related_lookups=["approvals", "eligibility_diagnoses"]
         )
+
+        self.logger.debug("<table>")
+        self.logger.debug("<thead>")
+        self.logger.debug("<tr>")
+        self.logger.debug("<th>Compte de destination</th>")
+        self.logger.debug("<th>Nombre de doublons</th>")
+        self.logger.debug("<th>Doublons</th>")
+        self.logger.debug("</tr>")
+        self.logger.debug("</thead>")
+        self.logger.debug("<tbody>")
 
         for pe_id, duplicates in duplicates_dict.items():
 
@@ -104,18 +122,52 @@ class Command(BaseCommand):
 
             # Hard cases.
             # More than one PASS IAE was issued for the same person.
+            # We only display logs for the moment, we don't know yet how to merge them.
             elif len(users_with_approval) > 1:
                 count_hard_cases += 1
                 hard_cases.append(duplicates)
 
+        self.logger.debug("</tbody></table>")
+
         self.logger.debug("-" * 80)
         self.logger.debug(f"{count_easy_cases} easy cases merged.")
 
-        self.logger.debug("-" * 80)
-        self.logger.debug(f"{count_hard_cases} hard cases with more than one PASS IAE issued for the same person:")
-        self.logger.debug("-" * 80)
-        for duplicates in hard_cases:
-            self.logger.debug(f"{', '.join([u.email for u in duplicates])}")
+        self.log_hard_cases(count_hard_cases, hard_cases)
 
         self.logger.debug("-" * 80)
         self.logger.debug("Done.")
+
+    def log_hard_cases(self, count_hard_cases, hard_cases):
+        self.logger.debug("-" * 80)
+        self.logger.debug(f"{count_hard_cases} hard cases with more than one PASS IAE issued for the same person:")
+        self.logger.debug("<table>")
+        self.logger.debug("<thead>")
+        self.logger.debug("<tr>")
+        self.logger.debug("<th>Numéro</th>")
+        self.logger.debug("<th>Nombre de doublons</th>")
+        self.logger.debug("<th>Email</th>")
+        self.logger.debug("<th>Numéro PASS IAE</th>")
+        self.logger.debug("<th>Début PASS IAE</th>")
+        self.logger.debug("<th>Fin PASS IAE</th>")
+        self.logger.debug("</tr>")
+        self.logger.debug("</thead>")
+        self.logger.debug("<tbody>")
+        for i, duplicates in enumerate(hard_cases, 1):
+            for u in duplicates:
+                self.logger.debug("<tr>")
+                self.logger.debug(f"<td>{i}</td>")
+                self.logger.debug(f"<td>{len(duplicates)}</td>")
+                user_admin_path = reverse("admin:users_user_change", args=[u.pk])
+                user_admin_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{user_admin_path}"
+                debug_msg = f'<td><a href="{user_admin_url}">{u.email}</a></td>'
+                if approval := u.approvals.last():
+                    approval_admin_path = reverse("admin:approvals_approval_change", args=[approval.pk])
+                    approval_admin_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{approval_admin_path}"
+                    debug_msg += f'<td><a href="{approval_admin_url}">{approval.number}</a> </td>'
+                    debug_msg += f"<td>{approval.start_at.strftime('%d/%m/%Y')}</td>"
+                    debug_msg += f"<td>{approval.end_at.strftime('%d/%m/%Y')}</td>"
+                else:
+                    debug_msg += f'<td colspan="3"> </td>'
+                self.logger.debug(debug_msg)
+                self.logger.debug("</tr>")
+        self.logger.debug("</tbody></table>")
