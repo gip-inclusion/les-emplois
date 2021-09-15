@@ -201,7 +201,6 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
 
-    numeroAnnexe = serializers.CharField(source="financial_annex_number")
     mesure = serializers.CharField(source="asp_siae_type")
     siret = serializers.CharField(source="job_application.to_siae.siret")
 
@@ -221,7 +220,6 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
             "passDateFin",
             "numLigne",
             "typeMouvement",
-            "numeroAnnexe",
             "mesure",
             "siret",
             "personnePhysique",
@@ -263,6 +261,36 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         employee_situation["orienteur"] = instance.asp_prescriber_type
 
         return result
+
+
+class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
+    """
+    This serializer is a version with the `numeroAnnexe` field added (financial annex number).
+
+    This field not needed by ASP was simply ignored in earlier versions of the
+    main SFTP serializer but was removed for RGPD concerns.
+    """
+
+    numeroAnnexe = serializers.CharField(source="financial_annex_number")
+
+    class Meta:
+        model = EmployeeRecord
+        fields = [
+            "passIae",
+            "passDateDeb",
+            "passDateFin",
+            "numLigne",
+            "typeMouvement",
+            "numeroAnnexe",
+            "mesure",
+            "siret",
+            "personnePhysique",
+            "adresse",
+            "situationSalarie",
+            "codeTraitement",
+            "libelleTraitement",
+        ]
+        read_only_fields = fields
 
 
 class EmployeeRecordBatchSerializer(serializers.Serializer):
