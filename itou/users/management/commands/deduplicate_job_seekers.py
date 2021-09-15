@@ -167,7 +167,7 @@ class Command(BaseCommand):
                     debug_msg += f"<td>{approval.start_at.strftime('%d/%m/%Y')}</td>"
                     debug_msg += f"<td>{approval.end_at.strftime('%d/%m/%Y')}</td>"
                 else:
-                    debug_msg += f'<td colspan="3"> </td>'
+                    debug_msg += '<td colspan="3"> </td>'
                 self.logger.debug(debug_msg)
                 self.logger.debug("</tr>")
         self.logger.debug("</tbody></table>")
