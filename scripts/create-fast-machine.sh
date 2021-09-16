@@ -47,7 +47,7 @@ clever service link-addon c1-itou-redis --alias $IMPORT_APP_NAME
 
 clever deploy --alias $IMPORT_APP_NAME --branch $DEPLOY_BRANCH --force
 
-IMPORT_APP_NAME=pouet; cat << EOF
+cat << EOF
 
 🎉 Le déploiement est terminé 🎉
 
