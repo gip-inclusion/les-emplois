@@ -503,7 +503,8 @@ METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 # Metabase embedded dashboard IDs
 PUBLIC_BASIC_STATS_DASHBOARD_ID = 34
 PUBLIC_ADVANCED_STATS_DASHBOARD_ID = 43
-CD_STATS_DASHBOARD_ID = 52
+CD_STATS_DASHBOARD_ID = 118
+CD_STATS_ALLOWED_DEPARTMENTS = ["38", "62", "67", "93"]
 
 # Huey / async
 # Workers are run in prod via `CC_WORKER_COMMAND = django-admin run_huey`.

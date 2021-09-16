@@ -397,6 +397,7 @@ class User(AbstractUser, AddressMixin):
             and not current_org.is_brsa
             and current_org.department is not None
             and current_org.department != ""
+            and current_org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS
         )
 
     def get_stats_cd_department(self, current_org):
