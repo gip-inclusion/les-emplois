@@ -26,23 +26,7 @@
                 <span>Item 02</span>
               </a>
             </li>
-            <li>
-              <button class="btn btn-outline-primary btn-ico">
-                <span>
-                  Se connecter
-                </span>
-              </button>
-            </li>
-            <li>
-              <button class="btn btn-primary btn-ico">
-                <span>
-                  S'inscrire
-                </span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-                  <path fill="currentColor" fill-rule="nonzero" stroke="currentColor" d="M1.964 8.95h11.03L9.51 12.737a.451.451 0 00.037.646.474.474 0 00.66-.037L14.386 8.8l.035-.043.033-.05.013-.05V8.539c0-.012.033-.02.033-.044v-.151l-.014-.05-.019-.03-.034-.045-4.193-4.566a.474.474 0 00-.66-.037.452.452 0 00-.036.646l3.45 3.777H1.963a.46.46 0 00-.464.455.46.46 0 00.464.455z"></path>
-                </svg>
-              </button>
-            </li>
+            {% include 'layout/_nav_btn_items.html' %}
           </ul>
         </nav>
       </div>
@@ -91,3 +75,18 @@
     </div>
   </section>
 </header>
+<div class="layout-section layout-section-white border-bottom">
+    <nav class="nav itou-main-nav">
+        {% if user.is_authenticated %}
+            <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+        {% endif %}
+        <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">Rechercher des employeurs</a>
+
+        <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs</a>
+
+        <a class="nav-link" href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" aria-label="Accéder au Forum de l'inclusion (nouvel onglet)">Communauté {% include "includes/icon.html" with icon="external-link" %}</a>
+
+        <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Documentation {% include "includes/icon.html" with icon="external-link" %}</a>
+
+    </nav>
+</div>
