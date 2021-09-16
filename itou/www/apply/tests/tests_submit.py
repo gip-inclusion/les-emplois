@@ -42,6 +42,7 @@ class ApplyAsJobSeekerTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": None,
@@ -64,6 +65,7 @@ class ApplyAsJobSeekerTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -86,6 +88,7 @@ class ApplyAsJobSeekerTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": user.pk,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -165,7 +168,7 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:list_for_job_seeker")
+        next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=user, sender=user, to_siae=siae)
@@ -235,6 +238,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": None,
@@ -257,6 +261,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -310,6 +315,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": new_job_seeker.pk,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -353,7 +359,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:list_for_prescriber")
+        next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
@@ -425,6 +431,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": None,
@@ -447,6 +454,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -500,6 +508,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": new_job_seeker.pk,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -538,7 +547,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:list_for_prescriber")
+        next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
@@ -576,6 +585,7 @@ class ApplyAsPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": None,
@@ -598,6 +608,7 @@ class ApplyAsPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -653,6 +664,7 @@ class ApplyAsPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": new_job_seeker.pk,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -689,7 +701,7 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:list_for_prescriber")
+        next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
@@ -775,6 +787,7 @@ class ApplyAsSiaeTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": None,
@@ -797,6 +810,7 @@ class ApplyAsSiaeTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -850,6 +864,7 @@ class ApplyAsSiaeTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = {
+            "back_url": None,
             "job_seeker_pk": new_job_seeker.pk,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -886,7 +901,7 @@ class ApplyAsSiaeTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:list_for_siae")
+        next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
