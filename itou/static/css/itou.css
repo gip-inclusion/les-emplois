@@ -169,6 +169,9 @@ footer img.footer-logo {
     padding: 20px;
 }
 
+.s-footer {
+    grid-column: full;
+}
 /* Spacing.
 --------------------------------------------------------------------------- */
 
