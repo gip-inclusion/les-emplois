@@ -638,6 +638,7 @@ class Prolongation(models.Model):
     MAX_DURATION_MONTHS = 12
 
     class Reason(models.TextChoices):
+        SENIOR_CDI = "SENIOR_CDI", "CDI conclu avec une personne âgée d'au moins 57 ans (12 mois maximum)"
         COMPLETE_TRAINING = "COMPLETE_TRAINING", "Fin d'une formation (6 mois maximum)"
         RQTH = "RQTH", "RQTH (12 mois maximum)"
         SENIOR = "SENIOR", "50 ans et plus (12 mois maximum)"
