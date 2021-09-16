@@ -1,14 +1,21 @@
+import datetime
 import uuid
 from unittest import mock
 
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 
 import itou.asp.factories as asp
 from itou.asp.models import AllocationDuration, EmployerType
-from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.eligibility.models import EligibilityDiagnosis
+from itou.job_applications.factories import (
+    JobApplicationSentByJobSeekerFactory,
+    JobApplicationWithApprovalFactory,
+    JobApplicationWithEligibilityDiagnosis,
+)
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberMembershipFactory,
@@ -19,6 +26,111 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
+
+
+class ManagerTest(TestCase):
+    def test_get_duplicated_pole_emploi_ids(self):
+
+        # Unique user.
+        JobSeekerFactory(pole_emploi_id="5555555A")
+
+        # 2 users using the same `pole_emploi_id`.
+        JobSeekerFactory(pole_emploi_id="6666666B")
+        JobSeekerFactory(pole_emploi_id="6666666B")
+
+        # 3 users using the same `pole_emploi_id`.
+        JobSeekerFactory(pole_emploi_id="7777777C")
+        JobSeekerFactory(pole_emploi_id="7777777C")
+        JobSeekerFactory(pole_emploi_id="7777777C")
+
+        duplicated_pole_emploi_ids = User.objects.get_duplicated_pole_emploi_ids()
+
+        expected_result = ["6666666B", "7777777C"]
+        self.assertCountEqual(duplicated_pole_emploi_ids, expected_result)
+
+    def test_get_duplicates_by_pole_emploi_id(self):
+
+        # 2 users using the same `pole_emploi_id` and different birthdates.
+        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
+        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
+
+        # 2 users using the same `pole_emploi_id` and the same birthdates.
+        user1 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+        user2 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+
+        # 3 users using the same `pole_emploi_id` and the same birthdates.
+        user3 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user4 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user5 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        # + 1 user using the same `pole_emploi_id` but a different birthdate.
+        JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
+
+        duplicated_users = User.objects.get_duplicates_by_pole_emploi_id()
+
+        expected_result = {
+            "7777777B": [user1, user2],
+            "8888888C": [user3, user4, user5],
+        }
+        self.assertCountEqual(duplicated_users, expected_result)
+
+
+class ManagementCommandsTest(TestCase):
+    def test_deduplicate_job_seekers_easy_case(self):
+        """
+        Test the deduplication of several users with the same `pole_emploi_id`
+        and `birthdate`.
+
+        The scenario is an easy case : among all the duplicates, only one has
+        a PASS IAE.
+        """
+
+        # Create 3 users with the same `pole_emploi_id` and `birthdate`.
+
+        kwargs = {
+            "job_seeker__pole_emploi_id": "6666666B",
+            "job_seeker__birthdate": datetime.date(2002, 12, 12),
+        }
+
+        # Create `user1`.
+        job_app1 = JobApplicationWithApprovalFactory(**kwargs)
+        user1 = job_app1.job_seeker
+
+        self.assertEqual(1, user1.job_applications.count())
+        self.assertEqual(1, user1.eligibility_diagnoses.count())
+        self.assertEqual(1, user1.approvals.count())
+
+        # Create `user2`.
+        job_app2 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        user2 = job_app2.job_seeker
+
+        self.assertEqual(0, user2.approvals.count())
+        self.assertEqual(1, user2.job_applications.count())
+        self.assertEqual(1, user2.eligibility_diagnoses.count())
+
+        # Create `user3`.
+        job_app3 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        user3 = job_app3.job_seeker
+
+        self.assertEqual(0, user3.approvals.count())
+        self.assertEqual(1, user3.job_applications.count())
+        self.assertEqual(1, user3.eligibility_diagnoses.count())
+
+        # Merge all users into `user1`.
+
+        call_command("deduplicate_job_seekers", verbosity=0)
+
+        self.assertEqual(3, user1.job_applications.count())
+        self.assertEqual(3, user1.eligibility_diagnoses.count())
+        self.assertEqual(1, user1.approvals.count())
+
+        self.assertEqual(0, User.objects.filter(email=user2.email).count())
+        self.assertEqual(0, User.objects.filter(email=user3.email).count())
+
+        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user2).count())
+        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user3).count())
+
+        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user2).count())
+        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user3).count())
 
 
 class ModelTest(TestCase):
