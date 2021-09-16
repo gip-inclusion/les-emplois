@@ -14,7 +14,7 @@
             <p>
                 Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>. Il sera automatiquement importé dans votre compte.
             </p>
-            <a class="btn btn-secondary" href="{{ back_url }}">Retour</a>
+            <a class="btn btn-emploi" href="{{ back_url }}">Retour</a>
 
         {% else %}
             {% if approval.is_pass_iae %}
@@ -29,7 +29,7 @@
                 <p>
                     Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>.
                 </p>
-                <a class="btn btn-secondary" href="{{ back_url }}">Retour</a>
+                <a class="btn btn-emploi" href="{{ back_url }}">Retour</a>
             {% else %}
                 <p>
                     L'agrément <strong>{{ approval.number|slice:12 }}</strong> a été délivré pour <strong>{{ approval.first_name|title }} {{ approval.last_name|title }}</strong>.
@@ -40,7 +40,7 @@
                 <p>
                     Mais avant, nous avons besoin de connaître l'adresse e-mail de votre salarié(e).
                 </p>
-                    <a class="btn btn-secondary" href="{{ back_url }}">Annuler</a>
+                    <a class="btn btn-emploi" href="{{ back_url }}">Annuler</a>
                     <a class="btn btn-primary" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">
                         Continuer
                     </a>
