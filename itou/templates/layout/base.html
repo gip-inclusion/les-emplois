@@ -27,7 +27,7 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="shortcut icon" href="{% static "favicon.ico" %}" type="image/ico">
     <link rel="stylesheet" href="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.css" %}" type="text/css">
-    <link rel="stylesheet" href="{% static "vendor/bootstrap-4.3.1/bootstrap.min.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "vendor/theme-inclusion/app.css" %}" type="text/css">
     <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
     {% block extra_head %}{% endblock %}
 </head>
@@ -37,6 +37,7 @@
 
     <div class="layout">
 
+        {% include "layout/_header.html" %}
         <header class="layout-section layout-section-white">
             <div class="layout-header py-2 px-0 px-sm-3">
                 <a href="/" class="text-decoration-none text-reset">
@@ -226,119 +227,7 @@
         </div>
 
         {% block content_full_viewport %}{% endblock %}
-
-        <footer class="layout-section text-center text-sm-left">
-            <section class="layout layout-column-full border-top">
-
-              <div class="layout-column-main py-4">
-                    <div class="row">
-
-                        <div class="col-sm-2">
-                            <img class="footer-logo" src="{% static 'img/logo_ministere_du_travail.svg' %}" alt="">
-                        </div>
-
-                        <div class="col-sm-4">
-                            <h5><b>inclusion</b>.beta.gouv.fr</h5>
-                            <p>
-                                Les emplois de l'inclusion <i>en expérimentation</i>
-                            </p>
-                            <p class="mb-0">
-                                Nous suivre
-                            </p>
-                            <ul class="list-unstyled">
-                                <li>
-                                    <a href="https://www.linkedin.com/company/inclusion-gouv/" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="linkedin" %}
-                                        <small>LinkedIn</small>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.facebook.com/inclusion.gouv/" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="facebook" %}
-                                        <small>Facebook</small>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.instagram.com/inclusion_gouv/" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="instagram" %}
-                                        <small>Instagram</small>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://twitter.com/inclusion_gouv/" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="twitter" %}
-                                        <small>Twitter</small>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="youtube" %}
-                                        <small>YouTube</small>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <ul class="list-unstyled">
-                                {# Internal links. #}
-                                <li>
-                                    <a href="{% url 'stats:public_basic_stats' %}">Statistiques, lexiques et indicateurs</a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'accessibility' %}">Accessibilité (non conforme)</a>
-                                </li>
-                                {# Use `mb-*` to mark a visual separation between internal and external links. #}
-                                <li class="mb-3">
-                                    <a href="{% url 'releases:list' %}">Journal des modifications</a>
-                                </li>
-                                {# External links. #}
-                                <li>
-                                    <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Besoin d'aide ?
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                <li>
-                                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Inscription Newsletter
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Qui peut bénéficier des contrats d'IAE ?
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ ITOU_COMMUNITY_URL }}/c/retours-sur-le-site/2" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Questions à la communauté
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Mentions légales
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a href="https://stats.uptimerobot.com/JYJ6XHq6xY" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Disponibilité
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-
-
-                            </ul>
-                        </div>
-
-                    </div>
-                </div>
-            </section>
-
-        </footer>
+        {% include "layout/_footer.html" %}
 
     </div>
 
@@ -346,6 +235,8 @@
     <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap-4.3.1/popper.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
+
+    <script src="{% static "vendor/theme-inclusion/app.js" %}"></script>
 
     {# tarteaucitron.js cookies consent / https://tarteaucitron.io/fr/install/ #}
     <script src="{% static "vendor/tarteaucitron/tarteaucitron.js" %}"></script>

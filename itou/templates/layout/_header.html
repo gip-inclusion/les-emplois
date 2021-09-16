@@ -1,0 +1,93 @@
+{% load static %}
+<header class="layout-section s-header s-header--emploi" role="banner" id="header">
+  <section class="s-header__container">
+    <div class="s-header__row row">
+      <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center pr-0 pr-md-3">
+        <a href="#top" class="s-header__logo-ministere"><img src="{% static 'img/logo-ministere-emploi.svg' %}" alt="Ministère de l'emploi"></a>
+      </div>
+      <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center px-0 px-md-3">
+        <a href=""><img src="{% static 'img/logo-emploi-inclusion.svg' %}" alt="L'emploi de l'inclusion"></a>
+      </div>
+      <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
+        <nav role="navigation">
+          <ul>
+            <li>
+              <a href="" class="is-active" rel="noopener">
+                <span>Accueil</span>
+              </a>
+            </li>
+            <li>
+              <a href="" rel="noopener">
+                <span>Item 01</span>
+              </a>
+            </li>
+            <li>
+              <a href="" rel="noopener">
+                <span>Item 02</span>
+              </a>
+            </li>
+            <li>
+              <button class="btn btn-outline-primary btn-ico">
+                <span>
+                  Se connecter
+                </span>
+              </button>
+            </li>
+            <li>
+              <button class="btn btn-primary btn-ico">
+                <span>
+                  S'inscrire
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                  <path fill="currentColor" fill-rule="nonzero" stroke="currentColor" d="M1.964 8.95h11.03L9.51 12.737a.451.451 0 00.037.646.474.474 0 00.66-.037L14.386 8.8l.035-.043.033-.05.013-.05V8.539c0-.012.033-.02.033-.044v-.151l-.014-.05-.019-.03-.034-.045-4.193-4.566a.474.474 0 00-.66-.037.452.452 0 00-.036.646l3.45 3.777H1.963a.46.46 0 00-.464.455.46.46 0 00.464.455z"></path>
+                </svg>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none" data-toggle="burger">
+        <span id="burger"><img src="images/picto-burger.svg" alt="Menu"></span>
+        <span id="close"><img src="images/picto-close.svg" alt="Fermer"></span>
+      </div>
+      <div id="burgerNav">
+        <nav role="navigation">
+          <ul>
+            <li>
+              <a href="" class="is-active" rel="noopener">
+                <span>Accueil</span>
+              </a>
+            </li>
+            <li>
+              <a href="" rel="noopener">
+                <span>Item 01</span>
+              </a>
+            </li>
+            <li>
+              <a href="" rel="noopener">
+                <span>Item 02</span>
+              </a>
+            </li>
+            <li>
+              <button class="btn btn-outline-primary btn-ico">
+                <span>
+                  Se connecter
+                </span>
+              </button>
+            </li>
+            <li>
+              <button class="btn btn-primary btn-ico">
+                <span>
+                  S'inscrire
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                  <path fill="currentColor" fill-rule="nonzero" stroke="currentColor" d="M1.964 8.95h11.03L9.51 12.737a.451.451 0 00.037.646.474.474 0 00.66-.037L14.386 8.8l.035-.043.033-.05.013-.05V8.539c0-.012.033-.02.033-.044v-.151l-.014-.05-.019-.03-.034-.045-4.193-4.566a.474.474 0 00-.66-.037.452.452 0 00-.036.646l3.45 3.777H1.963a.46.46 0 00-.464.455.46.46 0 00.464.455z"></path>
+                </svg>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </section>
+</header>
