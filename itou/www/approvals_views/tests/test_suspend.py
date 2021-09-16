@@ -49,7 +49,7 @@ class ApprovalSuspendViewTest(TestCase):
         post_data = {
             "start_at": start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "reason": Suspension.Reason.SICKNESS,
+            "reason": Suspension.Reason.SUSPENDED_CONTRACT,
             "reason_explanation": "",
             # Preview.
             "preview": "1",
