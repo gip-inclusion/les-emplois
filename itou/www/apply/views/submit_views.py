@@ -393,14 +393,8 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
 @login_required
 @valid_session_required
 def step_application_sent(request, siae_pk, template_name="apply/submit_step_application_sent.html"):
-
-    dashboard_url = reverse("apply:list_for_job_seeker")
-    if request.user.is_prescriber:
-        dashboard_url = reverse("apply:list_for_prescriber")
-    elif request.user.is_siae_staff:
+    if request.user.is_siae_staff:
         dashboard_url = reverse("apply:list_for_siae")
-
-    if not request.user.is_prescriber:
         messages.success(request, "Candidature bien envoyée !")
         return HttpResponseRedirect(dashboard_url)
 
