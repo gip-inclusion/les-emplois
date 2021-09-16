@@ -99,6 +99,8 @@ class SuspensionForm(forms.ModelForm):
         self.approval = kwargs.pop("approval")
         self.siae = kwargs.pop("siae")
         super().__init__(*args, **kwargs)
+        # Show new reasons but keep old ones for history.
+        self.fields["reason"].choices = Suspension.Reason.displayed_choices
 
         if not self.instance.pk:
             self.instance.siae = self.siae

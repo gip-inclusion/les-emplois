@@ -12,7 +12,7 @@ from django.db import models
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
-from django.utils.functional import cached_property
+from django.utils.functional import cached_property, classproperty
 from django.utils.safestring import mark_safe
 from unidecode import unidecode
 
@@ -387,6 +387,12 @@ class Suspension(models.Model):
     MAX_DURATION_MONTHS = 12
 
     class Reason(models.TextChoices):
+        # Displayed choices
+        SUSPENDED_CONTRACT = "CONTRACT_SUSPENDED", "Contrat de travail suspendu depuis plus de 15 jours"
+        BROKEN_CONTRACT = "CONTRACT_BROKEN", "Contract de travail rompu"
+        FINISHED_CONTRACT = "FINISHED_CONTRACT", "Contrat de travail terminé"
+
+        # Old reasons kept for history. See cls.displayed_choices
         SICKNESS = "SICKNESS", "Arrêt pour longue maladie"
         MATERNITY = "MATERNITY", "Congé de maternité"
         INCARCERATION = "INCARCERATION", "Incarcération"
@@ -403,6 +409,15 @@ class Suspension(models.Model):
             ),
         )
 
+        @classproperty
+        def displayed_choices(cls):
+            """
+            Old reasons are not showed anymore but kept to let users still see
+            a nice label in their dashboard instead of just the enum stored in the DB.
+            """
+            reasons = [cls.SUSPENDED_CONTRACT, cls.BROKEN_CONTRACT, cls.FINISHED_CONTRACT]
+            return [(reason.value, reason.label) for reason in reasons]
+
     approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
     end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
@@ -413,7 +428,9 @@ class Suspension(models.Model):
         on_delete=models.SET_NULL,
         related_name="approvals_suspended",
     )
-    reason = models.CharField(verbose_name="Motif", max_length=30, choices=Reason.choices, default=Reason.SICKNESS)
+    reason = models.CharField(
+        verbose_name="Motif", max_length=30, choices=Reason.choices, default=Reason.SUSPENDED_CONTRACT
+    )
     reason_explanation = models.TextField(verbose_name="Explications supplémentaires", blank=True)
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     created_by = models.ForeignKey(
