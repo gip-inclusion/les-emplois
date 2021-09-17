@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.urls import include, path, re_path, register_converter
 from django.views.generic import TemplateView
 
-from itou.france_connect import views as france_connect_views
 from itou.utils.urls import SiretConverter
 from itou.www.dashboard import views as dashboard_views
 from itou.www.login import views as login_views
@@ -54,6 +53,7 @@ urlpatterns = [
     # --------------------------------------------------------------------------------------
     # API.
     path("api/v1/", include("itou.api.urls", namespace="v1")),
+    path("api/", include("itou.www.api.urls")),
     # www.
     path("", include("itou.www.home.urls")),
     path("apply/", include("itou.www.apply.urls")),
