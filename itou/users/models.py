@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Count
@@ -250,6 +251,9 @@ class User(AbstractUser, AddressMixin):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+    )
+    provider_json = models.JSONField(
+        verbose_name="Information sur la source des champs", blank=True, null=True, encoder=DjangoJSONEncoder
     )
 
     objects = ItouUserManager()
