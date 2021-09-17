@@ -5,6 +5,7 @@ from django.shortcuts import render
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.utils.apis.metabase import metabase_embedded_url
+from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 
 
@@ -55,10 +56,10 @@ def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
     CD ("Conseil Départemental") stats shown to relevant CD members.
     They can only view data for their own departement.
 
-    Important: "département" field should be locked on metabase side.
+    Important: "département" and "région" fields should be locked on metabase side.
     Go to https://stats.inclusion.beta.gouv.fr/dashboard/XXX then "Partage" then "Partager et intégrer" then
     "Intégrer ce dashboard dans une application" then inside "Paramètres" on the right, make sure the relevant
-    parameter "Département" is "Verrouillé" and "Région" is "Désactivé".
+    parameters "Département" and "Région" are "Verrouillé".
     """
     if request.user.is_stats_vip:
         current_org = None
@@ -69,6 +70,32 @@ def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
     department = request.user.get_stats_cd_department(current_org=current_org)
     context = {
         "iframeurl": metabase_embedded_url(settings.CD_STATS_DASHBOARD_ID, department=department),
+        "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def stats_ddets(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
+    They can only view data for their own departement.
+
+    Important: "département" and "région" fields should be locked on metabase side.
+    Go to https://stats.inclusion.beta.gouv.fr/dashboard/XXX then "Partage" then "Partager et intégrer" then
+    "Intégrer ce dashboard dans une application" then inside "Paramètres" on the right, make sure the relevant
+    parameters "Département" and "Région" are "Verrouillé".
+    """
+    if request.user.is_stats_vip:
+        current_institution = None
+    else:
+        current_institution = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_ddets(current_institution=current_institution):
+        raise PermissionDenied
+    department = request.user.get_stats_ddets_department(current_institution=current_institution)
+    context = {
+        "iframeurl": metabase_embedded_url(settings.DDETS_STATS_DASHBOARD_ID, department=department),
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
     }

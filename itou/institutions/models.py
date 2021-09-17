@@ -38,6 +38,10 @@ class Institution(AddressMixin, OrganizationAbstract):
 
     objects = models.Manager.from_queryset(OrganizationQuerySet)()
 
+    @property
+    def is_ddets(self):
+        return self.kind == self.Kind.DDETS
+
 
 class InstitutionMembership(MembershipAbstract):
     """Intermediary model between `User` and `Institution`."""

@@ -364,19 +364,21 @@ class User(AbstractUser, AddressMixin):
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
 
-    def can_view_stats_dashboard_widget(self, current_org):
+    def can_view_stats_dashboard_widget(self, current_org, current_institution):
         """
         Whether a stats section should be displayed on the user's dashboard.
 
         It should be displayed if one or more stats sections are available for the user.
         """
-        return self.can_view_stats_cd(current_org=current_org)
+        return self.can_view_stats_cd(current_org=current_org) or self.can_view_stats_ddets(
+            current_institution=current_institution
+        )
 
     def can_view_stats_cd(self, current_org):
         """
-        CD as in "Conseil Départemental".
-
         All users, not just the admins, of a real CD can see the confidential CD stats, and for their department only.
+
+        CD as in "Conseil Départemental".
 
         Unfortunately the `PrescriberOrganization.Kind.DEPT` kind contains not only the real CD but also some random
         organizations authorized by some CD.
@@ -411,6 +413,33 @@ class User(AbstractUser, AddressMixin):
             # VIP users always and only see departement 01, as an example.
             return "01"
         return current_org.department
+
+    def can_view_stats_ddets(self, current_institution):
+        """
+        All users of a DDETS can see the confidential DDETS stats of their department only.
+        DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
+        """
+        if self.is_stats_vip:
+            return True
+        return (
+            self.is_labor_inspector
+            and current_institution is not None
+            and current_institution.is_ddets
+            and current_institution.department is not None
+            and current_institution.department != ""
+        )
+
+    def get_stats_ddets_department(self, current_institution):
+        """
+        Get department that the user has the permission to see for the DDETS stats page.
+        DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
+        """
+        if not self.can_view_stats_ddets(current_institution=current_institution):
+            raise PermissionDenied
+        if self.is_stats_vip:
+            # VIP users always and only see departement 01, as an example.
+            return "01"
+        return current_institution.department
 
     @cached_property
     def last_accepted_job_application(self):
