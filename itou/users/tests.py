@@ -11,6 +11,8 @@ from django.utils import timezone
 import itou.asp.factories as asp
 from itou.asp.models import AllocationDuration, EmployerType
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.institutions.factories import InstitutionWithMembershipFactory
+from itou.institutions.models import Institution
 from itou.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
     JobApplicationWithApprovalFactory,
@@ -24,7 +26,13 @@ from itou.prescribers.factories import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
+from itou.users.factories import (
+    JobSeekerFactory,
+    JobSeekerProfileFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    UserFactory,
+)
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
@@ -359,11 +367,11 @@ class ModelTest(TestCase):
 
     def test_vip_user_can_view_all_stats(self):
         user = UserFactory()
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=None))
         user = UserFactory(is_stats_vip=True)
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=None))
         user = UserFactory(is_superuser=True)
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=None))
 
     def test_can_view_stats_cd(self):
         """
@@ -376,7 +384,7 @@ class ModelTest(TestCase):
         self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
         self.assertEqual(user.get_stats_cd_department(current_org=org), org.department)
         self.assertNotEqual(user.get_stats_cd_department(current_org=org), "01")
 
@@ -387,7 +395,7 @@ class ModelTest(TestCase):
         self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
         # Member of CD of not yet allowed department cannot access.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
@@ -396,32 +404,71 @@ class ModelTest(TestCase):
         self.assertFalse(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
         # Non authorized organization does not give access.
         org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
         # Non CD organization does not give access.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory()
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
         # Prescriber without organization cannot access.
         org = None
         user = PrescriberFactory()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
         # VIP user can always access, even without a CD.
         org = None
         user = UserFactory(is_stats_vip=True)
         self.assertTrue(user.can_view_stats_cd(current_org=org))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
         self.assertEqual(user.get_stats_cd_department(current_org=org), "01")
+
+    def test_can_view_stats_ddets(self):
+        """
+        DDETS as in "Directions départementales de l’emploi, du travail et des solidarités"
+        """
+        # Admin member of DDETS can access.
+        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DDETS, department="93")
+        user = institution.members.get()
+        self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+        self.assertEqual(user.get_stats_ddets_department(current_institution=institution), institution.department)
+        self.assertNotEqual(user.get_stats_ddets_department(current_institution=institution), "01")
+
+        # Non admin member of DDETS can access as well.
+        institution = InstitutionWithMembershipFactory(
+            kind=Institution.Kind.DDETS, membership__is_admin=False, department="93"
+        )
+        user = institution.members.get()
+        self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+
+        # Member of institution of another kind cannot access.
+        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DGEFP, department="93")
+        user = institution.members.get()
+        self.assertFalse(user.can_view_stats_ddets(current_institution=institution))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+
+        # Labor inspector user without institution cannot access.
+        institution = None
+        user = LaborInspectorFactory()
+        self.assertFalse(user.can_view_stats_ddets(current_institution=institution))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+
+        # VIP user can always access, even without a DDETS.
+        institution = None
+        user = UserFactory(is_stats_vip=True)
+        self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+        self.assertEqual(user.get_stats_ddets_department(current_institution=institution), "01")
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):
