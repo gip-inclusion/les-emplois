@@ -7,6 +7,11 @@
 
 ## Environnement de développement
 
+### Avant de cloner le projet
+```
+git config --global core.autocrlf input
+git config --global core.eol lf
+```
 ### Définition des variables d'environnement
 
 Commencez par copier le gabarit du fichier de configuration Django prévu pour le
