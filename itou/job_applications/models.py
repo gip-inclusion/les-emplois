@@ -354,6 +354,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     message = models.TextField(verbose_name="Message de candidature", blank=True)
     answer = models.TextField(verbose_name="Message de réponse", blank=True)
+    answer_to_prescriber = models.TextField(verbose_name="Message de réponse au prescripeur", blank=True)
     refusal_reason = models.CharField(
         verbose_name="Motifs de refus", max_length=30, choices=REFUSAL_REASON_CHOICES, blank=True
     )
@@ -647,7 +648,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def refuse(self, *args, **kwargs):
         # Send notification.
         connection = mail.get_connection()
-        emails = [self.email_refuse]
+        emails = [self.email_refuse_for_job_seeker]
+        if self.is_sent_by_proxy:
+            emails.append(self.email_refuse_for_proxy)
         connection.send_messages(emails)
 
     @xwf_models.transition()
@@ -707,15 +710,20 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return get_email_message(to, context, subject, body)
 
     @property
-    def email_refuse(self):
-        to = [self.job_seeker.email]
-        bcc = []
-        if self.is_sent_by_proxy:
-            bcc.append(self.sender.email)
+    def email_refuse_for_proxy(self):
+        to = [self.sender.email]
         context = {"job_application": self}
         subject = "apply/email/refuse_subject.txt"
-        body = "apply/email/refuse_body.txt"
-        return get_email_message(to, context, subject, body, bcc=bcc)
+        body = "apply/email/refuse_body_for_proxy.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_refuse_for_job_seeker(self):
+        to = [self.job_seeker.email]
+        context = {"job_application": self}
+        subject = "apply/email/refuse_subject.txt"
+        body = "apply/email/refuse_body_for_job_seeker.txt"
+        return get_email_message(to, context, subject, body)
 
     def email_cancel(self, cancelled_by):
         to = [cancelled_by.email]
