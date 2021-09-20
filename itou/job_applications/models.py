@@ -233,11 +233,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     REFUSAL_REASON_NO_POSITION = "no_position"
     REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE = "approval_expiration_too_close"
     REFUSAL_REASON_DEACTIVATION = "deactivation"
+    REFUSAL_REASON_NOT_MOBILE = "not_mobile"
     REFUSAL_REASON_OTHER = "other"
     REFUSAL_REASON_CHOICES = (
         (REFUSAL_REASON_DID_NOT_COME, "Candidat non venu ou non joignable"),
         (REFUSAL_REASON_UNAVAILABLE, "Candidat indisponible ou non intéressé par le poste"),
         (REFUSAL_REASON_NON_ELIGIBLE, "Candidat non éligible"),
+        (REFUSAL_REASON_NOT_MOBILE, "Candidat non mobile"),
         (
             REFUSAL_REASON_ELIGIBILITY_DOUBT,
             "Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)",
