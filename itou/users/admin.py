@@ -223,7 +223,7 @@ class ItouUserAdmin(UserAdmin):
     def is_created_by_a_proxy(self, obj):
         # Use the "hidden" field with an `_id` suffix to avoid hitting the database for each row.
         # https://docs.djangoproject.com/en/dev/ref/models/fields/#database-representation
-        return bool(obj.created_by)
+        return bool(obj.created_by_id)
 
     is_created_by_a_proxy.boolean = True
     is_created_by_a_proxy.short_description = "créé par un tiers"

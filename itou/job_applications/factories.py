@@ -85,29 +85,23 @@ class JobApplicationSentByPrescriberFactory(JobApplicationFactory):
     sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
 
 
-class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationFactory):
+class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationSentByPrescriberFactory):
     """Generates a JobApplication() object sent by a prescriber member of an organization."""
 
-    sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
 
-class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplicationFactory):
+class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplicationSentByPrescriberFactory):
     """Generates a JobApplication() object sent by a prescriber member of an authorized organization."""
 
-    sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
     sender_prescriber_organization = factory.SubFactory(AuthorizedPrescriberOrganizationWithMembershipFactory)
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
 
-class JobApplicationWithApprovalFactory(JobApplicationSentByPrescriberFactory):
-    """
-    Generates a Job Application with an Approval.
-    """
+class JobApplicationWithEligibilityDiagnosis(JobApplicationSentByAuthorizedPrescriberOrganizationFactory):
+    """Generates a JobApplication() object with an EligibilityDiagnosis() object."""
 
-    state = models.JobApplicationWorkflow.STATE_ACCEPTED
-    approval = factory.SubFactory(ApprovalFactory, user=factory.SelfAttribute("..job_seeker"))
     eligibility_diagnosis = factory.SubFactory(
         EligibilityDiagnosisFactory,
         job_seeker=factory.SelfAttribute("..job_seeker"),
@@ -115,10 +109,15 @@ class JobApplicationWithApprovalFactory(JobApplicationSentByPrescriberFactory):
     )
 
 
+class JobApplicationWithApprovalFactory(JobApplicationWithEligibilityDiagnosis):
+    """Generates a JobApplication() object with an Approval() object."""
+
+    state = models.JobApplicationWorkflow.STATE_ACCEPTED
+    approval = factory.SubFactory(ApprovalFactory, user=factory.SelfAttribute("..job_seeker"))
+
+
 class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory):
-    """
-    Generates a Job Application without Approval.
-    """
+    """Generates a JobApplication() object without an Approval() object."""
 
     state = models.JobApplicationWorkflow.STATE_ACCEPTED
     hiring_without_approval = True

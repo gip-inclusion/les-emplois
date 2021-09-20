@@ -1,4 +1,5 @@
 from allauth.account.views import LoginView
+from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.template.response import TemplateResponse
 from django.urls import reverse
@@ -31,6 +32,7 @@ class ItouLoginView(LoginView):
             account_type_display_name = ItouLoginView.ACCOUNT_TYPE_TO_DISPLAY_NAME.get(account_type)
             signup_url = reverse(ItouLoginView.ACCOUNT_TYPE_TO_SIGNUP_URL.get(account_type, "account_signup"))
             show_peamu = account_type == "job_seeker"
+            show_france_connect = settings.FRANCE_CONNECT_ENABLED and account_type == "job_seeker"
             signup_allowed = account_type != "institution"
             redirect_field_value = get_safe_url(self.request, REDIRECT_FIELD_NAME)
 
@@ -39,6 +41,7 @@ class ItouLoginView(LoginView):
                 "account_type_display_name": account_type_display_name,
                 "signup_url": signup_url,
                 "show_peamu": show_peamu,
+                "show_france_connect": show_france_connect,
                 "redirect_field_name": REDIRECT_FIELD_NAME,
                 "redirect_field_value": redirect_field_value,
                 "signup_allowed": signup_allowed,

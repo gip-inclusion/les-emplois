@@ -2,6 +2,7 @@
 Base settings to build other settings files upon.
 https://docs.djangoproject.com/en/dev/ref/settings
 """
+import datetime
 import os
 
 
@@ -56,6 +57,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",  # DRF (Django Rest Framework).
     "rest_framework.authtoken",  # Required for DRF TokenAuthentication.
     "drf_spectacular",
+    "django_filters",
 ]
 
 
@@ -71,6 +73,7 @@ LOCAL_APPS = [
     "itou.job_applications",
     "itou.approvals",
     "itou.eligibility",
+    "itou.france_connect",
     "itou.invitations",
     "itou.external_data",
     "itou.metabase",
@@ -374,6 +377,21 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountAdapter"
+
+# France Connect
+# https://partenaires.franceconnect.gouv.fr/
+FRANCE_CONNECT_ENABLED = False
+FRANCE_CONNECT_URL = "https://app.franceconnect.gouv.fr/api/v1/"
+FRANCE_CONNECT_SCOPES = "openid gender given_name family_name email address phone birthdate birthplace birthcountry"
+FRANCE_CONNECT_ENDPOINT_AUTHORIZE = "authorize"
+FRANCE_CONNECT_ENDPOINT_TOKEN = "token"
+FRANCE_CONNECT_ENDPOINT_USERINFO = "userinfo"
+FRANCE_CONNECT_ENDPOINT_LOGOUT = "logout"
+
+FRANCE_CONNECT_CLIENT_ID = os.environ.get("FRANCE_CONNECT_CLIENT_ID")
+FRANCE_CONNECT_CLIENT_SECRET = os.environ.get("FRANCE_CONNECT_CLIENT_SECRET")
+
+FRANCE_CONNECT_STATE_EXPIRATION = datetime.timedelta(hours=1)
 
 # PDFShift
 # ------------------------------------------------------------------------------

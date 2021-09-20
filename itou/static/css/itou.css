@@ -503,3 +503,19 @@ Usage:
     color: #fff;
     background-color: #000638;
 }
+
+.itou-france-connect {
+  display: inline-block;
+  height: 52px !important;
+  width: 186px;
+  margin: auto;
+  margin-bottom: 8px;
+  background-image: url(../img/france-connect-white.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  cursor: pointer;
+}
+
+.itou-france-connect:hover {
+  background-image: url(../img/france-connect-hover.svg);
+}

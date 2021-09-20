@@ -34,3 +34,15 @@ ALLOW_POPULATING_METABASE = True
 
 # DRF Browseable API renderer is not available in production
 REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ["rest_framework.renderers.JSONRenderer"]
+
+# Active Elastic APM metrics
+# See https://www.elastic.co/guide/en/apm/agent/python/current/configuration.html
+INSTALLED_APPS += ["elasticapm.contrib.django"]  # noqa F405
+
+ELASTIC_APM = {
+    "SERVICE_NAME": "itou-django",
+    "SERVER_URL": os.environ.get("APM_SERVER_URL", ""),
+    "SECRET_TOKEN": os.environ.get("APM_AUTH_TOKEN", ""),
+    "ENVIRONMENT": "prod",
+    "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
+}
