@@ -5,7 +5,7 @@
 {% if job_application.is_sent_by_proxy %}
 
 {{ job_application.sender.get_full_name }} a envoyé votre candidature chez {{ job_application.to_siae.display_name }}.
-Vous et {{ sender }} serez tous les deux informés de l'avancement de cette candidature.
+Vous et {{ job_application.sender.get_full_name }} serez tous les deux informés de l'avancement de cette candidature.
 
 {% else %}
 Candidature chez {{ job_application.to_siae.display_name }} envoyée avec succès !
