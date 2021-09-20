@@ -7,6 +7,9 @@ FROM python:3.9.2-slim-buster
 
 ENV PYTHONIOENCODING="UTF-8"
 ENV PYTHONUNBUFFERED=1
+# Set ipdb as the default debugger.
+# https://www.andreagrandi.it/2018/10/16/using-ipdb-with-python-37-breakpoint/
+ENV PYTHONBREAKPOINT=ipdb.set_trace
 
 ENV APP_DIR="/app"
 
