@@ -71,7 +71,7 @@ redis==3.5.3  # https://github.com/andymccurdy/redis-py
 PyJWT==2.1.0  # https://github.com/jpadilla/pyjwt
 
 # Requests alternative including a default time out
-httpx==0.18.2  # https://github.com/encode/httpx/
+httpx==0.19.0  # https://github.com/encode/httpx/
 
 # SFTP file transfer for ASP
 pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
