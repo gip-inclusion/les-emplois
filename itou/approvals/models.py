@@ -389,7 +389,7 @@ class Suspension(models.Model):
     class Reason(models.TextChoices):
         # Displayed choices
         SUSPENDED_CONTRACT = "CONTRACT_SUSPENDED", "Contrat de travail suspendu depuis plus de 15 jours"
-        BROKEN_CONTRACT = "CONTRACT_BROKEN", "Contract de travail rompu"
+        BROKEN_CONTRACT = "CONTRACT_BROKEN", "Contrat de travail rompu"
         FINISHED_CONTRACT = "FINISHED_CONTRACT", "Contrat de travail terminé"
 
         # Old reasons kept for history. See cls.displayed_choices
