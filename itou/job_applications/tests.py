@@ -312,6 +312,9 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.sender.get_full_name(), email.body)
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.to_siae.kind, email.body)
+        self.assertIn(job_application.to_siae.city, email.body)
 
         # Assert the Job Seeker does not have access to confidential information.
         email = job_application.email_new_for_job_seeker(base_url="http://testserver")
