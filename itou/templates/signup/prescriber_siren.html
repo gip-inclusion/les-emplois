@@ -68,7 +68,7 @@
                                     {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
                                     afin de rejoindre cette organisation.
                                 </i>
-                                <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-emploi mt-2">
+                                <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
                                     Demander une invitation
                                 </a>
                             {% endwith %}
