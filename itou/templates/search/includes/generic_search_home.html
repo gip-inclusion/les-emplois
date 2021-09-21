@@ -1,0 +1,11 @@
+<section class="container-blue container-search py-5">
+
+    <div class="container">
+        <h2 class="font-weight-bold text-center h2 mb-6">{{ title }}</h2>
+
+        <form method="get" action="{% url url_search %}">
+            {% include template_form_name with form=form align="center" %}
+        </form>
+    </div>
+
+</section>

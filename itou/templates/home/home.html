@@ -5,16 +5,7 @@
 
 {% block content %}
 
-    <section class="container-blue container-search">
-
-        <div class="container">
-            <h2 class="font-weight-bold text-center my-5 h2">Prenez contact avec un employeur solidaire</h2>
-
-            <form method="get" action="{% url 'search:siaes_results' %}">
-                {% include "search/includes/siaes_search_form.html" with form=siae_search_form align="center" %}
-            </form>
-        </div>
-    </section>
+    {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Prenez contact avec un employeur solidaire" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
 
     {% if not user.is_authenticated %}
         <section class="bg-light pt-5 text-center">
