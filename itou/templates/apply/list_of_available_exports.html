@@ -5,9 +5,9 @@
 
 {% block content %}
     {% if export_for == "siae" %}
-    <h1>Export des candidatures reçues chez {{ siae.display_name }}</h1>
+    <h1 class="h1">Export des candidatures reçues chez {{ siae.display_name }}</h1>
     {% else %}
-    <h1>Export des candidatures</h1>
+    <h1 class="h1">Export des candidatures</h1>
     {% endif %}
 
     {% if not job_applications_by_month %}
