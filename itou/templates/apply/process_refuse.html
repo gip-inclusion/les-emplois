@@ -35,7 +35,7 @@
         {% bootstrap_field form.answer %}
 
         {% buttons %}
-            <a class="btn btn-emploi" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
+            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
             <button type="submit" class="btn btn-danger">Décliner la candidature</button>
         {% endbuttons %}
 
