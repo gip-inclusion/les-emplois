@@ -301,15 +301,15 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.job_seeker.get_full_name(), email.subject)
 
         # Body.
-        self.assertIn(job_application.job_seeker.first_name, email.body)
-        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.job_seeker.first_name.title(), email.body)
+        self.assertIn(job_application.job_seeker.last_name.title(), email.body)
         self.assertIn(job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body)
         self.assertIn(job_application.job_seeker.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.job_seeker.phone), email.body)
         self.assertIn(job_application.message, email.body)
         for job in job_application.selected_jobs.all():
             self.assertIn(job.display_name, email.body)
-        self.assertIn(job_application.sender.get_full_name(), email.body)
+        self.assertIn(job_application.sender.get_full_name().title(), email.body)
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
@@ -318,7 +318,7 @@ class JobApplicationNotificationsTest(TestCase):
 
         # Assert the Job Seeker does not have access to confidential information.
         email = job_application.email_new_for_job_seeker(base_url="http://testserver")
-        self.assertIn(job_application.sender.get_full_name(), email.body)
+        self.assertIn(job_application.sender.get_full_name().title(), email.body)
         self.assertIn(job_application.sender_prescriber_organization.display_name, email.body)
         self.assertNotIn(job_application.sender.email, email.body)
         self.assertNotIn(format_filters.format_phone(job_application.sender.phone), email.body)
@@ -336,16 +336,16 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.to_siae.display_name, email.subject)
 
         # Body.
-        self.assertIn(job_application.job_seeker.first_name, email.body)
-        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.job_seeker.first_name.title(), email.body)
+        self.assertIn(job_application.job_seeker.last_name.title(), email.body)
         self.assertIn(job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body)
         self.assertIn(job_application.job_seeker.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.job_seeker.phone), email.body)
         self.assertIn(job_application.message, email.body)
         for job in job_application.selected_jobs.all():
             self.assertIn(job.display_name, email.body)
-        self.assertIn(job_application.sender.first_name, email.body)
-        self.assertIn(job_application.sender.last_name, email.body)
+        self.assertIn(job_application.sender.first_name.title(), email.body)
+        self.assertIn(job_application.sender.last_name.title(), email.body)
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
@@ -424,10 +424,10 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.sender.email, email.to)
         self.assertEqual(len(email.to), 1)
         # Body.
-        self.assertIn(job_application.sender.first_name, email.body)
-        self.assertIn(job_application.sender.last_name, email.body)
-        self.assertIn(job_application.job_seeker.first_name, email.body)
-        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.sender.first_name.title(), email.body)
+        self.assertIn(job_application.sender.last_name.title(), email.body)
+        self.assertIn(job_application.job_seeker.first_name.title(), email.body)
+        self.assertIn(job_application.job_seeker.last_name.title(), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.answer, email.body)
         self.assertIn(job_application.answer_to_prescriber, email.body)
