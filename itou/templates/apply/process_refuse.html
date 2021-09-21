@@ -17,30 +17,19 @@
 
         {# TODO: Fix incorrect rendering of form with radio buttons #}
         {# https://github.com/zostera/django-bootstrap4/issues/126 #}
-        <div class="accordion" id="refusal-reasons">
-            <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %}">
-                {{ form.refusal_reason.label_tag }}
-                <ul class="list-unstyled">
-                    {% for radio in form.refusal_reason %}
-                        {% if radio.choice_label == "Autre" %}
-                            <li>
-                                <!-- Toggle a "know more" field. -->
-                                <label for="{{ radio.id_for_label }}" data-toggle="collapse" data-target="#other-answer-to-prescriber" aria-expanded="false" aria-controls="other-answer-to-prescriber">{{ radio.tag }} {{ radio.choice_label }}</label>
-                            </li>
-                        {% else %}
-                            <li>
-                                <label for="{{ radio.id_for_label }}" data-toggle="collapse" data-target="#empty" aria-expanded="false" aria-controls="empty">{{ radio.tag }} {{ radio.choice_label }}</label>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
+        <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %} js-refusal-reasons">
+            {{ form.refusal_reason.label_tag }}
+            <ul class="list-unstyled">
+                {% for radio in form.refusal_reason %}
+                    <li>
+                        <label for="{{ radio.id_for_label }}">{{ radio.tag }} {{ radio.choice_label }}</label>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
             
-            <div class="collapse" id="other-answer-to-prescriber" data-parent="#refusal-reasons">
-                {% bootstrap_field form.answer_to_prescriber %}
-            </div>
-            <!-- Small hack to hide "answer_to_prescriber" when clicking on other reasons. -->
-            <div class="collapse" id="empty" data-parent="#refusal-reasons"></div>
+        <div id="js-field-answer-to-prescriber">
+            {% bootstrap_field form.answer_to_prescriber %}
         </div>
 
         {% bootstrap_field form.answer %}
@@ -52,4 +41,21 @@
 
     </form>
 
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript">
+        // Clicking on the "other" radio button displays a hidden field.
+        $('#js-field-answer-to-prescriber').css("display", "none");
+        $('.js-refusal-reasons input')
+          .on('change', function () {
+            const value = $(this).val();
+            if (value == "other") {
+                $('#js-field-answer-to-prescriber').show("slide");
+            }
+            else {
+                $('#js-field-answer-to-prescriber').hide("slide");
+            }
+          });
+    </script>
 {% endblock %}
