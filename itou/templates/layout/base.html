@@ -31,13 +31,13 @@
     <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="bg-gray-100">
 
     {% include "includes/test_accounts.html" %}
+    {% include "layout/_header.html" %}
 
-    <div class="layout">
+    <main class="s-main layout">
 
-        {% include "layout/_header.html" %}
         
         <div class="layout-section layout-section-white">
             <div class="layout-messages">
@@ -57,13 +57,13 @@
         {% block content_full_viewport %}{% endblock %}
         {% include "layout/_footer.html" %}
 
-    </div>
+    </main>
 
     <script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
     <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap-4.3.1/popper.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
-
+    {% comment %} TODO: let's see if it's possible to merge all the js in one file {% endcomment %}
     <script src="{% static "vendor/theme-inclusion/app.js" %}"></script>
 
     {# tarteaucitron.js cookies consent / https://tarteaucitron.io/fr/install/ #}
@@ -147,7 +147,6 @@
             }
         };
         (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
-
     </script>
 
     {% block script %}
