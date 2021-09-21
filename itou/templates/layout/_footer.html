@@ -1,11 +1,12 @@
 {% load static %}
+{% load theme_inclusion %}
 
 <section class="s-prefooter s-prefooter--emploi">
   <div class="s-prefooter__container container">
     <div class="s-prefooter__row row">
       <div class="s-prefooter__col col-12 col-sm-auto d-flex align-items-center">
         <div class="s-prefooter__logo">
-          <img src="{% static 'img/logo-emploi-inclusion.svg' %}" alt="">
+          <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="">
         </div>
       </div>
       <div class="s-prefooter__col col-12 col-sm d-flex align-items-center justify-content-start justify-content-sm-end justify-content-lg-start">
@@ -30,11 +31,11 @@
         <div class="s-footer-help__col col-12 col-lg-auto">
           <ul>
             <li><span>Nous suivre</span></li>
-            <li><a href="https://twitter.com/inclusion_gouv" rel="noopener" target="_blank"><img src="{% static 'img/picto-twitter.svg'%}" height="25" alt="Rejoignez-nous sur Twitter"></a></li>
-            <li><a href="https://www.linkedin.com/company/inclusion-gouv/" rel="noopener" target="_blank"><img src="{% static 'img/picto-linkedin.svg'%}" height="25" alt="Rejoignez-nous sur Linkedin"></a></li>
-            <li><a href="https://www.facebook.com/inclusion.gouv/" rel="noopener" target="_blank"><img src="{% static 'img/picto-facebook.svg'%}" height="25" alt="Rejoignez-nous sur Facebook"></a></li>
-            <li><a href="https://www.instagram.com/inclusion_gouv/" rel="noopener" target="_blank"><img src="{% static 'img/picto-instagram.svg'%}" height="25" alt="Rejoignez-nous sur Instagram"></a></li>
-            <li><a href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" rel="noopener" target="_blank"><img src="{% static 'img/picto-youtube.svg'%}" height="25" alt="Rejoignez-nous sur Youtube"></a></li>
+            <li><a href="https://twitter.com/inclusion_gouv" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-twitter.svg'%}" height="25" alt="Rejoignez-nous sur Twitter"></a></li>
+            <li><a href="https://www.linkedin.com/company/inclusion-gouv/" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-linkedin.svg'%}" height="25" alt="Rejoignez-nous sur Linkedin"></a></li>
+            <li><a href="https://www.facebook.com/inclusion.gouv/" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-facebook.svg'%}" height="25" alt="Rejoignez-nous sur Facebook"></a></li>
+            <li><a href="https://www.instagram.com/inclusion_gouv/" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-instagram.svg'%}" height="25" alt="Rejoignez-nous sur Instagram"></a></li>
+            <li><a href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-youtube.svg'%}" height="25" alt="Rejoignez-nous sur Youtube"></a></li>
           </ul>
         </div>
       </div>
@@ -46,16 +47,16 @@
       <div class="s-footer-nav__row row">
         <div class="s-footer-nav__col col-5 col-lg-2 d-flex align-items-center">
           <div class="s-footer-nav__logo">
-            <img src="{% static 'img/logo-republique-francaise.svg'%}" alt="Rébublique Française" class="img-fluid">
+            <img src="{% static_theme_images 'logo-republique-francaise.svg'%}" alt="Rébublique Française" class="img-fluid">
           </div>
         </div>
         <div class="s-footer-nav__col col-7 col-lg-4 d-flex align-items-center justify-content-end justify-content-lg-start">
           <div class="d-inline-block text-center">
             <span class="d-block">
-              <img src="{% static 'img/logo-plateforme-inclusion.svg'%}" height="60" alt="Plateforme de l'inclusion">
+              <img src="{% static_theme_images 'logo-plateforme-inclusion.svg'%}" height="60" alt="Plateforme de l'inclusion">
             </span>
             <span class="d-block mt-2">
-              <img src="{% static 'img/logo-accelere-betagouv.svg'%}" alt="Accéléré par Beta.gouv.fr">
+              <img src="{% static_theme_images 'logo-accelere-betagouv.svg'%}" alt="Accéléré par Beta.gouv.fr">
             </span>
           </div>
         </div>

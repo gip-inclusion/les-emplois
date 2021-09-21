@@ -1,12 +1,14 @@
 {% load static %}
+{% load theme_inclusion %}
+
 <header class="s-header s-header--emploi" role="banner" id="header">
   <section class="s-header__container container">
     <div class="s-header__row row">
       <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center pr-0 pr-md-3">
-        <a href="/" class="s-header__logo-ministere"><img src="{% static 'img/logo-ministere-emploi.svg' %}" alt="Ministère de l'emploi"></a>
+        <a href="/" class="s-header__logo-ministere"><img src="{% static_theme_images 'logo-ministere-emploi.svg' %}" alt="Ministère de l'emploi"></a>
       </div>
       <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center px-0 px-md-3">
-        <a href="/"><img src="{% static 'img/logo-emploi-inclusion.svg' %}" alt="L'emploi de l'inclusion"></a>
+        <a href="/"><img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="L'emploi de l'inclusion"></a>
       </div>
       <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
         <nav role="navigation">
@@ -60,13 +62,13 @@
 
             <li>
               <a class="nav-link" href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" aria-label="Accéder au Forum de l'inclusion (nouvel onglet)">Communauté 
-                <img src="{% static 'vendor/theme-inclusion/images/external_link_arrow.svg' %}" alt="Flèche pour un lien externe">
+                <img src="{% static_theme_images 'external_link_arrow.svg' %}" alt="Flèche pour un lien externe">
               </a>
             </li>
 
             <li>
               <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Documentation 
-                <img src="{% static 'vendor/theme-inclusion/images/external_link_arrow.svg' %}" alt="Flèche pour un lien externe">
+                <img src="{% static_theme_images 'external_link_arrow.svg' %}" alt="Flèche pour un lien externe">
               </a>
             </li>
           </ul>
