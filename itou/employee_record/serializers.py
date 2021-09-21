@@ -109,7 +109,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
         # Don't send phone number if not in ASP expected format
         # (we don't want any post-processing or update on this field)
         if result.get("adrTelephone"):
-            if not re.match("^\+[0-9]{1,16}$", result.get("adrTelephone")):
+            if not re.match("^\\+?[0-9]{1,16}$", result.get("adrTelephone")):
                 result["adrTelephone"] = None
 
         for field in empty_as_null_fields:
