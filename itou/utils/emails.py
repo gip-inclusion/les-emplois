@@ -1,4 +1,5 @@
 import re
+import textwrap
 
 from django.conf import settings
 from django.core import mail
@@ -41,11 +42,15 @@ def get_email_text_template(template, context):
 
 def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None):
     subject_prefix = "[DEMO] " if settings.ITOU_ENVIRONMENT == "DEMO" else ""
+    # Mailjet max subject length is 255
+    subject = textwrap.shorten(
+        subject_prefix + get_email_text_template(subject, context), width=250, placeholder="..."
+    )
     return mail.EmailMessage(
         from_email=from_email,
         to=to,
         bcc=bcc,
-        subject=subject_prefix + get_email_text_template(subject, context),
+        subject=subject,
         body=get_email_text_template(body, context),
     )
 

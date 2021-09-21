@@ -33,9 +33,10 @@ SHOW_TEST_ACCOUNTS_BANNER = True
 INSTALLED_APPS += ["elasticapm.contrib.django"]  # noqa F405
 
 ELASTIC_APM = {
-    "SERVICE_NAME": "itou-django-review",
+    "SERVICE_NAME": "itou-django",
     "SERVER_URL": os.environ.get("APM_SERVER_URL", ""),
     "SECRET_TOKEN": os.environ.get("APM_AUTH_TOKEN", ""),
     "ENVIRONMENT": "review",
     "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
+    "TRANSACTION_IGNORE_URLS": ["/approvals/download/*"],  # to avoid `httpx` error
 }
