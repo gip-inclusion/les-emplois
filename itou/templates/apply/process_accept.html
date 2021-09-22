@@ -14,7 +14,7 @@
         {% csrf_token %}
 
         {% if form_address or form_pe_status %}
-            <h3>Candidat</h3>
+            <h3 class="h3">Candidat</h3>
         {% endif %}
 
         {% if form_pe_status %}
@@ -33,7 +33,7 @@
 
         <div class="mt-5">
 
-            <h3>Embauche</h3>
+            <h3 class="h3">Embauche</h3>
             {% bootstrap_form form_accept alert_error_type="all" %}
 
         </div>
