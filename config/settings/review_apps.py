@@ -28,15 +28,15 @@ sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
 
 SHOW_TEST_ACCOUNTS_BANNER = True
 
-# Active Elastic APM metrics
-# See https://www.elastic.co/guide/en/apm/agent/python/current/configuration.html
-INSTALLED_APPS += ["elasticapm.contrib.django"]  # noqa F405
-
-ELASTIC_APM = {
-    "SERVICE_NAME": "itou-django",
-    "SERVER_URL": os.environ.get("APM_SERVER_URL", ""),
-    "SECRET_TOKEN": os.environ.get("APM_AUTH_TOKEN", ""),
-    "ENVIRONMENT": "review",
-    "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
-    "TRANSACTION_IGNORE_URLS": ["/approvals/download/*"],  # to avoid `httpx` error
-}
+# # Active Elastic APM metrics
+# # See https://www.elastic.co/guide/en/apm/agent/python/current/configuration.html
+# INSTALLED_APPS += ["elasticapm.contrib.django"]  # noqa F405
+#
+# ELASTIC_APM = {
+#     "SERVICE_NAME": "itou-django",
+#     "SERVER_URL": os.environ.get("APM_SERVER_URL", ""),
+#     "SECRET_TOKEN": os.environ.get("APM_AUTH_TOKEN", ""),
+#     "ENVIRONMENT": "review",
+#     "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
+#     "TRANSACTION_IGNORE_URLS": ["/approvals/download/*"],  # to avoid `httpx` error
+# }
