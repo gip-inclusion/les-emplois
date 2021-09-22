@@ -5,10 +5,10 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from itou.utils.urls import get_safe_url
+from itou.www.login.forms import ItouLoginForm
 
 
 class ItouLoginView(LoginView):
-
     ACCOUNT_TYPE_TO_DISPLAY_NAME = {
         "job_seeker": "Candidat",
         "prescriber": "Prescripteur",
@@ -24,12 +24,12 @@ class ItouLoginView(LoginView):
         "siae": "signup:siae_select",
     }
 
+    form_class = ItouLoginForm
     template_name = "account/login.html"
 
     def inject_context_into_response(self, response, params):
         if isinstance(response, TemplateResponse):
             account_type = params.get("account_type")
-            account_type_display_name = ItouLoginView.ACCOUNT_TYPE_TO_DISPLAY_NAME.get(account_type)
             signup_url = reverse(ItouLoginView.ACCOUNT_TYPE_TO_SIGNUP_URL.get(account_type, "account_signup"))
             show_peamu = account_type == "job_seeker"
             show_france_connect = settings.FRANCE_CONNECT_ENABLED and account_type == "job_seeker"
@@ -38,7 +38,6 @@ class ItouLoginView(LoginView):
 
             context = {
                 "account_type": account_type,
-                "account_type_display_name": account_type_display_name,
                 "signup_url": signup_url,
                 "show_peamu": show_peamu,
                 "show_france_connect": show_france_connect,
