@@ -233,11 +233,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     REFUSAL_REASON_NO_POSITION = "no_position"
     REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE = "approval_expiration_too_close"
     REFUSAL_REASON_DEACTIVATION = "deactivation"
+    REFUSAL_REASON_NOT_MOBILE = "not_mobile"
     REFUSAL_REASON_OTHER = "other"
     REFUSAL_REASON_CHOICES = (
         (REFUSAL_REASON_DID_NOT_COME, "Candidat non venu ou non joignable"),
         (REFUSAL_REASON_UNAVAILABLE, "Candidat indisponible ou non intéressé par le poste"),
         (REFUSAL_REASON_NON_ELIGIBLE, "Candidat non éligible"),
+        (REFUSAL_REASON_NOT_MOBILE, "Candidat non mobile"),
         (
             REFUSAL_REASON_ELIGIBILITY_DOUBT,
             "Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)",
@@ -352,6 +354,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     message = models.TextField(verbose_name="Message de candidature", blank=True)
     answer = models.TextField(verbose_name="Message de réponse", blank=True)
+    answer_to_prescriber = models.TextField(verbose_name="Message de réponse au prescripeur", blank=True)
     refusal_reason = models.CharField(
         verbose_name="Motifs de refus", max_length=30, choices=REFUSAL_REASON_CHOICES, blank=True
     )
@@ -645,7 +648,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def refuse(self, *args, **kwargs):
         # Send notification.
         connection = mail.get_connection()
-        emails = [self.email_refuse]
+        emails = [self.email_refuse_for_job_seeker]
+        if self.is_sent_by_proxy:
+            emails.append(self.email_refuse_for_proxy)
         connection.send_messages(emails)
 
     @xwf_models.transition()
@@ -705,15 +710,20 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return get_email_message(to, context, subject, body)
 
     @property
-    def email_refuse(self):
-        to = [self.job_seeker.email]
-        bcc = []
-        if self.is_sent_by_proxy:
-            bcc.append(self.sender.email)
+    def email_refuse_for_proxy(self):
+        to = [self.sender.email]
         context = {"job_application": self}
         subject = "apply/email/refuse_subject.txt"
-        body = "apply/email/refuse_body.txt"
-        return get_email_message(to, context, subject, body, bcc=bcc)
+        body = "apply/email/refuse_body_for_proxy.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_refuse_for_job_seeker(self):
+        to = [self.job_seeker.email]
+        context = {"job_application": self}
+        subject = "apply/email/refuse_subject.txt"
+        body = "apply/email/refuse_body_for_job_seeker.txt"
+        return get_email_message(to, context, subject, body)
 
     def email_cancel(self, cancelled_by):
         to = [cancelled_by.email]

@@ -180,6 +180,19 @@ class RefusalForm(forms.Form):
         initial=ANSWER_INITIAL,
         help_text="Vous pouvez modifier le texte proposé ou l'utiliser tel quel.",
     )
+    answer_to_prescriber = forms.CharField(
+        label="Précisez",
+        widget=forms.TextInput(attrs={"placeholder": ""}),
+        strip=True,
+        required=False,
+        help_text="Message privé destiné au prescripteur. Le candidat ne verra pas ce message.",
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get("refusal_reason") != JobApplication.REFUSAL_REASON_OTHER:
+            cleaned_data.pop("answer_to_prescriber")
+        return cleaned_data
 
 
 class AnswerForm(forms.Form):

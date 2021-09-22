@@ -28,13 +28,7 @@
 
             {% bootstrap_form_errors form alert_error_type="all" %}
 
-            {% for field in form %}
-                {# Display a warning message before the "reason" field. #}
-                {% if field.name == "reason" %}
-                    {% include "approvals/includes/suspension_reason_alert.html" %}
-                {% endif %}
-                {% bootstrap_field field %}
-            {% endfor %}
+            {% bootstrap_form form %}
 
             {% buttons %}
                 <a class="btn btn-secondary" href="{{ back_url }}">
