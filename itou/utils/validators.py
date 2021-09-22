@@ -44,6 +44,27 @@ def validate_pole_emploi_id(pole_emploi_id):
         )
 
 
+def validate_nir(nir):
+    # http://nourtier.net/cle_NIR/cle_NIR.htm
+    nir = str(nir).upper()
+    if len(nir) > 15:
+        raise ValidationError("Le numéro de sécurité sociale est trop long (15 caractères autorisés).")
+    if len(nir) < 15:
+        raise ValidationError("Le numéro de sécurité sociale est trop court (15 caractères autorisés).")
+    # God bless forums.
+    nir_regex = r"^[12][0-9]{2}[0-1][0-9](2[AB]|[0-9]{2})[0-9]{3}[0-9]{3}[0-9]{2}$"
+    match = re.match(nir_regex, nir)
+    if not match:
+        raise ValidationError("Ce numéro n'est pas valide.")
+
+    # Last 2 digits validate previous 13 characters.
+    control_key = int(nir[-2:])
+    # Replace 2A and 2B by 19 and 18 to compute the control key.
+    nir.replace("2A", "19").replace("2B", "18")
+    if control_key != (97 - int(nir[:13]) % 97):
+        raise ValidationError("Ce numéro n'est pas valide.")
+
+
 def get_min_birthdate():
     return datetime.date(1900, 1, 1)
 

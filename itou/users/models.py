@@ -29,7 +29,7 @@ from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
 from itou.institutions.models import Institution
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
+from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 
 class ItouUserManager(UserManager):
@@ -211,6 +211,8 @@ class User(AbstractUser, AddressMixin):
     is_labor_inspector = models.BooleanField(
         verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
     )
+
+    nir = models.CharField(verbose_name="NIR", max_length=15, validators=[validate_nir], db_index=True, blank=True)
 
     # The two following Pôle emploi fields are reserved for job seekers.
     # They are used in the process of delivering an approval.

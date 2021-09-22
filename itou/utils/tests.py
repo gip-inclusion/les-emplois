@@ -43,6 +43,7 @@ from itou.utils.validators import (
     validate_birthdate,
     validate_code_safir,
     validate_naf,
+    validate_nir,
     validate_pole_emploi_id,
     validate_post_code,
     validate_siren,
@@ -326,6 +327,22 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=365))
         self.assertRaises(ValidationError, validate_birthdate, max_date)
         validate_birthdate(max_date - datetime.timedelta(days=3600))
+
+    def test_validate_nir(self):
+        # Valid number
+        validate_nir("141068078200557")
+        # Corse-du-Sud in lower case.
+        validate_nir("141062a78200557")
+        # Haute-Corse
+        validate_nir("141062B78200557")
+        self.assertRaises(ValidationError, validate_nir, "123456789")
+        self.assertRaises(ValidationError, validate_nir, "141068078200557123")
+        # Should start with 1 or 2.
+        self.assertRaises(ValidationError, validate_nir, "341208078200557")
+        # Third group should be between 0 and 12.
+        self.assertRaises(ValidationError, validate_nir, "141208078200557")
+        # Last group should validate the first 13 characters.
+        self.assertRaises(ValidationError, validate_nir, "141068078200520")
 
     def test_validate_af_number(self):
         # Dubious values.
