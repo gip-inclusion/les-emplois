@@ -3,7 +3,7 @@ import time
 import jwt
 from django.conf import settings
 
-from itou.common_apps.address.departments import DEPARTMENTS
+from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
 
 # Metabase private / signed URLs
@@ -25,8 +25,8 @@ def metabase_embedded_url(dashboard_id, department=None):
     """
     params = {}
     if department is not None:
-        # `é` in `département` is converted to `_` on metabase side.
-        params["d_partement"] = DEPARTMENTS[department]
+        params["d%C3%A9partement"] = DEPARTMENTS[department]
+        params["r%C3%A9gion"] = DEPARTMENT_TO_REGION[department]
 
     payload = {"resource": {"dashboard": dashboard_id}, "params": params, "exp": round(time.time()) + (10 * 60)}
     return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + "#titled=false"
