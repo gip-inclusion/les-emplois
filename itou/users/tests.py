@@ -26,13 +26,7 @@ from itou.prescribers.factories import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import (
-    JobSeekerFactory,
-    JobSeekerProfileFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-    UserFactory,
-)
+from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
@@ -454,12 +448,6 @@ class ModelTest(TestCase):
         # Member of institution of another kind cannot access.
         institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DGEFP, department="93")
         user = institution.members.get()
-        self.assertFalse(user.can_view_stats_ddets(current_institution=institution))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
-
-        # Labor inspector user without institution cannot access.
-        institution = None
-        user = LaborInspectorFactory()
         self.assertFalse(user.can_view_stats_ddets(current_institution=institution))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
 
