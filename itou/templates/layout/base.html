@@ -27,8 +27,7 @@
     {# Use this to get the value of the CSRF token in JavaScript. #}
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="shortcut icon" href="{% static_theme_images "favico.ico" %}" type="image/ico">
-    <link rel="stylesheet" href="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.css" %}" type="text/css">
-    <link rel="stylesheet" href="{% static_theme "stylesheets/app.css" %}" type="text/css">
+    {% import_static_CSS_theme_inclusion %}
     <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
     {% block extra_head %}{% endblock %}
 </head>
@@ -56,19 +55,12 @@
         </div>
 
         {% block content_full_viewport %}{% endblock %}
-        {% include "layout/_footer.html" %}
 
     </main>
 
-    <script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
-    <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
-    <script src="{% static "vendor/bootstrap-4.3.1/popper.min.js" %}"></script>
-    <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
-    {% comment %} TODO: let's see if it's possible to merge all the js in one file {% endcomment %}
-    <script src="{% static_theme "javascripts/app.js" %}"></script>
+    {% include "layout/_footer.html" %}
 
-    {# tarteaucitron.js cookies consent / https://tarteaucitron.io/fr/install/ #}
-    <script src="{% static "vendor/tarteaucitron/tarteaucitron.js" %}"></script>
+    {% import_static_JS_theme_inclusion %}
     <script>
 
         // Tarteaucitron's language is set according to the browser configuration
@@ -78,24 +70,28 @@
         var tarteaucitronForceLanguage = "fr";
 
         tarteaucitron.init({
-            "bodyPosition": "top",  /* Put the banner at the beginning of the DOM for screen readers */
-            "privacyUrl": "",  /* Privacy policy url */
-            "hashtag": "#tarteaucitron",  /* Open the panel with this hashtag */
+            "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
             "cookieName": "tarteaucitron", /* Cookie name */
-            "orientation": "top",  /* Put the banner at the top to help visually impaired people */
-            "showAlertSmall": false,  /* Show the small banner on bottom right */
-            "cookieslist": false,  /* Show the cookie list */
-            "showIcon": false, /* Show cookie icon to manage cookies */
-            "adblocker": false,  /* Show a Warning if an adblocker is detected */
+            "orientation": "bottom", /* Banner position (top - bottom) */
+            "groupServices": false, /* Group services by category */
+            "showAlertSmall": false, /* Show the small banner on bottom right */
+            "cookieslist": false, /* Show the cookie list */
+            "closePopup": false, /* Show a close X on the banner */
+            "showIcon": true, /* Show cookie icon to manage cookies */
+            //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
+            "iconPosition": "BottomRight", /* BottomRight, BottomLeft, TopRight and TopLeft */
+            "adblocker": false, /* Show a Warning if an adblocker is detected */
             "DenyAllCta" : true, /* Show the deny all button */
-            "AcceptAllCta" : true,  /* Show the accept all button when highPrivacy on */
-            "highPrivacy": true,  /* Disable auto consent */
-            "handleBrowserDNTRequest": false,  /* If Do Not Track == 1, disallow all */
-            "removeCredit": true,  /* Remove credit link */
-            "moreInfoLink": true,  /* Show more info link */
-            "useExternalCss": false,  /* If false, the tarteaucitron.css file will be loaded */
-            "readmoreLink": "{{ ITOU_DOC_URL }}/mentions/protection-des-donnees",  /* Change the default readmore link */
-            "mandatory": false,  /* Show a message about mandatory cookies */
+            "AcceptAllCta" : true, /* Show the accept all button when highPrivacy on */
+            "highPrivacy": true, /* HIGHLY RECOMMANDED Disable auto consent */
+            "handleBrowserDNTRequest": false, /* If Do Not Track == 1, disallow all */
+            "removeCredit": true, /* Remove credit link */
+            "moreInfoLink": true, /* Show more info link */
+            "useExternalCss": true, /* If false, the tarteaucitron.css file will be loaded */
+            "useExternalJs": false, /* If false, the tarteaucitron.js file will be loaded */
+            //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
+            "readmoreLink": "{{ ITOU_DOC_URL }}/mentions/protection-des-donnees", /* Change the default readmore link */
+            "mandatory": true, /* Show a message about mandatory cookies */
         });
 
         // Hotjar.
