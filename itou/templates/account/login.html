@@ -1,74 +1,83 @@
 {# django-allauth template override. #}
-{% extends "layout/content_small.html" %}
+{% extends "layout/base.html" %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block title %}Connexion{{ block.super }}{% endblock %}
 
-{% block content %}
-<h1 class="mb-4">
-    Bienvenue !
-</h1>
+{% block content_full_viewport %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm order-sm-12 mt-5">
+            {% if show_france_connect or show_peamu %}
+                <b class="mb-4">Connectez-vous avec un service tiers</b>
+                <div class="row mt-3">
+                    {% if not show_france_connect %}
+                        <div class="col-sm">
+                            {% include "signup/includes/france_connect_button.html" %}
+                        </div>
+                    {% endif %}
 
-{% if show_france_connect or show_peamu %}
-    <!-- <div class="container"> -->
-        <b>Connectez-vous avec un service tiers</b>
-        <div class="row mt-3">
-            {% if not show_france_connect %}
-                <div class="col-sm">
-                    {% include "signup/includes/france_connect_button.html" %}
+                    {% if show_peamu %}
+                    <div class="col-sm">
+                        <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="mt-4 mb-3">
+                    <b>Ou utilisez votre adresse e-mail</b>
                 </div>
             {% endif %}
 
-            {% if show_peamu %}
-            <div class="col-sm">
-                <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
-            </div>
+            <form method="post" action="{% url 'account_login' %}" class="js-prevent-multiple-submit">
+
+                {% csrf_token %}
+
+                {% bootstrap_form_errors form type="all" %}
+
+                {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                {% endif %}
+
+                {% bootstrap_field form.login form_group_class="form-group" %}
+
+                {% bootstrap_field form.password form_group_class="form-group mb-1" %}
+                <p class="text-right small font-italic">
+                    <a href="{% url 'account_reset_password' %}">Mot de passe oublié ?</a>
+                </p>
+
+                <input type="hidden" id="account_type" name="account_type" value="{{ account_type }}">
+
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary">Connexion</button>
+                {% endbuttons %}
+
+            </form>
+
+
+            {% if signup_allowed %}
+                <div class="mt-5 mb-5">
+                    <p>Vous n'avez pas de compte ?</p>
+
+                    <p>
+                        <a class="btn btn-outline-primary" href="{{ signup_url }}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                        Inscription 
+                        {% if account_type_display_name %}
+                            {{ account_type_display_name|lower }}
+                        {% endif %}
+                        </a>
+                    </p>
+                </div>
             {% endif %}
         </div>
-    <!-- </div> -->
 
-    <b>Ou utilisez votre adresse e-mail</b>
-
-{% endif %}
-
-<form method="post" action="{% url 'account_login' %}" class="js-prevent-multiple-submit">
-
-    {% csrf_token %}
-
-    {% bootstrap_form_errors form type="all" %}
-
-    {% if redirect_field_value %}
-    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-    {% endif %}
-
-    {% bootstrap_field form.login %}
-    <p class="text-center">{% include "signup/includes/no_email_link.html" %}</p>
-
-    {% bootstrap_field form.password %}
-
-    <input type="hidden" id="account_type" name="account_type" value="{{ account_type }}">
-
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">Connexion</button>
-        <a class="btn btn-link" href="{% url 'account_reset_password' %}">Mot de passe oublié ?</a>
-    {% endbuttons %}
-
-</form>
-
-
-{% if signup_allowed %}
-    <hr>
-    <p>Vous n'avez pas de compte ?</p>
-
-    <p>
-        <a class="btn btn-outline-primary" href="{{ signup_url }}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-        Créer un compte
-        {% if account_type_display_name %}
-            {{ account_type_display_name|lower }}
-        {% endif %}
-        </a>
-    </p>
-
-{% endif %}
+        <div class="col-sm order-sm-1 bg-emploi-lightest">
+            <div class="mt-5">
+                <h2 class="ff-extra-01 text-center">Bienvenue !</h2>
+                <img class="img-fluid mt-5" src="{% static 'img/login.svg' %}">
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
