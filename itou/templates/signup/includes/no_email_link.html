@@ -1,12 +1,14 @@
 {% load static %}
 
-<a href="#" data-toggle="modal" data-target="#no-email-modal">
-    {% if link_text %}
-        {{ link_text }}
-    {% else %}
-        Je n'ai pas d'adresse e-mail
-    {% endif %}
-</a>
+<p class="text-right small font-italic mb-0">
+    <a href="#" data-toggle="modal" data-target="#no-email-modal">
+        {% if link_text %}
+            {{ link_text }}
+        {% else %}
+            Pas d'adresse e-mail ?
+        {% endif %}
+    </a>
+</p>
 
 <div
     class="modal fade text-left"
