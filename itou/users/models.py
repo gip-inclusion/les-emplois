@@ -397,8 +397,6 @@ class User(AbstractUser, AddressMixin):
             and current_org.is_authorized
             and current_org.authorization_status == PrescriberOrganization.AuthorizationStatus.VALIDATED
             and not current_org.is_brsa
-            and current_org.department is not None
-            and current_org.department != ""
             and current_org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS
         )
 
@@ -421,13 +419,7 @@ class User(AbstractUser, AddressMixin):
         """
         if self.is_stats_vip:
             return True
-        return (
-            self.is_labor_inspector
-            and current_institution is not None
-            and current_institution.is_ddets
-            and current_institution.department is not None
-            and current_institution.department != ""
-        )
+        return self.is_labor_inspector and current_institution.kind == current_institution.Kind.DDETS
 
     def get_stats_ddets_department(self, current_institution):
         """
