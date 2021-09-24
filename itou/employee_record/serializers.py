@@ -210,7 +210,8 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
 
     mesure = serializers.CharField(source="asp_siae_type")
-    siret = serializers.CharField(source="job_application.to_siae.siret")
+    # Note that this is the "parent" SIRET (for antennas)
+    siret = serializers.CharField()
 
     personnePhysique = _EmployeeSerializer(source="job_application.job_seeker")
     adresse = _EmployeeAddress(source="job_application.job_seeker")
