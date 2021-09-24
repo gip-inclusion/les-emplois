@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
@@ -124,6 +125,7 @@ def list(request, template_name="employee_record/list.html"):
         "employee_records_list": employee_records_list,
         "badges": status_badges,
         "navigation_pages": navigation_pages,
+        "feature_availability_date": settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
     }
 
     return render(request, template_name, context)

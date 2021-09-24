@@ -20,7 +20,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
     readonly_fields = (
         "pk",
-        "status",
+        # "status",
         "created_at",
         "updated_at",
         "approval_number",
