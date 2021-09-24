@@ -5,7 +5,8 @@ from django.utils import timezone
 
 from itou.asp.models import EmployerType, PrescriberType, SiaeKind
 from itou.job_applications.models import JobApplication
-from itou.siaes.models import SiaeFinancialAnnex
+from itou.siaes.models import Siae, SiaeFinancialAnnex
+from itou.utils.validators import validate_siret
 
 
 # Validators
@@ -161,6 +162,12 @@ class EmployeeRecord(models.Model):
     # These fields are duplicated to act as constraint fields on DB level
     approval_number = models.CharField(max_length=12, verbose_name="Numéro d'agrément")
     asp_id = models.IntegerField(verbose_name="Identifiant ASP de la SIAE")
+    # If the SIAE is an "antenna",
+    # we MUST provide the SIRET of the SIAE linked to the financial annex on ASP side (i.e. "parent/mother" SIAE)
+    # NOT the actual SIAE (which can be fake and unrecognized by ASP).
+    siret = models.CharField(
+        verbose_name="Siret structure mère", max_length=14, validators=[validate_siret], db_index=True
+    )
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
@@ -480,6 +487,12 @@ class EmployeeRecord(models.Model):
 
         fs.asp_id = job_application.to_siae.convention.asp_id
         fs.approval_number = job_application.approval.number
+
+        # Fetch correct number if SIAE is antenna
+        if job_application.to_siae.source == Siae.SOURCE_USER_CREATED:
+            fs.siret = job_application.to_siae.siret
+        else:
+            fs.siret = job_application.to_siae.siret
 
         return fs
 
