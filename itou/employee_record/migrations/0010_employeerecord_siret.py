@@ -17,7 +17,6 @@ class Migration(migrations.Migration):
             name="siret",
             field=models.CharField(
                 db_index=True,
-                default=9999999999999,
                 max_length=14,
                 validators=[itou.utils.validators.validate_siret],
                 verbose_name="Siret structure mère",
