@@ -489,9 +489,10 @@ class EmployeeRecord(models.Model):
         fs.asp_id = job_application.to_siae.convention.asp_id
         fs.approval_number = job_application.approval.number
 
-        # Fetch correct number if SIAE is antenna
+        # Fetch correct number if SIAE is an antenna
         if job_application.to_siae.source == Siae.SOURCE_USER_CREATED:
-            fs.siret = job_application.to_siae.siret
+            main_siae = Siae.objects.get(convention=job_application.to_siae.convention, source=Siae.SOURCE_ASP)
+            fs.siret = main_siae.siret
         else:
             fs.siret = job_application.to_siae.siret
 
