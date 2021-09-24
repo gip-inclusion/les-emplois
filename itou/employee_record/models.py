@@ -162,6 +162,7 @@ class EmployeeRecord(models.Model):
     # These fields are duplicated to act as constraint fields on DB level
     approval_number = models.CharField(max_length=12, verbose_name="Numéro d'agrément")
     asp_id = models.IntegerField(verbose_name="Identifiant ASP de la SIAE")
+
     # If the SIAE is an "antenna",
     # we MUST provide the SIRET of the SIAE linked to the financial annex on ASP side (i.e. "parent/mother" SIAE)
     # NOT the actual SIAE (which can be fake and unrecognized by ASP).

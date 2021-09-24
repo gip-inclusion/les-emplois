@@ -26,3 +26,4 @@ ASP_FS_KNOWN_HOSTS = None
 
 # Temporary: employee record deployment
 EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED = True
+EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 1, 1)
