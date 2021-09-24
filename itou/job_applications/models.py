@@ -201,7 +201,8 @@ class JobApplicationQuerySet(models.QuerySet):
                 employee_record__isnull=True,
                 to_siae=siae,
                 hiring_start_at__lt=today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED),
-                updated_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,  # Must be accepted after production date
+                # Must be accepted after production date
+                updated_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
             )
             .select_related("job_seeker", "approval")
         )
