@@ -32,7 +32,7 @@
 
     {% if current_siae and not current_siae.is_active %}
         <div class="alert alert-warning mb-0" role="alert">
-            La DGEFP nous indique que votre structure n'est plus conventionnée.<br>
+            La DGEFP nous indique que votre structure {% if current_siae.siret %}(inscrite avec le numéro SIRET : {{ current_siae.siret }}) {% endif %}n'est plus conventionnée.<br>
             Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.<br>
             À compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.<br>
 
@@ -442,6 +442,13 @@
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
                             <a href="{% url 'stats:stats_cd' %}">Voir les données de mon département</a>
+                            <span class="badge badge-info">Nouveau</span>
+                        </p>
+                    {% endif %}
+                    {% if can_view_stats_ddets %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="activity" %}
+                            <a href="{% url 'stats:stats_ddets' %}">Voir les données de mon département</a>
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}

@@ -1,7 +1,7 @@
 {% load bootstrap4 %}
 {% load format_filters %}
     
-{% if job_application.state.is_new %}
+    {% if job_application.state.is_new %}
 
         <hr>
 
@@ -17,7 +17,7 @@
 
     {# Answer ------------------------------------------------------------------------- #}
 
-    {% if job_application.refusal_reason or job_application.answer %}
+    {% if job_application.answer or job_application.state.is_refused %}
 
         <hr>
 
@@ -32,8 +32,15 @@
 
         {% if job_application.answer %}
             <div class="alert alert-secondary">
-                <p><b>Message :</b></p>
+                <p><b>Réponse :</b></p>
                 {{ job_application.answer|linebreaks }}
+            </div>
+        {% endif %}
+
+        {% if job_application.answer_to_prescriber %}
+            <div class="alert alert-secondary">
+                <p><b>Message pour le prescripteur :</b></p>
+                {{ job_application.answer_to_prescriber|linebreaks }}
             </div>
         {% endif %}
 

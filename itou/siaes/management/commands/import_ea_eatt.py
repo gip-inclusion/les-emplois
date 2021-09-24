@@ -37,9 +37,6 @@ def get_ea_eatt_df():
 
     df = pd.read_excel(filename, converters={siret_field_name: str, post_code_field_name: str, phone_field_name: str})
 
-    # Many EA are duplicated on several rows. The natural way to deduplicate those seems to be the following filter.
-    df = df[df.Est_Etab_Signataire == "Oui"]
-
     column_mapping = {
         "Denomination_Sociale_Signataire": "name",
         "LIB_TYPE_EA": "kind",
@@ -62,6 +59,12 @@ def get_ea_eatt_df():
 
     # Drop rows without siret.
     df = df[~df.siret.isnull()]
+
+    df.drop_duplicates(
+        subset=["siret"],
+        keep="first",
+        inplace=True,
+    )
 
     df["address_line_1"] = ""
 

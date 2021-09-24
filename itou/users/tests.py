@@ -1,14 +1,24 @@
+import datetime
 import uuid
 from unittest import mock
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 
 import itou.asp.factories as asp
 from itou.asp.models import AllocationDuration, EmployerType
-from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.eligibility.models import EligibilityDiagnosis
+from itou.institutions.factories import InstitutionWithMembershipFactory
+from itou.institutions.models import Institution
+from itou.job_applications.factories import (
+    JobApplicationSentByJobSeekerFactory,
+    JobApplicationWithApprovalFactory,
+    JobApplicationWithEligibilityDiagnosis,
+)
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberMembershipFactory,
@@ -19,6 +29,111 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
+
+
+class ManagerTest(TestCase):
+    def test_get_duplicated_pole_emploi_ids(self):
+
+        # Unique user.
+        JobSeekerFactory(pole_emploi_id="5555555A")
+
+        # 2 users using the same `pole_emploi_id`.
+        JobSeekerFactory(pole_emploi_id="6666666B")
+        JobSeekerFactory(pole_emploi_id="6666666B")
+
+        # 3 users using the same `pole_emploi_id`.
+        JobSeekerFactory(pole_emploi_id="7777777C")
+        JobSeekerFactory(pole_emploi_id="7777777C")
+        JobSeekerFactory(pole_emploi_id="7777777C")
+
+        duplicated_pole_emploi_ids = User.objects.get_duplicated_pole_emploi_ids()
+
+        expected_result = ["6666666B", "7777777C"]
+        self.assertCountEqual(duplicated_pole_emploi_ids, expected_result)
+
+    def test_get_duplicates_by_pole_emploi_id(self):
+
+        # 2 users using the same `pole_emploi_id` and different birthdates.
+        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
+        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
+
+        # 2 users using the same `pole_emploi_id` and the same birthdates.
+        user1 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+        user2 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+
+        # 3 users using the same `pole_emploi_id` and the same birthdates.
+        user3 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user4 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user5 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        # + 1 user using the same `pole_emploi_id` but a different birthdate.
+        JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
+
+        duplicated_users = User.objects.get_duplicates_by_pole_emploi_id()
+
+        expected_result = {
+            "7777777B": [user1, user2],
+            "8888888C": [user3, user4, user5],
+        }
+        self.assertCountEqual(duplicated_users, expected_result)
+
+
+class ManagementCommandsTest(TestCase):
+    def test_deduplicate_job_seekers_easy_case(self):
+        """
+        Test the deduplication of several users with the same `pole_emploi_id`
+        and `birthdate`.
+
+        The scenario is an easy case : among all the duplicates, only one has
+        a PASS IAE.
+        """
+
+        # Create 3 users with the same `pole_emploi_id` and `birthdate`.
+
+        kwargs = {
+            "job_seeker__pole_emploi_id": "6666666B",
+            "job_seeker__birthdate": datetime.date(2002, 12, 12),
+        }
+
+        # Create `user1`.
+        job_app1 = JobApplicationWithApprovalFactory(**kwargs)
+        user1 = job_app1.job_seeker
+
+        self.assertEqual(1, user1.job_applications.count())
+        self.assertEqual(1, user1.eligibility_diagnoses.count())
+        self.assertEqual(1, user1.approvals.count())
+
+        # Create `user2`.
+        job_app2 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        user2 = job_app2.job_seeker
+
+        self.assertEqual(0, user2.approvals.count())
+        self.assertEqual(1, user2.job_applications.count())
+        self.assertEqual(1, user2.eligibility_diagnoses.count())
+
+        # Create `user3`.
+        job_app3 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        user3 = job_app3.job_seeker
+
+        self.assertEqual(0, user3.approvals.count())
+        self.assertEqual(1, user3.job_applications.count())
+        self.assertEqual(1, user3.eligibility_diagnoses.count())
+
+        # Merge all users into `user1`.
+
+        call_command("deduplicate_job_seekers", verbosity=0)
+
+        self.assertEqual(3, user1.job_applications.count())
+        self.assertEqual(3, user1.eligibility_diagnoses.count())
+        self.assertEqual(1, user1.approvals.count())
+
+        self.assertEqual(0, User.objects.filter(email=user2.email).count())
+        self.assertEqual(0, User.objects.filter(email=user3.email).count())
+
+        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user2).count())
+        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user3).count())
+
+        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user2).count())
+        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user3).count())
 
 
 class ModelTest(TestCase):
@@ -246,11 +361,11 @@ class ModelTest(TestCase):
 
     def test_vip_user_can_view_all_stats(self):
         user = UserFactory()
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=None))
         user = UserFactory(is_stats_vip=True)
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=None))
         user = UserFactory(is_superuser=True)
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=None))
 
     def test_can_view_stats_cd(self):
         """
@@ -258,46 +373,90 @@ class ModelTest(TestCase):
         """
         # Admin prescriber of authorized CD can access.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganization.Kind.DEPT, department="02"
+            kind=PrescriberOrganization.Kind.DEPT, department="93"
         )
+        self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
         self.assertEqual(user.get_stats_cd_department(current_org=org), org.department)
         self.assertNotEqual(user.get_stats_cd_department(current_org=org), "01")
 
         # Non admin prescriber can access as well.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganization.Kind.DEPT, membership__is_admin=False
+            kind=PrescriberOrganization.Kind.DEPT, membership__is_admin=False, department="93"
         )
+        self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
+
+        # Member of CD of not yet allowed department cannot access.
+        org = AuthorizedPrescriberOrganizationWithMembershipFactory(
+            kind=PrescriberOrganization.Kind.DEPT, department="02"
+        )
+        self.assertFalse(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
+        user = org.members.get()
+        self.assertFalse(user.can_view_stats_cd(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
         # Non authorized organization does not give access.
         org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
         # Non CD organization does not give access.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory()
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
         # Prescriber without organization cannot access.
         org = None
         user = PrescriberFactory()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
         # VIP user can always access, even without a CD.
         org = None
         user = UserFactory(is_stats_vip=True)
         self.assertTrue(user.can_view_stats_cd(current_org=org))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
         self.assertEqual(user.get_stats_cd_department(current_org=org), "01")
+
+    def test_can_view_stats_ddets(self):
+        """
+        DDETS as in "Directions départementales de l’emploi, du travail et des solidarités"
+        """
+        # Admin member of DDETS can access.
+        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DDETS, department="93")
+        user = institution.members.get()
+        self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+        self.assertEqual(user.get_stats_ddets_department(current_institution=institution), institution.department)
+        self.assertNotEqual(user.get_stats_ddets_department(current_institution=institution), "01")
+
+        # Non admin member of DDETS can access as well.
+        institution = InstitutionWithMembershipFactory(
+            kind=Institution.Kind.DDETS, membership__is_admin=False, department="93"
+        )
+        user = institution.members.get()
+        self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+
+        # Member of institution of another kind cannot access.
+        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DGEFP, department="93")
+        user = institution.members.get()
+        self.assertFalse(user.can_view_stats_ddets(current_institution=institution))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+
+        # VIP user can always access, even without a DDETS.
+        institution = None
+        user = UserFactory(is_stats_vip=True)
+        self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+        self.assertEqual(user.get_stats_ddets_department(current_institution=institution), "01")
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):

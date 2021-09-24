@@ -17,7 +17,7 @@
 
         {# TODO: Fix incorrect rendering of form with radio buttons #}
         {# https://github.com/zostera/django-bootstrap4/issues/126 #}
-        <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %}">
+        <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %} js-refusal-reasons">
             {{ form.refusal_reason.label_tag }}
             <ul class="list-unstyled">
                 {% for radio in form.refusal_reason %}
@@ -26,6 +26,10 @@
                     </li>
                 {% endfor %}
             </ul>
+        </div>
+            
+        <div id="js-field-answer-to-prescriber">
+            {% bootstrap_field form.answer_to_prescriber %}
         </div>
 
         {% bootstrap_field form.answer %}
@@ -37,4 +41,21 @@
 
     </form>
 
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript">
+        // Clicking on the "other" radio button displays a hidden field.
+        $('#js-field-answer-to-prescriber').css("display", "none");
+        $('.js-refusal-reasons input')
+          .on('change', function () {
+            const value = $(this).val();
+            if (value == "other") {
+                $('#js-field-answer-to-prescriber').show("slide");
+            }
+            else {
+                $('#js-field-answer-to-prescriber').hide("slide");
+            }
+          });
+    </script>
 {% endblock %}

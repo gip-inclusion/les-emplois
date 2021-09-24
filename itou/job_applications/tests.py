@@ -301,21 +301,24 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.job_seeker.get_full_name(), email.subject)
 
         # Body.
-        self.assertIn(job_application.job_seeker.first_name, email.body)
-        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.job_seeker.first_name.title(), email.body)
+        self.assertIn(job_application.job_seeker.last_name.title(), email.body)
         self.assertIn(job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body)
         self.assertIn(job_application.job_seeker.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.job_seeker.phone), email.body)
         self.assertIn(job_application.message, email.body)
         for job in job_application.selected_jobs.all():
             self.assertIn(job.display_name, email.body)
-        self.assertIn(job_application.sender.get_full_name(), email.body)
+        self.assertIn(job_application.sender.get_full_name().title(), email.body)
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.to_siae.kind, email.body)
+        self.assertIn(job_application.to_siae.city, email.body)
 
         # Assert the Job Seeker does not have access to confidential information.
         email = job_application.email_new_for_job_seeker(base_url="http://testserver")
-        self.assertIn(job_application.sender.get_full_name(), email.body)
+        self.assertIn(job_application.sender.get_full_name().title(), email.body)
         self.assertIn(job_application.sender_prescriber_organization.display_name, email.body)
         self.assertNotIn(job_application.sender.email, email.body)
         self.assertNotIn(format_filters.format_phone(job_application.sender.phone), email.body)
@@ -333,16 +336,16 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.to_siae.display_name, email.subject)
 
         # Body.
-        self.assertIn(job_application.job_seeker.first_name, email.body)
-        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.job_seeker.first_name.title(), email.body)
+        self.assertIn(job_application.job_seeker.last_name.title(), email.body)
         self.assertIn(job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body)
         self.assertIn(job_application.job_seeker.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.job_seeker.phone), email.body)
         self.assertIn(job_application.message, email.body)
         for job in job_application.selected_jobs.all():
             self.assertIn(job.display_name, email.body)
-        self.assertIn(job_application.sender.first_name, email.body)
-        self.assertIn(job_application.sender.last_name, email.body)
+        self.assertIn(job_application.sender.first_name.title(), email.body)
+        self.assertIn(job_application.sender.last_name.title(), email.body)
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
@@ -413,27 +416,28 @@ class JobApplicationNotificationsTest(TestCase):
 
         # When sent by authorized prescriber.
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            refusal_reason=JobApplication.REFUSAL_REASON_DID_NOT_COME
+            refusal_reason=JobApplication.REFUSAL_REASON_DID_NOT_COME,
+            answer_to_prescriber="Le candidat n'est pas venu.",
         )
-        email = job_application.email_refuse
+        email = job_application.email_refuse_for_proxy
         # To.
-        self.assertIn(job_application.job_seeker.email, email.to)
-        self.assertIn(job_application.sender.email, email.bcc)
+        self.assertIn(job_application.sender.email, email.to)
         self.assertEqual(len(email.to), 1)
-        self.assertEqual(len(email.bcc), 1)
         # Body.
-        self.assertIn(job_application.sender.first_name, email.body)
-        self.assertIn(job_application.sender.last_name, email.body)
-        self.assertIn(job_application.job_seeker.first_name, email.body)
-        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.sender.first_name.title(), email.body)
+        self.assertIn(job_application.sender.last_name.title(), email.body)
+        self.assertIn(job_application.job_seeker.first_name.title(), email.body)
+        self.assertIn(job_application.job_seeker.last_name.title(), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.answer, email.body)
+        self.assertIn(job_application.answer_to_prescriber, email.body)
 
         # When sent by jobseeker.
         job_application = JobApplicationSentByJobSeekerFactory(
-            refusal_reason=JobApplication.REFUSAL_REASON_DID_NOT_COME
+            refusal_reason=JobApplication.REFUSAL_REASON_DID_NOT_COME,
+            answer_to_prescriber="Le candidat n'est pas venu.",
         )
-        email = job_application.email_refuse
+        email = job_application.email_refuse_for_job_seeker
         # To.
         self.assertEqual(job_application.job_seeker.email, job_application.sender.email)
         self.assertIn(job_application.job_seeker.email, email.to)
@@ -441,6 +445,7 @@ class JobApplicationNotificationsTest(TestCase):
         # Body.
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.answer, email.body)
+        self.assertNotIn(job_application.answer_to_prescriber, email.body)
 
     def test_email_deliver_approval(self):
         job_seeker = JobSeekerFactory()

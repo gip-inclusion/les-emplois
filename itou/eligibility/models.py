@@ -252,6 +252,8 @@ class AdministrativeCriteria(models.Model):
 
     The table is automatically populated with a fixture at the end of
     eligibility's migration #0007.
+
+    Warning : any change to the criteria must be notified to C2 members (names are used in Metabase)
     """
 
     MAX_UI_RANK = 32767

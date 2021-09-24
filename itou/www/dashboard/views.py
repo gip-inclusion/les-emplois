@@ -15,6 +15,7 @@ from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
@@ -79,13 +80,20 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         except Http404:
             current_org = None
 
+    current_institution = None
+    if request.user.is_labor_inspector:
+        current_institution = get_current_institution_or_404(request)
+
     context = {
         "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
         "job_applications_categories": job_applications_categories,
         "can_show_financial_annexes": can_show_financial_annexes,
         "can_show_employee_records": can_show_employee_records,
-        "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(current_org=current_org),
+        "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(
+            current_org=current_org, current_institution=current_institution
+        ),
         "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
+        "can_view_stats_ddets": request.user.can_view_stats_ddets(current_institution=current_institution),
         "can_show_deployment_message": can_show_deployment_message,
     }
 

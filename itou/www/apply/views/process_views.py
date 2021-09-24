@@ -166,6 +166,7 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
             # After each successful transition, a save() is performed by django-xworkflows.
             job_application.refusal_reason = form.cleaned_data["refusal_reason"]
             job_application.answer = form.cleaned_data["answer"]
+            job_application.answer_to_prescriber = form.cleaned_data.get("answer_to_prescriber", "")
             job_application.refuse(user=request.user)
             messages.success(request, "Modification effectuée.")
         except xwf_models.InvalidTransitionError:

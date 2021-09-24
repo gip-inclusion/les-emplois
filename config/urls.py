@@ -48,9 +48,12 @@ urlpatterns = [
     # --------------------------------------------------------------------------------------
     # PEAMU URLs.
     path("accounts/", include("itou.allauth_adapters.peamu.urls")),
+    # FranceConnect URLs.
+    path("franceconnect/", include("itou.france_connect.urls")),
     # --------------------------------------------------------------------------------------
     # API.
     path("api/v1/", include("itou.api.urls", namespace="v1")),
+    path("api/", include("itou.www.api.urls")),
     # www.
     path("", include("itou.www.home.urls")),
     path("apply/", include("itou.www.apply.urls")),
@@ -68,7 +71,7 @@ urlpatterns = [
     path("versions/", include("itou.www.releases.urls")),
     # Enable Anymail’s status tracking
     # https://anymail.readthedocs.io/en/stable/esps/mailjet/#status-tracking-webhooks
-    re_path(r'^webhooks/anymail/', include('anymail.urls')),
+    re_path(r"^webhooks/anymail/", include("anymail.urls")),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
     # Static pages.
     path("accessibility/", TemplateView.as_view(template_name="static/accessibility.html"), name="accessibility"),

@@ -1,5 +1,35 @@
 # Journal des modifications
 
+## [27] - 2021-09-24
+
+### Ajouté
+
+- Ajout d'une étape de confirmation au processus de candidature afin d'éviter qu'une adresse e-mail soit utilisée par différents candidats
+- Ajout d'une étape supplémentaire à la fin du parcours de candidature pour permettre aux prescripteurs de revenir à leur recherche ou d'aller au tableau de bord.
+- Ajout du motif de prolongation "CDI conclu avec une personne âgée d'au moins 57 ans (12 mois max)"
+- Création et exécution d'un script de fusion des doublons de candidats
+- Brique technique de gestion de France Connect, en vue de faciliter l'identification candidat
+- Ajout d'une page de destination pour présenter l'API
+- Ajout du motif de refus de candidature "Candidat non mobile"
+- Ajout d'un champ « Précisez » si le motif du refus sélectionné est « Autre »
+
+### Modifié
+
+- Mise à jour des motifs et de la durée maximum de suspension
+- Ajout du SIRET dans le message d'avertissement lorsqu'une structure n'est plus conventionnée
+- Remplacement de l'image du logo dans les meta tags par une image au format 1200x630 pixels.
+- Ajout le nom de la SIAE dans l'e-mail de confirmation d'envoi transmis au prescripteur
+- Correction des erreurs d'envois d'e-mail en réduisant la longueur du sujet lorsque le nom de la structure est trop long
+- Ajout de la possibilité d'ordonner les différents résultats de l'API SIAE 
+- Correctifs sur l'import EA
+- Correctifs mineurs concernant l'envoi des données des fiches salarié
+- Mise en production et ouverture progressive des fiches salarié 
+
+### Supprimé
+
+- Suppression de la mention obsolète sur les motifs de suspension sur le formulaire de suspension
+- Suppression de la mention "(socle)" du critère d'éligibilité "Bénéficiaire du RSA"
+
 ## [26] - 2021-09-09
 
 ### Ajouté

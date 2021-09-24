@@ -30,8 +30,7 @@ class DeclareProlongationForm(forms.ModelForm):
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
         # `PARTICULAR_DIFFICULTIES` is allowed only for ACI.
-        # It should be allowed for AI again in the near future, see https://trello.com/c/YJ2kLJi1
-        if self.siae.kind not in [self.siae.KIND_ACI]:
+        if self.siae.kind not in [self.siae.KIND_ACI, self.siae.KIND_AI]:
             self.fields["reason"].choices = [
                 item
                 for item in self.fields["reason"].choices
@@ -99,6 +98,8 @@ class SuspensionForm(forms.ModelForm):
         self.approval = kwargs.pop("approval")
         self.siae = kwargs.pop("siae")
         super().__init__(*args, **kwargs)
+        # Show new reasons but keep old ones for history.
+        self.fields["reason"].choices = Suspension.Reason.displayed_choices
 
         if not self.instance.pk:
             self.instance.siae = self.siae

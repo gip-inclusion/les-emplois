@@ -1,10 +1,16 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 
-{% block title %}Modification d'un candidat{{ block.super }}{% endblock %}
+{% block title %}Informations personnelles de {{ job_application.job_seeker.get_full_name|title }}{{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>Candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span></h1>
+<h1>Informations personnelles de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span></h1>
+
+<div class="alert alert-warning" role="alert">
+  <b>Vous allez modifier des informations sensibles</b> concernant ce candidat ou cette candidate.<br>
+  Tout changement entraînera une modification définitive dans notre base de données. <b>Les informations
+  supprimées seront perdues.</b>
+</div>
 
 <form method="post" action="" class="js-prevent-multiple-submit">
 
@@ -14,7 +20,7 @@
 
     {% buttons %}
         <a class="btn btn-secondary" href="{{ prev_url }}">Annuler</a>
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
     {% endbuttons %}
 
 </form>

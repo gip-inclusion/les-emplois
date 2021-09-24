@@ -29,6 +29,8 @@ djangorestframework==3.12.2  # https://www.django-rest-framework.org/
 # DRF-Spectacular (Django Rest Framework Spectacular, open API schema browser)
 drf-spectacular==0.17.3  # https://github.com/tfranzel/drf-spectacular
 
+# Django filter (filtering/ordering of API results)
+django-filter==2.4.0 # https://django-filter.readthedocs.io/en/stable/
 
 # Front-end
 # ------------------------------------------------------------------------------
@@ -69,7 +71,7 @@ redis==3.5.3  # https://github.com/andymccurdy/redis-py
 PyJWT==2.1.0  # https://github.com/jpadilla/pyjwt
 
 # Requests alternative including a default time out
-httpx==0.18.2  # https://github.com/encode/httpx/
+httpx==0.19.0  # https://github.com/encode/httpx/
 
 # SFTP file transfer for ASP
 pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/

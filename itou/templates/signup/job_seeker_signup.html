@@ -10,6 +10,16 @@
     <small class="text-muted">Candidat</small>
 </h1>
 
+{% if show_france_connect %}
+
+    {% include "signup/includes/france_connect_button.html" %}
+
+    {% if show_peamu %}
+    <span class="lines-on-sides">ou</span>
+    {% endif %}
+
+{% endif %}
+
 <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
 
 <p class="lines-on-sides">ou</p>

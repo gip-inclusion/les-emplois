@@ -6,6 +6,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
@@ -18,6 +19,7 @@ from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.perms.user import get_user_info
 from itou.utils.storage.s3 import S3Upload
+from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
@@ -77,8 +79,11 @@ def start(request, siae_pk):
         # Message only visible in DEBUG
         raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
+    back_url = get_safe_url(request, "back_url")
+
     # Start a fresh session.
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
+        "back_url": back_url,
         "job_seeker_pk": None,
         "to_siae_pk": siae.pk,
         "sender_pk": None,
@@ -131,24 +136,46 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
         request.session.modified = True
         return HttpResponseRedirect(next_url)
 
+    job_seeker_name = None
+    form = UserExistsForm(data=request.POST or None)
+    preview_mode = False
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
-    form = UserExistsForm(data=request.POST or None)
-
     if request.method == "POST" and form.is_valid():
-
         job_seeker = form.get_user()
 
         if job_seeker:
-            session_data["job_seeker_pk"] = job_seeker.pk
-            request.session.modified = True
-            return HttpResponseRedirect(next_url)
+            # Go to the next step.
+            if request.POST.get("save"):
+                session_data["job_seeker_pk"] = job_seeker.pk
+                request.session.modified = True
+                return HttpResponseRedirect(next_url)
 
-        args = urlencode({"email": form.cleaned_data["email"]})
-        next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
-        return HttpResponseRedirect(f"{next_url}?{args}")
+            # Display a modal containing more information.
+            if request.POST.get("preview"):
+                preview_mode = True
+                job_seeker_name = job_seeker.get_full_name()
+                if request.user.is_prescriber and not request.user.is_prescriber_with_authorized_org:
+                    # Don't display personal information to unauthorized members.
+                    job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
 
-    context = {"siae": siae, "form": form}
+            # Create a new form to start from new.
+            elif request.POST.get("cancel"):
+                msg = mark_safe(
+                    f"L'email <b>{ form.data['email'] }</b> est déjà utilisé par un autre candidat "
+                    "sur la Plateforme.<br>"
+                    "Merci de renseigner <b>l'adresse email personnelle et unique</b> "
+                    "du candidat pour lequel vous souhaitez postuler."
+                )
+                form = UserExistsForm()
+                messages.warning(request, msg)
+
+        else:
+            args = urlencode({"email": form.cleaned_data["email"]})
+            next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
+            return HttpResponseRedirect(f"{next_url}?{args}")
+
+    context = {"job_seeker_name": job_seeker_name, "form": form, "preview_mode": preview_mode, "siae": siae}
     return render(request, template_name, context)
 
 
@@ -310,11 +337,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
 
     if request.method == "POST" and form.is_valid():
-        next_url = reverse("apply:list_for_job_seeker")
-        if request.user.is_prescriber:
-            next_url = reverse("apply:list_for_prescriber")
-        elif request.user.is_siae_staff:
-            next_url = reverse("apply:list_for_siae")
+        next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae_pk})
 
         # Prevent multiple rapid clicks on the submit button to create multiple
         # job applications.
@@ -350,8 +373,6 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         if job_application.is_sent_by_proxy:
             job_application.email_new_for_prescriber.send()
 
-        messages.success(request, "Candidature bien envoyée !")
-
         return HttpResponseRedirect(next_url)
 
     s3_upload = S3Upload(kind="resume")
@@ -365,5 +386,26 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         "approvals_wrapper": approvals_wrapper,
         "s3_form_values": s3_form_values,
         "s3_upload_config": s3_upload_config,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+@valid_session_required
+def step_application_sent(request, siae_pk, template_name="apply/submit_step_application_sent.html"):
+    if request.user.is_siae_staff:
+        dashboard_url = reverse("apply:list_for_siae")
+        messages.success(request, "Candidature bien envoyée !")
+        return HttpResponseRedirect(dashboard_url)
+
+    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    back_url = get_safe_url(request=request, url=session_data["back_url"])
+    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+
+    context = {
+        "back_url": back_url,
+        "job_seeker": job_seeker,
+        "siae": siae,
     }
     return render(request, template_name, context)

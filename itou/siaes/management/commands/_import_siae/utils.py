@@ -174,9 +174,14 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
     db_sirets = set([siae.siret for siae in Siae.objects.filter(kind__in=kinds)])
     df_sirets = set(df.siret.tolist())
 
-    # Create structures which do not exist in database yet.
     creatable_sirets = df_sirets - db_sirets
     print(f"{len(creatable_sirets)} {source} will be created.")
+    updatable_sirets = db_sirets.intersection(df_sirets)
+    print(f"{len(updatable_sirets)} {source} will be updated when needed.")
+    deletable_sirets = db_sirets - df_sirets
+    print(f"{len(deletable_sirets)} {source} will be deleted when possible.")
+
+    # Create structures which do not exist in database yet.
     siret_to_row = {row.siret: row for _, row in df.iterrows()}
     for siret in creatable_sirets:
         row = siret_to_row[siret]
@@ -186,7 +191,6 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
             print(f"siae.id={siae.id} has been created.")
 
     # Update structures which already exist in database.
-    updatable_sirets = db_sirets.intersection(df_sirets)
     for siret in updatable_sirets:
         siae = Siae.objects.get(siret=siret, kind__in=kinds)
         if siae.source != source:
@@ -198,7 +202,6 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
                 siae.save()
 
     # Delete structures which no longer exist in the latest export.
-    deletable_sirets = db_sirets - df_sirets
     deleted_count = 0
     undeletable_count = 0
     for siret in deletable_sirets:
