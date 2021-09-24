@@ -9,9 +9,16 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "pk",
         "created_at",
         "approval_number",
+        "siret",
         "status",
     )
     list_filter = ("status",)
+
+    search_fields = (
+        "pk",
+        "siret",
+        "approval_number",
+    )
 
     raw_id_fields = (
         "job_application",
@@ -20,10 +27,10 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
     readonly_fields = (
         "pk",
-        # "status",
         "created_at",
         "updated_at",
         "approval_number",
+        "siret",
         "asp_batch_file",
         "asp_batch_line_number",
         "asp_processing_code",
@@ -40,6 +47,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
                     "status",
                     "job_application",
                     "approval_number",
+                    "siret",
                     "asp_id",
                     "financial_annex",
                     "created_at",
