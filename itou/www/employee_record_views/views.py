@@ -189,7 +189,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
 
     profile = job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=job_seeker)
-    maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_application.job_seeker.address_on_one_line}")
+    maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_application.job_seeker.geocoding_address}")
     step = 2
 
     if request.method == "POST" and form.is_valid():
