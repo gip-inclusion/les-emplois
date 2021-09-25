@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
@@ -124,6 +125,7 @@ def list(request, template_name="employee_record/list.html"):
         "employee_records_list": employee_records_list,
         "badges": status_badges,
         "navigation_pages": navigation_pages,
+        "feature_availability_date": settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
     }
 
     return render(request, template_name, context)
@@ -187,7 +189,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
 
     profile = job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=job_seeker)
-    maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_application.job_seeker.address_on_one_line}")
+    maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_application.job_seeker.geocoding_address}")
     step = 2
 
     if request.method == "POST" and form.is_valid():
@@ -315,6 +317,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
     context = {
         "employee_record": employee_record,
+        "job_application": job_application,
         "steps": STEPS,
         "step": step,
     }

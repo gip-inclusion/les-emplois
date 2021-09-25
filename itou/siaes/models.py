@@ -417,6 +417,7 @@ class Siae(AddressMixin, OrganizationAbstract):
         """
         Check if this SIAE can use the employee record app
         """
+        # No need to check if convention is active (done by middleware)
         return self.kind in self.ASP_EMPLOYEE_RECORD_KINDS
 
     def convention_can_be_accessed_by(self, user):

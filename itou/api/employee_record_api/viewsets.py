@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from itou.employee_record.models import EmployeeRecord
-from itou.employee_record.serializers import EmployeeRecordSerializer
+from itou.employee_record.serializers import EmployeeRecordAPISerializer
 from itou.job_applications.models import JobApplication
 
 from .perms import EmployeeRecordAPIPermission
@@ -69,7 +69,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     # a `basename` parameter must be set on the router (see local `urls.py` file)
     # See: https://www.django-rest-framework.org/api-guide/routers/
 
-    serializer_class = EmployeeRecordSerializer
+    serializer_class = EmployeeRecordAPISerializer
 
     # Possible authentication frameworks:
     # - token auth: for external access / real world use case
