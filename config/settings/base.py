@@ -4,7 +4,7 @@ https://docs.djangoproject.com/en/dev/ref/settings
 """
 import datetime
 import os
-
+from django.utils import timezone
 
 # Paths.
 # ------------------------------------------------------------------------------
@@ -645,7 +645,7 @@ STORAGE_UPLOAD_KINDS = {
 EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS = int(os.environ.get("EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS", 13 * 30))
 
 # Employee records progressive opening settings
-# (to be removed after complete production)
+# (most of these values will be removed after complete production)
 # ------------------------------------------------------------------------------
 EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED = os.environ.get("EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED", False)
 # Use a percentage of eligible SIAEs for progressive opening
@@ -654,3 +654,7 @@ EMPLOYEE_RECORD_OPENING_PERCENTAGE = int(os.environ.get("EMPLOYEE_RECORD_OPENING
 # Allows a manual / custom selection of some SIAEs as "VIP users":
 # Add selected SIAE IDs in list below:
 EMPLOYEE_RECORD_CUSTOM_SIAE_ID_LIST = [41, 4847, 4848]
+# This is the official and final production phase date of the employee record feature.
+# It is used as parameter to filter the eligible job applications for the feature.
+# (no job application before this date can be used for this feature)
+EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 9, 27)

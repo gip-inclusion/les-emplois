@@ -18,7 +18,6 @@ class TestEmployeeRecordSerializer(EmployeeRecordSerializer):
 
         result["mesure"] = test_data["mesure"]
         result["siret"] = test_data["siret"]
-        result["numeroAnnexe"] = test_data["numeroAnnexe"]
 
         return result
 

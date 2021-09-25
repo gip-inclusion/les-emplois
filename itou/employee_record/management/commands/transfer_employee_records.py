@@ -94,10 +94,9 @@ class Command(BaseCommand):
         Render a list of employee records in JSON format then send it to SFTP upload folder
         """
         # Temporary ability to use test serializers
+        raw_batch = EmployeeRecordBatch(employee_records)
         batch = (
-            TestEmployeeRecordBatchSerializer(EmployeeRecordBatch(employee_records))
-            if self.asp_test
-            else EmployeeRecordBatchSerializer(EmployeeRecordBatch(employee_records))
+            TestEmployeeRecordBatchSerializer(raw_batch) if self.asp_test else EmployeeRecordBatchSerializer(raw_batch)
         )
 
         # JSONRenderer produces byte arrays
@@ -112,6 +111,8 @@ class Command(BaseCommand):
             self.logger.info("DRY-RUN: (not) sending '%s' (%d bytes)", remote_path, len(json_bytes))
             self.logger.info("Content: \n%s", json_bytes)
             return
+
+        self.logger.info("Batch info: %s", raw_batch)
 
         # There are specific folders for upload and download on the SFTP server
         with conn.cd(settings.ASP_FS_REMOTE_UPLOAD_DIR):
