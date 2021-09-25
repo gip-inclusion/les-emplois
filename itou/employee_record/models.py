@@ -545,7 +545,7 @@ class EmployeeRecordBatch:
             er.asp_processing_label = None
 
     def __str__(self):
-        return f"{self.upload_filename}"
+        return f"FIL£NAME:{self.upload_filename} NB_RECORDS:{len(self.employee_records)}"
 
     @staticmethod
     def feedback_filename(filename):
