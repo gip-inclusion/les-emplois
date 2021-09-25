@@ -317,6 +317,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
     context = {
         "employee_record": employee_record,
+        "job_application": job_application,
         "steps": STEPS,
         "step": step,
     }
