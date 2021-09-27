@@ -47,11 +47,11 @@
       <div class="col-12 s-postheader__col s-postheader__col--nav d-flex align-items-center">
         <nav role="navigation">
           <ul>
-            <li>
-              {% if user.is_authenticated %}
-                <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">Tableau de bord</a>
-              {% endif %}
-            </li>
+            {% if user.is_authenticated %}
+              <li>
+                  <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+              </li>
+            {% endif %}
             <li>
               <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">Rechercher des employeurs</a>
             </li>
