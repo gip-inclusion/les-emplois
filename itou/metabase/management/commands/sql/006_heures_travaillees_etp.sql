@@ -86,6 +86,4 @@ from
     left join sa_ept ept on ept.code_comm = structure.structure_adresse_admin_code_insee
 where
     /* on prend uniquement les salariés ayant travaillé au moins une heure dans la structure */
-    emi.emi_nb_heures_travail > 0
-    /* le département de l'expérimentation en cours est le 93 */
-    and structure.nom_region_structure = 'Île-de-France'
+    emi.emi_nb_heures_travail > 0 and emi.emi_sme_annee >= (date_part('year', current_date) - 2 )

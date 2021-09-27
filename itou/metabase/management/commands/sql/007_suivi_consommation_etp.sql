@@ -40,9 +40,7 @@ from suivi_saisies_dans_asp saisie_asp
         and emi.emi_sme_annee = date_part('year', current_date) 
         and date_part('year', to_date(af.af_date_debut_effet, 'dd/mm/yyyy')) = date_part('year', current_date) 
     left join "fluxIAE_Structure_v2" as structure
-        on af.af_id_structure = structure.structure_id_siae  
-where
-    structure.nom_region_structure = 'Île-de-France'
+        on af.af_id_structure = structure.structure_id_siae
 group by 
     dernier_mois_saisi_asp,
     structure.structure_denomination,
