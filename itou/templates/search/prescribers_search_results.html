@@ -35,7 +35,7 @@
             </h3>
         {% endif %}
 
-        <h4 class="h4 font-weight-normal text-muted">
+        <h4 class="font-weight-normal text-muted">
             {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages and prescriber_orgs_page.paginator.count as counter %}
                 <b>{{ counter }}</b> résultat{% if counter > 1 %}s{% endif %}
                 {% if prescriber_orgs_page.paginator.num_pages > 1 %}
