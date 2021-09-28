@@ -1,44 +1,3 @@
-/* Colors
---------------------------------------------------------------------------- */
-/* Default Boostrap colors: */
-/* https://github.com/twbs/bootstrap/blob/master/dist/css/bootstrap.css#L7 */
-
-/* Layout.
---------------------------------------------------------------------------- */
-
-body {
-    overflow-y: scroll;
-}
-
-html {
-    background: #f2f2f2;
-}
-
-/*
-  Bootstrap overrides navigators default stylesheet in _reboot.scss.
-  But there is one problem with the b tag. It has the `font-weight: bolder;`
-  property which, oddly, does not work as expected on Linux computers.
-*/
-b {
-    font-weight: 700!important;
-}
-
-.layout {
-    /*
-    First and last columns are gutters, with a minimum size but the ability
-    to stretch to fill one unit of available space.
-    Between them is the main content column with the ability to stretch.
-    https://cloudfour.com/thinks/breaking-out-with-css-grid-layout/
-    https://rachelandrew.co.uk/archives/2017/06/01/breaking-out-with-css-grid-explained/
-    */
-    display: grid;
-    grid-template-columns:
-      [full-start] minmax(1em, 1fr)
-      [main-start] minmax(0, 1280px)
-      [main-end] minmax(1em, 1fr)
-      [full-end];
-}
-
 .container-white {
     background: #fff;
     color: #1c1c1c;
@@ -65,6 +24,7 @@ b {
         background-image: none;
     }
 }
+
 
 /* Header.
 --------------------------------------------------------------------------- */
@@ -95,72 +55,40 @@ header.layout-section {
     margin-left: auto;
 }
 
-@media (max-width: 700px) {  /* For any browser < max-width. */
-
+@media (max-width: 700px) {
+    /* For any browser < max-width. */
     .layout-header {
         display: block;
     }
-
     .layout-header-content {
         margin-top: 10px;
     }
-
 }
 
-/* Main.
---------------------------------------------------------------------------- */
 
-main.layout-section {
-    padding: 2em 0;
-}
-
-@media (max-width: 700px) {  /* For any browser < max-width. */
-
-    main.layout-section {
-        padding: 0.5em 0;
-    }
-
-}
-
-/* Footer.
---------------------------------------------------------------------------- */
-
-footer {
-    background: #f2f2f2;
-}
-
-footer a {
-    text-decoration: underline;
-}
-
-footer a:focus,
-footer a:active,
-footer a:hover {
-    text-decoration: none;
-}
-
-footer img.footer-logo {
-    max-width: 170px;
-    max-height: 160px;
-    background: #fff;
-    margin: 0 0 20px 0;
-    padding: 20px;
-}
-
-.s-footer {
-    grid-column: full;
-}
 /* Spacing.
 --------------------------------------------------------------------------- */
 
+.s-main>section {
+    padding: 5rem 0;
+}
+
+.h1,
+h1 {
+    margin-bottom: 3rem;
+}
+
+
+/* 
 .layout-content {
     padding: 1rem 1rem 2rem 1rem;
 }
 
-.layout-content > .content-small {
+.layout-content>.content-small {
     margin: 0 auto;
     max-width: 600px;
-}
+} */
+
 
 /* Messages. */
 
@@ -168,12 +96,14 @@ footer img.footer-logo {
     margin: 1.4rem 0;
 }
 
+
 /* Icons */
 
 a.with-icon span {
     padding-left: 0.2rem;
     vertical-align: sub;
 }
+
 
 /* BETA banner.
 --------------------------------------------------------------------------- */
@@ -193,10 +123,11 @@ body:after {
     transform: rotate(-45deg);
 }
 
+
 /* Forms.
 --------------------------------------------------------------------------- */
 
-.form-group-required > label:first-of-type:after {
+.form-group-required>label:first-of-type:after {
     content: " *";
     color: #d63626;
 }
@@ -205,18 +136,22 @@ body:after {
     display: block !important;
 }
 
+
 /*
 Force the display of `.invalid-feedback` for Duet Date Picker with Bootstrap 4.
 See also `duet_date_picker.html`.
 https://getbootstrap.com/docs/4.6/components/forms/#server-side
 */
-duet-date-picker.is-invalid ~ .invalid-feedback {
-    display:block
+
+duet-date-picker.is-invalid~.invalid-feedback {
+    display: block
 }
 
 .duet-date__input {
-    border-color: #ced4da;  /* Match with colors of Bootstrap 4. */
+    border-color: #ced4da;
+    /* Match with colors of Bootstrap 4. */
 }
+
 
 /* Welcoming tour */
 
@@ -232,6 +167,7 @@ duet-date-picker.is-invalid ~ .invalid-feedback {
     height: 10px;
 }
 
+
 /* Missing Boostrap utilities
 --------------------------------------------------------------------------- */
 
@@ -242,24 +178,19 @@ duet-date-picker.is-invalid ~ .invalid-feedback {
         bottom: 0;
         z-index: 1030;
     }
-
     /* Set width depending on a breaking point. */
     .w-sm-25 {
         width: 25% !important;
     }
-
     .w-sm-33 {
         width: 33% !important;
     }
-
     .w-sm-50 {
         width: 50% !important;
     }
-
     .w-sm-75 {
         width: 75% !important;
     }
-
     /* Reset width */
     /* To be used with, for example, w-100 to have a with: 100%; only on mobile. */
     .w-sm-auto {
@@ -272,13 +203,15 @@ a.disabled {
     color: #495057;
 }
 
-a.disabled button, button.disabled {
+a.disabled button,
+button.disabled {
     cursor: not-allowed !important;
     color: var(--grey);
     border-color: var(--grey);
 }
 
-a.disabled button:hover, button.disabled:hover {
+a.disabled button:hover,
+button.disabled:hover {
     background-color: transparent;
     color: inherit;
     border-color: inherit;
@@ -288,23 +221,29 @@ a.disabled button:hover, button.disabled:hover {
     border-style: dashed !important;
 }
 
+
 /* Overrides opacity for disabled button (search cities) */
+
 .js-search-button {
     opacity: 100% !important;
 }
 
+
 /* Browser-specific issues
 --------------------------------------------------------------------------- */
+
+
 /* Firefox applies `:-moz-ui-invalid` as soon as it considers
 an input field being invalid, generating an uncontrolled red box-shadow. */
 
 .home-search :not(output):-moz-ui-invalid:not(:focus) {
-  box-shadow: none;
+    box-shadow: none;
 }
 
 .home-search :not(output):-moz-ui-invalid:-moz-focusring:not(:focus) {
-  box-shadow: none;
+    box-shadow: none;
 }
+
 
 /* Old browsers.
 --------------------------------------------------------------------------- */
@@ -313,18 +252,28 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     display: none;
 }
 
+
 /* Target only IE 11. */
+
+
 /* https://stackoverflow.com/a/27315792 */
-_:-ms-fullscreen, :root .alert-old-browser {
+
+_:-ms-fullscreen,
+ :root .alert-old-browser {
     display: block;
 }
 
+
 /* JavaScript disabled
 ---------------------------------------------------------------------------- */
+
+
 /* Element is shown with JavaScript. See static > js > utils.js */
+
 .js-display-if-javascript-enabled {
     display: none;
 }
+
 
 /* Horizontal line with words in the middle.
 https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-with-words-in-the-middle/44647131#44647131
@@ -334,18 +283,23 @@ https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-
     display: flex;
     flex-direction: row;
 }
-.lines-on-sides:before, .lines-on-sides:after{
+
+.lines-on-sides:before,
+.lines-on-sides:after {
     content: "";
     flex: 1 1;
     border-bottom: 1px solid inherit;
     margin: auto;
 }
+
 .lines-on-sides:before {
     margin-right: 10px
 }
+
 .lines-on-sides:after {
     margin-left: 10px
 }
+
 
 /* Main nav (Boostrap override).
 --------------------------------------------------------------------------- */
@@ -358,6 +312,7 @@ https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-
     background: #e2f2ff;
 }
 
+
 /* Responsive Multi-Step Progress Bar.
 https://codepen.io/athimannil/pen/wWPYkQ
 
@@ -369,11 +324,13 @@ Usage:
     </ul>
 --------------------------------------------------------------------------- */
 
-.multi-steps > li.is-active:before, .multi-steps > li.is-active ~ li:before {
+.multi-steps>li.is-active:before,
+.multi-steps>li.is-active~li:before {
     content: counter(stepNum);
 }
 
-.multi-steps > li.is-active:after, .multi-steps > li.is-active ~ li:after {
+.multi-steps>li.is-active:after,
+.multi-steps>li.is-active~li:after {
     background-color: #ededed;
 }
 
@@ -383,7 +340,7 @@ Usage:
     width: 100%;
 }
 
-.multi-steps > li {
+.multi-steps>li {
     counter-increment: stepNum;
     text-align: center;
     display: table-cell;
@@ -392,8 +349,9 @@ Usage:
     z-index: 1;
 }
 
-.multi-steps > li:before {
-    content: '\2713'; /* Check mark symbol. */
+.multi-steps>li:before {
+    content: '\2713';
+    /* Check mark symbol. */
     display: block;
     margin: 0 auto 4px;
     background: #fff;
@@ -406,7 +364,7 @@ Usage:
     border-radius: 50%;
 }
 
-.multi-steps > li:after {
+.multi-steps>li:after {
     content: '';
     height: 2px;
     width: 100%;
@@ -417,28 +375,31 @@ Usage:
     z-index: -1;
 }
 
-.multi-steps > li:last-child:after {
+.multi-steps>li:last-child:after {
     display: none;
 }
 
-.multi-steps > li.is-active:before {
+.multi-steps>li.is-active:before {
     background-color: #fff;
     border-color: #28a745;
 }
 
-.multi-steps > li.is-active ~ li {
+.multi-steps>li.is-active~li {
     color: #808080;
 }
 
-.multi-steps > li.is-active ~ li:before {
+.multi-steps>li.is-active~li:before {
     background-color: #ededed;
     border-color: #ededed;
 }
 
+
 /* Dropzone component used to upload files to an S3 bucket
 --------------------------------------------------------------------------- */
 
+
 /* By default, an error message is displayed only on hover */
+
 .dropzone .dz-preview.dz-error .dz-error-message {
     opacity: 1;
     pointer-events: auto;
@@ -457,6 +418,7 @@ Usage:
     bottom: -5px !important;
     top: auto !important;
 }
+
 
 /* To move in theme */
 
@@ -483,17 +445,17 @@ Usage:
 }
 
 .itou-france-connect {
-  display: inline-block;
-  height: 52px !important;
-  width: 186px;
-  margin: auto;
-  margin-bottom: 8px;
-  background-image: url(../img/france-connect-white.svg);
-  background-repeat: no-repeat;
-  background-size: cover;
-  cursor: pointer;
+    display: inline-block;
+    height: 52px !important;
+    width: 186px;
+    margin: auto;
+    margin-bottom: 8px;
+    background-image: url(../img/france-connect-white.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    cursor: pointer;
 }
 
 .itou-france-connect:hover {
-  background-image: url(../img/france-connect-hover.svg);
+    background-image: url(../img/france-connect-hover.svg);
 }
