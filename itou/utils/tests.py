@@ -332,9 +332,9 @@ class UtilsValidatorsTest(TestCase):
         # Valid number
         validate_nir("141068078200557")
         # Corse-du-Sud in lower case.
-        validate_nir("141062a78200557")
+        validate_nir("141062a78200555")
         # Haute-Corse
-        validate_nir("141062B78200557")
+        validate_nir("141062B78200582")
         self.assertRaises(ValidationError, validate_nir, "123456789")
         self.assertRaises(ValidationError, validate_nir, "141068078200557123")
         # Should start with 1 or 2.

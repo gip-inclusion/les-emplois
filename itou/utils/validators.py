@@ -47,6 +47,8 @@ def validate_pole_emploi_id(pole_emploi_id):
 def validate_nir(nir):
     # http://nourtier.net/cle_NIR/cle_NIR.htm
     nir = str(nir).upper()
+    # Replace 2A and 2B by 19 and 18 to handle digits.
+    nir = nir.replace("2A", "19").replace("2B", "18")
     if len(nir) > 15:
         raise ValidationError("Le numéro de sécurité sociale est trop long (15 caractères autorisés).")
     if len(nir) < 15:
@@ -59,8 +61,6 @@ def validate_nir(nir):
 
     # Last 2 digits validate previous 13 characters.
     control_key = int(nir[-2:])
-    # Replace 2A and 2B by 19 and 18 to compute the control key.
-    nir.replace("2A", "19").replace("2B", "18")
     if control_key != (97 - int(nir[:13]) % 97):
         raise ValidationError("Ce numéro n'est pas valide.")
 
