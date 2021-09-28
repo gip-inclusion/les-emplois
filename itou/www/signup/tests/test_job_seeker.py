@@ -35,7 +35,7 @@ class JobSeekerSignupTest(TestCase):
         self.assertFormError(response, "form", "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
 
         # Check if one of eligibility criterion is checked.
-        next_url = reverse("signup:job_seeker")
+        next_url = reverse("signup:job_seeker_nir")
         for choice in JobSeekerSituationForm.ELIGIBLE_SITUATION:
             post_data = {"situation": [choice]}
             response = self.client.post(url, data=post_data)
@@ -65,8 +65,57 @@ class JobSeekerSignupTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_job_seeker_nir(self):
+        nir = "141068078200557"
+
+        # Get the NIR.
+        # It will be saved in the next view.
+        url = reverse("signup:job_seeker_nir")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {"nir": nir}
+        response = self.client.post(url, post_data)
+        self.assertRedirects(response, reverse("signup:job_seeker"))
+        self.assertIn(settings.ITOU_SESSION_SIGNED_NIR_KEY, list(self.client.session.keys()))
+        self.assertTrue(self.client.session.get(settings.ITOU_SESSION_SIGNED_NIR_KEY))
+
+        # NIR is stored with user information.
+        url = reverse("signup:job_seeker")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        address_line_1 = "Test adresse"
+        address_line_2 = "Test adresse complémentaire"
+        city = City.objects.first()
+        post_code = city.post_codes[0]
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@siae.com",
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
+            "address_line_1": address_line_1,
+            "address_line_2": address_line_2,
+            "post_code": post_code,
+            "city_name": city.name,
+            "city": city.slug,
+        }
+
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        job_seeker = User.objects.get(email=post_data["email"])
+        self.assertEqual(nir, job_seeker.nir)
+
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
+        # NIR is set on a previous step and tested separately.
+        # See self.test_job_seeker_nir
+        nir = "141068078200557"
+        self.client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
 
         url = reverse("signup:job_seeker")
         response = self.client.get(url)

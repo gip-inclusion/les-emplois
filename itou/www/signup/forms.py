@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from django.core.signing import Signer
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 
@@ -15,7 +16,7 @@ from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.validators import validate_code_safir, validate_siren, validate_siret
+from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
 
 
 BLANK_CHOICE = (("", "---------"),)
@@ -34,6 +35,16 @@ class FullnameFormMixin(forms.Form):
         max_length=User._meta.get_field("last_name").max_length,
         required=True,
         strip=True,
+    )
+
+
+class JobSeekerNirForm(forms.Form):
+    nir = forms.CharField(
+        label="Numéro de sécurité sociale",
+        max_length=15,
+        required=True,
+        strip=True,
+        validators=[validate_nir],
     )
 
 
@@ -76,13 +87,21 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         # Avoid django-allauth to call its own often failing `generate_unique_username`
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
-        # Create the user.
 
+        # Retrieve NIR from session.
+        signed_nir = request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY]
+        signer = Signer()
+        nir = signer.unsign(signed_nir)
+
+        # Create the user.
         user = super().save(request)
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
+        user.nir = nir
         user.is_job_seeker = True
         user.save()
+
+        del request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY]
 
         return user
 

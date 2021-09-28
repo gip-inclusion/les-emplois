@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
+from django.core.signing import Signer
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -65,6 +66,10 @@ class JobSeekerSignupView(SignupView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
+        # Ensure a NIR is present.
+        if not request.session.get(settings.ITOU_SESSION_SIGNED_NIR_KEY):
+            raise PermissionDenied
+
         return super().post(request, *args, **kwargs)
 
 
@@ -72,7 +77,7 @@ def job_seeker_situation(
     request, template_name="signup/job_seeker_situation.html", redirect_field_name=REDIRECT_FIELD_NAME
 ):
     """
-    Entry point of the signup process for jobseeker.
+    Second step of the signup process for jobseeker.
 
     The user is asked to choose at least one eligibility criterion to continue the signup process.
     """
@@ -84,7 +89,30 @@ def job_seeker_situation(
 
         # If at least one of the eligibility choices is selected, go to the signup form.
         if any(choice in forms.JobSeekerSituationForm.ELIGIBLE_SITUATION for choice in form.cleaned_data["situation"]):
-            next_url = reverse("signup:job_seeker")
+            next_url = reverse("signup:job_seeker_nir")
+
+        # forward next page
+        if redirect_field_name in form.data:
+            next_url = f"{next_url}?{redirect_field_name}={form.data[redirect_field_name]}"
+
+        return HttpResponseRedirect(next_url)
+
+    context = {
+        "form": form,
+        "redirect_field_name": redirect_field_name,
+        "redirect_field_value": get_safe_url(request, redirect_field_name),
+    }
+    return render(request, template_name, context)
+
+
+def job_seeker_nir(request, template_name="signup/job_seeker_nir.html", redirect_field_name=REDIRECT_FIELD_NAME):
+    form = forms.JobSeekerNirForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        signer = Signer()
+        signed_nir = signer.sign(form.cleaned_data["nir"])
+        request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY] = signed_nir
+        next_url = reverse("signup:job_seeker")
 
         # forward next page
         if redirect_field_name in form.data:
