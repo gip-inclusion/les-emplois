@@ -250,7 +250,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
         # Get organizations with members with same SIREN but not the same SIRET
         prescriber_orgs_with_members_same_siren = (
             PrescriberOrganization.objects.prefetch_active_memberships()
-            .filter(siret__startswith=form.cleaned_data["siret"][:9], department=form.cleaned_data["department"])
+            .filter(siret=form.cleaned_data["siret"])
             .exclude(members=None)
             .exclude(pk__in=[p.pk for p in prescriber_orgs_with_members_same_siret])
         )
