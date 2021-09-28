@@ -18,9 +18,9 @@ urlpatterns = [
     ),
     # Prescriber.
     path(
-        "prescriber/is_pole_emploi",
-        views.prescriber_is_pole_emploi,
-        name="prescriber_is_pole_emploi",
+        "prescriber/check_already_exists",
+        views.prescriber_check_already_exists,
+        name="prescriber_check_already_exists",
     ),
     path(
         "prescriber/siren",

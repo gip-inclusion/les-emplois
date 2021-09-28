@@ -196,8 +196,9 @@ def valid_prescriber_signup_session_required(function=None):
     return decorated
 
 
-def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_emploi.html"):
+def prescriber_check_already_exists(request, template_name="signup/prescriber_check_already_exists.html"):
     """
+
     Entry point of the signup process for prescribers/orienteurs.
 
     The signup process consists of several steps during which the user answers
@@ -211,8 +212,8 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
     - added to the members of a new unauthorized organization ("orienteur")
     - without any organization ("orienteur")
 
-    Step 1: as 80% of prescribers on Itou are Pôle emploi members,
-    ask the user if he works for PE.
+    Step 1: makes it possible to avoid duplicates of prescriber's organizations.
+    As 80% of prescribers on Itou are Pôle emploi members, a link is dedicated for users who work for PE.
     """
 
     # Start a fresh session that will be used during the signup process.
@@ -228,16 +229,32 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
         "next": get_safe_url(request, "next"),
     }
 
-    form = forms.PrescriberIsPoleEmploiForm(data=request.POST or None)
+    prescriber_orgs_with_members = None
+
+    form = forms.PrescriberCheckAlreadyExistsForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
-        if form.cleaned_data["is_pole_emploi"]:
-            return HttpResponseRedirect(reverse("signup:prescriber_pole_emploi_safir_code"))
+        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        session_data.update({"siret": form.cleaned_data["siret"]})
+        request.session.modified = True
 
-        return HttpResponseRedirect(reverse("signup:prescriber_siren"))
+        prescriber_orgs_with_members = (
+            PrescriberOrganization.objects.prefetch_active_memberships()
+            .filter(siret__startswith=form.cleaned_data["siret"][:9], department=form.cleaned_data["department"])
+            .exclude(members=None)
+        )
 
-    context = {"form": form}
+        # Redirect to creation steps if no organization with member is found,
+        # else, displays the same form with the list of organizations with first member
+        # to indicate which person to request an invitation from
+        if not prescriber_orgs_with_members:
+            return HttpResponseRedirect(reverse("signup:prescriber_choose_org"))
+
+    context = {
+        "prescriber_orgs_with_members": prescriber_orgs_with_members,
+        "form": form,
+    }
     return render(request, template_name, context)
 
 
@@ -494,7 +511,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
         logger.error(
             "User has reached step3 of the worflow w/o the required information (kind=%s, siren=%s)", kind, siren
         )
-        return HttpResponseRedirect(reverse("signup:prescriber_is_pole_emploi"))
+        return HttpResponseRedirect(reverse("signup:prescriber_check_already_exists"))
 
     form = forms.PrescriberSiretForm(
         kind=session_data["kind"],

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.utils.http import urlsafe_base64_decode
+from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -210,27 +211,15 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
 # ------------------------------------------------------------------------------------------
 
 
-class PrescriberIsPoleEmploiForm(forms.Form):
+class PrescriberCheckAlreadyExistsForm(forms.Form):
 
-    IS_POLE_EMPLOI_CHOICES = (
-        (1, "Oui"),
-        (0, "Non"),
-    )
-
-    is_pole_emploi = forms.TypedChoiceField(
-        label="Travaillez-vous pour Pôle emploi ?",
-        choices=IS_POLE_EMPLOI_CHOICES,
-        widget=forms.RadioSelect,
-        coerce=int,
-    )
-
-
-class PrescriberSirenForm(forms.Form):
-
-    siren = forms.CharField(
-        label="Numéro SIREN de votre organisation",
-        min_length=9,
-        help_text="Le numéro SIREN contient 9 chiffres.",
+    siret = forms.CharField(
+        label="Numéro de SIRET de votre organisation",
+        min_length=14,
+        help_text=mark_safe(
+            "Retrouvez facilement votre numéro SIRET à partir du nom de votre organisation sur le site "
+            '<a href="https://sirene.fr/" rel="noopener" target="_blank">sirene.fr</a>'
+        ),
     )
 
     department = forms.ChoiceField(
@@ -238,11 +227,11 @@ class PrescriberSirenForm(forms.Form):
         choices=DEPARTMENTS.items(),
     )
 
-    def clean_siren(self):
+    def clean_siret(self):
         # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
-        siren = self.cleaned_data["siren"].replace(" ", "")
-        validate_siren(siren)
-        return siren
+        siret = self.cleaned_data["siret"].replace(" ", "")
+        validate_siret(siret)
+        return siret
 
 
 class PrescriberRequestInvitationForm(FullnameFormMixin):
