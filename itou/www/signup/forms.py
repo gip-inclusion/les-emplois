@@ -231,6 +231,40 @@ class PrescriberCheckAlreadyExistsForm(forms.Form):
         # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
         siret = self.cleaned_data["siret"].replace(" ", "")
         validate_siret(siret)
+
+        # Fetch name and address from API entreprise.
+        etablissement, error = etablissement_get_or_error(siret)
+        if error:
+            raise forms.ValidationError(error)
+
+        if etablissement.is_closed:
+            raise forms.ValidationError("La base Sirene indique que l'établissement est fermé.")
+
+        # Perform another API call to fetch geocoding data.
+        address_fields = [
+            etablissement.address_line_1,
+            # `address_line_2` is omitted on purpose because it tends to return no results with the BAN API.
+            etablissement.post_code,
+            etablissement.city,
+            etablissement.department,
+        ]
+        address_on_one_line = ", ".join([field for field in address_fields if field])
+        geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.post_code) or {}
+
+        self.org_data = {
+            "siret": siret,
+            "is_head_office": etablissement.is_head_office,
+            "name": etablissement.name,
+            "address_line_1": etablissement.address_line_1,
+            "address_line_2": etablissement.address_line_2,
+            "post_code": etablissement.post_code,
+            "city": etablissement.city,
+            "department": etablissement.department,
+            "longitude": geocoding_data.get("longitude"),
+            "latitude": geocoding_data.get("latitude"),
+            "geocoding_score": geocoding_data.get("score"),
+        }
+
         return siret
 
 
@@ -287,75 +321,6 @@ class PrescriberConfirmAuthorizationForm(forms.Form):
         widget=forms.RadioSelect,
         coerce=int,
     )
-
-
-class PrescriberSiretForm(forms.Form):
-    """
-    Retrieve info about an organization from a given SIRET.
-    """
-
-    def __init__(self, kind, siren, **kwargs):
-        # We need the kind of the SIAE to check constraint on SIRET number
-        self.kind = kind
-        self.siren = siren
-        self.org_data = None
-        super().__init__(**kwargs)
-
-    # On rendering, the SIREN is displayed just before this input
-    partial_siret = forms.CharField(label="Numéro SIRET de votre organisation", min_length=5, max_length=5)
-
-    def clean_partial_siret(self):
-        siret = self.siren + self.cleaned_data["partial_siret"]
-
-        validate_siret(siret)
-
-        # Does an org with this SIRET already exist?
-        org = PrescriberOrganization.objects.filter(siret=siret, kind=self.kind).first()
-        if org:
-            error = f"« {org.display_name} » utilise déjà ce SIRET."
-            admin = org.get_admins().first()
-            if admin:
-                error += (
-                    f" "
-                    f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
-                    f"{admin.first_name.title()} {admin.last_name[0].upper()}."
-                )
-            raise forms.ValidationError(error)
-
-        # Fetch name and address from API entreprise.
-        etablissement, error = etablissement_get_or_error(siret)
-        if error:
-            raise forms.ValidationError(error)
-
-        if etablissement.is_closed:
-            raise forms.ValidationError("La base Sirene indique que l'établissement est fermé.")
-
-        # Perform another API call to fetch geocoding data.
-        address_fields = [
-            etablissement.address_line_1,
-            # `address_line_2` is omitted on purpose because it tends to return no results with the BAN API.
-            etablissement.post_code,
-            etablissement.city,
-            etablissement.department,
-        ]
-        address_on_one_line = ", ".join([field for field in address_fields if field])
-        geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.post_code) or {}
-
-        self.org_data = {
-            "siret": siret,
-            "is_head_office": etablissement.is_head_office,
-            "name": etablissement.name,
-            "address_line_1": etablissement.address_line_1,
-            "address_line_2": etablissement.address_line_2,
-            "post_code": etablissement.post_code,
-            "city": etablissement.city,
-            "department": etablissement.department,
-            "longitude": geocoding_data.get("longitude"),
-            "latitude": geocoding_data.get("latitude"),
-            "geocoding_score": geocoding_data.get("score"),
-        }
-
-        return siret
 
 
 class PrescriberPoleEmploiSafirCodeForm(forms.Form):
