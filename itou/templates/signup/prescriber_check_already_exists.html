@@ -12,9 +12,9 @@
         <small class="text-muted">Prescripteur/Orienteur</small>
     </h1>
 
-    <h2>
+    <h3>
         Votre organisation est-elle déjà inscrite ?
-    </h2>
+    </h3>
 
     <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour Pôle emploi</a>
 
@@ -25,27 +25,17 @@
         {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
-            {# Change the label of the submit button and the position of the return button if the form is submitted #}
-            {% if prescriber_orgs_with_members %}
             <button type="submit" class="btn btn-primary">Rechercher</button>
-            {% else %}
-            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-                Retour
-            </a>
-            <button type="submit" class="btn btn-primary">Continuer</button>
-            {% endif %}
         {% endbuttons %}
 
     </form>
 
-    {% if prescriber_orgs_with_members %}
+    {% if prescriber_orgs_with_members_same_siret %}
         <div class="mt-5">
-            <h3>Organisations déjà inscrites</h3>
-            <div class="alert alert-secondary" role="info">
-                <i>Par sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</i>
-            </div>
+            <h3>Organisation(s) déjà inscrite(s) avec ce SIRET</h3>
+            <p>Par mesure sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
             <ul>
-                {% for prescriber_org in prescriber_orgs_with_members %}
+                {% for prescriber_org in prescriber_orgs_with_members_same_siret %}
                     <li>
                         <p>
                             <b>{{ prescriber_org.siret|format_siret }}</b> - {{ prescriber_org.kind }}
@@ -66,7 +56,7 @@
                                 <i>
                                     Demandez une invitation à
                                     {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
-                                    afin de rejoindre cette organisation.
+                                    pour rejoindre cette organisation.
                                 </i>
                                 <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
                                     Demander une invitation
@@ -77,23 +67,77 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="alert alert-warning mt-4" role="alert">
+    {% endif %}
+
+    {% if prescriber_orgs_with_members_same_siren %}
+        <div class="mt-5">
+            {% if not prescriber_orgs_with_members_same_siret %}
+            <h3>Organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
+            <p>Par mesure sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
+            {% else %}
+            <h3>Autre(s) organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
+            {% endif %}
+            <ul>
+                {% for prescriber_org in prescriber_orgs_with_members_same_siren %}
+                    <li>
+                        <p>
+                            <b>{{ prescriber_org.siret|format_siret }}</b> - {{ prescriber_org.kind }}
+                            <br>
+                            {{ prescriber_org.display_name }}
+                            <br>
+                            {{ prescriber_org.address_line_1 }},
+                            {% if prescriber_org.address_line_2 %}
+                                <br>
+                                {{ prescriber_org.address_line_2 }},
+                            {% endif %}
+                            <br>
+                            {{ prescriber_org.post_code }} {{ prescriber_org.city }}
+                            <br>
+                            {% with prescriber_org.prescribermembership_set.first as membership %}
+                                {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
+                                {# For security, display only the first char of the last name. #}
+                                <i>
+                                    Demandez une invitation à
+                                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
+                                    pour rejoindre cette organisation.
+                                </i>
+                                <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
+                                    Demander une invitation
+                                </a>
+                            {% endwith %}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if prescriber_orgs_with_members_same_siret or prescriber_orgs_with_members_same_siren %}
+    <div class="mt-5">
+        <h3>Ajouter mon organisation</h3>
+
+        {% if prescriber_orgs_with_members_same_siret %}
+        <div class="alert alert-warning pb-0" role="alert">
             <p>
                 <small>
-                    Si vous ne retrouvez pas votre organisation dans cette liste, vous pouvez la créer.
+                    Attention une ou plusieurs organisations existent déjà avec ce SIRET.
+
+                    Si vous ne retrouvez pas votre organisation dans la liste ci-dessus ou si
+                    vous souhaitez créer un compte avec ce SIRET pour un autre type
+                    d'organisation, vous avez la possibilité de l'inscrire.
                 </small>
-                <a href="{% url 'signup:prescriber_choose_org' %}" class="btn btn-primary mt-3">Ajouter mon organisation</a>
             </p>
         </div>
-    <div class="mt-4">
+        {% else %}
         <p>
-            En cas de problème, contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank">{{ ITOU_ASSISTANCE_URL }} {% include "includes/icon.html" with icon="external-link" %}</a>
+            <small>
+                Si vous ne retrouvez pas votre organisation dans la liste ci-dessus, vous avez la possibilité de l'inscrire.
+            </small>
         </p>
+        {% endif %}
+        <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
+        <a href="{% url 'signup:prescriber_choose_org' %}" class="btn btn-primary mt-3">Inscrire mon organisation</a>
     </div>
-    <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-        Retour
-    </a>
-    {% else %}
     <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
     {% endif %}
 {% endblock %}

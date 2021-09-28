@@ -229,73 +229,44 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
         "next": get_safe_url(request, "next"),
     }
 
-    prescriber_orgs_with_members = None
+    prescriber_orgs_with_members_same_siret = None
+    prescriber_orgs_with_members_same_siren = None
 
     form = forms.PrescriberCheckAlreadyExistsForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        session_data.update({"siret": form.cleaned_data["siret"]})
-        request.session.modified = True
+        # Puts the data from API entreprise and geocoding in session for the last creation step
+        if hasattr(form, "org_data"):
+            session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+            session_data["prescriber_org_data"] = form.org_data
+            request.session.modified = True
 
-        prescriber_orgs_with_members = (
+        # Get organizations with members with precisely the same SIRET
+        prescriber_orgs_with_members_same_siret = (
+            PrescriberOrganization.objects.prefetch_active_memberships()
+            .filter(siret=form.cleaned_data["siret"])
+            .exclude(members=None)
+        )
+
+        # Get organizations with members with same SIREN but not the same SIRET
+        prescriber_orgs_with_members_same_siren = (
             PrescriberOrganization.objects.prefetch_active_memberships()
             .filter(siret__startswith=form.cleaned_data["siret"][:9], department=form.cleaned_data["department"])
             .exclude(members=None)
+            .exclude(pk__in=[p.pk for p in prescriber_orgs_with_members_same_siret])
         )
 
         # Redirect to creation steps if no organization with member is found,
         # else, displays the same form with the list of organizations with first member
         # to indicate which person to request an invitation from
-        if not prescriber_orgs_with_members:
+        if not prescriber_orgs_with_members_same_siret and not prescriber_orgs_with_members_same_siren:
             return HttpResponseRedirect(reverse("signup:prescriber_choose_org"))
 
     context = {
-        "prescriber_orgs_with_members": prescriber_orgs_with_members,
+        "prescriber_orgs_with_members_same_siret": prescriber_orgs_with_members_same_siret,
+        "prescriber_orgs_with_members_same_siren": prescriber_orgs_with_members_same_siren,
         "form": form,
-    }
-    return render(request, template_name, context)
-
-
-# TODO 2021-07-28 GET method with side-effect (session update), to rewrite as:
-# - POST but not a very choice for search view
-# - GET with params w/o session update
-@valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
-    """
-    Try to find a pre-existing prescriber's organization from a given SIREN.
-
-    This step makes it possible to avoid duplicates of prescriber's organizations.
-    """
-
-    prescriber_orgs_with_members = None
-
-    form = forms.PrescriberSirenForm(data=request.GET or None)
-
-    if request.method == "GET" and form.is_valid():
-
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        session_data.update({"siren": form.cleaned_data["siren"]})
-        request.session.modified = True
-
-        prescriber_orgs_with_members = (
-            PrescriberOrganization.objects.prefetch_active_memberships()
-            .filter(siret__startswith=form.cleaned_data["siren"], department=form.cleaned_data["department"])
-            .exclude(members=None)
-        )
-
-        # Redirect to creation steps if no organization with member is found,
-        # else, displays the same form with the list of organizations with first member
-        # to indicate which person to request an invitation from
-        if not prescriber_orgs_with_members:
-            return HttpResponseRedirect(reverse("signup:prescriber_choose_org"))
-
-    context = {
-        "prescriber_orgs_with_members": prescriber_orgs_with_members,
-        "form": form,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
@@ -358,13 +329,13 @@ def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.h
         else:
             # A pre-existing kind of authorized organization was chosen.
             authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
-            next_url = reverse("signup:prescriber_siret")
+            next_url = reverse("signup:prescriber_user")
 
         session_data.update(
             {
                 "authorization_status": authorization_status,
                 "kind": prescriber_kind,
-                "prescriber_org_data": None,
+                # "prescriber_org_data": None,
                 "pole_emploi_org_pk": None,
                 "safir_code": None,
             }
@@ -396,19 +367,18 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
         authorization_status = None
         kind = None
 
+        next_url = reverse("signup:prescriber_user")
         if prescriber_kind == form.KIND_AUTHORIZED_ORG:
             next_url = reverse("signup:prescriber_confirm_authorization")
-
         elif prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
             authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
             kind = PrescriberOrganization.Kind.OTHER.value
-            next_url = reverse("signup:prescriber_siret")
 
         session_data.update(
             {
                 "authorization_status": authorization_status,
                 "kind": kind,
-                "prescriber_org_data": None,
+                # "prescriber_org_data": None,
                 "pole_emploi_org_pk": None,
                 "safir_code": None,
             }
@@ -442,13 +412,13 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
             {
                 "authorization_status": PrescriberOrganization.AuthorizationStatus[authorization_status].value,
                 "kind": PrescriberOrganization.Kind.OTHER.value,
-                "prescriber_org_data": None,
+                # "prescriber_org_data": None,
                 "pole_emploi_org_pk": None,
                 "safir_code": None,
             }
         )
         request.session.modified = True
-        next_url = reverse("signup:prescriber_siret")
+        next_url = reverse("signup:prescriber_user")
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -485,54 +455,6 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
 
     context = {
         "form": form,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
-    }
-    return render(request, template_name, context)
-
-
-@valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
-    """
-    Automatically fetch info about the prescriber's organization from a given SIRET.
-
-    This step is common to users who are members of any type of organization.
-    So `prescriber_org_data` will be the only modified value in the session.
-
-    The SIRET is also the best way we have yet found to avoid duplicate organizations in the DB.
-    """
-
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-    kind = session_data.get("kind")
-    siren = session_data.get("siren")
-
-    if not kind or not siren:
-        # The user didn't use the right workflow
-        logger.error(
-            "User has reached step3 of the worflow w/o the required information (kind=%s, siren=%s)", kind, siren
-        )
-        return HttpResponseRedirect(reverse("signup:prescriber_check_already_exists"))
-
-    form = forms.PrescriberSiretForm(
-        kind=session_data["kind"],
-        siren=siren,
-        data=request.POST or None,
-    )
-
-    # `PrescriberSiretForm` performs several API calls:
-    # - to SIRENE API to validate the SIRET existence and the status of the organization
-    # - get geolocalisation from Adresse API
-    # See PrescriberSiretForm.clean_partial_siret.
-    if request.method == "POST" and form.is_valid():
-
-        session_data["prescriber_org_data"] = form.org_data
-        request.session.modified = True
-        next_url = reverse("signup:prescriber_user")
-        return HttpResponseRedirect(next_url)
-
-    context = {
-        "form": form,
-        "siren": siren,
         "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
