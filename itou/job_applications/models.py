@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, When
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, When
 from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -188,7 +188,7 @@ class JobApplicationQuerySet(models.QuerySet):
         via the employee record app.
 
         These job applications must:
-        - be definitely accepted (hiring can't be cancelled)
+        - be definitely accepted (hiring can't be cancelled after CANCELLATION_DAYS_AFTER_HIRING_STARTED days)
         - have no one-to-one relationship with an employee record
         - have been created after production date
         """
@@ -200,10 +200,10 @@ class JobApplicationQuerySet(models.QuerySet):
             .filter(
                 employee_record__isnull=True,
                 to_siae=siae,
-                # Must be accepted after production date
+                hiring_start_at__lt=cancellation_date,
+                # Must be accepted after production date:
                 updated_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
             )
-            .filter(Q(approval__created_at__lt=cancellation_date) | Q(hiring_start_at__lt=cancellation_date))
             .select_related("job_seeker", "approval")
         )
 
