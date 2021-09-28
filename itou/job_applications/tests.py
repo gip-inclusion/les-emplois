@@ -247,6 +247,7 @@ class JobApplicationQuerySetTest(TestCase):
         job_app = JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
+        # Approval start date is also checked (must be older then CANCELLATION_DAY_AFTER_HIRING STARTED).
         job_app = JobApplicationWithApprovalNotCancellableFactory()
         self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
