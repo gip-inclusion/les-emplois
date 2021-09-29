@@ -91,7 +91,11 @@ class Command(BaseCommand):
 
             # This is known as "Identifiant Pôle emploi".
             ID_REGIONAL_BENE = str(row["ID_REGIONAL_BENE"]).strip()
-            assert len(ID_REGIONAL_BENE) == 8
+            if len(ID_REGIONAL_BENE) < 8:
+                self.logger.debug("-" * 80)
+                self.logger.debug("Bad format for ID_REGIONAL_BENE (PE ID) found, skipping…")
+                self.logger.debug("%s", ID_REGIONAL_BENE)
+                continue
             # Check the format of ID_REGIONAL_BENE.
             # First 7 chars should be digits.
             assert ID_REGIONAL_BENE[:7].isdigit()
