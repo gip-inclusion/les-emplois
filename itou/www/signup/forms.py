@@ -76,6 +76,12 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
+        for password_field in [self.fields["password1"], self.fields["password2"]]:
+            password_field.widget.attrs["placeholder"] = "**********"
+        self.fields["email"].widget.attrs["placeholder"] = "adresse@email.fr"
+        self.fields["email"].label = "Adresse e-mail"
+        self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
+        self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
 
     def clean_email(self):
         email = super().clean_email()

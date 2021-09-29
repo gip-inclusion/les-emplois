@@ -31,15 +31,15 @@ class ItouLoginView(LoginView):
         if isinstance(response, TemplateResponse):
             account_type = params.get("account_type")
             signup_url = reverse(ItouLoginView.ACCOUNT_TYPE_TO_SIGNUP_URL.get(account_type, "account_signup"))
-            show_peamu = account_type == "job_seeker"
-            show_france_connect = settings.FRANCE_CONNECT_ENABLED and account_type == "job_seeker"
+            show_sign_in_providers = account_type == "job_seeker"
+            show_france_connect = settings.FRANCE_CONNECT_ENABLED
             signup_allowed = account_type != "institution"
             redirect_field_value = get_safe_url(self.request, REDIRECT_FIELD_NAME)
 
             context = {
                 "account_type": account_type,
                 "signup_url": signup_url,
-                "show_peamu": show_peamu,
+                "show_sign_in_providers": show_sign_in_providers,
                 "show_france_connect": show_france_connect,
                 "redirect_field_name": REDIRECT_FIELD_NAME,
                 "redirect_field_value": redirect_field_value,
