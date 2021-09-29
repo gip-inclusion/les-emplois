@@ -90,7 +90,7 @@ class Command(BaseCommand):
             assert len(CODE_STRUCT_AFFECT_BENE) in [4, 5]
 
             # This is known as "Identifiant Pôle emploi".
-            ID_REGIONAL_BENE = row["ID_REGIONAL_BENE"].strip()
+            ID_REGIONAL_BENE = str(row["ID_REGIONAL_BENE"]).strip()
             assert len(ID_REGIONAL_BENE) == 8
             # Check the format of ID_REGIONAL_BENE.
             # First 7 chars should be digits.
