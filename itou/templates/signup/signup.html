@@ -5,35 +5,41 @@
 
 
 {% block content %}
-    <div class="card-deck my-5 justify-content-between text-center">
-        <div class="card p-4" style="flex: 0 0 23%;">
+    <div class="card-deck card-deck-itou">
+        <div class="card">
             <div class="card-body">
-                <h5 class="card-title font-weight-light mb-4">
+                <h5 class="card-title font-weight-light">
                     <span class="d-block">Vous êtes un employeur solidaire</span>
                     <span class="d-block">(SIAE, GEIQ, EA, ...)</span>
                 </h5>
+            </div>
+            <div class="card-footer">
                 <a class="btn btn-primary" href="{% url 'signup:siae_select' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                     Créer un compte
                 </a>
             </div>
         </div>
 
-        <div class="card p-4" style="flex: 0 0 23%;">
+        <div class="card">
             <div class="card-body">
-                <h5 class="card-title font-weight-light mb-4">
+                <h5 class="card-title font-weight-light">
                     Vous êtes prescripteur ou orienteur
                 </h5>
+            </div>
+            <div class="card-footer">
                 <a class="btn btn-primary" href="{% url 'signup:prescriber_is_pole_emploi' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                     Créer un compte
                 </a>
             </div>
         </div>
 
-        <div class="card p-4" style="flex: 0 0 23%;">
+        <div class="card">
             <div class="card-body">
-                <h5 class="card-title font-weight-light mb-4">
+                <h5 class="card-title font-weight-light">
                     Vous êtes en recherche d'un emploi et souhaitez postuler
                 </h5>
+            </div>
+            <div class="card-footer">
                 <a class="btn btn-primary" href="{% url 'signup:job_seeker_situation' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                     Créer un compte
                 </a>
