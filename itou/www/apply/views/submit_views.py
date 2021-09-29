@@ -20,7 +20,13 @@ from itou.users.models import User
 from itou.utils.perms.user import get_user_info
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
-from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
+from itou.www.apply.forms import (
+    CheckJobSeekerInfoForm,
+    CheckJobSeekerNirForm,
+    CreateJobSeekerForm,
+    SubmitJobApplicationForm,
+    UserExistsForm,
+)
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
@@ -128,7 +134,7 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
     Determine the job seeker, in the cases where the application is sent by a proxy.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
+    next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae_pk})
 
     # The user submit an application for himself.
     if request.user.is_job_seeker:
@@ -176,6 +182,30 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
             return HttpResponseRedirect(f"{next_url}?{args}")
 
     context = {"job_seeker_name": job_seeker_name, "form": form, "preview_mode": preview_mode, "siae": siae}
+    return render(request, template_name, context)
+
+
+@login_required
+@valid_session_required
+def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step_check_job_seeker_nir.html"):
+    """
+    Ensure the job seeker has a NIR.
+    """
+    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
+
+    if job_seeker.nir:
+        return HttpResponseRedirect(next_url)
+
+    form = CheckJobSeekerNirForm(instance=job_seeker, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return HttpResponseRedirect(next_url)
+
+    context = {"form": form, "job_seeker": job_seeker, "siae": siae}
     return render(request, template_name, context)
 
 

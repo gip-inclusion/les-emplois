@@ -29,7 +29,7 @@ class ApplyAsJobSeekerTest(TestCase):
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        user = JobSeekerFactory(birthdate=None)
+        user = JobSeekerFactory(birthdate=None, nir="")
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
         # Entry point.
@@ -98,6 +98,23 @@ class ApplyAsJobSeekerTest(TestCase):
             "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
+
+        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        # Step check job seeker NIR.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {"nir": "141068078200557"}
+
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = User.objects.get(pk=user.pk)
+        self.assertEqual(user.nir, post_data["nir"])
 
         next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)

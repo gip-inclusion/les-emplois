@@ -42,6 +42,22 @@ class UserExistsForm(forms.Form):
         return self.user
 
 
+class CheckJobSeekerNirForm(forms.ModelForm):
+    nir = forms.CharField(
+        label="Numéro de sécurité sociale",
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "1 23 45 67 890 123 45",
+            }
+        ),
+    )
+
+    class Meta:
+        model = User
+        fields = ["nir"]
+
+
 class CheckJobSeekerInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
