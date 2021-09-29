@@ -28,6 +28,7 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="shortcut icon" href="{% static_theme_images "favico.ico" %}" type="image/ico">
     {% import_static_CSS_theme_inclusion %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.css" integrity="sha256-NRYg+xSNb5bHzrFEddJ0wL3YDp6YNt2dGNI+T5rOb2c=" crossorigin="anonymous" type="text/css">
     <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
     {% block extra_head %}{% endblock %}
 </head>
@@ -61,6 +62,7 @@
     {% include "layout/_footer.html" %}
 
     {% import_static_JS_theme_inclusion %}
+    <script src="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
     <script>
 
         // Tarteaucitron's language is set according to the browser configuration

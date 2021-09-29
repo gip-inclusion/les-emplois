@@ -6,17 +6,18 @@ from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 
 
+"""
+This template tags has for objectif to mutualise all the dependecies and specifics component from the itou theme
+
+To use it, you need to copy (if it's not already done) the folder `dist` of https://github.com/betagouv/itou-theme
+And you need to paste it into the folder `itou/static/vendor/theme-inclusion` 
+"""
+
 register = template.Library()
 
 URL_THEME = "vendor/theme-inclusion/"
 
 CSS_DEPENDENCIES_THEME = [
-    {
-        # for knwo it's dependecies only for c1
-        "is_external": True,
-        "src": "https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.css",
-        "integrity": "sha256-NRYg+xSNb5bHzrFEddJ0wL3YDp6YNt2dGNI+T5rOb2c=",
-    },
     {
         "is_external": False,
         "src": "stylesheets/app.css",
@@ -30,12 +31,6 @@ JS_DEPENDENCIES_THEME = [
         # "src": "https://code.jquery.com/jquery-3.5.1.slim.min.js", => could'nt work for us (C1)
         "src": "https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js",
         "integrity": "sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=",
-    },
-    {
-        # for knwo it's dependecies only for c1
-        "is_external": True,
-        "src": "https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.js",
-        "integrity": "sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=",
     },
     {
         "is_external": True,
