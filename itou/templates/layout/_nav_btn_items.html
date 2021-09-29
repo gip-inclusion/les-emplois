@@ -1,6 +1,5 @@
 {% if user.is_authenticated %}
-    <li>
-        <div class="dropdown mr-2">
+    <li class="dropdown mr-2">
             <button
                 type="button"
                 class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle"
@@ -50,10 +49,10 @@
                     Déconnexion
                 </a>
             </div>
-        </div>
+        </li>
 
     {% if user.is_siae_staff and user_siaes|length > 1 %}
-        <li>
+        <li  class="dropdown">
             <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                 Changer de structure
             </button>
@@ -74,7 +73,7 @@
     {% endif %}
 
     {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
-        <li>
+        <li  class="dropdown">
             <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                 Changer de structure
             </button>
@@ -95,7 +94,7 @@
     {% endif %}
 
     {% if user.is_labor_inspector and user_institutions|length > 1 %}
-        <li>
+        <li class="dropdown">
             <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                 Changer de structure
             </button>
@@ -118,7 +117,7 @@
 </li>
 
 {% else %}
-    <li>
+    <li class="dropdown">
         <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             S'inscrire | Se connecter
         </button>
