@@ -1,14 +1,12 @@
 {% load static %}
 
-<p class="text-right small font-italic mb-0">
-    <a href="#" data-toggle="modal" data-target="#no-email-modal">
-        {% if link_text %}
-            {{ link_text }}
-        {% else %}
-            Pas d'adresse e-mail ?
-        {% endif %}
-    </a>
-</p>
+<a href="#" data-toggle="modal" data-target="#no-email-modal">
+    {% if link_text %}
+        {{ link_text }}
+    {% else %}
+        Pas d'adresse e-mail ?
+    {% endif %}
+</a>
 
 <div
     class="modal fade text-left"
@@ -36,6 +34,7 @@
                             <p>Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net.</p>
                             <p>Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici.</p>
                             <a
+                                aria-label="Ouverture dans un nouvel onglet"
                                 href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI"
                                 class="btn btn-primary matomo-event"
                                 data-matomo-category="inscription-candidat"
@@ -43,7 +42,7 @@
                                 data-matomo-option="je-n-ai-pas-d-adresse-email"
                                 rel="noopener"
                                 target="_blank">
-                                Créer une adresse e-mail
+                                Créer une adresse e-mail {% include "includes/icon.html" with icon="external-link" %}
                             </a>
                         </div>
                     </div>

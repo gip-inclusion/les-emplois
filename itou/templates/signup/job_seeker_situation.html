@@ -1,27 +1,39 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/base.html" %}
 {% load bootstrap4 %}
 {% load static %}
 
 {% block title %}Demandeur d'emploi - Inscription{{ block.super }}{% endblock %}
 
-{% block content %}
-    <h1>
-        Inscription
-        <small class="text-muted">Candidat</small>
-    </h1>
-    <form method="post" action="{% url 'signup:job_seeker_situation' %}" role="form" class="js-prevent-multiple-submit">
+{% block content_full_viewport %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm order-sm-12 mt-5">
+            <!-- TODO: show steps as in Prescriber signup path? -->
+            <h1>
+                Inscription <span class="text-muted">candidat</span>
+            </h1>
+            <form method="post" action="{% url 'signup:job_seeker_situation' %}" role="form" class="js-prevent-multiple-submit">
 
-        {% csrf_token %}
-        
-        {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-        {% endif %}
+                {% csrf_token %}
 
-        {% bootstrap_form form alert_error_type="all" %}
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                {% endif %}
 
-        {% buttons %}
-            <button type="submit" class="btn btn-primary">Continuer</button>
-        {% endbuttons %}
+                {% bootstrap_form form alert_error_type="all" %}
 
-    </form>
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary">Continuer</button>
+                {% endbuttons %}
+
+            </form>
+        </div>
+        <div class="col-sm order-sm-1 bg-emploi-lightest">
+            <div class="my-5 text-center">
+                <h2 class="ff-extra-01">Votre éligibilité à l'IAE dépend de votre situation</h2>
+                <img class="mt-5" src="{% static 'img/job_seeker_signup_situation.svg' %}">
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
