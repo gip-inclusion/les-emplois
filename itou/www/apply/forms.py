@@ -151,7 +151,7 @@ class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):
                 }
             ),
         }
-        labels = {"selected_jobs": "Métiers recherchés (optionnel)"}
+        labels = {"selected_jobs": "Métiers recherchés (ne rien cocher pour une candidature spontanée)"}
 
 
 class RefusalForm(forms.Form):
