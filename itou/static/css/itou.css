@@ -79,15 +79,28 @@ h1 {
 }
 
 
-/* 
-.layout-content {
-    padding: 1rem 1rem 2rem 1rem;
+/* Cards.
+--------------------------------------------------------------------------- */
+
+.card-deck-itou {
+    text-align: center;
+    justify-content: space-between;
 }
 
-.layout-content>.content-small {
-    margin: 0 auto;
-    max-width: 600px;
-} */
+.card-deck-itou>.card {
+    flex: 0 0 26%;
+    padding: 1.5rem;
+}
+
+.card-deck-itou>.card>.card-body {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.card-deck-itou>.card>.card-footer {
+    background: transparent;
+}
 
 
 /* Messages. */
