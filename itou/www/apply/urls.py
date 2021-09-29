@@ -12,6 +12,11 @@ urlpatterns = [
     path("<int:siae_pk>/step_sender", submit_views.step_sender, name="step_sender"),
     path("<int:siae_pk>/step_job_seeker", submit_views.step_job_seeker, name="step_job_seeker"),
     path(
+        "<int:siae_pk>/step_check_job_seeker_nir",
+        submit_views.step_check_job_seeker_nir,
+        name="step_check_job_seeker_nir",
+    ),
+    path(
         "<int:siae_pk>/step_check_job_seeker_info",
         submit_views.step_check_job_seeker_info,
         name="step_check_job_seeker_info",

@@ -1,0 +1,79 @@
+{# django-allauth template override. #}
+{% extends "layout/base.html" %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block title %}Postuler{{ block.super }}{% endblock %}
+
+{% block content_full_viewport %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm order-sm-12 mt-5">
+            <!-- SAME AS submit_base.html -->
+            <!-- Not possible to extend from it as we need a full layout (layout/base.html) -->
+            <!-- instead of the tiny layout/content_small.html -->
+            <h1>
+                {% if request.user.is_siae_staff %}
+                    <span class="text-muted">{{ siae.display_name }} </span>
+                    <span class="badge badge-primary">{{ siae.kind }}</span>
+                {% else %}
+                    Postuler
+                    {% if request.user.is_prescriber %}pour <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>{% endif %}
+                    chez <span class="text-muted">{{ siae.display_name }}</span>
+                {% endif %}
+            </h1>
+            {% if request.user.is_siae_staff and job_seeker %}
+                <h2>{{ job_seeker.get_full_name|title }}</h2>
+            {% endif %}
+
+            {% if approvals_wrapper.latest_approval %}
+                {# Approval status. #}
+                <div class="card my-3">
+                    <div class="card-body">
+                        <div class="card-text">
+                            {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <!-- End of duplicated code. -->
+
+            <form method="post" action="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="js-prevent-multiple-submit">
+
+                {% csrf_token %}
+
+                {% bootstrap_form_errors form type="all" %}
+
+                {% bootstrap_form form %}
+                <!-- TODO: automatically slice NIR numbers -->
+
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                {% endif %}
+
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary">Suivant</button>
+                {% endbuttons %}
+
+            </form>
+            <p class="mt-5">
+                {% if request.user.is_job_seeker %}
+                    Vous n'avez pas de numéro de sécurité sociale ?<br>
+                {% else %}
+                    Le candidat n'a pas de numéro de sécurité sociale ?<br>
+                {% endif %}
+                <a href="https://www.ameli.fr/vosges/assure/remboursements/etre-bien-rembourse/carte-vitale    " rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">ameli.fr {% include "includes/icon.html" with icon="external-link" %}</a>, le site de l'assurance maladie, vous explique comment l'obtenir.
+            </p>
+        </div>
+
+        <div class="col-sm order-sm-1 bg-emploi-lightest">
+            <div class="my-5 text-center">
+                <h2 class="ff-extra-01">Où trouver mon numéro de sécurité sociale ?</h2>
+                <img class="mt-5" src="{% static 'img/carte_vitale.png' %}">
+                <p class="ff-extra-01 mt-0">Il est présent à cet endroit sur {% if request.user.is_job_seeker %}votre{% else %}la{% endif %} carte Vitale.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
