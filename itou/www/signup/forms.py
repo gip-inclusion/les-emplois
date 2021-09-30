@@ -41,10 +41,15 @@ class FullnameFormMixin(forms.Form):
 class JobSeekerNirForm(forms.Form):
     nir = forms.CharField(
         label="Numéro de sécurité sociale",
-        max_length=15,
         required=True,
+        max_length=21,  # 15 + 6 white spaces
         strip=True,
         validators=[validate_nir],
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "2 69 05 49 588 157 80",
+            }
+        ),
     )
 
 

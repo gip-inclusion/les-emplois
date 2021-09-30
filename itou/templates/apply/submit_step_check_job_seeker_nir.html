@@ -38,7 +38,7 @@
             {% endif %}
             <!-- End of duplicated code. -->
 
-            <form method="post" action="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="js-prevent-multiple-submit">
+            <form method="post" action="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="js-prevent-multiple-submit js-format-nir">
 
                 {% csrf_token %}
 
@@ -77,3 +77,7 @@
 </div>
 
 {% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/split_nir.js' %}"></script>
+{% endblock script %}
