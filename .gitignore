@@ -74,6 +74,7 @@ coverage.xml
 .venv
 venv/
 ENV/
+Pipfile*
 
 # Rope project settings
 .ropeproject
