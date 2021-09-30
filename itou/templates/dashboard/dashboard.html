@@ -71,14 +71,17 @@
 
     {# Employee record progressive opening notification #}
     {% if can_show_deployment_message %}
-        <div class="alert alert-info pb-0">
+        <div class="alert alert-danger pb-0">
             <p>
-                Les fonctionnalités de gestion des fiches salarié ASP sont actuellement en cours de déploiement.
+                Suite à la fermeture de la saisie de fiches salarié dans l'Extranet 2.0 de l'ASP à compter du 27 septembre 2021 (saisie manuelle ou inter-opérabilité depuis votre système d'information), 
+                nous vous permettons d'introduire de nouvelles fiches salariés (depuis votre tableau de bord) pour toutes embauches non déclarées dans l'Extranet 2.0 de l'ASP à compter du <b>1er juillet 2021</b>.
             </p>
+
             <p>
-                Dès que ces fonctionnalités seront disponibles pour votre structure, vous pourrez y accéder via un lien
-                dans la section <b>"Mes candidatures"</b> du tableau de bord.
+                Vous pouvez accéder à cette fonctionnalité via le lien <b>"Mes candidatures / Gérer mes fiches salarié"</b> du tableau de bord.
             </p>
+
+
         </div>
     {% endif %}
 
