@@ -202,7 +202,7 @@ class JobApplicationQuerySet(models.QuerySet):
                 to_siae=siae,
                 hiring_start_at__lt=cancellation_date,
                 # Must be accepted after production date:
-                created_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+                updated_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
             )
             .select_related("job_seeker", "approval")
         )
