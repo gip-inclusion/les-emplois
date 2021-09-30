@@ -91,6 +91,7 @@ def start(request, siae_pk):
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
         "back_url": back_url,
         "job_seeker_pk": None,
+        "nir": None,
         "to_siae_pk": siae.pk,
         "sender_pk": None,
         "sender_kind": None,
@@ -123,8 +124,53 @@ def step_sender(request, siae_pk):
 
     request.session.modified = True
 
-    next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
+    next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae_pk})
     return HttpResponseRedirect(next_url)
+
+
+@login_required
+@valid_session_required
+def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step_check_job_seeker_nir.html"):
+    """
+    Ensure the job seeker has a NIR.
+    """
+    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    job_seeker = None
+
+    # The user submits an application for himself.
+    if request.user.is_job_seeker:
+        session_data["job_seeker_pk"] = request.user.pk
+        request.session.modified = True
+        job_seeker = request.user
+        if job_seeker.nir:
+            return HttpResponseRedirect(next_url)
+
+    form = CheckJobSeekerNirForm(job_seeker=job_seeker, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        nir = form.cleaned_data["nir"]
+        job_seeker = form.get_job_seeker()
+
+        if not job_seeker:
+            # Redirect to user creation.
+            # Should we sign it?
+            session_data["nir"] = nir
+            request.session.modified = True
+            next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
+            return HttpResponseRedirect(next_url)
+
+        session_data["job_seeker_pk"] = job_seeker.pk
+        request.session.modified = True
+        # Todo: don(t update if request.user is a prescriber AND job_seeker.nir is not None.
+        # Add it to User.nir_can_be_updated_by
+        job_seeker.nir = nir
+        job_seeker.save()
+        return HttpResponseRedirect(next_url)
+
+    context = {"form": form, "job_seeker": job_seeker, "siae": siae}
+    return render(request, template_name, context)
 
 
 @login_required
@@ -134,12 +180,10 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
     Determine the job seeker, in the cases where the application is sent by a proxy.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae_pk})
+    next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
 
     # The user submit an application for himself.
     if request.user.is_job_seeker:
-        session_data["job_seeker_pk"] = request.user.pk
-        request.session.modified = True
         return HttpResponseRedirect(next_url)
 
     job_seeker_name = None
@@ -187,30 +231,6 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
 
 @login_required
 @valid_session_required
-def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step_check_job_seeker_nir.html"):
-    """
-    Ensure the job seeker has a NIR.
-    """
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
-    next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
-
-    if job_seeker.nir:
-        return HttpResponseRedirect(next_url)
-
-    form = CheckJobSeekerNirForm(instance=job_seeker, data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        return HttpResponseRedirect(next_url)
-
-    context = {"form": form, "job_seeker": job_seeker, "siae": siae}
-    return render(request, template_name, context)
-
-
-@login_required
-@valid_session_required
 def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_step_job_seeker_check_info.html"):
     """
     Ensure the job seeker has all required info.
@@ -248,8 +268,9 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
+    nir = session_data["nir"]
     form = CreateJobSeekerForm(
-        proxy_user=request.user, data=request.POST or None, initial={"email": request.GET.get("email")}
+        proxy_user=request.user, nir=nir, data=request.POST or None, initial={"email": request.GET.get("email")}
     )
 
     if request.method == "POST" and form.is_valid():
