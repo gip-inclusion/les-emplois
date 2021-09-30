@@ -206,7 +206,6 @@ class User(AbstractUser, AddressMixin):
     is_job_seeker = models.BooleanField(verbose_name="Demandeur d'emploi", default=False)
     is_prescriber = models.BooleanField(verbose_name="Prescripteur", default=False)
     is_siae_staff = models.BooleanField(verbose_name="Employeur (SIAE)", default=False)
-    is_stats_vip = models.BooleanField(verbose_name="Pilotage (VIP)", default=False)
     # Members of DDETS, DREETS or DGEFP institution have their own dashboard.
     is_labor_inspector = models.BooleanField(
         verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
@@ -388,8 +387,6 @@ class User(AbstractUser, AddressMixin):
         Hence we take extra precautions to filter out these edge cases to ensure we never ever show sensitive stats to
         a non-CD organization of the `DEPT` kind.
         """
-        if self.is_stats_vip:
-            return True
         return (
             self.is_prescriber
             and current_org is not None
@@ -407,9 +404,6 @@ class User(AbstractUser, AddressMixin):
         """
         if not self.can_view_stats_cd(current_org=current_org):
             raise PermissionDenied
-        if self.is_stats_vip:
-            # VIP users always and only see departement 01, as an example.
-            return "01"
         return current_org.department
 
     def can_view_stats_ddets(self, current_institution):
@@ -417,8 +411,6 @@ class User(AbstractUser, AddressMixin):
         All users of a DDETS can see the confidential DDETS stats of their department only.
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
         """
-        if self.is_stats_vip:
-            return True
         return self.is_labor_inspector and current_institution.kind == current_institution.Kind.DDETS
 
     def get_stats_ddets_department(self, current_institution):
@@ -428,9 +420,6 @@ class User(AbstractUser, AddressMixin):
         """
         if not self.can_view_stats_ddets(current_institution=current_institution):
             raise PermissionDenied
-        if self.is_stats_vip:
-            # VIP users always and only see departement 01, as an example.
-            return "01"
         return current_institution.department
 
     @cached_property

@@ -115,7 +115,6 @@ class KindFilter(admin.SimpleListFilter):
             ("is_job_seeker", "Demandeur d'emploi"),
             ("is_prescriber", "Prescripteur"),
             ("is_siae_staff", "SIAE"),
-            ("is_stats_vip", "Pilotage (VIP)"),
             ("is_labor_inspector", "Inspecteur du travail"),
         )
 
@@ -127,8 +126,6 @@ class KindFilter(admin.SimpleListFilter):
             queryset = queryset.filter(is_prescriber=True)
         elif value == "is_siae_staff":
             queryset = queryset.filter(is_siae_staff=True)
-        elif value == "is_stats_vip":
-            queryset = queryset.filter(is_stats_vip=True)
         elif value == "is_labor_inspector":
             queryset = queryset.filter(is_labor_inspector=True)
         return queryset
@@ -200,7 +197,6 @@ class ItouUserAdmin(UserAdmin):
                     "is_job_seeker",
                     "is_prescriber",
                     "is_siae_staff",
-                    "is_stats_vip",
                     "is_labor_inspector",
                     "pole_emploi_id",
                     "lack_of_pole_emploi_id_reason",

@@ -416,14 +416,6 @@ class ModelTest(TestCase):
         user.emailaddress_set.create(email=user.email, verified=True)
         self.assertTrue(user.has_verified_email)
 
-    def test_vip_user_can_view_all_stats(self):
-        user = UserFactory()
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=None))
-        user = UserFactory(is_stats_vip=True)
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=None))
-        user = UserFactory(is_superuser=True)
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=None))
-
     def test_can_view_stats_cd(self):
         """
         CD as in "Conseil Départemental".
@@ -437,7 +429,6 @@ class ModelTest(TestCase):
         self.assertTrue(user.can_view_stats_cd(current_org=org))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
         self.assertEqual(user.get_stats_cd_department(current_org=org), org.department)
-        self.assertNotEqual(user.get_stats_cd_department(current_org=org), "01")
 
         # Non admin prescriber can access as well.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
@@ -475,13 +466,6 @@ class ModelTest(TestCase):
         self.assertFalse(user.can_view_stats_cd(current_org=org))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
 
-        # VIP user can always access, even without a CD.
-        org = None
-        user = UserFactory(is_stats_vip=True)
-        self.assertTrue(user.can_view_stats_cd(current_org=org))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
-        self.assertEqual(user.get_stats_cd_department(current_org=org), "01")
-
     def test_can_view_stats_ddets(self):
         """
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités"
@@ -492,7 +476,6 @@ class ModelTest(TestCase):
         self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
         self.assertEqual(user.get_stats_ddets_department(current_institution=institution), institution.department)
-        self.assertNotEqual(user.get_stats_ddets_department(current_institution=institution), "01")
 
         # Non admin member of DDETS can access as well.
         institution = InstitutionWithMembershipFactory(
@@ -507,13 +490,6 @@ class ModelTest(TestCase):
         user = institution.members.get()
         self.assertFalse(user.can_view_stats_ddets(current_institution=institution))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
-
-        # VIP user can always access, even without a DDETS.
-        institution = None
-        user = UserFactory(is_stats_vip=True)
-        self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
-        self.assertEqual(user.get_stats_ddets_department(current_institution=institution), "01")
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):
