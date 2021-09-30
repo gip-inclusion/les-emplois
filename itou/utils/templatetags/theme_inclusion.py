@@ -7,10 +7,10 @@ from django.utils.safestring import mark_safe
 
 
 """
-This template tags has for objectif to mutualise all the dependecies and specifics component from the itou theme
+This template tags have for goal to mutualize all the dependencies and specifics component from the itou theme
 
-To use it, you need to copy (if it's not already done) the folder `dist` of https://github.com/betagouv/itou-theme
-And you need to paste it into the folder `itou/static/vendor/theme-inclusion` 
+To use it, you need to copy (if it's not already done) the folder `dist` of https://github.com/betagouv/itou-theme
+And you need to paste it into the folder `itou/static/vendor/theme-inclusion`
 """
 
 register = template.Library()
