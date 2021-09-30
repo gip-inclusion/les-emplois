@@ -66,16 +66,18 @@ select
     mei.mei_nombre_heures as nombre_heures,
     emi.emi_nb_heures_facturees as nombre_heures_facturees,
     s.structure_siret_actualise as siret_structure,
-    s.itou_name as nom_structure,
-    s.itou_post_code as code_postal_structure,
-    s.itou_city as ville_structure,
-    s.itou_department_code as departement_code_structure,
-    s.itou_department as departement_structure,
-    s.itou_region as region_structure,
+    s.structure_denomination as nom_structure,
+    s.structure_adresse_admin_cp  as code_postal_structure,
+    s.structure_adresse_admin_commune as ville_structure,
+    s.code_departement as departement_code_structure,
+    s.nom_departement_structure as departement_structure,
+    s.nom_region_structure as region_structure,
     s.structure_code_naf as code_naf_structure,
-    s.itou_kind as type_structure,
-    s.itou_latitude as latitude_structure,
-    s.itou_longitude as longitude_structure
+    substring(
+        cm.contrat_mesure_disp_code from 1 for char_length(cm.contrat_mesure_disp_code) - 3
+    ) as type_structure,
+    commune_structure.latitude as latitude_structure,
+    commune_structure.longitude as longitude_structure
 from
     /* TODO use lateral joins instead maybe */
     missions m
@@ -85,8 +87,18 @@ from
         on mei.mei_dsm_id = emi.emi_dsm_id
     left outer join "fluxIAE_ContratMission" cm
         on m.mission_id_ctr = cm.contrat_id_ctr
-    left outer join "fluxIAE_Structure" s
+    left outer join "fluxIAE_Structure_v2" s
         on cm.contrat_id_structure = s.structure_id_siae
+     left outer join (
+         select distinct 
+             code_insee,
+             latitude,
+             longitude 
+        from 
+            commune_GPS
+    ) as commune_structure 
+        on trim(cast(s.structure_adresse_admin_code_insee as varchar)) 
+        = trim(cast(commune_structure.code_insee as varchar))
     left outer join "codes_rome" r
         on m.mission_code_rome = r.code_rome
-where m.code_operation in ('AIEHPAD', 'AIPH', 'AIRESTO', 'ETTIRESTO')          
+where m.code_operation in ('AIEHPAD', 'AIPH', 'AIRESTO', 'ETTIRESTO')
