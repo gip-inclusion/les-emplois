@@ -13,6 +13,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import User
+from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -42,12 +43,13 @@ class UserExistsForm(forms.Form):
         return self.user
 
 
-class CheckJobSeekerNirForm(forms.ModelForm):
+class CheckJobSeekerNirForm(forms.Form):
     nir = forms.CharField(
         label="Numéro de sécurité sociale",
         max_length=21,  # 15 + 6 white spaces
-        strip=True,
         required=True,
+        strip=True,
+        validators=[validate_nir],
         widget=forms.TextInput(
             attrs={
                 "placeholder": "2 69 05 49 588 157 80",
@@ -55,9 +57,19 @@ class CheckJobSeekerNirForm(forms.ModelForm):
         ),
     )
 
-    class Meta:
-        model = User
-        fields = ["nir"]
+    def __init__(self, *args, job_seeker=None, **kwargs):
+        self.job_seeker = job_seeker
+        super().__init__(*args, **kwargs)
+
+    def clean_nir(self):
+        nir = self.cleaned_data["nir"]
+        if not self.job_seeker:
+            # For the moment, consider NIR to be unique among users.
+            self.job_seeker = User.objects.filter(nir=nir).first()
+        return nir
+
+    def get_job_seeker(self):
+        return self.job_seeker
 
 
 class CheckJobSeekerInfoForm(forms.ModelForm):
@@ -90,8 +102,9 @@ class CreateJobSeekerForm(MandatoryAddressFormMixin, forms.ModelForm):
         widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com", "readonly": True}),
     )
 
-    def __init__(self, proxy_user, *args, **kwargs):
+    def __init__(self, proxy_user, nir, *args, **kwargs):
         self.proxy_user = proxy_user
+        self.nir = nir
         super().__init__(*args, **kwargs)
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
@@ -136,6 +149,7 @@ class CreateJobSeekerForm(MandatoryAddressFormMixin, forms.ModelForm):
     def save(self, commit=True):
         # Exclude 'city_slug' form field (not mapped to model)
         partial_fields = self.cleaned_data
+        partial_fields["nir"] = self.nir
         del partial_fields["city_slug"]
 
         if commit:
