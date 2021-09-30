@@ -85,9 +85,9 @@ def stats_ddets(request, template_name=_STATS_HTML_TEMPLATE):
     parameters "Département" and "Région" are "Verrouillé".
     """
     current_institution = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_ddets(current_institution=current_institution):
+    if not request.user.can_view_stats_ddets(current_org=current_institution):
         raise PermissionDenied
-    department = request.user.get_stats_ddets_department(current_institution=current_institution)
+    department = request.user.get_stats_ddets_department(current_org=current_institution)
     context = {
         "iframeurl": metabase_embedded_url(settings.DDETS_STATS_DASHBOARD_ID, department=department),
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",

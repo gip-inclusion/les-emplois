@@ -27,6 +27,7 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
+from itou.institutions.models import Institution
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
 
@@ -363,15 +364,13 @@ class User(AbstractUser, AddressMixin):
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
 
-    def can_view_stats_dashboard_widget(self, current_org, current_institution):
+    def can_view_stats_dashboard_widget(self, current_org):
         """
         Whether a stats section should be displayed on the user's dashboard.
 
         It should be displayed if one or more stats sections are available for the user.
         """
-        return self.can_view_stats_cd(current_org=current_org) or self.can_view_stats_ddets(
-            current_institution=current_institution
-        )
+        return self.can_view_stats_cd(current_org=current_org) or self.can_view_stats_ddets(current_org=current_org)
 
     def can_view_stats_cd(self, current_org):
         """
@@ -390,9 +389,10 @@ class User(AbstractUser, AddressMixin):
         return (
             self.is_prescriber
             and current_org is not None
-            and current_org.kind == PrescriberOrganization.Kind.DEPT
+            and isinstance(current_org, PrescriberOrganization)
+            and current_org.kind == current_org.Kind.DEPT
             and current_org.is_authorized
-            and current_org.authorization_status == PrescriberOrganization.AuthorizationStatus.VALIDATED
+            and current_org.authorization_status == current_org.AuthorizationStatus.VALIDATED
             and not current_org.is_brsa
             and current_org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS
         )
@@ -406,21 +406,25 @@ class User(AbstractUser, AddressMixin):
             raise PermissionDenied
         return current_org.department
 
-    def can_view_stats_ddets(self, current_institution):
+    def can_view_stats_ddets(self, current_org):
         """
         All users of a DDETS can see the confidential DDETS stats of their department only.
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
         """
-        return self.is_labor_inspector and current_institution.kind == current_institution.Kind.DDETS
+        return (
+            self.is_labor_inspector
+            and isinstance(current_org, Institution)
+            and current_org.kind == current_org.Kind.DDETS
+        )
 
-    def get_stats_ddets_department(self, current_institution):
+    def get_stats_ddets_department(self, current_org):
         """
         Get department that the user has the permission to see for the DDETS stats page.
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
         """
-        if not self.can_view_stats_ddets(current_institution=current_institution):
+        if not self.can_view_stats_ddets(current_org=current_org):
             raise PermissionDenied
-        return current_institution.department
+        return current_org.department
 
     @cached_property
     def last_accepted_job_application(self):

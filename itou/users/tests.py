@@ -427,7 +427,7 @@ class ModelTest(TestCase):
         self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
         self.assertEqual(user.get_stats_cd_department(current_org=org), org.department)
 
         # Non admin prescriber can access as well.
@@ -437,7 +437,7 @@ class ModelTest(TestCase):
         self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Member of CD of not yet allowed department cannot access.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
@@ -446,25 +446,25 @@ class ModelTest(TestCase):
         self.assertFalse(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Non authorized organization does not give access.
         org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Non CD organization does not give access.
         org = AuthorizedPrescriberOrganizationWithMembershipFactory()
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Prescriber without organization cannot access.
         org = None
         user = PrescriberFactory()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org, current_institution=None))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
 
     def test_can_view_stats_ddets(self):
         """
@@ -473,23 +473,23 @@ class ModelTest(TestCase):
         # Admin member of DDETS can access.
         institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DDETS, department="93")
         user = institution.members.get()
-        self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
-        self.assertEqual(user.get_stats_ddets_department(current_institution=institution), institution.department)
+        self.assertTrue(user.can_view_stats_ddets(current_org=institution))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
+        self.assertEqual(user.get_stats_ddets_department(current_org=institution), institution.department)
 
         # Non admin member of DDETS can access as well.
         institution = InstitutionWithMembershipFactory(
             kind=Institution.Kind.DDETS, membership__is_admin=False, department="93"
         )
         user = institution.members.get()
-        self.assertTrue(user.can_view_stats_ddets(current_institution=institution))
-        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+        self.assertTrue(user.can_view_stats_ddets(current_org=institution))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
 
         # Member of institution of another kind cannot access.
         institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DGEFP, department="93")
         user = institution.members.get()
-        self.assertFalse(user.can_view_stats_ddets(current_institution=institution))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None, current_institution=institution))
+        self.assertFalse(user.can_view_stats_ddets(current_org=institution))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=institution))
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):

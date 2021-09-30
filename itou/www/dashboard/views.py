@@ -63,27 +63,24 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "url"
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
+    # `current_org` can be a PrescriberOrganization or an Institution.
     current_org = None
     if request.user.is_prescriber:
         try:
             current_org = get_current_org_or_404(request)
         except Http404:
-            current_org = None
-
-    current_institution = None
+            pass
     if request.user.is_labor_inspector:
-        current_institution = get_current_institution_or_404(request)
+        current_org = get_current_institution_or_404(request)
 
     context = {
         "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
         "job_applications_categories": job_applications_categories,
         "can_show_financial_annexes": can_show_financial_annexes,
         "can_show_employee_records": can_show_employee_records,
-        "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(
-            current_org=current_org, current_institution=current_institution
-        ),
+        "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(current_org=current_org),
         "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
-        "can_view_stats_ddets": request.user.can_view_stats_ddets(current_institution=current_institution),
+        "can_view_stats_ddets": request.user.can_view_stats_ddets(current_org=current_org),
     }
 
     return render(request, template_name, context)
