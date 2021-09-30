@@ -69,7 +69,7 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertContains(response, "en cours de déploiement")
+        self.assertContains(response, "fermeture de la saisie de fiches salarié")
 
     def test_hide_progressive_deployment_message(self):
         # Message hidden if user is logged in with a non-eligible SIAE
@@ -79,7 +79,7 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertNotContains(response, "en cours de déploiement")
+        self.assertNotContains(response, "fermeture de la saisie de fiches salarié")
 
 
 class EditUserInfoViewTest(TestCase):
