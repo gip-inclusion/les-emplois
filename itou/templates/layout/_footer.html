@@ -12,6 +12,51 @@
       <div class="s-prefooter__col col-12 col-sm d-flex align-items-center justify-content-start justify-content-sm-end justify-content-lg-start">
         <p class="mb-0">Le site de la plateforme <br class="d-none d-xl-inline">de l'inclusion dédiée <br class="d-none d-xl-inline">aux emplois</p>
       </div>
+      <div class="s-prefooter__col col-12 col-lg-6 d-flex align-items-center">
+        <ul class="s-prefooter__gridlist">
+          <li>
+              <a href="{% url 'stats:public_basic_stats' %}">Statistiques, lexiques et indicateurs</a>
+          </li>
+          <li>
+              <a href="{% url 'accessibility' %}">Accessibilité (non conforme)</a>
+          </li>
+          {# Use `mb-*` to mark a visual separation between internal and external links. #}
+          <li>
+              <a href="{% url 'releases:list' %}">Journal des modifications</a>
+          </li>
+          {# External links. #}
+          <li>
+              <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
+                  Besoin d'aide ?
+              </a>
+          <li>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
+                  Inscription Newsletter
+              </a>
+          </li>
+          <li>
+              <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
+                  Qui peut bénéficier des contrats d'IAE ?
+              </a>
+          </li>
+          <li>
+              <a href="{{ ITOU_COMMUNITY_URL }}/c/retours-sur-le-site/2" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
+                  Questions à la communauté
+              </a>
+          </li>
+          <li>
+              <a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
+                  Mentions légales
+              </a>
+          </li>
+
+          <li>
+              <a href="https://stats.uptimerobot.com/JYJ6XHq6xY" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
+                  Disponibilité
+              </a>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
