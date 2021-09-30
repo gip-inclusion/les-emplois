@@ -45,10 +45,12 @@ class UserExistsForm(forms.Form):
 class CheckJobSeekerNirForm(forms.ModelForm):
     nir = forms.CharField(
         label="Numéro de sécurité sociale",
+        max_length=21,  # 15 + 6 white spaces
+        strip=True,
         required=True,
         widget=forms.TextInput(
             attrs={
-                "placeholder": "1 23 45 67 890 123 45",
+                "placeholder": "2 69 05 49 588 157 80",
             }
         ),
     )

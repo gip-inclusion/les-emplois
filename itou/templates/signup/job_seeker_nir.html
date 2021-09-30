@@ -11,7 +11,7 @@
         <div class="col-sm order-sm-12 mt-5">
             <!-- TODO: show steps as in Prescriber signup path? -->
             <h1>Inscription <span class="text-muted">candidat</span></h1>
-            <form method="post" action="{% url 'signup:job_seeker_nir' %}" class="js-prevent-multiple-submit">
+            <form method="post" action="{% url 'signup:job_seeker_nir' %}" class="js-prevent-multiple-submit js-format-nir">
 
                 {% csrf_token %}
 
@@ -46,3 +46,7 @@
 </div>
 
 {% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/split_nir.js' %}"></script>
+{% endblock script %}
