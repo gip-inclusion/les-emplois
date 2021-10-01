@@ -76,20 +76,17 @@ class FranceConnectTest(TestCase):
     def test_callback_no_code(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "La requête ne contient pas le paramètre « code ».")
+        self.assertEqual(response.status_code, 302)
 
     def test_callback_no_state(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url, data={"code": "123"})
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Le paramètre « state » n'est pas valide.")
+        self.assertEqual(response.status_code, 302)
 
     def test_callback_invalid_state(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url, data={"code": "123", "state": "000"})
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Le paramètre « state » n'est pas valide.")
+        self.assertEqual(response.status_code, 302)
 
     @respx.mock
     def test_callback(self):
@@ -103,12 +100,11 @@ class FranceConnectTest(TestCase):
         csrf_signed = france_connect_views.state_new()
         url = reverse("france_connect:callback")
         response = self.client.get(url, data={"code": "123", "state": csrf_signed})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["family_name"], "DUBOIS")
+        self.assertEqual(response.status_code, 302)
 
     def test_logout_no_id_token(self):
         url = reverse("france_connect:logout")
-        response = self.client.get(url)
+        response = self.client.get(url + "?")
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "Le paramètre « id_token » est manquant.")
 
@@ -118,4 +114,4 @@ class FranceConnectTest(TestCase):
 
         respx.post(url=settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_LOGOUT).respond(302)
         response = self.client.get(url, data={"id_token": "123"})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)

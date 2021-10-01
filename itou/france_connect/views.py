@@ -4,6 +4,8 @@ from urllib.parse import unquote
 
 import httpx
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import login
 from django.core import signing
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
@@ -82,11 +84,18 @@ def france_connect_authorize(request):
 def france_connect_callback(request):  # pylint: disable=too-many-return-statements
     code = request.GET.get("code")
     if code is None:
-        return JsonResponse({"message": "La requête ne contient pas le paramètre « code »."}, status=400)
+        messages.error(
+            request, "France Connect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
+        )
+        return HttpResponseRedirect(reverse("account_login"))
 
     state = request.GET.get("state")
     if not state_is_valid(state):
-        return JsonResponse({"message": "Le paramètre « state » n'est pas valide."}, status=400)
+        message = (
+            "Le paramètre « state » fourni par France Connect et nécessaire à votre authentification n’est pas valide."
+        )
+        messages.error(request, message)
+        return HttpResponseRedirect(reverse("account_login"))
 
     redirect_uri = get_callback_redirect_uri(request)
 
@@ -105,15 +114,18 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     if response.status_code != 200:
         message = "Impossible d'obtenir le jeton de FranceConnect."
         logger.error("%s : %s", message, response.content)
-        # The response is certainly ignored by FC but it's convenient for our tests
-        return JsonResponse({"message": message}, status=response.status_code)
+        messages.error(request, message)
+        return HttpResponseRedirect(reverse("account_login"))
 
     # Contains access_token, token_type, expires_in, id_token
     token_data = response.json()
 
     access_token = token_data.get("access_token")
     if not access_token:
-        return JsonResponse({"message": "Aucun champ « access_token » dans la réponse FranceConnect."}, status=400)
+        message = "Aucun champ « access_token » dans la réponse FranceConnect, impossible de vous authentifier"
+        messages.error(request, message)
+        logger.error(message)
+        return HttpResponseRedirect(reverse("account_login"))
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
@@ -127,48 +139,48 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     if response.status_code != 200:
         message = "Impossible d'obtenir les informations utilisateur de FranceConnect."
         logger.error(message)
-        return JsonResponse({"message": message}, status=response.status_code)
+        return HttpResponseRedirect(reverse("account_login"))
 
     try:
         user_data = json.loads(response.content.decode("utf-8"))
     except json.decoder.JSONDecodeError:
-        return JsonResponse(
-            {"message": "Impossible de décoder les informations utilisateur."},
-            status=400,
-        )
+        message = "Impossible de décoder les informations utilisateur."
+        logger.error(message)
+        return HttpResponseRedirect(reverse("account_login"))
 
     if "sub" not in user_data:
-        return JsonResponse(
-            {"message": "Le paramètre « sub » n'a pas été retourné par FranceConnect."},
-            status=400,
-        )
+        message = "Le paramètre « sub » n'a pas été retourné par FranceConnect."
+        logger.error(message)
+        return HttpResponseRedirect(reverse("account_login"))
 
     fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+
     # Keep token_data["id_token"] to logout from FC
     # At this step, we can update the user's fields in DB and create a session if required
-    france_connect_models.create_or_update_user(fc_user_data)
+    user, created = france_connect_models.create_or_update_user(fc_user_data)
+    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    request.session["franceconnect_id_token"] = token_data["id_token"]
+    request.session["franceconnect_state"] = state
+    request.session.modified = True
 
-    return JsonResponse(user_data)
+    next_url = reverse("dashboard:index")
+    return HttpResponseRedirect(next_url)
 
 
 def france_connect_logout(request):
     # The user can be authentified on FC w/o a session on itou.
+    # https://partenaires.franceconnect.gouv.fr/fcp/fournisseur-service#sign_out
     id_token = request.GET.get("id_token")
+    state = request.GET.get("state", "")
 
     if not id_token:
         return JsonResponse({"message": "Le paramètre « id_token » est manquant."}, status=400)
 
     params = {
         "id_token_hint": id_token,
-        "state": crypto.get_random_string(length=12),
+        "state": state,
         "post_logout_redirect_uri": get_absolute_url(reverse("home:hp")),
     }
     url = settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_LOGOUT
-    response = httpx.post(url, params=params)
-    if response.status_code != 302:
-        return JsonResponse(
-            {"message": "Impossible de déconnecter l'utilisateur de FranceConnect."},
-            status=400,
-        )
-
-    return JsonResponse({"message": "L'utilisateur a été déconnecté de FranceConnect."})
+    complete_url = f"{url}?{urlencode(params)}"
+    return HttpResponseRedirect(complete_url)
