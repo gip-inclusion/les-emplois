@@ -370,11 +370,16 @@ class User(AbstractUser, AddressMixin):
 
         It should be displayed if one or more stats sections are available for the user.
         """
-        return self.can_view_stats_cd(current_org=current_org) or self.can_view_stats_ddets(current_org=current_org)
+        return (
+            self.can_view_stats_cd(current_org=current_org)
+            or self.can_view_stats_ddets(current_org=current_org)
+            or self.can_view_stats_dreets(current_org=current_org)
+            or self.can_view_stats_dgefp(current_org=current_org)
+        )
 
     def can_view_stats_cd(self, current_org):
         """
-        All users, not just the admins, of a real CD can see the confidential CD stats, and for their department only.
+        Users of a real CD can view the confidential CD stats for their department only.
 
         CD as in "Conseil Départemental".
 
@@ -399,7 +404,7 @@ class User(AbstractUser, AddressMixin):
 
     def get_stats_cd_department(self, current_org):
         """
-        Get department that the user has the permission to see for the CD stats page.
+        Get department that the user has the permission to view for the CD stats page.
         CD as in "Conseil Départemental".
         """
         if not self.can_view_stats_cd(current_org=current_org):
@@ -408,7 +413,7 @@ class User(AbstractUser, AddressMixin):
 
     def can_view_stats_ddets(self, current_org):
         """
-        All users of a DDETS can see the confidential DDETS stats of their department only.
+        Users of a DDETS can view the confidential DDETS stats of their department only.
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
         """
         return (
@@ -420,12 +425,42 @@ class User(AbstractUser, AddressMixin):
 
     def get_stats_ddets_department(self, current_org):
         """
-        Get department that the user has the permission to see for the DDETS stats page.
+        Get department that the user has the permission to view for the DDETS stats page.
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
         """
         if not self.can_view_stats_ddets(current_org=current_org):
             raise PermissionDenied
         return current_org.department
+
+    def can_view_stats_dreets(self, current_org):
+        """
+        Users of a DREETS can view the confidential DREETS stats of their region only.
+        DREETS as in "Directions régionales de l’économie, de l’emploi, du travail et des solidarités".
+        """
+        return (
+            self.is_labor_inspector
+            and isinstance(current_org, Institution)
+            and current_org.kind == current_org.Kind.DREETS
+        )
+
+    def get_stats_dreets_region(self, current_org):
+        """
+        Get region that the user has the permission to view for the DREETS stats page.
+        DREETS as in "Directions régionales de l’économie, de l’emploi, du travail et des solidarités".
+        """
+        if not self.can_view_stats_dreets(current_org=current_org):
+            raise PermissionDenied
+        return current_org.region
+
+    def can_view_stats_dgefp(self, current_org):
+        """
+        Users of the DGEFP institution can view the confidential DGEFP stats for all regions and departments.
+        """
+        return (
+            self.is_labor_inspector
+            and isinstance(current_org, Institution)
+            and current_org.kind == current_org.Kind.DGEFP
+        )
 
     @cached_property
     def last_accepted_job_application(self):

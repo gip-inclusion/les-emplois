@@ -81,6 +81,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(current_org=current_org),
         "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
         "can_view_stats_ddets": request.user.can_view_stats_ddets(current_org=current_org),
+        "can_view_stats_dreets": request.user.can_view_stats_dreets(current_org=current_org),
+        "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
     }
 
     return render(request, template_name, context)

@@ -10,4 +10,6 @@ urlpatterns = [
     path("advanced/", views.public_advanced_stats, name="public_advanced_stats"),
     path("cd/", views.stats_cd, name="stats_cd"),
     path("ddets/", views.stats_ddets, name="stats_ddets"),
+    path("dreets/", views.stats_dreets, name="stats_dreets"),
+    path("dgefp/", views.stats_dgefp, name="stats_dgefp"),
 ]
