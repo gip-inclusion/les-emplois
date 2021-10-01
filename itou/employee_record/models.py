@@ -440,7 +440,11 @@ class EmployeeRecord(models.Model):
 
         prescriber_organization = self.job_application.sender_prescriber_organization
 
-        return PrescriberType.from_itou_prescriber_kind(prescriber_organization.kind).value
+        return (
+            PrescriberType.from_itou_prescriber_kind(prescriber_organization.kind).value
+            if prescriber_organization
+            else None
+        )
 
     @property
     def asp_siae_type(self):
