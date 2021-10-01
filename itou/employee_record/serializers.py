@@ -106,6 +106,12 @@ class _EmployeeAddress(serializers.ModelSerializer):
             "adrCpltDistribution",
         ]
 
+        # Don't send extended address if it must be truncated:
+        # Do not lower quality of data on itou side
+        # Check ASP rule : T030_c026_rg002
+        if len(result.get("adrCpltDistribution", "")) > 32:
+            result["adrCpltDistribution"] = None
+
         # Don't send phone number if not in ASP expected format
         # (we don't want any post-processing or update on this field)
         if result.get("adrTelephone"):
