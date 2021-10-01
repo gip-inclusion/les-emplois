@@ -105,7 +105,7 @@ class ExternalDataImportTest(TestCase):
         # Birthdate is already filled by factory:
         self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
 
-        self.assertEqual(6, len(report.get("fields_updated")))
+        self.assertEqual(6 + 1, len(report.get("fields_updated")))  # all the fields + history
         self.assertEqual(12, len(report.get("fields_fetched")))
 
     @requests_mock.Mocker()
@@ -122,7 +122,7 @@ class ExternalDataImportTest(TestCase):
         self.assertIn(
             f"JobSeekerExternalData/{user.jobseekerexternaldata.pk}/is_pe_jobseeker", report.get("fields_updated")
         )
-        self.assertEqual(5, len(report.get("fields_updated")))
+        self.assertEqual(5 + 1, len(report.get("fields_updated")))  # fields + history
         self.assertEqual(9, len(report.get("fields_fetched")))
         self.assertEqual(2, len(report.get("fields_failed")))
 
@@ -166,7 +166,7 @@ class JobSeekerExternalDataTest(TestCase):
 
         report = result.report
         self.assertIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
-        self.assertEqual(7, len(report.get("fields_updated")))
+        self.assertEqual(7 + 1, len(report.get("fields_updated")))  # fields + history
         self.assertEqual(12, len(report.get("fields_fetched")))
 
         # Just checking birthdate is not overriden
