@@ -472,6 +472,7 @@ class ModelTest(TestCase):
         """
         # Admin member of DDETS can access.
         institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DDETS, department="93")
+        self.assertTrue(institution.department in settings.DDETS_STATS_ALLOWED_DEPARTMENTS)
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_ddets(current_org=institution))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
@@ -481,11 +482,19 @@ class ModelTest(TestCase):
         institution = InstitutionWithMembershipFactory(
             kind=Institution.Kind.DDETS, membership__is_admin=False, department="93"
         )
+        self.assertTrue(institution.department in settings.DDETS_STATS_ALLOWED_DEPARTMENTS)
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_ddets(current_org=institution))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
 
-        # Member of institution of another kind cannot access.
+        # Member of institution of a non allowed department cannot access.
+        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DDETS, department="18")
+        self.assertFalse(institution.department in settings.DDETS_STATS_ALLOWED_DEPARTMENTS)
+        user = institution.members.get()
+        self.assertFalse(user.can_view_stats_ddets(current_org=institution))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=institution))
+
+        # Member of institution of wrong kind cannot access.
         institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DGEFP, department="93")
         user = institution.members.get()
         self.assertFalse(user.can_view_stats_ddets(current_org=institution))

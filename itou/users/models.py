@@ -415,6 +415,7 @@ class User(AbstractUser, AddressMixin):
             self.is_labor_inspector
             and isinstance(current_org, Institution)
             and current_org.kind == current_org.Kind.DDETS
+            and current_org.department in settings.DDETS_STATS_ALLOWED_DEPARTMENTS
         )
 
     def get_stats_ddets_department(self, current_org):
