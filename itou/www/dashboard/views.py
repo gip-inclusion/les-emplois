@@ -17,7 +17,7 @@ from itou.siaes.models import Siae
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.dashboard.forms import EditNewJobAppEmployersNotificationForm, EditUserEmailForm, EditUserInfoForm
 
 
@@ -106,12 +106,26 @@ class ItouLogoutView(LogoutView):
     def post(self, *args, **kwargs):
         """
         We overload this method so that we can process the PEAMU callback
-        when the user logs out.
+        or notify France Connect when the user logs out.
         Original code:
         https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L775
         """
+
         peamu_id_token = self.request.user.peamu_id_token
+        fc_token = self.request.session.get("franceconnect_id_token")
+        fc_state = self.request.session.get("franceconnect_state")
+        # Note: if you need session data, fetch them BEFORE calling super() ;)
         ajax_response = super().post(*args, **kwargs)
+
+        # Logouts user from the app and from France Connect (FC).
+        if fc_token and not settings.ITOU_ENVIRONMENT == "DEV":
+            # In the dev environment, user is not logged out from FC because for some reason
+            # on FC’s end, it throws an error and crash so post-logout
+            # redirection is not performed
+            params = {"id_token": fc_token, "state": fc_state}
+            fc_base_logout_url = get_absolute_url(reverse("france_connect:logout"))
+            fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
+            return HttpResponseRedirect(fc_logout_url)
         if peamu_id_token:
             hp_url = self.request.build_absolute_uri("/")
             params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
