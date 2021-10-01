@@ -3,6 +3,9 @@ import string
 from django.core.exceptions import ValidationError
 
 
+FRANCE_CONNECT_PASSWORD_EXPLANATION = "Attention, ce mot de passe est celui de votre compte local et en aucun cas celui du compte que vous utilisez au travers de FranceConnect. Il vous servira uniquement lorsque vous vous connecterez avec votre adresse mail plutôt que via FranceConnect."  # noqa E501
+
+
 class CnilCompositionPasswordValidator:
     """
     Validate whether the password is conform to CNIL guidelines.

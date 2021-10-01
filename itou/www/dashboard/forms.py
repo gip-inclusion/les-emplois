@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
 from itou.common_apps.address.forms import OptionalAddressFormMixin
 from itou.job_applications.notifications import (
@@ -7,6 +8,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.users.models import User
+from itou.utils.perms.user import is_user_france_connected
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
@@ -19,12 +21,10 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         editor = kwargs.pop("editor")
+        request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
-        # Noboby can edit its own email.
-        # Only prescribers and employers can edit the job seeker's email here under certain conditions
-        if not self.instance.is_job_seeker or not editor.can_edit_email(self.instance):
-            del self.fields["email"]
+        user_france_connected = is_user_france_connected(request)
 
         if not self.instance.is_job_seeker:
             del self.fields["birthdate"]
@@ -39,6 +39,22 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
                     "max": DuetDatePickerWidget.max_birthdate(),
                 }
             )
+
+        if user_france_connected:
+            # When a user is logged-in through France Connect,
+            # it should see the field but most should be disabled
+            # (that’s a requirement on FC’s side)
+            disabled_fields = ["first_name", "last_name", "email", "birthdate"]
+            for field_name in disabled_fields:
+                self.fields[field_name].disabled = True
+
+            edit_email_url = reverse("dashboard:edit_user_email")
+            self.fields["email"].help_text = f'<a href="{edit_email_url}"> Modifier votre adresse email</a>'
+        else:
+            # Noboby can edit its own email.
+            # Only prescribers and employers can edit the job seeker's email here under certain conditions
+            if not self.instance.is_job_seeker or not editor.can_edit_email(self.instance):
+                del self.fields["email"]
 
     class Meta:
         model = User

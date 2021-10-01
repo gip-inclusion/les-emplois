@@ -43,8 +43,8 @@ def load_user_data(user_data: dict) -> dict:
         "first_name": user_data.get("given_name", ""),
         "last_name": user_data.get("family_name", ""),
         "birthdate": datetime.date.fromisoformat(user_data["birthdate"]) if user_data.get("birthdate") else None,
-        "email": user_data.get("email"),
-        "phone": user_data.get("phone_number"),
+        "email": user_data.get("email", ""),
+        "phone": user_data.get("phone_number", ""),
         "address_line_1": "",
         "post_code": "",
         "city": "",
@@ -62,55 +62,50 @@ def load_user_data(user_data: dict) -> dict:
     return user_model_dict
 
 
-def set_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData):
-    # birth_country_id from user_data["birthcountry"]
-    # birth_place_id from user_data["birthplace"]
-    provider_json = {}
+def get_field_provider_info(value, source):
+    """Fills the provider info line"""
     now = timezone.now()
-    provider_info = {"source": "france_connect", "created_at": now}
+    return {"source": source, "created_at": now, "value": value}
+
+
+def create_user_from_fc_user_data(fc_user_data: FranceConnectUserData):
+    user = User(is_job_seeker=True)
     for field in ["username", "first_name", "last_name", "birthdate", "email", "phone"]:
-        setattr(user, field, getattr(fc_user_data, field))
-        provider_json[field] = provider_info
+        value = getattr(fc_user_data, field)
+        if user.update_external_data_source_history_field(settings.PROVIDER_FRANCE_CONNECT, field, value):
+            setattr(user, field, value)
 
     if fc_user_data.country == "France":
         for field in ["address_line_1", "post_code", "city"]:
-            setattr(user, field, getattr(fc_user_data, field))
-            provider_json[field] = provider_info
+            value = getattr(fc_user_data, field)
+            if user.update_external_data_source_history_field(settings.PROVIDER_FRANCE_CONNECT, field, value):
+                setattr(user, field, getattr(fc_user_data, field))
+    return user
 
-    user.provider_json = provider_json
 
-
-def update_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData, provider_json: dict):
-    now = timezone.now()
-
-    # Not very smart
-    def is_fc_source(field):
-        return provider_json.get(field) and provider_json[field]["source"] == "france_connect"
-
-    def update_time(field):
-        provider_json[field]["created_at"] = now
-
+def update_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData):
     for field in dataclasses.fields(fc_user_data):
         if field.name == "country":
             continue
-
-        if is_fc_source(field.name):
+        value = getattr(fc_user_data, field.name)
+        if (
+            user.update_external_data_source_history_field(settings.PROVIDER_FRANCE_CONNECT, field.name, value)
+            or getattr(fc_user_data, field.name) == ""
+        ):
             setattr(user, field.name, getattr(fc_user_data, field.name))
-            update_time(field.name)
 
 
 def create_or_update_user(fc_user_data: FranceConnectUserData):
-    # We can't use a get_or_create here because we have to set provider_json for each field
+    # We can't use a get_or_create here because we have to set the provider data for each field
     try:
         user = User.objects.get(username=fc_user_data.username)
         # Should we update the user fields on user authenticate?
         # In first approach, it safes to update FC fields
-        update_fields_from_user_data(user, fc_user_data, user.provider_json)
+        update_fields_from_user_data(user, fc_user_data)
         created = False
     except User.DoesNotExist:
         # Create a new user
-        user = User()
-        set_fields_from_user_data(user, fc_user_data)
+        user = create_user_from_fc_user_data(fc_user_data)
         created = True
     user.save()
 

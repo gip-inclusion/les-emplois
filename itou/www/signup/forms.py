@@ -13,7 +13,7 @@ from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import get_geocoding_data
-from itou.utils.password_validation import CnilCompositionPasswordValidator
+from itou.utils.password_validation import FRANCE_CONNECT_PASSWORD_EXPLANATION, CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
 
@@ -98,6 +98,9 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         self.fields["email"].label = "Adresse e-mail"
         self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
         self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
+        self.fields["password1"].help_text = (
+            CnilCompositionPasswordValidator().get_help_text() + " " + FRANCE_CONNECT_PASSWORD_EXPLANATION
+        )
 
     def clean_email(self):
         email = super().clean_email()

@@ -55,7 +55,7 @@ class FranceConnectTest(TestCase):
         response = self.client.get(url, follow=False)
         # Don't use assertRedirects to avoid fetch
         self.assertTrue(
-            response.url.startswith(settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_AUTHORIZE)
+            response.url.startswith(settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_AUTHORIZE)
         )
 
     def test_create_user_from_user_data(self):
@@ -65,7 +65,7 @@ class FranceConnectTest(TestCase):
         self.assertTrue(created)
         self.assertEqual(user.last_name, user_data["family_name"])
         self.assertEqual(user.first_name, user_data["given_name"])
-        self.assertEqual(user.provider_json["last_name"]["source"], "france_connect")
+        self.assertEqual(user.external_data_source_history["last_name"]["source"], "franceconnect")
 
         # Update user
         fc_user_data.last_name = "DUPUIS"
@@ -76,39 +76,35 @@ class FranceConnectTest(TestCase):
     def test_callback_no_code(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "La requête ne contient pas le paramètre « code ».")
+        self.assertEqual(response.status_code, 302)
 
     def test_callback_no_state(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url, data={"code": "123"})
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Le paramètre « state » n'est pas valide.")
+        self.assertEqual(response.status_code, 302)
 
     def test_callback_invalid_state(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url, data={"code": "123", "state": "000"})
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Le paramètre « state » n'est pas valide.")
+        self.assertEqual(response.status_code, 302)
 
     @respx.mock
     def test_callback(self):
-        url_fc_token = settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_TOKEN
+        url_fc_token = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_TOKEN
         token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
         respx.post(url_fc_token).mock(return_value=httpx.Response(200, json=token_json))
 
-        url_fc_userinfo = settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_USERINFO
+        url_fc_userinfo = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_USERINFO
         respx.get(url_fc_userinfo).mock(return_value=httpx.Response(200, json=FRANCE_CONNECT_USERINFO))
 
         csrf_signed = france_connect_views.state_new()
         url = reverse("france_connect:callback")
         response = self.client.get(url, data={"code": "123", "state": csrf_signed})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["family_name"], "DUBOIS")
+        self.assertEqual(response.status_code, 302)
 
     def test_logout_no_id_token(self):
         url = reverse("france_connect:logout")
-        response = self.client.get(url)
+        response = self.client.get(url + "?")
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "Le paramètre « id_token » est manquant.")
 
@@ -116,6 +112,6 @@ class FranceConnectTest(TestCase):
     def test_logout(self):
         url = reverse("france_connect:logout")
 
-        respx.post(url=settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_LOGOUT).respond(302)
+        respx.post(url=settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_LOGOUT).respond(302)
         response = self.client.get(url, data={"id_token": "123"})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)

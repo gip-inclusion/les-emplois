@@ -14,10 +14,11 @@ from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.utils.password_validation import FRANCE_CONNECT_PASSWORD_EXPLANATION
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.dashboard.forms import EditNewJobAppEmployersNotificationForm, EditUserEmailForm, EditUserInfoForm
 
 
@@ -98,6 +99,11 @@ class ItouPasswordChangeView(PasswordChangeView):
 
     success_url = reverse_lazy("dashboard:index")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["password_change_message"] = FRANCE_CONNECT_PASSWORD_EXPLANATION
+        return context
+
 
 password_change = login_required(ItouPasswordChangeView.as_view())
 
@@ -106,12 +112,23 @@ class ItouLogoutView(LogoutView):
     def post(self, *args, **kwargs):
         """
         We overload this method so that we can process the PEAMU callback
-        when the user logs out.
+        or notify France Connect when the user logs out.
         Original code:
         https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L775
         """
+
         peamu_id_token = self.request.user.peamu_id_token
+        fc_token = self.request.session.get(settings.FRANCE_CONNECT_SESSION_TOKEN)
+        fc_state = self.request.session.get(settings.FRANCE_CONNECT_SESSION_STATE)
+        # Note: if you need session data, fetch them BEFORE calling super() ;)
         ajax_response = super().post(*args, **kwargs)
+
+        # Logouts user from the app and from France Connect (FC).
+        if fc_token:
+            params = {"id_token": fc_token, "state": fc_state}
+            fc_base_logout_url = get_absolute_url(reverse("france_connect:logout"))
+            fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
+            return HttpResponseRedirect(fc_logout_url)
         if peamu_id_token:
             hp_url = self.request.build_absolute_uri("/")
             params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
@@ -131,9 +148,21 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
         with transaction.atomic():
             request.user.email = form.cleaned_data["email"]
             request.user.save()
-            request.user.emailaddress_set.first().delete()
+            if request.user.emailaddress_set and request.user.emailaddress_set.first():
+                request.user.emailaddress_set.first().delete()
+        # we perform the redirection like this in order to ensure every logout
+        # route performs the same operations
+        fc_token = request.session.get(settings.FRANCE_CONNECT_SESSION_TOKEN)
+        fc_state = request.session.get(settings.FRANCE_CONNECT_SESSION_STATE)
+
         auth.logout(request)
-        return HttpResponseRedirect("/")
+        # Logouts user from the app and from France Connect (FC).
+        if fc_token:
+            params = {"id_token": fc_token, "state": fc_state}
+            fc_base_logout_url = get_absolute_url(reverse("france_connect:logout"))
+            fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
+            return HttpResponseRedirect(fc_logout_url)
+        return HttpResponseRedirect(reverse("account_logout"))
 
     context = {
         "form": form,
@@ -149,7 +178,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
-    form = EditUserInfoForm(instance=request.user, editor=request.user, data=request.POST or None)
+    form = EditUserInfoForm(request=request, instance=request.user, editor=request.user, data=request.POST or None)
     extra_data = request.user.externaldataimport_set.pe_sources().first()
 
     if request.method == "POST" and form.is_valid():
@@ -191,7 +220,9 @@ def edit_job_seeker_info(request, job_application_id, template_name="dashboard/e
 
     dashboard_url = reverse_lazy("dashboard:index")
     back_url = get_safe_url(request, "back_url", fallback_url=dashboard_url)
-    form = EditUserInfoForm(instance=job_application.job_seeker, editor=request.user, data=request.POST or None)
+    form = EditUserInfoForm(
+        request=request, instance=job_application.job_seeker, editor=request.user, data=request.POST or None
+    )
 
     if request.method == "POST" and form.is_valid():
         form.save()
