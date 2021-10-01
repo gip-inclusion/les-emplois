@@ -369,10 +369,14 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     def department_code(self):
         """
         INSEE department code are the first 2 characters of the commune code
-        With no exception.
 
         For processing concerns, ASP expects 3 characters: 0-padding is the way
+        except for department code beginning with 97 or 98 ("Outremer")
         """
+        if self.code.startswith("97") or self.code.startswith("98"):
+            return self.code[0:3]
+
+        # But in most of the cases:
         return f"0{self.code[0:2]}"
 
 
