@@ -440,10 +440,11 @@ class EmployeeRecord(models.Model):
 
         prescriber_organization = self.job_application.sender_prescriber_organization
 
+        # This workaround is under investigation (systematically fails if UNKNOW is chosen)
         return (
             PrescriberType.from_itou_prescriber_kind(prescriber_organization.kind).value
             if prescriber_organization
-            else PrescriberType.SPONTANEOUS_APPLICATION
+            else PrescriberType.AUTHORIZED_PRESCRIBERS
         )
 
     @property
