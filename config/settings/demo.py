@@ -28,3 +28,4 @@ sentry_init(dsn=os.environ["SENTRY_DSN_DEMO"])
 ASP_ITOU_PREFIX = "XXXXX"
 
 SHOW_TEST_ACCOUNTS_BANNER = True
+FRANCE_CONNECT_BASE_URL = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"

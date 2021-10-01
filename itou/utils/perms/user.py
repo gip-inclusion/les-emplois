@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+from django.conf import settings
+
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 
@@ -36,3 +38,11 @@ def get_user_info(request):
     is_authorized_prescriber = prescriber_organization.is_authorized if prescriber_organization else False
 
     return UserInfo(request.user, kind, prescriber_organization, is_authorized_prescriber, siae)
+
+
+def is_user_france_connected(request):
+    """
+    When a user logs in with France Connect, we store its france connect ID
+    in the session. We can later know when a users logs in with France Connect
+    """
+    return settings.FRANCE_CONNECT_SESSION_TOKEN in request.session

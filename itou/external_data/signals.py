@@ -1,8 +1,13 @@
-from allauth.account.signals import user_logged_in
+from allauth.account.signals import user_logged_in  # , user_logged_out
 from anymail.signals import tracking
+from django.conf import settings
 from django.dispatch import receiver
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.utils.http import urlencode
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
+from itou.utils.urls import get_absolute_url
 
 from .models import ExternalDataImport, RejectedEmailEventData
 from .tasks import huey_import_user_pe_data
@@ -48,10 +53,33 @@ def store_rejected_email_event(event):
         rejected_email.save()
 
 
+def log_out_from_france_connect(request, user):
+    # https://django-allauth.readthedocs.io/en/latest/signals.html
+    fc_token = request.session.get(settings.FRANCE_CONNECT_SESSION_TOKEN)
+    fc_state = request.session.get(settings.FRANCE_CONNECT_SESSION_STATE)
+    # Note: if you need session data, fetch them BEFORE calling super() ;)
+    # ajax_response = super().post(*args, **kwargs)
+
+    # Logouts user from the app and from France Connect (FC).
+    if fc_token:  # and not settings.ITOU_ENVIRONMENT == "DEV":
+        # In the dev environment, user is not logged out from FC because for some reason
+        # on FC’s end, it throws an error and crash so post-logout
+        # redirection is not performed
+        params = {"id_token": fc_token, "state": fc_state}
+        fc_base_logout_url = get_absolute_url(reverse("france_connect:logout"))
+        fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
+        return HttpResponseRedirect(fc_logout_url)
+
+
 @receiver(user_logged_in)
 def user_logged_in_receiver(sender, **kwargs):
     # Wrapper required to mock the db_task of Huey in unit tests
     import_user_pe_data_on_peamu_login(sender, **kwargs)
+
+
+# @receiver(user_logged_out)
+# def user_logged_out_receiver(request, user, **kwargs):
+#     log_out_from_france_connect(request, user)
 
 
 @receiver(tracking)

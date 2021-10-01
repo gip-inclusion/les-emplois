@@ -85,3 +85,5 @@ if settings.DEBUG and "debug_toolbar" in settings.INSTALLED_APPS:
     import debug_toolbar
 
     urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+    # In the local developpemnt environment, we enable the default callback URLs
+    urlpatterns = [path("", include("itou.france_connect.urls"))] + urlpatterns
