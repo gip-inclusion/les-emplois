@@ -443,7 +443,7 @@ class EmployeeRecord(models.Model):
         return (
             PrescriberType.from_itou_prescriber_kind(prescriber_organization.kind).value
             if prescriber_organization
-            else None
+            else PrescriberType.SPONTANEOUS_APPLICATION
         )
 
     @property
