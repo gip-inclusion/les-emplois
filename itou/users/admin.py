@@ -271,7 +271,14 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
         "user",
         "hexa_commune",
     )
+
     list_display = ("pk", "user", "username")
+
+    search_fields = (
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+    )
 
     readonly_fields = (
         "hexa_lane_number",
