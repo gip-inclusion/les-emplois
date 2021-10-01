@@ -10,6 +10,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "created_at",
         "approval_number",
         "siret",
+        "asp_processing_code",
         "status",
     )
     list_filter = ("status",)
@@ -18,6 +19,8 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "pk",
         "siret",
         "approval_number",
+        "asp_processing_code",
+        "asp_batch_file",
     )
 
     raw_id_fields = (
