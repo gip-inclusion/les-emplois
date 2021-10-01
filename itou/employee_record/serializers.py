@@ -273,7 +273,7 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         employee_situation["salarieTypeEmployeur"] = instance.asp_employer_type
 
         # same workaround for prescriber type (orienteur)
-        employee_situation["orienteur"] = instance.asp_prescriber_type
+        employee_situation["orienteur"] = instance.tmp_asp_prescriber_type
 
         return result
 

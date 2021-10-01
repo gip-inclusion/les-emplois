@@ -421,6 +421,11 @@ class EmployeeRecord(models.Model):
             return EmployerType.from_itou_siae_kind(self.job_application.to_siae.kind)
         return None
 
+    # FIXME:
+    # This property is currently *never* accepted in production
+    # This has to be fixed with ASP (or not)
+    # In the meantime the serializer will use a fixed value for this field
+    # (see `tmp_prescriber_type` property)
     @property
     def asp_prescriber_type(self):
         """
@@ -446,6 +451,11 @@ class EmployeeRecord(models.Model):
             if prescriber_organization
             else PrescriberType.AUTHORIZED_PRESCRIBERS
         )
+
+    @property
+    def tmp_asp_prescriber_type(self):
+        # this is temporary (read above)
+        return PrescriberType.SPONTANEOUS_APPLICATION
 
     @property
     def asp_siae_type(self):
