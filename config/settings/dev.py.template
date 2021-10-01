@@ -88,4 +88,4 @@ ASP_ITOU_PREFIX = "XXXXX"
 
 # Integration platform and associated public key (non confidential)
 # When the integration platform is used, an endpoint called "/callback" should be defined in itou.
-FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
+FRANCE_CONNECT_URL = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"

@@ -1,7 +1,7 @@
 import os
 
 from ._sentry import sentry_init
-from .base import *  # noqa: F403
+from .base import *  # noqa: F401,F403
 
 
 # See `itou.utils.new_dns.middleware.NewDnsRedirectMiddleware`.

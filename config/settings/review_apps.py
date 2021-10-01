@@ -1,5 +1,7 @@
+import os
+
 from ._sentry import sentry_init
-from .base import *
+from .base import *  # noqa: F401,F403
 
 
 ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io"]
@@ -42,3 +44,5 @@ ELASTIC_APM = {
     "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
     "TRANSACTION_SAMPLE_RATE": 1,
 }
+FRANCE_CONNECT_URL = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
+
