@@ -18,21 +18,7 @@
               <a href="{% url 'stats:public_basic_stats' %}">Statistiques, lexiques et indicateurs</a>
           </li>
           <li>
-              <a href="{% url 'accessibility' %}">Accessibilité (non conforme)</a>
-          </li>
-          {# Use `mb-*` to mark a visual separation between internal and external links. #}
-          <li>
               <a href="{% url 'releases:list' %}">Journal des modifications</a>
-          </li>
-          {# External links. #}
-          <li>
-              <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
-                  Besoin d'aide ?
-              </a>
-          <li>
-              <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
-                  Inscription Newsletter
-              </a>
           </li>
           <li>
               <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
@@ -44,12 +30,6 @@
                   Questions à la communauté
               </a>
           </li>
-          <li>
-              <a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
-                  Mentions légales
-              </a>
-          </li>
-
           <li>
               <a href="https://stats.uptimerobot.com/JYJ6XHq6xY" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">
                   Disponibilité
@@ -128,9 +108,9 @@
         <div class="s-footer-legal__col col-12 col-lg">
           <nav role="navigation">
             <ul>
-              <li><a href="#" rel="noopener" target="_blank">Mentions légales</a></li>
+              <li><a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank">Mentions légales</a></li>
               <li><a href="#" rel="noopener" target="_blank">Gestion des cookies</a></li>
-              <li><a href="#" rel="noopener" target="_blank">Accessibilité : non conforme</a></li>
+              <li><a href="{% url 'accessibility' %}" rel="noopener">Accessibilité : non conforme</a></li>
             </ul>
           </nav>
         </div>
