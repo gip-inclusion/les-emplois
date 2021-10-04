@@ -25,7 +25,7 @@
 
 
 {% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
-    <div class="alert alert-secondary mt-5" role="info">
+    <div class="alert alert-emploi mt-5" role="info">
         Aucun résultat pour <b>{{ siren_form.cleaned_data.siren }}</b>.
     </div>
 
@@ -50,7 +50,7 @@
 
         <h3>Entreprises disponibles</h3>
 
-        <div class="alert alert-secondary" role="info">
+        <div class="alert alert-emploi" role="info">
             <i>Les données sont fournies par l'extranet IAE 2.0 de l'ASP.</i>
         </div>
 
@@ -111,7 +111,7 @@
 
         <h3>Entreprises déjà inscrites</h3>
 
-        <div class="alert alert-secondary" role="info">
+        <div class="alert alert-emploi" role="info">
             <i>Par sécurité vous devez obtenir une invitation pour rejoindre ces structures.</i>
         </div>
 
