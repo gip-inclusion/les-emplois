@@ -8,7 +8,7 @@
     {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Prenez contact avec un employeur solidaire" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
 
     {% if not user.is_authenticated %}
-        <section class="bg-light text-center">
+        <section class="bg-white text-center">
             <div class="container">
                 <h2>Nos missions</h2>
                 <p class="lead">Ce service facilite la mise en relation des personnes les plus éloignées de l'emploi avec les employeurs solidaires (SIAE, GEIQ, EA et EATT) et les accompagnants (orienteurs et prescripteurs habilités).<br>Il offre aux utilisateurs un outil mutualisé pour simplifier les procédures, fluidifier les parcours d'insertion entre professionnels et renforcer la qualité de l'accompagnement des personnes.</p>
