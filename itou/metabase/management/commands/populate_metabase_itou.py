@@ -26,6 +26,7 @@ from collections import OrderedDict
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.core.paginator import Paginator
 from django.utils import timezone
 from psycopg2 import extras as psycopg2_extras, sql
 from tqdm import tqdm
@@ -308,21 +309,28 @@ class Command(BaseCommand):
         Populate associations between job applications and job descriptions.
         """
         table_name = "fiches_de_poste_par_candidature"
-        self.log(f"Preparing content for {table_name} table...")
+        chunk_size = 1000
+        self.log(f"Preparing content for {table_name} table by chunk of {chunk_size} items...")
+
+        # Iterating directly on this very large queryset results in psycopg2.errors.DiskFull error.
+        # We use pagination to mitigate this issue.
+        queryset = JobApplication.objects.prefetch_related("selected_jobs").all()
+        paginator = Paginator(queryset, chunk_size)
 
         rows = []
-        for ja in tqdm(JobApplication.objects.prefetch_related("selected_jobs").all()):
-            for jd in ja.selected_jobs.all():
-                # We want to preserve the order of columns.
-                row = OrderedDict()
+        for page_idx in tqdm(range(1, paginator.num_pages + 1)):
+            for ja in paginator.page(page_idx).object_list:
+                for jd in ja.selected_jobs.all():
+                    # We want to preserve the order of columns.
+                    row = OrderedDict()
 
-                row["id_fiche_de_poste"] = jd.pk
-                row["id_anonymisé_candidature"] = anonymize(
-                    ja.pk, salt=_job_applications.JOB_APPLICATION_PK_ANONYMIZATION_SALT
-                )
+                    row["id_fiche_de_poste"] = jd.pk
+                    row["id_anonymisé_candidature"] = anonymize(
+                        ja.pk, salt=_job_applications.JOB_APPLICATION_PK_ANONYMIZATION_SALT
+                    )
 
-                rows.append(row)
-            if self.dry_run and len(rows) > 1000:
+                    rows.append(row)
+            if self.dry_run and len(rows) >= 1000:
                 break
 
         df = get_df_from_rows(rows)
