@@ -1,3 +1,5 @@
+import re
+
 from unidecode import unidecode
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
@@ -8,6 +10,8 @@ ERROR_HEXA_CONVERSION = "Impossible de transformer cet objet en adresse HEXA"
 ERROR_GEOCODING_API = "Erreur de geocoding, impossible d'obtenir un résultat"
 ERROR_INCOMPLETE_ADDRESS_DATA = "Données d'adresse incomplètes"
 ERROR_UNKNOWN_ADDRESS_LANE = "Impossible d'obtenir le nom de la voie"
+
+LANE_NUMBER_RE = r"^([0-9]{1,5})(.*?)$"
 
 
 def format_address(obj):
@@ -61,8 +65,12 @@ def format_address(obj):
     # Street extension processing (bis, ter ...)
     # Extension is part of the resulting streetnumber geo API field
     number_plus_ext = address.get("number")
+
     if number_plus_ext:
-        number, *extension = number_plus_ext.split()
+        # API change : now extension can be "stuck" to lane number
+        # This was not he case before (space in between)
+        # REGEX to the rescue to fix ASP error 3323
+        [[number, extension]] = re.findall(LANE_NUMBER_RE, number_plus_ext)
 
         if number:
             result["number"] = number
