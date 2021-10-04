@@ -33,15 +33,14 @@
         {% bootstrap_field field %}
     {% endfor %}
 
-    <div class="alert alert-warning" role="alert">
-        <p>
-            En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
-        </p>
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-        {% endbuttons %}
-    </div>
+
+    <p>
+        En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+    </p>
+    {% buttons %}
+        <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    {% endbuttons %}
 
 </form>
 
