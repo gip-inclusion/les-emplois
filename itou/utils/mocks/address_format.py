@@ -2,7 +2,7 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
     {
         "score": 0.8745736363636364,
         "address_line_1": "37 B Rue du Général De Gaulle",
-        "number": "37 b",
+        "number": "37b",
         "lane": "Rue du Général de Gaulle",
         "address": "37 b Rue du Général de Gaulle",
         "post_code": "67118",
@@ -194,7 +194,7 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
     {
         "score": 0.8745736363636364,
         "address_line_1": "37 Ter Rue du Général De Gaulle",
-        "number": "37 t",
+        "number": "37t",
         "lane": "Rue du Général de Gaulle",
         "address": "37 t Rue du Général de Gaulle",
         "post_code": "67118",
@@ -206,7 +206,7 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
     {
         "score": 0.8745736363636364,
         "address_line_1": "37 G Rue du Général De Gaulle",
-        "number": "37 g",
+        "number": "37g",
         "lane": "Rue du Général de Gaulle",
         "address": "37 G Rue du Général de Gaulle",
         "post_code": "67118",
