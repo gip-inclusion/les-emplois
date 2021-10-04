@@ -55,7 +55,7 @@ Vous pouvez maintenant:
  - ✈️ Aller sur la machine:
     clever ssh --alias $IMPORT_APP_NAME
  - 🔨 Jouer un script d’import, par ex:
-    cd app_* && ./scripts/import_asp.sh
+    cd app_* && ./scripts/imports-asp.sh
  - 🍺 Supprimer la machine:
     clever delete --alias $IMPORT_APP_NAME --yes
 EOF
