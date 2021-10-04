@@ -5,10 +5,10 @@
                 class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle"
                 data-toggle="dropdown"
                 aria-haspopup="true"
-                aria-expanded="false" data-display="static" >
+                aria-expanded="false" >
                 Mon espace
             </button>
-            <div class="dropdown-menu dropdown-menu-sm-right">
+            <div class="dropdown-menu dropdown-menu-left">
                 <div class="dropdown-item media">
                     {% include "includes/icon.html" with icon="user" size="40" class="mr-3 icon align-self-center" %}
                     <div class="media-body align-self-center text-wrap">
@@ -56,7 +56,7 @@
             <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                 Changer de structure
             </button>
-            <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
+            <div class="dropdown-menu dropdown-menu-left">
                 <form action="{% url 'dashboard:switch_siae' %}" method="post">
                     {% csrf_token %}
                     {% for s in user_siaes %}
@@ -74,10 +74,10 @@
 
     {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
         <li  class="dropdown">
-            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Changer de structure
             </button>
-            <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
+            <div class="dropdown-menu dropdown-menu-left">
                 <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
                     {% csrf_token %}
                     {% for po in user_prescriberorganizations %}
@@ -95,10 +95,10 @@
 
     {% if user.is_labor_inspector and user_institutions|length > 1 %}
         <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Changer de structure
             </button>
-            <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
+            <div class="dropdown-menu dropdown-menu-left">
                 <form action="{% url 'dashboard:switch_institution' %}" method="post">
                     {% csrf_token %}
                     {% for i in user_institutions %}
