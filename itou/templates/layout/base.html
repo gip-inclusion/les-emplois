@@ -37,22 +37,20 @@
     {% include "includes/test_accounts.html" %}
     {% include "layout/_header.html" %}
 
-    <main class="s-main">
+    <main class="s-main bg-gray-400">
 
         {% comment %} Add todo to check if we display the messages {% endcomment %}
-        <div class="bg-white">
-            <div class="container container-messages">
-                {% block messages %}
+        <div class="container container-messages">
+            {% block messages %}
 
-                    {% bootstrap_messages %}
+                {% bootstrap_messages %}
 
-                    {# Display an alert for old browsers #}
-                    <div class="alert alert-secondary alert-old-browser" role="alert">
-                        La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
-                    </div>
+                {# Display an alert for old browsers #}
+                <div class="alert alert-secondary alert-old-browser" role="alert">
+                    La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
+                </div>
 
-                {% endblock %}
-            </div>
+            {% endblock %}
         </div>
 
         {% block content_full_viewport %}{% endblock %}
