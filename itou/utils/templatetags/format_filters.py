@@ -1,6 +1,7 @@
 """
 https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 """
+import re
 from textwrap import wrap
 
 from django import template
@@ -39,3 +40,11 @@ def format_siret(siret):
         return siren
 
     return f"{siren} {siret[9:]}"
+
+
+@register.filter
+@stringfilter
+def format_nir(nir):
+    nir_regex = r"^([12])([0-9]{2})([0-1][0-9])(2[AB]|[0-9]{2})([0-9]{3})([0-9]{3})([0-9]{2})$"
+    match = re.match(nir_regex, nir)
+    return " ".join(match.groups())
