@@ -44,7 +44,7 @@ class WelcomingTourTest(TestCase):
 
         # First signup step: job seeker NIR.
         url = reverse("signup:job_seeker_nir")
-        self.client.post(url, {"nir": job_seeker.nir})
+        self.client.post(url, {"nir": job_seeker.nir, "confirm": 1})
 
         # Second signup step: job seeker credentials.
         url = reverse("signup:job_seeker")
@@ -124,7 +124,7 @@ class WelcomingTourExceptions(TestCase):
         # First signup step: job seeker NIR.
         next_to = reverse("apply:start", kwargs={"siae_pk": siae.pk})
         url = f"{reverse('signup:job_seeker_nir')}?next={next_to}"
-        self.client.post(url, {"nir": job_seeker.nir})
+        self.client.post(url, {"nir": job_seeker.nir, "confirm": 1})
 
         # Second signup step: job seeker credentials.
         url = f"{reverse('signup:job_seeker')}?next={next_to}"
