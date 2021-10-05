@@ -21,6 +21,9 @@
 
         {% buttons %}
             {# Reload this page and show a modal containing more information about the job seeker. #}
+            <a href="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="btn btn-outline-primary">
+                Retour
+            </a>
             <button type="submit" name="preview" value="1" class="btn btn-primary">
                 Continuer
             </button>
