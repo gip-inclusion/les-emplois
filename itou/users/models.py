@@ -494,23 +494,19 @@ class User(AbstractUser, AddressMixin):
         )
 
     def update_external_data_source_history(self, provider_name, field, value):
-        def _get_field_provider_info(source, value):
-            """Fills the provider info line"""
-            now = timezone.now()
-            return {"source": source, "created_at": now, "value": value}
-
+        now = timezone.now()
         has_performed_update = False
         # If we never wrote any value, initialize the dict
         if self.provider_json is None:
             self.provider_json = {}
         if not self.provider_json.get(field):
             # If we never stored something for this property, store it for this provider
-            self.provider_json[field] = _get_field_provider_info(provider_name, value)
+            self.provider_json[field] = {"source": provider_name, "created_at": now, "value": value}
             has_performed_update = True
         else:
             # If we already have something, we want to update it only if it changed
             if not self.provider_json[field].get("value") or self.provider_json[field]["value"] != value:
-                self.provider_json[field] = _get_field_provider_info(provider_name, value)
+                self.provider_json[field] = {"source": provider_name, "created_at": now, "value": value}
                 has_performed_update = True
         return has_performed_update
 
