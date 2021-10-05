@@ -13,23 +13,17 @@
             </div>
 
             {# Statuses #}
-            {% if form.status.value == "SENT" %}
-                <div class="col-md-5 text-right">
-                    <p class="m-0 pt-1 badge badge-warning">Transmise à l'ASP le <b>{{ employee_record.updated_at }}</b></p>
-                </div>
-            {% elif form.status.value == "REJECTED" %}
-                <div class="col-md-5 text-right">
-                    <p class="m-0 pt-1 badge badge-danger">Retour en erreur le <b>{{ employee_record.updated_at }}</b></p>
-                </div>
-            {% elif form.status.value == "PROCESSED" %}
-                <div class="col-md-5 text-right">
-                    <p class="m-0 pt-1 badge badge-success">Validée par l'ASP le <b>{{ employee_record.updated_at }}</b></p>
-                </div>
-            {% elif form.status.value == "READY" %}
-                <div class="col-md-5 text-right">
-                    <p class="m-0 pt-1 badge badge-secondary">Complétée le <b>{{ employee_record.updated_at }}</b></p>
-                </div>
-            {% endif %}
+            <div class="col-md-5 text-right">
+                {% if form.status.value == "SENT" %}
+                    <p class="badge badge-warning">Transmise à l'ASP le <b>{{ employee_record.updated_at }}</b></p>
+                {% elif form.status.value == "REJECTED" %}
+                    <p class="badge badge-danger">Retour en erreur le <b>{{ employee_record.updated_at }}</b></p>
+                {% elif form.status.value == "PROCESSED" %}
+                    <p class="badge badge-success">Validée par l'ASP le <b>{{ employee_record.updated_at }}</b></p>
+                {% elif form.status.value == "READY" %}
+                    <p class="badge badge-secondary">Complétée le <b>{{ employee_record.updated_at }}</b></p>
+                {% endif %}
+            </div>
         </div>
 
         {# ASP error #}

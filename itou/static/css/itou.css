@@ -329,3 +329,12 @@ Usage:
 .itou-france-connect:hover {
     background-image: url(../img/france-connect-hover.svg);
 }
+
+
+/* To be discussed
+--------------------------------------------------------------------------- */
+
+.employee-records-list .badge {
+    white-space: normal;
+    margin: 0;
+}
