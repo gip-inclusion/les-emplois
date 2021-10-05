@@ -219,6 +219,9 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
             if request.POST.get("save"):
                 session_data["job_seeker_pk"] = job_seeker.pk
                 request.session.modified = True
+                if request.user.can_add_nir(job_seeker) and session_data.get("nir"):
+                    job_seeker.nir = session_data["nir"]
+                    job_seeker.save()
                 return HttpResponseRedirect(next_url)
 
             # Display a modal containing more information.
