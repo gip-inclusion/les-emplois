@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, When
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, When
 from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -203,6 +203,7 @@ class JobApplicationQuerySet(models.QuerySet):
         return (
             self.exclude(approval=None)
             .accepted()
+            .filter(Q(employee_record__status="NEW") | Q(employee_record__isnull=True))
             .filter(
                 to_siae=siae,
                 hiring_start_at__lt=cancellation_date,
