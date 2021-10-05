@@ -11,12 +11,6 @@
         <small class="text-muted">Prescripteur/Orienteur</small>
     </h1>
 
-    <ul class="list-unstyled multi-steps my-5">
-        <li>Type de prescripteur</li>
-        {% if not join_as_orienteur_without_org %}<li>SIRET</li>{% endif %}
-        <li class="is-active">Vos informations</li>
-    </ul>
-
     {% if join_authorized_org and not kind_is_other %}
         {# Display kind's full name if known. #}
         <div class="alert alert-emploi pb-0" role="alert">
