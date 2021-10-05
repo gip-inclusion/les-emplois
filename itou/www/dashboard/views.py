@@ -112,8 +112,8 @@ class ItouLogoutView(LogoutView):
         """
 
         peamu_id_token = self.request.user.peamu_id_token
-        fc_token = self.request.session.get("franceconnect_id_token")
-        fc_state = self.request.session.get("franceconnect_state")
+        fc_token = self.request.session.get(settings.FRANCE_CONNECT_SESSION_TOKEN)
+        fc_state = self.request.session.get(settings.FRANCE_CONNECT_SESSION_STATE)
         # Note: if you need session data, fetch them BEFORE calling super() ;)
         ajax_response = super().post(*args, **kwargs)
 

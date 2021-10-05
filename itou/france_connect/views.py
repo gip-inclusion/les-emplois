@@ -159,8 +159,8 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     # At this step, we can update the user's fields in DB and create a session if required
     user, created = france_connect_models.create_or_update_user(fc_user_data)
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-    request.session["franceconnect_id_token"] = token_data["id_token"]
-    request.session["franceconnect_state"] = state
+    request.session[settings.FRANCE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
+    request.session[settings.FRANCE_CONNECT_SESSION_STATE] = state
     request.session.modified = True
 
     next_url = reverse("dashboard:index")

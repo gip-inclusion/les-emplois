@@ -404,6 +404,9 @@ FRANCE_CONNECT_CLIENT_SECRET = os.environ.get("FRANCE_CONNECT_CLIENT_SECRET")
 
 FRANCE_CONNECT_STATE_EXPIRATION = datetime.timedelta(hours=1)
 
+FRANCE_CONNECT_SESSION_TOKEN = "FC_ID_TOKEN"
+FRANCE_CONNECT_SESSION_STATE = "FC_STATE"
+
 # PDFShift
 # ------------------------------------------------------------------------------
 
