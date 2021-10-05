@@ -196,8 +196,8 @@ class Command(BaseCommand):
                             processing_code, processing_label, renderer.render(serializer.data).decode()
                         )
                     except Exception as ex:
-                        self.logger.error("Error: can't update employee record : %s", employee_record)
-                        self.logger.error("Current status: %s, Exception raised: %s", employee_record.status, ex)
+                        self.logger.warning("Can't update employee record : %s", employee_record)
+                        self.logger.warning("Current status: %s, exception raised: %s", employee_record.status, ex)
 
                 else:
                     self.logger.info(
