@@ -77,7 +77,7 @@ def france_connect_authorize(request):
         "nonce": crypto.get_random_string(length=12),
         "acr_values": "eidas1",
     }
-    url = settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_AUTHORIZE
+    url = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 
 
@@ -108,7 +108,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     }
 
     # Exceptions catched by Sentry
-    url = settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_TOKEN
+    url = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_TOKEN
     response = httpx.post(url, data=data, timeout=30)
 
     if response.status_code != 200:
@@ -129,7 +129,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
-    url = settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_USERINFO
+    url = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_USERINFO
     response = httpx.get(
         url,
         params={"schema": "openid"},
@@ -181,6 +181,6 @@ def france_connect_logout(request):
         "state": state,
         "post_logout_redirect_uri": get_absolute_url(reverse("home:hp")),
     }
-    url = settings.FRANCE_CONNECT_URL + settings.FRANCE_CONNECT_ENDPOINT_LOGOUT
+    url = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"
     return HttpResponseRedirect(complete_url)

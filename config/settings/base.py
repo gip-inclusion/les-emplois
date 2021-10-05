@@ -392,7 +392,7 @@ SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountA
 # France Connect
 # https://partenaires.franceconnect.gouv.fr/
 FRANCE_CONNECT_ENABLED = True
-FRANCE_CONNECT_URL = "https://app.franceconnect.gouv.fr/api/v1/"
+FRANCE_CONNECT_BASE_URL = "https://app.franceconnect.gouv.fr/api/v1/"
 FRANCE_CONNECT_SCOPES = "openid gender given_name family_name email birthdate birthplace birthcountry"
 FRANCE_CONNECT_ENDPOINT_AUTHORIZE = "authorize"
 FRANCE_CONNECT_ENDPOINT_TOKEN = "token"

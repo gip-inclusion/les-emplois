@@ -27,4 +27,4 @@ sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
 
 ASP_ITOU_PREFIX = "YYYYY"
 
-FRANCE_CONNECT_URL = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
+FRANCE_CONNECT_BASE_URL = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"

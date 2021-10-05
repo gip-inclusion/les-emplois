@@ -44,5 +44,4 @@ ELASTIC_APM = {
     "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
     "TRANSACTION_SAMPLE_RATE": 1,
 }
-FRANCE_CONNECT_URL = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
-
+FRANCE_CONNECT_BASE_URL = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
