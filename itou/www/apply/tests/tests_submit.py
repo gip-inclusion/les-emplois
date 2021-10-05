@@ -755,6 +755,86 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
 
+class ApplyAsPrescriberNirExceptionsTest(TestCase):
+    """
+    The following normal use cases are tested in tests above:
+        - job seeker creation,
+        - job seeker found with a unique NIR.
+    But, for historical reasons, our database is not perfectly clean.
+    Some job seekers share the same NIR as the historical unique key was the e-mail address.
+    Or the NIR is not found because their account was created before
+    we added this possibility.
+    """
+
+    def create_test_data(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        # Only authorized prescribers can add a NIR.
+        # See User.can_add_nir
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
+        user = prescriber_organization.members.first()
+        return siae, user
+
+    def test_one_account_no_nir(self):
+        """
+        No account with this NIR is found.
+        A search by email is proposed.
+        An account is found for this email.
+        This NIR account is empty.
+        An update is expected.
+        """
+        job_seeker = JobSeekerFactory(nir="")
+        # Create an approval to bypass the eligibility diagnosis step.
+        PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
+        siae, user = self.create_test_data()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+
+        # Follow all redirections…
+        response = self.client.get(url, follow=True)
+
+        # …until a job seeker has to be determined.
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
+
+        # Enter an a non-existing NIR.
+        # ----------------------------------------------------------------------
+        nir = "141068078200557"
+        post_data = {"nir": nir, "confirm": 1}
+        response = self.client.post(last_url, data=post_data)
+        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        self.assertRedirects(response, next_url)
+
+        # Enter an existing email.
+        # ----------------------------------------------------------------------
+        post_data = {"email": job_seeker.email, "save": "1"}
+        response = self.client.post(next_url, data=post_data)
+        next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
+        self.assertRedirects(response, next_url, target_status_code=302)
+
+        # Follow all redirections until the end.
+        # ----------------------------------------------------------------------
+        response = self.client.get(next_url, follow=True)
+        self.assertTrue(response.status_code, 200)
+
+        next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
+        post_data = {
+            "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
+            "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rockie-balboa.pdf",
+        }
+        response = self.client.post(next_url, data=post_data, follow=True)
+        expected_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(expected_url, last_url)
+
+        # Make sure the job seeker NIR is now filled in.
+        # ----------------------------------------------------------------------
+        job_seeker.refresh_from_db()
+        self.assertEqual(job_seeker.nir, nir)
+
+
 class ApplyAsSiaeTest(TestCase):
     def setUp(self):
         create_test_cities(["57"], num_per_department=1)
