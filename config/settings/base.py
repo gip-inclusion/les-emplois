@@ -407,6 +407,9 @@ FRANCE_CONNECT_STATE_EXPIRATION = datetime.timedelta(hours=1)
 FRANCE_CONNECT_SESSION_TOKEN = "FC_ID_TOKEN"
 FRANCE_CONNECT_SESSION_STATE = "FC_STATE"
 
+PROVIDER_PE_CONNECT = "poleemploi_connect"
+PROVIDER_FRANCE_CONNECT = "franceconnect"
+
 # PDFShift
 # ------------------------------------------------------------------------------
 

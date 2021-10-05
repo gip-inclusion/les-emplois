@@ -68,20 +68,17 @@ def get_field_provider_info(value, source):
     return {"source": source, "created_at": now, "value": value}
 
 
-FRANCE_CONNECT_PROVIDER = "france_connect"
-
-
 def create_user_from_fc_user_data(fc_user_data: FranceConnectUserData):
     user = User(is_job_seeker=True)
     for field in ["username", "first_name", "last_name", "birthdate", "email", "phone"]:
         value = getattr(fc_user_data, field)
-        if user.update_external_data_source_history(FRANCE_CONNECT_PROVIDER, field, value):
+        if user.update_external_data_source_history(settings.PROVIDER_FRANCE_CONNECT, field, value):
             setattr(user, field, value)
 
     if fc_user_data.country == "France":
         for field in ["address_line_1", "post_code", "city"]:
             value = getattr(fc_user_data, field)
-            if user.update_external_data_source_history(FRANCE_CONNECT_PROVIDER, field, value):
+            if user.update_external_data_source_history(settings.PROVIDER_FRANCE_CONNECT, field, value):
                 setattr(user, field, getattr(fc_user_data, field))
     return user
 
@@ -92,7 +89,7 @@ def update_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData
             continue
         value = getattr(fc_user_data, field.name)
         if (
-            user.update_external_data_source_history(FRANCE_CONNECT_PROVIDER, field.name, value)
+            user.update_external_data_source_history(settings.PROVIDER_FRANCE_CONNECT, field.name, value)
             or getattr(fc_user_data, field.name) == ""
         ):
             setattr(user, field.name, getattr(fc_user_data, field.name))
