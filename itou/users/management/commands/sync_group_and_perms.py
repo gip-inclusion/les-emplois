@@ -42,8 +42,8 @@ class Command(BaseCommand):
             # cities.City
             "view_city",
             # employee_record.EmployeeRecord
-            "view_employee_record",
-            "change_employee_record",
+            "view_employeerecord",
+            "change_employeerecord",
             # eligibility.AdministrativeCriteria
             "view_administrativecriteria",
             # eligibility.EligibilityDiagnosis
