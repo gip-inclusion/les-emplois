@@ -339,7 +339,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
         return f"{obj.user.first_name} {obj.user.last_name}"
 
     def pole_emploi_id(self, obj):
-        return f"{obj.user.pole_emploi_id}"
+        return obj.user.pole_emploi_id
 
     username.short_description = "Nom complet"
     pole_emploi_id.short_description = "Identifiant Pôle emploi"
