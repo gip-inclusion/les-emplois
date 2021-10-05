@@ -191,6 +191,12 @@ class JobApplicationQuerySet(models.QuerySet):
         - be definitely accepted (hiring can't be cancelled after CANCELLATION_DAYS_AFTER_HIRING_STARTED days)
         - have no one-to-one relationship with an employee record
         - have been created after production date
+
+        An eligible job application *may* or *may not* have an employee record object linked
+        to it.
+        For instance, when creating a new employee record from an eligible job application
+        and NOT finishing the entire creation process.
+        (employee record object creation occurs half-way of the "tunnel")
         """
         today = datetime.date.today()
         cancellation_date = today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
@@ -198,7 +204,6 @@ class JobApplicationQuerySet(models.QuerySet):
             self.exclude(approval=None)
             .accepted()
             .filter(
-                employee_record__isnull=True,
                 to_siae=siae,
                 hiring_start_at__lt=cancellation_date,
                 # Must be accepted after production date:
