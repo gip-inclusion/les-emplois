@@ -9,9 +9,9 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm order-sm-12 mt-5">
-            <!-- SAME AS submit_base.html -->
+            <!-- SAME AS submit_base.html. -->
             <!-- Not possible to extend from it as we need a full layout (layout/base.html) -->
-            <!-- instead of the tiny layout/content_small.html -->
+            <!-- instead of the tiny layout/content_small.html. -->
             <h1>
                 {% if request.user.is_siae_staff %}
                     <span class="text-muted">{{ siae.display_name }} </span>
@@ -50,8 +50,45 @@
                 {% endif %}
 
                 {% buttons %}
-                    <button type="submit" class="btn btn-primary">Suivant</button>
+                    {# Reload this page and show a modal containing more information about the job seeker. #}
+                    <button type="submit" name="preview" value="1" class="btn btn-primary">
+                        Continuer
+                    </button>
                 {% endbuttons %}
+
+                {% if preview_mode %}
+                    <!-- Modal -->
+                    <div class="modal" id="nir-confirmation-modal" tabindex="-1" aria-labelledby="nir-confirmation-label" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="nir-confirmation-label">Utilisateur trouvé</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Le numéro {{ form.nir.value }} est associé au compte de <b>{{ job_seeker_name }}</b>.</p>
+                                    <p>
+                                        Si cette candidature n'est pas pour <b>{{ job_seeker_name }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    {% buttons %}
+                                        {# Reload this page with a new form. #}
+                                        <button type="submit" name="cancel" value="1" class="btn btn-secondary">
+                                            Ce n'est pas mon candidat
+                                        </button>
+                                        {# Go to the next step. #}
+                                        <button type="submit" name="confirm" value="1" class="btn btn-primary">
+                                            Continuer
+                                        </button>
+                                    {% endbuttons %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
 
             </form>
             <p class="mt-5">
@@ -78,4 +115,12 @@
 
 {% block script %}
     <script type="text/javascript" src="{% static 'js/split_nir.js' %}"></script>
+    {% if preview_mode %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script type="text/javascript">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            $("#nir-confirmation-modal").modal("show");
+        </script>
+    {% endif %}
 {% endblock script %}

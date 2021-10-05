@@ -138,6 +138,7 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
     next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
     job_seeker = None
+    job_seeker_name = None
 
     # The user submits an application for himself.
     if request.user.is_job_seeker:
@@ -148,11 +149,17 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
             return HttpResponseRedirect(next_url)
 
     form = CheckJobSeekerNirForm(job_seeker=job_seeker, data=request.POST or None)
+    preview_mode = False
 
     if request.method == "POST" and form.is_valid():
         nir = form.cleaned_data["nir"]
-        job_seeker = form.get_job_seeker()
 
+        if request.user.is_job_seeker:
+            job_seeker.nir = nir
+            job_seeker.save()
+            return HttpResponseRedirect(next_url)
+
+        job_seeker = form.get_job_seeker()
         if not job_seeker:
             # Redirect to user creation.
             # Should we sign it?
@@ -161,15 +168,28 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
             next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
             return HttpResponseRedirect(next_url)
 
-        session_data["job_seeker_pk"] = job_seeker.pk
-        request.session.modified = True
-        # Todo: don(t update if request.user is a prescriber AND job_seeker.nir is not None.
-        # Add it to User.nir_can_be_updated_by
-        job_seeker.nir = nir
-        job_seeker.save()
-        return HttpResponseRedirect(next_url)
+        if form.data.get("confirm"):
+            # Job seeker found for the given NIR
+            session_data["job_seeker_pk"] = job_seeker.pk
+            request.session.modified = True
+            return HttpResponseRedirect(next_url)
 
-    context = {"form": form, "job_seeker": job_seeker, "siae": siae}
+        if form.data.get("preview"):
+            preview_mode = True
+            job_seeker_name = job_seeker.get_full_name()
+            if request.user.is_prescriber and not request.user.is_prescriber_with_authorized_org:
+                # Don't display personal information to unauthorized members.
+                job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
+        elif form.data.get("cancel"):
+            form = CheckJobSeekerNirForm()
+
+    context = {
+        "form": form,
+        "job_seeker": job_seeker,
+        "job_seeker_name": job_seeker_name,
+        "preview_mode": preview_mode,
+        "siae": siae,
+    }
     return render(request, template_name, context)
 
 

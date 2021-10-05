@@ -88,7 +88,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         nir = "141068078200557"
-        post_data = {"nir": nir}
+        post_data = {"nir": nir, "confirm": 1}
 
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -292,7 +292,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         nir = "141068078200557"
-        post_data = {"nir": nir}
+        post_data = {"nir": nir, "confirm": 1}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
         session = self.client.session
@@ -435,7 +435,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
-        post_data = {"nir": job_seeker.nir}
+        post_data = {"nir": job_seeker.nir, "confirm": 1}
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the eligibility step which should trigger a 200 OK.
@@ -495,7 +495,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"nir": job_seeker.nir}
+        post_data = {"nir": job_seeker.nir, "confirm": 1}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -613,7 +613,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         nir = "141068078200557"
-        post_data = {"nir": nir}
+        post_data = {"nir": nir, "confirm": 1}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
         session = self.client.session
@@ -745,7 +745,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
-        post_data = {"nir": job_seeker.nir}
+        post_data = {"nir": job_seeker.nir, "confirm": 1}
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the expected 403.
@@ -837,7 +837,7 @@ class ApplyAsSiaeTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         nir = "141068078200557"
-        post_data = {"nir": nir}
+        post_data = {"nir": nir, "confirm": 1}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
         session = self.client.session
@@ -971,6 +971,7 @@ class ApplyAsSiaeTest(TestCase):
         # …choose one, then follow all redirections…
         post_data = {
             "nir": job_seeker.nir,
+            "confirm": 1,
         }
         response = self.client.post(last_url, data=post_data, follow=True)
 
