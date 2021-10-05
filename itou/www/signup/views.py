@@ -271,6 +271,8 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
     return render(request, template_name, context)
 
 
+@valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_request_invitation(request, membership_id, template_name="signup/prescriber_request_invitation.html"):
 
     prescriber_membership = get_object_or_404(
@@ -300,6 +302,7 @@ def prescriber_request_invitation(request, membership_id, template_name="signup/
         "prescriber": prescriber_membership.user,
         "organization": prescriber_membership.organization,
         "form": form,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
