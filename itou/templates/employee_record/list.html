@@ -19,7 +19,7 @@
 
 <h1>Fiches salarié ASP - <span class="text-muted">{{ current_siae.display_name }}</span></h1>
 
-<div class="ml-0 mt-3">
+<div class="mt-3">
     <form method="get" class="form" id="status-filter-form">
         <div class="row">
             <div class="col-sm-3">
@@ -50,7 +50,7 @@
             </div>
     </form>
 
-    <div class="col-sm-9 p-0">
+    <div class="col-sm-9">
         <div class="container rounded bg-light p-3 mb-3">
             <div class="row">
                 <div class="col-sm-10">
@@ -59,12 +59,12 @@
                     Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.
                     </p>
                     <ul>
-                        <li>Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à partir du <b>{{ feature_availability_date|date }}</b>.</li> 
+                        <li>Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à partir du <b>{{ feature_availability_date|date }}</b>.</li>
                         <li>Les candidatures acceptées ne seront visibles <b>qu'après échéance du délai d'annulation de 96H</b>.</li>
                     </ul>
                 </div>
                 <div class="col-sm-2 text-right">
-                    <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP"></img>
+                    <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP" class="img-fluid"></img>
                 </div>
             </div>
         </div>
@@ -88,8 +88,8 @@
             {% endif%}
         </div>
 
-        <div>
-            {# "Real" employee records objects #}
+        {# "Real" employee records objects #}
+        <div class="employee-records-list">
             {% if employee_records_list %}
                 {% for employee_record in navigation_pages %}
                     {% with item=employee_record.job_application %}
@@ -110,7 +110,7 @@
                 <span>Aucune fiche salarié avec le statut selectionné ...</span>
             </div>
         {% endif %}
-                
+
         {% include "includes/pagination.html" with page=navigation_pages %}
 
     </div>
