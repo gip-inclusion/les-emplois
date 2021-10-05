@@ -34,6 +34,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "updated_at",
         "approval_number",
         "siret",
+        "asp_id",
         "asp_batch_file",
         "asp_batch_line_number",
         "asp_processing_code",

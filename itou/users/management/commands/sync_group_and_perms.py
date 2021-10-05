@@ -41,6 +41,9 @@ class Command(BaseCommand):
             "view_prolongation",
             # cities.City
             "view_city",
+            # employee_record.EmployeeRecord
+            "view_employeerecord",
+            "change_employeerecord",
             # eligibility.AdministrativeCriteria
             "view_administrativecriteria",
             # eligibility.EligibilityDiagnosis
@@ -99,6 +102,9 @@ class Command(BaseCommand):
             "add_user",
             "change_user",
             "view_user",
+            # users.JobseekerProfile
+            "view_jobseekerprofile",
+            "change_jobseekerprofile",
             # ASP
             "view_commune",
             "view_country",

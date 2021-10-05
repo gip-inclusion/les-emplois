@@ -272,7 +272,12 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
         "hexa_commune",
     )
 
-    list_display = ("pk", "user", "username")
+    list_display = (
+        "pk",
+        "user",
+        "username",
+        "pole_emploi_id",
+    )
 
     search_fields = (
         "user__first_name",
@@ -281,6 +286,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = (
+        "pole_emploi_id",
         "hexa_lane_number",
         "hexa_std_extension",
         "hexa_non_std_extension",
@@ -297,6 +303,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
                 "fields": (
                     "user",
                     "education_level",
+                    "pole_emploi_id",
                     "pole_emploi_since",
                     "unemployed_since",
                     "resourceless",
@@ -336,4 +343,8 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
     def username(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
 
+    def pole_emploi_id(self, obj):
+        return obj.user.pole_emploi_id or "-"
+
     username.short_description = "Nom complet"
+    pole_emploi_id.short_description = "Identifiant Pôle emploi"
