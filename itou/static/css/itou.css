@@ -97,28 +97,6 @@ duet-date-picker.is-invalid~.invalid-feedback {
     display: block
 }
 
-.duet-date__input {
-    border-color: #ced4da;
-    /* Match with colors of Bootstrap 4. */
-}
-
-
-/* Welcoming tour */
-
-
-/* #welcoming_tour .carousel-indicators {
-    bottom: 3rem;
-}
-
-#welcoming_tour .carousel-indicators li {
-    background-color: #007bff;
-    background-color: var(--primary);
-    border-radius: 50%;
-    width: 10px;
-    height: 10px;
-}
- */
-
 
 /* Missing Boostrap utilities
 --------------------------------------------------------------------------- */
