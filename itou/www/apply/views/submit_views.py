@@ -208,18 +208,21 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
 
     job_seeker_name = None
     form = UserExistsForm(data=request.POST or None)
+    nir = session_data.get("nir")
+    can_add_nir = False
     preview_mode = False
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
     if request.method == "POST" and form.is_valid():
         job_seeker = form.get_user()
+        can_add_nir = nir and request.user.can_add_nir(job_seeker)
 
         if job_seeker:
             # Go to the next step.
             if request.POST.get("save"):
                 session_data["job_seeker_pk"] = job_seeker.pk
                 request.session.modified = True
-                if request.user.can_add_nir(job_seeker) and session_data.get("nir"):
+                if can_add_nir:
                     job_seeker.nir = session_data["nir"]
                     job_seeker.save()
                 return HttpResponseRedirect(next_url)
@@ -248,7 +251,14 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
             next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
             return HttpResponseRedirect(f"{next_url}?{args}")
 
-    context = {"job_seeker_name": job_seeker_name, "form": form, "preview_mode": preview_mode, "siae": siae}
+    context = {
+        "job_seeker_name": job_seeker_name,
+        "form": form,
+        "can_add_nir": can_add_nir,
+        "nir": nir,
+        "preview_mode": preview_mode,
+        "siae": siae,
+    }
     return render(request, template_name, context)
 
 

@@ -5,6 +5,11 @@
 
     {{ block.super }}
 
+    <div class="alert alert-warning">
+        Aucun utilisateur n'est incrit avec ce numéro de sécurité sociale.
+        Merci de renseigner l'adresse e-mail de votre candidat.
+    </div>
+
     <form method="post" action="" class="js-prevent-multiple-submit">
 
         {% csrf_token %}
@@ -39,6 +44,9 @@
                                 « Ce n'est pas mon candidat » afin d'enregistrer ses informations
                                 personnelles.
                             </p>
+                            {% if can_add_nir %}
+                                <p>En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir }} soit associé à ce candidat.</b></p>
+                            {% endif %}
                         </div>
                         <div class="modal-footer">
                             {% buttons %}
