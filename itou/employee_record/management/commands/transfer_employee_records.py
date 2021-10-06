@@ -183,8 +183,9 @@ class Command(BaseCommand):
                 record_errors += 1
                 continue
 
+            # Employee record succesfully processed by ASP :
             if processing_code == success_code:
-                # Archive JSON copy of employee record (with processing code and label)
+                # Archive a JSON copy of employee record (with processing code and label)
                 employee_record.asp_processing_code = processing_code
                 employee_record.asp_processing_label = processing_label
 
@@ -202,19 +203,22 @@ class Command(BaseCommand):
                             employee_record.status,
                             ex,
                         )
-
                 else:
                     self.logger.info(
                         "DRY-RUN: Accepted %s, code: %s, label: %s", employee_record, processing_code, processing_label
                     )
-                continue
-
-            if not dry_run:
-                employee_record.update_as_rejected(processing_code, processing_label)
             else:
-                self.logger.info(
-                    "DRY-RUN: Rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label
-                )
+                # Employee record has not been processed by ASP :
+                if not dry_run:
+                    # Fixes unexpected stop on multiple pass on the same file
+                    if employee_record.status != EmployeeRecord.Status.REJECTED:
+                        employee_record.update_as_rejected(processing_code, processing_label)
+                    else:
+                        self.logger.warning("Already rejected: %s", employee_record)
+                else:
+                    self.logger.info(
+                        "DRY-RUN: Rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label
+                    )
 
         return record_errors
 
