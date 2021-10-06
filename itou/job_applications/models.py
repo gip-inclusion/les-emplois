@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, When
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, When
 from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -191,14 +191,20 @@ class JobApplicationQuerySet(models.QuerySet):
         - be definitely accepted (hiring can't be cancelled after CANCELLATION_DAYS_AFTER_HIRING_STARTED days)
         - have no one-to-one relationship with an employee record
         - have been created after production date
+
+        An eligible job application *may* or *may not* have an employee record object linked
+        to it.
+        For instance, when creating a new employee record from an eligible job application
+        and NOT finishing the entire creation process.
+        (employee record object creation occurs half-way of the "tunnel")
         """
         today = datetime.date.today()
         cancellation_date = today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
         return (
             self.exclude(approval=None)
             .accepted()
+            .filter(Q(employee_record__status="NEW") | Q(employee_record__isnull=True))
             .filter(
-                employee_record__isnull=True,
                 to_siae=siae,
                 hiring_start_at__lt=cancellation_date,
                 # Must be accepted after production date:

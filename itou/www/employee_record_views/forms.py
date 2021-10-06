@@ -200,10 +200,12 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             if not self.cleaned_data["pole_emploi_since"]:
                 raise forms.ValidationError("La durée d'inscription à Pôle emploi est obligatoire")
 
-            if not self.cleaned_data["pole_emploi_id"]:
+            if not self.cleaned_data.get("pole_emploi_id"):
+                # This field is validated and may not exist in `cleaned_data`
                 raise forms.ValidationError("L'identifiant Pôle emploi est obligatoire")
 
             self.instance.user.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
+            self.instance.user.save()
         else:
             # Reset "inner" fields
             self.cleaned_data["pole_emploi_since"] = self.cleaned_data["pole_emploi_id"] = ""

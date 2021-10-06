@@ -200,7 +200,7 @@ class AbstractPeriod(models.Model):
     """
 
     start_date = models.DateField(verbose_name="Début de validité")
-    end_date = models.DateField(verbose_name="Fin de validité", null=True)
+    end_date = models.DateField(verbose_name="Fin de validité", null=True, blank=True)
 
     objects = models.Manager.from_queryset(PeriodQuerySet)()
 

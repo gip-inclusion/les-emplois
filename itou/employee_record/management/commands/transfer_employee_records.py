@@ -191,9 +191,18 @@ class Command(BaseCommand):
                 serializer = EmployeeRecordSerializer(employee_record)
 
                 if not dry_run:
-                    employee_record.update_as_accepted(
-                        processing_code, processing_label, renderer.render(serializer.data).decode()
-                    )
+                    try:
+                        employee_record.update_as_accepted(
+                            processing_code, processing_label, renderer.render(serializer.data).decode()
+                        )
+                    except Exception as ex:
+                        self.logger.warning(
+                            "Can't update employee record : %s, STATUS: %s, exc: %s",
+                            employee_record,
+                            employee_record.status,
+                            ex,
+                        )
+
                 else:
                     self.logger.info(
                         "DRY-RUN: Accepted %s, code: %s, label: %s", employee_record, processing_code, processing_label
