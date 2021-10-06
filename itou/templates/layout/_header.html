@@ -62,13 +62,13 @@
 
             <li>
               <a class="nav-link" href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" aria-label="Accéder au Forum de l'inclusion (nouvel onglet)">Communauté 
-                <img src="{% static_theme_images 'ico-arrow-right.svg' %}" alt="Flèche pour un lien externe">
+                  {% include "includes/icon.html" with icon="external-link" %}
               </a>
             </li>
 
             <li>
               <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Documentation 
-                <img src="{% static_theme_images 'ico-arrow-right.svg' %}" alt="Flèche pour un lien externe">
+                  {% include "includes/icon.html" with icon="external-link" %}
               </a>
             </li>
           </ul>
