@@ -35,14 +35,14 @@
             </h3>
         {% endif %}
 
-        <h4 class="font-weight-normal text-muted">
+        <p class="font-weight-bold text-muted">
             {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages and prescriber_orgs_page.paginator.count as counter %}
                 <b>{{ counter }}</b> résultat{% if counter > 1 %}s{% endif %}
                 {% if prescriber_orgs_page.paginator.num_pages > 1 %}
                     - Page <b>{{ current_page }}</b>/{{ total_pages }}
                 {% endif %}
             {% endwith %}
-        </h4>
+        </p>
 
         <div class="row">
             <div class="col-12 col-md-4">
@@ -52,11 +52,11 @@
                 {% for prescriber_org in prescriber_orgs_page %}
                     <div class="card my-4">
                         <div class="card-body">
-                            <h5 class="card-title">
+                            <h3 class="card-title">
                                 <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
                                     {{ prescriber_org.name }}
                                 </a>
-                            </h5>
+                            </h3>
                             <h6 class="card-subtitle mb-2 text-muted">
                                 {{ prescriber_org.get_kind_display }}
                                 {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
@@ -65,10 +65,10 @@
                             <h6 class="card-subtitle mb-2 text-muted">
                                 {{ prescriber_org.address_on_one_line }}
                             </h6>
-                            <p class="card-text">
-                                <span class="badge badge-dark">{{ prescriber_org.distance.km|floatformat:"-1" }} km</span>
+                            <small class="card-text">
+                                <span class="badge badge-info">{{ prescriber_org.distance.km|floatformat:"-1" }} km</span>
                                 de votre lieu de recherche
-                            </p>
+                            </small>
                         </div>
                     </div>
                 {% empty %}
