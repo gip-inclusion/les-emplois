@@ -63,6 +63,7 @@ class CheckJobSeekerNirForm(forms.Form):
 
     def clean_nir(self):
         nir = self.cleaned_data["nir"]
+        nir = nir.replace(" ", "")
         if not self.job_seeker:
             # For the moment, consider NIR to be unique among users.
             self.job_seeker = User.objects.filter(nir=nir).first()
