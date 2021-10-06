@@ -19,9 +19,11 @@
                 <td>
                     {{ member.user.get_full_name }}
                     {% if member.user in active_admin_members %}
-                    <span class="badge badge-info" data-toggle="tooltip" title="Administrateur de la structure">
-                        admin                            
-                    </span>
+                        <small>
+                            <span class="badge badge-info" data-toggle="tooltip" title="Administrateur de la structure">
+                                admin
+                            </span>
+                        </small>
                     {% endif %}
                 </td>
                 <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
