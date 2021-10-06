@@ -428,6 +428,7 @@ class UtilsTemplateFiltersTestCase(TestCase):
 
     def test_format_nir(self):
         self.assertEqual(format_filters.format_nir("141068078200557"), "1 41 06 80 782 005 57")
+        self.assertEqual(format_filters.format_nir(" 1 41 06 80 782 005 57"), "1 41 06 80 782 005 57")
 
 
 class UtilsEmailsTestCase(TestCase):
