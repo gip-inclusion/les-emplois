@@ -54,6 +54,9 @@ class Command(BaseCommand):
 
         now = timezone.now().date()
         DATE_FORMAT = "%d/%m/%y"
+        # Sometimes, there are multiple date formats in the XLS file.
+        # Otherwise it would be too easy.
+        FALLBACK_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
         count_before = PoleEmploiApproval.objects.count()
         count_canceled_approvals = 0
@@ -70,10 +73,6 @@ class Command(BaseCommand):
         df.sort_values("DATE_HISTO")
         first_approval_date = df.iloc[0].DATE_HISTO.strftime(DATE_FORMAT)
         last_approval_date = df.iloc[-1].DATE_HISTO.strftime(DATE_FORMAT)
-
-        df["DATE_DEB"] = pd.to_datetime(df.DATE_DEB, format=DATE_FORMAT)
-        df["DATE_FIN"] = pd.to_datetime(df.DATE_FIN, format=DATE_FORMAT)
-        df["DATE_NAISS_BENE"] = pd.to_datetime(df.DATE_NAISS_BENE, format=DATE_FORMAT)
 
         self.stdout.write("Ready.")
         self.stdout.write(f"Importing up to {len(df)} approvals from {first_approval_date} to {last_approval_date}")
@@ -133,8 +132,23 @@ class Command(BaseCommand):
                 suffix = NUM_AGR_DEC[12:]
                 unique_approval_suffixes[suffix] = unique_approval_suffixes.get(suffix, 0) + 1
 
-            DATE_DEB_AGR_DEC = row["DATE_DEB"]
-            DATE_FIN_AGR_DEC = row["DATE_FIN"]
+            DATE_DEB_AGR_DEC = str(row["DATE_DEB"]).strip()
+            try:
+                DATE_DEB_AGR_DEC = datetime.datetime.strptime(DATE_DEB_AGR_DEC, DATE_FORMAT).date()
+            except ValueError:
+                DATE_DEB_AGR_DEC = datetime.datetime.strptime(DATE_DEB_AGR_DEC, FALLBACK_DATE_FORMAT).date()
+
+            DATE_FIN_AGR_DEC = str(row["DATE_FIN"]).strip()
+            try:
+                DATE_FIN_AGR_DEC = datetime.datetime.strptime(DATE_FIN_AGR_DEC, DATE_FORMAT).date()
+            except ValueError:
+                DATE_FIN_AGR_DEC = datetime.datetime.strptime(DATE_FIN_AGR_DEC, FALLBACK_DATE_FORMAT).date()
+
+            DATE_NAISS_BENE = str(row["DATE_NAISS_BENE"]).strip()
+            try:
+                DATE_NAISS_BENE = datetime.datetime.strptime(DATE_NAISS_BENE, DATE_FORMAT).date()
+            except ValueError:
+                DATE_NAISS_BENE = datetime.datetime.strptime(DATE_NAISS_BENE, FALLBACK_DATE_FORMAT).date()
 
             # Same start and end dates means that the approval has been canceled.
             if DATE_DEB_AGR_DEC == DATE_FIN_AGR_DEC:
@@ -143,8 +157,6 @@ class Command(BaseCommand):
                 self.logger.debug("Canceled approval found, skipping…")
                 self.logger.debug("%s - %s - %s", NUM_AGR_DEC, NOM_USAGE_BENE, PRENOM_BENE)
                 continue
-
-            DATE_NAISS_BENE = row["DATE_NAISS_BENE"]
 
             # Pôle emploi sends us the year in a two-digit format ("14/03/68")
             # but strptime() will set it in the future:
