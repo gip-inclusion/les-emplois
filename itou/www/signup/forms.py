@@ -52,6 +52,10 @@ class JobSeekerNirForm(forms.Form):
         ),
     )
 
+    def clean_nir(self):
+        nir = self.cleaned_data["nir"]
+        return nir.replace(" ", "")
+
 
 class JobSeekerSituationForm(forms.Form):
 
