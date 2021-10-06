@@ -59,7 +59,7 @@ h1 {
 --------------------------------------------------------------------------- */
 
 body:after {
-    content: "BETA";
+    content: 'BETA';
     color: #fff;
     background: #d63626;
     text-align: center;
@@ -78,7 +78,7 @@ body:after {
 --------------------------------------------------------------------------- */
 
 .form-group-required>label:first-of-type:after {
-    content: " *";
+    content: ' *';
     color: #d63626;
 }
 
@@ -94,7 +94,7 @@ https://getbootstrap.com/docs/4.6/components/forms/#server-side
 */
 
 duet-date-picker.is-invalid~.invalid-feedback {
-    display: block
+    display: block;
 }
 
 
@@ -170,7 +170,7 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 /* https://stackoverflow.com/a/27315792 */
 
 _:-ms-fullscreen,
- :root .alert-old-browser {
+:root .alert-old-browser {
     display: block;
 }
 
