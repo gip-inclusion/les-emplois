@@ -215,10 +215,10 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
 
     if request.method == "POST" and form.is_valid():
         job_seeker = form.get_user()
-        can_add_nir = nir and request.user.can_add_nir(job_seeker)
 
         if job_seeker:
             # Go to the next step.
+            can_add_nir = nir and request.user.can_add_nir(job_seeker)
             if request.POST.get("save"):
                 session_data["job_seeker_pk"] = job_seeker.pk
                 request.session.modified = True
