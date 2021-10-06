@@ -309,6 +309,14 @@ Usage:
 }
 
 
+/* To be integrate to the global theme
+--------------------------------------------------------------------------- */
+
+.list-group-item {
+    background-color: transparent;
+}
+
+
 /* To be discussed
 --------------------------------------------------------------------------- */
 
