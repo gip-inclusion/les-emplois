@@ -45,7 +45,8 @@ class Command(BaseCommand):
             if not dry_run:
                 job_app.save()
 
-        self.stdout.write(f"Unable to fix {job_apps_without_sender.count()} job applications.")
+        unfixable_job_apps_without_sender = JobApplication.objects.filter(sender__isnull=True)
+        self.stdout.write(f"Unable to fix {unfixable_job_apps_without_sender.count()} job applications.")
 
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
