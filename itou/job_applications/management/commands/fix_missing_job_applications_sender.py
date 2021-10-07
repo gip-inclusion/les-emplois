@@ -13,7 +13,7 @@ class Command(BaseCommand):
     * 1631 cases before 16/09/2021 (1st run)
     * 3180 cases before 02/10/2021 (2nd run)
     * 3288 cases before running this fix
-    * 1629 cases after running this fix \o/
+    * 1629 cases after running this fix!!!
 
     Some cases cannot be fixed by this fix.
 
