@@ -20,6 +20,12 @@
                 <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
             {% endif %}
 
+            {% if form.errors %}
+                <div class="alert alert-info">
+                    Vous possédez un numéro de sécurité sociale temporaire ? <button type="submit" name="skip" value="1" class="btn btn-link m-0 p-0">Cliquez ici pour accéder à l'étape suivante.</button>
+                </div>
+            {% endif %}
+
             {% buttons %}
                 <button type="submit" class="btn btn-primary">Suivant</button>
             {% endbuttons %}

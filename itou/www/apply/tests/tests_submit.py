@@ -189,6 +189,60 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.resume_link, post_data["resume_link"])
 
+    def test_apply_as_job_seeker_temporary_nir(self):
+        """
+        Full path is tested above. See test_apply_as_job_seeker.
+        """
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+
+        user = JobSeekerFactory(nir="")
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        # Entry point.
+        # ----------------------------------------------------------------------
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+
+        # Follow all redirections until NIR.
+        # ----------------------------------------------------------------------
+        nir = "123456789KLOIU"
+        post_data = {"nir": nir}
+
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["form"].is_valid())
+
+        # Temporary number should be skipped.
+        post_data = {"nir": nir, "skip": 1}
+        response = self.client.post(next_url, data=post_data, follow=True)
+        last_url = response.redirect_chain[-1][0]
+        expected_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(last_url, expected_url)
+        self.assertEqual(response.status_code, 200)
+
+        # Step application.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(last_url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "selected_jobs": [siae.job_description_through.first().pk],
+            "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rocky-balboa.pdf",
+        }
+        response = self.client.post(last_url, data=post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        last_url = response.redirect_chain[-1][0]
+        next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(last_url, next_url)
+        user.refresh_from_db()
+        self.assertFalse(user.nir)
+
     def test_apply_as_jobseeker_to_siae_with_approval_in_waiting_period(self):
         """
         Apply as jobseeker to a SIAE (not a GEIQ) with an approval in waiting period.

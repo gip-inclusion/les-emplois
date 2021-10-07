@@ -53,6 +53,9 @@ class JobSeekerNirForm(forms.Form):
     )
 
     def clean_nir(self):
+        """
+        For the moment, allow job seekers to register with a NIR that may exist.
+        """
         nir = self.cleaned_data["nir"]
         return nir.replace(" ", "")
 
@@ -103,20 +106,23 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
 
-        # Retrieve NIR from session.
-        signed_nir = request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY]
-        signer = Signer()
-        nir = signer.unsign(signed_nir)
-
         # Create the user.
         user = super().save(request)
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
-        user.nir = nir
         user.is_job_seeker = True
+
+        # Retrieve NIR from session.
+        signed_nir = request.session.get(settings.ITOU_SESSION_SIGNED_NIR_KEY)
+        if signed_nir:
+            signer = Signer()
+            nir = signer.unsign(signed_nir)
+            user.nir = nir
+
         user.save()
 
-        del request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY]
+        if signed_nir:
+            del request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY]
 
         return user
 
