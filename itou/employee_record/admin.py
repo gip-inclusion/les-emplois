@@ -5,6 +5,14 @@ import itou.employee_record.models as models
 
 @admin.register(models.EmployeeRecord)
 class EmployeeRecordAdmin(admin.ModelAdmin):
+    @admin.action(description="Marquer les fiches salarié selectionnées comme COMPLETÉES")
+    def update_employee_record_as_ready(self, _request, queryset):
+        queryset.update(status=models.EmployeeRecord.Status.READY)
+
+    actions = [
+        update_employee_record_as_ready,
+    ]
+
     list_display = (
         "pk",
         "created_at",
