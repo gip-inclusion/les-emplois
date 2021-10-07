@@ -19,7 +19,7 @@
 /* Spacing.
 --------------------------------------------------------------------------- */
 
-.s-main>section {
+.s-main > section {
     padding: 5rem 0;
 }
 
@@ -39,18 +39,18 @@ h1 {
     justify-content: space-between;
 }
 
-.card-deck-itou>.card {
+.card-deck-itou > .card {
     flex: 0 0 26%;
     padding: 1.5rem;
 }
 
-.card-deck-itou>.card>.card-body {
+.card-deck-itou > .card > .card-body {
     align-items: center;
     justify-content: center;
     display: flex;
 }
 
-.card-deck-itou>.card>.card-footer {
+.card-deck-itou > .card > .card-footer {
     background: transparent;
 }
 
@@ -77,7 +77,7 @@ body:after {
 /* Forms.
 --------------------------------------------------------------------------- */
 
-.form-group-required>label:first-of-type:after {
+.form-group-required > label:first-of-type:after {
     content: ' *';
     color: #d63626;
 }
@@ -197,13 +197,13 @@ Usage:
     </ul>
 --------------------------------------------------------------------------- */
 
-.multi-steps>li.is-active:before,
-.multi-steps>li.is-active~li:before {
+.multi-steps > li.is-active:before,
+.multi-steps > li.is-active~li:before {
     content: counter(stepNum);
 }
 
-.multi-steps>li.is-active:after,
-.multi-steps>li.is-active~li:after {
+.multi-steps > li.is-active:after,
+.multi-steps > li.is-active~li:after {
     background-color: #ededed;
 }
 
@@ -213,7 +213,7 @@ Usage:
     width: 100%;
 }
 
-.multi-steps>li {
+.multi-steps > li {
     counter-increment: stepNum;
     text-align: center;
     display: table-cell;
@@ -222,7 +222,7 @@ Usage:
     z-index: 1;
 }
 
-.multi-steps>li:before {
+.multi-steps > li:before {
     content: '\2713';
     /* Check mark symbol. */
     display: block;
@@ -237,7 +237,7 @@ Usage:
     border-radius: 50%;
 }
 
-.multi-steps>li:after {
+.multi-steps > li:after {
     content: '';
     height: 2px;
     width: 100%;
@@ -248,20 +248,20 @@ Usage:
     z-index: -1;
 }
 
-.multi-steps>li:last-child:after {
+.multi-steps > li:last-child:after {
     display: none;
 }
 
-.multi-steps>li.is-active:before {
+.multi-steps > li.is-active:before {
     background-color: #fff;
     border-color: #28a745;
 }
 
-.multi-steps>li.is-active~li {
+.multi-steps > li.is-active~li {
     color: #808080;
 }
 
-.multi-steps>li.is-active~li:before {
+.multi-steps > li.is-active~li:before {
     background-color: #ededed;
     border-color: #ededed;
 }
