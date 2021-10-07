@@ -1,83 +1,79 @@
-{% extends "layout/base.html" %}
+{% extends "layout/content_two_columns.html" %}
 {% load bootstrap4 %}
 {% load static %}
 
 {% block title %}Demandeur d'emploi - Inscription{{ block.super }}{% endblock %}
 
-{% block content_full_viewport %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-sm order-sm-12 mt-5">
-            <!-- TODO: show steps as in Prescriber signup path? -->
-            <h1>
-                Inscription <span class="text-muted">candidat</span>
-            </h1>
+{% block right_content %}
+    <div class="mt-5">
+        <h1>
+            Inscription <span class="text-muted">candidat</span>
+        </h1>
 
-            <b class="mb-4">Inscrivez-vous avec un service tiers</b>
-            <div class="row mt-3">
-                <!-- TODO: change condition -->
-                {% if not show_france_connect %}
-                    <div class="col-sm">
-                        {% include "signup/includes/france_connect_button.html" %}
-                    </div>
-                {% endif %}
-
+        <b class="mb-4">Inscrivez-vous avec un service tiers</b>
+        <div class="row mt-3">
+            <!-- TODO: change condition -->
+            {% if not show_france_connect %}
                 <div class="col-sm">
-                    <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
+                    {% include "signup/includes/france_connect_button.html" %}
                 </div>
-            </div>
-            <div class="mt-4 mb-3">
-                <b>Ou utilisez votre adresse e-mail</b>
-            </div>
+            {% endif %}
 
-            <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit">
-
-                {% csrf_token %}
-
-                {% if redirect_field_value %}
-                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-                {% endif %}
-
-                {# bootstrap_form_errors form alert_error_type="all" #}
-                {% bootstrap_field form.email form_group_class="form-group mb-1" %}
-                <div class="text-right small font-italic mb-0">
-                    {% include "signup/includes/no_email_link.html" %}
-                </div>
-
-                {% bootstrap_field form.last_name form_group_class="form-group mt-1" %}
-                {% bootstrap_field form.first_name %}
-                {% bootstrap_field form.password1 %}
-                {% bootstrap_field form.password2 %}
-
-                <div class="small pb-4 text-secondary">
-                    Vous pourrez créer et modifier des informations telles que votre adresse ou un lien vers un CV après votre inscription, à partir de votre tableau de bord.
-                </div>
-
-                {% include "signup/includes/submit_rgpd.html" %}
-
-                {% buttons %}
-                    <button type="submit" class="btn btn-primary">Inscription</button>
-                {% endbuttons %}
-
-            </form>
-
-            <div class="mt-5 mb-5">
-                <p>Vous avez déjà un compte ?</p>
-                <p>
-                    <a class="btn btn-outline-primary" href="{% url 'account_login' %}">
-                    Connexion
-                    </a>
-                </p>
+            <div class="col-sm">
+                <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
             </div>
         </div>
-        <div class="col-sm order-sm-1 bg-emploi-lightest">
-            <div class="my-5 text-center">
-                <h2 class="ff-extra-01">Vos informations de connexion</h2>
-                <img class="mt-5" src="{% static 'img/job_seeker_signup.svg' %}">
+        <div class="mt-4 mb-3">
+            <b>Ou utilisez votre adresse e-mail</b>
+        </div>
+
+        <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit">
+
+            {% csrf_token %}
+
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+            {% endif %}
+
+            {# bootstrap_form_errors form alert_error_type="all" #}
+            {% bootstrap_field form.email form_group_class="form-group mb-1" %}
+            <div class="text-right small font-italic mb-0">
+                {% include "signup/includes/no_email_link.html" %}
             </div>
+
+            {% bootstrap_field form.last_name form_group_class="form-group mt-1" %}
+            {% bootstrap_field form.first_name %}
+            {% bootstrap_field form.password1 %}
+            {% bootstrap_field form.password2 %}
+
+            <div class="small pb-4 text-secondary">
+                Vous pourrez créer et modifier des informations telles que votre adresse ou un lien vers un CV après votre inscription, à partir de votre tableau de bord.
+            </div>
+
+            {% include "signup/includes/submit_rgpd.html" %}
+
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">Inscription</button>
+            {% endbuttons %}
+
+        </form>
+
+        <div class="mt-5 mb-5">
+            <p>Vous avez déjà un compte ?</p>
+            <p>
+                <a class="btn btn-outline-primary" href="{% url 'account_login' %}">
+                Connexion
+                </a>
+            </p>
         </div>
     </div>
-</div>
+{% endblock %}
+
+{% block left_content %}
+    <div class="my-5 text-center">
+        <h2 class="ff-extra-01">Vos informations de connexion</h2>
+        <img class="mt-5" src="{% static 'img/job_seeker_signup.svg' %}">
+    </div>
 {% endblock %}
 
 {% block script %}
