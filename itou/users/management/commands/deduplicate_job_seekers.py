@@ -13,7 +13,11 @@ class Command(BaseCommand):
     """
     Deduplicate job seekers.
 
-    To run the command without any change in DB and have a preview of which accounts will be merged:
+    This is temporary and should be deleted after the release of the NIR
+    which should prevent duplication.
+
+    To run the command without any change in DB and have a preview of which
+    accounts will be merged:
         django-admin deduplicate_job_seekers --dry-run
 
     To merge duplicates job seekers in the database:

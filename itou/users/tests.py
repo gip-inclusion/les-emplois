@@ -81,7 +81,8 @@ class ManagementCommandsTest(TestCase):
     """
     Test the deduplication of several users.
 
-    This is temporary until the release of the NIR which should prevent duplication.
+    This is temporary and should be deleted after the release of the NIR
+    which should prevent duplication.
     """
 
     def test_deduplicate_job_seekers(self):

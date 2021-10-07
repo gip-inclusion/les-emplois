@@ -7,6 +7,29 @@ class Command(BaseCommand):
     """
     Fix missing `sender` field in JobApplication entries.
 
+    Half of the cases where caused by `deduplicate_job_seekers`.
+    But 1631 cases were existing before the first run:
+
+    * 1631 cases before 16/09/2021 (1st run)
+    * 3180 cases before 02/10/2021 (2nd run)
+    * 3288 cases before running this fix
+    * 1629 cases after running this fix \o/
+
+    Some cases cannot be fixed by this fix.
+
+    This is temporary and should be deleted after having been
+    run in production.
+
+    Query:
+        select
+            *
+        from
+            job_applications_jobapplication
+        where
+            sender_id is null
+        order by
+            created_at
+
     To debug:
         django-admin fix_missing_job_applications_sender --dry-run
 
@@ -35,6 +58,7 @@ class Command(BaseCommand):
                 try:
                     job_app.sender = job_app.sender_prescriber_organization.active_admin_members.first()
                 except AttributeError:
+                    # Some cases cannot be fixed by this fix, mostly pre-existing cases.
                     self.stdout.write(
                         f"Unable to find a `sender` for {job_app.pk} since it has no `sender_prescriber_organization`."
                     )
