@@ -193,9 +193,12 @@ class Command(BaseCommand):
 
                 if not dry_run:
                     try:
-                        employee_record.update_as_accepted(
-                            processing_code, processing_label, renderer.render(serializer.data).decode()
-                        )
+                        if employee_record.status != EmployeeRecord.Status.PROCESSED:
+                            employee_record.update_as_accepted(
+                                processing_code, processing_label, renderer.render(serializer.data).decode()
+                            )
+                        else:
+                            self.logger.warning("Already accepted: %s", employee_record)
                     except Exception as ex:
                         self.logger.warning(
                             "Can't update employee record : %s, STATUS: %s, exc: %s",
