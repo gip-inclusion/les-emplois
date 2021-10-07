@@ -316,6 +316,10 @@ Usage:
     background-color: transparent;
 }
 
+.s-postheader__col .nav-link.active {
+    /* .font-weight-bold */
+    font-weight: 700;
+}
 
 /* To be discussed
 --------------------------------------------------------------------------- */
