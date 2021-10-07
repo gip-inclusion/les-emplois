@@ -1,50 +1,44 @@
 {# django-allauth template override. #}
-{% extends "layout/base.html" %}
+{% extends "layout/content_two_columns.html" %}
 {% load bootstrap4 %}
 {% load static %}
 
 {% block title %}Connexion{{ block.super }}{% endblock %}
 
-{% block content_full_viewport %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-sm order-sm-12 mt-5">
-            <!-- TODO: show steps as in Prescriber signup path? -->
-            <h1>Inscription <span class="text-muted">candidat</span></h1>
-            <form method="post" action="{% url 'signup:job_seeker_nir' %}" class="js-prevent-multiple-submit js-format-nir">
+{% block right_content %}
+    <div class="mt-5">
+        <h1>Inscription <span class="text-muted">candidat</span></h1>
+        <form method="post" action="{% url 'signup:job_seeker_nir' %}" class="js-prevent-multiple-submit js-format-nir">
 
-                {% csrf_token %}
+            {% csrf_token %}
 
-                {% bootstrap_form_errors form type="all" %}
+            {% bootstrap_form_errors form type="all" %}
 
-                {% bootstrap_form form %}
-                <!-- TODO: automatically slice NIR numbers -->
+            {% bootstrap_form form %}
 
-                {% if redirect_field_value %}
-                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-                {% endif %}
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+            {% endif %}
 
-                {% buttons %}
-                    <button type="submit" class="btn btn-primary">Suivant</button>
-                {% endbuttons %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">Suivant</button>
+            {% endbuttons %}
 
-            </form>
-            <p class="mt-5">
-                Vous n'avez pas de numéro de sécurité sociale ?<br>
-                <a href="https://www.ameli.fr/vosges/assure/remboursements/etre-bien-rembourse/carte-vitale    " rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">ameli.fr {% include "includes/icon.html" with icon="external-link" %}</a>, le site de l'assurance maladie, vous explique comment l'obtenir.
-            </p>
-        </div>
-
-        <div class="col-sm order-sm-1 bg-emploi-lightest">
-            <div class="my-5 text-center">
-                <h2 class="ff-extra-01">Où trouver mon numéro de sécurité sociale ?</h2>
-                <img class="mt-5" src="{% static 'img/carte_vitale.png' %}">
-                <p class="ff-extra-01 mt-0">Il est présent à cet endroit sur votre carte Vitale.</p>
-            </div>
-        </div>
+        </form>
+        <p class="mt-5">
+            Vous n'avez pas de numéro de sécurité sociale ?<br>
+            <a href="https://www.ameli.fr/vosges/assure/remboursements/etre-bien-rembourse/carte-vitale"rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">ameli.fr {% include "includes/icon.html" with icon="external-link" %}</a>, le site de l'assurance maladie, vous explique comment l'obtenir.
+        </p>
     </div>
-</div>
 
+{% endblock %}
+
+{% block left_content %}
+    <div class="my-5 text-center">
+        <h2 class="ff-extra-01">Où trouver mon numéro de sécurité sociale ?</h2>
+        <img class="mt-5" src="{% static 'img/carte_vitale.png' %}">
+        <p class="ff-extra-01 mt-0">Il est présent à cet endroit sur votre carte Vitale.</p>
+    </div>
 {% endblock %}
 
 {% block script %}

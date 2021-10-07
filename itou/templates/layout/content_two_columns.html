@@ -1,0 +1,17 @@
+{% extends "layout/base.html" %}
+{% block content_full_viewport %}
+
+    {% block pre_content %}{% endblock %}
+
+    <main class="{% block content_container_css_classes %}{% endblock %} container-fluid">
+        <div class="row">
+            <div class="col-sm order-sm-12">
+                {% block right_content %}{% endblock %}
+            </div>
+            <div class="col-sm order-sm-1 bg-emploi-lightest">
+                {% block left_content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+{% endblock %}
