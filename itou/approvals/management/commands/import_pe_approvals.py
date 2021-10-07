@@ -24,6 +24,11 @@ class Command(BaseCommand):
 
     help = "Import the content of the Pole emploi's approvals xlsx file into the database."
 
+    DATE_FORMAT = "%d/%m/%y"
+    # Sometimes, there are multiple date formats in the XLS file.
+    # Otherwise it would be too easy.
+    FALLBACK_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
     def add_arguments(self, parser):
         parser.add_argument(
             "--file-path",
@@ -48,15 +53,21 @@ class Command(BaseCommand):
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
 
+    def parse_date(self, value):
+        """
+        In some of the XLS files provided, there are find two date formats.
+        """
+        value = str(value).strip()
+        try:
+            return datetime.datetime.strptime(value, self.DATE_FORMAT).date()
+        except ValueError:
+            return datetime.datetime.strptime(value, self.FALLBACK_DATE_FORMAT).date()
+
     def handle(self, file_path, dry_run=False, **options):
 
         self.set_logger(options.get("verbosity"))
 
         now = timezone.now().date()
-        DATE_FORMAT = "%d/%m/%y"
-        # Sometimes, there are multiple date formats in the XLS file.
-        # Otherwise it would be too easy.
-        FALLBACK_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
         count_before = PoleEmploiApproval.objects.count()
         count_canceled_approvals = 0
@@ -69,10 +80,10 @@ class Command(BaseCommand):
         chunk_size = 5000
 
         df = pd.read_excel(file_path)
-        df["DATE_HISTO"] = pd.to_datetime(df.DATE_HISTO, format=DATE_FORMAT)
+        df["DATE_HISTO"] = pd.to_datetime(df.DATE_HISTO, format=self.DATE_FORMAT)
         df.sort_values("DATE_HISTO")
-        first_approval_date = df.iloc[0].DATE_HISTO.strftime(DATE_FORMAT)
-        last_approval_date = df.iloc[-1].DATE_HISTO.strftime(DATE_FORMAT)
+        first_approval_date = df.iloc[0].DATE_HISTO.strftime(self.DATE_FORMAT)
+        last_approval_date = df.iloc[-1].DATE_HISTO.strftime(self.DATE_FORMAT)
 
         self.stdout.write("Ready.")
         self.stdout.write(f"Importing up to {len(df)} approvals from {first_approval_date} to {last_approval_date}")
@@ -132,23 +143,9 @@ class Command(BaseCommand):
                 suffix = NUM_AGR_DEC[12:]
                 unique_approval_suffixes[suffix] = unique_approval_suffixes.get(suffix, 0) + 1
 
-            DATE_DEB_AGR_DEC = str(row["DATE_DEB"]).strip()
-            try:
-                DATE_DEB_AGR_DEC = datetime.datetime.strptime(DATE_DEB_AGR_DEC, DATE_FORMAT).date()
-            except ValueError:
-                DATE_DEB_AGR_DEC = datetime.datetime.strptime(DATE_DEB_AGR_DEC, FALLBACK_DATE_FORMAT).date()
-
-            DATE_FIN_AGR_DEC = str(row["DATE_FIN"]).strip()
-            try:
-                DATE_FIN_AGR_DEC = datetime.datetime.strptime(DATE_FIN_AGR_DEC, DATE_FORMAT).date()
-            except ValueError:
-                DATE_FIN_AGR_DEC = datetime.datetime.strptime(DATE_FIN_AGR_DEC, FALLBACK_DATE_FORMAT).date()
-
-            DATE_NAISS_BENE = str(row["DATE_NAISS_BENE"]).strip()
-            try:
-                DATE_NAISS_BENE = datetime.datetime.strptime(DATE_NAISS_BENE, DATE_FORMAT).date()
-            except ValueError:
-                DATE_NAISS_BENE = datetime.datetime.strptime(DATE_NAISS_BENE, FALLBACK_DATE_FORMAT).date()
+            DATE_DEB_AGR_DEC = self.parse_date(row["DATE_DEB"])
+            DATE_FIN_AGR_DEC = self.parse_date(row["DATE_FIN"])
+            DATE_NAISS_BENE = self.parse_date(row["DATE_NAISS_BENE"])
 
             # Same start and end dates means that the approval has been canceled.
             if DATE_DEB_AGR_DEC == DATE_FIN_AGR_DEC:
