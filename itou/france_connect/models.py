@@ -72,36 +72,36 @@ def create_user_from_fc_user_data(fc_user_data: FranceConnectUserData):
     user = User(is_job_seeker=True)
     for field in ["username", "first_name", "last_name", "birthdate", "email", "phone"]:
         value = getattr(fc_user_data, field)
-        if user.update_external_data_source_history(settings.PROVIDER_FRANCE_CONNECT, field, value):
+        if user.update_external_data_source_history_field(settings.PROVIDER_FRANCE_CONNECT, field, value):
             setattr(user, field, value)
 
     if fc_user_data.country == "France":
         for field in ["address_line_1", "post_code", "city"]:
             value = getattr(fc_user_data, field)
-            if user.update_external_data_source_history(settings.PROVIDER_FRANCE_CONNECT, field, value):
+            if user.update_external_data_source_history_field(settings.PROVIDER_FRANCE_CONNECT, field, value):
                 setattr(user, field, getattr(fc_user_data, field))
     return user
 
 
-def update_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData, provider_json: dict):
+def update_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData):
     for field in dataclasses.fields(fc_user_data):
         if field.name == "country":
             continue
         value = getattr(fc_user_data, field.name)
         if (
-            user.update_external_data_source_history(settings.PROVIDER_FRANCE_CONNECT, field.name, value)
+            user.update_external_data_source_history_field(settings.PROVIDER_FRANCE_CONNECT, field.name, value)
             or getattr(fc_user_data, field.name) == ""
         ):
             setattr(user, field.name, getattr(fc_user_data, field.name))
 
 
 def create_or_update_user(fc_user_data: FranceConnectUserData):
-    # We can't use a get_or_create here because we have to set provider_json for each field
+    # We can't use a get_or_create here because we have to set the provider data for each field
     try:
         user = User.objects.get(username=fc_user_data.username)
         # Should we update the user fields on user authenticate?
         # In first approach, it safes to update FC fields
-        update_fields_from_user_data(user, fc_user_data, user.provider_json)
+        update_fields_from_user_data(user, fc_user_data)
         created = False
     except User.DoesNotExist:
         # Create a new user
