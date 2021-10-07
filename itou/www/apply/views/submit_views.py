@@ -161,15 +161,14 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
 
         job_seeker = form.get_job_seeker()
         if not job_seeker:
-            # Redirect to user creation.
-            # Should we sign it?
+            # Redirect to search by e-mail address.
             session_data["nir"] = nir
             request.session.modified = True
             next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
             return HttpResponseRedirect(next_url)
 
         if form.data.get("confirm"):
-            # Job seeker found for the given NIR
+            # Job seeker found for the given NIR.
             session_data["job_seeker_pk"] = job_seeker.pk
             request.session.modified = True
             return HttpResponseRedirect(next_url)
@@ -182,6 +181,11 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
                 job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
         elif form.data.get("cancel"):
             form = CheckJobSeekerNirForm()
+
+    if request.method == "POST" and form.data.get("skip"):
+        # Redirect to search by e-mail address.
+        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
+        return HttpResponseRedirect(next_url)
 
     context = {
         "form": form,
@@ -252,9 +256,9 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
             return HttpResponseRedirect(f"{next_url}?{args}")
 
     context = {
-        "job_seeker_name": job_seeker_name,
-        "form": form,
         "can_add_nir": can_add_nir,
+        "form": form,
+        "job_seeker_name": job_seeker_name,
         "nir": nir,
         "preview_mode": preview_mode,
         "siae": siae,

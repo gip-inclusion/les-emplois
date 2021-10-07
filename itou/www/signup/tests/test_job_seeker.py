@@ -110,6 +110,57 @@ class JobSeekerSignupTest(TestCase):
         job_seeker = User.objects.get(email=post_data["email"])
         self.assertEqual(nir, job_seeker.nir)
 
+    def test_job_seeker_temporary_nir(self):
+        """
+        For the moment, we don't handle temporary social numbers.
+        Skipping NIR verification is allowed if a temporary one should be used instead.
+        """
+
+        # Temporary numbers don't have a consistent format.
+        nir = "1234567895GHTUI"
+
+        url = reverse("signup:job_seeker_nir")
+        post_data = {"nir": nir}
+        response = self.client.post(url, post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context.get("form").is_valid())
+
+        post_data = {"nir": nir, "skip": 1}
+        response = self.client.post(url, post_data)
+        self.assertRedirects(response, reverse("signup:job_seeker"))
+        self.assertNotIn(settings.ITOU_SESSION_SIGNED_NIR_KEY, list(self.client.session.keys()))
+        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_SIGNED_NIR_KEY))
+
+        # Temporary NIR is not stored with user information.
+        url = reverse("signup:job_seeker")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        address_line_1 = "Test adresse"
+        address_line_2 = "Test adresse complémentaire"
+        city = City.objects.first()
+        post_code = city.post_codes[0]
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@siae.com",
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
+            "address_line_1": address_line_1,
+            "address_line_2": address_line_2,
+            "post_code": post_code,
+            "city_name": city.name,
+            "city": city.slug,
+        }
+
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        job_seeker = User.objects.get(email=post_data["email"])
+        self.assertFalse(job_seeker.nir)
+
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
         # NIR is set on a previous step and tested separately.

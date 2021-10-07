@@ -74,10 +74,6 @@ class JobSeekerSignupView(SignupView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
-        # Ensure a NIR is present.
-        if not request.session.get(settings.ITOU_SESSION_SIGNED_NIR_KEY):
-            raise PermissionDenied
-
         return super().post(request, *args, **kwargs)
 
 
@@ -116,17 +112,21 @@ def job_seeker_situation(
 def job_seeker_nir(request, template_name="signup/job_seeker_nir.html", redirect_field_name=REDIRECT_FIELD_NAME):
     form = forms.JobSeekerNirForm(data=request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
-        signer = Signer()
-        signed_nir = signer.sign(form.cleaned_data["nir"])
-        request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY] = signed_nir
+    if request.method == "POST":
         next_url = reverse("signup:job_seeker")
+        if form.is_valid():
+            signer = Signer()
+            signed_nir = signer.sign(form.cleaned_data["nir"])
+            request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY] = signed_nir
 
-        # forward next page
-        if redirect_field_name in form.data:
-            next_url = f"{next_url}?{redirect_field_name}={form.data[redirect_field_name]}"
+            # forward next page
+            if redirect_field_name in form.data:
+                next_url = f"{next_url}?{redirect_field_name}={form.data[redirect_field_name]}"
 
-        return HttpResponseRedirect(next_url)
+            return HttpResponseRedirect(next_url)
+
+        if form.data.get("skip"):
+            return HttpResponseRedirect(next_url)
 
     context = {
         "form": form,
