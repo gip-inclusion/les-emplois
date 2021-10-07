@@ -412,7 +412,7 @@ class ModelTest(TestCase):
 
         self.assertTrue(authorized_prescriber.can_add_nir(job_seeker_no_nir))
         self.assertFalse(unauthorized_prescriber.can_add_nir(job_seeker_no_nir))
-        self.assertFalse(siae_staff.can_add_nir(job_seeker_no_nir))
+        self.assertTrue(siae_staff.can_add_nir(job_seeker_no_nir))
         self.assertFalse(authorized_prescriber.can_add_nir(job_seeker_with_nir))
 
     def test_is_account_creator(self):
