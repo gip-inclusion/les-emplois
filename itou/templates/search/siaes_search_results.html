@@ -102,17 +102,17 @@
 
                         <div class="card-footer">
                             {% if not siae.has_active_members %}
-                                <a class="btn btn-sm btn-emploi disabled" href="" aria-label="Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                <a class="btn btn-sm btn-primary disabled" href="" aria-label="Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                     {% include "includes/icon.html" with icon="message-square" %} Postuler
                                 </a>
                                 <small>Cet employeur n'a pas encore créé son compte.</small>
                             {% elif siae.block_job_applications %}
-                                <a class="btn btn-sm btn-emploi disabled" href="" aria-label="Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                <a class="btn btn-sm btn-primary disabled" href="" aria-label="Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                     {% include "includes/icon.html" with icon="message-square" %} Postuler
                                 </a>
                                 <small>Cet employeur n'accepte plus de candidatures pour le moment</small>
                             {% else %}
-                                <a class="btn btn-sm btn-emploi matomo-event" href="{% url 'apply:start' siae_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-bt-postuler">
+                                <a class="btn btn-sm btn-primary matomo-event" href="{% url 'apply:start' siae_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-bt-postuler">
                                     {% include "includes/icon.html" with icon="message-square" %} Postuler
                                 </a>
                             {% endif %}
