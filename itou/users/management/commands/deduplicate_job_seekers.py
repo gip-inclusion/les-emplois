@@ -2,8 +2,10 @@ import logging
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db.models import Case, F, Value, When
 from django.urls import reverse
 
+from itou.job_applications.models import JobApplication
 from itou.users.models import User
 
 
@@ -11,7 +13,11 @@ class Command(BaseCommand):
     """
     Deduplicate job seekers.
 
-    To run the command without any change in DB and have a preview of which accounts will be merged:
+    This is temporary and should be deleted after the release of the NIR
+    which should prevent duplication.
+
+    To run the command without any change in DB and have a preview of which
+    accounts will be merged:
         django-admin deduplicate_job_seekers --dry-run
 
     To merge duplicates job seekers in the database:
@@ -59,7 +65,14 @@ class Command(BaseCommand):
             assert user.approvals.count() == 0
 
             if not self.dry_run:
-                user.job_applications.update(job_seeker=target)
+                user.job_applications.update(
+                    job_seeker=target,
+                    sender=Case(
+                        When(sender_kind=JobApplication.SENDER_KIND_JOB_SEEKER, then=Value(target.pk)),
+                        default=F("sender"),
+                        output_field=JobApplication._meta.get_field("sender"),
+                    ),
+                )
                 user.eligibility_diagnoses.update(job_seeker=target)
                 user.delete()
 
