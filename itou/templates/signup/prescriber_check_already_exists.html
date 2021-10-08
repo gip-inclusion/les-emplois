@@ -50,18 +50,23 @@
                             <br>
                             {{ prescriber_org.post_code }} {{ prescriber_org.city }}
                             <br>
-                            {% with prescriber_org.prescribermembership_set.first as membership %}
-                                {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
-                                {# For security, display only the first char of the last name. #}
-                                <i>
-                                    Demandez une invitation à
-                                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
-                                    pour rejoindre cette organisation.
-                                </i>
-                                <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
-                                    Demander une invitation
-                                </a>
-                            {% endwith %}
+                            {# Organizations can exist without a member  #}
+                            {% if prescriber_org.prescribermembership_set.first %}
+                                {% with prescriber_org.prescribermembership_set.first as membership %}
+                                    {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
+                                    {# For security, display only the first char of the last name. #}
+                                    <i>
+                                        Demandez une invitation à
+                                        {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
+                                        pour rejoindre cette organisation.
+                                    </i>
+                                    <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
+                                        Demander une invitation
+                                    </a>
+                                {% endwith %}
+                            {% else %}
+                                <i>Cette organisation n'a pas de membre.</i>
+                            {% endif %}
                         </p>
                     </li>
                 {% endfor %}
@@ -138,6 +143,6 @@
         <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
         <a href="{% url 'signup:prescriber_choose_org' %}" class="btn btn-primary mt-3">Inscrire mon organisation</a>
     </div>
-    <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
     {% endif %}
+    <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
 {% endblock %}
