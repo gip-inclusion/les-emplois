@@ -28,6 +28,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "siret",
         "approval_number",
         "asp_processing_code",
+        "asp_processing_label",
         "asp_batch_file",
     )
 
