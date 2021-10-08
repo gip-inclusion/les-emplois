@@ -288,9 +288,6 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
     readonly_fields = (
         "pole_emploi_id",
         "user",
-        "hexa_lane_number",
-        "hexa_std_extension",
-        "hexa_non_std_extension",
         "hexa_lane_type",
         "hexa_post_code",
         "hexa_commune",
