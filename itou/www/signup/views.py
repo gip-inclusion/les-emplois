@@ -313,8 +313,9 @@ def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.h
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    prescriber_org_data = session_data.get("prescriber_org_data")
 
-    form = forms.PrescriberChooseOrgKindForm(data=request.POST or None)
+    form = forms.PrescriberChooseOrgKindForm(siret=prescriber_org_data.get("siret"), data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
@@ -379,7 +380,6 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
             {
                 "authorization_status": authorization_status,
                 "kind": kind,
-                # "prescriber_org_data": None,
                 "pole_emploi_org_pk": None,
                 "safir_code": None,
             }
@@ -413,7 +413,6 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
             {
                 "authorization_status": PrescriberOrganization.AuthorizationStatus[authorization_status].value,
                 "kind": PrescriberOrganization.Kind.OTHER.value,
-                # "prescriber_org_data": None,
                 "pole_emploi_org_pk": None,
                 "safir_code": None,
             }
