@@ -283,12 +283,31 @@ class PrescriberRequestInvitationForm(FullnameFormMixin):
 
 
 class PrescriberChooseOrgKindForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.siret = kwargs.pop("siret")
+        super().__init__(*args, **kwargs)
 
     kind = forms.ChoiceField(
         label="Pour qui travaillez-vous ?",
         widget=forms.RadioSelect,
         choices=PrescriberOrganization.Kind.choices,
     )
+
+    def clean_kind(self):
+        # Check if the couple "type / siret" already exist
+        kind = self.cleaned_data["kind"]
+        org = PrescriberOrganization.objects.filter(siret=self.siret, kind=kind).first()
+        if org:
+            error = f"« {org.display_name} » utilise déjà ce type d'organisation avec le même SIRET ({self.siret})."
+            admin = org.get_admins().first()
+            if admin:
+                error += (
+                    f" "
+                    f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
+                    f"{admin.first_name.title()} {admin.last_name[0].upper()}."
+                )
+            raise forms.ValidationError(error)
+        return kind
 
 
 class PrescriberChooseKindForm(forms.Form):
