@@ -42,6 +42,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "approval_number",
+        "job_seeker",
         "siret",
         "asp_id",
         "asp_batch_file",
@@ -60,6 +61,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
                     "status",
                     "job_application",
                     "approval_number",
+                    "job_seeker",
                     "siret",
                     "asp_id",
                     "financial_annex",
@@ -81,3 +83,8 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+    def job_seeker(self, obj):
+        return obj.job_application.job_seeker or "-"
+
+    job_seeker.short_description = "Salarié"
