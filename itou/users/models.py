@@ -688,7 +688,8 @@ class JobSeekerProfile(models.Model):
     hexa_non_std_extension = models.CharField(
         max_length=10,
         verbose_name="Extension de voie (non-repertoriée)",
-        null=True,
+        blank=True,
+        default="",
     )
     hexa_lane_type = models.CharField(
         max_length=4,
@@ -813,7 +814,7 @@ class JobSeekerProfile(models.Model):
         self.hexa_lane_type = ""
         self.hexa_lane_number = ""
         self.hexa_std_extension = ""
-        self.hexa_non_std_extension = None
+        self.hexa_non_std_extension = ""
         self.hexa_lane_name = ""
         self.hexa_post_code = ""
         self.hexa_commune = None

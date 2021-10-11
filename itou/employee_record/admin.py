@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 import itou.employee_record.models as models
 
@@ -28,6 +30,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "siret",
         "approval_number",
         "asp_processing_code",
+        "asp_processing_label",
         "asp_batch_file",
     )
 
@@ -41,7 +44,11 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "approval_number",
+        "job_application",
+        "job_seeker",
+        "job_seeker_profile_link",
         "siret",
+        "financial_annex",
         "asp_id",
         "asp_batch_file",
         "asp_batch_line_number",
@@ -59,6 +66,8 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
                     "status",
                     "job_application",
                     "approval_number",
+                    "job_seeker",
+                    "job_seeker_profile_link",
                     "siret",
                     "asp_id",
                     "financial_annex",
@@ -80,3 +89,17 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+    def job_seeker(self, obj):
+        return obj.job_application.job_seeker or "-"
+
+    def job_seeker_profile_link(self, obj):
+        job_seeker = obj.job_application.job_seeker
+        app_label = job_seeker._meta.app_label
+
+        model_name = job_seeker.jobseeker_profile._meta.model_name
+        url = reverse(f"admin:{app_label}_{model_name}_change", args=[job_seeker.id])
+        return mark_safe(f'<a href="{url}">{job_seeker.id}</a>')
+
+    job_seeker.short_description = "Salarié"
+    job_seeker_profile_link.short_description = "Profil du salarié"

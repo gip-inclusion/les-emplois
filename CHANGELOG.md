@@ -1,5 +1,35 @@
 # Journal des modifications
 
+## [28] - 2021-10-08
+
+### Ajouté
+
+- Fiches salarié :
+    - Message explicatif sur le délai de 96H : "*Les candidatures acceptées ne seront visibles qu'après échéance du délai d'annulation de 96H*"
+    - Gestion des communes dans l'admin
+    - Action dans l'admin pour envoyer manuellement des lots de fiches salarié en cas de problème de transmission
+    - Traitement des cas non documentés des retours d'intégration ASP
+
+### Modifié
+
+- Fiches salarié :
+    - Amélioration de la recherche dans l'admin
+    - Amélioration des logs de transfert pour éviter certaines remontées Sentry inutiles
+    - Correctif d'un bug du formatage des voies et des extensions (bis, ter…) des adresses suite à un changement dans l'API de géolocalisation (`API Geo`)
+    - Correctif pour les données de tests (`fixtures`) de l'environnement de développement
+    - Correctif pour les codes des départements d'outre-mer
+    - Correctif d'un bug d'absence d'affichage pour les fiches non complétées
+    - Correctif d'un bug dans le parcours de saisie de la partie Pôle emploi (*erreur 500*)
+    - Correctif d'un bug dans la récupération de données ASP quand une erreur de traitement entraîne le blocage du traitement des fiches restantes dans un lot
+- Correctif pour 1659 candidatures sans émetteurs qui empêchaient les entreprises de les accepter ou de les refuser (*erreur 500*)
+- Résolution d'une erreur dans le script quotidien *Metabase* provoqué par une grosse requête générant une erreur de mémoire partagée
+- Nouveaux tableaux de bord Metabase pour les conseils départementaux et les directions départementales de l'emploi, du travail et des solidarités (*DDETS*)
+- Meilleure explication du mécanisme pour envoyer une candidature spontanée : "*Ne rien cocher pour une candidature spontanée*" à la place de "*Optionnel*"
+- Meilleure explication des résultats de recherche : "*Les résultats de recherche affichent en priorité les entreprises qui ont reçu peu de candidatures par rapport aux métiers proposés*"
+- Correctifs dans le mécanisme d'import des agréments Pôle emploi à cause des incohérences dans le format des données reçues (différents formats de date notamment)
+- Mise à jour vers Django 3.2.8
+- Mise à jour du SDK Sentry 1.4.3
+
 ## [27] - 2021-09-24
 
 ### Ajouté
