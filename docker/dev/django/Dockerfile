@@ -54,6 +54,7 @@ RUN set -eux \
     && deps=" \
        gdal-bin \
        gettext \
+       git \
        postgresql-client-$PG_MAJOR \
     " \
     && apt-get update && apt-get install -y $buildDeps $deps --no-install-recommends \
