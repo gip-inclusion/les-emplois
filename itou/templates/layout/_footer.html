@@ -47,20 +47,19 @@
         <div class="s-footer-help__col col-12 col-lg">
           <nav role="navigation">
             <ul>
-              <li><a href="#" rel="noopener" target="_blank" class="is-external">Besoin d'aide ?</a></li>
-              <li><a href="#" rel="noopener" target="_blank" class="is-external">Nous contacter</a></li>
-              <li><a href="#" rel="noopener" target="_blank" class="is-external">Inscription Newsletter</a></li>
+              <li><a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet" class="is-external">Besoin d'aide ?</a></li>
+              <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet" class="is-external">Inscription Newsletter</a></li>
             </ul>
           </nav>
         </div>
         <div class="s-footer-help__col col-12 col-lg-auto">
           <ul>
             <li><span>Nous suivre</span></li>
-            <li><a href="https://twitter.com/inclusion_gouv" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-twitter.svg' %}" height="25" alt="Rejoignez-nous sur Twitter"></a></li>
-            <li><a href="https://www.linkedin.com/company/inclusion-gouv/" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-linkedin.svg' %}" height="25" alt="Rejoignez-nous sur Linkedin"></a></li>
-            <li><a href="https://www.facebook.com/inclusion.gouv/" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-facebook.svg' %}" height="25" alt="Rejoignez-nous sur Facebook"></a></li>
-            <li><a href="https://www.instagram.com/inclusion_gouv/" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-instagram.svg' %}" height="25" alt="Rejoignez-nous sur Instagram"></a></li>
-            <li><a href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" rel="noopener" target="_blank"><img src="{% static_theme_images 'picto-youtube.svg' %}" height="25" alt="Rejoignez-nous sur Youtube"></a></li>
+            <li><a href="https://twitter.com/inclusion_gouv" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet" ><img src="{% static_theme_images 'picto-twitter.svg' %}" height="25" alt="Rejoignez-nous sur Twitter"></a></li>
+            <li><a href="https://www.linkedin.com/company/inclusion-gouv/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet" ><img src="{% static_theme_images 'picto-linkedin.svg' %}" height="25" alt="Rejoignez-nous sur Linkedin"></a></li>
+            <li><a href="https://www.facebook.com/inclusion.gouv/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet" ><img src="{% static_theme_images 'picto-facebook.svg' %}" height="25" alt="Rejoignez-nous sur Facebook"></a></li>
+            <li><a href="https://www.instagram.com/inclusion_gouv/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet" ><img src="{% static_theme_images 'picto-instagram.svg' %}" height="25" alt="Rejoignez-nous sur Instagram"></a></li>
+            <li><a href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet" ><img src="{% static_theme_images 'picto-youtube.svg' %}" height="25" alt="Rejoignez-nous sur Youtube"></a></li>
           </ul>
         </div>
       </div>
@@ -72,16 +71,20 @@
       <div class="s-footer-nav__row row">
         <div class="s-footer-nav__col col-5 col-lg-2 d-flex align-items-center">
           <div class="s-footer-nav__logo">
-            <img src="{% static_theme_images 'logo-republique-francaise.svg'%}" alt="Rébublique Française" class="img-fluid">
+            <img src="{% static_theme_images 'logo-republique-francaise.svg' %}" alt="Rébublique Française" class="img-fluid">
           </div>
         </div>
         <div class="s-footer-nav__col col-7 col-lg-4 d-flex align-items-center justify-content-end justify-content-lg-start">
           <div class="d-inline-block text-center">
             <span class="d-block">
-              <img src="{% static_theme_images 'logo-plateforme-inclusion.svg'%}" height="60" alt="Plateforme de l'inclusion">
+              <a href="https://inclusion.beta.gouv.fr/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet" >
+                <img src="{% static_theme_images 'logo-plateforme-inclusion.svg' %}" height="60" alt="Plateforme de l'inclusion">
+              </a>
             </span>
             <span class="d-block mt-2">
-              <img src="{% static_theme_images 'logo-accelere-betagouv.svg'%}" alt="Accéléré par Beta.gouv.fr">
+              <a href="https://beta.gouv.fr/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet" >
+                <img src="{% static_theme_images 'logo-accelere-betagouv.svg' %}" alt="Accéléré par Beta.gouv.fr">
+              </a>
             </span>
           </div>
         </div>
