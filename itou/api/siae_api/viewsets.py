@@ -74,6 +74,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SiaeSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = SiaeOrderingFilter
+    ordering = ["id"]
 
     # No authentication is required on this API and everybody can query anything − it’s read-only.
     authentication_classes = []
@@ -130,7 +131,7 @@ On peut spécifier la direction de tri :
         queryset = self._filter_by_query_params(self.request, queryset)
 
         try:
-            return queryset
+            return queryset.order_by("id")
         finally:
             # Tracking is currently done via user-agent header
             logger.info(
