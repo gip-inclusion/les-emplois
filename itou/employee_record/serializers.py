@@ -120,6 +120,11 @@ class _EmployeeAddress(serializers.ModelSerializer):
             if not re.match("^\\+?[0-9]{1,16}$", result.get("adrTelephone")):
                 result["adrTelephone"] = None
 
+        # Remove diacritics and parenthesis from adrLibelleVoie field fixes ASP error 3330
+        # (parenthesis are not described as invalid characters in specification document)
+        if lane := result.get("adrLibelleVoie"):
+            result["adrLibelleVoie"] = unidecode(lane.translate({ord(ch): "" for ch in "()"}))
+
         for field in empty_as_null_fields:
             if result.get(field) == "":
                 result[field] = None
