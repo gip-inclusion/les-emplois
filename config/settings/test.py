@@ -1,6 +1,9 @@
 import logging
 
-from .base import *
+import pytz
+from django.utils import timezone
+
+from .base import *  # noqa: F401,F403
 
 
 # `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
@@ -26,7 +29,7 @@ ASP_FS_KNOWN_HOSTS = None
 
 # Temporary: employee record deployment
 EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED = True
-EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 1, 1)
+EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 1, 1, tzinfo=pytz.UTC)
 
 FRANCE_CONNECT_CLIENT_ID = "FC_CLIENT_ID_123"
 FRANCE_CONNECT_CLIENT_SECRET = "FC_CLIENT_SECRET_123"
