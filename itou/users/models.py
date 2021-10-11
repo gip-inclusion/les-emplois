@@ -814,7 +814,7 @@ class JobSeekerProfile(models.Model):
         self.hexa_lane_type = ""
         self.hexa_lane_number = ""
         self.hexa_std_extension = ""
-        self.hexa_non_std_extension = None
+        self.hexa_non_std_extension = ""
         self.hexa_lane_name = ""
         self.hexa_post_code = ""
         self.hexa_commune = None
