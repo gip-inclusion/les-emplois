@@ -31,15 +31,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     if request.user.is_siae_staff:
         siae = get_current_siae_or_404(request)
         can_show_financial_annexes = siae.convention_can_be_accessed_by(request.user)
-        # progressive_opening_eligibility = siae_eligible_for_progressive_opening(siae)
-        # can_show_employee_records = (
-        #     siae.can_use_employee_record
-        #     and settings.EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED
-        #     and progressive_opening_eligibility
-        # )
-        # can_show_deployment_message = (
-        #     siae.can_use_employee_record and settings.EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED
-        # )
         can_show_employee_records = siae.can_use_employee_record
 
         job_applications_categories = [
