@@ -10,7 +10,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
-# from itou.employee_record.utils import siae_eligible_for_progressive_opening
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
