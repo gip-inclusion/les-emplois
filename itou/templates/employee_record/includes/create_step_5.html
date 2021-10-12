@@ -12,6 +12,9 @@
             Le traitement est effectué à intervalle régulier et vous serez notifié du changement d'état
             de la fiche salarié sur la liste récapitulative accessible depuis le tableau de bord.
         </p>
+        <p>
+            Après validation de la fiche salarié, <b>la modification de la date de début du PASS IAE n'est plus possible</b>.
+        </p>
     </div>
 
     <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.id %}" class="js-prevent-multiple-submit">

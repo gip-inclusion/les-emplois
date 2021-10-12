@@ -15,7 +15,6 @@ from itou.employee_record.mocks.transfer_employee_records import (
     SFTPGoodConnectionMock,
 )
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
-from itou.employee_record.utils import siae_eligible_for_progressive_opening
 from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
     JobApplicationWithApprovalNotCancellableFactory,
@@ -24,8 +23,6 @@ from itou.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.factories import SiaeFactory
-from itou.siaes.models import Siae
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
@@ -492,44 +489,3 @@ class EmployeeRecordManagementCommandTest(TestCase):
         # Check correct status and empty archived JSON
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.ARCHIVED)
         self.assertIsNone(self.employee_record.archived_json)
-
-
-# Temporary test: progressive opening
-
-
-class EmployeeRecordProgressiveOpeningTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        # Create 100 SIAE for testing modulo
-        for id in range(1, 101):
-            SiaeFactory(kind="EI", id=id)
-
-    def test_percentage_of_siaes(self):
-        # Check test SIAEs
-        siaes = Siae.objects.filter(kind="EI").order_by("id")
-        self.assertEqual(100, siaes.count())
-
-        # Check SIAE in 1%
-        self.assertTrue(siae_eligible_for_progressive_opening(siaes[0], percentage=1))
-        self.assertFalse(siae_eligible_for_progressive_opening(siaes[1], percentage=1))
-
-        # Check SIAE in 10%
-        self.assertTrue(siae_eligible_for_progressive_opening(siaes[9], percentage=10))
-        self.assertFalse(siae_eligible_for_progressive_opening(siaes[10], percentage=10))
-
-        # Check SIAE in 50%
-        self.assertTrue(siae_eligible_for_progressive_opening(siaes[49], percentage=50))
-        self.assertFalse(siae_eligible_for_progressive_opening(siaes[50], percentage=50))
-
-        # Check SIAE in 100% (practically useless => full opening)
-        self.assertTrue(siae_eligible_for_progressive_opening(siaes[99], percentage=100))
-
-    def test_curated_siaes(self):
-        # Test "curated" SIAE
-        curated_siae = Siae.objects.get(id=42)
-        # Set a low percentage where the curated SIAE is not included
-        self.assertFalse(siae_eligible_for_progressive_opening(curated_siae, percentage=20))
-        # Selected SIAE as curated
-        self.assertTrue(
-            siae_eligible_for_progressive_opening(curated_siae, percentage=20, curated_siae_ids=[curated_siae.id])
-        )
