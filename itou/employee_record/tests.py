@@ -23,8 +23,6 @@ from itou.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.factories import SiaeFactory
-from itou.siaes.models import Siae
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
