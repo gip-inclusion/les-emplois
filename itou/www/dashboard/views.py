@@ -10,7 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
-from itou.employee_record.utils import siae_eligible_for_progressive_opening
+# from itou.employee_record.utils import siae_eligible_for_progressive_opening
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
@@ -27,20 +27,20 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     can_show_financial_annexes = False
     can_show_employee_records = False
     job_applications_categories = []
-    can_show_deployment_message = False
 
     if request.user.is_siae_staff:
         siae = get_current_siae_or_404(request)
         can_show_financial_annexes = siae.convention_can_be_accessed_by(request.user)
-        progressive_opening_eligibility = siae_eligible_for_progressive_opening(siae)
-        can_show_employee_records = (
-            siae.can_use_employee_record
-            and settings.EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED
-            and progressive_opening_eligibility
-        )
-        can_show_deployment_message = (
-            siae.can_use_employee_record and settings.EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED
-        )
+        # progressive_opening_eligibility = siae_eligible_for_progressive_opening(siae)
+        # can_show_employee_records = (
+        #     siae.can_use_employee_record
+        #     and settings.EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED
+        #     and progressive_opening_eligibility
+        # )
+        # can_show_deployment_message = (
+        #     siae.can_use_employee_record and settings.EMPLOYEE_RECORD_PROGRESSIVE_OPENING_ENABLED
+        # )
+        can_show_employee_records = siae.can_use_employee_record
 
         job_applications_categories = [
             {
@@ -94,7 +94,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         ),
         "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
         "can_view_stats_ddets": request.user.can_view_stats_ddets(current_institution=current_institution),
-        "can_show_deployment_message": can_show_deployment_message,
     }
 
     return render(request, template_name, context)
