@@ -1,5 +1,9 @@
 # Journal des modifications
 
+## [N/A] - 2021-10-12
+
+- Ajout d'une recette jetable pour EY
+
 ## [28] - 2021-10-08
 
 ### Ajouté
