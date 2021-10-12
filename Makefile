@@ -69,11 +69,8 @@ graph_models_itou_venv:
 
 .PHONY: test
 
-# make test
-# make test TARGET=itou.utils MAX=8
-MAX = 4 # Default parallel tests.
 test:
-	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput --failfast --parallel=$(MAX) $(TARGET)
+	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput --failfast --parallel $(TARGET)
 
 # Lets you add a debugger.
 test-interactive:
