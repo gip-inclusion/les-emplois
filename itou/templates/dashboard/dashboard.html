@@ -354,7 +354,7 @@
                     {% if can_show_employee_records %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="file" %}
-                            <a href="{% url 'employee_record_views:list' %}">Gérer mes fiches salarié (ASP)</a>
+                            <a href="{% url 'employee_record_views:list' %}?status=NEW">Gérer mes fiches salarié (ASP)</a>
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
