@@ -18,7 +18,7 @@
 
 <form method="post" action="" class="js-prevent-multiple-submit">
 
-    <div class="alert alert-secondary" role="alert">
+    <div class="alert alert-emploi" role="alert">
         <i>Laisser les champs vides pour ne rien afficher.</i>
     </div>
 
@@ -29,15 +29,13 @@
 
     {% bootstrap_form form exclude="brand" %}
 
-    <div class="alert alert-warning" role="alert">
-        <p>
-            En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
-        </p>
-        {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">Annuler</a>
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-        {% endbuttons %}
-    </div>
+    <p>
+        En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+    </p>
+    {% buttons %}
+        <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    {% endbuttons %}
 
 </form>
 

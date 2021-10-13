@@ -10,7 +10,7 @@
 
 <div class="alert alert-info">
 
-    Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte Pôle emploi 
+    Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte Pôle emploi
     (récupérés lors de votre connexion du {{extra_data.created_at|date:"d F Y"}}).
 
 </div>
@@ -24,7 +24,7 @@
     {% bootstrap_form form alert_error_type="all" %}
 
     {% buttons %}
-        <a class="btn btn-secondary" href="{{ prev_url }}">Annuler</a>
+        <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     {% endbuttons %}
 

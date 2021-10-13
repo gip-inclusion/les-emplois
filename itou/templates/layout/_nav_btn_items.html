@@ -1,0 +1,137 @@
+{% if user.is_authenticated %}
+    <li class="dropdown mr-2">
+        <button
+            type="button"
+            class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false" >
+            Mon espace
+        </button>
+        <div class="dropdown-menu dropdown-menu-left">
+            <div class="dropdown-item media">
+                {% include "includes/icon.html" with icon="user" size="40" class="mr-3 icon align-self-center" %}
+                <div class="media-body align-self-center text-wrap">
+                    {% if user.get_full_name %}
+                        <div>{{ user.get_full_name }}</div>
+                    {% endif %}
+                    <div class="text-secondary">{{ user.email }}</div>
+                </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
+                Tableau de bord
+            </a>
+
+            {% if user.is_siae_staff %}
+                <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_preferences' %}">
+                    Préférences
+                </a>
+            {% endif %}
+
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
+                Modifier mon profil
+            </a>
+
+            {% if not user.is_peamu %}
+                <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
+                    Modifier mon mot de passe
+                </a>
+                <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_email' %}">
+                    Modifier mon adresse e-mail
+                </a>
+            {% endif %}
+
+            <div class="dropdown-divider"></div>
+
+            <a class="dropdown-item text-danger" id="js-logout" href="{% url 'account_logout' %}">
+                Déconnexion
+            </a>
+        </div>
+    </li>
+
+    {% if user.is_siae_staff and user_siaes|length > 1 %}
+        <li  class="dropdown">
+            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                Changer de structure
+            </button>
+            <div class="dropdown-menu dropdown-menu-left">
+                <form action="{% url 'dashboard:switch_siae' %}" method="post">
+                    {% csrf_token %}
+                    {% for s in user_siaes %}
+                        <button
+                            class="dropdown-item text-primary {% if s.pk == current_siae.pk %} font-weight-bold disabled{% endif %}"
+                            type="submit"
+                            name="siae_id"
+                            value="{{ s.pk }}"><span class="badge badge-primary">{{ s.kind }}</span> {{ s.display_name }}
+                        </button>
+                    {% endfor %}
+                </form>
+            </div>
+        </li>
+    {% endif %}
+
+    {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
+        <li  class="dropdown">
+            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Changer de structure
+            </button>
+            <div class="dropdown-menu dropdown-menu-left">
+                <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
+                    {% csrf_token %}
+                    {% for po in user_prescriberorganizations %}
+                        <button
+                            class="dropdown-item text-primary {% if po.pk == current_prescriber_organization.pk %} font-weight-bold disabled{% endif %}"
+                            type="submit"
+                            name="prescriber_organization_id"
+                            value="{{ po.pk }}">{{ po.display_name }} <span class="badge badge-primary">{{ s.kind }}</span>
+                        </button>
+                    {% endfor %}
+                </form>
+            </div>
+        </li>
+    {% endif %}
+
+    {% if user.is_labor_inspector and user_institutions|length > 1 %}
+        <li class="dropdown">
+            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Changer de structure
+            </button>
+            <div class="dropdown-menu dropdown-menu-left">
+                <form action="{% url 'dashboard:switch_institution' %}" method="post">
+                    {% csrf_token %}
+                    {% for i in user_institutions %}
+                        <button
+                            class="dropdown-item text-primary {% if i.pk == current_institution.pk %} font-weight-bold disabled{% endif %}"
+                            type="submit"
+                            name="institution_id"
+                            value="{{ i.pk }}">{{ i.display_name }} <span class="badge badge-primary">{{ i.kind }}</span>
+                        </button>
+                    {% endfor %}
+                </form>
+            </div>
+        </li>
+    {% endif %}
+
+{% else %}
+    <li class="dropdown mr-2">
+        <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            S'inscrire | Se connecter
+        </button>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" href="{% url 'account_login' %}?account_type=job_seeker{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                Candidat
+            </a>
+            <a class="dropdown-item" href="{% url 'account_login' %}?account_type=prescriber{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                Prescripteur
+            </a>
+            <a class="dropdown-item" href="{% url 'account_login' %}?account_type=siae{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                Employeur solidaire
+            </a>
+            <a class="dropdown-item" href="{% url 'account_login' %}?account_type=institution{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                Institution partenaire
+            </a>
+        </div>
+    </li>
+{% endif %}

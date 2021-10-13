@@ -43,7 +43,7 @@
     {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
     {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
 
-    <div class="alert alert-secondary" role="alert">
+    <div class="alert alert-emploi" role="alert">
         <p>
             Si le candidat n'est pas éligible à l'insertion par l'activité économique, vous pouvez décliner sa candidature :
         </p>

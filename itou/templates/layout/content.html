@@ -3,10 +3,10 @@
 
     {% block pre_content %}{% endblock %}
 
-    <main class="{% block content_container_css_classes %}layout-section layout-section-white{% endblock %}">
-        <div class="layout-content">
+    <section class="{% block content_container_css_classes %}{% endblock %}">
+        <div class="container">
             {% block content %}{% endblock %}
         </div>
-    </main>
+    </section>
 
 {% endblock %}

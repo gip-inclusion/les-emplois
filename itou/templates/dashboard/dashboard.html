@@ -105,9 +105,9 @@
 
     {# Mise en avant temporaire du marché pour les employeurs. #}
     {% if user.is_siae_staff %}
-        <div class="card mb-5 bg-light text-center">
+        <div class="card mb-7 bg-light text-center">
             <div class="card-body">
-                <p class="h5 mb-3">
+                <p class="h4 mb-3">
                     <span class="badge badge-warning">Nouveau</span>
                     Améliorez la visibilité de votre structure
                 </p>
@@ -121,7 +121,7 @@
         </div>
     {% endif %}
 
-    <h1>
+    <h1 class="h2">
         Tableau de bord
         {% if current_siae %} - <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
         {% if current_prescriber_organization %} -
@@ -354,7 +354,7 @@
                     {% if can_show_employee_records %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="file" %}
-                            <a href="{% url 'employee_record_views:list' %}">Gérer mes fiches salarié (ASP)</a>
+                            <a href="{% url 'employee_record_views:list' %}?status=NEW">Gérer mes fiches salarié (ASP)</a>
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}

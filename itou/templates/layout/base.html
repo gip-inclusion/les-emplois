@@ -1,4 +1,5 @@
 {% load static %}
+{% load theme_inclusion %}
 {% load bootstrap4 %}
 <!DOCTYPE HTML>
 <html lang="fr">
@@ -25,330 +26,40 @@
 
     {# Use this to get the value of the CSRF token in JavaScript. #}
     <meta name="csrf-token" content="{{ csrf_token }}">
-    <link rel="shortcut icon" href="{% static "favicon.ico" %}" type="image/ico">
-    <link rel="stylesheet" href="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.css" %}" type="text/css">
-    <link rel="stylesheet" href="{% static "vendor/bootstrap-4.3.1/bootstrap.min.css" %}" type="text/css">
+    <link rel="shortcut icon" href="{% static_theme_images "favico.ico" %}" type="image/ico">
+    {% import_static_CSS_theme_inclusion %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.css" integrity="sha256-NRYg+xSNb5bHzrFEddJ0wL3YDp6YNt2dGNI+T5rOb2c=" crossorigin="anonymous" type="text/css">
     <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
     {% block extra_head %}{% endblock %}
 </head>
 <body>
 
     {% include "includes/test_accounts.html" %}
+    {% include "layout/_header.html" %}
 
-    <div class="layout">
+    <main class="s-main bg-gray-400">
 
-        <header class="layout-section layout-section-white">
-            <div class="layout-header py-2 px-0 px-sm-3">
-                <a href="/" class="text-decoration-none text-reset">
-                    <div class="row">
-                        <img class="layout-header-logo" src="{% static 'img/logo_header.svg' %}" alt="{{ ITOU_FQDN }}">
-                    </div>
-                </a>
-                <div class="layout-header-content">
-                    <nav class="d-flex align-content-stretch flex-wrap">
-                        {% if user.is_authenticated %}
-                            <div class="d-flex flex-row">
-                                <div class="dropdown mr-2">
-                                    <button
-                                        type="button"
-                                        class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle"
-                                        data-toggle="dropdown"
-                                        aria-haspopup="true"
-                                        aria-expanded="false" data-display="static" >
-                                        Mon espace
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-sm-right">
-                                        <div class="dropdown-item media">
-                                            {% include "includes/icon.html" with icon="user" size="40" class="mr-3 icon align-self-center" %}
-                                            <div class="media-body align-self-center text-wrap">
-                                                {% if user.get_full_name %}
-                                                    <div>{{ user.get_full_name }}</div>
-                                                {% endif %}
-                                                <div class="text-secondary">{{ user.email }}</div>
-                                            </div>
-                                        </div>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
-                                            Tableau de bord
-                                        </a>
+        <div class="container container-messages">
+            {% block messages %}
 
-                                        {% if user.is_siae_staff %}
-                                            <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_preferences' %}">
-                                                Préférences
-                                            </a>
-                                        {% endif %}
+                {% bootstrap_messages %}
 
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
-                                            Modifier mon profil
-                                        </a>
-
-                                        {% if not user.is_peamu %}
-                                            <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
-                                                Modifier mon mot de passe
-                                            </a>
-                                            <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_email' %}">
-                                                Modifier mon adresse e-mail
-                                            </a>
-                                        {% endif %}
-
-                                        <div class="dropdown-divider"></div>
-
-                                        <a class="dropdown-item text-danger" id="js-logout" href="{% url 'account_logout' %}">
-                                            Déconnexion
-                                        </a>
-                                    </div>
-                                </div>
-
-                            {% if user.is_siae_staff and user_siaes|length > 1 %}
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                                        Changer de structure
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
-                                        <form action="{% url 'dashboard:switch_siae' %}" method="post">
-                                            {% csrf_token %}
-                                            {% for s in user_siaes %}
-                                                <button
-                                                    class="dropdown-item text-primary {% if s.pk == current_siae.pk %} font-weight-bold disabled{% endif %}"
-                                                    type="submit"
-                                                    name="siae_id"
-                                                    value="{{ s.pk }}"><span class="badge badge-primary">{{ s.kind }}</span> {{ s.display_name }}
-                                                </button>
-                                            {% endfor %}
-                                        </form>
-                                    </div>
-                                </div>
-                            {% endif %}
-
-                            {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                                        Changer de structure
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
-                                        <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
-                                            {% csrf_token %}
-                                            {% for po in user_prescriberorganizations %}
-                                                <button
-                                                    class="dropdown-item text-primary {% if po.pk == current_prescriber_organization.pk %} font-weight-bold disabled{% endif %}"
-                                                    type="submit"
-                                                    name="prescriber_organization_id"
-                                                    value="{{ po.pk }}">{{ po.display_name }} <span class="badge badge-primary">{{ s.kind }}</span>
-                                                </button>
-                                            {% endfor %}
-                                        </form>
-                                    </div>
-                                </div>
-                            {% endif %}
-
-                            {% if user.is_labor_inspector and user_institutions|length > 1 %}
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                                        Changer de structure
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
-                                        <form action="{% url 'dashboard:switch_institution' %}" method="post">
-                                            {% csrf_token %}
-                                            {% for i in user_institutions %}
-                                                <button
-                                                    class="dropdown-item text-primary {% if i.pk == current_institution.pk %} font-weight-bold disabled{% endif %}"
-                                                    type="submit"
-                                                    name="institution_id"
-                                                    value="{{ i.pk }}">{{ i.display_name }} <span class="badge badge-primary">{{ i.kind }}</span>
-                                                </button>
-                                            {% endfor %}
-                                        </form>
-                                    </div>
-                                </div>
-                            {% endif %}
-
-                            </div>
-
-                        {% else %}
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    S'inscrire | Se connecter
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=job_seeker{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        Candidat
-                                    </a>
-                                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=prescriber{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        Prescripteur
-                                    </a>
-                                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=siae{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        Employeur solidaire
-                                    </a>
-                                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=institution{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        Institution partenaire
-                                    </a>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                    </nav>
+                {# Display an alert for old browsers #}
+                <div class="alert alert-secondary alert-old-browser" role="alert">
+                    La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
                 </div>
-            </div>
-        </header>
 
-        <div class="layout-section layout-section-white border-bottom">
-            <nav class="nav itou-main-nav">
-
-                {% if user.is_authenticated %}
-                    <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">Tableau de bord</a>
-                {% endif %}
-
-                <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">Rechercher des employeurs</a>
-
-                <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs</a>
-
-                <a class="nav-link" href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" aria-label="Accéder au Forum de l'inclusion (nouvel onglet)">Communauté {% include "includes/icon.html" with icon="external-link" %}</a>
-
-                <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Documentation {% include "includes/icon.html" with icon="external-link" %}</a>
-
-            </nav>
-        </div>
-
-        <div class="layout-section layout-section-white">
-            <div class="layout-messages">
-                {% block messages %}
-
-                    {% bootstrap_messages %}
-
-                    {# Display an alert for old browsers #}
-                    <div class="alert alert-secondary alert-old-browser" role="alert">
-                        La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
-                    </div>
-
-                {% endblock %}
-            </div>
+            {% endblock %}
         </div>
 
         {% block content_full_viewport %}{% endblock %}
 
-        <footer class="layout-section text-center text-sm-left">
-            <section class="layout layout-column-full border-top">
+    </main>
 
-              <div class="layout-column-main py-4">
-                    <div class="row">
+    {% include "layout/_footer.html" %}
 
-                        <div class="col-sm-2">
-                            <img class="footer-logo" src="{% static 'img/logo_ministere_du_travail.svg' %}" alt="">
-                        </div>
-
-                        <div class="col-sm-4">
-                            <h5><b>inclusion</b>.beta.gouv.fr</h5>
-                            <p>
-                                Les emplois de l'inclusion <i>en expérimentation</i>
-                            </p>
-                            <p class="mb-0">
-                                Nous suivre
-                            </p>
-                            <ul class="list-unstyled">
-                                <li>
-                                    <a href="https://www.linkedin.com/company/inclusion-gouv/" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="linkedin" %}
-                                        <small>LinkedIn</small>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.facebook.com/inclusion.gouv/" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="facebook" %}
-                                        <small>Facebook</small>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.instagram.com/inclusion_gouv/" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="instagram" %}
-                                        <small>Instagram</small>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://twitter.com/inclusion_gouv/" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="twitter" %}
-                                        <small>Twitter</small>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" rel="noopener" target="_blank">
-                                        {% include "includes/icon.html" with icon="youtube" %}
-                                        <small>YouTube</small>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <ul class="list-unstyled">
-                                {# Internal links. #}
-                                <li>
-                                    <a href="{% url 'stats:public_basic_stats' %}">Statistiques, lexiques et indicateurs</a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'accessibility' %}">Accessibilité (non conforme)</a>
-                                </li>
-                                {# Use `mb-*` to mark a visual separation between internal and external links. #}
-                                <li class="mb-3">
-                                    <a href="{% url 'releases:list' %}">Journal des modifications</a>
-                                </li>
-                                {# External links. #}
-                                <li>
-                                    <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Besoin d'aide ?
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                <li>
-                                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Inscription Newsletter
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Qui peut bénéficier des contrats d'IAE ?
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ ITOU_COMMUNITY_URL }}/c/retours-sur-le-site/2" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Questions à la communauté
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Mentions légales
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a href="https://stats.uptimerobot.com/JYJ6XHq6xY" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Disponibilité
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-
-
-                            </ul>
-                        </div>
-
-                    </div>
-                </div>
-            </section>
-
-        </footer>
-
-    </div>
-
-    <script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
-    <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
-    <script src="{% static "vendor/bootstrap-4.3.1/popper.min.js" %}"></script>
-    <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
-
-    {# tarteaucitron.js cookies consent / https://tarteaucitron.io/fr/install/ #}
-    <script src="{% static "vendor/tarteaucitron/tarteaucitron.js" %}"></script>
+    {% import_static_JS_theme_inclusion %}
+    <script src="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
     <script>
 
         // Tarteaucitron's language is set according to the browser configuration
@@ -358,24 +69,28 @@
         var tarteaucitronForceLanguage = "fr";
 
         tarteaucitron.init({
-            "bodyPosition": "top",  /* Put the banner at the beginning of the DOM for screen readers */
-            "privacyUrl": "",  /* Privacy policy url */
-            "hashtag": "#tarteaucitron",  /* Open the panel with this hashtag */
+            "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
             "cookieName": "tarteaucitron", /* Cookie name */
-            "orientation": "top",  /* Put the banner at the top to help visually impaired people */
-            "showAlertSmall": false,  /* Show the small banner on bottom right */
-            "cookieslist": false,  /* Show the cookie list */
-            "showIcon": false, /* Show cookie icon to manage cookies */
-            "adblocker": false,  /* Show a Warning if an adblocker is detected */
+            "orientation": "top", /* Banner position (top - bottom) */
+            "groupServices": false, /* Group services by category */
+            "showAlertSmall": false, /* Show the small banner on bottom right */
+            "cookieslist": false, /* Show the cookie list */
+            "closePopup": false, /* Show a close X on the banner */
+            "showIcon": true, /* Show cookie icon to manage cookies */
+            //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
+            "iconPosition": "BottomLeft", /* BottomRight, BottomLeft, TopRight and TopLeft */
+            "adblocker": false, /* Show a Warning if an adblocker is detected */
             "DenyAllCta" : true, /* Show the deny all button */
-            "AcceptAllCta" : true,  /* Show the accept all button when highPrivacy on */
-            "highPrivacy": true,  /* Disable auto consent */
-            "handleBrowserDNTRequest": false,  /* If Do Not Track == 1, disallow all */
-            "removeCredit": true,  /* Remove credit link */
-            "moreInfoLink": true,  /* Show more info link */
-            "useExternalCss": false,  /* If false, the tarteaucitron.css file will be loaded */
-            "readmoreLink": "{{ ITOU_DOC_URL }}/mentions/protection-des-donnees",  /* Change the default readmore link */
-            "mandatory": false,  /* Show a message about mandatory cookies */
+            "AcceptAllCta" : true, /* Show the accept all button when highPrivacy on */
+            "highPrivacy": true, /* HIGHLY RECOMMANDED Disable auto consent */
+            "handleBrowserDNTRequest": false, /* If Do Not Track == 1, disallow all */
+            "removeCredit": true, /* Remove credit link */
+            "moreInfoLink": true, /* Show more info link */
+            "useExternalCss": true, /* If false, the tarteaucitron.css file will be loaded */
+            "useExternalJs": false, /* If false, the tarteaucitron.js file will be loaded */
+            //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
+            "readmoreLink": "{{ ITOU_DOC_URL }}/mentions/protection-des-donnees", /* Change the default readmore link */
+            "mandatory": true, /* Show a message about mandatory cookies */
         });
 
         // Hotjar.
@@ -388,7 +103,7 @@
         tarteaucitron.user.matomoId = 117;
         tarteaucitron.user.matomoHost = "https://stats.data.gouv.fr/";
         (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
-            
+
         // livestorm
         const tablet_width = 750;
         tarteaucitron.services.livestorm = {
@@ -405,10 +120,10 @@
                         width = x.getAttribute("width"),
                         height = x.getAttribute("height"),
                         url = x.getAttribute("data-url");
-                    
+
                     // Poor attempt to make the Livestorm iframe responsive.
                     if (document.body.clientWidth > tablet_width) {
-                        height = "310px";
+                        height = "365px";
                     }
                     return '<iframe title="' + frame_title + '" src="' + url + '" width="' + width + '" height="' + height + '" frameborder="0" scrolling="no" allowtransparency allowfullscreen></iframe>';
                 });
@@ -478,7 +193,7 @@
     {% if request.path == "/" %}
         <div class="fixed-sm-bottom text-center text-sm-right p-3 pr-sm-2 pb-sm-2">
             <a href="https://voxusagers.numerique.gouv.fr/Demarches/2436?&view-mode=formulaire-avis&nd_mode=en-ligne-enti%C3%A8rement&nd_source=button&key=ca117c905602fb63fda68b31ee0f5bdd" target="_blank">
-              <img src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis" title="Je donne mon avis sur cette démarche" style="width: 150px;">
+              <img src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis" title="Je donne mon avis sur cette démarche" style="width: 150px;" >
             </a>
         </div>
     {% else %}

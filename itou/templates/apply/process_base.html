@@ -12,12 +12,8 @@
     <h1>
         Candidature de
         <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
-        <div class="row">
-            <div class="col-sm">
-                <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>
-            </div>
-        </div>
     </h1>
+    <p class="h3">{% include "apply/includes/state_badge.html" with job_application=job_application %}</p>
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 

@@ -4,11 +4,11 @@
 
 <div class="alert alert-warning">
     <small>
-        <div class="mt-1">    
+        <div class="mt-1">
             Merci de bien vouloir vérifier si le format d'adresse ci-dessous (HEXA) correspond bien
             à l'adresse de l'employé.
         </div>
-        <div class="mt-1">    
+        <div class="mt-1">
             <b>Si l'adresse ne correspond pas</b>, merci de mettre à jour l'adresse à l'aide du formulaire
             et de cliquer sur le bouton <b>"Modifier l'adresse"</b> et de repéter l'opération jusqu'à obtention d'une adresse correcte.
         </div>
@@ -16,7 +16,7 @@
 </div>
 
 <form method="post" action="{% url "employee_record_views:create_step_2" job_application.id %}" class="js-prevent-multiple-submit">
-    <div class="alert alert-secondary">
+    <div class="alert alert-emploi">
         <h5><b>Adresse retenue</b></h5>
 
         {% if profile.hexa_address_filled %}
@@ -46,7 +46,7 @@
                 </ul>
             <p>
             <p>
-                Veuillez vérifier et modifier les différents éléments de l'adresse, 
+                Veuillez vérifier et modifier les différents éléments de l'adresse,
                 puis cliquez sur le bouton <b>"Modifier l'adresse"</b> dés que tout semble correct.
             </p>
         </div>

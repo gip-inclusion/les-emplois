@@ -5,52 +5,48 @@
 
 {% block content %}
 
-    <section class="layout-section layout-section-blue layout-section-search">
-
-        <div class="layout-content">
-            <h2 class="font-weight-bold text-center my-5">Prenez contact avec un employeur solidaire</h2>
-
-            <form method="get" action="{% url 'search:siaes_results' %}">
-                {% include "search/includes/siaes_search_form.html" with form=siae_search_form align="center" %}
-            </form>
-        </div>
-    </section>
+    {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Prenez contact avec un employeur solidaire" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
 
     {% if not user.is_authenticated %}
-        <section class="layout-section bg-light pt-5 text-center">
-            <div class="layout-content pb-0">
-                <h3 class="h4 font-weight-bold">Nos missions</h3>
+        <section class="bg-white text-center">
+            <div class="container">
+                <h2>Nos missions</h2>
                 <p class="lead">Ce service facilite la mise en relation des personnes les plus éloignées de l'emploi avec les employeurs solidaires (SIAE, GEIQ, EA et EATT) et les accompagnants (orienteurs et prescripteurs habilités).<br>Il offre aux utilisateurs un outil mutualisé pour simplifier les procédures, fluidifier les parcours d'insertion entre professionnels et renforcer la qualité de l'accompagnement des personnes.</p>
 
-                <div class="card-deck mt-5 justify-content-between text-center">
-                    <div class="card p-4" style="flex: 0 0 23%;">
+                <div class="card-deck card-deck-itou mt-5">
+                    <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title font-weight-light mb-4">
-                                <span class="d-block">Pour commencer,</span>
-                                <span class="d-block">inscrivez-vous</span>
+                            <h5 class="card-title font-weight-light">
+                                Inscrivez-vous pour commencer à utiliser la plateforme
                             </h5>
+                        </div>
+                        <div class="card-footer">
                             <a class="btn btn-primary" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                                 Créer un compte
                             </a>
                         </div>
                     </div>
 
-                    <div class="card p-4" style="flex: 0 0 23%;">
+                    <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title font-weight-light mb-4">
+                            <h5 class="card-title font-weight-light">
                                 Discutez entre professionnels sur le forum de l'inclusion
                            </h5>
+                        </div>
+                        <div class="card-footer">
                             <a class="btn btn-primary" href="{{ ITOU_COMMUNITY_URL }}">
                                 Accéder au forum
                             </a>
                         </div>
                     </div>
 
-                    <div class="card p-4" style="flex: 0 0 23%;">
+                    <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title font-weight-light mb-4">
+                            <h5 class="card-title font-weight-light">
                                 Découvrez l'espace de documentation pour tout comprendre
                             </h5>
+                        </div>
+                        <div class="card-footer">
                             <a class="btn btn-primary" href="{{ ITOU_DOC_URL }}/" target=_blank>
                                 En savoir plus
                             </a>
@@ -62,9 +58,9 @@
 
     {% endif %}
 
-    <section class="layout-section bg-light py-5 text-center">
-        <div class="layout-content">
-            <div class="js-tac-livestorm" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm" width="100%" height="980px"></div>
+    <section class="bg-gray-400 text-center">
+        <div class="container">
+            <div class="js-tac-livestorm" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm" width="100%"></div>
         </div>
     </section>
 

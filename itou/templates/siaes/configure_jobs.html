@@ -85,7 +85,7 @@
 
         <label for="job-autocomplete-input">Ajouter un métier :</label>
         <div class="input-group mb-4">
-            <div class="input-group-prepend">
+            <div class="input-group-prepend bg-white">
                 {# Loading #}
                 <span class="input-group-text js-job-autocomplete-loading d-none">
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -107,7 +107,7 @@
         </div>
 
         {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">Annuler</a>
+            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
             <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
         {% endbuttons %}
 

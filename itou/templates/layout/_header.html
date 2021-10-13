@@ -1,0 +1,74 @@
+{% load static %}
+{% load theme_inclusion %}
+
+<header class="s-header s-header--emploi" role="banner" id="header">
+  <section class="s-header__container container">
+    <div class="s-header__row row">
+      <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center pr-0 pr-md-3">
+        <a href="/" class="s-header__logo-ministere"><img src="{% static_theme_images 'logo-ministere-emploi.svg' %}" alt="Ministère de l'emploi"></a>
+      </div>
+      <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center px-0 px-md-3">
+        <a href="/"><img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion"></a>
+      </div>
+      <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
+        <nav role="navigation">
+          <ul>
+            {% include 'layout/_nav_btn_items.html' %}
+          </ul>
+        </nav>
+      </div>
+      <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none" data-toggle="burger">
+        <span id="burger"><img src="{% static_theme_images "picto-burger.svg" %}" alt="Menu"></span>
+        <span id="close"><img src="{% static_theme_images "picto-close.svg" %}" alt="Fermer"></span>
+      </div>
+      <div id="burgerNav">
+        <nav role="navigation">
+          <ul>
+            <li>
+              <a href="/" class="{% if request.path == '/' %}is-active{% endif %}" rel="noopener">
+                <span>Accueil</span>
+              </a>
+            </li>
+            {% include 'layout/_nav_btn_items.html' %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </section>
+</header>
+<section class="s-postheader mb-1">
+  <div class="container s-postheader__container">
+    <div class="row">
+      <div class="col-12 s-postheader__col s-postheader__col--nav d-flex align-items-center">
+        <nav role="navigation">
+          <ul>
+            {% if user.is_authenticated %}
+              <li>
+                  <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+              </li>
+            {% endif %}
+            <li>
+              <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">Rechercher des employeurs</a>
+            </li>
+
+            <li>
+              <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs</a>
+            </li>
+
+            <li>
+              <a class="nav-link" href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" aria-label="Accéder au Forum de l'inclusion (nouvel onglet)">Communauté 
+                  {% include "includes/icon.html" with icon="external-link" %}
+              </a>
+            </li>
+
+            <li>
+              <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Documentation 
+                  {% include "includes/icon.html" with icon="external-link" %}
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>

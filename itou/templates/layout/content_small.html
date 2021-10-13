@@ -1,10 +1,12 @@
 {% extends "layout/base.html" %}
 {% block content_full_viewport %}
-<main class="layout-section layout-section-white">
-    <div class="layout-content">
-        <div class="content-small">
-            {% block content %}{% endblock %}
+<section class="bg-light">
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-md-8">
+                {% block content %}{% endblock %}
+            </div>
         </div>
     </div>
-</main>
+</section>
 {% endblock %}

@@ -4,10 +4,8 @@
 
 {% block content %}
 
-    <div class="d-sm-inline-flex mb-3 align-items-sm-baseline">
-        <h1>Collaborateurs</h1>
-        <h2 class="text-muted ml-sm-4">{{ siae.display_name }}</h2>
-    </div>
+    <h1>Collaborateurs</h1>
+    <h2 class="text-muted">{{ siae.display_name }}</h2>
 
     <div class="alert alert-info" role="alert">
         Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})

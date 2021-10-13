@@ -15,18 +15,14 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality:
-	docker exec -ti itou_django black --check itou
-	docker exec -ti itou_django isort --check-only itou
+	docker exec -ti itou_django black itou
+	docker exec -ti itou_django isort itou
 	docker exec -ti itou_django flake8 itou
 
 quality_venv:
-	black --check itou
-	isort --check-only itou
+	black itou
+	isort itou
 	flake8 itou
-
-style:
-	docker exec -ti itou_django black itou
-	docker exec -ti itou_django isort itou
 
 pylint:
 	docker exec -ti itou_django pylint itou
@@ -37,17 +33,6 @@ coverage:
 
 coverage_venv:
 	coverage run ./manage.py test itou --settings=config.settings.test && coverage html
-
-setup_git_pre_commit_hook:
-	touch .git/hooks/pre-commit
-	chmod +x .git/hooks/pre-commit
-	echo -e "\
-	docker exec -t itou_django black itou\n\
-	docker exec -t itou_django isort itou\n\
-	" > .git/hooks/pre-commit
-
-setup_git_pre_commit_hook_venv:
-	pre-commit install
 
 # Django.
 # =============================================================================
@@ -84,11 +69,8 @@ graph_models_itou_venv:
 
 .PHONY: test
 
-# make test
-# make test TARGET=itou.utils
-# make test TARGET=itou.utils.tests.UtilsTemplateTagsTestCase.test_url_add_query
 test:
-	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput --failfast --parallel=2 $(TARGET)
+	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput --failfast --parallel $(TARGET)
 
 # Lets you add a debugger.
 test-interactive:

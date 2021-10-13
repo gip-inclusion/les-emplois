@@ -3,19 +3,7 @@
 {% block title %}Rechercher des prescripteurs habilités{{ block.super }}{% endblock %}
 
 {% block pre_content %}
-
-    <section class="layout-section layout-section-blue layout-section-search">
-
-        <div class="layout-content">
-            <h2 class="font-weight-bold text-center my-5">Rechercher des prescripteurs habilités</h2>
-
-            <form method="get" action="{% url 'search:prescribers_results' %}">
-                {% include "search/includes/prescribers_search_form.html" with form=form align="center" %}
-            </form>
-        </div>
-
-    </section>
-
+    {% include "search/includes/generic_search_home.html" with form=form title="Rechercher des prescripteurs habilités" url_search="search:prescribers_results" template_form_name="search/includes/prescribers_search_form.html" %}
 {% endblock %}
 
 {# The "content" block is empty here, so we hide it to avoid a gap in UI. #}
