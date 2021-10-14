@@ -10,6 +10,7 @@ from itou.institutions.models import InstitutionMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
+from itou.users.admin_forms import UserAdminForm
 
 
 class SiaeMembershipInline(admin.TabularInline):
@@ -150,6 +151,7 @@ class CreatedByProxyFilter(admin.SimpleListFilter):
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
 
+    form = UserAdminForm
     inlines = UserAdmin.inlines + [
         SiaeMembershipInline,
         PrescriberMembershipInline,
