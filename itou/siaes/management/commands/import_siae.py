@@ -350,4 +350,7 @@ class Command(BaseCommand):
         self.check_aciphc_data_consistency()
 
         if self.fatal_errors >= 1:
-            raise RuntimeError("At least one fatal error above needs manual resolution")
+            raise RuntimeError(
+                "The command completed all its actions successfully but at least one fatal error needs "
+                "manual resolution, see command output"
+            )

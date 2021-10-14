@@ -410,6 +410,26 @@ class Command(BaseCommand):
         df = get_df_from_rows(rows)
         store_df(df=df, table_name=table_name, dry_run=self.dry_run)
 
+    def report_data_inconsistencies(self):
+        """
+        Report data inconsistencies that were previously ignored during `populate_approvals` method in order to avoid
+        having the script break in the middle. This way, the scripts breaks only at the end with informative
+        fatal errors after having completed its job.
+        """
+        fatal_errors = 0
+        self.log("Checking data for inconsistencies.")
+        for approval in Approval.objects.prefetch_related("user").all():
+            user = approval.user
+            if not user.is_job_seeker:
+                self.log(f"FATAL ERROR: user {user.id} has an approval but is not a job seeker")
+                fatal_errors += 1
+
+        if fatal_errors >= 1:
+            raise RuntimeError(
+                "The command completed all its actions successfully but at least one fatal error needs "
+                "manual resolution, see command output"
+            )
+
     def populate_metabase_itou(self):
         if not settings.ALLOW_POPULATING_METABASE:
             self.log("Populating metabase is not allowed in this environment.")
@@ -427,6 +447,8 @@ class Command(BaseCommand):
             self.populate_rome_codes()
             self.populate_insee_codes()
             self.populate_departments()
+
+            self.report_data_inconsistencies()
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))

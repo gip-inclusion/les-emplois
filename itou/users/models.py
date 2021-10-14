@@ -27,6 +27,7 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
+from itou.institutions.models import Institution
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
 
@@ -206,7 +207,6 @@ class User(AbstractUser, AddressMixin):
     is_job_seeker = models.BooleanField(verbose_name="Demandeur d'emploi", default=False)
     is_prescriber = models.BooleanField(verbose_name="Prescripteur", default=False)
     is_siae_staff = models.BooleanField(verbose_name="Employeur (SIAE)", default=False)
-    is_stats_vip = models.BooleanField(verbose_name="Pilotage (VIP)", default=False)
     # Members of DDETS, DREETS or DGEFP institution have their own dashboard.
     is_labor_inspector = models.BooleanField(
         verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
@@ -364,19 +364,22 @@ class User(AbstractUser, AddressMixin):
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
 
-    def can_view_stats_dashboard_widget(self, current_org, current_institution):
+    def can_view_stats_dashboard_widget(self, current_org):
         """
         Whether a stats section should be displayed on the user's dashboard.
 
         It should be displayed if one or more stats sections are available for the user.
         """
-        return self.can_view_stats_cd(current_org=current_org) or self.can_view_stats_ddets(
-            current_institution=current_institution
+        return (
+            self.can_view_stats_cd(current_org=current_org)
+            or self.can_view_stats_ddets(current_org=current_org)
+            or self.can_view_stats_dreets(current_org=current_org)
+            or self.can_view_stats_dgefp(current_org=current_org)
         )
 
     def can_view_stats_cd(self, current_org):
         """
-        All users, not just the admins, of a real CD can see the confidential CD stats, and for their department only.
+        Users of a real CD can view the confidential CD stats for their department only.
 
         CD as in "Conseil Départemental".
 
@@ -388,50 +391,76 @@ class User(AbstractUser, AddressMixin):
         Hence we take extra precautions to filter out these edge cases to ensure we never ever show sensitive stats to
         a non-CD organization of the `DEPT` kind.
         """
-        if self.is_stats_vip:
-            return True
         return (
             self.is_prescriber
             and current_org is not None
-            and current_org.kind == PrescriberOrganization.Kind.DEPT
+            and isinstance(current_org, PrescriberOrganization)
+            and current_org.kind == current_org.Kind.DEPT
             and current_org.is_authorized
-            and current_org.authorization_status == PrescriberOrganization.AuthorizationStatus.VALIDATED
+            and current_org.authorization_status == current_org.AuthorizationStatus.VALIDATED
             and not current_org.is_brsa
             and current_org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS
         )
 
     def get_stats_cd_department(self, current_org):
         """
-        Get department that the user has the permission to see for the CD stats page.
+        Get department that the user has the permission to view for the CD stats page.
         CD as in "Conseil Départemental".
         """
         if not self.can_view_stats_cd(current_org=current_org):
             raise PermissionDenied
-        if self.is_stats_vip:
-            # VIP users always and only see departement 01, as an example.
-            return "01"
         return current_org.department
 
-    def can_view_stats_ddets(self, current_institution):
+    def can_view_stats_ddets(self, current_org):
         """
-        All users of a DDETS can see the confidential DDETS stats of their department only.
+        Users of a DDETS can view the confidential DDETS stats of their department only.
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
         """
-        if self.is_stats_vip:
-            return True
-        return self.is_labor_inspector and current_institution.kind == current_institution.Kind.DDETS
+        return (
+            self.is_labor_inspector
+            and isinstance(current_org, Institution)
+            and current_org.kind == current_org.Kind.DDETS
+            and current_org.department in settings.DDETS_STATS_ALLOWED_DEPARTMENTS
+        )
 
-    def get_stats_ddets_department(self, current_institution):
+    def get_stats_ddets_department(self, current_org):
         """
-        Get department that the user has the permission to see for the DDETS stats page.
+        Get department that the user has the permission to view for the DDETS stats page.
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
         """
-        if not self.can_view_stats_ddets(current_institution=current_institution):
+        if not self.can_view_stats_ddets(current_org=current_org):
             raise PermissionDenied
-        if self.is_stats_vip:
-            # VIP users always and only see departement 01, as an example.
-            return "01"
-        return current_institution.department
+        return current_org.department
+
+    def can_view_stats_dreets(self, current_org):
+        """
+        Users of a DREETS can view the confidential DREETS stats of their region only.
+        DREETS as in "Directions régionales de l’économie, de l’emploi, du travail et des solidarités".
+        """
+        return (
+            self.is_labor_inspector
+            and isinstance(current_org, Institution)
+            and current_org.kind == current_org.Kind.DREETS
+        )
+
+    def get_stats_dreets_region(self, current_org):
+        """
+        Get region that the user has the permission to view for the DREETS stats page.
+        DREETS as in "Directions régionales de l’économie, de l’emploi, du travail et des solidarités".
+        """
+        if not self.can_view_stats_dreets(current_org=current_org):
+            raise PermissionDenied
+        return current_org.region
+
+    def can_view_stats_dgefp(self, current_org):
+        """
+        Users of the DGEFP institution can view the confidential DGEFP stats for all regions and departments.
+        """
+        return (
+            self.is_labor_inspector
+            and isinstance(current_org, Institution)
+            and current_org.kind == current_org.Kind.DGEFP
+        )
 
     @cached_property
     def last_accepted_job_application(self):
