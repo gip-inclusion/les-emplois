@@ -19,6 +19,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
 )
+from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.www.dashboard.forms import EditUserEmailForm
@@ -33,6 +34,8 @@ class DashboardViewTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        expected_message = "Suite à la fermeture de la saisie de fiches"
+        self.assertContains(response, expected_message)
 
     def test_user_with_inactive_siae_can_still_login_during_grace_period(self):
         siae = SiaePendingGracePeriodFactory()
@@ -58,6 +61,17 @@ class DashboardViewTest(TestCase):
 
         expected_message = "votre compte n'est malheureusement plus actif"
         self.assertContains(response, expected_message)
+
+    def test_dashboard_eiti(self):
+        siae = SiaeWithMembershipFactory(kind=Siae.KIND_EITI)
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        expected_message = "Suite à la fermeture de la saisie de fiches"
+        self.assertNotContains(response, expected_message)
 
 
 class EditUserInfoViewTest(TestCase):
