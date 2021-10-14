@@ -15,10 +15,10 @@ from itou.users.models import User
 from itou.utils.validators import validate_nir
 
 
-NIR_COL = "ppn_numero_inscription"
 BIRTHDATE_COL = "pph_date_naissance"
 FIRST_NAME_COL = "pph_prenom"
 LAST_NAME_COL = "pph_nom_usage"
+NIR_COL = "ppn_numero_inscription"
 
 
 class Command(BaseCommand):
