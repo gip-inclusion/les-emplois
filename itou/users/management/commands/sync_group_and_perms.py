@@ -55,6 +55,19 @@ class Command(BaseCommand):
             "change_selectedadministrativecriteria",
             "delete_selectedadministrativecriteria",
             "view_selectedadministrativecriteria",
+            # institutions.Institution
+            "add_institution",
+            "change_institution",
+            "view_institution",
+            # institutions.InstitutionMembership
+            "add_institutionmembership",
+            "change_institutionmembership",
+            "delete_institutionmembership",
+            "view_institutionmembership",
+            # invitations.LaborInspectorInvitation
+            "change_laborinspectorinvitation",
+            "delete_laborinspectorinvitation",
+            "view_laborinspectorinvitation",
             # invitations.PrescriberWithOrgInvitation
             "change_prescriberwithorginvitation",
             "delete_prescriberwithorginvitation",

@@ -1,5 +1,5 @@
 """
-Populate metabase with fluxIAE data and some custom tables for our needs (mainly `missions_ai_ehpad`).
+Populate metabase with fluxIAE data and some custom tables for our needs.
 
 For itou data, see the other script `populate_metabase_itou.py`.
 
@@ -65,11 +65,9 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from psycopg2 import sql
 
-from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._dataframes import store_df, switch_table_atomically
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
-from itou.siaes.models import Siae
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -120,50 +118,6 @@ class Command(BaseCommand):
 
     def log(self, message):
         self.logger.debug(message)
-
-    @timeit
-    def populate_fluxiae_structures(self):
-        """
-        Populate fluxIAE_Structure table and enrich it with some itou data.
-        """
-        vue_name = "fluxIAE_Structure"
-        df = get_fluxiae_df(
-            vue_name=vue_name,
-            converters={
-                "structure_siret_actualise": str,
-                "structure_siret_signature": str,
-                "structure_adresse_mail_corresp_technique": str,
-                "structure_adresse_gestion_cp": str,
-                "structure_adresse_gestion_telephone": str,
-            },
-            dry_run=self.dry_run,
-        )
-
-        # Enrich Vue Structure with some itou data.
-        for index, row in df.iterrows():
-            asp_id = row["structure_id_siae"]
-            siaes = Siae.objects.filter(source=Siae.SOURCE_ASP, convention__asp_id=asp_id).select_related("convention")
-
-            # Preferably choose an AI.
-            ai_siaes = [s for s in siaes if s.kind == Siae.KIND_AI]
-            if len(ai_siaes) >= 1:
-                siae = ai_siaes[0]
-            else:
-                siae = siaes.first()
-
-            if siae:
-                # row is a copy no longer connected to initial df.
-                df.loc[index, "itou_name"] = siae.display_name
-                df.loc[index, "itou_kind"] = siae.kind
-                df.loc[index, "itou_post_code"] = siae.post_code
-                df.loc[index, "itou_city"] = siae.city
-                df.loc[index, "itou_department_code"] = siae.department
-                df.loc[index, "itou_department"] = DEPARTMENTS.get(siae.department)
-                df.loc[index, "itou_region"] = DEPARTMENT_TO_REGION.get(siae.department)
-                df.loc[index, "itou_latitude"] = siae.latitude
-                df.loc[index, "itou_longitude"] = siae.longitude
-
-        store_df(df=df, table_name=vue_name, dry_run=self.dry_run)
 
     @timeit
     def populate_fluxiae_view(self, vue_name, skip_first_row=True):
@@ -226,10 +180,6 @@ class Command(BaseCommand):
 
         self.populate_fluxiae_referentials()
 
-        # Specific fluxIAE views requiring some mixing with itou data.
-        self.populate_fluxiae_structures()
-
-        # Regular fluxIAE views not mixed with any itou data.
         self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
         self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciereACI")
         self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
@@ -241,6 +191,7 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
         self.populate_fluxiae_view(vue_name="fluxIAE_PMSMP")
         self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
+        self.populate_fluxiae_view(vue_name="fluxIAE_Structure")
 
         # Build custom tables by running raw SQL queries on existing tables.
         self.build_custom_tables()
