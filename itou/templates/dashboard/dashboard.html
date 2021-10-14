@@ -69,6 +69,7 @@
     {% endif %}
 
 
+    {% if can_show_employee_records %}
     {# Employee record #}
     <div class="alert alert-warning pb-0">
         <p>
@@ -79,6 +80,7 @@
             Vous pouvez accéder à cette fonctionnalité via le lien <b>"Mes candidatures / Gérer mes fiches salarié"</b> du tableau de bord.
         </p>
     </div>
+    {% endif %}
 
 
 {% endblock %}
