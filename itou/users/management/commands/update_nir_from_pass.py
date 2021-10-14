@@ -15,6 +15,12 @@ from itou.users.models import User
 from itou.utils.validators import validate_nir
 
 
+NIR_COL = "ppn_numero_inscription"
+BIRTHDATE_COL = "pph_date_naissance"
+FIRST_NAME_COL = "pph_prenom"
+LAST_NAME_COL = "pph_nom_usage"
+
+
 class Command(BaseCommand):
     """
     Deduplicate job seekers.
@@ -57,12 +63,13 @@ class Command(BaseCommand):
             self.logger.setLevel(logging.DEBUG)
 
     def get_ratio(self, first_value, second_value):
-        return round((len(first_value) / second_value) * 100, 2)
+        return round((first_value / second_value) * 100, 2)
 
     def nir_is_valid(self, row):
-        nir = row.ppn_numero_inscription
-        birthdate = row.pph_date_naissance
-        assert isinstance(birthdate, datetime.datetime)
+        nir = row[NIR_COL]
+        birthdate = row[BIRTHDATE_COL]
+        if not isinstance(birthdate, datetime.datetime):
+            self.logger.debug(f"BIRTHDATE IS NOT A DATETIME! {birthdate} {type(birthdate)}")
         try:
             validate_nir(nir)
             nir_regex = r"^[12]([0-9]{2})([0-1][0-9])*."
@@ -71,6 +78,12 @@ class Command(BaseCommand):
             if not is_valid:
                 raise ValidationError("Ce numéro n'est pas valide.")
         except ValidationError:
+            return False
+        return True
+
+    def check_if_different(self, kind, first_value, second_value):
+        if first_value != second_value:
+            self.logger.debug(f"Different {kind}: {first_value} is not {second_value}")
             return False
         return True
 
@@ -95,24 +108,14 @@ class Command(BaseCommand):
                 continue
 
             job_seeker = approval.user
-            if row.pph_prenom != self.format_name(job_seeker.first_name):
-                self.logger.debug(
-                    f"Different first name: {row.pph_prenom} is not {self.format_name(job_seeker.first_name)}"
-                )
+            self.check_if_different("first name", row[FIRST_NAME_COL], self.format_name(job_seeker.first_name))
+            self.check_if_different("last_name", row[LAST_NAME_COL], self.format_name(job_seeker.last_name))
 
-            if row.pph_nom_usage != self.format_name(job_seeker.last_name):
-                self.logger.debug(
-                    f"Different last name: {row.pph_nom_usage} is not {self.format_name(job_seeker.last_name)}"
-                )
-
-            assert isinstance(row.pph_date_naissance, datetime.datetime)
-            if row.pph_date_naissance.date() != job_seeker.birthdate:
-                self.logger.debug(
-                    f"Different birthdate: {row.pph_date_naissance.date()} is not {job_seeker.birthdate}"
-                )
+            assert isinstance(row[BIRTHDATE_COL], datetime.datetime)
+            self.check_if_different("birthdate", row[BIRTHDATE_COL].date(), job_seeker.birthdate)
 
             if not self.dry_run:
-                job_seeker.nir = row.ppn_numero_inscription
+                job_seeker.nir = row[NIR_COL]
                 updated_job_seekers.append(job_seeker)
 
         if not self.dry_run:
@@ -123,7 +126,6 @@ class Command(BaseCommand):
         self.logger.info(f"{len(not_updated_job_seekers)} rows not existing in database.")
 
     def handle(self, file_path, dry_run=False, **options):
-
         self.set_logger(options.get("verbosity"))
         self.dry_run = dry_run
         self.logger.info("Starting. Good luck…")
@@ -135,16 +137,13 @@ class Command(BaseCommand):
         nir_column = df.ppn_numero_inscription
         pass_column = df.agr_numero_agrement
 
-        # Keep all duplicated rows.
+        # Duplicated NIR mean PASS IAE have been delivered for the same person.
         duplicated_nirs = df[nir_column.duplicated(keep=False)]
-        unique_duplicated_nirs = duplicated_nirs.ppn_numero_inscription.unique()
+        unique_duplicated_nirs = duplicated_nirs[NIR_COL].unique()
         self.logger.info(f"{len(duplicated_nirs)} different PASS IAE for {len(unique_duplicated_nirs)} unique NIR.")
+        self.logger.info(f"{self.get_ratio(len(duplicated_nirs), total_rows)}% cases of duplicated NIR.")
         self.logger.info(
-            f"{self.get_ratio(duplicated_nirs, unique_duplicated_nirs)} different PASS IAE per NIR as average."
-        )
-        self.logger.info(
-            f"{self.get_ratio(duplicated_nirs, total_rows)}% cases of duplicated NIR "
-            "(different PASS IAE delivered for the same person)."
+            f"{round(len(duplicated_nirs) / len(unique_duplicated_nirs), 2)} different PASS IAE per NIR as average."
         )
 
         # Add a new column to know whether it's a NIR duplicate or not.
@@ -154,13 +153,14 @@ class Command(BaseCommand):
         df["pass_is_duplicated"] = pass_column.duplicated(keep=False)
         self.logger.info(f"{self.get_ratio(len(df[df.pass_is_duplicated]), total_rows)}% of duplicated PASS IAE.")
 
-        # Invalid NIR
+        #  Add a new column to know whether the NIR is valid or not..
         df["nir_is_valid"] = df.apply(self.nir_is_valid, axis=1)
         invalid_nirs = df[~df.nir_is_valid]
         valid_nirs = df[df.nir_is_valid]
         self.logger.info(f"{len(invalid_nirs)} invalid NIR and {len(valid_nirs)} valid NIR.")
         self.logger.info(f"{self.get_ratio(len(invalid_nirs), len(valid_nirs))}% invalid NIRS.")
 
+        # Complicated cases have an invalid NIR, or a duplicated PASS IAE or a duplicated NIR.
         # It's complicated!
         complicated_cases = df[~df.nir_is_valid | df.pass_is_duplicated | df.nir_is_duplicated]
         easy_cases = df[df.nir_is_valid & ~df.pass_is_duplicated & ~df.nir_is_duplicated]
@@ -169,8 +169,8 @@ class Command(BaseCommand):
         self.logger.info(f"{self.get_ratio(len(complicated_cases), len(easy_cases))}% of complicated_cases.")
 
         # Update easy cases
-        self.update_easy_cases(easy_cases.sample(1))
+        self.update_easy_cases(easy_cases.sample(100))
 
-        # Don't do nothing for complicated cases for the moment.
+        # Ignore complicated cases for the moment.
         self.logger.info("-" * 80)
         self.logger.info("Done.")
