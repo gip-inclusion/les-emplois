@@ -1,4 +1,8 @@
+# pylint: disable=W1203
+
+import datetime
 import logging
+import re
 
 import pandas as pd
 import unidecode
@@ -52,9 +56,20 @@ class Command(BaseCommand):
         if verbosity >= 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def nir_is_valid(self, nir):
+    def get_ratio(self, first_value, second_value):
+        return round((len(first_value) / second_value) * 100, 2)
+
+    def nir_is_valid(self, row):
+        nir = row.ppn_numero_inscription
+        birthdate = row.pph_date_naissance
+        assert isinstance(birthdate, datetime.datetime)
         try:
             validate_nir(nir)
+            nir_regex = r"^[12]([0-9]{2})([0-1][0-9])*."
+            match = re.match(nir_regex, nir)
+            is_valid = match.group(1) == birthdate.strftime("%y") and match.group(2) == birthdate.strftime("%m")
+            if not is_valid:
+                raise ValidationError("Ce numéro n'est pas valide.")
         except ValidationError:
             return False
         return True
@@ -90,6 +105,7 @@ class Command(BaseCommand):
                     f"Different last name: {row.pph_nom_usage} is not {self.format_name(job_seeker.last_name)}"
                 )
 
+            assert isinstance(row.pph_date_naissance, datetime.datetime)
             if row.pph_date_naissance.date() != job_seeker.birthdate:
                 self.logger.debug(
                     f"Different birthdate: {row.pph_date_naissance.date()} is not {job_seeker.birthdate}"
@@ -99,7 +115,8 @@ class Command(BaseCommand):
                 job_seeker.nir = row.ppn_numero_inscription
                 updated_job_seekers.append(job_seeker)
 
-        User.objects.bulk_update(updated_job_seekers, ["nir"])
+        if not self.dry_run:
+            User.objects.bulk_update(updated_job_seekers, ["nir"])
 
         self.logger.info("-" * 80)
         self.logger.info(f"{len(updated_job_seekers)} updated job seekers.")
@@ -123,11 +140,11 @@ class Command(BaseCommand):
         unique_duplicated_nirs = duplicated_nirs.ppn_numero_inscription.unique()
         self.logger.info(f"{len(duplicated_nirs)} different PASS IAE for {len(unique_duplicated_nirs)} unique NIR.")
         self.logger.info(
-            f"{round(len(duplicated_nirs) / len(unique_duplicated_nirs), 2)} different PASS IAE per NIR as average."
+            f"{self.get_ratio(duplicated_nirs, unique_duplicated_nirs)} different PASS IAE per NIR as average."
         )
-        nir_duplicates_percent = round((len(duplicated_nirs) / total_rows) * 100, 2)
         self.logger.info(
-            f"{nir_duplicates_percent}% cases of duplicated NIR (different PASS IAE delivered for the same person)."
+            f"{self.get_ratio(duplicated_nirs, total_rows)}% cases of duplicated NIR "
+            "(different PASS IAE delivered for the same person)."
         )
 
         # Add a new column to know whether it's a NIR duplicate or not.
@@ -135,24 +152,21 @@ class Command(BaseCommand):
 
         # Add a new column to know whether it's a PASS IAE duplicate or not.
         df["pass_is_duplicated"] = pass_column.duplicated(keep=False)
-        pass_is_duplicated_percent = round((len(df[df.pass_is_duplicated])) / total_rows, 2) * 100
-        self.logger.info(f"{pass_is_duplicated_percent}% of duplicated PASS IAE.")
+        self.logger.info(f"{self.get_ratio(len(df[df.pass_is_duplicated]), total_rows)}% of duplicated PASS IAE.")
 
         # Invalid NIR
-        df["nir_is_valid"] = nir_column.apply(self.nir_is_valid)
+        df["nir_is_valid"] = df.apply(self.nir_is_valid, axis=1)
         invalid_nirs = df[~df.nir_is_valid]
         valid_nirs = df[df.nir_is_valid]
         self.logger.info(f"{len(invalid_nirs)} invalid NIR and {len(valid_nirs)} valid NIR.")
-        invalid_nirs_percent = round((len(invalid_nirs) / len(valid_nirs)) * 100, 2)
-        self.logger.info(f"{invalid_nirs_percent}% invalid NIRS.")
+        self.logger.info(f"{self.get_ratio(len(invalid_nirs), len(valid_nirs))}% invalid NIRS.")
 
         # It's complicated!
         complicated_cases = df[~df.nir_is_valid | df.pass_is_duplicated | df.nir_is_duplicated]
         easy_cases = df[df.nir_is_valid & ~df.pass_is_duplicated & ~df.nir_is_duplicated]
         assert len(easy_cases) + len(complicated_cases) == total_rows
         self.logger.info(f"{len(easy_cases)} easy cases and {len(complicated_cases)} complicated_cases.")
-        easy_vs_complicated_percent = round(len(complicated_cases) / len(easy_cases), 2) * 100
-        self.logger.info(f"{easy_vs_complicated_percent}% of complicated_cases.")
+        self.logger.info(f"{self.get_ratio(len(complicated_cases), len(easy_cases))}% of complicated_cases.")
 
         # Update easy cases
         self.update_easy_cases(easy_cases.sample(1))
