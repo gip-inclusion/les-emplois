@@ -70,7 +70,7 @@ graph_models_itou_venv:
 .PHONY: test
 
 test:
-	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput --failfast --parallel $(TARGET)
+	docker exec -ti itou_django django-admin test --settings=config.settings.test $(TARGET) --noinput --failfast --parallel
 
 # Lets you add a debugger.
 test-interactive:
