@@ -21,3 +21,9 @@ class UserAdminForm(forms.ModelForm):
                 "Un utilisateur ne peut avoir qu'un rôle à la fois : soit candidat, soit prescripteur, "
                 "soit employeur, soit inspecteur."
             )
+
+        has_approval = self.instance.approvals_wrapper.latest_approval is not None
+        if has_approval and not self.cleaned_data["is_job_seeker"]:
+            raise ValidationError(
+                "Cet utilisateur possède déjà un PASS IAE et doit donc obligatoirement être un candidat."
+            )
