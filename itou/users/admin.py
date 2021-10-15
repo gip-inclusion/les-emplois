@@ -26,15 +26,15 @@ class SiaeMembershipInline(admin.TabularInline):
         "updated_at",
         "updated_by",
     )
-    can_delete = False
+    can_delete = True
     show_change_link = True
     fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return True
 
     def has_add_permission(self, request, obj=None):
-        return False
+        return True
 
     def siae_id_link(self, obj):
         app_label = obj.siae._meta.app_label
@@ -57,14 +57,14 @@ class PrescriberMembershipInline(admin.TabularInline):
         "updated_at",
         "updated_by",
     )
-    can_delete = False
+    can_delete = True
     fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return True
 
     def has_add_permission(self, request, obj=None):
-        return False
+        return True
 
     def organization_id_link(self, obj):
         app_label = obj.organization._meta.app_label
@@ -90,14 +90,14 @@ class InstitutionMembershipInline(admin.TabularInline):
         "created_at",
         "updated_at",
     )
-    can_delete = False
+    can_delete = True
     fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return True
 
     def has_add_permission(self, request, obj=None):
-        return False
+        return True
 
     def institution_id_link(self, obj):
         app_label = obj.institution._meta.app_label
