@@ -577,12 +577,12 @@ class JobSeekerProfileModelTest(TestCase):
 
         # No title on User
         with self.assertRaises(ValidationError):
-            self.profile.clean()
+            self.profile.clean_model()
 
         self.profile.user.title = User.Title.M
 
         # Won't raise exception
-        self.profile.clean()
+        self.profile.clean_model()
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -594,7 +594,7 @@ class JobSeekerProfileModelTest(TestCase):
         """
         self.profile.user.title = User.Title.M
         self.profile.update_hexa_address()
-        self.profile.clean()
+        self.profile.clean_model()
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
