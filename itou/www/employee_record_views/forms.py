@@ -181,7 +181,7 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
         post_code = self.cleaned_data.get("hexa_post_code")
 
         # Check basic coherence between post-code and INSEE code:
-        if post_code[:2] != commune_code[:2]:
+        if post_code and commune_code and post_code[:2] != commune_code[:2]:
             raise ValidationError("Le code postal ne correspond pas à la commune")
 
         if commune_code:
