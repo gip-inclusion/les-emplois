@@ -1,15 +1,17 @@
 from os import name
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 
-from itou.asp.models import Commune, RSAAllocation, LaneExtension, LaneType
+from itou.asp.models import Commune, LaneExtension, LaneType, RSAAllocation
 from itou.employee_record.models import EmployeeRecord
 from itou.siaes.models import SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget
+
 
 # Endpoint for INSEE communes autocomplete
 COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")

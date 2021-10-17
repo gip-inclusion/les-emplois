@@ -752,8 +752,8 @@ class JobSeekerProfile(models.Model):
         # Birth place an country are checked in User.clean()
         self.user.clean()
 
-        # if not self.education_level:
-        #    raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
+        if not self.education_level:
+            raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
 
     def _clean_job_seeker_situation(self):
         if self.previous_employer_kind and self.unemployed_since:
