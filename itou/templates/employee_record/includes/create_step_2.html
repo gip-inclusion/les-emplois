@@ -20,7 +20,7 @@
     {% if profile.hexa_address_filled %}
         <div class="row">
             <div class="col-md-3">Numéro</div>
-            <div class="col-md-9"><b>{{ profile.hexa_lane_number }} {{ profile.get_hexa_std_extension_display }}{{ profile.hexa_non_std_extension }}</b></div>
+            <div class="col-md-9"><b>{{ profile.hexa_lane_number|default:"-" }} {{ profile.get_hexa_std_extension_display }}{{ profile.hexa_non_std_extension }}</b></div>
         </div>
         <div class="row">
             <div class="col-md-3">Voie</div>

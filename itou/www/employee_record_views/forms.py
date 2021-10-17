@@ -1,11 +1,9 @@
-from os import name
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 
-from itou.asp.models import Commune, LaneExtension, LaneType, RSAAllocation
+from itou.asp.models import Commune, RSAAllocation
 from itou.employee_record.models import EmployeeRecord
 from itou.siaes.models import SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile, User
@@ -176,7 +174,15 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
     def clean(self):
         super().clean()
 
+        if self.cleaned_data.get("hexa_std_extension") and not self.cleaned_data.get("hexa_lane_number"):
+            raise ValidationError("L'extension doit être saisie avec un numéro de voie")
+
         commune_code = self.cleaned_data.get("insee_commune_code")
+        post_code = self.cleaned_data.get("hexa_post_code")
+
+        # Check basic coherence between post-code and INSEE code:
+        if post_code[:2] != commune_code[:2]:
+            raise ValidationError("Le code postal ne correspond pas à la commune")
 
         if commune_code:
             commune = Commune.objects.current().by_insee_code(commune_code).first()
