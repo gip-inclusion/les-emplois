@@ -281,15 +281,16 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
         # Set an invalid address
         data = {
-            "address_line_1": "",
-            "post_code": "",
-            "city": "",
+            "hexa_lane_name": "",
+            "hexa_lane_type": "",
+            "hexa_post_code": "xxx",
+            "insee_commune_code": "xxx",
         }
 
         # And update it
         response = self.client.post(self.url, data=data)
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(self.job_seeker.jobseeker_profile.hexa_address_filled)
 
 
