@@ -2,7 +2,6 @@ from os import name
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator
-from django.forms.fields import CharField
 from django.urls import reverse_lazy
 
 from itou.asp.models import Commune, RSAAllocation, LaneExtension, LaneType
