@@ -727,6 +727,7 @@ class JobSeekerProfile(models.Model):
         choices=LaneType.choices,
     )
     hexa_lane_name = models.CharField(max_length=120, verbose_name="Nom de la voie", blank=True)
+    hexa_additional_address = models.CharField(max_length=32, verbose_name="Complément d'adresse", blank=True)
     hexa_post_code = models.CharField(max_length=6, verbose_name="Code postal", blank=True)
     hexa_commune = models.ForeignKey(
         Commune,
@@ -751,8 +752,8 @@ class JobSeekerProfile(models.Model):
         # Birth place an country are checked in User.clean()
         self.user.clean()
 
-        if not self.education_level:
-            raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
+        # if not self.education_level:
+        #    raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
 
     def _clean_job_seeker_situation(self):
         if self.previous_employer_kind and self.unemployed_since:
@@ -773,6 +774,7 @@ class JobSeekerProfile(models.Model):
                 self.hexa_non_std_extension,
                 self.hexa_lane_type,
                 self.hexa_lane_name,
+                self.hexa_additional_address,
                 self.hexa_post_code,
                 self.hexa_commune,
             ]
@@ -794,8 +796,17 @@ class JobSeekerProfile(models.Model):
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_COMMUNE)
 
-    def clean(self):
-        # see validation methods above
+    #  This used to be the `clean` method for the global model validation
+    #  when using forms.
+    #  However, building forms with ModelForm objects and a *subset* of
+    #  the model fields is really troublesome when using a global validator.
+    #  (forms are calling model.clean() at every validation).
+    #  This method as to be triggered manually from now on.
+    def clean_model(self):
+        """
+        Global model validation. Used to be the `clean` method.
+        """
+        # see partial validation methods above
         self._clean_job_seeker_details()
         self._clean_job_seeker_situation()
         self._clean_job_seeker_hexa_address()
@@ -845,6 +856,7 @@ class JobSeekerProfile(models.Model):
         self.hexa_std_extension = ""
         self.hexa_non_std_extension = ""
         self.hexa_lane_name = ""
+        self.hexa_additional_address = ""
         self.hexa_post_code = ""
         self.hexa_commune = None
 

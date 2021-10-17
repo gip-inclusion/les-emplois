@@ -245,7 +245,9 @@ class EmployeeRecord(models.Model):
             raise ValidationError(self.ERROR_JOB_SEEKER_HAS_NO_PROFILE)
 
         # Further validation in the job seeker profile
-        job_seeker.jobseeker_profile.clean()
+        # Note that the job seeker profile validation is done
+        # via `clean_model` and not `clean` : see comments on `JobSeekerProfile.clean_model`
+        job_seeker.jobseeker_profile.clean_model()
 
     def clean(self):
         # see private methods above
