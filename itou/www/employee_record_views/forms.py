@@ -1,7 +1,7 @@
 from os import name
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, RegexValidator
 from django.forms.fields import CharField
 from django.urls import reverse_lazy
 
@@ -151,6 +151,19 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
         self.fields["hexa_lane_type"].required = True
         self.fields["hexa_lane_name"].required = True
         self.fields["hexa_post_code"].required = True
+
+        # Adding RE validators for ASP constraints
+        self.fields["hexa_lane_number"].validators = [
+            RegexValidator("^[0-9]{,5}$", message="Numéro de voie incorrect")
+        ]
+
+        self.fields["hexa_post_code"].validators = [RegexValidator("^[0-9]{5}$", message="Code postal incorrect")]
+
+        address_re_validator = RegexValidator(
+            "^[a-zA-Z0-9@ ]{,32}$", message="Le champs contient des caractères spéciaux"
+        )
+        self.fields["hexa_lane_name"].validators = [address_re_validator]
+        self.fields["hexa_additional_address"].validators = [address_re_validator]
 
         # Pre-fill INSEE commune
         if self.instance.hexa_commune:
