@@ -1,14 +1,19 @@
+from os import name
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
+from django.forms.fields import CharField
 from django.urls import reverse_lazy
 
-from itou.asp.models import Commune, RSAAllocation
+from itou.asp.models import Commune, RSAAllocation, LaneExtension, LaneType
 from itou.employee_record.models import EmployeeRecord
 from itou.siaes.models import SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget
+
+# Endpoint for INSEE communes autocomplete
+COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):
@@ -120,29 +125,64 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
 
 class NewEmployeeRecordStep2Form(forms.ModelForm):
     """
-    New employee record step 2:
-
-    - HEXA address lookup
-    - details of the employee
+    If the geolocation of address fails, allows user to manually enter
+    an address based on ASP internal address format.
+    These fields are *not* mapped directly to a JobSeekerProfile object,
+    mainly because of model level validation concerns (model.clean method)
     """
+
+    insee_commune = forms.CharField(
+        label="Commune",
+        widget=forms.TextInput(
+            attrs={
+                "class": "js-commune-autocomplete-input form-control",
+                "data-autocomplete-source-url": COMMUNE_AUTOCOMPLETE_SOURCE_URL,
+                "data-autosubmit-on-enter-pressed": 0,
+                "placeholder": "Nom de la commune",
+                "autocomplete": "off",
+            }
+        ),
+    )
+    insee_commune_code = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-commune-autocomplete-hidden"}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for field_name in ["phone", "email"]:
-            self.fields[field_name].widget.attrs["readonly"] = True
-            self.fields[field_name].help_text = "Champ non-modifiable"
+        self.fields["hexa_lane_type"].required = True
+        self.fields["hexa_lane_name"].required = True
+        self.fields["hexa_post_code"].required = True
+
+        # Pre-fill INSEE commune
+        if self.instance.hexa_commune:
+            self.initial[
+                "insee_commune"
+            ] = f"{self.instance.hexa_commune.name} ({self.instance.hexa_commune.department_code})"
+            self.initial["insee_commune_code"] = self.instance.hexa_commune.code
+
+    def clean(self):
+        super().clean()
+
+        commune_code = self.cleaned_data.get("insee_commune_code")
+
+        if commune_code:
+            commune = Commune.objects.current().by_insee_code(commune_code).first()
+            self.cleaned_data["hexa_commune"] = commune
 
     class Meta:
-        model = User
+        model = JobSeekerProfile
         fields = [
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "phone",
-            "email",
+            "hexa_lane_type",
+            "hexa_lane_number",
+            "hexa_std_extension",
+            "hexa_lane_name",
+            "hexa_additional_address",
+            "hexa_post_code",
+            "hexa_commune",
         ]
+        labels = {
+            "hexa_lane_number": "Numéro",
+            "hexa_std_extension": "Extension",
+        }
 
 
 class NewEmployeeRecordStep3Form(forms.ModelForm):
