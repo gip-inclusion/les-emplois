@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import Q
 from django.http import JsonResponse
 from django.template.defaultfilters import slugify
 
@@ -63,11 +66,13 @@ def communes_autocomplete(request):
     """
 
     term = request.GET.get("term", "").strip()
+    dt = datetime.fromisoformat(request.GET.get("date", "1900-01-01"))
     communes = []
 
     if term:
         communes = (
-            Commune.objects.filter(end_date=None)
+            Commune.objects.filter(start_date__gt=dt)
+            .filter(Q(end_date=None) | Q(end_date__lt=dt))
             .annotate(similarity=TrigramSimilarity("name", term))
             .filter(similarity__gt=0.1)
             .order_by("-similarity")
