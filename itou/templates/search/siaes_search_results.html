@@ -58,7 +58,8 @@
             <div class="col-12 col-md-8">
                 {% for siae in siaes_page %}
                     <div class="card my-4">
-                        <div class="card-body">
+                        {% with siae.job_description_through.all as jobs_descriptions %}
+                        <div class="bg-light p-3">
                             <h3 class="card-title">
                                 <b><abbr title="{{ siae.get_kind_display }}">{{ siae.kind }}</abbr></b>
                                 -
@@ -76,48 +77,47 @@
                                 <br />
                             {% endif %}
                             <small>
-                                <span class="badge badge-info my-3">{{ siae.distance|floatformat:"-1" }} km</span> de votre lieu de recherche.
+                                <span class="badge badge-dark mb-3">{{ siae.distance|floatformat:"-1" }} km</span> de votre lieu de recherche.
                             </small>
                             {% if siae.job_description_through.exists and not siae.block_job_applications %}
-                                <p class="h6 border-bottom border-gray pb-2">Métiers proposés</p>
-                                <ul class="mb-0">
-                                {% for job in siae.job_description_through.all %}
-                                    <li>
-                                        <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
-                                            {{ job.display_name }}
-                                        </a>
-                                        {% if job.is_popular %}
-                                        <small>
-                                            <span class="ml-3">
-                                                    {% include "includes/icon.html" with icon="layers" size=15 class="mr-1 text-danger" %}
-                                                    Plus de {{ job.POPULAR_THRESHOLD }} candidatures reçues
-                                                </span>
-                                        </small>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
+                                <a data-toggle="collapse"  data-target="#collapse{{siae.id}}" role="button" aria-expanded="false" aria-controls="collapse{{siae.id}}">
+                                    <h6>Métiers exercès au sein de la structure</h6>
+                                </a>
+                                <ul class="collapse" id="collapse{{siae.id}}">
+                                    {% for job in jobs_descriptions %}
+                                        <li>
+                                            <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+                                                {{ job.display_name }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
                                 </ul>
                             {% endif %}
                         </div>
-
-                        <div class="card-footer">
-                            {% if not siae.has_active_members %}
-                                <a class="btn btn-sm btn-primary disabled" href="" aria-label="Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ siae.display_name }}">
-                                    {% include "includes/icon.html" with icon="message-square" %} Postuler
-                                </a>
-                                <small>Cet employeur n'a pas encore créé son compte.</small>
-                            {% elif siae.block_job_applications %}
-                                <a class="btn btn-sm btn-primary disabled" href="" aria-label="Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ siae.display_name }}">
-                                    {% include "includes/icon.html" with icon="message-square" %} Postuler
-                                </a>
-                                <small>Cet employeur n'accepte plus de candidatures pour le moment</small>
-                            {% else %}
-                                <a class="btn btn-sm btn-primary matomo-event" href="{% url 'apply:start' siae_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-bt-postuler">
-                                    {% include "includes/icon.html" with icon="message-square" %} Postuler
-                                </a>
+                        <div class="card-body">
+                            {% if siae.count_active_job_descriptions > 0 %}
+                                <div class="btns-actives-jobs">
+                                    <p class="h4 pb-2">Recrutement en cours</p>
+                                    {% for job in jobs_descriptions %}
+                                        {% if job.is_active %}
+                                            <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event btn btn-outline-primary mb-2" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+                                                {{ job.display_name }}
+                                            </a>
+                                            {% if job.is_popular %}
+                                                <small>
+                                                    <span class="ml-3">
+                                                            {% include "includes/icon.html" with icon="layers" size=15 class="mr-1 text-danger" %}
+                                                            Plus de {{ job.POPULAR_THRESHOLD }} candidatures reçues
+                                                        </span>
+                                                </small>
+                                            {% endif %}
+                                        {% endif %}
+                                        <br >
+                                    {% endfor %}
+                                </div>
                             {% endif %}
                         </div>
-
+                    {% endwith %}
                     </div>
                 {% empty %}
                     <div class="card my-4">
