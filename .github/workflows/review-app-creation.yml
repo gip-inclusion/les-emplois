@@ -18,6 +18,7 @@ env:
   CONFIGURATION_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_CONFIGURATION_ADDON }}
   S3_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_S3_ADDON }}
   BRANCH: ${{ github.head_ref }}
+  PYTHON_VERSION: 3.9
 
 jobs:
   create:
@@ -37,7 +38,11 @@ jobs:
     - name: 🏷 Set review app name
       run:
         echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g'`" >> $GITHUB_ENV
-
+    # Clever cloud seem to inject CC_PYTHON_VERSION=3, whicĥ breaks some of our machines
+    # that use 3.9 and may not support python 3.10
+    - name: 🏷 Fix Python version
+      run:
+        echo 'CC_PYTHON_VERSION=${{ env.DEPLOY_BRANCH }}'
     - name: 🏷 Set database addon name
       run:
         echo "REVIEW_APP_DB_NAME=`echo $REVIEW_APP_NAME | sed -r 's/-/_/g'`" >> $GITHUB_ENV
