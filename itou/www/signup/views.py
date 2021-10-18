@@ -562,6 +562,8 @@ class PrescriberUserSignupView(SignupView):
 
         self.authorization_status = authorization_status
         self.kind = kind
+        # Get kind label
+        self.kind_label = dict(PrescriberOrganization.Kind.choices).get(kind)
         self.prescriber_org_data = prescriber_org_data
         self.join_as_orienteur_without_org = join_as_orienteur_without_org
         self.join_authorized_org = join_authorized_org
@@ -586,7 +588,7 @@ class PrescriberUserSignupView(SignupView):
             {
                 "join_as_orienteur_without_org": self.join_as_orienteur_without_org,
                 "join_authorized_org": self.join_authorized_org,
-                "kind": self.kind,
+                "kind_label": self.kind_label,
                 "kind_is_other": self.kind == PrescriberOrganization.Kind.OTHER.value,
                 "prescriber_org_data": self.prescriber_org_data,
                 "prev_url": get_prev_url_from_history(self.request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),

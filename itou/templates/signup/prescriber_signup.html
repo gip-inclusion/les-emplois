@@ -11,10 +11,10 @@
         <small class="text-muted">Prescripteur/Orienteur</small>
     </h1>
 
-    {% if join_authorized_org and not kind_is_other %}
+    {% if join_authorized_org and kind_label and not kind_is_other %}
         {# Display kind's full name if known. #}
         <div class="alert alert-emploi pb-0" role="alert">
-            <p class="lead">{{ kind.label }}</p>
+            <p class="lead">{{ kind_label }}</p>
         </div>
     {% endif %}
 

@@ -25,6 +25,8 @@
                 <h5 class="card-title font-weight-light">
                     Vous êtes prescripteur ou orienteur
                 </h5>
+            </div>
+            <div class="card-footer">
                 <a class="btn btn-primary" href="{% url 'signup:prescriber_check_already_exists' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                     Créer un compte
                 </a>
