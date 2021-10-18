@@ -834,6 +834,7 @@ class JobSeekerProfile(models.Model):
         self.hexa_non_std_extension = result.get("non_std_extension")
         self.hexa_lane_name = result.get("lane")
         self.hexa_post_code = result.get("post_code")
+        self.hexa_additional_address = result.get("additional_address")
 
         # Special field: Commune object contains both city name and INSEE code
         insee_code = result.get("insee_code")
@@ -902,6 +903,8 @@ class JobSeekerProfile(models.Model):
                 result += f"{self.hexa_std_extension} "
             elif self.hexa_non_std_extension:
                 result += f"{self.hexa_non_std_extension} "
+            if self.hexa_lane_type:
+                result += f"{self.get_hexa_lane_type_display()} "
 
             result += f"{self.hexa_lane_name} - {self.hexa_post_code} {self.hexa_commune.name}"
             return result
