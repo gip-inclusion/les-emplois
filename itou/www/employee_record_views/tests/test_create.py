@@ -293,6 +293,91 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(self.job_seeker.jobseeker_profile.hexa_address_filled)
 
+    def test_address_updated_by_user(self):
+        # User can now update the geolocated address if invalid
+
+        # Pass step 1
+        self.pass_step_1()
+
+        test_data = {
+            "hexa_lane_number": "15",
+            "hexa_std_extension": "B",
+            "hexa_lane_type": "RUE",
+            "hexa_lane_name": "des colonies",
+            "hexa_additional_address": "Bat A",
+            "hexa_post_code": "67000",
+            "insee_commune": "STRASBOURG",
+            "insee_commune_code": "67482",
+        }
+
+        data = test_data
+        response = self.client.post(self.url, data=data)
+        # This data set should pass
+        self.assertEqual(response.status_code, 302)
+
+        # Check form validators
+
+        # Lane number :
+        data = test_data
+
+        # Can't use extension without number
+        data["hexa_lane_number"] = ""
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        # Can't use anything else than up to 5 digits
+        data["hexa_lane_number"] = "a"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        data["hexa_lane_number"] = "123456"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        # Post code :
+        data = test_data
+
+        # 5 digits exactly
+        data["hexa_post_code"] = "123456"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        data["hexa_post_code"] = "1234"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        data["hexa_lane_number"] = "1234a"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        # Coherence with INSEE code
+        data["hexa_lane_number"] = "12345"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        # Lane name and additional address
+        data = test_data
+
+        # No special characters
+        data["hexa_lane_name"] = "des colons !"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        # 32 chars max
+        data["hexa_lane_name"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        data = test_data
+        data["hexa_additional_address"] = "Bat a !"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        # 32 chars max
+        data["hexa_additional_address"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+
 
 class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
     """
