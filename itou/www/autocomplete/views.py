@@ -61,6 +61,10 @@ def communes_autocomplete(request):
     """
     Autocomplete endpoint for INSEE communes (ASP ref. files)
 
+    Slight variation : a `date` parameter is send with search term
+    in order to get valid INSEE codes (with this date within a period between
+    commune.start_date and commune.end_date)
+
     Returns JSON data compliant with the jQuery UI Autocomplete Widget:
     https://api.jqueryui.com/autocomplete/#option-source
     """
@@ -71,8 +75,8 @@ def communes_autocomplete(request):
 
     if term:
         communes = (
-            Commune.objects.filter(start_date__gt=dt)
-            .filter(Q(end_date=None) | Q(end_date__lt=dt))
+            Commune.objects.filter(start_date__lte=dt)
+            .filter(Q(end_date=None) | Q(end_date__gt=dt))
             .annotate(similarity=TrigramSimilarity("name", term))
             .filter(similarity__gt=0.1)
             .order_by("-similarity")
