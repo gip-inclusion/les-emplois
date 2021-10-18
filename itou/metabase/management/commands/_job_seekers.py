@@ -27,6 +27,17 @@ def get_user_age_in_years(user):
     return None
 
 
+def get_user_signup_kind(user):
+    creator = user.created_by
+    if creator is None:
+        return "autonome"
+    if creator.is_prescriber:
+        return "par prescripteur"
+    if creator.is_siae_staff:
+        return "par employeur"
+    raise ValueError("Unexpected job seeker creator kind")
+
+
 def get_latest_diagnosis(job_seeker):
     assert job_seeker.is_job_seeker
     if job_seeker.eligibility_diagnoses.count() == 0:
@@ -127,6 +138,12 @@ TABLE_COLUMNS = [
         "type": "date",
         "comment": "Date inscription du candidat",
         "fn": lambda o: o.date_joined,
+    },
+    {
+        "name": "type_inscription",
+        "type": "varchar",
+        "comment": "Type inscription du candidat",
+        "fn": get_user_signup_kind,
     },
     {
         "name": "pe_connect",

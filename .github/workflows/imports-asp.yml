@@ -82,7 +82,9 @@ jobs:
         $CLEVER_CLI service link-addon c1-itou-redis
 
     - name: "🚀 Deploy post-deploy hook to Clever"
-      run: $CLEVER_CLI env import-vars CC_RUN_SUCCEEDED_HOOK
+      run:
+        $CLEVER_CLI env import-vars CC_RUN_SUCCEEDED_HOOK
+        $CLEVER_CLI env import-vars CC_PYTHON_VERSION
 
 # OK, here is the tricky part: we use a hook, so in the following 2 tasks
 # we deploy and destroy the app, but in fact we sequentially:

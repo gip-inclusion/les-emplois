@@ -10,6 +10,7 @@ from itou.institutions.models import InstitutionMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
+from itou.users.admin_forms import UserAdminForm
 
 
 class SiaeMembershipInline(admin.TabularInline):
@@ -26,15 +27,15 @@ class SiaeMembershipInline(admin.TabularInline):
         "updated_at",
         "updated_by",
     )
-    can_delete = False
+    can_delete = True
     show_change_link = True
     fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return True
 
     def has_add_permission(self, request, obj=None):
-        return False
+        return True
 
     def siae_id_link(self, obj):
         app_label = obj.siae._meta.app_label
@@ -57,14 +58,14 @@ class PrescriberMembershipInline(admin.TabularInline):
         "updated_at",
         "updated_by",
     )
-    can_delete = False
+    can_delete = True
     fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return True
 
     def has_add_permission(self, request, obj=None):
-        return False
+        return True
 
     def organization_id_link(self, obj):
         app_label = obj.organization._meta.app_label
@@ -90,14 +91,14 @@ class InstitutionMembershipInline(admin.TabularInline):
         "created_at",
         "updated_at",
     )
-    can_delete = False
+    can_delete = True
     fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return True
 
     def has_add_permission(self, request, obj=None):
-        return False
+        return True
 
     def institution_id_link(self, obj):
         app_label = obj.institution._meta.app_label
@@ -150,6 +151,7 @@ class CreatedByProxyFilter(admin.SimpleListFilter):
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
 
+    form = UserAdminForm
     inlines = UserAdmin.inlines + [
         SiaeMembershipInline,
         PrescriberMembershipInline,
