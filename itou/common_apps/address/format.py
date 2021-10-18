@@ -92,7 +92,7 @@ def format_address(obj):
     result["lane"] = lane
 
     # Lane type processing (Avenue, RUe, Boulevard ...)
-    lane_type = lane.split(maxsplit=1)[0]
+    lane_type, *rest = lane.split(maxsplit=1)
 
     lt = (
         # The API field is similar to know lane type,
@@ -109,6 +109,9 @@ def format_address(obj):
 
     if lt:
         result["lane_type"] = lt.name
+        # If split is successful, then we can strip the lane type
+        # from the lane name for a better result
+        result["lane"] = rest[0]
     else:
         return None, f"Impossible de trouver le type de voie : {lane_type} pour l'adresse : {address}"
 
