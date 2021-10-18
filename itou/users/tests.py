@@ -173,6 +173,7 @@ class ManagementCommandsTest(TestCase):
         # Merge all users into `user1`.
         call_command("deduplicate_job_seekers", verbosity=0)
 
+        user1.refresh_from_db()
         self.assertEqual(3, user1.job_applications.count())
 
         job_app1.refresh_from_db()
