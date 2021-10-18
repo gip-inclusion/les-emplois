@@ -27,6 +27,7 @@ env:
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   CRON_APPS_ORGANIZATION_NAME: ${{ secrets.CLEVER_CRON_APPS_ORGANIZATION_NAME }}
   DEPLOY_BRANCH: master_clever
+  PYTHON_VERSION: 3.9
 
 jobs:
   populate_metabase:
@@ -44,6 +45,12 @@ jobs:
     - name: 🏷 Setup app name
       run:
         echo "CRON_TASK_APP_NAME=`echo \"c1-cron-populate-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
+
+    # Clever cloud seem to inject CC_PYTHON_VERSION=3, whicĥ breaks some of our machines
+    # that use 3.9 and may not support python 3.10
+    - name: 🏷 Fix Python version
+      run:
+        echo 'CC_PYTHON_VERSION=${{ env.DEPLOY_BRANCH }}'
 
     # CC_RUN_SUCCEEDED_HOOK is a clever-cloud-specific environment variable.
     # We set the command we want to run once the app is started
