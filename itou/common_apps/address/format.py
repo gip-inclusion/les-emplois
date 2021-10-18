@@ -12,6 +12,7 @@ ERROR_INCOMPLETE_ADDRESS_DATA = "Données d'adresse incomplètes"
 ERROR_UNKNOWN_ADDRESS_LANE = "Impossible d'obtenir le nom de la voie"
 
 LANE_NUMBER_RE = r"^([0-9]{1,5})(.*?)$"
+ADDITIONAL_ADDRESS_RE = r"^[a-zA-Z0-9@ ]{,32}$"
 
 
 def format_address(obj):
@@ -33,6 +34,7 @@ def format_address(obj):
     - non_std_extension (opt.): if another extension is detected
     - lane: name of the lane
     - lane_type: One of the ASP ref lane type (see LaneType)
+    - additional_address : further details on the address (if available)
     - city: name of city
     - post_code: postal code
     - insee_code: INSEE code of the city (Itou)
@@ -57,9 +59,11 @@ def format_address(obj):
         return None, ERROR_GEOCODING_API
 
     # Default values
+    additional_address = unidecode(obj.address_line_2)
     result = {
         "number": "",
         "non_std_extension": "",
+        "additional_address": additional_address if re.match(ADDITIONAL_ADDRESS_RE, additional_address) else "",
     }
 
     # Street extension processing (bis, ter ...)

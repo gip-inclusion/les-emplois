@@ -78,7 +78,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
     codeextensionvoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension", allow_blank=True)
     codetypevoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
     adrLibelleVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_name")
-    adrCpltDistribution = serializers.CharField(source="address_line_2", allow_blank=True)
+    adrCpltDistribution = serializers.CharField(source="jobseeker_profile.hexa_additional_address", allow_blank=True)
 
     codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code")
     codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")
