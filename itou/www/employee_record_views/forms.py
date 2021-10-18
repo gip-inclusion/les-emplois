@@ -159,7 +159,8 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
         self.fields["hexa_post_code"].validators = [RegexValidator("^[0-9]{5}$", message="Code postal incorrect")]
 
         address_re_validator = RegexValidator(
-            "^[a-zA-Z0-9@ ]{,32}$", message="Le champs contient des caractères spéciaux"
+            "^[a-zA-Z0-9@ ]{,32}$",
+            message="Le champ ne doit pas contenir de caractères spéciaux et ne pas excéder 32 caractères",
         )
         self.fields["hexa_lane_name"].validators = [address_re_validator]
         self.fields["hexa_additional_address"].validators = [address_re_validator]
