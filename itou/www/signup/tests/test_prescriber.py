@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.http import urlencode
 
 from itou.prescribers.factories import (
@@ -607,8 +608,7 @@ class PrescriberSignupTest(TestCase):
             "kind": PrescriberOrganization.Kind.PLIE.value,
         }
         response = self.client.post(url, data=post_data)
-
-        # TODO: test error
+        self.assertContains(response, escape("utilise déjà ce type d'organisation avec le même SIRET"))
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -634,7 +634,7 @@ class PrescriberSignupTest(TestCase):
         self.assertContains(response, prescriber_org.display_name)
 
         response = self.client.post(url, data={"first_name": "Bertrand", "last_name": "Martin", "email": "beber"})
-        self.assertContains(response, "Saisissez une adresse e-mail valide.")
+        self.assertContains(response, escape("Saisissez une adresse e-mail valide."))
 
         requestor = {"first_name": "Bertrand", "last_name": "Martin", "email": "bertand@wahoo.fr"}
         response = self.client.post(url, data=requestor)
