@@ -15,6 +15,13 @@ $(document).ready(() => {
     searchButton.prop("disabled", true)
   }
 
+  function fetchBirthDate() {
+    // Try to fetch the value of the field 'birthDate' (if existing)
+    // => allows browsing in history of INSEE communes codes
+    let birthDate = $('input[name=birthdate]').val()
+    return birthDate
+  }
+
   communeSearchInput
     // https://api.jqueryui.com/autocomplete/
     .autocomplete({
@@ -25,6 +32,7 @@ $(document).ready(() => {
       // Make a selection on focus.
       focus: (event, ui) => {
         searchButton.prop("disabled", true)
+        fetchBirthDate()
         hiddenCommuneInput.val(ui.item.code)  // Store commune code.
         hiddenCommuneInput.data('title', ui.item.value)  // Store commune name.
       },
