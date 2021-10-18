@@ -27,7 +27,12 @@ $(document).ready(() => {
     .autocomplete({
       delay: 150,
       minLength: 1,
-      source: communeSearchInput.data('autocomplete-source-url'),
+      // Use a callback to add custom parameter 'date':
+      source: function(request, response) {
+        $.getJSON(communeSearchInput.data('autocomplete-source-url'), 
+          {term: request.term, date: fetchBirthDate()}, 
+          response)
+      },
       autoFocus: true,
       // Make a selection on focus.
       focus: (event, ui) => {
