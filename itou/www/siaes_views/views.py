@@ -136,8 +136,8 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
 @login_required
 def show_financial_annexes(request, template_name="siaes/show_financial_annexes.html"):
     """
-    Show a summary of the financial annexes of the convention to the siae admin user.
-    Financial annexes are grouped by suffix, and only the most relevant one (active if any, or most recent if not) is shown for each suffix.
+    Show a summary of the financial annexes of the convention to the siae admin user. Financial annexes are grouped
+    by suffix and only the most relevant one (active if any, or most recent if not) is shown for each suffix.
     """
     current_siae = get_current_siae_or_404(request)
     if not current_siae.convention_can_be_accessed_by(request.user):
@@ -147,8 +147,8 @@ def show_financial_annexes(request, template_name="siaes/show_financial_annexes.
     if current_siae.convention:
         financial_annexes = current_siae.convention.financial_annexes.all()
 
-    # For each group of AFs sharing the same number prefix, show only the most relevant AF (active if any, or most recent if not).
-    # We do this to avoid showing too many AFs and confusing the user.
+    # For each group of AFs sharing the same number prefix, show only the most relevant AF
+    # (active if any, or most recent if not). We do this to avoid showing too many AFs and confusing the user.
     prefix_to_af = {}
     for af in financial_annexes:
         prefix = af.number_prefix

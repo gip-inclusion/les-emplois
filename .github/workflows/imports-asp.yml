@@ -24,6 +24,7 @@ env:
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   ITOU_ORGANIZATION_NAME: ${{ secrets.CLEVER_ORGANIZATION_NAME }}
   DEPLOY_BRANCH: master_clever
+  PYTHON_VERSION: 3.9
 
 jobs:
   imports_asp:
@@ -49,6 +50,12 @@ jobs:
     - name: 🏷 Setup post-deployment hook
       run:
         echo 'CC_RUN_SUCCEEDED_HOOK=./scripts/imports-asp.sh' >> $GITHUB_ENV
+
+    # Clever cloud seem to inject CC_PYTHON_VERSION=3, whicĥ breaks some of our machines
+    # that use 3.9 and may not support python 3.10
+    - name: 🏷 Fix Python version
+      run:
+        echo 'CC_PYTHON_VERSION=${{ env.DEPLOY_BRANCH }}'
 
     - name: 🧫 Create a cron app on Clever Cloud on a strong machine
       run: |
