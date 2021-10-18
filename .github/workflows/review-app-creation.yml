@@ -82,6 +82,7 @@ jobs:
         $CLEVER_CLI service link-addon $CONFIGURATION_ADDON
         $CLEVER_CLI env import-vars REVIEW_APP_DB_NAME
         $CLEVER_CLI env import-vars DEPLOY_URL
+        $CLEVER_CLI env import-vars CC_PYTHON_VERSION
 
     - name: 🚀 Deploy to Clever Cloud
       run: $CLEVER_CLI deploy --branch $BRANCH --force
