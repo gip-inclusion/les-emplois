@@ -63,7 +63,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             siaes_step_1
             # Convert km to m (injected in SQL query)
             .annotate(distance=Distance("coords", city.coords) / 1000)
-            .prefetch_job_description_through(is_active=True)
+            .prefetch_job_description_through()
             # For sorting let's put siaes in only 2 buckets (boolean has_active_members).
             # If we sort naively by `-_total_active_members` we would show
             # siaes with 10 members (where 10 is the max), then siaes
