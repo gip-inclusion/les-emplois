@@ -148,10 +148,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
 
         # Create jobseeker_profile if needed
         employee = job_application.job_seeker
-        profile = JobSeekerProfile(user=employee)
-
-        if not employee.has_jobseeker_profile:
-            profile.save()
+        profile, _ = JobSeekerProfile.objects.get_or_create(user=employee)
 
         # Try a geo lookup of the address every time we call this form
         try:
