@@ -337,7 +337,6 @@ def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.h
             {
                 "authorization_status": authorization_status,
                 "kind": prescriber_kind,
-                # "prescriber_org_data": None,
                 "pole_emploi_org_pk": None,
                 "safir_code": None,
             }
