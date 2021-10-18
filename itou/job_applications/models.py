@@ -211,6 +211,7 @@ class JobApplicationQuerySet(models.QuerySet):
                 hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
             )
             .select_related("job_seeker", "approval")
+            .order_by("-hiring_start_at")
         )
 
 

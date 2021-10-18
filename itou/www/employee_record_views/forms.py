@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 
 from itou.asp.models import Commune, RSAAllocation
@@ -9,6 +9,10 @@ from itou.siaes.models import SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget
+
+
+# Endpoint for INSEE communes autocomplete
+COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):
@@ -120,29 +124,86 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
 
 class NewEmployeeRecordStep2Form(forms.ModelForm):
     """
-    New employee record step 2:
-
-    - HEXA address lookup
-    - details of the employee
+    If the geolocation of address fails, allows user to manually enter
+    an address based on ASP internal address format.
+    These fields are *not* mapped directly to a JobSeekerProfile object,
+    mainly because of model level validation concerns (model.clean method)
     """
+
+    insee_commune = forms.CharField(
+        label="Commune",
+        widget=forms.TextInput(
+            attrs={
+                "class": "js-commune-autocomplete-input form-control",
+                "data-autocomplete-source-url": COMMUNE_AUTOCOMPLETE_SOURCE_URL,
+                "data-autosubmit-on-enter-pressed": 0,
+                "placeholder": "Nom de la commune",
+                "autocomplete": "off",
+            }
+        ),
+    )
+    insee_commune_code = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-commune-autocomplete-hidden"}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for field_name in ["phone", "email"]:
-            self.fields[field_name].widget.attrs["readonly"] = True
-            self.fields[field_name].help_text = "Champ non-modifiable"
+        self.fields["hexa_lane_type"].required = True
+        self.fields["hexa_lane_name"].required = True
+        self.fields["hexa_post_code"].required = True
+
+        # Adding RE validators for ASP constraints
+        self.fields["hexa_lane_number"].validators = [
+            RegexValidator("^[0-9]{,5}$", message="Numéro de voie incorrect")
+        ]
+
+        self.fields["hexa_post_code"].validators = [RegexValidator("^[0-9]{5}$", message="Code postal incorrect")]
+
+        address_re_validator = RegexValidator(
+            "^[a-zA-Z0-9@ ]{,32}$",
+            message="Le champ ne doit pas contenir de caractères spéciaux et ne pas excéder 32 caractères",
+        )
+        self.fields["hexa_lane_name"].validators = [address_re_validator]
+        self.fields["hexa_additional_address"].validators = [address_re_validator]
+
+        # Pre-fill INSEE commune
+        if self.instance.hexa_commune:
+            self.initial[
+                "insee_commune"
+            ] = f"{self.instance.hexa_commune.name} ({self.instance.hexa_commune.department_code})"
+            self.initial["insee_commune_code"] = self.instance.hexa_commune.code
+
+    def clean(self):
+        super().clean()
+
+        if self.cleaned_data.get("hexa_std_extension") and not self.cleaned_data.get("hexa_lane_number"):
+            raise ValidationError("L'extension doit être saisie avec un numéro de voie")
+
+        commune_code = self.cleaned_data.get("insee_commune_code")
+        post_code = self.cleaned_data.get("hexa_post_code")
+
+        # Check basic coherence between post-code and INSEE code:
+        if post_code and commune_code and post_code[:2] != commune_code[:2]:
+            raise ValidationError("Le code postal ne correspond pas à la commune")
+
+        if commune_code:
+            commune = Commune.objects.current().by_insee_code(commune_code).first()
+            self.cleaned_data["hexa_commune"] = commune
 
     class Meta:
-        model = User
+        model = JobSeekerProfile
         fields = [
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "phone",
-            "email",
+            "hexa_lane_type",
+            "hexa_lane_number",
+            "hexa_std_extension",
+            "hexa_lane_name",
+            "hexa_additional_address",
+            "hexa_post_code",
+            "hexa_commune",
         ]
+        labels = {
+            "hexa_lane_number": "Numéro",
+            "hexa_std_extension": "Extension",
+        }
 
 
 class NewEmployeeRecordStep3Form(forms.ModelForm):

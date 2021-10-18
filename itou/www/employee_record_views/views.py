@@ -148,14 +148,14 @@ def create(request, job_application_id, template_name="employee_record/create.ht
 
         # Create jobseeker_profile if needed
         employee = job_application.job_seeker
-        if not employee.has_jobseeker_profile:
-            profile = JobSeekerProfile(user=employee)
-            try:
-                profile.save()
-                profile.update_hexa_address()
-            except ValidationError:
-                # cleanup address
-                profile.clear_hexa_address()
+        profile, _ = JobSeekerProfile.objects.get_or_create(user=employee)
+
+        # Try a geo lookup of the address every time we call this form
+        try:
+            profile.update_hexa_address()
+        except ValidationError:
+            # cleanup address
+            profile.clear_hexa_address()
 
         return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
 
@@ -186,28 +186,31 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     # - employee record is in an updatable state (if exists)
     # - target job_application / employee record must be linked to given SIAE
     # - a job seeker profile must exist (created in step 1)
+    # - if there is no HEXA address (no geolocation), allow manual input for address details
 
     profile = job_seeker.jobseeker_profile
-    form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=job_seeker)
-    maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_application.job_seeker.geocoding_address}")
+    form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=profile)
+    maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_seeker.geocoding_address}")
     step = 2
+    address_updated_by_user = bool(request.GET.get("address_updated_by_user", False))
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        try:
-            profile.update_hexa_address()
-        except ValidationError:
-            # Impossible to get a valid hexa address:
-            # clear previous entry
-            profile.clear_hexa_address()
 
-        # Retry until good
-        return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
+        # Retry until we're good
+        return HttpResponseRedirect(
+            reverse(
+                "employee_record_views:create_step_2",
+                args=(job_application.id,),
+            )
+            + "?address_updated_by_user=true"
+        )
 
     context = {
         "job_application": job_application,
         "form": form,
-        "profile": job_application.job_seeker.jobseeker_profile,
+        "profile": profile,
+        "address_updated_by_user": address_updated_by_user,
         "maps_url": maps_url,
         "steps": STEPS,
         "step": step,
