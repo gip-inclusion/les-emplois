@@ -217,7 +217,7 @@ class Command(BaseCommand):
         self.logger.info(f"🎯 STEP 2: hunt duplicates!")
 
         # Step 2: treat duplicates.
-        # Duplicated NIR mean PASS IAE have been delivered for the same person.
+        # Duplicated NIR means PASS IAE have been delivered for the same person.
         # Add a new column to know whether it's a NIR duplicate or not.
         df["nir_is_duplicated"] = df[NIR_COL].duplicated(keep=False)
 
