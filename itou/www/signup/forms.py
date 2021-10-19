@@ -3,6 +3,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 
@@ -299,14 +300,18 @@ class PrescriberChooseOrgKindForm(forms.Form):
         org = PrescriberOrganization.objects.filter(siret=self.siret, kind=kind).first()
         if org:
             error = f"« {org.display_name} » utilise déjà ce type d'organisation avec le même SIRET ({self.siret})."
-            admin = org.get_admins().first()
-            if admin:
+            # Get the first member to display their name and the link to the invitation request
+            member = org.prescribermembership_set.first()
+            if member:
+                url = reverse("signup:prescriber_request_invitation", args=[member.id])
                 error += (
                     f" "
-                    f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
-                    f"{admin.first_name.title()} {admin.last_name[0].upper()}."
+                    f"Pour rejoindre cette organisation, vous devez obtenir une invitation de : "
+                    f"{member.user.first_name.title()} {member.user.last_name[0].upper()}."
+                    f" "
+                    f'<a href="{url}">Demander une invitation</a>'
                 )
-            raise forms.ValidationError(error)
+            raise forms.ValidationError(mark_safe(error))
         return kind
 
 
