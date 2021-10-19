@@ -68,10 +68,14 @@ def communes_autocomplete(request):
     Returns JSON data compliant with the jQuery UI Autocomplete Widget:
     https://api.jqueryui.com/autocomplete/#option-source
     """
-
-    term = request.GET.get("term", "").strip()
-    dt = datetime.fromisoformat(request.GET.get("date", "1900-01-01"))
     communes = []
+    term = request.GET.get("term", "").strip()
+
+    try:
+        dt = datetime.fromisoformat(request.GET.get("date"))
+    except:
+        # Can't extract date in iso format, use fallback
+        dt = datetime.fromisoformat("1900-01-01")
 
     if term:
         communes = (
