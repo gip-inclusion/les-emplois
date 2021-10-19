@@ -1,3 +1,5 @@
+// Serialize social security numbers to display them as they are on social security cards.
+
 "use strict";
 
 let form = $( ".js-format-nir" );

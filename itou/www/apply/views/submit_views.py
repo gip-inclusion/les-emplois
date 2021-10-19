@@ -132,7 +132,7 @@ def step_sender(request, siae_pk):
 @valid_session_required
 def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step_check_job_seeker_nir.html"):
     """
-    Ensure the job seeker has a NIR.
+    Ensure the job seeker has a NIR. If not and if possible, update it.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
