@@ -1,5 +1,5 @@
 # flake8: noqa
-# pylint: disable=[W1203, C0121]
+# pylint: disable=[logging-fstring-interpolation, singleton-comparison]
 
 import datetime
 import logging
@@ -20,22 +20,23 @@ BIRTHDATE_COL = "pph_date_naissance"
 FIRST_NAME_COL = "pph_prenom"
 LAST_NAME_COL = "pph_nom_usage"
 NIR_COL = "ppn_numero_inscription"
-PASS_COL = "agr_numero_agrement"
+APPROVAL_COL = "agr_numero_agrement"
 
 
 class Command(BaseCommand):
     """
-    Deduplicate job seekers.
+    Update job seekers' account with their NIR (social security number) if an approval has been issued.
 
-    This is temporary and should be deleted after the release of the NIR
-    which should prevent duplication.
+    To do so, parse an Excel file containing job seekers' birthdate, approval number and NIR.
 
-    To run the command without any change in DB and have a preview of which
-    accounts will be merged:
-        django-admin deduplicate_job_seekers --dry-run
+    To run the command without any change in DB and have a preview of the results:
+        django-admin update_nir_from_pass --file-path=path/to/file.xlsx --dry-run
 
-    To merge duplicates job seekers in the database:
-        django-admin deduplicate_job_seekers
+    To disable debug logs (not matching birthdate, first name or last name between file and DB):
+        django-admin update_nir_from_pass --file-path=path/to/file.xlsx --verbosity=0
+
+    To update job seekers in the database:
+        django-admin update_nir_from_pass --file-path=path/to/file.xlsx
     """
 
     help = "Deduplicate job seekers."
@@ -84,8 +85,8 @@ class Command(BaseCommand):
         return True
 
     def approval_is_valid(self, row):
-        approval = row[PASS_COL]
-        wrong_approval_numbers = ["999990000000", "999999999999", "999999000000"]
+        approval = row[APPROVAL_COL]
+        wrong_approval_numbers = ["999990000000", "999999999999", "999999000000", "999992100000"]
         return len(approval) == 12 and approval.startswith("99999") and approval not in wrong_approval_numbers
 
     def check_if_different(self, kind, first_value, second_value):
@@ -98,7 +99,7 @@ class Command(BaseCommand):
         return unidecode.unidecode(name.upper())
 
     def update_job_seekers(self, df):
-        approval_list = df[PASS_COL].tolist()
+        approval_list = df[APPROVAL_COL].tolist()
         approvals_qs = Approval.objects.filter(number__in=approval_list).select_related("user").all()
 
         updated_job_seekers = []
@@ -108,7 +109,7 @@ class Command(BaseCommand):
         for _, row in df.iterrows():
             pbar.update(1)
             try:
-                approval = approvals_qs.get(number=row[PASS_COL])
+                approval = approvals_qs.get(number=row[APPROVAL_COL])
             except ObjectDoesNotExist:
                 not_updated_job_seekers.append(row)
                 continue
@@ -129,7 +130,7 @@ class Command(BaseCommand):
 
         self.logger.info(f"{len(updated_job_seekers)} updated job seekers.")
         self.logger.info(f"{len(not_updated_job_seekers)} rows not existing in database.")
-        logs = [f"| PASS : {u[PASS_COL]}, NIR : {u[NIR_COL]} |" for u in not_updated_job_seekers]
+        logs = [f"| PASS : {u[APPROVAL_COL]}, NIR : {u[NIR_COL]} |" for u in not_updated_job_seekers]
         self.logger.info(logs)
 
     def clean_and_merge_duplicated_approval(self, df):
@@ -138,11 +139,11 @@ class Command(BaseCommand):
 
         # Same birthdate, NIR and PASS.
         # Don't mark them as treated to keep them integrated to complicated cases.
-        complicated_cases = df[~df.duplicated(subset=[PASS_COL, NIR_COL, BIRTHDATE_COL], keep=False)]
+        complicated_cases = df[~df.duplicated(subset=[APPROVAL_COL, NIR_COL, BIRTHDATE_COL], keep=False)]
         df.loc[complicated_cases.index, "is_treated"] = False
 
         # Merge kept rows.
-        kept_rows = df[df.duplicated(subset=[PASS_COL, NIR_COL, BIRTHDATE_COL], keep="first")]
+        kept_rows = df[df.duplicated(subset=[APPROVAL_COL, NIR_COL, BIRTHDATE_COL], keep="first")]
         df.loc[kept_rows.index, "approval_is_duplicated"] = False
         df.loc[kept_rows.index, "nir_is_duplicated"] = False
         self.logger.info(
@@ -166,7 +167,7 @@ class Command(BaseCommand):
         # Step 1: clean data
         self.logger.info("✨ STEP 1: clean!")
         df[NIR_COL] = df[NIR_COL].apply(str)
-        df[PASS_COL] = df[PASS_COL].apply(str)
+        df[APPROVAL_COL] = df[APPROVAL_COL].apply(str)
 
         # Add a new column to know whether the approval is valid or not.
         # If an approval is not valid, its number is replaced by "nan".
@@ -189,12 +190,15 @@ class Command(BaseCommand):
         df.loc[invalid_approvals.index, "is_treated"] = True
 
         invalid_rows = df[~df.nir_is_valid | ~df.approval_is_valid]
-        self.logger.info(f"Leaving {len(invalid_rows)} rows behind")
+        self.logger.info(
+            f"Leaving {len(invalid_rows)} rows behind ({self.get_ratio(len(invalid_rows), total_rows)}%)."
+        )
 
-        # Remove treated rows.
+        # Remove treated rows to continue with valid NIRs and approvals.
         df = df[~df.is_treated].copy()
+        self.logger.info(f"Continuing with {len(df)} rows left.")
 
-        self.logger.info(f"🎯 STEP 2: hunt duplicates! {len(df)} rows left.")
+        self.logger.info(f"🎯 STEP 2: hunt duplicates!")
 
         # Step 2: treat duplicates.
         # Duplicated NIR mean PASS IAE have been delivered for the same person.
@@ -202,7 +206,7 @@ class Command(BaseCommand):
         df["nir_is_duplicated"] = df[NIR_COL].duplicated(keep=False)
 
         # Add a new column to know whether it's a PASS IAE duplicate or not.
-        df["approval_is_duplicated"] = df[PASS_COL].duplicated(keep=False)
+        df["approval_is_duplicated"] = df[APPROVAL_COL].duplicated(keep=False)
         # Then remove wrong PAsS IAE numbers, merge duplicates and mark complicated cases as untreated.
         result_df = self.clean_and_merge_duplicated_approval(df[df["approval_is_duplicated"]])
         df.update(result_df)
@@ -238,8 +242,13 @@ class Command(BaseCommand):
         # Ignore untreated cases for the moment.
         treated_cases = df[df.is_treated]
         untreated_cases = df[df.is_treated == False]  # Using ~ would return an error if no result found.
-        self.logger.info(f"{len(treated_cases)} treated cases and {len(untreated_cases)} complicated cases.")
+        self.logger.info(
+            f"{len(treated_cases)} treated cases and {len(untreated_cases)} complicated cases (without wrong NIRs and approvals)."
+        )
         self.logger.info(f"{self.get_ratio(len(untreated_cases), len(treated_cases))}% of complicated cases.")
+        self.logger.info(
+            f"{self.get_ratio(len(treated_cases), total_rows)}% of treated cases totally (with wrong NIRs and approvals)."
+        )
         if not untreated_cases.empty:
             self.logger.info(f"Complicated cases to handle manually:")
             self.logger.info(untreated_cases)
