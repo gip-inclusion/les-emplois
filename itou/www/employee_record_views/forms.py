@@ -62,6 +62,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
             attrs={
                 "class": "js-commune-autocomplete-input form-control",
                 "data-autocomplete-source-url": COMMUNE_AUTOCOMPLETE_SOURCE_URL,
+                "data-period-date": "birthdate",
                 "data-autosubmit-on-enter-pressed": 0,
                 "placeholder": "Nom de la commune",
                 "autocomplete": "off",
