@@ -210,6 +210,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         "job_application": job_application,
         "form": form,
         "profile": profile,
+        "job_seeker": job_seeker,
         "address_updated_by_user": address_updated_by_user,
         "maps_url": maps_url,
         "steps": STEPS,
