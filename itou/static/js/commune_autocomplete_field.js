@@ -9,17 +9,19 @@ $(document).ready(() => {
 
   let autoSubmitOnEnterPressed = communeSearchInput.data('autosubmit-on-enter-pressed')
 
+  // Date / period parameter is defined with this attribute
+  let periodDate = communeSearchInput.data('period-date')
+
   function clearInput() {
     communeSearchInput.val('')
     hiddenCommuneInput.val('')
     searchButton.prop("disabled", true)
   }
 
-  function fetchBirthDate() {
-    // Try to fetch the value of the field 'birthDate' (if existing)
+  function fetchPeriodDate() {
+    // Try to fetch the value of the field 'period-date' (if existing)
     // => allows browsing in history of INSEE communes codes
-    let birthDate = $('input[name=birthdate]').val()
-    return birthDate
+    return $('input[name=' + periodDate + ']').val()
   }
 
   communeSearchInput
@@ -30,14 +32,14 @@ $(document).ready(() => {
       // Use a callback to add custom parameter 'date':
       source: function(request, response) {
         $.getJSON(communeSearchInput.data('autocomplete-source-url'), 
-          {term: request.term, date: fetchBirthDate()}, 
+          {term: request.term, date: fetchPeriodDate()}, 
           response)
       },
       autoFocus: true,
       // Make a selection on focus.
       focus: (event, ui) => {
         searchButton.prop("disabled", true)
-        fetchBirthDate()
+        fetchPeriodDate()
         hiddenCommuneInput.val(ui.item.code)  // Store commune code.
         hiddenCommuneInput.data('title', ui.item.value)  // Store commune name.
       },
