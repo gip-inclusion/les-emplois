@@ -35,6 +35,9 @@ class Command(BaseCommand):
     To disable debug logs (not matching birthdate, first name or last name between file and DB):
         django-admin update_nir_from_pass --file-path=path/to/file.xlsx --verbosity=0
 
+    To work with a sample rather than with the whole file:
+        django-admin update_nir_from_pass --file-path=path/to/file.xlsx --sample-size=2000
+
     To update job seekers in the database:
         django-admin update_nir_from_pass --file-path=path/to/file.xlsx
     """
@@ -42,7 +45,14 @@ class Command(BaseCommand):
     help = "Deduplicate job seekers."
 
     def add_arguments(self, parser):
-        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="")
+        parser.add_argument(
+            "--dry-run", dest="dry_run", action="store_true", help="Don't change anything in the database."
+        )
+        parser.add_argument(
+            "--sample-size",
+            dest="sample_size",
+            help="Sample size to run this script with (instead of the whole file).",
+        )
         parser.add_argument(
             "--file-path",
             dest="file_path",
@@ -154,12 +164,18 @@ class Command(BaseCommand):
         return df
 
     def handle(self, file_path, dry_run=False, **options):
-        self.set_logger(options.get("verbosity"))
         self.dry_run = dry_run
+        self.set_logger(options.get("verbosity"))
+        sample_size = options.get("sample_size")
+
         self.logger.info("Starting. Good luck…")
         self.logger.info("-" * 80)
 
-        df = pd.read_excel(file_path).sample(2000)
+        if sample_size:
+            df = pd.read_excel(file_path).sample(int(sample_size))
+        else:
+            df = pd.read_excel(file_path)
+
         total_rows = len(df)
         # Add a new column to mark rows as treated. Store only treated data.
         df["is_treated"] = False
