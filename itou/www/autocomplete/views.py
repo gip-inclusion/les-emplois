@@ -73,7 +73,7 @@ def communes_autocomplete(request):
 
     try:
         dt = datetime.fromisoformat(request.GET.get("date"))
-    except:
+    except ValueError:
         # Can't extract date in iso format, use fallback
         dt = datetime.fromisoformat("1900-01-01")
 
