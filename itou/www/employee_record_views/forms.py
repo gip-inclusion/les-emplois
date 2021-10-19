@@ -54,6 +54,12 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         "birth_country",
     ]
 
+    # FIXME:
+    # `data-period-date` class attribute should not be on this component
+    # but on `DuetDatePickerWidget`
+    # For the moment :
+    # - adding custom classes attrs via `widget.attrs` on datepicker does not work
+    # - keep using the autocomplete as "holder" of the period information
     insee_commune = forms.CharField(
         label="Commune de naissance",
         required=False,

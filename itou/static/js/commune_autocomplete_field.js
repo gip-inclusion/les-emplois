@@ -10,6 +10,7 @@ $(document).ready(() => {
   let autoSubmitOnEnterPressed = communeSearchInput.data('autosubmit-on-enter-pressed')
 
   // Date / period parameter is defined with this attribute
+  // FIXME: not clean, allow the DuetDatePicker component to have custom classes
   let periodDate = communeSearchInput.data('period-date')
 
   function clearInput() {
@@ -39,7 +40,6 @@ $(document).ready(() => {
       // Make a selection on focus.
       focus: (event, ui) => {
         searchButton.prop("disabled", true)
-        fetchPeriodDate()
         hiddenCommuneInput.val(ui.item.code)  // Store commune code.
         hiddenCommuneInput.data('title', ui.item.value)  // Store commune name.
       },
