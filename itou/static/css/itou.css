@@ -347,3 +347,19 @@ Usage:
 .text-with-btn span{
     line-height: 2.2;
 }
+
+.itou-france-connect {
+  display: inline-block;
+  height: 60px !important;
+  width: 230px;
+  margin: auto;
+  /*margin-bottom: 8px;*/
+  background-image: url(../img/franceconnect-bouton.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  cursor: pointer;
+}
+
+.itou-france-connect:hover {
+  background-image: url(../img/franceconnect-bouton-hover.svg);
+}
