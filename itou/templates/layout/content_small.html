@@ -3,7 +3,7 @@
 <section class="bg-light">
     <div class="container">
         <div class="row justify-content-md-center">
-            <div class="col-md-8">
+            <div class="col-md-{% block nb_columns %}8{% endblock %}">
                 {% block content %}{% endblock %}
             </div>
         </div>

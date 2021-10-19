@@ -44,7 +44,19 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
     """
     job_description = get_object_or_404(SiaeJobDescription, pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
-    context = {"job": job_description, "siae": job_description.siae, "back_url": back_url}
+    siae = job_description.siae
+    # TODO: why request is duplicated ?!
+    others_active_jobs = (
+        SiaeJobDescription.objects.select_related("appellation")
+        .filter(is_active=True, siae=siae)
+        .exclude(id=job_description_id)
+    )
+    context = {
+        "job": job_description,
+        "siae": siae,
+        "others_active_jobs": others_active_jobs,
+        "back_url": back_url,
+    }
     return render(request, template_name, context)
 
 
