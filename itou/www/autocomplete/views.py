@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import Q
 from django.http import JsonResponse
 from django.template.defaultfilters import slugify
 
@@ -58,16 +61,26 @@ def communes_autocomplete(request):
     """
     Autocomplete endpoint for INSEE communes (ASP ref. files)
 
+    Slight variation : a `date` parameter is send with search term
+    in order to get valid INSEE codes (with this date within a period between
+    commune.start_date and commune.end_date)
+
     Returns JSON data compliant with the jQuery UI Autocomplete Widget:
     https://api.jqueryui.com/autocomplete/#option-source
     """
-
-    term = request.GET.get("term", "").strip()
     communes = []
+    term = request.GET.get("term", "").strip()
+
+    try:
+        dt = datetime.fromisoformat(request.GET.get("date", ""))
+    except ValueError:
+        # Can't extract date in iso format, use fallback
+        dt = datetime.fromisoformat("1900-01-01")
 
     if term:
         communes = (
-            Commune.objects.filter(end_date=None)
+            Commune.objects.filter(start_date__lte=dt)
+            .filter(Q(end_date=None) | Q(end_date__gt=dt))
             .annotate(similarity=TrigramSimilarity("name", term))
             .filter(similarity__gt=0.1)
             .order_by("-similarity")

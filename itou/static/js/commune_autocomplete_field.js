@@ -9,10 +9,20 @@ $(document).ready(() => {
 
   let autoSubmitOnEnterPressed = communeSearchInput.data('autosubmit-on-enter-pressed')
 
+  // Date / period parameter is defined with this attribute
+  // FIXME: not clean, allow the DuetDatePicker component to have custom classes
+  let periodDate = communeSearchInput.data('period-date')
+
   function clearInput() {
     communeSearchInput.val('')
     hiddenCommuneInput.val('')
     searchButton.prop("disabled", true)
+  }
+
+  function fetchPeriodDate() {
+    // Try to fetch the value of the field 'period-date' (if existing)
+    // => allows browsing in history of INSEE communes codes
+    return $('input[name=' + periodDate + ']').val()
   }
 
   communeSearchInput
@@ -20,7 +30,12 @@ $(document).ready(() => {
     .autocomplete({
       delay: 150,
       minLength: 1,
-      source: communeSearchInput.data('autocomplete-source-url'),
+      // Use a callback to add custom parameter 'date':
+      source: function(request, response) {
+        $.getJSON(communeSearchInput.data('autocomplete-source-url'), 
+          {term: request.term, date: fetchPeriodDate()}, 
+          response)
+      },
       autoFocus: true,
       // Make a selection on focus.
       focus: (event, ui) => {
