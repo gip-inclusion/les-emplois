@@ -125,6 +125,7 @@
 
     <h1 class="h2">
         Tableau de bord
+        {% if user.is_job_seeker and user.get_full_name %} - <span class="text-muted">{{ user.get_full_name }}</span>{% endif %}
         {% if current_siae %} - <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
         {% if current_prescriber_organization %} -
         <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>
