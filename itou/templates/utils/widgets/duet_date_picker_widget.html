@@ -1,6 +1,7 @@
 <duet-date-picker
     identifier="{{ widget.attrs.id }}"
     {% if widget.attrs.required %}required{% endif %}
+    {% if widget.attrs.disabled %}disabled="disabled"{% endif %}
     name="{{ widget.name }}"
     {% if widget.attrs.min %}min="{{ widget.attrs.min }}"{% endif %}
     {% if widget.attrs.max %}max="{{ widget.attrs.max }}"{% endif %}

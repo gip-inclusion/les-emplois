@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 
@@ -20,15 +21,10 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         editor = kwargs.pop("editor")
+        request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
-        # Noboby can edit its own email.
-        # Only prescribers and employers can edit the job seeker's email here under certain conditions
-        if not self.instance.is_job_seeker or not editor.can_edit_email(self.instance):
-            # in order to comply with France connect, we should display the user email
-            self.fields["email"].disabled = True
-            edit_email_url = reverse("dashboard:edit_user_email")
-            self.fields["email"].help_text = f'<a href="{edit_email_url}"> Modifier votre adresse email</a>'
+        is_user_france_connected = settings.FRANCE_CONNECT_SESSION_TOKEN in request.session
 
         if not self.instance.is_job_seeker:
             del self.fields["birthdate"]
@@ -43,6 +39,22 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
                     "max": DuetDatePickerWidget.max_birthdate(),
                 }
             )
+
+        if is_user_france_connected:
+            # When a user is logged-in through France Connect,
+            # it should see the field but most should be disabled
+            # (that’s a requirement on FC’s side)
+            disabled_fields = ["first_name", "last_name", "email", "birthdate"]
+            for field_name in disabled_fields:
+                self.fields[field_name].disabled = True
+
+            edit_email_url = reverse("dashboard:edit_user_email")
+            self.fields["email"].help_text = f'<a href="{edit_email_url}"> Modifier votre adresse email</a>'
+        else:
+            # Noboby can edit its own email.
+            # Only prescribers and employers can edit the job seeker's email here under certain conditions
+            if not self.instance.is_job_seeker or not editor.can_edit_email(self.instance):
+                del self.fields["email"]
 
     class Meta:
         model = User
