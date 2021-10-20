@@ -271,7 +271,7 @@ class Command(BaseCommand):
         )
 
         # Remove treated rows to continue with valid NIRs and approvals.
-        df = df[~df.is_treated].copy()
+        df = df.drop(df[df.is_treated].index)
         self.logger.info(f"Continuing with {len(df)} rows left.")
 
         self.logger.info(f"🎯 STEP 2: hunt duplicates!")
