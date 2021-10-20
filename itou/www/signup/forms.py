@@ -56,7 +56,7 @@ class JobSeekerNirForm(forms.Form):
         nir = self.cleaned_data["nir"].replace(" ", "")
         user_exists = User.objects.filter(nir=nir).exists()
         if user_exists:
-            raise ValidationError("Un compte avec ce numéro de sécurité sociale existe déjà.")
+            raise ValidationError("Un compte avec ce numéro existe déjà.")
         return nir
 
 
