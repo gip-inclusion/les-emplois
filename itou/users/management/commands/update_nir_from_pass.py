@@ -113,20 +113,11 @@ class Command(BaseCommand):
         wrong_approval_numbers = ["999990000000", "999999999999", "999999000000", "999992100000"]
         return len(approval) == 12 and approval.startswith("99999") and approval not in wrong_approval_numbers
 
-    def check_if_different(self, kind, first_value, second_value):
-        if first_value != second_value:
-            self.logger.debug(f"Different {kind}: {first_value} is not {second_value}")
-            return True
-        return False
-
     def format_name(self, name):
         return unidecode.unidecode(name.upper())
 
     def update_job_seekers(self, df):
-        approval_list = df[APPROVAL_COL].tolist()
-        approvals_qs = Approval.objects.filter(number__in=approval_list).select_related("user").all()
-
-        updated_job_seekers = []
+        nb_updated_job_seekers = 0
         not_updated_job_seekers = []
         not_same_personal_info = []
         not_same_personal_info_dict = {
@@ -144,13 +135,13 @@ class Command(BaseCommand):
         for _, row in df.iterrows():
             pbar.update(1)
             try:
-                approval = approvals_qs.get(number=row[APPROVAL_COL])
+                approval = Approval.objects.get(number=row[APPROVAL_COL])
             except ObjectDoesNotExist:
                 not_updated_job_seekers.append(row.to_dict())
                 continue
 
             job_seeker = approval.user
-            if self.check_if_different("first name", row[FIRST_NAME_COL], self.format_name(job_seeker.first_name)):
+            if row[FIRST_NAME_COL] != self.format_name(job_seeker.first_name):
                 not_same_personal_info.append(
                     not_same_personal_info_dict
                     | {
@@ -161,7 +152,7 @@ class Command(BaseCommand):
                     }
                 )
 
-            if self.check_if_different("last_name", row[LAST_NAME_COL], self.format_name(job_seeker.last_name)):
+            if row[LAST_NAME_COL] != self.format_name(job_seeker.last_name):
                 not_same_personal_info.append(
                     not_same_personal_info_dict
                     | {
@@ -174,7 +165,7 @@ class Command(BaseCommand):
 
             assert isinstance(row[BIRTHDATE_COL], datetime.datetime)
 
-            if self.check_if_different("birthdate", row[BIRTHDATE_COL].date(), job_seeker.birthdate):
+            if row[BIRTHDATE_COL].date() != job_seeker.birthdate:
                 not_same_personal_info.append(
                     not_same_personal_info_dict
                     | {
@@ -187,12 +178,12 @@ class Command(BaseCommand):
 
             if not self.dry_run:
                 job_seeker.nir = row[NIR_COL]
-                updated_job_seekers.append(job_seeker)
+                nb_updated_job_seekers += 1
 
         if not self.dry_run:
-            User.objects.bulk_update(updated_job_seekers, ["nir"])
+            job_seeker.save()
 
-        self.logger.info(f"{len(updated_job_seekers)} updated job seekers.")
+        self.logger.info(f"{nb_updated_job_seekers} updated job seekers.")
         self.logger.info(f"{len(not_updated_job_seekers)} rows not existing in database.")
         logs = [f"| PASS : {u[APPROVAL_COL]}, NIR : {u[NIR_COL]} |" for u in not_updated_job_seekers]
         self.logger.debug(logs)
@@ -305,7 +296,7 @@ class Command(BaseCommand):
         df.loc[easy_cases.index, "is_treated"] = True
 
         # Step 3: update job seekers.
-        self.logger.info(f"🔥 STEP 3: update job seekers. {len(easy_cases)} rows left.")
+        self.logger.info(f"🔥 STEP 3: update job seekers.")
         self.update_job_seekers(easy_cases)
 
         # Step 4: recap!
