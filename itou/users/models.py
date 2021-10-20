@@ -212,7 +212,10 @@ class User(AbstractUser, AddressMixin):
         verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
     )
 
-    nir = models.CharField(verbose_name="NIR", max_length=15, validators=[validate_nir], db_index=True, blank=True)
+    # Don’t need to specify db_index because unique implies the creation of an index.
+    nir = models.CharField(
+        verbose_name="NIR", max_length=15, validators=[validate_nir], null=True, blank=True, unique=True
+    )
 
     # The two following Pôle emploi fields are reserved for job seekers.
     # They are used in the process of delivering an approval.
