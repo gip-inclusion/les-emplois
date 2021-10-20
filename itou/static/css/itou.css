@@ -306,8 +306,31 @@ Usage:
 
 /* To be discussed
 --------------------------------------------------------------------------- */
+.collapse-caret, .collapse-caret:hover{
+    text-decoration: unset;
+}
+.collapse-caret>h6::after {
+    /* when not collapsed */
+    display: inline-block;
+    content: " ";
+    /* icon arrow-down-s-fill from remix icon */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M12 16l-6-6h12z'/%3E%3C/svg%3E");
+    /* h6 font size = 1rem */
+    background-size: 24px 24px;
+    height: 8px;
+    width: 24px;
+    background-position-y: center;
+    margin-left: 14px;
+    transform: rotate(180deg);
+}
+
+.collapse-caret.collapsed>h6::after {
+    height: 15px;
+    transform: rotate(0deg);
+}
 
 .employee-records-list .badge {
     white-space: normal;
     margin: 0;
 }
+
