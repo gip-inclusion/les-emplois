@@ -53,11 +53,11 @@ class JobSeekerNirForm(forms.Form):
     )
 
     def clean_nir(self):
-        """
-        For the moment, allow job seekers to register with a NIR that may exist.
-        """
-        nir = self.cleaned_data["nir"]
-        return nir.replace(" ", "")
+        nir = self.cleaned_data["nir"].replace(" ", "")
+        user_exists = User.objects.filter(nir=nir).exists()
+        if user_exists:
+            raise ValidationError("Un compte avec ce numéro de sécurité sociale existe déjà.")
+        return nir
 
 
 class JobSeekerSituationForm(forms.Form):
