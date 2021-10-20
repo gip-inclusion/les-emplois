@@ -151,6 +151,7 @@ class Command(BaseCommand):
                         "NIR": row[NIR_COL],
                     }
                 )
+                continue
 
             if row[LAST_NAME_COL] != self.format_name(job_seeker.last_name):
                 not_same_personal_info.append(
@@ -162,6 +163,7 @@ class Command(BaseCommand):
                         "NIR": row[NIR_COL],
                     }
                 )
+                continue
 
             assert isinstance(row[BIRTHDATE_COL], datetime.datetime)
 
@@ -175,6 +177,7 @@ class Command(BaseCommand):
                         "NIR": row[NIR_COL],
                     }
                 )
+                continue
 
             if not self.dry_run:
                 job_seeker.nir = row[NIR_COL]
