@@ -19,7 +19,7 @@ repository="https://github.com/betagouv/itou-theme"
 # create temporary folder
 mkdir -p $tmpFolder
 
-copy_and_replace_folder_theme() {
+copyAndReplaceFolderTheme() {
     local folderToReplace=$1
     cp -TRv "$tmpFolderDistribSources/$folderToReplace/" "$localFolderTheme/$folderToReplace/"
 }
@@ -28,9 +28,9 @@ copy_and_replace_folder_theme() {
 git clone $repository $tmpFolder
 
 # copy and replace all files in those folders
-copy_and_replace_folder_theme fonts
-copy_and_replace_folder_theme images
-copy_and_replace_folder_theme javascripts
-copy_and_replace_folder_theme stylesheets
+copyAndReplaceFolderTheme fonts
+copyAndReplaceFolderTheme images
+copyAndReplaceFolderTheme javascripts
+copyAndReplaceFolderTheme stylesheets
 
 rm -rf $tmpFolder
