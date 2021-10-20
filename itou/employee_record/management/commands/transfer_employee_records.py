@@ -211,6 +211,14 @@ class Command(BaseCommand):
                         "DRY-RUN: Accepted %s, code: %s, label: %s", employee_record, processing_code, processing_label
                     )
             else:
+                # Employee record has already been processed : SKIP
+                # (this can happen if files are processed twice
+                # or employee record transmitted twice or more)
+                if employee_record.status == EmployeeRecord.Status.PROCESSED:
+                    # Do not update, keep it clean
+                    self.logger.warning("Skipping, already accepted: %s", employee_record)
+                    continue
+
                 # Employee record has not been processed by ASP :
                 if not dry_run:
                     # Fixes unexpected stop on multiple pass on the same file
