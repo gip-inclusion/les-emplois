@@ -1,5 +1,7 @@
+import os
+
 from ._sentry import sentry_init
-from .base import *
+from .base import *  # noqa: F403
 
 
 # See `itou.utils.new_dns.middleware.NewDnsRedirectMiddleware`.
@@ -8,7 +10,7 @@ ALLOWED_HOSTS = [
     "inclusion.beta.gouv.fr",
     "emploi.inclusion.beta.gouv.fr",
     "emplois.inclusion.beta.gouv.fr",
-    "forum.inclusion.beta.gouv.fr",
+    "communaute.inclusion.beta.gouv.fr",
 ]
 
 DATABASES = {
@@ -33,7 +35,7 @@ sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])
 ALLOW_POPULATING_METABASE = True
 
 # DRF Browseable API renderer is not available in production
-REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ["rest_framework.renderers.JSONRenderer"]
+REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ["rest_framework.renderers.JSONRenderer"]  # noqa F405
 
 # Active Elastic APM metrics
 # See https://www.elastic.co/guide/en/apm/agent/python/current/configuration.html
