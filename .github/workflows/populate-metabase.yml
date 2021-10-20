@@ -67,7 +67,7 @@ jobs:
         $CLEVER_CLI create $CRON_TASK_APP_NAME -t python --region par --alias $CRON_TASK_APP_NAME --org Itou
         # Force Python version through env, because its default value 3 is not accurate and environment variables
         # have precedence over configuration addons
-        $CLEVER_CLI env set CC_PYTHON_VERSION ${{ env.PYTHON_VERSION }} --alias $REVIEW_APP_NAME
+        $CLEVER_CLI env set CC_PYTHON_VERSION ${{ env.PYTHON_VERSION }} --alias $CRON_TASK_APP_NAME
         $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
         $CLEVER_CLI scale --flavor XL
 
