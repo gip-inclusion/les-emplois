@@ -180,8 +180,8 @@ class Command(BaseCommand):
                 job_seeker.nir = row[NIR_COL]
                 nb_updated_job_seekers += 1
 
-        if not self.dry_run:
-            job_seeker.save()
+            if not self.dry_run:
+                job_seeker.save()
 
         self.logger.info(f"{nb_updated_job_seekers} updated job seekers.")
         self.logger.info(f"{len(not_updated_job_seekers)} rows not existing in database.")
