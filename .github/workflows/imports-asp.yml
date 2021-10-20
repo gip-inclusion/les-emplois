@@ -51,12 +51,6 @@ jobs:
       run:
         echo 'CC_RUN_SUCCEEDED_HOOK=./scripts/imports-asp.sh' >> $GITHUB_ENV
 
-    # Clever cloud seem to inject CC_PYTHON_VERSION=3, whicĥ breaks some of our machines
-    # that use 3.9 and may not support python 3.10
-    - name: 🏷 Fix Python version
-      run:
-        echo 'CC_PYTHON_VERSION=${{ env.DEPLOY_BRANCH }}'
-
     - name: 🧫 Create a cron app on Clever Cloud on a strong machine
       run: |
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
@@ -68,6 +62,9 @@ jobs:
         # --region: server location ("par" means Paris).
         # --alias: custom application name, used to find it with the CLI.
         $CLEVER_CLI create $IMPORT_APP_NAME -t python --region par --alias $IMPORT_APP_NAME --org Itou
+        # Force Python version through env, because its default value 3 is not accurate and environment variables
+        # have precedence over configuration addons
+        $CLEVER_CLI env set CC_PYTHON_VERSION ${{ env.PYTHON_VERSION }} --alias $IMPORT_APP_NAME
         $CLEVER_CLI link $IMPORT_APP_NAME --org $ITOU_ORGANIZATION_NAME
         $CLEVER_CLI scale --flavor XL
 
@@ -84,7 +81,6 @@ jobs:
     - name: "🚀 Deploy post-deploy hook to Clever"
       run:
         $CLEVER_CLI env import-vars CC_RUN_SUCCEEDED_HOOK
-        $CLEVER_CLI env import-vars CC_PYTHON_VERSION
 
 # OK, here is the tricky part: we use a hook, so in the following 2 tasks
 # we deploy and destroy the app, but in fact we sequentially:

@@ -39,13 +39,13 @@ clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
 # --region: server location ("par" means Paris).
 # --alias: custom application name, used to find it with the CLI.
 clever create $IMPORT_APP_NAME --type python --region par --alias $IMPORT_APP_NAME --org $ORGANIZATION_NAME
+clever env set CC_PYTHON_VERSION "$CC_PYTHON_VERSION" --alias $IMPORT_APP_NAME
 clever link $IMPORT_APP_NAME --org $ORGANIZATION_NAME
 clever scale --flavor XL --alias $IMPORT_APP_NAME
 clever service link-addon c1-imports-config --alias $IMPORT_APP_NAME
 clever service link-addon c1-prod-config --alias $IMPORT_APP_NAME
 clever service link-addon c1-prod-database-encrypted  --alias $IMPORT_APP_NAME
 clever service link-addon c1-itou-redis --alias $IMPORT_APP_NAME
-clever env set CC_PYTHON_VERSION $CC_PYTHON_VERSION --alias $IMPORT_APP_NAME
 
 clever deploy --alias $IMPORT_APP_NAME --branch $DEPLOY_BRANCH --force
 

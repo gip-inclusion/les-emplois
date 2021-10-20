@@ -38,11 +38,7 @@ jobs:
     - name: 🏷 Set review app name
       run:
         echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g'`" >> $GITHUB_ENV
-    # Clever cloud seem to inject CC_PYTHON_VERSION=3, whicĥ breaks some of our machines
-    # that use 3.9 and may not support python 3.10
-    - name: 🏷 Fix Python version
-      run:
-        echo 'CC_PYTHON_VERSION=${{ env.DEPLOY_BRANCH }}'
+
     - name: 🏷 Set database addon name
       run:
         echo "REVIEW_APP_DB_NAME=`echo $REVIEW_APP_NAME | sed -r 's/-/_/g'`" >> $GITHUB_ENV
@@ -63,6 +59,9 @@ jobs:
         # --region: server location ("par" means Paris).
         # --alias: custom application name, used to find it with the CLI.
         $CLEVER_CLI create $REVIEW_APP_NAME -t python --org $REVIEW_APPS_ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
+        # Force Python version through env, because its default is not accurate and environment variables
+        # have precedence over configuration addons
+        $CLEVER_CLI env set CC_PYTHON_VERSION ${{ env.PYTHON_VERSION }} --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
         $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
 

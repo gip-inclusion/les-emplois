@@ -46,12 +46,6 @@ jobs:
       run:
         echo "CRON_TASK_APP_NAME=`echo \"c1-cron-populate-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
 
-    # Clever cloud seem to inject CC_PYTHON_VERSION=3, whicĥ breaks some of our machines
-    # that use 3.9 and may not support python 3.10
-    - name: 🏷 Fix Python version
-      run:
-        echo 'CC_PYTHON_VERSION=${{ env.DEPLOY_BRANCH }}'
-
     # CC_RUN_SUCCEEDED_HOOK is a clever-cloud-specific environment variable.
     # We set the command we want to run once the app is started
     # The goal of this entire file relies on this variable !
@@ -71,6 +65,9 @@ jobs:
         # --region: server location ("par" means Paris).
         # --alias: custom application name, used to find it with the CLI.
         $CLEVER_CLI create $CRON_TASK_APP_NAME -t python --region par --alias $CRON_TASK_APP_NAME --org Itou
+        # Force Python version through env, because its default value 3 is not accurate and environment variables
+        # have precedence over configuration addons
+        $CLEVER_CLI env set CC_PYTHON_VERSION ${{ env.PYTHON_VERSION }} --alias $REVIEW_APP_NAME
         $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
         $CLEVER_CLI scale --flavor XL
 
