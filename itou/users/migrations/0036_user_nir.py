@@ -8,7 +8,7 @@ import itou.utils.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("users", "0033_alter_jobseekerprofile_hexa_non_std_extension"),
+        ("users", "0035_jobseekerprofile_hexa_additional_address"),
     ]
 
     operations = [
