@@ -1,12 +1,15 @@
 # flake8: noqa
 # pylint: disable=[logging-fstring-interpolation, singleton-comparison]
 
+import csv
 import datetime
 import logging
 import re
+from pathlib import Path
 
 import pandas as pd
 import unidecode
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
@@ -78,6 +81,17 @@ class Command(BaseCommand):
     def get_ratio(self, first_value, second_value):
         return round((first_value / second_value) * 100, 2)
 
+    def log_to_csv(self, csv_name, logs):
+        csv_file = Path(settings.EXPORT_DIR) / f"{csv_name}.csv"
+        with open(csv_file, "w", newline="") as file:
+            if isinstance(logs, list):
+                fieldnames = list(logs[0].keys())
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(logs)
+            else:
+                file.write(logs.to_csv())
+
     def nir_is_valid(self, row):
         nir = row[NIR_COL]
         birthdate = row[BIRTHDATE_COL]
@@ -102,8 +116,8 @@ class Command(BaseCommand):
     def check_if_different(self, kind, first_value, second_value):
         if first_value != second_value:
             self.logger.debug(f"Different {kind}: {first_value} is not {second_value}")
-            return False
-        return True
+            return True
+        return False
 
     def format_name(self, name):
         return unidecode.unidecode(name.upper())
@@ -114,6 +128,17 @@ class Command(BaseCommand):
 
         updated_job_seekers = []
         not_updated_job_seekers = []
+        not_same_personal_info = []
+        not_same_personal_info_dict = {
+            "Prénom plateforme": None,
+            "Prénom ASP": None,
+            "Nom plateforme": None,
+            "Nom ASP": None,
+            "Date de naissance plateforme": None,
+            "Date de naissance ASP": None,
+            "PASS IAE": None,
+            "NIR": None,
+        }
 
         pbar = tqdm(total=len(df))
         for _, row in df.iterrows():
@@ -121,15 +146,44 @@ class Command(BaseCommand):
             try:
                 approval = approvals_qs.get(number=row[APPROVAL_COL])
             except ObjectDoesNotExist:
-                not_updated_job_seekers.append(row)
+                not_updated_job_seekers.append(row.to_dict())
                 continue
 
             job_seeker = approval.user
-            self.check_if_different("first name", row[FIRST_NAME_COL], self.format_name(job_seeker.first_name))
-            self.check_if_different("last_name", row[LAST_NAME_COL], self.format_name(job_seeker.last_name))
+            if self.check_if_different("first name", row[FIRST_NAME_COL], self.format_name(job_seeker.first_name)):
+                not_same_personal_info.append(
+                    not_same_personal_info_dict
+                    | {
+                        "Prénom plateforme": self.format_name(job_seeker.first_name),
+                        "Prénom ASP": row[FIRST_NAME_COL],
+                        "PASS IAE": row[APPROVAL_COL],
+                        "NIR": row[NIR_COL],
+                    }
+                )
+
+            if self.check_if_different("last_name", row[LAST_NAME_COL], self.format_name(job_seeker.last_name)):
+                not_same_personal_info.append(
+                    not_same_personal_info_dict
+                    | {
+                        "Nom plateforme": self.format_name(job_seeker.last_name),
+                        "Nom ASP": row[LAST_NAME_COL],
+                        "PASS IAE": row[APPROVAL_COL],
+                        "NIR": row[NIR_COL],
+                    }
+                )
 
             assert isinstance(row[BIRTHDATE_COL], datetime.datetime)
-            self.check_if_different("birthdate", row[BIRTHDATE_COL].date(), job_seeker.birthdate)
+
+            if self.check_if_different("birthdate", row[BIRTHDATE_COL].date(), job_seeker.birthdate):
+                not_same_personal_info.append(
+                    not_same_personal_info_dict
+                    | {
+                        "Date de naissance plateforme": job_seeker.birthdate,
+                        "Date de naissance ASP": row[BIRTHDATE_COL].date(),
+                        "PASS IAE": row[APPROVAL_COL],
+                        "NIR": row[NIR_COL],
+                    }
+                )
 
             if not self.dry_run:
                 job_seeker.nir = row[NIR_COL]
@@ -141,7 +195,13 @@ class Command(BaseCommand):
         self.logger.info(f"{len(updated_job_seekers)} updated job seekers.")
         self.logger.info(f"{len(not_updated_job_seekers)} rows not existing in database.")
         logs = [f"| PASS : {u[APPROVAL_COL]}, NIR : {u[NIR_COL]} |" for u in not_updated_job_seekers]
-        self.logger.info(logs)
+        self.logger.debug(logs)
+        self.log_to_csv(csv_name="inexistent_users", logs=not_updated_job_seekers)
+        self.logger.info(f"Inexistent users exported to {settings.EXPORT_DIR}/inexistent_users.csv.")
+        self.log_to_csv(csv_name="not_matching_personal_infos", logs=not_same_personal_info)
+        self.logger.info(
+            f"Users with inconsistent data exported to {settings.EXPORT_DIR}/not_matching_personal_infos.csv."
+        )
 
     def clean_and_merge_duplicated_approval(self, df):
         df = df.copy()
@@ -238,8 +298,6 @@ class Command(BaseCommand):
             self.logger.info(
                 f"{round(len(duplicated_nirs) / len(unique_duplicated_nirs), 2)} different PASS IAE per NIR as average."
             )
-            self.logger.info("Duplicated NIRs:")
-            self.logger.info(duplicated_nirs)
 
         # Mark easy cases as treated automatically:
         # PASS number and NIR numbers are unique.
@@ -266,8 +324,10 @@ class Command(BaseCommand):
             f"{self.get_ratio(len(treated_cases), total_rows)}% of treated cases totally (with wrong NIRs and approvals)."
         )
         if not untreated_cases.empty:
-            self.logger.info(f"Complicated cases to handle manually:")
-            self.logger.info(untreated_cases)
+            self.logger.debug(f"Complicated cases to handle manually:")
+            self.logger.debug(untreated_cases)
+            self.log_to_csv(csv_name="complicated_cases", logs=untreated_cases)
+            self.logger.info(f"Complicated cases exported to {settings.EXPORT_DIR}/complicated_cases.csv.")
 
         self.logger.info("-" * 80)
         self.logger.info("👏 Good job!")
