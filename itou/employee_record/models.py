@@ -172,7 +172,7 @@ class EmployeeRecord(models.Model):
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
-    asp_processing_label = models.CharField(max_length=100, verbose_name="Libellé de traitement ASP", null=True)
+    asp_processing_label = models.CharField(max_length=200, verbose_name="Libellé de traitement ASP", null=True)
 
     # Employee records are sent to ASP in a JSON file,
     # We keep track of the name for processing feedback
