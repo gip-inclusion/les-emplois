@@ -1,0 +1,20 @@
+{% comment %} takes 1 argument jobs_descriptions <List of SiaeJobDescription> {% endcomment %}
+<h4 class="pb-2">Recrutement en cours</h4>
+{% for job in jobs_descriptions %}
+    {% if job.is_active %}
+        <a class="matomo-event btn btn-outline-primary mb-2"
+            href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
+            data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+            {{ job.display_name }}
+        </a>
+        {% if job.is_popular %}
+            <small>
+                <span class="ml-3">
+                        {% include "includes/icon.html" with icon="layers" size=15 class="mr-1 text-danger" %}
+                        Plus de {{ job.POPULAR_THRESHOLD }} candidatures reçues
+                    </span>
+            </small>
+        {% endif %}
+        <br >
+    {% endif %}
+{% endfor %}

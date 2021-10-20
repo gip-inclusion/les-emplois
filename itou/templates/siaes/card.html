@@ -55,39 +55,12 @@
                 {% endif %}
                 {% if jobs_descriptions and not siae.block_job_applications %}
                     <div class="border-top py-3">
-                        <a href="#" class="collapsed collapse-caret" data-toggle="collapse"  data-target="#collapse{{siae.id}}" role="button" aria-expanded="false" aria-controls="collapse{{siae.id}}">
-                            <h6>Métiers exercès au sein de la structure</h6>
-                        </a>
-                        <ul class="collapse" id="collapse{{siae.id}}">
-                            {% for job in jobs_descriptions %}
-                                <li>
-                                    <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
-                                        {{ job.display_name }}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                        {% include "siaes/includes/_list_siae_jobs.html" with siae=siae jobs_descriptions=jobs_descriptions %}
                     </div>
                 {% endif %}
                 {% if siae.count_active_job_descriptions > 0 and not siae.block_job_applications %}
                     <div class="border-top py-3">
-                        <h4 class="pb-2">Recrutement en cours</h4>
-                        {% for job in jobs_descriptions %}
-                            {% if job.is_active %}
-                                <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event btn btn-outline-primary mb-2" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
-                                    {{ job.display_name }}
-                                </a>
-                                {% if job.is_popular %}
-                                    <small>
-                                        <span class="ml-3">
-                                                {% include "includes/icon.html" with icon="layers" size=15 class="mr-1 text-danger" %}
-                                                Plus de {{ job.POPULAR_THRESHOLD }} candidatures reçues
-                                            </span>
-                                    </small>
-                                {% endif %}
-                            {% endif %}
-                            <br >
-                        {% endfor %}
+                        {% include "siaes/includes/_list_siae_actives_jobs.html" with jobs_descriptions=jobs_descriptions %}
                     </div>
                 {% endif %}
                 {% if not siae.block_job_applications %}

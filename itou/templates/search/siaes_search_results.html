@@ -79,44 +79,15 @@
                             <small>
                                 <span class="badge badge-dark mb-3">{{ siae.distance|floatformat:"-1" }} km</span> de votre lieu de recherche.
                             </small>
-                            {% if siae.job_description_through.exists and not siae.block_job_applications %}
-                                <a data-toggle="collapse"  data-target="#collapse{{siae.id}}" role="button" aria-expanded="false" aria-controls="collapse{{siae.id}}">
-                                    <h6>Métiers exercès au sein de la structure</h6>
-                                </a>
-                                <ul class="collapse" id="collapse{{siae.id}}">
-                                    {% for job in jobs_descriptions %}
-                                        <li>
-                                            <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
-                                                {{ job.display_name }}
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
+                            {% if jobs_descriptions and not siae.block_job_applications %}
+                                {% include "siaes/includes/_list_siae_jobs.html" with siae=siae jobs_descriptions=jobs_descriptions %}
                             {% endif %}
                         </div>
-                        <div class="card-body">
-                            {% if siae.count_active_job_descriptions > 0 %}
-                                <div class="btns-actives-jobs">
-                                    <p class="h4 pb-2">Recrutement en cours</p>
-                                    {% for job in jobs_descriptions %}
-                                        {% if job.is_active %}
-                                            <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event btn btn-outline-primary mb-2" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
-                                                {{ job.display_name }}
-                                            </a>
-                                            {% if job.is_popular %}
-                                                <small>
-                                                    <span class="ml-3">
-                                                            {% include "includes/icon.html" with icon="layers" size=15 class="mr-1 text-danger" %}
-                                                            Plus de {{ job.POPULAR_THRESHOLD }} candidatures reçues
-                                                        </span>
-                                                </small>
-                                            {% endif %}
-                                        {% endif %}
-                                        <br >
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
+                        {% if siae.count_active_job_descriptions > 0 %}
+                            <div class="card-body">
+                                {% include "siaes/includes/_list_siae_actives_jobs.html" with jobs_descriptions=jobs_descriptions %}
+                            </div>
+                        {% endif %}
                     {% endwith %}
                     </div>
                 {% empty %}
