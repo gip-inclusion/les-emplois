@@ -2,102 +2,111 @@
 {% load format_filters %}
 
 {% block title %}{{ siae.display_name }}{{ block.super }}{% endblock %}
+{% comment %} {% block nb_columns %}10{% endblock %} {% endcomment %}
 
 {% block content %}
+    {% with siae.job_description_through.all as jobs_descriptions %}
+        <div class="card c-card  c-card--emploi p-3">
+            <div class="card-body">
+                <div class="pb-3">
+                    <h1 class="mb-3">
+                        <b><abbr title="{{ siae.get_kind_display }}">{{ siae.kind }}</abbr></b>
+                        -
+                        <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-structure">
+                            {{ siae.display_name }}
+                        </a>
+                        {# Display non-user-edited name too. #}
+                        {% comment %} {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %} {% endcomment %}
+                    </h1>
+                    <adresse class="card-subtitle h3 text-muted">{{ siae.address_on_one_line }}</adresse>
+                </div>
 
-    <p>
-        <b>{{ siae.kind }}</b>
-        -
-        <i>{{ siae.get_kind_display }}</i>
-    </p>
+                {% if siae.email or siae.phone or siae.website %}
+                    <div class="border-top py-3">
+                        <h6>Contacts</h6>
+                        {% if siae.email %}
+                            <p>
+                                {% include "includes/icon.html" with icon="mail" title="E-mail" %}
+                                <a href="mailto:{{ siae.email }}">{{ siae.email }}</a>
+                            </p>
+                        {% endif %}
 
-    <hr>
+                        {% if siae.phone %}
+                            <p>
+                                {% include "includes/icon.html" with icon="phone" title="Téléphone" %}
+                                <a href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
+                            </p>
+                        {% endif %}
 
-    <h1>
-        {{ siae.display_name }}
-        {# Display non-user-edited name too. #}
-        {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
-    </h1>
+                        {% if siae.website %}
+                            <p>
+                                {% include "includes/icon.html" with icon="external-link" title="Site Internet" %}
+                                <a href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
+                            </p>
+                        {% endif %}
 
-    <p class="text-muted">
-        {{ siae.address_line_1 }},
-        {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
-        {{ siae.post_code }} {{ siae.city }}
-    </p>
-
-    {% if siae.description %}
-        <hr>
-        <div>{{ siae.description|linebreaks }}</div>
-    {% endif %}
-
-    {% if siae.email or siae.phone or siae.website %}
-
-        <hr>
-
-        {% if siae.email %}
-            <p>
-                {% include "includes/icon.html" with icon="mail" title="E-mail" %}
-                <a href="mailto:{{ siae.email }}">{{ siae.email }}</a>
-            </p>
-        {% endif %}
-
-        {% if siae.phone %}
-            <p>
-                {% include "includes/icon.html" with icon="phone" title="Téléphone" %}
-                <a href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
-            </p>
-        {% endif %}
-
-        {% if siae.website %}
-            <p>
-                {% include "includes/icon.html" with icon="external-link" title="Site Internet" %}
-                <a href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
-            </p>
-        {% endif %}
-
-    {% endif %}
-
-    {% if siae.block_job_applications %}
-
-        <div class="alert alert-warning">
-            Cet employeur ne traite plus de nouvelles candidatures pour le moment
+                    </div>
+                {% endif %}
+                {% if siae.description %}
+                    <div class="py-3">
+                        <h6>Descriptif</h6>
+                            {{ siae.description|linebreaks }}
+                    </div>
+                {% endif %}
+                {% if jobs_descriptions and not siae.block_job_applications %}
+                    <div class="border-top py-3">
+                        <a data-toggle="collapse"  data-target="#collapse{{siae.id}}" role="button" aria-expanded="false" aria-controls="collapse{{siae.id}}">
+                            <h6>Métiers exercès au sein de la structure</h6>
+                        </a>
+                        <ul class="collapse" id="collapse{{siae.id}}">
+                            {% for job in jobs_descriptions %}
+                                <li>
+                                    <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+                                        {{ job.display_name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% if siae.count_active_job_descriptions > 0 and not siae.block_job_applications %}
+                    <div class="border-top py-3">
+                        <h4 class="pb-2">Recrutement en cours</h4>
+                        {% for job in jobs_descriptions %}
+                            {% if job.is_active %}
+                                <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event btn btn-outline-primary mb-2" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+                                    {{ job.display_name }}
+                                </a>
+                                {% if job.is_popular %}
+                                    <small>
+                                        <span class="ml-3">
+                                                {% include "includes/icon.html" with icon="layers" size=15 class="mr-1 text-danger" %}
+                                                Plus de {{ job.POPULAR_THRESHOLD }} candidatures reçues
+                                            </span>
+                                    </small>
+                                {% endif %}
+                            {% endif %}
+                            <br >
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if not siae.block_job_applications %}
+                    <div class="border-top py-3">
+                        <h4 class="pb-2">Cette structure vous interesse ?</h4>
+                        <a class="btn btn-primary"
+                            href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
+                            aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                            {% include "includes/icon.html" with icon="message-square" %} Proposez votre candidature
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
-    {% else %}
-
-        {% if siae.job_description_through.exists %}
-            <hr>
-            <p class="mb-2">
-                {% include "includes/icon.html" with icon="briefcase" %}
-                Métiers proposés
-            </p>
-            <ul>
-            {% for job in siae.job_description_through.all %}
-                <li>
-                    <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{{ job.display_name }}</a>
-                </li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-
-        {% if siae.has_members %}
-            <hr>
-            <p>
-                <a class="btn btn-outline-primary"
-                    href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                    aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
-                    {% include "includes/icon.html" with icon="message-square" %} Postuler
-                </a>
+        {% if back_url %}
+            <p class="mt-4">
+                <a href="{{ back_url }}">Retour</a>
             </p>
         {% endif %}
-
-    {% endif %}
-
-    {% if back_url %}
-        <hr>
-        <p>
-            <a href="{{ back_url }}">Retour</a>
-        </p>
-    {% endif %}
-
+    {% endwith %}
 {% endblock %}
