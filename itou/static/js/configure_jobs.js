@@ -21,6 +21,17 @@ $(document).ready(() => {
     }
   })
 
+  $(document).on('change', 'input.js-check-hide-next-elmnt', function(){
+    var toggleElment = $(this).data("toggleElement");
+    if(toggleElment) {
+      if($(this).is(':checked')) {
+        $(toggleElment).show();
+      } else {
+        $(toggleElment).hide();
+      }
+    }
+  });
+
   // Autocomplete.
 
   let codesSelector = '[name="code"]'
@@ -32,11 +43,9 @@ $(document).ready(() => {
   let noLoading = $('.js-job-autocomplete-no-loading')
 
   let addJob = appellation => {
+    // TODO: get one html in configure_jobs and here, to avoid errors when code is updated
     $('.js-jobs-tbody').append(`<tr>
-        <td scope="row">
-            <input type="hidden" name="code" value="${appellation.code}">
-            <input type="checkbox" name="is_active-${appellation.code}" checked>
-        </td>
+        <td>${appellation.rome}</td>
         <td class="text-left">
             <p class="job-appellation-name text-success">
               <i>${appellation.name}</i>
@@ -68,8 +77,33 @@ $(document).ready(() => {
                 </small>
             </div>
         </td>
-        <td>${appellation.rome}</td>
-        <td><a href="#" role="button" class="js-job-delete">Supprimer</a></td>
+        <td class="text-left align-middle" scope="row">
+          <input type="hidden" name="code" value="${appellation.code}">
+          <div class="custom-control custom-switch mb-3">
+              <input name="is_displayed-${appellation.code}"
+                  id="is_displayed-${appellation.code}" type="checkbox"
+                  class="custom-control-input js-check-hide-next-elmnt"
+                  data-toggle-element="#js-custom-switch-${appellation.code}"
+                  checked>
+              <label class="custom-control-label font-weight-bold"
+                  for="is_displayed-${appellation.code}">Afficher le métier</label>
+          </div>
+          <div id="js-custom-switch-${appellation.code}" class="custom-control custom-switch">
+              <input name="is_active-${appellation.code}"
+                  id="is_active-${appellation.code}" type="checkbox"
+                  class="custom-control-input"
+                  checked>
+              <label class="custom-control-label font-weight-bold"
+                  for="is_active-${appellation.code}">Ouvrir au recrutement</label>
+          </div>
+        </td>
+        <td class="align-middle">
+          <a href="#" role="button" class="js-job-delete">
+            <svg class="icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-top;">
+                <use xlink:href="/static/icons/feather-sprite.svg#trash-2"></use>
+            </svg>
+          </a>
+        </td>
     </tr>`)
   }
 
