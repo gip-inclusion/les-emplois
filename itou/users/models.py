@@ -29,7 +29,7 @@ from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
 from itou.institutions.models import Institution
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
+from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 
 class ItouUserManager(UserManager):
@@ -210,6 +210,11 @@ class User(AbstractUser, AddressMixin):
     # Members of DDETS, DREETS or DGEFP institution have their own dashboard.
     is_labor_inspector = models.BooleanField(
         verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
+    )
+
+    # Don’t need to specify db_index because unique implies the creation of an index.
+    nir = models.CharField(
+        verbose_name="NIR", max_length=15, validators=[validate_nir], null=True, blank=True, unique=True
     )
 
     # The two following Pôle emploi fields are reserved for job seekers.
