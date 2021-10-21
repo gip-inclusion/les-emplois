@@ -12,6 +12,8 @@ from itou.employee_record.serializers import EmployeeRecordSerializer
 class Command(BaseCommand):
     """
     Manually process an employee record ASP report file
+
+    *SHOULD BE TEMPORARY*
     """
 
     def __init__(self, *args, **kwargs):
@@ -33,7 +35,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """
-        Fixes employee record "in-between" state in case of the crash of CRON jobs
+        Fixes employee record "in-between" state in case of the crash of CRON jobs.
+        - employee record successfully processed are updated
+        - duplicates status code and label are updated if needed
+        - other error cases are processed the usual way
         """
         input_file = options.get("input_file")
         renderer = JSONRenderer()
@@ -43,13 +48,14 @@ class Command(BaseCommand):
             filename = os_path.basename(f.name)
             batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(filename)
             cnt = 0
-            asp_success_code = "0000"
+            asp_success_code = "0000"  # This is fine
+            dup_error_code = "3436"  # Already procesed by ASP, i.e. duplicate
 
             self.logger.info("Start processing of ASP file: %s", batch_filename)
 
             records = data.get("lignesTelechargement")
 
-            for _, employee_record in enumerate(records, 1):
+            for employee_record in records:
                 line_number = employee_record.get("numLigne")
                 processing_code = employee_record.get("codeTraitement")
                 processing_label = employee_record.get("libelleTraitement")
@@ -76,20 +82,18 @@ class Command(BaseCommand):
                         employee_record.update_as_accepted(
                             processing_code, processing_label, renderer.render(serializer.data).decode()
                         )
-                        cnt += 1
-                    elif processing_code == "3436":
+                    elif processing_code == dup_error_code:
                         # Dups already processed by ASP:
                         self.logger.info("Already processed by ASP (dup) : closing")
                         employee_record.update_as_accepted(
                             asp_success_code, "INTEGRATION PLATEFORME", renderer.render(serializer.data).decode()
                         )
-                        cnt += 1
                     else:
                         # "Normal" error case
                         self.logger.info("Updating as REJECTED with error code: %s", processing_code)
                         employee_record.update_as_rejected(processing_code, processing_label)
-                        cnt += 1
 
+                    cnt += 1
                     self.logger.info("---")
 
             if cnt > 0:
