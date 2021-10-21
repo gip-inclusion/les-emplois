@@ -85,7 +85,6 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
                 "custom_name": request.POST.get(f"custom-name-{code}", ""),
                 "description": request.POST.get(f"description-{code}", ""),
                 "is_active": bool(request.POST.get(f"is_active-{code}")),
-                "is_displayed": bool(request.POST.get(f"is_displayed-{code}")),
             }
             # We use a single ModelForm instance to validate each submitted group of data.
             form = ValidateSiaeJobDescriptionForm(data=data)
@@ -109,13 +108,10 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
                     # Create.
                     for code in codes_to_create:
                         appellation = Appellation.objects.get(code=code)
-                        through_defaults_is_active = bool(request.POST.get(f"is_active-{code}"))
-                        through_defaults_is_displayed = bool(request.POST.get(f"is_displayed-{code}"))
                         through_defaults = {
                             "custom_name": request.POST.get(f"custom-name-{code}", ""),
                             "description": request.POST.get(f"description-{code}", ""),
-                            "is_active": through_defaults_is_displayed,
-                            "is_displayed": (through_defaults_is_displayed and through_defaults_is_active),
+                            "is_active": bool(request.POST.get(f"is_active-{code}")),
                         }
                         siae.jobs.add(appellation, through_defaults=through_defaults)
 
@@ -130,17 +126,14 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
                         new_custom_name = request.POST.get(f"custom-name-{code}", "")
                         new_description = request.POST.get(f"description-{code}", "")
                         new_is_active = bool(request.POST.get(f"is_active-{code}"))
-                        new_is_displayed = bool(request.POST.get(f"is_displayed-{code}"))
                         if (
                             job_through.custom_name != new_custom_name
                             or job_through.description != new_description
                             or job_through.is_active != new_is_active
-                            or job_through.is_displayed != new_is_displayed
                         ):
                             job_through.custom_name = new_custom_name
                             job_through.description = new_description
-                            job_through.is_active = new_is_active and new_is_displayed
-                            job_through.is_displayed = new_is_displayed
+                            job_through.is_active = new_is_active
                             job_through.save()
 
                 messages.success(request, "Mise à jour effectuée !")
