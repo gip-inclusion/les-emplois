@@ -70,9 +70,10 @@
 {% endblock %}
 
 {% block left_content %}
-    <div class="my-5 text-center">
+    <!-- Hide left column on small devices. -->
+    <div class="my-5 text-center d-none d-sm-block">
         <h2 class="ff-extra-01">Vos informations de connexion</h2>
-        <img class="mt-5" src="{% static 'img/job_seeker_signup.svg' %}">
+        <img class="mt-5 img-fluid" src="{% static 'img/job_seeker_signup.svg' %}">
     </div>
 {% endblock %}
 
