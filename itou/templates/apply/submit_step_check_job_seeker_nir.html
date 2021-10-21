@@ -1,7 +1,7 @@
-{# django-allauth template override. #}
 {% extends "apply/submit_base_two_columns.html" %}
 {% load bootstrap4 %}
 {% load static %}
+{% load format_filters %}
 
 {% block title %}Postuler{{ block.super }}{% endblock %}
 
@@ -51,7 +51,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p>Le numéro {{ form.nir.value }} est associé au compte de <b>{{ job_seeker_name }}</b>.</p>
+                            <p>Le numéro {{ form.nir.value|format_nir }} est associé au compte de <b>{{ job_seeker_name }}</b>.</p>
                             <p>
                                 Si cette candidature n'est pas pour <b>{{ job_seeker_name }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
                             </p>
@@ -85,7 +85,7 @@
 {% endblock %}
 
 {% block left_column %}
-    <h2 class="ff-extra-01">Où trouver mon numéro de sécurité sociale ?</h2>
+    <h2 class="ff-extra-01">Où trouver {% if request.user.is_job_seeker %}mon{% else %}le{% endif %} numéro de sécurité sociale ?</h2>
     <img class="mt-5 img-fluid" src="{% static 'img/carte_vitale.png' %}">
     <p class="ff-extra-01 mt-0">Il est présent à cet endroit sur {% if request.user.is_job_seeker %}votre{% else %}la{% endif %} carte Vitale.</p>
 {% endblock %}
