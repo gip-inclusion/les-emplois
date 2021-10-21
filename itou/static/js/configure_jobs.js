@@ -40,6 +40,7 @@ $(document).ready(() => {
             <p class="job-appellation-name text-success">
               <i>${appellation.name}</i>
             </p>
+            <input type="hidden" name="code" value="${appellation.code}">
             <div class="form-group">
                 <label for="custom-name-${appellation.code}">
                     <small>Nom personnalisé</small>
