@@ -34,7 +34,7 @@ $(document).ready(() => {
 
   let addJob = appellation => {
     // TODO: get one html in configure_jobs and here, to avoid errors when code is updated
-    $('.js-jobs-tbody').append(`<tr>
+    $('.js-jobs-tbody').prepend(`<tr>
         <td>${appellation.rome}</td>
         <td class="text-left">
             <p class="job-appellation-name text-success">
