@@ -13,14 +13,20 @@
         {% csrf_token %}
         <div class="border-top py-4">
             <div class="custom-control custom-switch mb-3">
-                <input name="siae-block_job_applications-{{ siae.id }}"
-                    type="checkbox" id="siae-block_job_applications-{{ siae.id }}"
+                <input name="block_job_applications"
+                    type="checkbox" id="block_job_applications"
                     class="custom-control-input"
                     {% if siae.block_job_applications %}checked{% endif %}>
                 <label class="custom-control-label h5"
-                    for="siae-block_job_applications-{{ siae.id }}">Bloquer les nouvelles candidatures</label>
-                <p class="text-muted">Bloquer temporairement la réception de candidatures (candidatures spontanées, recrutements)</p>
+                    for="block_job_applications">Bloquer les nouvelles candidatures</label>
             </div>
+            {% if siae.block_job_applications %}
+                <p class="alert alert-warning">
+                    Vous avez activé cette option la dernière fois le {{ siae.job_applications_blocked_at|date }}
+                </p>
+            {% else %}
+                <p class="text-muted">Bloquer temporairement la réception de candidatures (candidatures spontanées, recrutements)</p>
+            {% endif %}
         </div>
         <div class="border-top py-3">
             <h2>Gérer les métiers et recrutements</h2>
