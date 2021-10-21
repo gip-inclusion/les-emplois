@@ -304,6 +304,13 @@ Usage:
     font-weight: 700;
 }
 
+.font-size-hat {
+    font-size: 1.25rem;
+}
+
+.title-with-badge .badge{
+    font-size: 1rem;
+}
 /* To be discussed
 --------------------------------------------------------------------------- */
 .collapse-caret, .collapse-caret:hover{
@@ -334,3 +341,6 @@ Usage:
     margin: 0;
 }
 
+.text-with-btn span{
+    line-height: 2.2;
+}
