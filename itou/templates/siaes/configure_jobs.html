@@ -29,8 +29,8 @@
                 <tr>
                     <th scope="col">ROME</th>
                     <th scope="col" class="text-left">Poste</th>
-                    <th scope="col">Publier la<br>fiche de poste</th>
-                    <th scope="col">{% include "includes/icon.html" with icon="trash-2" %}</th>
+                    <th class="w-25" scope="col">Actions</th>
+                    <th scope="col">Supprimer</th>
                 </tr>
             </thead>
             <tbody class="js-jobs-tbody">
@@ -70,14 +70,33 @@
                             </small>
                         </div>
                     </td>
-                    <td scope="row">
+                    <td class="text-left align-middle" scope="row">
                         <input type="hidden" name="code" value="{{ job.appellation.code }}">
-                        <input
-                            type="checkbox"
-                            name="is_active-{{ job.appellation.code }}"
-                            {% if job.is_active %}checked{% endif %}>
+                        <div class="custom-control custom-switch mb-3">
+                            <input name="is_displayed-{{ job.appellation.code }}"
+                                type="checkbox" id="is_displayed-{{ job.appellation.code }}"
+                                class="custom-control-input js-check-hide-next-elmnt"
+                                data-toggle-element="#js-custom-switch-{{job.appellation.code}}"
+                                {% if job.is_displayed %}checked{% endif %}>
+                            <label class="custom-control-label font-weight-bold"
+                                for="is_displayed-{{ job.appellation.code }}">Afficher le métier</label>
+                        </div>
+                        <div id="js-custom-switch-{{job.appellation.code}}"
+                            class="custom-control custom-switch"
+                            {% if not job.is_displayed %}style="display: none;"{% endif %}>
+                            <input name="is_active-{{ job.appellation.code }}"
+                                type="checkbox" class="custom-control-input"
+                                id="is_active-{{ job.appellation.code }}"
+                                {% if job.is_active %}checked{% endif %}>
+                            <label class="custom-control-label font-weight-bold"
+                                for="is_active-{{ job.appellation.code }}">Ouvrir au recrutement</label>
+                        </div>
                     </td>
-                    <td><a href="#" role="button" class="js-job-delete">Supprimer</a></td>
+                    <td class="align-middle">
+                        <a href="#" role="button" class="js-job-delete">
+                            {% include "includes/icon.html" with icon="trash-2" %}
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
