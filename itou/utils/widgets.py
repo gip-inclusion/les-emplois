@@ -63,6 +63,9 @@ class DuetDatePickerWidget(forms.DateInput):
         max_attr = attrs.get("max")
         if max_attr:
             attrs["max"] = self.format_value(max_attr)
+        # Remove the `form-control` class inserted by `django-bootstrap4` to avoid
+        # breaking the layout.
+        attrs["class"] = attrs.get("class", "").replace("form-control", "").strip()
         return attrs
 
     @classmethod
