@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from django.core.signing import Signer
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 
@@ -113,16 +112,14 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         user.is_job_seeker = True
 
         # Retrieve NIR from session.
-        signed_nir = request.session.get(settings.ITOU_SESSION_SIGNED_NIR_KEY)
-        if signed_nir:
-            signer = Signer()
-            nir = signer.unsign(signed_nir)
+        nir = request.session.get(settings.ITOU_SESSION_NIR_KEY)
+        if nir:
             user.nir = nir
 
         user.save()
 
-        if signed_nir:
-            del request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY]
+        if nir:
+            del request.session[settings.ITOU_SESSION_NIR_KEY]
 
         return user
 
