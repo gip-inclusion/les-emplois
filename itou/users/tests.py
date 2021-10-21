@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 import itou.asp.factories as asp
+from itou.approvals.factories import ApprovalFactory
 from itou.asp.models import AllocationDuration, EmployerType
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.institutions.factories import InstitutionWithMembershipFactory
@@ -139,7 +140,7 @@ class ManagementCommandsTest(TestCase):
 
     def test_deduplicate_job_seekers_without_empty_sender_field(self):
         """
-        Easy case : among all the duplicates, only one has a PASS IAE.
+        Easy case: among all the duplicates, only one has a PASS IAE.
         Ensure that the `sender` field is never left empty.
         """
 
@@ -170,10 +171,16 @@ class ManagementCommandsTest(TestCase):
         self.assertNotEqual(job_app3.sender, user3)
         job_app3_sender = job_app3.sender  # The sender is a prescriber.
 
+        # Ensure that `user1` will always be the target into which duplicates will be merged
+        # by attaching a PASS IAE to him.
+        self.assertEqual(0, user1.approvals.count())
+        self.assertEqual(0, user2.approvals.count())
+        self.assertEqual(0, user3.approvals.count())
+        ApprovalFactory(user=user1)
+
         # Merge all users into `user1`.
         call_command("deduplicate_job_seekers", verbosity=0)
 
-        user1.refresh_from_db()
         self.assertEqual(3, user1.job_applications.count())
 
         job_app1.refresh_from_db()

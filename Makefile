@@ -156,6 +156,12 @@ postgres_dump_cities:
 	docker exec -ti itou_postgres bash -c "pg_dump --clean --if-exists --format c --no-owner --no-privileges -d itou -t cities_city > /backups/cities.sql"
 	docker cp itou_postgres:/backups/cities.sql itou/fixtures/postgres/
 
+# Itou theme
+# =============================================================================
+
+update_itou_theme: scripts/upload_itou_theme.sh
+	docker exec itou_django /bin/sh -c "./scripts/upload_itou_theme.sh"
+
 # Deployment
 # =============================================================================
 

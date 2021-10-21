@@ -10,5 +10,5 @@
         See also `itou.css`.
         https://getbootstrap.com/docs/4.6/components/forms/#server-side
     {% endcomment %}
-    {% if "is-invalid" in widget.attrs.class %}class="is-invalid"{% endif %}
+    {% if widget.attrs.class %}class="{{ widget.attrs.class }}"{% endif %}
     ></duet-date-picker>
