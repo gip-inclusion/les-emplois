@@ -74,13 +74,13 @@ def communes_autocomplete(request):
     try:
         dt = datetime.fromisoformat(request.GET.get("date", ""))
     except ValueError:
-        # Can't extract date in iso format, use fallback
-        dt = datetime.fromisoformat("1900-01-01")
+        # Can't extract date in iso format, use today as fallback
+        dt = datetime.now()
 
     if term:
         communes = (
             Commune.objects.filter(start_date__lte=dt)
-            .filter(Q(end_date=None) | Q(end_date__gt=dt))
+            .filter((Q(end_date=None) & Q(start_date__lt=dt)) | (Q(end_date__gt=dt) & Q(start_date__lt=dt)))
             .annotate(similarity=TrigramSimilarity("name", term))
             .filter(similarity__gt=0.1)
             .order_by("-similarity")
