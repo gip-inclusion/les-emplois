@@ -442,7 +442,7 @@ ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_CURRENT_INSTITUTION_KEY = "current_institution"
 ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
 ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
-ITOU_SESSION_SIGNED_NIR_KEY = "signed_nir"
+ITOU_SESSION_NIR_KEY = "job_seeker_nir"
 
 # Some external libraries, as PDF Shift, need access to static files
 # but they can't access them when working locally.

@@ -8,7 +8,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
-from django.core.signing import Signer
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -115,9 +114,7 @@ def job_seeker_nir(request, template_name="signup/job_seeker_nir.html", redirect
     if request.method == "POST":
         next_url = reverse("signup:job_seeker")
         if form.is_valid():
-            signer = Signer()
-            signed_nir = signer.sign(form.cleaned_data["nir"])
-            request.session[settings.ITOU_SESSION_SIGNED_NIR_KEY] = signed_nir
+            request.session[settings.ITOU_SESSION_NIR_KEY] = form.cleaned_data["nir"]
 
             # forward next page
             if redirect_field_name in form.data:

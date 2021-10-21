@@ -77,8 +77,8 @@ class JobSeekerSignupTest(TestCase):
         post_data = {"nir": nir}
         response = self.client.post(url, post_data)
         self.assertRedirects(response, reverse("signup:job_seeker"))
-        self.assertIn(settings.ITOU_SESSION_SIGNED_NIR_KEY, list(self.client.session.keys()))
-        self.assertTrue(self.client.session.get(settings.ITOU_SESSION_SIGNED_NIR_KEY))
+        self.assertIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertTrue(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
 
         # NIR is stored with user information.
         url = reverse("signup:job_seeker")
@@ -128,8 +128,8 @@ class JobSeekerSignupTest(TestCase):
         post_data = {"nir": nir, "skip": 1}
         response = self.client.post(url, post_data)
         self.assertRedirects(response, reverse("signup:job_seeker"))
-        self.assertNotIn(settings.ITOU_SESSION_SIGNED_NIR_KEY, list(self.client.session.keys()))
-        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_SIGNED_NIR_KEY))
+        self.assertNotIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
 
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")
