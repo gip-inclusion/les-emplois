@@ -1,3 +1,9 @@
+const trashIcon = `
+  <svg class="icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-top;">
+    <use xlink:href="/static/icons/feather-sprite.svg#trash-2"></use>
+  </svg>
+`;
+
 $(document).ready(() => {
 
   let jobsTableSelector = '.js-jobs-table'
@@ -12,7 +18,7 @@ $(document).ready(() => {
     if (tr.find('.job-appellation-name').hasClass('text-danger')) {
       tr.find('.job-appellation-name').removeClass('text-danger').css({'text-decoration': 'none'})
       tr.find(':input').prop('disabled', false)
-      tr.find('a').text("Supprimer")
+      tr.find('a').html(trashIcon)
     } else {
       tr.find('.job-appellation-name').addClass('text-danger').css({'text-decoration': 'line-through'})
       // Values of disabled inputs will not be submitted.
@@ -80,9 +86,7 @@ $(document).ready(() => {
         </td>
         <td class="align-middle">
           <a href="#" role="button" class="js-job-delete">
-            <svg class="icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-top;">
-                <use xlink:href="/static/icons/feather-sprite.svg#trash-2"></use>
-            </svg>
+            ${trashIcon}
           </a>
         </td>
     </tr>`)
