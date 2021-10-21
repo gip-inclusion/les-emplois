@@ -110,6 +110,7 @@ class Command(BaseCommand):
     def approval_is_valid(self, row):
         approval = row[APPROVAL_COL]
         wrong_approval_numbers = ["999990000000", "999999999999", "999999000000", "999992100000"]
+        # settings.ASP.ASP_ITOU_PREFIX is XXXXX in local.
         return len(approval) == 12 and approval.startswith("99999") and approval not in wrong_approval_numbers
 
     def format_name(self, name):
