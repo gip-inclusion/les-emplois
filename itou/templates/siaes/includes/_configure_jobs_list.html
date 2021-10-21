@@ -3,7 +3,7 @@
     <thead>
         <tr>
             <th scope="col">ROME</th>
-            <th scope="col" class="text-left">Poste</th>
+            <th scope="col" class="text-left">Le(s) métiers(s) exercés dans votre structure</th>
             <th class="w-25" scope="col">Actions</th>
             <th scope="col">Supprimer</th>
         </tr>
@@ -12,7 +12,7 @@
         {% for job in job_descriptions %}
         {# Important: keep the JavaScript template in sync if you edit the row markup. #}
         <tr>
-            <td>{{ job.appellation.rome.code }}</td>
+            <td class="font-weight-bold">{{ job.appellation.rome.code }}</td>
             <td class="text-left">
                 <p class="job-appellation-name">
                     <i>{{ job.appellation.name }}</i>
