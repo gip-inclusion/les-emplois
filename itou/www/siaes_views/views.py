@@ -327,22 +327,3 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
     }
 
     return render(request, template_name, context)
-
-
-@login_required
-def block_job_applications(request, template_name="siaes/block_job_applications.html"):
-    """
-    Settings: block job applications for given SIAE
-    """
-    siae = get_current_siae_or_404(request)
-
-    form = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Mise à jour du blocage des candidatures effectuée !")
-        return HttpResponseRedirect(reverse("dashboard:index"))
-
-    context = {"siae": siae, "form": form}
-
-    return render(request, template_name, context)
