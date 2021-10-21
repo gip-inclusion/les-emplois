@@ -1,0 +1,38 @@
+{% load format_filters %}
+<div class="card my-4">
+    <div class="card-body">
+        <h3 class="card-title">
+            <b>{{ prescriber_org.siret|format_siret }}</b> - {{ prescriber_org.kind }}
+        </h3>
+        <br>
+        {{ prescriber_org.display_name }}
+        <br>
+        {{ prescriber_org.address_line_1 }},
+        {% if prescriber_org.address_line_2 %}
+            <br>
+            {{ prescriber_org.address_line_2 }},
+        {% endif %}
+        <br>
+        {{ prescriber_org.post_code }} {{ prescriber_org.city }}
+    </div>
+    <div class="card-footer">
+        {# Organizations can exist without a member  #}
+        {% if prescriber_org.prescribermembership_set.first %}
+            {% with prescriber_org.prescribermembership_set.first as membership %}
+                {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
+                {# For security, display only the first char of the last name. #}
+                <i>
+                    Demandez une invitation à
+                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
+                    pour rejoindre cette organisation.
+                </i>
+                <br>
+                <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
+                    Demander une invitation
+                </a>
+            {% endwith %}
+        {% else %}
+            <i>Cette organisation n'a pas de membre.</i>
+        {% endif %}
+    </div>
+</div>
