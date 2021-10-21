@@ -237,10 +237,9 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
     if request.method == "POST" and form.is_valid():
 
         # Puts the data from API entreprise and geocoding in session for the last creation step
-        if hasattr(form, "org_data"):
-            session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-            session_data["prescriber_org_data"] = form.org_data
-            request.session.modified = True
+        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        session_data["prescriber_org_data"] = form.org_data
+        request.session.modified = True
 
         # Get organizations with members with precisely the same SIRET
         prescriber_orgs_with_members_same_siret = PrescriberOrganization.objects.prefetch_active_memberships().filter(
@@ -250,7 +249,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
         # Get organizations with members with same SIREN but not the same SIRET
         prescriber_orgs_with_members_same_siren = (
             PrescriberOrganization.objects.prefetch_active_memberships()
-            .filter(siret=form.cleaned_data["siret"])
+            .filter(siret__startswith=form.cleaned_data["siret"][:9], department=form.cleaned_data["department"])
             .exclude(members=None)
             .exclude(pk__in=[p.pk for p in prescriber_orgs_with_members_same_siret])
         )
