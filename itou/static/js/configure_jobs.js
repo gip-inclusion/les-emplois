@@ -21,16 +21,6 @@ $(document).ready(() => {
     }
   })
 
-  $(document).on('change', 'input.js-check-hide-next-elmnt', function(){
-    var toggleElment = $(this).data("toggleElement");
-    if(toggleElment) {
-      if($(this).is(':checked')) {
-        $(toggleElment).show();
-      } else {
-        $(toggleElment).hide();
-      }
-    }
-  });
 
   // Autocomplete.
 
@@ -78,17 +68,7 @@ $(document).ready(() => {
             </div>
         </td>
         <td class="text-left align-middle" scope="row">
-          <input type="hidden" name="code" value="${appellation.code}">
-          <div class="custom-control custom-switch mb-3">
-              <input name="is_displayed-${appellation.code}"
-                  id="is_displayed-${appellation.code}" type="checkbox"
-                  class="custom-control-input js-check-hide-next-elmnt"
-                  data-toggle-element="#js-custom-switch-${appellation.code}"
-                  checked>
-              <label class="custom-control-label font-weight-bold"
-                  for="is_displayed-${appellation.code}">Afficher le métier</label>
-          </div>
-          <div id="js-custom-switch-${appellation.code}" class="custom-control custom-switch">
+          <div class="custom-control custom-switch">
               <input name="is_active-${appellation.code}"
                   id="is_active-${appellation.code}" type="checkbox"
                   class="custom-control-input"
