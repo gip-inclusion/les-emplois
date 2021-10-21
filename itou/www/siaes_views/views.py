@@ -45,7 +45,6 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
     job_description = get_object_or_404(SiaeJobDescription, pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
     siae = job_description.siae
-    # TODO: why request is duplicated ?!
     others_active_jobs = (
         SiaeJobDescription.objects.select_related("appellation")
         .filter(is_active=True, siae=siae)
@@ -73,11 +72,15 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     errors = {}
 
     if request.method == "POST":
+        # Validate data for Siae block_job_applications
+        form_siae_block_job_applications = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
 
-        submitted_codes = set(request.POST.getlist("code"))
+        if form_siae_block_job_applications.is_valid():
+            form_siae_block_job_applications.save()
 
-        # Validate submitted data: this is not the standard way to do things
+        # Validate submitted data for jobs list: this is not the standard way to do things
         # and errors will not be shown at the field level.
+        submitted_codes = set(request.POST.getlist("code"))
         for code in submitted_codes:
             data = {
                 # Omit `SiaeJobDescription.appellation` since the field is
