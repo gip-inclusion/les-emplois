@@ -62,13 +62,10 @@ class JobSeekerSignupView(SignupView):
     form_class = forms.JobSeekerSignupForm
     template_name = "signup/job_seeker_signup.html"
 
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        context = {
-            "show_france_connect": settings.FRANCE_CONNECT_ENABLED,
-        }
-        response.context_data.update(context)
-        return response
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["show_france_connect"] = settings.FRANCE_CONNECT_ENABLED
+        return context
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
