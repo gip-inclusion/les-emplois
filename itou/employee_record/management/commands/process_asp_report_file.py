@@ -11,7 +11,7 @@ from itou.employee_record.serializers import EmployeeRecordSerializer
 
 class Command(BaseCommand):
     """
-    Manually processed an employee record ASP report file
+    Manually process an employee record ASP report file
     """
 
     def __init__(self, *args, **kwargs):
@@ -29,14 +29,11 @@ class Command(BaseCommand):
         """
         Command line arguments
         """
-        parser.add_argument(
-            "--dry-run", dest="dry_run", action="store_true", help="Just parse employee records, do not update"
-        )
         parser.add_argument("--file", dest="input_file", type=open, required=True, help="ASP input file")
 
     def handle(self, *args, **options):
         """
-        Employee Record Management Command
+        Fixes employee record "in-between" state in case of the crash of CRON jobs
         """
         input_file = options.get("input_file")
         renderer = JSONRenderer()
@@ -51,7 +48,8 @@ class Command(BaseCommand):
             self.logger.info("Start processing of ASP file: %s", batch_filename)
 
             records = data.get("lignesTelechargement")
-            for idx, employee_record in enumerate(records, 1):
+
+            for _, employee_record in enumerate(records, 1):
                 line_number = employee_record.get("numLigne")
                 processing_code = employee_record.get("codeTraitement")
                 processing_label = employee_record.get("libelleTraitement")
