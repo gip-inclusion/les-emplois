@@ -15,7 +15,6 @@ from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
 from itou.approvals.models import Approval
-from itou.users.models import User
 from itou.utils.validators import validate_nir
 
 
@@ -188,8 +187,6 @@ class Command(BaseCommand):
 
         self.logger.info(f"{nb_updated_job_seekers} updated job seekers.")
         self.logger.info(f"{len(not_updated_job_seekers)} rows not existing in database.")
-        logs = [f"| PASS : {u[APPROVAL_COL]}, NIR : {u[NIR_COL]} |" for u in not_updated_job_seekers]
-        self.logger.debug(logs)
         self.log_to_csv(csv_name="inexistent_users", logs=not_updated_job_seekers)
         self.logger.info(f"Inexistent users exported to {settings.EXPORT_DIR}/inexistent_users.csv.")
         self.log_to_csv(csv_name="not_matching_personal_infos", logs=not_same_personal_info)
@@ -201,20 +198,24 @@ class Command(BaseCommand):
         df = df.copy()
         df.is_treated = True
 
-        # Same birthdate, NIR and PASS.
-        # Don't mark them as treated to keep them integrated to complicated cases.
-        complicated_cases = df[~df.duplicated(subset=[APPROVAL_COL, NIR_COL, BIRTHDATE_COL], keep=False)]
-        df.loc[complicated_cases.index, "is_treated"] = False
-
-        # Merge kept rows.
+        # Merge duplicated PASS. Caution: Duplicated NIRS may still be present at the end.
         kept_rows = df[df.duplicated(subset=[APPROVAL_COL, NIR_COL, BIRTHDATE_COL], keep="first")]
         df.loc[kept_rows.index, "approval_is_duplicated"] = False
         df.loc[kept_rows.index, "nir_is_duplicated"] = False
+
+        # Same birthdate, NIR and PASS.
+        # Don't mark them as treated to keep them integrated to complicated cases.
+        complicated_cases = kept_rows[~kept_rows.duplicated(subset=[APPROVAL_COL, NIR_COL, BIRTHDATE_COL], keep=False)]
+        df.loc[complicated_cases.index, "is_treated"] = False
+        df.loc[complicated_cases.index, "approval_is_duplicated"] = True
+        df.loc[complicated_cases.index, "nir_is_duplicated"] = True
+
+        kept_rows_count = len(df[df.is_treated & (df.approval_is_duplicated == False)])
+
         self.logger.info(
             f"{len(complicated_cases)} don't have the same birthdate, NIR and PASS. Continuing with "
-            f"{len(kept_rows)} merged unique rows."
+            f"{kept_rows_count} merged unique rows."
         )
-
         return df
 
     def handle(self, file_path, dry_run=False, **options):
