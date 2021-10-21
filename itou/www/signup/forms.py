@@ -84,8 +84,13 @@ class JobSeekerSituationForm(forms.Form):
 
 
 class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
-    def __init__(self, *args, **kwargs):
+    nir = forms.CharField(disabled=True, required=False, label="Numéro de sécurité sociale")
+
+    def __init__(self, nir, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.nir = nir
+        self.fields["nir"].initial = self.nir
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
         for password_field in [self.fields["password1"], self.fields["password2"]]:
             password_field.widget.attrs["placeholder"] = "**********"
@@ -110,15 +115,12 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
         user.is_job_seeker = True
-
-        # Retrieve NIR from session.
-        nir = request.session.get(settings.ITOU_SESSION_NIR_KEY)
-        if nir:
-            user.nir = nir
+        if self.nir:
+            user.nir = self.nir
 
         user.save()
 
-        if nir:
+        if self.nir:
             del request.session[settings.ITOU_SESSION_NIR_KEY]
 
         return user
