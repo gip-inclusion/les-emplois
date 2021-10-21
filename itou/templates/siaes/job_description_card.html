@@ -3,7 +3,7 @@
 
 {% block title %}{{ job.display_name }} - {{ siae.display_name }}{{ block.super }}{% endblock %}
 
-{% block nb_columns %}10{% endblock %}
+{% block nb_columns %}8{% endblock %}
 
 {% block content %}
 
@@ -23,15 +23,13 @@
                 <h5 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h5>
             </div>
             <div class="py-5">
-                <h1 class="h2 mb-4">
+                <h1 class="h2 mb-4 title-with-badge">
                     {{ job.display_name }}
-                    <small>
                         {% if job.is_active %}
                             <span class="badge badge-pill badge-success">Recrutement en cours</span>
                         {% else %}
                             <span class="badge badge-pill badge-warning">Pas de recrutement en cours</span>
                         {% endif %}
-                    </small>
                 </h1>
                 {% if job.description %}
                     <h6>Descriptif</h6>
@@ -64,7 +62,7 @@
                             <a class="btn btn-primary"
                                 href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}&{% if back_url %}back_url={{ back_url }}{% endif %}"
                                 aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
-                                {% include "includes/icon.html" with icon="message-square" %} Postuler
+                                Postuler
                             </a>
                         {% endif %}
                     </div>
