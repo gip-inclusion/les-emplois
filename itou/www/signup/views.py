@@ -70,6 +70,11 @@ class JobSeekerSignupView(SignupView):
         response.context_data.update(context)
         return response
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["nir"] = self.request.session.get(settings.ITOU_SESSION_NIR_KEY)
+        return kwargs
+
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
