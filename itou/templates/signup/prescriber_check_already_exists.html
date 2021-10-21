@@ -1,7 +1,6 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 {% load static %}
-{% load format_filters %}
 
 {% block title %}Prescripteur/Orienteur - Inscription{{ block.super }}{% endblock %}
 
@@ -41,44 +40,9 @@
     {% if prescriber_orgs_with_members_same_siret %}
         <div class="mt-5">
             <h3>Organisation(s) déjà inscrite(s) avec ce SIRET</h3>
-            <p>Par mesure sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
+            <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
             {% for prescriber_org in prescriber_orgs_with_members_same_siret %}
-                <div class="card my-4">
-                    <div class="card-body">
-                        <h3 class="card-title">
-                            <b>{{ prescriber_org.siret|format_siret }}</b> - {{ prescriber_org.kind }}
-                        </h3>
-                        {{ prescriber_org.display_name }}
-                        <br>
-                        {{ prescriber_org.address_line_1 }},
-                        {% if prescriber_org.address_line_2 %}
-                            <br>
-                            {{ prescriber_org.address_line_2 }},
-                        {% endif %}
-                        <br>
-                        {{ prescriber_org.post_code }} {{ prescriber_org.city }}
-                    </div>
-                    <div class="card-footer">
-                        {# Organizations can exist without a member  #}
-                        {% if prescriber_org.prescribermembership_set.first %}
-                            {% with prescriber_org.prescribermembership_set.first as membership %}
-                                {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
-                                {# For security, display only the first char of the last name. #}
-                                <i>
-                                    Demandez une invitation à
-                                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
-                                    pour rejoindre cette organisation.
-                                </i>
-                                <br>
-                                <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
-                                    Demander une invitation
-                                </a>
-                            {% endwith %}
-                        {% else %}
-                            <i>Cette organisation n'a pas de membre.</i>
-                        {% endif %}
-                    </div>
-                </div>
+                {% include "signup/includes/prescriber_card.html" %}
             {% endfor %}
         </div>
     {% endif %}
@@ -87,44 +51,13 @@
         <div class="mt-5">
             {% if not prescriber_orgs_with_members_same_siret %}
             <h3>Organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
-            <p>Par mesure sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
+            <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
             {% else %}
             <h3>Autre(s) organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
             {% endif %}
             
             {% for prescriber_org in prescriber_orgs_with_members_same_siren %}
-            <div class="card my-4">
-                <div class="card-body">
-                    <h3 class="card-title">
-                        <b>{{ prescriber_org.siret|format_siret }}</b> - {{ prescriber_org.kind }}
-                    </h3>
-                    <br>
-                    {{ prescriber_org.display_name }}
-                    <br>
-                    {{ prescriber_org.address_line_1 }},
-                    {% if prescriber_org.address_line_2 %}
-                        <br>
-                        {{ prescriber_org.address_line_2 }},
-                    {% endif %}
-                    <br>
-                    {{ prescriber_org.post_code }} {{ prescriber_org.city }}
-                </div>
-                {% with prescriber_org.prescribermembership_set.first as membership %}
-                <div class="card-footer">
-                    {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
-                    {# For security, display only the first char of the last name. #}
-                    <i>
-                        Demandez une invitation à
-                        {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
-                        pour rejoindre cette organisation.
-                    </i>
-                    <br>
-                    <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
-                        Demander une invitation
-                    </a>
-                </div>
-                {% endwith %}
-            </div>
+                {% include "signup/includes/prescriber_card.html" %}
             {% endfor %}
         </div>
     {% endif %}

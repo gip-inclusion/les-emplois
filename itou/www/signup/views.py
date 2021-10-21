@@ -368,10 +368,13 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
         authorization_status = None
         kind = None
 
-        next_url = reverse("signup:prescriber_user")
-        if prescriber_kind == form.KIND_AUTHORIZED_ORG:
-            next_url = reverse("signup:prescriber_confirm_authorization")
-        elif prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
+        next_url = reverse(
+            "signup:prescriber_confirm_authorization"
+            if prescriber_kind == form.KIND_AUTHORIZED_ORG
+            else "signup:prescriber_user"
+        )
+
+        if prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
             authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
             kind = PrescriberOrganization.Kind.OTHER.value
 
