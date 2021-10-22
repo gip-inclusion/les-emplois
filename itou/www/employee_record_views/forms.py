@@ -264,7 +264,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         super().clean()
 
         # Pôle emploi
-        if self.cleaned_data["pole_emploi"]:
+        if self.instance.user.pole_emploi_id:
             if not self.cleaned_data["pole_emploi_since"]:
                 raise forms.ValidationError("La durée d'inscription à Pôle emploi est obligatoire")
 
