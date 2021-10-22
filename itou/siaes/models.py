@@ -546,7 +546,11 @@ class SiaeJobDescription(models.Model):
         return self.appellation.name
 
     def get_absolute_url(self):
-        return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})
+        # prevent preview case
+        if self.pk:
+            return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})
+        else:
+            return "#"
 
 
 class SiaeConvention(models.Model):

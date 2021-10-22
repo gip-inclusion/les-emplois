@@ -132,4 +132,30 @@ $(document).ready(() => {
       }
     })
 
+  $(document).on("click", "#js-preview-card", function(){
+    var urlPreview = $(this).data("urlPreview");
+    var FormDataJobs = $('form.js-prevent-multiple-submit').serializeArray();
+    var selectorContentModal = "#js-modal-preview-body";
+    $.ajax({
+        url: urlPreview,
+        type: 'post',
+        data: FormDataJobs,
+        beforeSend: function() {
+          $(selectorContentModal).html(`
+            <div class="d-flex justify-content-center">
+              <div class="spinner-border" style="width: 5rem; height: 5rem;" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </div>
+          `);
+          $('#js-modal-preview').modal('show');
+        },
+        success: function(data) {
+            $(selectorContentModal).html(data)
+        },
+        failure: function(data) {
+            console.error(data);
+        }
+    });
+  })
 })
