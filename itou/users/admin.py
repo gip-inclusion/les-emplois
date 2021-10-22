@@ -328,6 +328,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
                     "hexa_non_std_extension",
                     "hexa_lane_type",
                     "hexa_lane_name",
+                    "hexa_additional_address",
                     "hexa_post_code",
                     "hexa_commune",
                 )

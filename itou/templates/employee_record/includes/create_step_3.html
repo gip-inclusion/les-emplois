@@ -10,16 +10,26 @@
     {% csrf_token %}
 
     {% bootstrap_field form.education_level %}
+    
+    {% if not is_registered_to_pole_emploi %} 
+        <div role="button" data-toggle="collapse" data-target="#collapse_pole_emploi" aria-controls="#collapse_pole_emploi">
+            {% bootstrap_field form.pole_emploi %}
+        </div>
+        <div id="collapse_pole_emploi" class="ml-1 pl-4 border-left border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
+            {% bootstrap_field form.pole_emploi_id %}
+            {% bootstrap_field form.pole_emploi_since %}
+        </div>
+    {% else %}
+        <div class="mb-2">
+            <b>Le salarié est inscrit à Pôle emploi, merci de préciser la durée d'inscription : </b>
+        </div>
+        <div class="ml-1 pl-4 border-left border-primary">
+            {% bootstrap_field form.pole_emploi_id %}
+            {% bootstrap_field form.pole_emploi_since %}
+        </div>
+    {% endif %}
+
     {% bootstrap_field form.resourceless %}
-
-    <div role="button" data-toggle="collapse" data-target="#collapse_pole_emploi" aria-controls="#collapse_pole_emploi">
-        {% bootstrap_field form.pole_emploi %}
-    </div>
-
-    <div id="collapse_pole_emploi" class="ml-1 pl-4 border-left border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
-        {% bootstrap_field form.pole_emploi_id %}
-        {% bootstrap_field form.pole_emploi_since %}
-    </div>
 
     <div role="button" data-toggle="collapse" data-target="#collapse_unemployed" aria-controls="#collapse_unemployed">
         {% bootstrap_field form.unemployed %}
