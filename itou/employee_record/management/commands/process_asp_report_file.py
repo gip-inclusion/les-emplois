@@ -65,6 +65,7 @@ class Command(BaseCommand):
                     self.logger.info(
                         "Could not find employee record for file: %s, line: %s", batch_filename, line_number
                     )
+                    continue
 
                 # If and only if SENT :
                 if employee_record.status == EmployeeRecord.Status.SENT:
