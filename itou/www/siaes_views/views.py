@@ -3,8 +3,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
@@ -59,6 +60,71 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
     return render(request, template_name, context)
 
 
+def refresh_card_list(request, siae):
+    errors = {}
+    jobs = {"create": [], "delete": [], "update": []}
+
+    # Validate submitted data for jobs list: this is not the standard way to do things
+    # and errors will not be shown at the field level.
+    submitted_codes = set(request.POST.getlist("code"))
+    for code in submitted_codes:
+        data = {
+            # Omit `SiaeJobDescription.appellation` since the field is
+            # hidden and `Appellation.objects.get()` will fail anyway.
+            "custom_name": request.POST.get(f"custom-name-{code}", ""),
+            "description": request.POST.get(f"description-{code}", ""),
+            "is_active": bool(request.POST.get(f"is_active-{code}")),
+        }
+        # We use a single ModelForm instance to validate each submitted group of data.
+        form = ValidateSiaeJobDescriptionForm(data=data)
+        if not form.is_valid():
+            for key, value in form.errors.items():
+                verbose_name = form.fields[key].label
+                error = value[0]
+                # The key of the dict is used in tests.
+                errors[code] = f"{verbose_name} : {error}"
+
+    if not errors:
+
+        current_codes = set(siae.job_description_through.values_list("appellation__code", flat=True))
+        codes_to_create = submitted_codes - current_codes
+        # It is assumed that the codes to delete are not submitted (they must
+        # be removed from the DOM via JavaScript). Instead, they are deducted.
+        codes_to_delete = current_codes - submitted_codes
+        codes_to_update = current_codes - codes_to_delete
+        if codes_to_create or codes_to_delete or codes_to_update:
+            # Create.
+            for code in codes_to_create:
+                appellation = Appellation.objects.get(code=code)
+                through_defaults = {
+                    "custom_name": request.POST.get(f"custom-name-{code}", ""),
+                    "description": request.POST.get(f"description-{code}", ""),
+                    "is_active": bool(request.POST.get(f"is_active-{code}")),
+                }
+                jobs["create"].append(SiaeJobDescription(siae=siae, appellation=appellation, **through_defaults))
+            # Delete.
+            if codes_to_delete:
+                jobs["delete"] = Appellation.objects.filter(code__in=codes_to_delete)
+
+            # Update.
+            for job_through in siae.job_description_through.filter(appellation__code__in=codes_to_update):
+                code = job_through.appellation.code
+                new_custom_name = request.POST.get(f"custom-name-{code}", "")
+                new_description = request.POST.get(f"description-{code}", "")
+                new_is_active = bool(request.POST.get(f"is_active-{code}"))
+                if (
+                    job_through.custom_name != new_custom_name
+                    or job_through.description != new_description
+                    or job_through.is_active != new_is_active
+                ):
+                    job_through.custom_name = new_custom_name
+                    job_through.description = new_description
+                    job_through.is_active = new_is_active
+                    jobs["update"].append(job_through)
+
+    return {"jobs": jobs, "errors": errors}
+
+
 @login_required
 def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     """
@@ -78,72 +144,60 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
         if form_siae_block_job_applications.is_valid():
             form_siae_block_job_applications.save()
 
-        # Validate submitted data for jobs list: this is not the standard way to do things
-        # and errors will not be shown at the field level.
-        submitted_codes = set(request.POST.getlist("code"))
-        for code in submitted_codes:
-            data = {
-                # Omit `SiaeJobDescription.appellation` since the field is
-                # hidden and `Appellation.objects.get()` will fail anyway.
-                "custom_name": request.POST.get(f"custom-name-{code}", ""),
-                "description": request.POST.get(f"description-{code}", ""),
-                "is_active": bool(request.POST.get(f"is_active-{code}")),
-            }
-            # We use a single ModelForm instance to validate each submitted group of data.
-            form = ValidateSiaeJobDescriptionForm(data=data)
-            if not form.is_valid():
-                for key, value in form.errors.items():
-                    verbose_name = form.fields[key].label
-                    error = value[0]
-                    # The key of the dict is used in tests.
-                    errors[code] = f"{verbose_name} : {error}"
+        refreshed_cards = refresh_card_list(request=request, siae=siae)
 
-        if not errors:
+        if not refreshed_cards["errors"]:
+            with transaction.atomic():
+                if refreshed_cards["jobs"]["create"]:
+                    SiaeJobDescription.objects.bulk_create(refreshed_cards["jobs"]["create"])
 
-            current_codes = set(siae.job_description_through.values_list("appellation__code", flat=True))
-            codes_to_create = submitted_codes - current_codes
-            # It is assumed that the codes to delete are not submitted (they must
-            # be removed from the DOM via JavaScript). Instead, they are deducted.
-            codes_to_delete = current_codes - submitted_codes
-            codes_to_update = current_codes - codes_to_delete
-            if codes_to_create or codes_to_delete or codes_to_update:
-                with transaction.atomic():
-                    # Create.
-                    for code in codes_to_create:
-                        appellation = Appellation.objects.get(code=code)
-                        through_defaults = {
-                            "custom_name": request.POST.get(f"custom-name-{code}", ""),
-                            "description": request.POST.get(f"description-{code}", ""),
-                            "is_active": bool(request.POST.get(f"is_active-{code}")),
-                        }
-                        siae.jobs.add(appellation, through_defaults=through_defaults)
+                if refreshed_cards["jobs"]["update"]:
+                    SiaeJobDescription.objects.bulk_update(
+                        refreshed_cards["jobs"]["update"], ["custom_name", "description", "is_active"]
+                    )
 
-                    # Delete.
-                    if codes_to_delete:
-                        appellations = Appellation.objects.filter(code__in=codes_to_delete)
-                        siae.jobs.remove(*appellations)
-
-                    # Update.
-                    for job_through in siae.job_description_through.filter(appellation__code__in=codes_to_update):
-                        code = job_through.appellation.code
-                        new_custom_name = request.POST.get(f"custom-name-{code}", "")
-                        new_description = request.POST.get(f"description-{code}", "")
-                        new_is_active = bool(request.POST.get(f"is_active-{code}"))
-                        if (
-                            job_through.custom_name != new_custom_name
-                            or job_through.description != new_description
-                            or job_through.is_active != new_is_active
-                        ):
-                            job_through.custom_name = new_custom_name
-                            job_through.description = new_description
-                            job_through.is_active = new_is_active
-                            job_through.save()
+                if refreshed_cards["jobs"]["delete"]:
+                    siae.jobs.remove(*refreshed_cards["jobs"]["delete"])
 
                 messages.success(request, "Mise à jour effectuée !")
                 return HttpResponseRedirect(reverse("dashboard:index"))
+        else:
+            errors = refreshed_cards["errors"]
 
     context = {"errors": errors, "job_descriptions": job_descriptions, "siae": siae}
     return render(request, template_name, context)
+
+
+@login_required
+def card_search_preview(request, siae_id, template_name="siaes/includes/_card_siae.html"):
+    """
+    SIAE's card (or "Fiche" in French) search preview.
+
+    Return only html of card search preview without global template (header, footer, ...)
+    """
+    queryset = Siae.objects.prefetch_job_description_through(is_active=True).with_job_app_score()
+    siae = get_object_or_404(queryset, pk=siae_id)
+
+    if request.method == "POST":
+
+        refreshed_cards = refresh_card_list(request=request, siae=siae)
+        if not refreshed_cards["errors"]:
+            get_codes_values = lambda list_job: [job.appellation.code for job in list_job]
+            job_descriptions_unmodified = siae.job_description_through.select_related("appellation__rome").exclude(
+                appellation__code__in=(
+                    get_codes_values(refreshed_cards["jobs"]["create"] + refreshed_cards["jobs"]["update"])
+                    + [app.code for app in refreshed_cards["jobs"]["delete"]]
+                )
+            )
+
+            context = {
+                "siae": siae,
+                "jobs_descriptions": list(job_descriptions_unmodified)
+                + refreshed_cards["jobs"]["create"]
+                + refreshed_cards["jobs"]["update"],
+            }
+            html = render_to_string(template_name, context)
+            return HttpResponse(html)
 
 
 @login_required

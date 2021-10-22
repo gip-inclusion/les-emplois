@@ -8,6 +8,7 @@ app_name = "siaes_views"
 
 urlpatterns = [
     path("<int:siae_id>/card", views.card, name="card"),
+    path("<int:siae_id>/card_search_preview", views.card_search_preview, name="card_search_preview"),
     path("job_description/<int:job_description_id>/card", views.job_description_card, name="job_description_card"),
     path("configure_jobs", views.configure_jobs, name="configure_jobs"),
     path("show_financial_annexes", views.show_financial_annexes, name="show_financial_annexes"),

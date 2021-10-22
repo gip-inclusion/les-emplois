@@ -18,7 +18,7 @@
             <br />
         {% endif %}
         <small>
-            <span class="badge badge-dark mb-3">{{ siae.distance|floatformat:"-1" }} km</span> de votre lieu de recherche.
+            <span class="badge badge-dark mb-3">{{ siae.distance|floatformat:"-1"|default:"12" }} km</span> de votre lieu de recherche.
         </small>
         {% if jobs_descriptions and not siae.block_job_applications %}
             {% include "siaes/includes/_list_siae_jobs.html" with siae=siae jobs_descriptions=jobs_descriptions %}
