@@ -315,9 +315,7 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
                         <a class="title-with-badge" href="{% url 'siaes_views:configure_jobs' %}">Gérer les métiers et recrutements
-                            {% if current_siae.block_job_applications %}
-                                <span class="badge badge-warning">Recrutements non visible</span>
-                            {% endif %}
+                            <span class="badge badge-info" data-toggle="tooltip" data-placement="right" title="Rendez visible vos recrutements">Nouveau</span>
                         </a>
                     </p>
 
