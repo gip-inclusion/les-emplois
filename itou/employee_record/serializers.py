@@ -120,6 +120,16 @@ class _EmployeeAddress(serializers.ModelSerializer):
             if not re.match("^\\+?[0-9]{1,16}$", result.get("adrTelephone")):
                 result["adrTelephone"] = None
 
+        # By decision, do not display employee e-mail or phone number anymore:
+        # ASP has some weird filtering of technically valid email adresses
+        # and a phone numbre format not suitable for most cases
+        # leading to rejection of some employee records
+        if result.get("adrMail"):
+            result["adrMail"] = None
+
+        if result.get("adrTelephone"):
+            result["adrTelephone"] = None
+
         # Remove diacritics and parenthesis from adrLibelleVoie field fixes ASP error 3330
         # (parenthesis are not described as invalid characters in specification document)
         if lane := result.get("adrLibelleVoie"):
