@@ -22,14 +22,14 @@
                 </h4>
                 <h5 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h5>
             </div>
-            <div class="py-5">
-                <h1 class="h2 mb-4 title-with-badge">
+            <div class="pt-5">
+                {% if job.is_active %}
+                    <span class="badge badge-pill badge-success">Recrutement en cours</span>
+                {% else %}
+                    <span class="badge badge-pill badge-warning">Pas de recrutement en cours</span>
+                {% endif %}
+                <h1 class="h2 my-4 title-with-badge">
                     {{ job.display_name }}
-                        {% if job.is_active %}
-                            <span class="badge badge-pill badge-success">Recrutement en cours</span>
-                        {% else %}
-                            <span class="badge badge-pill badge-warning">Pas de recrutement en cours</span>
-                        {% endif %}
                 </h1>
                 {% if job.description %}
                     <h6>Descriptif</h6>
@@ -42,7 +42,7 @@
                     </p>
                 {% endif %}
                 <hr>
-                <div class="row py-3">
+                <div class="row pt-3">
                     <div class="col-md-8">
                         <p class="mt-2">
                             <a data-toggle="collapse" href="#share-job-description-job" role="button" aria-expanded="false">
@@ -69,19 +69,19 @@
                 </div>
             </div>
         </div>
-        {% if others_active_jobs %}
-            <div class="card-footer border-top py-4">
-                <h2 class="h3">Consultez les recrutement(s) en cours dans cette structure</h2>
-                {% for other_job in others_active_jobs %}
-                        <a href="{{ other_job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event btn btn-outline-primary mb-2" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
-                            {{ other_job.display_name }}
-                        </a>
-
-                    <br >
-                {% endfor %}
-            </div>
-        {% endif %}
     </div>
+    {% if others_active_jobs %}
+        <div class="py-4">
+            <h2 class="h3">Consultez les recrutement(s) en cours dans cette structure</h2>
+            {% for other_job in others_active_jobs %}
+                    <a href="{{ other_job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event btn btn-outline-primary mb-2" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+                        {{ other_job.display_name }}
+                    </a>
+
+                <br >
+            {% endfor %}
+        </div>
+    {% endif %}
 
     {% if back_url %}
         <p class="mt-4">
