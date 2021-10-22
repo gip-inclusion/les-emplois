@@ -258,6 +258,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     context = {
         "job_application": job_application,
         "form": form,
+        "is_registered_to_pole_emploi": bool(job_application.job_seeker.pole_emploi_id),
         "steps": STEPS,
         "step": step,
     }
