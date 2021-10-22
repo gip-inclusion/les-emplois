@@ -122,7 +122,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
 
         # By decision, do not display employee e-mail or phone number anymore:
         # ASP has some weird filtering of technically valid email adresses
-        # and a phone numbre format not suitable for most cases
+        # and a phone number format not suitable for most real cases
         # leading to rejection of some employee records
         if result.get("adrMail"):
             result["adrMail"] = None
