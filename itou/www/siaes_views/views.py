@@ -30,7 +30,7 @@ def card(request, siae_id, template_name="siaes/card.html"):
     # COVID-19 "Operation ETTI".
     Public view (previously private, made public during COVID-19).
     """
-    queryset = Siae.objects.prefetch_job_description_through(is_active=True).with_job_app_score()
+    queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
     siae = get_object_or_404(queryset, pk=siae_id)
     back_url = get_safe_url(request, "back_url")
     context = {"siae": siae, "back_url": back_url}

@@ -53,12 +53,12 @@
                         {{ siae.description|linebreaks }}
                     </div>
                 {% endif %}
-                {% if jobs_descriptions and not siae.block_job_applications %}
+                {% if jobs_descriptions %}
                     {% include "siaes/includes/_list_siae_jobs.html" with siae=siae jobs_descriptions=jobs_descriptions %}
                 {% endif %}
                 {% if siae.count_active_job_descriptions > 0 and not siae.block_job_applications %}
                     <div class="border-top py-3">
-                        {% include "siaes/includes/_list_siae_actives_jobs.html" with jobs_descriptions=jobs_descriptions %}
+                        {% include "siaes/includes/_list_siae_actives_jobs.html" with jobs_descriptions=jobs_descriptions siae=siae %}
                     </div>
                 {% endif %}
                 {% if not siae.block_job_applications %}

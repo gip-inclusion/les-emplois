@@ -23,7 +23,7 @@
                 <h5 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h5>
             </div>
             <div class="pt-5">
-                {% if job.is_active %}
+                {% if job.is_active and not siae.block_job_applications %}
                     <span class="badge badge-pill badge-success">Recrutement en cours</span>
                 {% else %}
                     <span class="badge badge-pill badge-warning">Pas de recrutement en cours</span>
@@ -58,7 +58,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 text-right">
-                        {% if job.is_active %}
+                        {% if job.is_active and not siae.block_job_applications %}
                             <a class="btn btn-primary"
                                 href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}&{% if back_url %}back_url={{ back_url }}{% endif %}"
                                 aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
@@ -70,8 +70,8 @@
             </div>
         </div>
     </div>
-    {% if others_active_jobs %}
-        <div class="py-4">
+    {% if others_active_jobs and not siae.block_job_applications %}
+        <div class="pt-4">
             <h2 class="h3">Consultez les recrutement(s) en cours dans cette structure</h2>
             {% for other_job in others_active_jobs %}
                     <a href="{{ other_job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event btn btn-outline-primary mb-2" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
@@ -84,7 +84,7 @@
     {% endif %}
 
     {% if back_url %}
-        <p>
+        <p class="pt-4">
             <a href="{{ back_url }}">Retour</a>
         </p>
     {% endif %}
