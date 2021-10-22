@@ -18,7 +18,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipFactory,
 )
 from itou.siaes.models import Siae, SiaeJobDescription
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
 
