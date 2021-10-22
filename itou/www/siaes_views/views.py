@@ -21,6 +21,7 @@ from itou.www.siaes_views.forms import (
     FinancialAnnexSelectForm,
     ValidateSiaeJobDescriptionForm,
 )
+from itou.www.siaes_views.utils import refresh_card_list
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
@@ -31,9 +32,11 @@ def card(request, siae_id, template_name="siaes/card.html"):
     Public view (previously private, made public during COVID-19).
     """
     queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
+
     siae = get_object_or_404(queryset, pk=siae_id)
+    jobs_descriptions = siae.job_description_through.all().order_by("-updated_at", "-created_at")
     back_url = get_safe_url(request, "back_url")
-    context = {"siae": siae, "back_url": back_url}
+    context = {"siae": siae, "back_url": back_url, "jobs_descriptions": jobs_descriptions}
     return render(request, template_name, context)
 
 
@@ -50,6 +53,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
         SiaeJobDescription.objects.select_related("appellation")
         .filter(is_active=True, siae=siae)
         .exclude(id=job_description_id)
+        .order_by("-updated_at", "-created_at")
     )
     context = {
         "job": job_description,
@@ -58,76 +62,6 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
         "back_url": back_url,
     }
     return render(request, template_name, context)
-
-
-def refresh_card_list(request, siae):
-    errors = {}
-    jobs = {"create": [], "delete": [], "update": [], "unmodified": []}
-
-    # Validate submitted data for jobs list: this is not the standard way to do things
-    # and errors will not be shown at the field level.
-    submitted_codes = set(request.POST.getlist("code"))
-    for code in submitted_codes:
-        data = {
-            # Omit `SiaeJobDescription.appellation` since the field is
-            # hidden and `Appellation.objects.get()` will fail anyway.
-            "custom_name": request.POST.get(f"custom-name-{code}", ""),
-            "description": request.POST.get(f"description-{code}", ""),
-            "is_active": bool(request.POST.get(f"is_active-{code}")),
-        }
-        # We use a single ModelForm instance to validate each submitted group of data.
-        form = ValidateSiaeJobDescriptionForm(data=data)
-        if not form.is_valid():
-            for key, value in form.errors.items():
-                verbose_name = form.fields[key].label
-                error = value[0]
-                # The key of the dict is used in tests.
-                errors[code] = f"{verbose_name} : {error}"
-
-    if not errors:
-
-        current_codes = set(siae.job_description_through.values_list("appellation__code", flat=True))
-        codes_to_create = submitted_codes - current_codes
-        # It is assumed that the codes to delete are not submitted (they must
-        # be removed from the DOM via JavaScript). Instead, they are deducted.
-        codes_to_delete = current_codes - submitted_codes
-        codes_to_update = current_codes - codes_to_delete
-        if codes_to_create or codes_to_delete or codes_to_update:
-            # Create.
-            for code in codes_to_create:
-                appellation = Appellation.objects.get(code=code)
-                through_defaults = {
-                    "custom_name": request.POST.get(f"custom-name-{code}", ""),
-                    "description": request.POST.get(f"description-{code}", ""),
-                    "is_active": bool(request.POST.get(f"is_active-{code}")),
-                }
-                jobs["create"].append(SiaeJobDescription(siae=siae, appellation=appellation, **through_defaults))
-            # Delete.
-            if codes_to_delete:
-                jobs["delete"] = Appellation.objects.filter(code__in=codes_to_delete)
-
-            # Update.
-            for job_through in siae.job_description_through.filter(appellation__code__in=codes_to_update):
-                code = job_through.appellation.code
-                new_custom_name = request.POST.get(f"custom-name-{code}", "")
-                new_description = request.POST.get(f"description-{code}", "")
-                new_is_active = bool(request.POST.get(f"is_active-{code}"))
-                if (
-                    job_through.custom_name != new_custom_name
-                    or job_through.description != new_description
-                    or job_through.is_active != new_is_active
-                ):
-                    job_through.custom_name = new_custom_name
-                    job_through.description = new_description
-                    job_through.is_active = new_is_active
-                    jobs["update"].append(job_through)
-                else:
-                    # need to add unmodified for preview
-                    jobs["unmodified"].append(job_through)
-    return {
-        "jobs": jobs,
-        "errors": errors,
-    }
 
 
 @login_required
@@ -139,7 +73,9 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     JavaScript to generate a dynamic form. No proper Django form is used.
     """
     siae = get_current_siae_or_404(request)
-    job_descriptions = siae.job_description_through.select_related("appellation__rome").all()
+    job_descriptions = (
+        siae.job_description_through.select_related("appellation__rome").all().order_by("-updated_at", "-created_at")
+    )
     errors = {}
 
     if request.method == "POST":
@@ -190,12 +126,22 @@ def card_search_preview(request, siae_id, template_name="siaes/includes/_card_si
 
         refreshed_cards = refresh_card_list(request=request, siae=siae)
         if not refreshed_cards["errors"]:
+            list_jobs_descriptions = sorted(
+                refreshed_cards["jobs"]["create"]
+                + refreshed_cards["jobs"]["update"]
+                + refreshed_cards["jobs"]["unmodified"],
+                key=lambda x: x.updated_at if x.updated_at else x.created_at,
+                reverse=True,
+            )
             context = {
                 "siae": siae,
-                "jobs_descriptions": refreshed_cards["jobs"]["unmodified"]
-                + refreshed_cards["jobs"]["create"]
-                + refreshed_cards["jobs"]["update"],
+                "jobs_descriptions": list_jobs_descriptions,
             }
+            print(
+                refreshed_cards["jobs"]["create"]
+                + refreshed_cards["jobs"]["update"]
+                + refreshed_cards["jobs"]["unmodified"],
+            )
             html = render_to_string(template_name, context)
             return HttpResponse(html)
 
