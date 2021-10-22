@@ -62,7 +62,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 
 def refresh_card_list(request, siae):
     errors = {}
-    jobs = {"create": [], "delete": [], "update": []}
+    jobs = {"create": [], "delete": [], "update": [], "unmodified": []}
 
     # Validate submitted data for jobs list: this is not the standard way to do things
     # and errors will not be shown at the field level.
@@ -121,8 +121,13 @@ def refresh_card_list(request, siae):
                     job_through.description = new_description
                     job_through.is_active = new_is_active
                     jobs["update"].append(job_through)
-
-    return {"jobs": jobs, "errors": errors}
+                else:
+                    # need to add unmodified for preview
+                    jobs["unmodified"].append(job_through)
+    return {
+        "jobs": jobs,
+        "errors": errors,
+    }
 
 
 @login_required
@@ -179,20 +184,15 @@ def card_search_preview(request, siae_id, template_name="siaes/includes/_card_si
     siae = get_object_or_404(queryset, pk=siae_id)
 
     if request.method == "POST":
+        form_siae_block_job_applications = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
+        if form_siae_block_job_applications.is_valid():
+            siae = form_siae_block_job_applications.instance
 
         refreshed_cards = refresh_card_list(request=request, siae=siae)
         if not refreshed_cards["errors"]:
-            get_codes_values = lambda list_job: [job.appellation.code for job in list_job]
-            job_descriptions_unmodified = siae.job_description_through.select_related("appellation__rome").exclude(
-                appellation__code__in=(
-                    get_codes_values(refreshed_cards["jobs"]["create"] + refreshed_cards["jobs"]["update"])
-                    + [app.code for app in refreshed_cards["jobs"]["delete"]]
-                )
-            )
-
             context = {
                 "siae": siae,
-                "jobs_descriptions": list(job_descriptions_unmodified)
+                "jobs_descriptions": refreshed_cards["jobs"]["unmodified"]
                 + refreshed_cards["jobs"]["create"]
                 + refreshed_cards["jobs"]["update"],
             }
