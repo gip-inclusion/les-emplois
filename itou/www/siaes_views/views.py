@@ -14,13 +14,7 @@ from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views.forms import (
-    BlockJobApplicationsForm,
-    CreateSiaeForm,
-    EditSiaeForm,
-    FinancialAnnexSelectForm,
-    ValidateSiaeJobDescriptionForm,
-)
+from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm, FinancialAnnexSelectForm
 from itou.www.siaes_views.utils import refresh_card_list
 
 
@@ -32,9 +26,10 @@ def card(request, siae_id, template_name="siaes/card.html"):
     Public view (previously private, made public during COVID-19).
     """
     queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
+    # siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
 
     siae = get_object_or_404(queryset, pk=siae_id)
-    jobs_descriptions = siae.job_description_through.all().order_by("-updated_at", "-created_at")
+    jobs_descriptions = siae.job_description_through.all()
     back_url = get_safe_url(request, "back_url")
     context = {"siae": siae, "back_url": back_url, "jobs_descriptions": jobs_descriptions}
     return render(request, template_name, context)
@@ -72,7 +67,9 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     Time was limited during the prototyping phase and this view is based on
     JavaScript to generate a dynamic form. No proper Django form is used.
     """
-    siae = get_current_siae_or_404(request)
+    # queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
+    # siae = get_object_or_404(queryset, pk=siae_id)
+    siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
     job_descriptions = (
         siae.job_description_through.select_related("appellation__rome").all().order_by("-updated_at", "-created_at")
     )
@@ -94,7 +91,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
 
                 if refreshed_cards["jobs"]["update"]:
                     SiaeJobDescription.objects.bulk_update(
-                        refreshed_cards["jobs"]["update"], ["custom_name", "description", "is_active"]
+                        refreshed_cards["jobs"]["update"], ["custom_name", "description", "is_active", "updated_at"]
                     )
 
                 if refreshed_cards["jobs"]["delete"]:
@@ -110,14 +107,14 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
 
 
 @login_required
-def card_search_preview(request, siae_id, template_name="siaes/includes/_card_siae.html"):
+def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
     """
     SIAE's card (or "Fiche" in French) search preview.
 
     Return only html of card search preview without global template (header, footer, ...)
+    Need to recount active jobs to avoid supress and updated count active jobs
     """
-    queryset = Siae.objects.prefetch_job_description_through(is_active=True).with_job_app_score()
-    siae = get_object_or_404(queryset, pk=siae_id)
+    siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
 
     if request.method == "POST":
         form_siae_block_job_applications = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
@@ -125,7 +122,9 @@ def card_search_preview(request, siae_id, template_name="siaes/includes/_card_si
             siae = form_siae_block_job_applications.instance
 
         refreshed_cards = refresh_card_list(request=request, siae=siae)
+
         if not refreshed_cards["errors"]:
+            # sort all the jobs buy updated_at and created_at desc
             list_jobs_descriptions = sorted(
                 refreshed_cards["jobs"]["create"]
                 + refreshed_cards["jobs"]["update"]
@@ -133,15 +132,20 @@ def card_search_preview(request, siae_id, template_name="siaes/includes/_card_si
                 key=lambda x: x.updated_at if x.updated_at else x.created_at,
                 reverse=True,
             )
+
+            # count the number of active jobs
+            count_active_job_descriptions = 0
+            for job in list_jobs_descriptions:
+                # int(True) = 1, int(False) = 0
+                count_active_job_descriptions = int(job.is_active) + count_active_job_descriptions
+
+            siae.count_active_job_descriptions = count_active_job_descriptions
+
             context = {
                 "siae": siae,
                 "jobs_descriptions": list_jobs_descriptions,
             }
-            print(
-                refreshed_cards["jobs"]["create"]
-                + refreshed_cards["jobs"]["update"]
-                + refreshed_cards["jobs"]["unmodified"],
-            )
+
             html = render_to_string(template_name, context)
             return HttpResponse(html)
 
