@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from itou.jobs.models import Appellation
 from itou.siaes.models import SiaeJobDescription
 from itou.www.siaes_views.forms import ValidateSiaeJobDescriptionForm
@@ -43,6 +45,7 @@ def refresh_card_list(request, siae):
                     "custom_name": request.POST.get(f"custom-name-{code}", ""),
                     "description": request.POST.get(f"description-{code}", ""),
                     "is_active": bool(request.POST.get(f"is_active-{code}")),
+                    "created_at": timezone.now(),
                 }
                 jobs["create"].append(SiaeJobDescription(siae=siae, appellation=appellation, **through_defaults))
             # Delete.
@@ -65,6 +68,7 @@ def refresh_card_list(request, siae):
                     job_through.custom_name = new_custom_name
                     job_through.description = new_description
                     job_through.is_active = new_is_active
+                    job_through.updated_at = timezone.now()
                     jobs["update"].append(job_through)
                 else:
                     # need to add unmodified for preview
