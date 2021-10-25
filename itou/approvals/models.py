@@ -138,8 +138,8 @@ class Approval(CommonApprovalMixin):
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
-    # The period of time during which it is possible to prolong a PASS IAE before it ends.
-    PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS = 3
+    # The period of time during which it is possible to prolong a PASS IAE.
+    IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS = 3
 
     # Error messages.
     ERROR_PASS_IAE_SUSPENDED_FOR_USER = (
@@ -285,10 +285,9 @@ class Approval(CommonApprovalMixin):
     @property
     def is_open_to_prolongation(self):
         now = timezone.now().date()
-        prolongation_threshold = self.end_at - relativedelta(
-            months=self.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS
-        )
-        return prolongation_threshold <= now <= self.end_at
+        lower_bound = self.end_at - relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS)
+        upper_bound = self.end_at + relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS)
+        return lower_bound <= now <= upper_bound
 
     @cached_property
     def can_be_prolonged(self):

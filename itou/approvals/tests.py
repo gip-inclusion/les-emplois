@@ -312,27 +312,28 @@ class ApprovalModelTest(TestCase):
 
         today = timezone.now().date()
 
-        # Ensure "now" is "before" the period of time during which it
-        # is possible to prolong a PASS IAE.
+        # Ensure that "now" is "before" the period open to prolongations.
         end_at = (
-            today
-            + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
-            + relativedelta(days=5)
+            today + relativedelta(months=Approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS) + relativedelta(days=5)
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_open_to_prolongation)
 
-        # Ensure "now" is "after" the period of time during which it
-        # is possible to prolong a PASS IAE.
-        end_at = (
-            today
-            + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
-            - relativedelta(days=5)
-        )
+        # Ensure "now" is in the period open to prolongations.
+        # Even if the approval ended 1 month ago, users are allowed to prolong it up to 3 months after the end.
+        end_at = today - relativedelta(months=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_open_to_prolongation)
+
+        # Ensure "now" is "after" the period open to prolongations.
+        end_at = (
+            today - relativedelta(months=Approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS) - relativedelta(days=5)
+        )
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.is_open_to_prolongation)
 
     def test_get_or_create_from_valid(self):
 
