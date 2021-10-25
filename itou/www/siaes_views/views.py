@@ -9,7 +9,6 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
-from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
