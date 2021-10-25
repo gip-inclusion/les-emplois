@@ -6,6 +6,7 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.encoding import escape_uri_path
+from django.contrib import messages
 
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
@@ -244,16 +245,24 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     if request.method == "POST" and form.is_valid():
         form.save()
         job_application.refresh_from_db()
-
         employee_record = None
-        if not job_application.employee_record.first():
-            employee_record = EmployeeRecord.from_job_application(job_application)
-        else:
-            employee_record = EmployeeRecord.objects.get(job_application=job_application)
 
-        employee_record.save()
+        try:
+            if not job_application.employee_record.first():
+                employee_record = EmployeeRecord.from_job_application(job_application)
+            else:
+                employee_record = EmployeeRecord.objects.get(job_application=job_application)
 
-        return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
+            employee_record.save()
+
+            return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
+        except ValidationError as ex:
+            # If anything goes wrong during employee record creation,
+            #  catch it and show error to the user
+            messages.error(
+                request,
+                f"Il est impossible de créer cette fiche salarié pour la raison suivante : {ex.message}.",
+            )
 
     context = {
         "job_application": job_application,
