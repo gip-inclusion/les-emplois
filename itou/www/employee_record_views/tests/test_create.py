@@ -533,6 +533,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             approval=self.job_application.approval,
         )
         dup_job_application.job_seeker.jobseeker_profile.education_level = "00"
+        dup_job_application.job_seeker.jobseeker_profile.commune = "00"
         dup_job_application.save()
 
         employee_record = EmployeeRecord.from_job_application(dup_job_application)
