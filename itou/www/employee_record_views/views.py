@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
@@ -6,7 +7,6 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.encoding import escape_uri_path
-from django.contrib import messages
 
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
