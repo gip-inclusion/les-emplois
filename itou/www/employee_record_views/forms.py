@@ -101,7 +101,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
             self.initial["insee_commune_code"] = self.instance.birth_place.code
 
     def clean_insee_commune_code(self):
-        commune_code = self.cleaned_data["insee_commune_code"]
+        commune_code = self.cleaned_data.get("insee_commune_code")
 
         if commune_code and not Commune.objects.current().by_insee_code(commune_code).exists():
             raise ValidationError("Cette commune n'existe pas ou n'est pas référencée")
@@ -111,7 +111,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
     def clean(self):
         super().clean()
 
-        commune_code = self.cleaned_data["insee_commune_code"]
+        commune_code = self.cleaned_data.get("insee_commune_code")
 
         if commune_code:
             self.cleaned_data["birth_place"] = Commune.objects.current().by_insee_code(commune_code).first()
@@ -357,6 +357,7 @@ class NewEmployeeRecordStep4(forms.Form):
         self.fields["financial_annex"].queryset = convention.financial_annexes.filter(
             state__in=SiaeFinancialAnnex.STATES_ACTIVE
         )
+        self.fields["financial_annex"].initial = employee_record.financial_annex
 
     def clean(self):
         super().clean()

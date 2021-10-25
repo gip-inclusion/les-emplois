@@ -508,6 +508,43 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
 
         self.assertEqual("03", self.profile.ass_allocation_since)
 
+    def test_fail_step_3(self):
+        # If anything goes wrong during employee record creation,
+        # catch error / exceptions and display a message
+        self.pass_step_2()
+        url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
+        self.client.get(url)
+
+        # Correct data :
+        data = {
+            "education_level": "00",
+            # Factory user is registed to Pôle emploi: all fields must be filled
+            "pole_emploi_since": "02",
+            # "pole_emploi_id": "1234567X",
+            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi": True,
+        }
+
+        # but incorrect context :
+        # create another employee record with similar features
+        dup_job_application = JobApplicationWithApprovalNotCancellableFactory(
+            to_siae=self.siae,
+            job_seeker=self.job_seeker,
+            approval=self.job_application.approval,
+        )
+        dup_job_application.job_seeker.jobseeker_profile.education_level = "00"
+        dup_job_application.save()
+
+        employee_record = EmployeeRecord.from_job_application(dup_job_application)
+        employee_record.save()
+
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Il est impossible de créer cette fiche salarié pour la raison suivante",
+        )
+
 
 class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
     """
