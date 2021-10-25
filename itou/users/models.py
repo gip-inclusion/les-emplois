@@ -764,8 +764,11 @@ class JobSeekerProfile(models.Model):
         if self.previous_employer_kind and self.unemployed_since:
             raise ValidationError(self.ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD)
 
-        if bool(self.pole_emploi_since) != bool(self.user.pole_emploi_id):
-            raise ValidationError(self.ERROR_JOBSEEKER_PE_FIELDS)
+        # FIXME or kill me
+        # Seems to be the major source of 500 errors
+        # Not really needed here, check are done at form level
+        # if bool(self.pole_emploi_since) != bool(self.user.pole_emploi_id):
+        #   raise ValidationError(self.ERROR_JOBSEEKER_PE_FIELDS)
 
         # Social allowances fields are not mandatory
         # However we may add some coherence check later on

@@ -1,5 +1,59 @@
 # Journal des modifications
 
+## [29] - 2021-10-22
+
+### Ajouté
+
+- Import automatique du NIR à partir de données fournies par l'ASP pour une partie des demandeurs d'emploi (environ 50K)
+- Possibilité de passer des classes CSS arbitraires au composant `datepicker`
+- Script d'import du thème de l'inclusion permettant de réduire les opérations manuelles
+- Fiches salarié :
+    - Ajout d’une commande permettant de corriger les fiches salarié qui restaient en erreur sur le SFTP de l'ASP
+- Pilotage de l’inclusion :
+    - Ajout d'une colonne Metabase `candidats.type_inscription`
+    - Ajout de stats DREETS : chaque DREETS peut voir seulemement sa région
+    - Ajout de stats DGEFP : la DGEFP peut voir toutes les régions
+    - Ajout d'un contrôle de cohérence entre la date de naissance du salarié et les codes INSEE existant à cette période
+- Création d'un environnement de recette temporaire destiné aux tests d'intrusion avec des comptes utilisateurs spécifiques
+
+### Modifié
+
+- Rétabissement de la base de données de *staging* qui était cassée
+- Fiches salarié :
+    - Correction d'un bug possible lors de la reprise de données
+    - Le numéro de téléphone et l'email des candidats ne sont plus envoyés à l'ASP
+    - La taille du champ `EmployeeRecord.asp_processing_label` passe de `100` à `200` caractères
+    - Possibilité de saisir manuellement une adresse en cas de géolocalisation préalable imparfaite
+    - Corrections graphiques liées au changement du thème
+- Prévention de quelques erreurs de manipulation du support
+- Interface d’administration:
+    - Correctif pour un bug (erreur 500) qui empêchait la création de comptes demandeurs d'emploi quand `approvals_wrapper` était vide
+    - Possibilité de gérer les adhésions depuis la page admin des utilisateurs
+    - Un utilisateur ne peut avoir qu'un seul rôle à la fois parmi candidat, prescripteur, employeur ou inspecteur
+    - Un candidat ayant déjà un PASS IAE ne peut plus être converti en un autre rôle (prescripteur etc.)
+    - Ajout des droits pour que le *staff* puisse manipuler les institutions
+- Correction d’un test qui échouait aléatoirement à déterminer la meilleure cible de la fusion de doublons candidats (*Pull request* #931)
+- Résolution des problèmes de versions dans les machines créées à la volée en spécifiant explicitement la version de Python cible (*Pull request* #927)
+- Interface "Mes Annexes financières" (*Pull request* #909)
+    - On montre une AF par groupe d'AF avec le même préfixe
+    - Pour chaque groupe, on montre la plus pertinente (soit une AF active, soit une AF récente)
+- Pilotage de l’inclusion :
+    - Suppression de colonnes obsolètes `fluxIAE_Structure.itou_*`
+    - Suppression du rôle stats VIP
+    - Prévention d'une boucle d'import potentielle entre `User` et `Institution`
+    - Simplification des paramètres de `user.can_view_stats_*`
+    - Restriction des stats DDETS aux 4 départements d'expérimentation
+- Correctif pour `make test` qui ne permettait plus de spécifier la série spécifique de tests à réaliser
+- Affichage d’un texte à destination des SIAE concernant les fiches salariés
+- Affichage d’un texte pour préciser la fonction de l’import prolongation/suspension
+
+### Supprimé
+
+- Fiches salarié :
+    - Suppression des doublons dans la liste d'autocomplétion des communes INSEE
+- Suppression de la commande de management `fix_missing_job_applications_sender` qui corrigeait un problème de candidatures sans émetteur introduit par `deduplicate_job_seekers`
+- Suppression des avertissements dans la sortie des tests locaux et dans l'intégration continue
+
 ## [28] - 2021-10-08
 
 ### Ajouté

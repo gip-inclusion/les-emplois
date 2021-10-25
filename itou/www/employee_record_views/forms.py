@@ -91,6 +91,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
                 "max": DuetDatePickerWidget.max_birthdate(),
             }
         )
+        self.fields["birthdate"].widget.attrs = {"class": "js-period-date-input"}
 
         # Init ASP commune
         if self.instance.birth_place:
@@ -264,7 +265,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         super().clean()
 
         # Pôle emploi
-        if self.cleaned_data["pole_emploi"]:
+        if self.instance.user.pole_emploi_id:
             if not self.cleaned_data["pole_emploi_since"]:
                 raise forms.ValidationError("La durée d'inscription à Pôle emploi est obligatoire")
 
