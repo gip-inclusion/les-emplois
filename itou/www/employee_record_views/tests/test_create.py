@@ -3,7 +3,7 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.asp.models import Commune
+from itou.asp.models import Commune, Country
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
@@ -539,6 +539,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         dup_job_application.job_seeker.jobseeker_profile.education_level = "00"
         dup_job_application.job_seeker.jobseeker_profile.commune = commune
         dup_job_application.job_seeker.birth_place = commune
+        dup_job_application.job_seeker.birth_country = Country.objects.get(code=Country._CODE_FRANCE)
         dup_job_application.save()
 
         employee_record = EmployeeRecord.from_job_application(dup_job_application)
