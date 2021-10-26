@@ -138,8 +138,8 @@ class Approval(CommonApprovalMixin):
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
-    # The period of time during which it is possible to prolong a PASS IAE before it ends.
-    PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS = 3
+    # The period of time during which it is possible to prolong a PASS IAE.
+    IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS = 3
 
     # Error messages.
     ERROR_PASS_IAE_SUSPENDED_FOR_USER = (
@@ -229,6 +229,13 @@ class Approval(CommonApprovalMixin):
             return False
         return self.jobapplication_set.get().state == state_accepted
 
+    @cached_property
+    def is_last_for_user(self):
+        """
+        Returns True if the current Approval is the most recent for the user, False otherwise.
+        """
+        return self == self.user.approvals.order_by("start_at").last()
+
     # Suspension.
 
     @cached_property
@@ -285,14 +292,17 @@ class Approval(CommonApprovalMixin):
     @property
     def is_open_to_prolongation(self):
         now = timezone.now().date()
-        prolongation_threshold = self.end_at - relativedelta(
-            months=self.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS
-        )
-        return prolongation_threshold <= now <= self.end_at
+        lower_bound = self.end_at - relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS)
+        upper_bound = self.end_at + relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS)
+        return lower_bound <= now <= upper_bound
 
     @cached_property
     def can_be_prolonged(self):
-        return self.is_open_to_prolongation and not self.is_suspended
+        # Since it is possible to prolong even 3 months after the end of a PASS IAE,
+        # it is possible that another one has been issued in the meantime. Thus we
+        # have to ensure that the current PASS IAE is the most recent for the user
+        # before allowing a prolongation.
+        return self.is_last_for_user and self.is_open_to_prolongation and not self.is_suspended
 
     def can_be_prolonged_by_siae(self, siae):
         return self.user.last_hire_was_made_by_siae(siae) and self.can_be_prolonged
