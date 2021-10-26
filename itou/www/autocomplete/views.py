@@ -80,7 +80,7 @@ def communes_autocomplete(request):
     if term:
         communes = (
             Commune.objects.filter(start_date__lte=dt)
-            .filter((Q(end_date=None) & Q(start_date__lt=dt)) | (Q(end_date__gt=dt) & Q(start_date__lt=dt)))
+            .filter(Q(end_date=None) | Q(end_date__gt=dt))
             .annotate(similarity=TrigramSimilarity("name", term))
             .filter(similarity__gt=0.1)
             .order_by("-similarity")

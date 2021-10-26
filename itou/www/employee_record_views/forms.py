@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 
@@ -54,12 +53,6 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         "birth_country",
     ]
 
-    # FIXME:
-    # `data-period-date` class attribute should not be on this component
-    # but on `DuetDatePickerWidget`
-    # For the moment :
-    # - adding custom classes attrs via `widget.attrs` on datepicker does not work
-    # - keep using the autocomplete as "holder" of the period information
     insee_commune = forms.CharField(
         label="Commune de naissance",
         required=False,
@@ -100,21 +93,20 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
             ] = f"{self.instance.birth_place.name} ({self.instance.birth_place.department_code})"
             self.initial["insee_commune_code"] = self.instance.birth_place.code
 
-    def clean_insee_commune_code(self):
-        commune_code = self.cleaned_data.get("insee_commune_code")
-
-        if commune_code and not Commune.objects.current().by_insee_code(commune_code).exists():
-            raise ValidationError("Cette commune n'existe pas ou n'est pas référencée")
-
-        return commune_code
-
     def clean(self):
         super().clean()
 
         commune_code = self.cleaned_data.get("insee_commune_code")
+        birth_date = self.cleaned_data.get("birthdate")
 
-        if commune_code:
-            self.cleaned_data["birth_place"] = Commune.objects.current().by_insee_code(commune_code).first()
+        # Here we must add coherence between birthdate and communes
+        # existing at this period (not a simple check of existence)
+        birth_place = Commune.objects.by_insee_code_and_period(commune_code, birth_date).first()
+
+        if not birth_place:
+            raise forms.ValidationError("Cette commune n'existe pas ou n'est pas référencée")
+
+        self.cleaned_data["birth_place"] = birth_place
 
     class Meta:
         model = User
@@ -184,14 +176,14 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
         super().clean()
 
         if self.cleaned_data.get("hexa_std_extension") and not self.cleaned_data.get("hexa_lane_number"):
-            raise ValidationError("L'extension doit être saisie avec un numéro de voie")
+            raise forms.ValidationError("L'extension doit être saisie avec un numéro de voie")
 
         commune_code = self.cleaned_data.get("insee_commune_code")
         post_code = self.cleaned_data.get("hexa_post_code")
 
         # Check basic coherence between post-code and INSEE code:
         if post_code and commune_code and post_code[:2] != commune_code[:2]:
-            raise ValidationError("Le code postal ne correspond pas à la commune")
+            raise forms.ValidationError("Le code postal ne correspond pas à la commune")
 
         if commune_code:
             commune = Commune.objects.current().by_insee_code(commune_code).first()
