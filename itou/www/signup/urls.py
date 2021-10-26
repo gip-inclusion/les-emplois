@@ -18,14 +18,9 @@ urlpatterns = [
     ),
     # Prescriber.
     path(
-        "prescriber/is_pole_emploi",
-        views.prescriber_is_pole_emploi,
-        name="prescriber_is_pole_emploi",
-    ),
-    path(
-        "prescriber/siren",
-        views.prescriber_siren,
-        name="prescriber_siren",
+        "prescriber/check_already_exists",
+        views.prescriber_check_already_exists,
+        name="prescriber_check_already_exists",
     ),
     path(
         "prescriber/request_invitation/<int:membership_id>",
@@ -46,11 +41,6 @@ urlpatterns = [
         "prescriber/confirm_authorization",
         views.prescriber_confirm_authorization,
         name="prescriber_confirm_authorization",
-    ),
-    path(
-        "prescriber/siret",
-        views.prescriber_siret,
-        name="prescriber_siret",
     ),
     path(
         "prescriber/pole_emploi/safir",

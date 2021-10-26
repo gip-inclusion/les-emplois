@@ -21,7 +21,10 @@
         {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">Envoyer la demande</button>
+            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
+                Retour
+            </a>
+            <button type="submit" class="btn btn-primary">Valider la demande</button>
         {% endbuttons %}
     </form>
 {% endblock %}

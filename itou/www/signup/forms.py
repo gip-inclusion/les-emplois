@@ -3,7 +3,9 @@ from django import forms
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.utils.http import urlsafe_base64_decode
+from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -210,27 +212,15 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
 # ------------------------------------------------------------------------------------------
 
 
-class PrescriberIsPoleEmploiForm(forms.Form):
+class PrescriberCheckAlreadyExistsForm(forms.Form):
 
-    IS_POLE_EMPLOI_CHOICES = (
-        (1, "Oui"),
-        (0, "Non"),
-    )
-
-    is_pole_emploi = forms.TypedChoiceField(
-        label="Travaillez-vous pour Pôle emploi ?",
-        choices=IS_POLE_EMPLOI_CHOICES,
-        widget=forms.RadioSelect,
-        coerce=int,
-    )
-
-
-class PrescriberSirenForm(forms.Form):
-
-    siren = forms.CharField(
-        label="Numéro SIREN de votre organisation",
-        min_length=9,
-        help_text="Le numéro SIREN contient 9 chiffres.",
+    siret = forms.CharField(
+        label="Numéro de SIRET de votre organisation",
+        min_length=14,
+        help_text=mark_safe(
+            "Retrouvez facilement votre numéro SIRET à partir du nom de votre organisation sur le site "
+            '<a href="https://sirene.fr/" rel="noopener" target="_blank">sirene.fr</a>'
+        ),
     )
 
     department = forms.ChoiceField(
@@ -238,100 +228,10 @@ class PrescriberSirenForm(forms.Form):
         choices=DEPARTMENTS.items(),
     )
 
-    def clean_siren(self):
+    def clean_siret(self):
         # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
-        siren = self.cleaned_data["siren"].replace(" ", "")
-        validate_siren(siren)
-        return siren
-
-
-class PrescriberRequestInvitationForm(FullnameFormMixin):
-    email = forms.EmailField(
-        label="E-mail",
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "type": "email",
-                "placeholder": "jeandupont@exemple.com",
-                "autocomplete": "off",
-            }
-        ),
-    )
-
-
-class PrescriberChooseOrgKindForm(forms.Form):
-
-    kind = forms.ChoiceField(
-        label="Pour qui travaillez-vous ?",
-        widget=forms.RadioSelect,
-        choices=PrescriberOrganization.Kind.choices,
-    )
-
-
-class PrescriberChooseKindForm(forms.Form):
-
-    KIND_AUTHORIZED_ORG = "authorized_org"
-    KIND_UNAUTHORIZED_ORG = "unauthorized_org"
-
-    KIND_CHOICES = (
-        (KIND_AUTHORIZED_ORG, "Pour une organisation habilitée par le Préfet"),
-        (KIND_UNAUTHORIZED_ORG, "Pour une organisation non-habilitée"),
-    )
-
-    kind = forms.ChoiceField(
-        label="Pour qui travaillez-vous ?",
-        choices=KIND_CHOICES,
-        widget=forms.RadioSelect,
-    )
-
-
-class PrescriberConfirmAuthorizationForm(forms.Form):
-
-    CONFIRM_AUTHORIZATION_CHOICES = (
-        (1, "Oui, je confirme que mon organisation est habilitée par le Préfet"),
-        (0, "Non, mon organisation n’est pas habilitée par le Préfet"),
-    )
-
-    confirm_authorization = forms.TypedChoiceField(
-        label="Votre habilitation est-elle officialisée par arrêté préfectoral ?",
-        choices=CONFIRM_AUTHORIZATION_CHOICES,
-        widget=forms.RadioSelect,
-        coerce=int,
-    )
-
-
-class PrescriberSiretForm(forms.Form):
-    """
-    Retrieve info about an organization from a given SIRET.
-    """
-
-    def __init__(self, kind, siren, **kwargs):
-        # We need the kind of the SIAE to check constraint on SIRET number
-        self.kind = kind
-        self.siren = siren
-        self.org_data = None
-        super().__init__(**kwargs)
-
-    # On rendering, the SIREN is displayed just before this input
-    partial_siret = forms.CharField(label="Numéro SIRET de votre organisation", min_length=5, max_length=5)
-
-    def clean_partial_siret(self):
-        siret = self.siren + self.cleaned_data["partial_siret"]
-
+        siret = self.cleaned_data["siret"].replace(" ", "")
         validate_siret(siret)
-
-        # Does an org with this SIRET already exist?
-        org = PrescriberOrganization.objects.filter(siret=siret, kind=self.kind).first()
-        if org:
-            error = f"« {org.display_name} » utilise déjà ce SIRET."
-            admin = org.get_admins().first()
-            if admin:
-                error += (
-                    f" "
-                    f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
-                    f"{admin.first_name.title()} {admin.last_name[0].upper()}."
-                )
-            raise forms.ValidationError(error)
 
         # Fetch name and address from API entreprise.
         etablissement, error = etablissement_get_or_error(siret)
@@ -367,6 +267,84 @@ class PrescriberSiretForm(forms.Form):
         }
 
         return siret
+
+
+class PrescriberRequestInvitationForm(FullnameFormMixin):
+    email = forms.EmailField(
+        label="E-mail",
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "placeholder": "jeandupont@exemple.com",
+                "autocomplete": "off",
+            }
+        ),
+    )
+
+
+class PrescriberChooseOrgKindForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.siret = kwargs.pop("siret")
+        super().__init__(*args, **kwargs)
+
+    kind = forms.ChoiceField(
+        label="Pour qui travaillez-vous ?",
+        widget=forms.RadioSelect,
+        choices=PrescriberOrganization.Kind.choices,
+    )
+
+    def clean_kind(self):
+        # Check if the couple "type / siret" already exist
+        kind = self.cleaned_data["kind"]
+        org = PrescriberOrganization.objects.filter(siret=self.siret, kind=kind).first()
+        if org:
+            error = f"« {org.display_name} » utilise déjà ce type d'organisation avec le même SIRET ({self.siret})."
+            # Get the first member to display their name and the link to the invitation request
+            member = org.prescribermembership_set.first()
+            if member:
+                url = reverse("signup:prescriber_request_invitation", args=[member.id])
+                error += (
+                    f" "
+                    f"Pour rejoindre cette organisation, vous devez obtenir une invitation de : "
+                    f"{member.user.first_name.title()} {member.user.last_name[0].upper()}."
+                    f" "
+                    f'<a href="{url}">Demander une invitation</a>'
+                )
+            raise forms.ValidationError(mark_safe(error))
+        return kind
+
+
+class PrescriberChooseKindForm(forms.Form):
+
+    KIND_AUTHORIZED_ORG = "authorized_org"
+    KIND_UNAUTHORIZED_ORG = "unauthorized_org"
+
+    KIND_CHOICES = (
+        (KIND_AUTHORIZED_ORG, "Pour une organisation habilitée par le Préfet"),
+        (KIND_UNAUTHORIZED_ORG, "Pour une organisation non-habilitée"),
+    )
+
+    kind = forms.ChoiceField(
+        label="Pour qui travaillez-vous ?",
+        choices=KIND_CHOICES,
+        widget=forms.RadioSelect,
+    )
+
+
+class PrescriberConfirmAuthorizationForm(forms.Form):
+
+    CONFIRM_AUTHORIZATION_CHOICES = (
+        (1, "Oui, je confirme que mon organisation est habilitée par le Préfet"),
+        (0, "Non, mon organisation n’est pas habilitée par le Préfet"),
+    )
+
+    confirm_authorization = forms.TypedChoiceField(
+        label="Votre habilitation est-elle officialisée par arrêté préfectoral ?",
+        choices=CONFIRM_AUTHORIZATION_CHOICES,
+        widget=forms.RadioSelect,
+        coerce=int,
+    )
 
 
 class PrescriberPoleEmploiSafirCodeForm(forms.Form):
