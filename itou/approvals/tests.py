@@ -308,6 +308,23 @@ class ApprovalModelTest(TestCase):
         expected = "99999 00 00001"
         self.assertEqual(approval.number_with_spaces, expected)
 
+    def test_is_last_for_user(self):
+
+        user = JobSeekerFactory()
+
+        # Ended 1 year ago.
+        end_at = timezone.now().date() - relativedelta(years=1)
+        start_at = end_at - relativedelta(years=2)
+        approval1 = ApprovalFactory(start_at=start_at, end_at=end_at, user=user)
+
+        # Start today, end in 2 years.
+        start_at = timezone.now().date()
+        end_at = start_at + relativedelta(years=2)
+        approval2 = ApprovalFactory(start_at=start_at, end_at=end_at, user=user)
+
+        self.assertFalse(approval1.is_last_for_user)
+        self.assertTrue(approval2.is_last_for_user)
+
     def test_is_open_to_prolongation(self):
 
         today = timezone.now().date()

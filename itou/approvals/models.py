@@ -229,6 +229,13 @@ class Approval(CommonApprovalMixin):
             return False
         return self.jobapplication_set.get().state == state_accepted
 
+    @cached_property
+    def is_last_for_user(self):
+        """
+        Returns True if the current Approval is the most recent for the user, False otherwise.
+        """
+        return self == self.user.approvals.order_by("start_at").last()
+
     # Suspension.
 
     @cached_property
@@ -245,7 +252,7 @@ class Approval(CommonApprovalMixin):
 
     @cached_property
     def can_be_suspended(self):
-        return self.is_in_progress and not self.is_suspended
+        return self.is_last_for_user and self.is_in_progress and not self.is_suspended
 
     def can_be_suspended_by_siae(self, siae):
         return (
@@ -291,7 +298,7 @@ class Approval(CommonApprovalMixin):
 
     @cached_property
     def can_be_prolonged(self):
-        return self.is_open_to_prolongation and not self.is_suspended
+        return self.is_last_for_user and self.is_open_to_prolongation and not self.is_suspended
 
     def can_be_prolonged_by_siae(self, siae):
         return self.user.last_hire_was_made_by_siae(siae) and self.can_be_prolonged
