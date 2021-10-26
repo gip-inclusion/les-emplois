@@ -252,7 +252,7 @@ class Approval(CommonApprovalMixin):
 
     @cached_property
     def can_be_suspended(self):
-        return self.is_last_for_user and self.is_in_progress and not self.is_suspended
+        return self.is_in_progress and not self.is_suspended
 
     def can_be_suspended_by_siae(self, siae):
         return (
@@ -298,6 +298,10 @@ class Approval(CommonApprovalMixin):
 
     @cached_property
     def can_be_prolonged(self):
+        # Since it is possible to prolong even 3 months after the end of a PASS IAE,
+        # it is possible that another one has been issued in the meantime. Thus we
+        # have to ensure that the current PASS IAE is the most recent for the user
+        # before allowing a prolongation.
         return self.is_last_for_user and self.is_open_to_prolongation and not self.is_suspended
 
     def can_be_prolonged_by_siae(self, siae):
