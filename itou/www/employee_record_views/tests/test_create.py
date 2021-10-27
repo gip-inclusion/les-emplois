@@ -198,6 +198,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         # Set a "random" commune in France
         data["insee_commune_code"] = 67152
         response = self.client.post(self.url, data=data)
+
         self.assertEqual(302, response.status_code)
 
         # Set a country different from France
