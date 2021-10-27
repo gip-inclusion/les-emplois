@@ -19,6 +19,7 @@ from itou.approvals.models import ApprovalsWrapper
 from itou.asp.models import (
     AllocationDuration,
     Commune,
+    Country,
     EducationLevel,
     EmployerType,
     LaneExtension,
@@ -147,7 +148,7 @@ class User(AbstractUser, AddressMixin):
     """
 
     # Used for validation of birth country / place
-    INSEE_CODE_FRANCE = "100"
+    INSEE_CODE_FRANCE = Country._CODE_FRANCE
 
     REASON_FORGOTTEN = "FORGOTTEN"
     REASON_NOT_REGISTERED = "NOT_REGISTERED"
@@ -270,9 +271,7 @@ class User(AbstractUser, AddressMixin):
     def clean(self):
         """
         Validation for FS
-
         Mainly coherence checks for birth country / place.
-
         Must be non blocking if these fields are not provided.
         """
         # If birth country is France, then birth place must be provided

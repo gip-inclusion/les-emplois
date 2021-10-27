@@ -1,5 +1,4 @@
 /*
-
 L'objectif est de retravailler les variables de la table fluxIAE_AnnexeFinanciere: 
     
     - extraire le numéro du département à partir du numéro de l'annexe financière, selon le dictionnaire des données ASP le numéro de l'annexe financière 
@@ -60,6 +59,15 @@ with "AnnexeFinanciere_v1" as (
                 then 
                     substring(
                         trim(af_numero_annexe_financiere_v4) from 2 for 2
+                    )
+                /* Gérer les numéros d'annexes financières du département 59 exemple ACI59VXX2010 */  
+                when 
+                    substring(
+                        trim(af_numero_annexe_financiere_v4) from 1 for 2
+                    ) = '59' 
+                then 
+                    substring(
+                        trim(af_numero_annexe_financiere_v4) from 1 for 2
                     )
                 /* Exemple pour ACI971160010 on récupère 971, pour un numéro de département qui ne commence pas par 0 
                 on garde les 3 caractères du af_numero_annexe_financiere_v4 */
