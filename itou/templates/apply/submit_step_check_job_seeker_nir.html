@@ -1,0 +1,103 @@
+{% extends "apply/submit_base_two_columns.html" %}
+{% load bootstrap4 %}
+{% load static %}
+{% load format_filters %}
+
+{% block title %}Postuler{{ block.super }}{% endblock %}
+
+{% block right_column %}
+    <form method="post" action="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="js-prevent-multiple-submit js-format-nir">
+
+        {% csrf_token %}
+
+        {% bootstrap_form_errors form type="all" %}
+
+        {% bootstrap_form form %}
+
+        {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+        {% endif %}
+
+        {% if form.errors %}
+            <div class="alert alert-info">
+                Vous possédez un numéro de sécurité sociale temporaire ? 
+                <button
+                    type="submit" name="skip" value="1"
+                    class="btn btn-link p-0 matomo-event"
+                    data-matomo-category="nir-temporaire"
+                    data-matomo-action="etape-suivante"
+                    data-matomo-option="candidature">
+                    Cliquez ici pour accéder à l'étape suivante.
+                </button>
+                </div>
+        {% endif %}
+
+        {% buttons %}
+            {# Reload this page and show a modal containing more information about the job seeker. #}
+            <button type="submit" name="preview" value="1" class="btn btn-primary">
+                Continuer
+            </button>
+        {% endbuttons %}
+
+        {% if preview_mode %}
+            <!-- Modal -->
+            <div class="modal" id="nir-confirmation-modal" tabindex="-1" aria-labelledby="nir-confirmation-label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="nir-confirmation-label">Utilisateur trouvé</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Le numéro {{ form.nir.value|format_nir }} est associé au compte de <b>{{ job_seeker_name }}</b>.</p>
+                            <p>
+                                Si cette candidature n'est pas pour <b>{{ job_seeker_name }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            {% buttons %}
+                                {# Reload this page with a new form. #}
+                                <button type="submit" name="cancel" value="1" class="btn btn-secondary">
+                                    Ce n'est pas mon candidat
+                                </button>
+                                {# Go to the next step. #}
+                                <button type="submit" name="confirm" value="1" class="btn btn-primary">
+                                    Continuer
+                                </button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    </form>
+    <p class="mt-5">
+        {% if request.user.is_job_seeker %}
+            Vous n'avez pas de numéro de sécurité sociale ?<br>
+        {% else %}
+            Le candidat n'a pas de numéro de sécurité sociale ?<br>
+        {% endif %}
+        <a href="https://www.ameli.fr/vosges/assure/remboursements/etre-bien-rembourse/carte-vitale"rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">ameli.fr {% include "includes/icon.html" with icon="external-link" %}</a>, le site de l'assurance maladie, vous explique comment l'obtenir.
+    </p>
+{% endblock %}
+
+{% block left_column %}
+    <h2 class="ff-extra-01">Où trouver {% if request.user.is_job_seeker %}mon{% else %}le{% endif %} numéro de sécurité sociale ?</h2>
+    <img class="mt-5 img-fluid" src="{% static 'img/carte_vitale.png' %}">
+    <p class="ff-extra-01 mt-0">Il est présent à cet endroit sur {% if request.user.is_job_seeker %}votre{% else %}la{% endif %} carte Vitale.</p>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/split_nir.js' %}"></script>
+    {% if preview_mode %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script type="text/javascript">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            $("#nir-confirmation-modal").modal("show");
+        </script>
+    {% endif %}
+{% endblock script %}

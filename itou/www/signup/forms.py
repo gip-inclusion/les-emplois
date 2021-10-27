@@ -15,7 +15,7 @@ from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.validators import validate_code_safir, validate_siren, validate_siret
+from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
 
 
 BLANK_CHOICE = (("", "---------"),)
@@ -35,6 +35,28 @@ class FullnameFormMixin(forms.Form):
         required=True,
         strip=True,
     )
+
+
+class JobSeekerNirForm(forms.Form):
+    nir = forms.CharField(
+        label="Numéro de sécurité sociale",
+        required=True,
+        max_length=21,  # 15 + 6 white spaces
+        strip=True,
+        validators=[validate_nir],
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "2 69 05 49 588 157 80",
+            }
+        ),
+    )
+
+    def clean_nir(self):
+        nir = self.cleaned_data["nir"].replace(" ", "")
+        user_exists = User.objects.filter(nir=nir).exists()
+        if user_exists:
+            raise ValidationError("Un compte avec ce numéro existe déjà.")
+        return nir
 
 
 class JobSeekerSituationForm(forms.Form):
@@ -62,9 +84,20 @@ class JobSeekerSituationForm(forms.Form):
 
 
 class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
-    def __init__(self, *args, **kwargs):
+    nir = forms.CharField(disabled=True, required=False, label="Numéro de sécurité sociale")
+
+    def __init__(self, nir, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.nir = nir
+        self.fields["nir"].initial = self.nir
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
+        for password_field in [self.fields["password1"], self.fields["password2"]]:
+            password_field.widget.attrs["placeholder"] = "**********"
+        self.fields["email"].widget.attrs["placeholder"] = "adresse@email.fr"
+        self.fields["email"].label = "Adresse e-mail"
+        self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
+        self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
 
     def clean_email(self):
         email = super().clean_email()
@@ -76,13 +109,19 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         # Avoid django-allauth to call its own often failing `generate_unique_username`
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
-        # Create the user.
 
+        # Create the user.
         user = super().save(request)
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
         user.is_job_seeker = True
+        if self.nir:
+            user.nir = self.nir
+
         user.save()
+
+        if self.nir:
+            del request.session[settings.ITOU_SESSION_NIR_KEY]
 
         return user
 

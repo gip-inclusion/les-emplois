@@ -24,12 +24,26 @@ from itou.utils.storage.s3 import S3Upload
 
 
 class ApplyAsJobSeekerTest(TestCase):
+    @property
+    def default_session_data(self):
+        return {
+            "back_url": None,
+            "job_seeker_pk": None,
+            "nir": None,
+            "to_siae_pk": None,
+            "sender_pk": None,
+            "sender_kind": None,
+            "sender_siae_pk": None,
+            "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
+        }
+
     def test_apply_as_jobseeker(self):
         """Apply as jobseeker."""
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        user = JobSeekerFactory(birthdate=None)
+        user = JobSeekerFactory(birthdate=None, nir="")
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
         # Entry point.
@@ -41,15 +55,8 @@ class ApplyAsJobSeekerTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
-            "sender_pk": None,
-            "sender_kind": None,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -64,38 +71,38 @@ class ApplyAsJobSeekerTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
-        # Step determine the job seeker.
+        # Step check job seeker NIR.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        nir = "141068078200557"
+        post_data = {"nir": nir, "confirm": 1}
+
+        response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
+
+        user = User.objects.get(pk=user.pk)
+        self.assertEqual(user.nir, nir)
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
+        expected_session_data = self.default_session_data | {
             "job_seeker_pk": user.pk,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -182,6 +189,60 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.resume_link, post_data["resume_link"])
 
+    def test_apply_as_job_seeker_temporary_nir(self):
+        """
+        Full path is tested above. See test_apply_as_job_seeker.
+        """
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+
+        user = JobSeekerFactory(nir="")
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        # Entry point.
+        # ----------------------------------------------------------------------
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+
+        # Follow all redirections until NIR.
+        # ----------------------------------------------------------------------
+        nir = "123456789KLOIU"
+        post_data = {"nir": nir}
+
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["form"].is_valid())
+
+        # Temporary number should be skipped.
+        post_data = {"nir": nir, "skip": 1}
+        response = self.client.post(next_url, data=post_data, follow=True)
+        last_url = response.redirect_chain[-1][0]
+        expected_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(last_url, expected_url)
+        self.assertEqual(response.status_code, 200)
+
+        # Step application.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(last_url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "selected_jobs": [siae.job_description_through.first().pk],
+            "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rocky-balboa.pdf",
+        }
+        response = self.client.post(last_url, data=post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        last_url = response.redirect_chain[-1][0]
+        next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(last_url, next_url)
+        user.refresh_from_db()
+        self.assertFalse(user.nir)
+
     def test_apply_as_jobseeker_to_siae_with_approval_in_waiting_period(self):
         """
         Apply as jobseeker to a SIAE (not a GEIQ) with an approval in waiting period.
@@ -219,6 +280,20 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         create_test_cities(["57"], num_per_department=1)
         self.city = City.objects.first()
 
+    @property
+    def default_session_data(self):
+        return {
+            "back_url": None,
+            "job_seeker_pk": None,
+            "nir": None,
+            "to_siae_pk": None,
+            "sender_pk": None,
+            "sender_kind": None,
+            "sender_siae_pk": None,
+            "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
+        }
+
     def test_apply_as_authorized_prescriber(self):
         """Apply as authorized prescriber."""
 
@@ -237,15 +312,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
-            "sender_pk": None,
-            "sender_kind": None,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -260,22 +328,41 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
-            "sender_siae_pk": None,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
+
+        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        # Step determine the job seeker with a NIR.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        nir = "141068078200557"
+        post_data = {"nir": nir, "confirm": 1}
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        session = self.client.session
+        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        expected_session_data = self.default_session_data | {
+            "nir": nir,
+            "to_siae_pk": siae.pk,
+            "sender_pk": user.pk,
+            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
+            "sender_prescriber_organization_pk": prescriber_organization.pk,
+        }
 
         next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
-        # Step determine the job seeker.
+        # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
@@ -314,15 +401,13 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
+        expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
+            "nir": new_job_seeker.nir,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
-            "sender_siae_pk": None,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -401,10 +486,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
-        post_data = {"email": job_seeker.email, "save": "1"}
+        post_data = {"nir": job_seeker.nir, "confirm": 1}
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the eligibility step which should trigger a 200 OK.
@@ -420,6 +505,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
         user = prescriber_organization.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        job_seeker = JobSeekerFactory()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -430,15 +516,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
-            "sender_pk": None,
-            "sender_kind": None,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -453,19 +532,15 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
-            "sender_siae_pk": None,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step determine the job seeker.
@@ -474,69 +549,30 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
+        post_data = {"nir": job_seeker.nir, "confirm": 1}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
-        args = urlencode({"email": post_data["email"]})
-        self.assertEqual(response.url, f"{next_url}?{args}")
-
-        # Step create a job seeker.
-        # ----------------------------------------------------------------------
-
-        response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
-
-        post_data = {
-            "email": "new.job.seeker@test.com",
-            "first_name": "John",
-            "last_name": "Doe",
-            "birthdate": "20/12/1978",
-            "phone": "0610200305",
-            "pole_emploi_id": "12345678",
-            "address_line_1": "36, rue du 6 Mai 1956",
-            "post_code": self.city.post_codes[0],
-            "city": self.city.name,
-            "city_slug": self.city.slug,
-        }
-        response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
-        new_job_seeker = User.objects.get(email=post_data["email"])
-
-        session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": new_job_seeker.pk,
-            "to_siae_pk": siae.pk,
-            "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": prescriber_organization.pk,
-            "job_description_id": None,
-        }
-        self.assertDictEqual(session_data, expected_session_data)
-
-        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step eligibility (not required when applying to a GEIQ).
         # ----------------------------------------------------------------------
 
-        response = self.client.post(next_url)
-        self.assertEqual(response.status_code, 302)
+        # Follow all redirections…
+        response = self.client.post(next_url, follow=True)
+        self.assertEqual(response.status_code, 200)
 
-        self.assertFalse(EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae))
+        self.assertFalse(EligibilityDiagnosis.objects.has_considered_valid(job_seeker, for_siae=siae))
 
-        next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        # …until it hits the job application page.
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("apply:step_application", kwargs={"siae_pk": siae.pk}))
 
         # Step application.
         # ----------------------------------------------------------------------
 
-        response = self.client.get(next_url)
+        response = self.client.get(last_url)
         self.assertEqual(response.status_code, 200)
 
         post_data = {
@@ -544,13 +580,13 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "resume_link": "https://server.com/rockie-balboa.pdf",
         }
-        response = self.client.post(next_url, data=post_data)
+        response = self.client.post(last_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
         next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
-        job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
+        job_application = JobApplication.objects.get(job_seeker=job_seeker, sender=user, to_siae=siae)
         self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
         self.assertEqual(job_application.sender_siae, None)
         self.assertEqual(job_application.sender_prescriber_organization, prescriber_organization)
@@ -566,6 +602,20 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 class ApplyAsPrescriberTest(TestCase):
     def setUp(self):
         create_test_cities(["67"], num_per_department=10)
+
+    @property
+    def default_session_data(self):
+        return {
+            "back_url": None,
+            "job_seeker_pk": None,
+            "nir": None,
+            "to_siae_pk": None,
+            "sender_pk": None,
+            "sender_kind": None,
+            "sender_siae_pk": None,
+            "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
+        }
 
     def test_apply_as_prescriber(self):
         """Apply as prescriber."""
@@ -584,15 +634,8 @@ class ApplyAsPrescriberTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
-            "sender_pk": None,
-            "sender_kind": None,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -607,22 +650,39 @@ class ApplyAsPrescriberTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
+
+        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        # Step determine the job seeker with a NIR.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        nir = "141068078200557"
+        post_data = {"nir": nir, "confirm": 1}
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        session = self.client.session
+        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        expected_session_data = self.default_session_data | {
+            "nir": nir,
+            "to_siae_pk": siae.pk,
+            "sender_pk": user.pk,
+            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
+        }
 
         next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
-        # Step determine the job seeker.
+        # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
@@ -663,15 +723,12 @@ class ApplyAsPrescriberTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
+        expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
+            "nir": new_job_seeker.nir,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -739,10 +796,10 @@ class ApplyAsPrescriberTest(TestCase):
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
-        post_data = {"email": job_seeker.email, "save": "1"}
+        post_data = {"nir": job_seeker.nir, "confirm": 1}
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the expected 403.
@@ -752,10 +809,104 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
 
+class ApplyAsPrescriberNirExceptionsTest(TestCase):
+    """
+    The following normal use cases are tested in tests above:
+        - job seeker creation,
+        - job seeker found with a unique NIR.
+    But, for historical reasons, our database is not perfectly clean.
+    Some job seekers share the same NIR as the historical unique key was the e-mail address.
+    Or the NIR is not found because their account was created before
+    we added this possibility.
+    """
+
+    def create_test_data(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        # Only authorized prescribers can add a NIR.
+        # See User.can_add_nir
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
+        user = prescriber_organization.members.first()
+        return siae, user
+
+    def test_one_account_no_nir(self):
+        """
+        No account with this NIR is found.
+        A search by email is proposed.
+        An account is found for this email.
+        This NIR account is empty.
+        An update is expected.
+        """
+        job_seeker = JobSeekerFactory(nir="")
+        # Create an approval to bypass the eligibility diagnosis step.
+        PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
+        siae, user = self.create_test_data()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+
+        # Follow all redirections…
+        response = self.client.get(url, follow=True)
+
+        # …until a job seeker has to be determined.
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
+
+        # Enter an a non-existing NIR.
+        # ----------------------------------------------------------------------
+        nir = "141068078200557"
+        post_data = {"nir": nir, "confirm": 1}
+        response = self.client.post(last_url, data=post_data)
+        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        self.assertRedirects(response, next_url)
+
+        # Enter an existing email.
+        # ----------------------------------------------------------------------
+        post_data = {"email": job_seeker.email, "save": "1"}
+        response = self.client.post(next_url, data=post_data)
+        next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
+        self.assertRedirects(response, next_url, target_status_code=302)
+
+        # Follow all redirections until the end.
+        # ----------------------------------------------------------------------
+        response = self.client.get(next_url, follow=True)
+        self.assertTrue(response.status_code, 200)
+
+        next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
+        post_data = {
+            "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
+            "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rockie-balboa.pdf",
+        }
+        response = self.client.post(next_url, data=post_data, follow=True)
+        expected_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(expected_url, last_url)
+
+        # Make sure the job seeker NIR is now filled in.
+        # ----------------------------------------------------------------------
+        job_seeker.refresh_from_db()
+        self.assertEqual(job_seeker.nir, nir)
+
+
 class ApplyAsSiaeTest(TestCase):
     def setUp(self):
         create_test_cities(["57"], num_per_department=1)
         self.city = City.objects.first()
+
+    @property
+    def default_session_data(self):
+        return {
+            "back_url": None,
+            "job_seeker_pk": None,
+            "nir": None,
+            "to_siae_pk": None,
+            "sender_pk": None,
+            "sender_kind": None,
+            "sender_siae_pk": None,
+            "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
+        }
 
     def test_perms_for_siae(self):
         """An SIAE can postulate only for itself."""
@@ -786,15 +937,8 @@ class ApplyAsSiaeTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
-            "sender_pk": None,
-            "sender_kind": None,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -809,22 +953,41 @@ class ApplyAsSiaeTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
-            "job_seeker_pk": None,
+        expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
             "sender_siae_pk": siae.pk,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
+
+        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        # Step determine the job seeker with a NIR.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        nir = "141068078200557"
+        post_data = {"nir": nir, "confirm": 1}
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        session = self.client.session
+        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        expected_session_data = self.default_session_data | {
+            "nir": nir,
+            "to_siae_pk": siae.pk,
+            "sender_pk": user.pk,
+            "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
+            "sender_siae_pk": siae.pk,
+        }
 
         next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
-        # Step determine the job seeker.
+        # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
@@ -863,15 +1026,13 @@ class ApplyAsSiaeTest(TestCase):
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-        expected_session_data = {
-            "back_url": None,
+        expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
+            "nir": new_job_seeker.nir,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
             "sender_siae_pk": siae.pk,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -939,10 +1100,13 @@ class ApplyAsSiaeTest(TestCase):
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
-        post_data = {"email": job_seeker.email, "save": "1"}
+        post_data = {
+            "nir": job_seeker.nir,
+            "confirm": 1,
+        }
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the expected 403.

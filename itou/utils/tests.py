@@ -426,6 +426,10 @@ class UtilsTemplateFiltersTestCase(TestCase):
         # SIRET
         self.assertEqual(format_filters.format_siret("12345678912345"), "123 456 789 12345")
 
+    def test_format_nir(self):
+        self.assertEqual(format_filters.format_nir("141068078200557"), "1 41 06 80 782 005 57")
+        self.assertEqual(format_filters.format_nir(" 1 41 06 80 782 005 57"), "1 41 06 80 782 005 57")
+
 
 class UtilsEmailsTestCase(TestCase):
     def test_get_safe_url(self):

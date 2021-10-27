@@ -200,6 +200,7 @@ class ItouUserAdmin(UserAdmin):
                     "is_prescriber",
                     "is_siae_staff",
                     "is_labor_inspector",
+                    "nir",
                     "pole_emploi_id",
                     "lack_of_pole_emploi_id_reason",
                     "created_by",

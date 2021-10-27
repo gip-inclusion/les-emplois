@@ -4,7 +4,7 @@
    "pk": 1,
    "fields": {
       "password": "pbkdf2_sha256$260000$7SMYXy9OTGSwYOs5myl9bP$GVwB+ayk8qAxkWOmP62sO+qGm1qyzivafdADRDip2/w=",
-      "last_login": "2021-07-13T09:46:55.391Z",
+      "last_login": "2021-10-07T15:28:36.090Z",
       "is_superuser": true,
       "username": "admin",
       "first_name": "",
@@ -29,11 +29,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -43,7 +45,7 @@
    "pk": 2,
    "fields": {
       "password": "pbkdf2_sha256$180000$mHdniX493cNN$FOJpI9iZuU9OhmH2AF4OMUaVCjlwA9TN9OOSwdfqCn0=",
-      "last_login": "2020-04-14T16:16:29.532Z",
+      "last_login": "2020-04-14T16:16:29Z",
       "is_superuser": false,
       "username": "test+de@inclusion.beta.gouv.fr",
       "first_name": "Jacques",
@@ -68,11 +70,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "190031398700953",
       "pole_emploi_id": "7654321A",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -107,11 +111,13 @@
       "is_prescriber": true,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -146,11 +152,13 @@
       "is_prescriber": false,
       "is_siae_staff": true,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -185,11 +193,13 @@
       "is_prescriber": true,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -224,11 +234,13 @@
       "is_prescriber": false,
       "is_siae_staff": true,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -263,11 +275,13 @@
       "is_prescriber": true,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -302,11 +316,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "278071494782047",
       "pole_emploi_id": "1234567U",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -341,11 +357,13 @@
       "is_prescriber": false,
       "is_siae_staff": true,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -380,11 +398,13 @@
       "is_prescriber": true,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -419,11 +439,13 @@
       "is_prescriber": true,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -458,11 +480,13 @@
       "is_prescriber": true,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -497,11 +521,13 @@
       "is_prescriber": true,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -536,11 +562,13 @@
       "is_prescriber": true,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -575,11 +603,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "67188457",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 6,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -614,11 +644,13 @@
       "is_prescriber": false,
       "is_siae_staff": true,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -653,11 +685,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "NOT_REGISTERED",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -692,11 +726,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "NOT_REGISTERED",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -731,11 +767,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "NOT_REGISTERED",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -770,11 +808,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "NOT_REGISTERED",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -809,11 +849,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": false,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "NOT_REGISTERED",
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }
@@ -848,11 +890,13 @@
       "is_prescriber": false,
       "is_siae_staff": false,
       "is_labor_inspector": true,
+      "nir": "",
       "pole_emploi_id": "",
       "lack_of_pole_emploi_id_reason": "",
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
+      "provider_json": null,
       "groups": [],
       "user_permissions": []
    }

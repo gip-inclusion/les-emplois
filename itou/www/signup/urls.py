@@ -10,6 +10,7 @@ app_name = "signup"
 urlpatterns = [
     # Job seeker.
     path("job_seeker", views.JobSeekerSignupView.as_view(), name="job_seeker"),
+    path("job_seeker/nir", views.job_seeker_nir, name="job_seeker_nir"),
     path("job_seeker/situation", views.job_seeker_situation, name="job_seeker_situation"),
     path(
         "job_seeker/situation_not_eligible",

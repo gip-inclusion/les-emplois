@@ -26,7 +26,7 @@ from itou.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
@@ -400,6 +400,24 @@ class ModelTest(TestCase):
         job_seeker = JobSeekerFactory(created_by=user)
         job_seeker.emailaddress_set.create(email=job_seeker.email, verified=True)
         self.assertFalse(user.can_edit_email(job_seeker))
+
+    def test_can_add_nir(self):
+        siae = SiaeWithMembershipFactory()
+        siae_staff = siae.members.first()
+        prescriber_org = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        authorized_prescriber = prescriber_org.members.first()
+        unauthorized_prescriber = PrescriberFactory()
+        job_seeker_no_nir = JobSeekerFactory(nir="")
+        job_seeker_with_nir = JobSeekerFactory()
+
+        self.assertTrue(authorized_prescriber.can_add_nir(job_seeker_no_nir))
+        self.assertFalse(unauthorized_prescriber.can_add_nir(job_seeker_no_nir))
+        self.assertTrue(siae_staff.can_add_nir(job_seeker_no_nir))
+        self.assertFalse(authorized_prescriber.can_add_nir(job_seeker_with_nir))
+
+    def test_nir_with_spaces(self):
+        job_seeker = JobSeekerFactory.build(nir="141068078200557")
+        self.assertEqual(job_seeker.nir_with_spaces, "1 41 06 80 782 005 57")
 
     def test_is_account_creator(self):
         user = UserFactory()

@@ -6,15 +6,14 @@
 
     <h1>
         {% if request.user.is_siae_staff %}
-            <span class="text-muted">{{ siae.display_name }} </span>
-            <span class="badge badge-primary">{{ siae.kind }}</span>
+            Candidature spontanée
         {% else %}
             Postuler
-            {% if job_seeker %}pour <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>{% endif %}
+            {% if request.user.is_prescriber and job_seeker %}pour <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>{% endif %}
             chez <span class="text-muted">{{ siae.display_name }}</span>
         {% endif %}
     </h1>
-    {% if user.is_siae_staff and job_seeker %}
+    {% if request.user.is_siae_staff and job_seeker %}
         <h2>{{ job_seeker.get_full_name|title }}</h2>
     {% endif %}
 

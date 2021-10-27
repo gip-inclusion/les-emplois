@@ -20,7 +20,13 @@ from itou.users.models import User
 from itou.utils.perms.user import get_user_info
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
-from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
+from itou.www.apply.forms import (
+    CheckJobSeekerInfoForm,
+    CheckJobSeekerNirForm,
+    CreateJobSeekerForm,
+    SubmitJobApplicationForm,
+    UserExistsForm,
+)
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
@@ -85,6 +91,7 @@ def start(request, siae_pk):
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
         "back_url": back_url,
         "job_seeker_pk": None,
+        "nir": None,
         "to_siae_pk": siae.pk,
         "sender_pk": None,
         "sender_kind": None,
@@ -117,8 +124,77 @@ def step_sender(request, siae_pk):
 
     request.session.modified = True
 
-    next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
+    next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae_pk})
     return HttpResponseRedirect(next_url)
+
+
+@login_required
+@valid_session_required
+def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step_check_job_seeker_nir.html"):
+    """
+    Ensure the job seeker has a NIR. If not and if possible, update it.
+    """
+    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    job_seeker = None
+    job_seeker_name = None
+
+    # The user submits an application for himself.
+    if request.user.is_job_seeker:
+        session_data["job_seeker_pk"] = request.user.pk
+        request.session.modified = True
+        job_seeker = request.user
+        if job_seeker.nir:
+            return HttpResponseRedirect(next_url)
+
+    form = CheckJobSeekerNirForm(job_seeker=job_seeker, data=request.POST or None)
+    preview_mode = False
+
+    if request.method == "POST" and form.is_valid():
+        nir = form.cleaned_data["nir"]
+
+        if request.user.is_job_seeker:
+            job_seeker.nir = nir
+            job_seeker.save()
+            return HttpResponseRedirect(next_url)
+
+        job_seeker = form.get_job_seeker()
+        if not job_seeker:
+            # Redirect to search by e-mail address.
+            session_data["nir"] = nir
+            request.session.modified = True
+            next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
+            return HttpResponseRedirect(next_url)
+
+        if form.data.get("confirm"):
+            # Job seeker found for the given NIR.
+            session_data["job_seeker_pk"] = job_seeker.pk
+            request.session.modified = True
+            return HttpResponseRedirect(next_url)
+
+        if form.data.get("preview"):
+            preview_mode = True
+            job_seeker_name = job_seeker.get_full_name()
+            if request.user.is_prescriber and not request.user.is_prescriber_with_authorized_org:
+                # Don't display personal information to unauthorized members.
+                job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
+        elif form.data.get("cancel"):
+            form = CheckJobSeekerNirForm()
+
+    if request.method == "POST" and form.data.get("skip"):
+        # Redirect to search by e-mail address.
+        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
+        return HttpResponseRedirect(next_url)
+
+    context = {
+        "form": form,
+        "job_seeker": job_seeker,
+        "job_seeker_name": job_seeker_name,
+        "preview_mode": preview_mode,
+        "siae": siae,
+    }
+    return render(request, template_name, context)
 
 
 @login_required
@@ -132,12 +208,12 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
 
     # The user submit an application for himself.
     if request.user.is_job_seeker:
-        session_data["job_seeker_pk"] = request.user.pk
-        request.session.modified = True
         return HttpResponseRedirect(next_url)
 
     job_seeker_name = None
     form = UserExistsForm(data=request.POST or None)
+    nir = session_data.get("nir")
+    can_add_nir = False
     preview_mode = False
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
@@ -146,9 +222,13 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
 
         if job_seeker:
             # Go to the next step.
+            can_add_nir = nir and request.user.can_add_nir(job_seeker)
             if request.POST.get("save"):
                 session_data["job_seeker_pk"] = job_seeker.pk
                 request.session.modified = True
+                if can_add_nir:
+                    job_seeker.nir = session_data["nir"]
+                    job_seeker.save()
                 return HttpResponseRedirect(next_url)
 
             # Display a modal containing more information.
@@ -175,7 +255,14 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
             next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
             return HttpResponseRedirect(f"{next_url}?{args}")
 
-    context = {"job_seeker_name": job_seeker_name, "form": form, "preview_mode": preview_mode, "siae": siae}
+    context = {
+        "can_add_nir": can_add_nir,
+        "form": form,
+        "job_seeker_name": job_seeker_name,
+        "nir": nir,
+        "preview_mode": preview_mode,
+        "siae": siae,
+    }
     return render(request, template_name, context)
 
 
@@ -218,8 +305,9 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
+    nir = session_data["nir"]
     form = CreateJobSeekerForm(
-        proxy_user=request.user, data=request.POST or None, initial={"email": request.GET.get("email")}
+        proxy_user=request.user, nir=nir, data=request.POST or None, initial={"email": request.GET.get("email")}
     )
 
     if request.method == "POST" and form.is_valid():

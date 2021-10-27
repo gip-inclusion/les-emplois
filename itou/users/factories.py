@@ -38,6 +38,19 @@ class JobSeekerFactory(UserFactory):
     is_job_seeker = True
     pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
 
+    @factory.lazy_attribute
+    def nir(self):
+        gender = random.choice([1, 2])
+        year = str(random.randint(0, 99)).zfill(2)
+        month = str(random.randint(1, 12)).zfill(2)
+        department = str(random.randint(1, 99)).zfill(2)
+        random_1 = str(random.randint(0, 399)).zfill(3)
+        random_2 = str(random.randint(0, 399)).zfill(3)
+        incomplete_nir = f"{gender}{year}{month}{department}{random_1}{random_2}"
+        assert len(incomplete_nir) == 13
+        control_key = 97 - int(incomplete_nir) % 97
+        return f"{incomplete_nir}{control_key}"
+
 
 class JobSeekerWithAddressFactory(JobSeekerFactory):
     address_line_1 = factory.Faker("street_address", locale="fr_FR")

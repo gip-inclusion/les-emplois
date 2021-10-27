@@ -41,6 +41,12 @@ class WelcomingTourTest(TestCase):
     def test_new_job_seeker_sees_welcoming_tour_test(self):
         job_seeker = JobSeekerFactory.build()
         self.email = job_seeker.email
+
+        # First signup step: job seeker NIR.
+        url = reverse("signup:job_seeker_nir")
+        self.client.post(url, {"nir": job_seeker.nir, "confirm": 1})
+
+        # Second signup step: job seeker credentials.
         url = reverse("signup:job_seeker")
         post_data = {
             "first_name": job_seeker.first_name,
@@ -114,7 +120,13 @@ class WelcomingTourExceptions(TestCase):
     def test_new_job_seeker_is_redirected_after_welcoming_tour_test(self):
         siae = SiaeWithMembershipFactory()
         job_seeker = JobSeekerFactory.build()
+
+        # First signup step: job seeker NIR.
         next_to = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        url = f"{reverse('signup:job_seeker_nir')}?next={next_to}"
+        self.client.post(url, {"nir": job_seeker.nir, "confirm": 1})
+
+        # Second signup step: job seeker credentials.
         url = f"{reverse('signup:job_seeker')}?next={next_to}"
         post_data = {
             "first_name": job_seeker.first_name,

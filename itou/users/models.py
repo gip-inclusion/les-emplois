@@ -1,3 +1,4 @@
+import re
 import uuid
 from collections import Counter
 
@@ -291,6 +292,9 @@ class User(AbstractUser, AddressMixin):
     def can_edit_email(self, user):
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
 
+    def can_add_nir(self, job_seeker):
+        return (self.is_prescriber_with_authorized_org or self.is_siae_staff) and not job_seeker.nir
+
     def is_created_by(self, user):
         return bool(self.created_by_id and self.created_by_id == user.pk)
 
@@ -332,6 +336,12 @@ class User(AbstractUser, AddressMixin):
             self.is_prescriber
             and self.prescriberorganization_set.filter(is_authorized=True, members__is_active=True).exists()
         )
+
+    @property
+    def nir_with_spaces(self):
+        nir_regex = r"^([12])([0-9]{2})([0-1][0-9])(2[AB]|[0-9]{2})([0-9]{3})([0-9]{3})([0-9]{2})$"
+        match = re.match(nir_regex, self.nir)
+        return " ".join(match.groups())
 
     def is_prescriber_of_authorized_organization(self, organization_id):
         return self.prescriberorganization_set.filter(
