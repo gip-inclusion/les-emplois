@@ -1,6 +1,7 @@
 from django import forms
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
+from django.utils import timezone
 
 from itou.asp.models import Commune, RSAAllocation
 from itou.employee_record.models import EmployeeRecord
@@ -99,12 +100,11 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         commune_code = self.cleaned_data.get("insee_commune_code")
         birth_date = self.cleaned_data.get("birthdate")
 
+        # Country coherence is done at model level (users.User)
+
         # Here we must add coherence between birthdate and communes
         # existing at this period (not a simple check of existence)
         birth_place = Commune.objects.by_insee_code_and_period(commune_code, birth_date).first()
-
-        if not birth_place:
-            raise forms.ValidationError("Cette commune n'existe pas ou n'est pas référencée")
 
         self.cleaned_data["birth_place"] = birth_place
 
@@ -347,7 +347,7 @@ class NewEmployeeRecordStep4(forms.Form):
         # Fetch active financial annexes for the SIAE
         convention = employee_record.job_application.to_siae.convention
         self.fields["financial_annex"].queryset = convention.financial_annexes.filter(
-            state__in=SiaeFinancialAnnex.STATES_ACTIVE
+            state=SiaeFinancialAnnex.STATE_VALID, end_at__gt=timezone.now()
         )
         self.fields["financial_annex"].initial = employee_record.financial_annex
 
