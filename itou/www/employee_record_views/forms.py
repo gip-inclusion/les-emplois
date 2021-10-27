@@ -347,7 +347,7 @@ class NewEmployeeRecordStep4(forms.Form):
         # Fetch active financial annexes for the SIAE
         convention = employee_record.job_application.to_siae.convention
         self.fields["financial_annex"].queryset = convention.financial_annexes.filter(
-            state=SiaeFinancialAnnex.STATE_VALID, end_at__gt=timezone.now()
+            state__in=SiaeFinancialAnnex.STATES_ACTIVE, end_at__gt=timezone.now()
         )
         self.fields["financial_annex"].initial = employee_record.financial_annex
 
