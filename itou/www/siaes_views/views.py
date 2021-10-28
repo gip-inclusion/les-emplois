@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
@@ -25,7 +26,6 @@ def card(request, siae_id, template_name="siaes/card.html"):
     Public view (previously private, made public during COVID-19).
     """
     queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
-    # siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
 
     siae = get_object_or_404(queryset, pk=siae_id)
     jobs_descriptions = siae.job_description_through.all()
@@ -66,8 +66,6 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     Time was limited during the prototyping phase and this view is based on
     JavaScript to generate a dynamic form. No proper Django form is used.
     """
-    # queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
-    # siae = get_object_or_404(queryset, pk=siae_id)
     siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
     job_descriptions = (
         siae.job_description_through.select_related("appellation__rome").all().order_by("-updated_at", "-created_at")
@@ -105,6 +103,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     return render(request, template_name, context)
 
 
+@require_POST
 @login_required
 def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
     """
@@ -115,38 +114,37 @@ def card_search_preview(request, template_name="siaes/includes/_card_siae.html")
     """
     siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
 
-    if request.method == "POST":
-        form_siae_block_job_applications = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
-        if form_siae_block_job_applications.is_valid():
-            siae = form_siae_block_job_applications.instance
+    form_siae_block_job_applications = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
+    if form_siae_block_job_applications.is_valid():
+        siae = form_siae_block_job_applications.instance
 
-        refreshed_cards = refresh_card_list(request=request, siae=siae)
+    refreshed_cards = refresh_card_list(request=request, siae=siae)
 
-        if not refreshed_cards["errors"]:
-            # sort all the jobs buy updated_at and created_at desc
-            list_jobs_descriptions = sorted(
-                refreshed_cards["jobs"]["create"]
-                + refreshed_cards["jobs"]["update"]
-                + refreshed_cards["jobs"]["unmodified"],
-                key=lambda x: x.updated_at if x.updated_at else x.created_at,
-                reverse=True,
-            )
+    if not refreshed_cards["errors"]:
+        # sort all the jobs buy updated_at and created_at desc
+        list_jobs_descriptions = sorted(
+            refreshed_cards["jobs"]["create"]
+            + refreshed_cards["jobs"]["update"]
+            + refreshed_cards["jobs"]["unmodified"],
+            key=lambda x: x.updated_at if x.updated_at else x.created_at,
+            reverse=True,
+        )
 
-            # count the number of active jobs
-            count_active_job_descriptions = 0
-            for job in list_jobs_descriptions:
-                # int(True) = 1, int(False) = 0
-                count_active_job_descriptions = int(job.is_active) + count_active_job_descriptions
+        # count the number of active jobs
+        count_active_job_descriptions = 0
+        for job in list_jobs_descriptions:
+            # int(True) = 1, int(False) = 0
+            count_active_job_descriptions = int(job.is_active) + count_active_job_descriptions
 
-            siae.count_active_job_descriptions = count_active_job_descriptions
+        siae.count_active_job_descriptions = count_active_job_descriptions
 
-            context = {
-                "siae": siae,
-                "jobs_descriptions": list_jobs_descriptions,
-            }
+        context = {
+            "siae": siae,
+            "jobs_descriptions": list_jobs_descriptions,
+        }
 
-            html = render_to_string(template_name, context)
-            return HttpResponse(html)
+        html = render_to_string(template_name, context)
+        return HttpResponse(html)
 
 
 @login_required
