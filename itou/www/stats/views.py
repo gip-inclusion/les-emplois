@@ -5,11 +5,12 @@ See an embedding sample at:
 https://github.com/metabase/embedding-reference-apps/blob/master/django/embedded_analytics/user_stats/views.py
 
 Some dashboards have sensitive information and the user should not be able to view data of other departments
-than their own, or of other region than their own.
-For those dashboards (typically CD, DDETS, DREETS...) the "département" and "région" fields should be locked
-on metabase side. Go to https://stats.inclusion.beta.gouv.fr/dashboard/XXX then "Partage"
+than their own, other regions than their own, or other SIAE than their own.
+
+For those dashboards, some filters such as department and/or region and/or SIAE id should be locked on metabase side.
+Go to https://stats.inclusion.beta.gouv.fr/dashboard/XXX then "Partage"
 then "Partager et intégrer" then "Intégrer ce dashboard dans une application" then inside "Paramètres" on the right,
-make sure the relevant parameters "Département" and "Région" are "Verrouillé".
+make sure that the correct filters are "Verrouillé".
 
 """
 from django.conf import settings
@@ -18,9 +19,10 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, REGIONS
-from itou.utils.apis.metabase import DEPARTMENT_FILTER_KEY, REGION_FILTER_KEY, metabase_embedded_url
+from itou.utils.apis.metabase import DEPARTMENT_FILTER_KEY, REGION_FILTER_KEY, SIAE_FILTER_KEY, metabase_embedded_url
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.perms.siae import get_current_siae_or_404
 
 
 # Each signed dashboard has the same look (at the moment)
@@ -54,6 +56,24 @@ def public_advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
         "page_title": "Statistiques avancées",
         "related_link": "stats:public_basic_stats",
         "related_title": "Vers les statistiques simplifiées",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def stats_siae(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    SIAE stats shown to their own members.
+    They can only view data for their own SIAE.
+    """
+    current_org = get_current_siae_or_404(request)
+    if not request.user.can_view_stats_siae(current_org=current_org):
+        raise PermissionDenied
+    params = {SIAE_FILTER_KEY: current_org.convention.asp_id}
+    context = {
+        "iframeurl": metabase_embedded_url(settings.SIAE_STATS_DASHBOARD_ID, params=params),
+        "page_title": f"Données de ma structure : {current_org.display_name}",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)

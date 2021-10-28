@@ -27,10 +27,13 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     can_show_employee_records = False
     job_applications_categories = []
 
+    # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
+    current_org = None
+
     if request.user.is_siae_staff:
-        siae = get_current_siae_or_404(request)
-        can_show_financial_annexes = siae.convention_can_be_accessed_by(request.user)
-        can_show_employee_records = siae.can_use_employee_record
+        current_org = get_current_siae_or_404(request)
+        can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
+        can_show_employee_records = current_org.can_use_employee_record
 
         job_applications_categories = [
             {
@@ -56,20 +59,19 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "badge": "badge-secondary",
             },
         ]
-        job_applications = siae.job_applications_received.values("state").all()
+        job_applications = current_org.job_applications_received.values("state").all()
         for category in job_applications_categories:
             category["counter"] = len([ja for ja in job_applications if ja["state"] in category["states"]])
             category[
                 "url"
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
-    # `current_org` can be a PrescriberOrganization or an Institution.
-    current_org = None
     if request.user.is_prescriber:
         try:
             current_org = get_current_org_or_404(request)
         except Http404:
             pass
+
     if request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
 
@@ -79,6 +81,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_show_financial_annexes": can_show_financial_annexes,
         "can_show_employee_records": can_show_employee_records,
         "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(current_org=current_org),
+        "can_view_stats_siae": request.user.can_view_stats_siae(current_org=current_org),
         "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
         "can_view_stats_ddets": request.user.can_view_stats_ddets(current_org=current_org),
         "can_view_stats_dreets": request.user.can_view_stats_dreets(current_org=current_org),

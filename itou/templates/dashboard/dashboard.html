@@ -437,11 +437,17 @@
                         {% include "includes/icon.html" with icon="activity" %}
                         <a href="{% url 'stats:public_advanced_stats' %}">Voir les statistiques avancées France entière</a>
                     </p>
+                    {% if can_view_stats_siae %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="activity" %}
+                            <a href="{% url 'stats:stats_siae' %}">Voir les données de ma structure</a>
+                            <span class="badge badge-info">Nouveau</span>
+                        </p>
+                    {% endif %}
                     {% if can_view_stats_cd %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
                             <a href="{% url 'stats:stats_cd' %}">Voir les données de mon département</a>
-                            <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
                     {% if can_view_stats_ddets %}

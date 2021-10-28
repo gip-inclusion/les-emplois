@@ -31,6 +31,7 @@ from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
 from itou.institutions.models import Institution
 from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.models import Siae
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 
@@ -385,10 +386,25 @@ class User(AbstractUser, AddressMixin):
         It should be displayed if one or more stats sections are available for the user.
         """
         return (
-            self.can_view_stats_cd(current_org=current_org)
+            self.can_view_stats_siae(current_org=current_org)
+            or self.can_view_stats_cd(current_org=current_org)
             or self.can_view_stats_ddets(current_org=current_org)
             or self.can_view_stats_dreets(current_org=current_org)
             or self.can_view_stats_dgefp(current_org=current_org)
+        )
+
+    def can_view_stats_siae(self, current_org):
+        """
+        Users of a SIAE can view their SIAE data and only theirs.
+        """
+        return (
+            self.is_siae_staff
+            and isinstance(current_org, Siae)
+            and current_org.has_member(self)
+            # Metabase expects a filter on the SIAE ASP id (technically `siae.convention.asp_id`) which is why
+            # we require a convention object to exist here.
+            # Some SIAE don't have a convention (SIAE created by support, GEIQ, EA...).
+            and current_org.convention is not None
         )
 
     def can_view_stats_cd(self, current_org):
@@ -407,7 +423,6 @@ class User(AbstractUser, AddressMixin):
         """
         return (
             self.is_prescriber
-            and current_org is not None
             and isinstance(current_org, PrescriberOrganization)
             and current_org.kind == current_org.Kind.DEPT
             and current_org.is_authorized
