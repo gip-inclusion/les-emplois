@@ -141,9 +141,9 @@ $(document).ready(() => {
     })
 
   $(document).on("click", "#js-preview-card", function(){
-    var urlPreview = $(this).data("urlPreview");
-    var FormDataJobs = $('form.js-prevent-multiple-submit').serializeArray();
-    var selectorContentModal = "#js-modal-preview-body";
+    const urlPreview = $(this).data("urlPreview");
+    const FormDataJobs = $('form.js-prevent-multiple-submit').serializeArray();
+    const selectorContentModal = "#js-modal-preview-body";
     $.ajax({
         url: urlPreview,
         type: 'post',
