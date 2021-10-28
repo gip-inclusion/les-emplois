@@ -17,9 +17,9 @@ Un filtre est appliqué pour récupérer un historique de 2 ans en plus de l'ann
 */
     
 select 
-    count (distinct(identifiant_salarie)) as nombre_salarie,
+    count (distinct(identifiant_salarie)) as nombre_salaries,
     sum(nombre_etp_consommes)/12 as nombre_etp,
-    sum(nombre_heures_travaillees) as nombre_heure_travaillees, 
+    sum(nombre_heures_travaillees) as nombre_heures_travaillees, 
     date_part('year', date_saisie) as annee_saisie,
     etablissement_Public_Territorial, 
     niveau_formation_salarie,
