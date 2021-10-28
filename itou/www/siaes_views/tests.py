@@ -762,11 +762,6 @@ class MembersTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-# TODO: move to SIAE configure job test case
-# class BlockJobApplicationsTest(TestCase):
-#
-
-
 class UserMembershipDeactivationTest(TestCase):
     def test_self_deactivation(self):
         """
