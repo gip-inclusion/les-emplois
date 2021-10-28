@@ -49,7 +49,7 @@ class JobSeekerFactory(UserFactory):
         random_2 = str(random.randint(0, 399)).zfill(3)
         incomplete_nir = f"{gender}{year}{month}{department}{random_1}{random_2}"
         assert len(incomplete_nir) == 13
-        control_key = 97 - int(incomplete_nir) % 97
+        control_key = str(97 - int(incomplete_nir) % 97).zfill(2)
         nir = f"{incomplete_nir}{control_key}"
         validate_nir(nir)
         return nir
