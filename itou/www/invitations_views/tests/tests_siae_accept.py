@@ -26,6 +26,11 @@ class TestAcceptInvitation(TestCase):
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEqual(invitation.sender.email, mail.outbox[0].to[0])
 
+    def test_if_siae_can_apply(self):
+        invitation = SentSiaeStaffInvitationFactory()
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertContains(response, '<button type="submit" class="btn btn-primary">Inscription</button>', html=True)
+
     def test_accept_invitation_signup(self):
         invitation = SentSiaeStaffInvitationFactory()
 
