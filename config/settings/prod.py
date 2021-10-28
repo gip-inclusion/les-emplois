@@ -49,3 +49,6 @@ ELASTIC_APM = {
     "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
     "TRANSACTION_SAMPLE_RATE": 0.1,
 }
+
+# Release SIAE stats only for specific users until we release it to everyone.
+SIAE_STATS_USER_PK_WHITELIST = [364550]

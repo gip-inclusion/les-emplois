@@ -405,6 +405,8 @@ class User(AbstractUser, AddressMixin):
             # we require a convention object to exist here.
             # Some SIAE don't have a convention (SIAE created by support, GEIQ, EA...).
             and current_org.convention is not None
+            # Temporary whitelist system until the feature is released.
+            and (settings.RELEASE_SIAE_STATS or self.pk in settings.SIAE_STATS_USER_PK_WHITELIST)
         )
 
     def can_view_stats_cd(self, current_org):
