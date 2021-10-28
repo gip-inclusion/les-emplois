@@ -60,6 +60,8 @@
                 <a href="#" role="button" class="js-job-delete">
                     {% include "includes/icon.html" with icon="trash-2" %}
                 </a>
+                {# will be enable with JavaScript if user click to delete it #}
+                <input type="hidden" name="delete"  value="{{ job.appellation.code }}" disabled>
             </td>
         </tr>
         {% endfor %}
