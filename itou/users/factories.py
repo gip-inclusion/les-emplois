@@ -10,6 +10,7 @@ from itou.asp.models import AllocationDuration, EducationLevel
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.users import models
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK
+from itou.utils.validators import validate_nir
 
 
 DEFAULT_PASSWORD = "P4ssw0rd!*"
@@ -41,15 +42,17 @@ class JobSeekerFactory(UserFactory):
     @factory.lazy_attribute
     def nir(self):
         gender = random.choice([1, 2])
-        year = str(random.randint(0, 99)).zfill(2)
-        month = str(random.randint(1, 12)).zfill(2)
+        year = self.birthdate.strftime("%y")
+        month = self.birthdate.strftime("%m")
         department = str(random.randint(1, 99)).zfill(2)
         random_1 = str(random.randint(0, 399)).zfill(3)
         random_2 = str(random.randint(0, 399)).zfill(3)
         incomplete_nir = f"{gender}{year}{month}{department}{random_1}{random_2}"
         assert len(incomplete_nir) == 13
-        control_key = 97 - int(incomplete_nir) % 97
-        return f"{incomplete_nir}{control_key}"
+        control_key = str(97 - int(incomplete_nir) % 97).zfill(2)
+        nir = f"{incomplete_nir}{control_key}"
+        validate_nir(nir)
+        return nir
 
 
 class JobSeekerWithAddressFactory(JobSeekerFactory):
