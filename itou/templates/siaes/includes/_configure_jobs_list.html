@@ -17,7 +17,7 @@
                 <p class="job-appellation-name">
                     <i>{{ job.appellation.name }}</i>
                 </p>
-                <input type="hidden" name="code" value="{{ job.appellation.code }}">
+                <input type="hidden" name="code-update" value="{{ job.appellation.code }}">
                 <div class="form-group">
                     <label for="custom-name-{{ job.appellation.code }}">
                         <small>Nom personnalisé</small>
@@ -61,7 +61,7 @@
                     {% include "includes/icon.html" with icon="trash-2" %}
                 </a>
                 {# will be enable with JavaScript if user click to delete it #}
-                <input type="hidden" name="delete"  value="{{ job.appellation.code }}" disabled>
+                <input type="hidden" name="code-delete"  value="{{ job.appellation.code }}" disabled>
             </td>
         </tr>
         {% endfor %}

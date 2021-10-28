@@ -11,8 +11,11 @@ def refresh_card_list(request, siae):
 
     # Validate submitted data for jobs list: this is not the standard way to do things
     # and errors will not be shown at the field level.
-    submitted_codes = set(request.POST.getlist("code"))
-    for code in submitted_codes:
+    codes_to_create = set(request.POST.getlist("code-create"))
+    codes_to_delete = set(request.POST.getlist("code-delete"))
+    codes_to_update = set(request.POST.getlist("code-update"))
+
+    for code in codes_to_create.union(codes_to_update):
         data = {
             # Omit `SiaeJobDescription.appellation` since the field is
             # hidden and `Appellation.objects.get()` will fail anyway.
@@ -30,12 +33,6 @@ def refresh_card_list(request, siae):
                 errors[code] = f"{verbose_name} : {error}"
 
     if not errors:
-
-        current_codes = set(siae.job_description_through.values_list("appellation__code", flat=True))
-        codes_to_create = submitted_codes - current_codes
-        # we need to send list of codes to delete
-        codes_to_delete = set(request.POST.getlist("delete"))
-        codes_to_update = current_codes - codes_to_delete
         if codes_to_create or codes_to_delete or codes_to_update:
             # Create.
             for code in codes_to_create:
