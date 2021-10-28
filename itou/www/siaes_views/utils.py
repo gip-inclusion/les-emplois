@@ -33,9 +33,8 @@ def refresh_card_list(request, siae):
 
         current_codes = set(siae.job_description_through.values_list("appellation__code", flat=True))
         codes_to_create = submitted_codes - current_codes
-        # It is assumed that the codes to delete are not submitted (they must
-        # be removed from the DOM via JavaScript). Instead, they are deducted.
-        codes_to_delete = current_codes - submitted_codes
+        # we need to send list of codes to delete
+        codes_to_delete = set(request.POST.getlist("delete"))
         codes_to_update = current_codes - codes_to_delete
         if codes_to_create or codes_to_delete or codes_to_update:
             # Create.

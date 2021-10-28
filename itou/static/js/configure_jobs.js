@@ -13,17 +13,24 @@ $(document).ready(() => {
 
   $(jobsTableSelector).on('click', 'a.js-job-delete', e => {
     e.preventDefault()
-    let link = $(e.currentTarget)
-    let tr = link.parents('tr').first()
-    if (tr.find('.job-appellation-name').hasClass('text-danger')) {
-      tr.find('.job-appellation-name').removeClass('text-danger').css({'text-decoration': 'none'})
-      tr.find(':input').prop('disabled', false)
-      tr.find('a').html(trashIcon)
-    } else {
-      tr.find('.job-appellation-name').addClass('text-danger').css({'text-decoration': 'line-through'})
-      // Values of disabled inputs will not be submitted.
-      tr.find(':input').prop('disabled', true)
-      tr.find('a').text("Rétablir")
+    const link = $(e.currentTarget)
+    const tr = link.parents('tr').first()
+    // usefull elements of 'tr' for the click
+    const appellationRome = tr.find('.job-appellation-name');
+    const inputs = tr.find(':input');
+    const inputToDelete = tr.find('input[name="delete"]');
+    const actionLink = tr.find('a');
+
+    if (!inputToDelete.prop('disabled')) { // click to not delete
+      appellationRome.removeClass('text-danger').css({'text-decoration': 'none'})
+      inputs.prop('disabled', false)
+      inputToDelete.prop('disabled', true);
+      actionLink.html(trashIcon)
+    } else { // click to delete
+      appellationRome.addClass('text-danger').css({'text-decoration': 'line-through'})
+      inputs.prop('disabled', true)
+      inputToDelete.prop('disabled', false);
+      actionLink.text("Rétablir")
     }
   })
 
@@ -88,6 +95,7 @@ $(document).ready(() => {
           <a href="#" role="button" class="js-job-delete">
             ${trashIcon}
           </a>
+          <input type="hidden" name="delete"  value="${appellation.code}" disabled>
         </td>
     </tr>`)
   }
