@@ -18,7 +18,7 @@ $(document).ready(() => {
     // usefull elements of 'tr' for the click
     const appellationRome = tr.find('.job-appellation-name');
     const inputs = tr.find(':input');
-    const inputToDelete = tr.find('input[name="delete"]');
+    const inputToDelete = tr.find('input[name="code-delete"]');
     const actionLink = tr.find('a');
 
     if (!inputToDelete.prop('disabled')) { // click to not delete
@@ -53,7 +53,7 @@ $(document).ready(() => {
             <p class="job-appellation-name text-success">
               <i>${appellation.name}</i>
             </p>
-            <input type="hidden" name="code" value="${appellation.code}">
+            <input type="hidden" name="code-create" value="${appellation.code}">
             <div class="form-group">
                 <label for="custom-name-${appellation.code}">
                     <small>Nom personnalisé</small>
@@ -95,7 +95,7 @@ $(document).ready(() => {
           <a href="#" role="button" class="js-job-delete">
             ${trashIcon}
           </a>
-          <input type="hidden" name="delete"  value="${appellation.code}" disabled>
+          <input type="hidden" name="code-delete" value="${appellation.code}" disabled>
         </td>
     </tr>`)
   }

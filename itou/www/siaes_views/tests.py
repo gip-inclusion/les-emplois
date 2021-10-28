@@ -110,7 +110,10 @@ class ConfigureJobsViewTest(TestCase):
 
         post_data = {
             # List of appellations codes that we will operate on.
-            "code": ["10357", "10579", "10750", "10877", "16361"],
+            "code-update": ["10579", "10750"],
+            "code-create": ["10877", "16361"],
+            # Exclude code `11999` from POST payload.
+            "code-delete": ["11999"],
             # Do nothing for "Agent / Agente cariste de livraison ferroviaire"
             "is_active-10357": "on",  # "on" is set when the checkbox is checked.
             # Update "Agent / Agente de quai manutentionnaire"
@@ -122,7 +125,6 @@ class ConfigureJobsViewTest(TestCase):
             "custom-name-10750": "",
             "description-10750": "",
             # Delete for "Chauffeur-livreur / Chauffeuse-livreuse"
-            # Exclude code `11999` from POST payload.
             # Add "Aide-livreur / Aide-livreuse"
             "is_active-10877": "on",
             "custom-name-10877": "Aide-livreur hebdomadaire",
@@ -130,10 +132,8 @@ class ConfigureJobsViewTest(TestCase):
             # Add "Manutentionnaire"
             "is_active-16361": "",
         }
-
         response = self.client.post(self.url, data=post_data)
         self.assertEqual(response.status_code, 302)
-
         self.assertEqual(self.siae.jobs.count(), 5)
         self.assertEqual(self.siae.job_description_through.count(), 5)
 
@@ -177,7 +177,7 @@ class ConfigureJobsViewTest(TestCase):
         custom_name_max_length = SiaeJobDescription._meta.get_field("custom_name").max_length
 
         post_data = {
-            "code": ["10357", "10579"],
+            "code-update": ["10357", "10579"],
             # Code 10357 should not validate.
             "is_active-10357": "on",
             "custom-name-10357": fake.sentence(nb_words=custom_name_max_length + 1),
@@ -262,7 +262,9 @@ class ConfigureJobsViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         # check active jobs when block job applications is true
-        post_data = {"block_job_applications": "on"}
+        post_data = {
+            "block_job_applications": "on",
+        }
         response = self.client.post(self.url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -279,42 +281,43 @@ class ConfigureJobsViewTest(TestCase):
         # get job description
         url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
         response = self.client.get(url)
-        # fail
+        response_content = str(response.content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["job"], job_description)
-        self.assertIn("Pas de Recrutement en cours", response_content)
+        self.assertIn("Pas de recrutement en cours", response_content)
 
-    # def test_blocking_jobs_false_and_list_jobs(self):
-    #     # be sure that we have always one active job
-    #     job_description = self.siae.job_description_through.first()
-    #     job_description.is_active = True
-    #     job_description.save()
+    def test_blocking_jobs_false_and_list_jobs(self):
+        # be sure that we have always one active job
+        job_description = self.siae.job_description_through.first()
+        job_description.is_active = True
+        job_description.save()
 
-    #     self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
-    #     response = self.client.get(self.url)
-    #     self.assertEqual(response.status_code, 200)
-    #     # check active jobs when block job applications is true
-    #     post_data = {"block_job_applications": ""}
-    #     response = self.client.post(self.url, data=post_data)
-    #     self.assertEqual(response.status_code, 302)
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        # check active jobs when block job applications is true
+        post_data = {"block_job_applications": ""}
+        response = self.client.post(self.url, data=post_data)
+        self.assertEqual(response.status_code, 302)
 
-    #     siae = Siae.objects.get(siret=self.siae.siret)
-    #     self.assertFalse(siae.block_job_applications)
-    #     # get card view
-    #     url_list_job = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
-    #     response = self.client.get(url_list_job)
-    #     # fail
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.context["siae"], self.siae)
-    #     response_content = str(response.content)
-    #     self.assertIn("Recrutement en cours", response_content)
+        siae = Siae.objects.get(siret=self.siae.siret)
+        self.assertFalse(siae.block_job_applications)
+        # get card view
+        url_list_job = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        response = self.client.get(url_list_job)
+        # fail
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["siae"], self.siae)
+        response_content = str(response.content)
+        self.assertIn("Recrutement en cours", response_content)
 
-    #     # get job description
-    #     url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.context["job"], job_description)
-    #     self.assertIn("Recrutement en cours", response_content)
+        # get job description
+        url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        response = self.client.get(url)
+        response_content = str(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["job"], job_description)
+        self.assertIn("Recrutement en cours", response_content)
 
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
