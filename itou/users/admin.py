@@ -18,7 +18,6 @@ class SiaeMembershipInline(admin.TabularInline):
     extra = 0
     raw_id_fields = ("siae",)
     readonly_fields = (
-        "siae",
         "siae_id_link",
         "joined_at",
         "is_admin",
@@ -50,7 +49,6 @@ class PrescriberMembershipInline(admin.TabularInline):
     extra = 0
     raw_id_fields = ("organization",)
     readonly_fields = (
-        "organization",
         "organization_id_link",
         "joined_at",
         "is_admin",
@@ -84,7 +82,6 @@ class InstitutionMembershipInline(admin.TabularInline):
         "updated_by",
     )
     readonly_fields = (
-        "institution",
         "institution_id_link",
         "joined_at",
         "is_admin",
