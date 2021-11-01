@@ -4,6 +4,7 @@ import jwt
 from django.conf import settings
 
 
+SIAE_FILTER_KEY = "identifiant_de_la_structure"
 DEPARTMENT_FILTER_KEY = "d%C3%A9partement"
 REGION_FILTER_KEY = "r%C3%A9gion"
 
