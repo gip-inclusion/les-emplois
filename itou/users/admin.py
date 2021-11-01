@@ -26,6 +26,7 @@ class SiaeMembershipInline(admin.TabularInline):
         "created_at",
         "updated_at",
         "updated_by",
+        "notifications",
     )
     can_delete = True
     show_change_link = True
