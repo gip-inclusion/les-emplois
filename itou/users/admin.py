@@ -176,7 +176,10 @@ class ItouUserAdmin(UserAdmin):
         "birth_place",
         "birth_country",
     )
-    search_fields = UserAdmin.search_fields + ("pk",)
+    search_fields = UserAdmin.search_fields + (
+        "pk",
+        "nir",
+    )
     readonly_fields = ("pk",)
 
     fieldsets = UserAdmin.fieldsets + (
