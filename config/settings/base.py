@@ -4,6 +4,7 @@ https://docs.djangoproject.com/en/dev/ref/settings
 """
 import datetime
 import os
+import json
 
 import pytz
 from django.utils import timezone
@@ -507,7 +508,7 @@ METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 # Once SIAE stats are released, all SIAE can view their data.
 # Until then, only whitelisted users can view them.
 RELEASE_SIAE_STATS = False
-SIAE_STATS_USER_PK_WHITELIST = []
+SIAE_STATS_USER_PK_WHITELIST = json.loads(os.environ.get("SIAE_STATS_USER_PK_WHITELIST", "[]"))
 
 # Metabase embedded dashboard IDs
 PUBLIC_BASIC_STATS_DASHBOARD_ID = 34
