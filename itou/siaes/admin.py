@@ -20,6 +20,7 @@ class JobsInline(admin.TabularInline):
     model = models.Siae.jobs.through
     extra = 1
     raw_id_fields = ("appellation",)
+    readonly_fields = ("created_at", "updated_at")
 
 
 class FinancialAnnexesInline(admin.TabularInline):
