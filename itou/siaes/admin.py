@@ -168,6 +168,7 @@ class SiaeConvention(admin.ModelAdmin):
     list_filter = ("kind", "is_active")
     raw_id_fields = ("reactivated_by",)
     readonly_fields = (
+        "asp_id",
         "kind",
         "siret_signature",
         "deactivated_at",
@@ -183,6 +184,7 @@ class SiaeConvention(admin.ModelAdmin):
                 "fields": (
                     "kind",
                     "siret_signature",
+                    "asp_id",
                 )
             },
         ),
