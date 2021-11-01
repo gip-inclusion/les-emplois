@@ -13,6 +13,7 @@ from itou.siaes.admin_forms import SiaeAdminForm
 
 class SiaeMembersInline(MembersInline):
     model = models.Siae.members.through
+    readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at", "notifications")
 
 
 class JobsInline(admin.TabularInline):
