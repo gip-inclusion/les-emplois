@@ -88,6 +88,7 @@ class InstitutionMembershipInline(admin.TabularInline):
         "is_active",
         "created_at",
         "updated_at",
+        "updated_by",
     )
     can_delete = True
     fk_name = "user"
