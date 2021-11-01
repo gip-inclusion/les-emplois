@@ -442,6 +442,22 @@ class ModelTest(TestCase):
         user.emailaddress_set.create(email=user.email, verified=True)
         self.assertTrue(user.has_verified_email)
 
+    def test_can_view_stats_siae(self):
+        # An employer can only view stats of their own SIAE.
+        siae1 = SiaeWithMembershipFactory()
+        user1 = siae1.members.get()
+        siae2 = SiaeFactory()
+
+        self.assertTrue(siae1.has_member(user1))
+        self.assertTrue(user1.can_view_stats_siae(current_org=siae1))
+        self.assertFalse(siae2.has_member(user1))
+        self.assertFalse(user1.can_view_stats_siae(current_org=siae2))
+
+        # Even non admin members can view their SIAE stats.
+        siae3 = SiaeWithMembershipFactory(membership__is_admin=False)
+        user3 = siae3.members.get()
+        self.assertTrue(user3.can_view_stats_siae(current_org=siae3))
+
     def test_can_view_stats_cd(self):
         """
         CD as in "Conseil Départemental".

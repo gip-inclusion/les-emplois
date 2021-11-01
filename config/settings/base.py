@@ -4,6 +4,7 @@ https://docs.djangoproject.com/en/dev/ref/settings
 """
 import datetime
 import os
+import json
 
 import pytz
 from django.utils import timezone
@@ -504,9 +505,15 @@ METABASE_INSERT_BATCH_SIZE = 100
 METABASE_SITE_URL = "https://stats.inclusion.beta.gouv.fr"
 METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 
+# Once SIAE stats are released, all SIAE can view their data.
+# Until then, only whitelisted users can view them.
+RELEASE_SIAE_STATS = False
+SIAE_STATS_USER_PK_WHITELIST = json.loads(os.environ.get("SIAE_STATS_USER_PK_WHITELIST", "[]"))
+
 # Metabase embedded dashboard IDs
 PUBLIC_BASIC_STATS_DASHBOARD_ID = 34
 PUBLIC_ADVANCED_STATS_DASHBOARD_ID = 43
+SIAE_STATS_DASHBOARD_ID = 128
 CD_STATS_DASHBOARD_ID = 118
 CD_STATS_ALLOWED_DEPARTMENTS = ["38", "62", "67", "93"]
 DDETS_STATS_DASHBOARD_ID = 117

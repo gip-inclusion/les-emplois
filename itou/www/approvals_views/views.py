@@ -23,8 +23,6 @@ from itou.www.approvals_views.forms import DeclareProlongationForm, PoleEmploiAp
 def approval_as_pdf(request, job_application_id, template_name="approvals/approval_as_pdf.html"):
     """
     Displays the approval in pdf format
-
-    Warning: this view is temporarily excluded from the Elastic APM to avoid an error during the stream type httpx call
     """
     siae = get_current_siae_or_404(request)
 

@@ -1,7 +1,5 @@
 /*
-
 L'objectif est d'avoir un suivi annuel des recrutements en se basant sur les déclarations mensuelles des structures dans l'extranet asp
-
 */
 
 select 
@@ -18,12 +16,13 @@ select
     structure_denomination,
     commune_structure, 
     code_insee_structure, 
-    nom_departement_structure, 
-    nom_region_structure,
+    nom_departement_af,
+    nom_region_af,
     af_numero_convention,
     af_numero_annexe_financiere
 from 
     saisies_mensuelles_IAE
+where date_part('year', date_recrutement) >= (date_part('year', current_date) - 2)
 group by 
     annee_recrutement,
     etablissement_Public_Territorial, 
@@ -36,7 +35,7 @@ group by
     structure_denomination,
     commune_structure, 
     code_insee_structure, 
-    nom_departement_structure, 
-    nom_region_structure,
+    nom_departement_af,
+    nom_region_af,
     af_numero_convention,
     af_numero_annexe_financiere
