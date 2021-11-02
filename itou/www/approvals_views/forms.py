@@ -19,6 +19,7 @@ class DeclareProlongationForm(forms.ModelForm):
         self.approval = kwargs.pop("approval")
         self.siae = kwargs.pop("siae")
         self.validated_by = None
+        self.reasons_not_need_prescriber_opinion = Prolongation.REASONS_NOT_NEED_PRESCRIBER_OPINION
         super().__init__(*args, **kwargs)
 
         if not self.instance.pk:
@@ -45,7 +46,7 @@ class DeclareProlongationForm(forms.ModelForm):
         self.fields["end_at"].label = f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au'
 
     email = forms.EmailField(
-        required=True,
+        required=False,
         label="E-mail du prescripteur habilité qui a autorisé cette prolongation",
         help_text=(
             "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
@@ -54,13 +55,16 @@ class DeclareProlongationForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        self.validated_by = User.objects.filter(email=email).first()
-        if not self.validated_by or not self.validated_by.is_prescriber_with_authorized_org:
-            error = (
-                "Ce prescripteur n'a pas de compte sur les emplois de l'inclusion. "
-                "Merci de renseigner l'e-mail d'un conseiller inscrit sur le service."
-            )
-            raise forms.ValidationError(error)
+        if self.cleaned_data["reason"] in self.reasons_not_need_prescriber_opinion:
+            email = None
+        else:
+            self.validated_by = User.objects.filter(email=email).first()
+            if not self.validated_by or not self.validated_by.is_prescriber_with_authorized_org:
+                error = (
+                    "Ce prescripteur n'a pas de compte sur les emplois de l'inclusion. "
+                    "Merci de renseigner l'e-mail d'un conseiller inscrit sur le service."
+                )
+                raise forms.ValidationError(error)
         return email
 
     class Meta:

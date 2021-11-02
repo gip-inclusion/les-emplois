@@ -26,7 +26,17 @@
 
             {% csrf_token %}
 
-            {% bootstrap_form form alert_error_type="all" %}
+            {% bootstrap_form_errors form type="all" %}
+
+            {% bootstrap_field form.reason %}
+    
+            {% bootstrap_field form.end_at %}
+    
+            {% bootstrap_field form.reason_explanation %}
+    
+            <div id="js-field-email">
+                {% bootstrap_field form.email %}
+            </div>
 
             <p>
                 Jusqu'à la publication du décret d'application de la loi du 14 décembre 2020, vous ne pouvez solliciter qu'un conseiller Pôle emploi pour demander une prolongation.
@@ -79,11 +89,13 @@
                         jusqu'au
                         <span class="badge badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
                     </p>
+                    {% if form.instance.validated_by.email %}
                     <p class="card-text">
                         Un e-mail sera envoyé au prescripteur habilité ayant autorisé la prolongation :
                         <b>{{ form.instance.validated_by.get_full_name|title }}</b>
                         ({{ form.instance.validated_by.email }})
                     </p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -113,4 +125,23 @@
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
+
+    {# Clicking on a reason that does not require the opinion of a prescriber hide email field  #}
+    <script type="text/javascript">
+        $(document).ready(() => {
+            var reasons_not_need_prescriber_opinion = ["{{ form.reasons_not_need_prescriber_opinion|join:'", "' }}"];
+            $('#js-field-email').css("display", "none");
+            
+            function toggle_email_field_visibility() {
+                const value = $('input[name="reason"]:checked').val();
+                if (reasons_not_need_prescriber_opinion.includes(value)) {
+                    $('#js-field-email').hide("slidedown");
+                } else {
+                    $('#js-field-email').show("slideup");
+                }
+            }
+            $('#id_reason input').on('change', toggle_email_field_visibility);
+            toggle_email_field_visibility();
+        });
+    </script>
 {% endblock %}
