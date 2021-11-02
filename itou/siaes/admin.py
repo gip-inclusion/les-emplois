@@ -13,12 +13,14 @@ from itou.siaes.admin_forms import SiaeAdminForm
 
 class SiaeMembersInline(MembersInline):
     model = models.Siae.members.through
+    readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at", "notifications")
 
 
 class JobsInline(admin.TabularInline):
     model = models.Siae.jobs.through
     extra = 1
     raw_id_fields = ("appellation",)
+    readonly_fields = ("created_at", "updated_at")
 
 
 class FinancialAnnexesInline(admin.TabularInline):
@@ -168,6 +170,7 @@ class SiaeConvention(admin.ModelAdmin):
     list_filter = ("kind", "is_active")
     raw_id_fields = ("reactivated_by",)
     readonly_fields = (
+        "asp_id",
         "kind",
         "siret_signature",
         "deactivated_at",
@@ -183,6 +186,7 @@ class SiaeConvention(admin.ModelAdmin):
                 "fields": (
                     "kind",
                     "siret_signature",
+                    "asp_id",
                 )
             },
         ),
