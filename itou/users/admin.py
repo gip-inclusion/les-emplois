@@ -18,7 +18,6 @@ class SiaeMembershipInline(admin.TabularInline):
     extra = 0
     raw_id_fields = ("siae",)
     readonly_fields = (
-        "siae",
         "siae_id_link",
         "joined_at",
         "is_admin",
@@ -26,6 +25,7 @@ class SiaeMembershipInline(admin.TabularInline):
         "created_at",
         "updated_at",
         "updated_by",
+        "notifications",
     )
     can_delete = True
     show_change_link = True
@@ -49,7 +49,6 @@ class PrescriberMembershipInline(admin.TabularInline):
     extra = 0
     raw_id_fields = ("organization",)
     readonly_fields = (
-        "organization",
         "organization_id_link",
         "joined_at",
         "is_admin",
@@ -83,13 +82,13 @@ class InstitutionMembershipInline(admin.TabularInline):
         "updated_by",
     )
     readonly_fields = (
-        "institution",
         "institution_id_link",
         "joined_at",
         "is_admin",
         "is_active",
         "created_at",
         "updated_at",
+        "updated_by",
     )
     can_delete = True
     fk_name = "user"
@@ -176,7 +175,10 @@ class ItouUserAdmin(UserAdmin):
         "birth_place",
         "birth_country",
     )
-    search_fields = UserAdmin.search_fields + ("pk",)
+    search_fields = UserAdmin.search_fields + (
+        "pk",
+        "nir",
+    )
     readonly_fields = ("pk",)
 
     fieldsets = UserAdmin.fieldsets + (

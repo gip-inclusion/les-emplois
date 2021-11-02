@@ -23,9 +23,6 @@ class NewDnsRedirectMiddleware:
         elif host == "staging.inclusion.beta.gouv.fr":
             new_host = "staging.emplois.inclusion.beta.gouv.fr"
 
-        elif host == "forum.inclusion.beta.gouv.fr":
-            new_host = "communaute.inclusion.beta.gouv.fr"
-
         if new_host:
             return HttpResponsePermanentRedirect(f"https://{new_host}{request.get_full_path()}")
 

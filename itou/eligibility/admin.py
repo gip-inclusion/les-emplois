@@ -65,7 +65,7 @@ class EligibilityDiagnosisAdmin(admin.ModelAdmin):
         "is_valid",
         "is_considered_valid",
     )
-    search_fields = ("job_seeker__email", "author__email")
+    search_fields = ("pk", "job_seeker__email", "author__email")
     inlines = (AdministrativeCriteriaInline,)
 
     def is_valid(self, obj):
