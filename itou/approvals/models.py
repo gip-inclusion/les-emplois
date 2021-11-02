@@ -672,6 +672,11 @@ class Prolongation(models.Model):
         },
     }
 
+    REASONS_NOT_NEED_PRESCRIBER_OPINION = (
+        Reason.SENIOR_CDI,
+        Reason.COMPLETE_TRAINING,
+    )
+
     approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
     end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
