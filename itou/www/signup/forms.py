@@ -13,13 +13,12 @@ from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import get_geocoding_data
-from itou.utils.password_validation import CnilCompositionPasswordValidator
+from itou.utils.password_validation import FRANCE_CONNECT_PASSWORD_EXPLANATION, CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
 
 
 BLANK_CHOICE = (("", "---------"),)
-FRANCE_CONNECT_PASSWORD_EXPLANATION = "Attention, ce mot de passe est celui de votre compte local et en aucun cas celui du compte que vous utilisez au travers de FranceConnect. Il vous servira uniquement lorsque vous vous connecterez avec votre adresse mail plutôt que via FranceConnect."  # noqa E501
 
 
 class FullnameFormMixin(forms.Form):

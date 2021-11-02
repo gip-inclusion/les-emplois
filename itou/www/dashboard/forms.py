@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 
@@ -9,6 +8,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.users.models import User
+from itou.utils.perms.user import is_user_france_connected
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
@@ -24,7 +24,7 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
         request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
-        is_user_france_connected = settings.FRANCE_CONNECT_SESSION_TOKEN in request.session
+        user_france_connected = is_user_france_connected(request)
 
         if not self.instance.is_job_seeker:
             del self.fields["birthdate"]
@@ -40,7 +40,7 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
                 }
             )
 
-        if is_user_france_connected:
+        if user_france_connected:
             # When a user is logged-in through France Connect,
             # it should see the field but most should be disabled
             # (that’s a requirement on FC’s side)

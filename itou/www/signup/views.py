@@ -71,9 +71,7 @@ class JobSeekerSignupView(SignupView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["nir"] = self.request.session.get(settings.ITOU_SESSION_NIR_KEY)
-        context["show_france_connect"] = settings.FRANCE_CONNECT_ENABLED
-        context["show_peamu"] = True
-        return context
+        return kwargs
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
