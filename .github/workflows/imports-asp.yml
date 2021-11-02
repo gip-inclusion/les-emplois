@@ -74,7 +74,7 @@ jobs:
       run: |
         $CLEVER_CLI link $IMPORT_APP_NAME --org $ITOU_ORGANIZATION_NAME
         $CLEVER_CLI service link-addon c1-imports-config
-        $CLEVER_CLI service link-addon c1-prod-config
+        $CLEVER_CLI service link-addon c1-fast-machine-config
         $CLEVER_CLI service link-addon c1-prod-database-encrypted
         $CLEVER_CLI service link-addon c1-itou-redis
 
