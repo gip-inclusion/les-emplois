@@ -76,7 +76,7 @@ jobs:
     - name: 🗺 Add environment variables and addons to the app
       run: |
         $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
-        $CLEVER_CLI service link-addon c1-prod-config
+        $CLEVER_CLI service link-addon c1-fast-machine-config
         $CLEVER_CLI service link-addon c1-prod-database-encrypted
         $CLEVER_CLI service link-addon c1-itou-redis
 
