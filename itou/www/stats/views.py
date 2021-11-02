@@ -73,7 +73,7 @@ def stats_siae(request, template_name=_STATS_HTML_TEMPLATE):
     params = {SIAE_FILTER_KEY: current_org.convention.asp_id}
     context = {
         "iframeurl": metabase_embedded_url(settings.SIAE_STATS_DASHBOARD_ID, params=params),
-        "page_title": f"Données de ma structure : {current_org.display_name}",
+        "page_title": "Données de ma structure",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
