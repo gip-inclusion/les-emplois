@@ -20,6 +20,9 @@
                 <adresse class="card-subtitle font-size-hat font-weight-bold text-muted">{{ siae.address_on_one_line }}</adresse>
             </div>
 
+            {% if siae.block_job_applications and siae.count_active_job_descriptions == 0 %}
+                <span class="badge badge-pill badge-warning">Pas de recrutement en cours</span>
+            {% endif %}
             {% if siae.email or siae.phone or siae.website %}
                 <div class="py-3">
                     <h6>Contacts</h6>
