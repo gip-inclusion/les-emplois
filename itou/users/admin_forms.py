@@ -1,10 +1,10 @@
-from django import forms
+from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
 
 from itou.users.models import User
 
 
-class UserAdminForm(forms.ModelForm):
+class UserAdminForm(UserChangeForm):
     class Meta:
         model = User
         fields = "__all__"
