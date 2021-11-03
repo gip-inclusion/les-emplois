@@ -134,7 +134,7 @@ def card_search_preview(request, template_name="siaes/includes/_card_siae.html")
         count_active_job_descriptions = 0
         for job in list_jobs_descriptions:
             # int(True) = 1, int(False) = 0
-            count_active_job_descriptions = int(job.is_active) + count_active_job_descriptions
+            count_active_job_descriptions += int(job.is_active)
 
         siae.count_active_job_descriptions = count_active_job_descriptions
 
