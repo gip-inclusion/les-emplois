@@ -12,24 +12,23 @@
     <form method="post" action="" class="d-block mt-3 js-prevent-multiple-submit">
         {% csrf_token %}
         <div class="border-top py-4">
+            <h3>Bloquer les nouvelles candidatures</h3>
             <div class="custom-control custom-switch mb-3">
                 <input name="block_job_applications"
                     type="checkbox" id="block_job_applications"
                     class="custom-control-input"
                     {% if siae.block_job_applications %}checked{% endif %}>
-                <label class="custom-control-label h5"
-                    for="block_job_applications">Bloquer les nouvelles candidatures</label>
+                <label class="custom-control-label text-muted"
+                    for="block_job_applications">Bloquer temporairement la réception de candidatures (candidatures spontanées, recrutements)</label>
             </div>
             {% if siae.block_job_applications %}
                 <p class="alert alert-warning">
                     Vous avez activé cette option la dernière fois le {{ siae.job_applications_blocked_at|date }}
                 </p>
-            {% else %}
-                <p class="text-muted">Bloquer temporairement la réception de candidatures (candidatures spontanées, recrutements)</p>
             {% endif %}
         </div>
         <div class="border-top py-3">
-            <h2>Métiers et recrutements</h2>
+            <h3>Métiers et recrutements</h3>
 
             {% if errors %}
                 <div class="alert alert-danger alert-dismissible alert-link" role="alert">
@@ -68,12 +67,14 @@
 
             {% include "siaes/includes/_configure_jobs_list.html" %}
         </div>
-        {% buttons %}
-            <a class="btn" href="{% url 'dashboard:index' %}">Annuler</a>
-            <button type="button" id="js-preview-card" class="btn btn-outline-primary"
-                data-url-preview="{% url 'siaes_views:card_search_preview' %}">Prévisualier les modifications</button>
-            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-        {% endbuttons %}
+        <div class="float-right">
+            {% buttons %}
+                <a class="btn" href="{% url 'dashboard:index' %}">Annuler</a>
+                <button type="button" id="js-preview-card" class="btn btn-outline-primary"
+                    data-url-preview="{% url 'siaes_views:card_search_preview' %}">Prévisualier les modifications</button>
+                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+            {% endbuttons %}
+        </div>
 
         <div id="preview"></div>
         <div class="modal modal-md fade" id="js-modal-preview" tabindex="-1" aria-labelledby="modalPrevisualisationTitle" aria-hidden="true">
