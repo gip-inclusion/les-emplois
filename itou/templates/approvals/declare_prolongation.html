@@ -1,4 +1,5 @@
 {% extends "layout/content_small.html" %}
+{% load js_filters %}
 {% load bootstrap4 %}
 
 {% block title %}Déclarer une prolongation de PASS IAE{{ block.super }}{% endblock %}
@@ -129,7 +130,7 @@
     {# Clicking on a reason that does not require the opinion of a prescriber hide email field  #}
     <script type="text/javascript">
         $(document).ready(() => {
-            var reasons_not_need_prescriber_opinion = ["{{ form.reasons_not_need_prescriber_opinion|join:'", "' }}"];
+            var reasons_not_need_prescriber_opinion = {{ form.reasons_not_need_prescriber_opinion|js }};
             $('#js-field-email').css("display", "none");
             
             function toggle_email_field_visibility() {
