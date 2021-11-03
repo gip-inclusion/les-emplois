@@ -141,7 +141,7 @@ $(document).ready(() => {
     })
 
   $(document).on("click", "#js-preview-card", function(){
-    const urlPreview = $(this).data("urlPreview");
+    const urlPreview = "$(this).data(urlPreview)";
     const FormDataJobs = $('form.js-prevent-multiple-submit').serializeArray();
     const selectorContentModal = "#js-modal-preview-body";
     $.ajax({
@@ -156,19 +156,20 @@ $(document).ready(() => {
               </div>
             </div>
           `);
-          $('#js-modal-preview').modal('show');
         },
         success: function(data) {
             $(selectorContentModal).html(data);
             // remove links in preview
             $(`${selectorContentModal} a`).css({"pointer-events":"none"});
         },
-        failure: function(data) {
+        error: function() {
           $(selectorContentModal).html(`
-            <div class="d-flex justify-content-center">
+            <p class="alert alert-warning">
               <i>Nous sommes désolés, mais suite à une erreur, la prévisualisation n'est pas disponible.</i>
-            </div>
+            </p>
           `);
+        },
+        complete: function(){
           $('#js-modal-preview').modal('show');
         }
     });
