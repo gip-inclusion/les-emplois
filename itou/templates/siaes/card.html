@@ -66,7 +66,7 @@
             {% if not siae.block_job_applications %}
                 <div class="border-top pt-4">
                     <p class="text-with-btn">
-                        <span class="h4">Cette structure vous interesse ?</span>
+                        <span class="h4">Cette structure vous intéresse ?</span>
                         <a class="btn btn-primary float-right"
                             href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
                             aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">

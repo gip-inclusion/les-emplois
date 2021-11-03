@@ -152,7 +152,7 @@ $(document).ready(() => {
           $(selectorContentModal).html(`
             <div class="d-flex justify-content-center">
               <div class="spinner-border" style="width: 5rem; height: 5rem;" role="status">
-                <span class="sr-only">Loading...</span>
+                <span class="sr-only">Chargement...</span>
               </div>
             </div>
           `);
@@ -164,7 +164,12 @@ $(document).ready(() => {
             $(`${selectorContentModal} a`).css({"pointer-events":"none"});
         },
         failure: function(data) {
-            console.error(data);
+          $(selectorContentModal).html(`
+            <div class="d-flex justify-content-center">
+              <i>Nous sommes désolés, mais suite à une erreur, la prévisualisation n'est pas disponible.</i>
+            </div>
+          `);
+          $('#js-modal-preview').modal('show');
         }
     });
   })
