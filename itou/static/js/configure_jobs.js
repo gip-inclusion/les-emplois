@@ -159,7 +159,9 @@ $(document).ready(() => {
           $('#js-modal-preview').modal('show');
         },
         success: function(data) {
-            $(selectorContentModal).html(data)
+            $(selectorContentModal).html(data);
+            // remove links in preview
+            $(`${selectorContentModal} a`).css({"pointer-events":"none"});
         },
         failure: function(data) {
             console.error(data);
