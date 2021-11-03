@@ -114,7 +114,8 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
             if form.cleaned_data.get("email"):
                 # Send an email w/o DB changes
                 prolongation.notify_authorized_prescriber()
-                messages.success(request, "Déclaration de prolongation enregistrée.")
+
+            messages.success(request, "Déclaration de prolongation enregistrée.")
             return HttpResponseRedirect(back_url)
 
     context = {
