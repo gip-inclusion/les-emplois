@@ -36,18 +36,18 @@
     
             <div id="js-field-email">
                 {% bootstrap_field form.email %}
+
+                <p>
+                    Pour enregistrer une prolongation avec ce motif, vous devez obtenir l'accord préalable d'un prescripteur habilité.
+                </p>
+
+                <p>
+                    <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank">
+                        Rechercher des prescripteurs
+                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                    </a>
+                </p>
             </div>
-
-            <p>
-                Jusqu'à la publication du décret d'application de la loi du 14 décembre 2020, vous ne pouvez solliciter qu'un conseiller Pôle emploi pour demander une prolongation.
-            </p>
-
-            <p>
-                <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank">
-                    Rechercher des prescripteurs
-                    {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
-                </a>
-            </p>
 
             <hr>
 
