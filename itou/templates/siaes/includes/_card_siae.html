@@ -29,7 +29,7 @@
             {% include "siaes/includes/_list_siae_actives_jobs.html" with jobs_descriptions=jobs_descriptions siae=siae %}
         {% elif not siae.block_job_applications %}
             <div class="text-with-btn">
-                <span>Cette structure vous interesse ?</span>
+                <span>Cette structure vous intéresse ?</span>
                 <div class="btn-group btn-group-sm float-right" role="group" aria-label="Postuler">
                     <a class="btn btn-primary"
                         href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
