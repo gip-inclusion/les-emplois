@@ -82,7 +82,7 @@ $(document).ready(() => {
             </div>
         </td>
         <td class="text-left align-middle" scope="row">
-          <div class="custom-control custom-switch">
+          <div class="custom-control custom-switch is-rtl">
               <input name="is_active-${appellation.code}"
                   id="is_active-${appellation.code}" type="checkbox"
                   class="custom-control-input"
@@ -141,7 +141,7 @@ $(document).ready(() => {
     })
 
   $(document).on("click", "#js-preview-card", function(){
-    const urlPreview = "$(this).data(urlPreview)";
+    const urlPreview = $(this).data("urlPreview");
     const FormDataJobs = $('form.js-prevent-multiple-submit').serializeArray();
     const selectorContentModal = "#js-modal-preview-body";
     $.ajax({
