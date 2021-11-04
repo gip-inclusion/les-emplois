@@ -81,7 +81,7 @@ $(document).ready(() => {
                 </small>
             </div>
         </td>
-        <td class="text-left align-middle" scope="row">
+        <td class="text-center align-middle" scope="row">
           <div class="custom-control custom-switch is-rtl">
               <input name="is_active-${appellation.code}"
                   id="is_active-${appellation.code}" type="checkbox"
