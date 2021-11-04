@@ -49,12 +49,17 @@
         $('#js-field-answer-to-prescriber').css("display", "none");
         $('.js-refusal-reasons input')
           .on('change', function () {
-            const value = $(this).val();
-            if (value == "other") {
-                $('#js-field-answer-to-prescriber').show("slide");
-            }
-            else {
-                $('#js-field-answer-to-prescriber').hide("slide");
+            $('#js-field-answer-to-prescriber').hide("slide");
+            $('#js-refusal-reason-poorly').hide("up", function(){
+                $(this).remove();
+            });
+            switch ($(this).val()) {
+                case "other":
+                    $('#js-field-answer-to-prescriber').show("slide");
+                    break;
+                case "poorly_informed":
+                    $(this).parent().after('<p id="js-refusal-reason-poorly"><i>En cas de besoin, n\'hésitez pas à contacter le prescripteur pour avoir plus d\'informations</i></p>');
+                    break;
             }
           });
     </script>
