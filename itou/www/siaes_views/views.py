@@ -3,23 +3,19 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
-from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views.forms import (
-    BlockJobApplicationsForm,
-    CreateSiaeForm,
-    EditSiaeForm,
-    FinancialAnnexSelectForm,
-    ValidateSiaeJobDescriptionForm,
-)
+from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm, FinancialAnnexSelectForm
+from itou.www.siaes_views.utils import refresh_card_list
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
@@ -29,10 +25,12 @@ def card(request, siae_id, template_name="siaes/card.html"):
     # COVID-19 "Operation ETTI".
     Public view (previously private, made public during COVID-19).
     """
-    queryset = Siae.objects.prefetch_job_description_through(is_active=True)
+    queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
+
     siae = get_object_or_404(queryset, pk=siae_id)
+    jobs_descriptions = siae.job_description_through.all()
     back_url = get_safe_url(request, "back_url")
-    context = {"siae": siae, "back_url": back_url}
+    context = {"siae": siae, "back_url": back_url, "jobs_descriptions": jobs_descriptions}
     return render(request, template_name, context)
 
 
@@ -44,7 +42,19 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
     """
     job_description = get_object_or_404(SiaeJobDescription, pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
-    context = {"job": job_description, "siae": job_description.siae, "back_url": back_url}
+    siae = job_description.siae
+    others_active_jobs = (
+        SiaeJobDescription.objects.select_related("appellation")
+        .filter(is_active=True, siae=siae)
+        .exclude(id=job_description_id)
+        .order_by("-updated_at", "-created_at")
+    )
+    context = {
+        "job": job_description,
+        "siae": siae,
+        "others_active_jobs": others_active_jobs,
+        "back_url": back_url,
+    }
     return render(request, template_name, context)
 
 
@@ -56,81 +66,85 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     Time was limited during the prototyping phase and this view is based on
     JavaScript to generate a dynamic form. No proper Django form is used.
     """
-    siae = get_current_siae_or_404(request)
-    job_descriptions = siae.job_description_through.select_related("appellation__rome").all()
+    siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
+    job_descriptions = (
+        siae.job_description_through.select_related("appellation__rome").all().order_by("-updated_at", "-created_at")
+    )
     errors = {}
 
     if request.method == "POST":
+        # Validate data for Siae block_job_applications
+        form_siae_block_job_applications = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
 
-        submitted_codes = set(request.POST.getlist("code"))
+        if form_siae_block_job_applications.is_valid():
+            form_siae_block_job_applications.save()
 
-        # Validate submitted data: this is not the standard way to do things
-        # and errors will not be shown at the field level.
-        for code in submitted_codes:
-            data = {
-                # Omit `SiaeJobDescription.appellation` since the field is
-                # hidden and `Appellation.objects.get()` will fail anyway.
-                "custom_name": request.POST.get(f"custom-name-{code}", ""),
-                "description": request.POST.get(f"description-{code}", ""),
-                "is_active": bool(request.POST.get(f"is_active-{code}")),
-            }
-            # We use a single ModelForm instance to validate each submitted group of data.
-            form = ValidateSiaeJobDescriptionForm(data=data)
-            if not form.is_valid():
-                for key, value in form.errors.items():
-                    verbose_name = form.fields[key].label
-                    error = value[0]
-                    # The key of the dict is used in tests.
-                    errors[code] = f"{verbose_name} : {error}"
+        refreshed_cards = refresh_card_list(request=request, siae=siae)
 
-        if not errors:
+        if not refreshed_cards["errors"]:
+            with transaction.atomic():
+                if refreshed_cards["jobs"]["create"]:
+                    SiaeJobDescription.objects.bulk_create(refreshed_cards["jobs"]["create"])
 
-            current_codes = set(siae.job_description_through.values_list("appellation__code", flat=True))
+                if refreshed_cards["jobs"]["update"]:
+                    SiaeJobDescription.objects.bulk_update(
+                        refreshed_cards["jobs"]["update"], ["custom_name", "description", "is_active", "updated_at"]
+                    )
 
-            codes_to_create = submitted_codes - current_codes
-            # It is assumed that the codes to delete are not submitted (they must
-            # be removed from the DOM via JavaScript). Instead, they are deducted.
-            codes_to_delete = current_codes - submitted_codes
-            codes_to_update = current_codes - codes_to_delete
-
-            if codes_to_create or codes_to_delete or codes_to_update:
-                with transaction.atomic():
-                    # Create.
-                    for code in codes_to_create:
-                        appellation = Appellation.objects.get(code=code)
-                        through_defaults = {
-                            "custom_name": request.POST.get(f"custom-name-{code}", ""),
-                            "description": request.POST.get(f"description-{code}", ""),
-                            "is_active": bool(request.POST.get(f"is_active-{code}")),
-                        }
-                        siae.jobs.add(appellation, through_defaults=through_defaults)
-
-                    # Delete.
-                    if codes_to_delete:
-                        appellations = Appellation.objects.filter(code__in=codes_to_delete)
-                        siae.jobs.remove(*appellations)
-
-                    # Update.
-                    for job_through in siae.job_description_through.filter(appellation__code__in=codes_to_update):
-                        code = job_through.appellation.code
-                        new_custom_name = request.POST.get(f"custom-name-{code}", "")
-                        new_description = request.POST.get(f"description-{code}", "")
-                        new_is_active = bool(request.POST.get(f"is_active-{code}"))
-                        if (
-                            job_through.custom_name != new_custom_name
-                            or job_through.description != new_description
-                            or job_through.is_active != new_is_active
-                        ):
-                            job_through.custom_name = new_custom_name
-                            job_through.description = new_description
-                            job_through.is_active = new_is_active
-                            job_through.save()
+                if refreshed_cards["jobs"]["delete"]:
+                    siae.jobs.remove(*refreshed_cards["jobs"]["delete"])
 
                 messages.success(request, "Mise à jour effectuée !")
                 return HttpResponseRedirect(reverse("dashboard:index"))
+        else:
+            errors = refreshed_cards["errors"]
 
     context = {"errors": errors, "job_descriptions": job_descriptions, "siae": siae}
     return render(request, template_name, context)
+
+
+@require_POST
+@login_required
+def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
+    """
+    SIAE's card (or "Fiche" in French) search preview.
+
+    Return only html of card search preview without global template (header, footer, ...)
+    Need to recount active jobs to avoid supress and updated count active jobs
+    """
+    siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
+
+    form_siae_block_job_applications = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
+    if form_siae_block_job_applications.is_valid():
+        siae = form_siae_block_job_applications.instance
+
+    refreshed_cards = refresh_card_list(request=request, siae=siae)
+
+    if not refreshed_cards["errors"]:
+        # sort all the jobs buy updated_at and created_at desc
+        list_jobs_descriptions = sorted(
+            refreshed_cards["jobs"]["create"]
+            + refreshed_cards["jobs"]["update"]
+            + refreshed_cards["jobs"]["unmodified"],
+            key=lambda x: x.updated_at if x.updated_at else x.created_at,
+            reverse=True,
+        )
+
+        # count the number of active jobs
+        count_active_job_descriptions = 0
+        for job in list_jobs_descriptions:
+            # int(True) = 1, int(False) = 0
+            count_active_job_descriptions += int(job.is_active)
+
+        siae.count_active_job_descriptions = count_active_job_descriptions
+
+        context = {
+            "siae": siae,
+            "jobs_descriptions": list_jobs_descriptions,
+        }
+
+        html = render_to_string(template_name, context)
+        return HttpResponse(html)
 
 
 @login_required
@@ -312,24 +326,5 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
         "structure": siae,
         "target_member": target_member,
     }
-
-    return render(request, template_name, context)
-
-
-@login_required
-def block_job_applications(request, template_name="siaes/block_job_applications.html"):
-    """
-    Settings: block job applications for given SIAE
-    """
-    siae = get_current_siae_or_404(request)
-
-    form = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Mise à jour du blocage des candidatures effectuée !")
-        return HttpResponseRedirect(reverse("dashboard:index"))
-
-    context = {"siae": siae, "form": form}
 
     return render(request, template_name, context)

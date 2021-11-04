@@ -304,10 +304,46 @@ Usage:
     font-weight: 700;
 }
 
+.font-size-hat {
+    font-size: 1.25rem;
+}
+
+.title-with-badge .badge{
+    font-size: 1rem;
+}
 /* To be discussed
 --------------------------------------------------------------------------- */
+.collapse-caret, .collapse-caret:hover{
+    text-decoration: unset;
+}
+.collapse-caret>h6::after {
+    /* when not collapsed */
+    display: inline-block;
+    content: " ";
+    /* icon arrow-down-s-fill from remix icon */
+    background-image: url("../vendor/theme-inclusion/images/ico-arrow-down-s-fill.svg");
+    /* h6 font size = 1rem */
+    background-size: 16px 16px;
+    height: 16px;
+    width: 24px;
+    background-position-y: bottom;
+    margin-left: 8px;
+    transform: rotate(180deg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.collapse-caret.collapsed>h6::after {
+    background-position-y: center;
+    height: 12px;
+    transform: rotate(0deg);
+}
 
 .employee-records-list .badge {
     white-space: normal;
     margin: 0;
+}
+
+.text-with-btn span{
+    line-height: 2.2;
 }

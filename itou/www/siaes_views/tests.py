@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.conf import settings
+from django.contrib.gis.geos import Point
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -8,6 +9,7 @@ from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
 from faker import Faker
 
+from itou.cities.models import City
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.factories import (
@@ -53,9 +55,14 @@ class JobDescriptionCardViewTest(TestCase):
 class ConfigureJobsViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Set up data for the whole TestCase.
 
-        siae = SiaeWithMembershipFactory()
+        # Set up data for the whole TestCase.
+        city_slug = "paris-75"
+        paris_city = City.objects.create(
+            name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
+        )
+
+        siae = SiaeWithMembershipFactory(department="75", coords=paris_city.coords, post_code="75001")
         user = siae.members.first()
 
         create_test_romes_and_appellations(["N1101", "N1105", "N1103", "N4105"])
@@ -68,7 +75,7 @@ class ConfigureJobsViewTest(TestCase):
             ]
         )
         siae.jobs.add(*appellations)
-
+        siae.save()
         cls.siae = siae
         cls.user = user
 
@@ -103,7 +110,10 @@ class ConfigureJobsViewTest(TestCase):
 
         post_data = {
             # List of appellations codes that we will operate on.
-            "code": ["10357", "10579", "10750", "10877", "16361"],
+            "code-update": ["10579", "10750"],
+            "code-create": ["10877", "16361"],
+            # Exclude code `11999` from POST payload.
+            "code-delete": ["11999"],
             # Do nothing for "Agent / Agente cariste de livraison ferroviaire"
             "is_active-10357": "on",  # "on" is set when the checkbox is checked.
             # Update "Agent / Agente de quai manutentionnaire"
@@ -115,7 +125,6 @@ class ConfigureJobsViewTest(TestCase):
             "custom-name-10750": "",
             "description-10750": "",
             # Delete for "Chauffeur-livreur / Chauffeuse-livreuse"
-            # Exclude code `11999` from POST payload.
             # Add "Aide-livreur / Aide-livreuse"
             "is_active-10877": "on",
             "custom-name-10877": "Aide-livreur hebdomadaire",
@@ -123,10 +132,8 @@ class ConfigureJobsViewTest(TestCase):
             # Add "Manutentionnaire"
             "is_active-16361": "",
         }
-
         response = self.client.post(self.url, data=post_data)
         self.assertEqual(response.status_code, 302)
-
         self.assertEqual(self.siae.jobs.count(), 5)
         self.assertEqual(self.siae.job_description_through.count(), 5)
 
@@ -170,7 +177,7 @@ class ConfigureJobsViewTest(TestCase):
         custom_name_max_length = SiaeJobDescription._meta.get_field("custom_name").max_length
 
         post_data = {
-            "code": ["10357", "10579"],
+            "code-update": ["10357", "10579"],
             # Code 10357 should not validate.
             "is_active-10357": "on",
             "custom-name-10357": fake.sentence(nb_words=custom_name_max_length + 1),
@@ -187,6 +194,130 @@ class ConfigureJobsViewTest(TestCase):
         # See the `configure_jobs` view.
         self.assertIn("10357", response.context["errors"])
         self.assertNotIn("10579", response.context["errors"])
+
+    def test_block_direct_job_application(self):
+        """
+        Check if user is trying to get to job application directly via URL
+        """
+        siae = SiaeWithMembershipAndJobsFactory(block_job_applications=True)
+
+        user = JobSeekerFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+        # Check for member of the SIAE: should pass
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_toggle_blocking(self):
+        """Testing enabling / disabling job applications blocking and checking results"""
+
+        # Avoid errors in validation of the SIAE
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.context["current_siae"], self.siae)
+
+        post_data = {"block_job_applications": "on"}
+
+        response = self.client.post(self.url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        siae = Siae.objects.get(siret=self.siae.siret)
+        self.assertTrue(siae.block_job_applications)
+        self.assertIsNotNone(siae.job_applications_blocked_at)
+
+        block_date = siae.job_applications_blocked_at
+
+        post_data = {"block_job_applications": ""}
+        response = self.client.post(self.url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        siae = Siae.objects.get(siret=self.siae.siret)
+        self.assertFalse(siae.block_job_applications)
+        self.assertEqual(siae.job_applications_blocked_at, block_date)
+
+        post_data = {"block_job_applications": "on"}
+
+        response = self.client.post(self.url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        siae = Siae.objects.get(siret=self.siae.siret)
+        self.assertTrue(siae.block_job_applications)
+        self.assertNotEqual(block_date, siae.job_applications_blocked_at)
+
+    def test_blocking_jobs_true_and_list_jobs(self):
+        # be sure that we have always one active job
+        job_description = self.siae.job_description_through.first()
+        job_description.is_active = True
+        job_description.save()
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        # check active jobs when block job applications is true
+        post_data = {
+            "block_job_applications": "on",
+        }
+        response = self.client.post(self.url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        siae = Siae.objects.get(siret=self.siae.siret)
+        self.assertTrue(siae.block_job_applications)
+        # get card view
+        url_list_job = reverse("siaes_views:card", kwargs={"siae_id": self.siae.pk})
+        response = self.client.get(url_list_job)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["siae"], self.siae)
+        response_content = str(response.content)
+        self.assertNotIn("Recrutement en cours", response_content)
+
+        # get job description
+        url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        response = self.client.get(url)
+        response_content = str(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["job"], job_description)
+        self.assertIn("Pas de recrutement en cours", response_content)
+
+    def test_blocking_jobs_false_and_list_jobs(self):
+        # be sure that we have always one active job
+        job_description = self.siae.job_description_through.first()
+        job_description.is_active = True
+        job_description.save()
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        # check active jobs when block job applications is true
+        post_data = {"block_job_applications": ""}
+        response = self.client.post(self.url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        siae = Siae.objects.get(siret=self.siae.siret)
+        self.assertFalse(siae.block_job_applications)
+        # get card view
+        url_list_job = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        response = self.client.get(url_list_job)
+        # fail
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["siae"], self.siae)
+        response_content = str(response.content)
+        self.assertIn("Recrutement en cours", response_content)
+
+        # get job description
+        url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        response = self.client.get(url)
+        response_content = str(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["job"], job_description)
+        self.assertIn("Recrutement en cours", response_content)
 
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
@@ -629,69 +760,6 @@ class MembersTest(TestCase):
         url = reverse("siaes_views:members")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-
-
-class BlockJobApplicationsTest(TestCase):
-    def test_block_direct_job_application(self):
-        """
-        Check if user is trying to get to job application directly via URL
-        """
-        siae = SiaeWithMembershipAndJobsFactory(block_job_applications=True)
-
-        user = JobSeekerFactory()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
-
-        # Check for member of the SIAE: should pass
-        user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-
-    def test_toggle_blocking(self):
-        """Testing enabling / disabling job applications blocking and checking results"""
-
-        # Avoid errors in validation of the SIAE
-        siae = SiaeWithMembershipFactory(department="67", post_code="67020")
-
-        user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-
-        url = reverse("siaes_views:block_job_applications")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], siae)
-
-        post_data = {"block_job_applications": "on"}
-
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
-        siae = Siae.objects.get(siret=siae.siret)
-        self.assertTrue(siae.block_job_applications)
-        self.assertIsNotNone(siae.job_applications_blocked_at)
-
-        block_date = siae.job_applications_blocked_at
-
-        post_data = {"block_job_applications": ""}
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
-        siae = Siae.objects.get(siret=siae.siret)
-        self.assertFalse(siae.block_job_applications)
-        self.assertEqual(siae.job_applications_blocked_at, block_date)
-
-        post_data = {"block_job_applications": "on"}
-
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
-        siae = Siae.objects.get(siret=siae.siret)
-        self.assertTrue(siae.block_job_applications)
-        self.assertNotEqual(block_date, siae.job_applications_blocked_at)
 
 
 class UserMembershipDeactivationTest(TestCase):
