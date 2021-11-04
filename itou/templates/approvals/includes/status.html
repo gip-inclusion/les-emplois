@@ -102,10 +102,12 @@
                             du {{ p.start_at|date:"d/m/Y" }} au {{ p.end_at|date:"d/m/Y" }}
                             <br>
                             <small>{{ p.get_reason_display }}</small>
+                            {% if p.validated_by %}
                             <br>
                             <small>
                                 Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
                             </small>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>

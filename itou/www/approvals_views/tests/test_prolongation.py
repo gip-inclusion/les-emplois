@@ -111,3 +111,55 @@ class ApprovalProlongationTest(TestCase):
         email = mail.outbox[0]
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], post_data["email"])
+
+    def test_prolong_approval_view_without_prescriber(self):
+        """
+        Test the creation of a prolongation without prescriber.
+        """
+
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+
+        back_url = "/"
+        params = urlencode({"back_url": back_url})
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
+        url = f"{url}?{params}"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["preview"], False)
+
+        reason = Prolongation.Reason.COMPLETE_TRAINING
+        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+
+        post_data = {
+            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "reason": reason,
+            "reason_explanation": "Reason explanation is required.",
+            # Preview.
+            "preview": "1",
+        }
+
+        # Go to preview.
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["preview"], True)
+
+        # Save to DB.
+        del post_data["preview"]
+        post_data["save"] = 1
+
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, back_url)
+
+        self.assertEqual(1, self.approval.prolongation_set.count())
+
+        prolongation = self.approval.prolongation_set.first()
+        self.assertEqual(prolongation.created_by, self.siae_user)
+        self.assertEqual(prolongation.declared_by, self.siae_user)
+        self.assertEqual(prolongation.declared_by_siae, self.job_application.to_siae)
+        self.assertIsNone(prolongation.validated_by)
+        self.assertEqual(prolongation.reason, post_data["reason"])
+
+        # No email should have been sent.
+        self.assertEqual(len(mail.outbox), 0)

@@ -165,7 +165,7 @@ class Command(BaseCommand):
         # e.g. '002_missions_ai_ehpad.sql' => 'missions_ai_ehpad'
         """
         path = f"{CURRENT_DIR}/sql"
-        for filename in [f for f in os.listdir(path) if f.endswith(".sql")]:
+        for filename in sorted([f for f in os.listdir(path) if f.endswith(".sql")]):
             self.log(f"Running {filename} ...")
             table_name = "_".join(filename.split(".")[0].split("_")[1:])
             with open(os.path.join(path, filename), "r") as file:

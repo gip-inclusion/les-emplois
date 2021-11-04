@@ -355,11 +355,18 @@ API_ENTREPRISE_CONTEXT = "emplois.inclusion.beta.gouv.fr"
 API_ENTREPRISE_RECIPIENT = os.environ.get("API_ENTREPRISE_RECIPIENT")
 API_ENTREPRISE_TOKEN = os.environ.get("API_ENTREPRISE_TOKEN")
 
-# Pôle emploi's Emploi Store Dev aka ESD.
-# https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
-# If you need the recette endpoints for testing, set those environment variables:
-# API_ESD_AUTH_BASE_URL="https://entreprise.pe-qvr.fr"
-# API_ESD_BASE_URL="https://api-r.es-qvr.fr/partenaire"
+# Pôle emploi's Emploi Store Dev aka ESD. There is a production AND a recette environment:
+#  - Production: https://www.pole-emploi.io
+#  - Recette: https://peio.pe-qvr.fr/
+# Key and secrets are on pole-emploi.io (prod and recette) accounts, the values are not the
+# same depending on the environment
+# Please note that some of APIs have a dry run mode which is handled through (possibly undocumented) scopes
+# Recette settings:
+## API_ESD_AUTH_BASE_URL="https://entreprise.pe-qvr.fr"
+## API_ESD_BASE_URL="https://api-r.es-qvr.fr/partenaire"
+# Production settings:
+## API_ESD_AUTH_BASE_URL="https://entreprise.pole-emploi.fr"
+## API_ESD_BASE_URL="https://api.emploi-store.fr/partenaire"
 API_ESD_KEY = os.environ.get("API_ESD_KEY", "")
 API_ESD_SECRET = os.environ.get("API_ESD_SECRET", "")
 API_ESD_AUTH_BASE_URL = os.environ.get("API_ESD_AUTH_BASE_URL", "https://entreprise.pole-emploi.fr")

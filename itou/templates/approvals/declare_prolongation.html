@@ -1,4 +1,5 @@
 {% extends "layout/content_small.html" %}
+{% load js_filters %}
 {% load bootstrap4 %}
 
 {% block title %}Déclarer une prolongation de PASS IAE{{ block.super }}{% endblock %}
@@ -26,18 +27,28 @@
 
             {% csrf_token %}
 
-            {% bootstrap_form form alert_error_type="all" %}
+            {% bootstrap_form_errors form type="all" %}
 
-            <p>
-                Jusqu'à la publication du décret d'application de la loi du 14 décembre 2020, vous ne pouvez solliciter qu'un conseiller Pôle emploi pour demander une prolongation.
-            </p>
+            {% bootstrap_field form.reason %}
+    
+            {% bootstrap_field form.end_at %}
+    
+            {% bootstrap_field form.reason_explanation %}
+    
+            <div id="js-field-email">
+                {% bootstrap_field form.email %}
 
-            <p>
-                <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank">
-                    Rechercher des prescripteurs
-                    {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
-                </a>
-            </p>
+                <p>
+                    Pour enregistrer une prolongation avec ce motif, vous devez obtenir l'accord préalable d'un prescripteur habilité.
+                </p>
+
+                <p>
+                    <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank">
+                        Rechercher des prescripteurs
+                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                    </a>
+                </p>
+            </div>
 
             <hr>
 
@@ -79,11 +90,13 @@
                         jusqu'au
                         <span class="badge badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
                     </p>
+                    {% if form.instance.validated_by.email %}
                     <p class="card-text">
                         Un e-mail sera envoyé au prescripteur habilité ayant autorisé la prolongation :
                         <b>{{ form.instance.validated_by.get_full_name|title }}</b>
                         ({{ form.instance.validated_by.email }})
                     </p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -113,4 +126,23 @@
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
+
+    {# Clicking on a reason that does not require the opinion of a prescriber hide email field  #}
+    <script type="text/javascript">
+        $(document).ready(() => {
+            var reasons_not_need_prescriber_opinion = {{ form.reasons_not_need_prescriber_opinion|js }};
+            $('#js-field-email').css("display", "none");
+            
+            function toggle_email_field_visibility() {
+                const value = $('input[name="reason"]:checked').val();
+                if (reasons_not_need_prescriber_opinion.includes(value)) {
+                    $('#js-field-email').hide("slidedown").find('.form-group').removeClass("form-group-required");
+                } else {
+                    $('#js-field-email').show("slideup").find('.form-group').addClass("form-group-required");
+                }
+            }
+            $('#id_reason input').on('change', toggle_email_field_visibility);
+            toggle_email_field_visibility();
+        });
+    </script>
 {% endblock %}
