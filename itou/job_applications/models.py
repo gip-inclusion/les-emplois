@@ -244,6 +244,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE = "approval_expiration_too_close"
     REFUSAL_REASON_DEACTIVATION = "deactivation"
     REFUSAL_REASON_NOT_MOBILE = "not_mobile"
+    REFUSAL_REASON_POORLY_INFORMED = "poorly_informed"
     REFUSAL_REASON_OTHER = "other"
     REFUSAL_REASON_CHOICES = (
         (REFUSAL_REASON_DID_NOT_COME, "Candidat non venu ou non joignable"),
@@ -265,6 +266,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         (REFUSAL_REASON_NO_POSITION, "Pas de poste ouvert en ce moment"),
         (REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE, "La date de fin du PASS IAE / agrément est trop proche"),
         (REFUSAL_REASON_DEACTIVATION, "La structure n'est plus conventionnée"),
+        (REFUSAL_REASON_POORLY_INFORMED, "Candidature pas assez renseignée"),
         (REFUSAL_REASON_OTHER, "Autre"),
     )
 
