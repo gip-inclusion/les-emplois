@@ -24,7 +24,6 @@ unzip -P $ASP_UNZIP_PASSWORD asp_shared_bucket/Liste_Contact_EA*.zip -d itou/sia
 # Perform the necessary data imports
 time ./manage.py populate_metabase_fluxiae --verbosity 2
 time ./manage.py import_siae --verbosity=2
-# The EA import is currently broken due to data issues
 time ./manage.py import_ea_eatt --verbosity=2
 
 # Destroy the cleartext ASP data
