@@ -1,0 +1,10 @@
+{% if errors %}
+    <div class="alert alert-danger alert-dismissible alert-link" role="alert">
+        <button class="close" type="button" data-dismiss="alert" aria-label="close">×</button>
+        <ul>
+            {% for error in errors.values %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
