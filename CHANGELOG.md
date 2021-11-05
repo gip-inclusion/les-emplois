@@ -4,22 +4,21 @@
 
 ### Ajouté
 
-- Ajout du NIR aux informations du candidat, pour mieux qualifier les comptes candidat.
-- On peut désormais avoir un aperçu dans le moteur de recherche des modifications dans "Gérer les métiers et recrutements".
-- Ajout d'un message dans la déclaration de fiches salarié à l'ASP, on informe désormais les employeurs qu'ils doivent avoir une annexe financière valide pour pouvoir déclarer une fiche salariée dans les emplois
-- Un PASS IAE peut dorénavant être prolongé jusqu'à 3 mois après sa fin.
-- Ajout de la fonctionnalité à certains employeurs pour voir les statistiques Metabase de leurs SIAE.
-- Ajout d'un indicateur pour le suivi du nombre de salariés en insertion.
+- Ajout du NIR aux informations du candidat, pour mieux qualifier les comptes candidat
+- On peut désormais avoir un aperçu dans le moteur de recherche des modifications dans "Gérer les métiers et recrutements"
+- Ajout d'un message dans la déclaration de fiches salarié à l'ASP, on informe désormais les employeurs qu'ils doivent avoir une annexe financière valide pour pouvoir déclarer une fiche salarié dans les emplois
+- Un PASS IAE peut dorénavant être prolongé jusqu'à 3 mois après sa fin
+- Ajout de la fonctionnalité à certains employeurs pour voir les statistiques Metabase de leurs SIAE
+- Les employeurs peuvent prolonger un PASS IAE sans l'avis d'un prescripteur habilité pour deux motifs _CDI conclu avec une personne âgée de + de 57 ans_ et _Fin de formation_
 - Admin des diagnostics
-  - Permettre la recherche par PK.
+  - Permettre la recherche par PK
 - Admin des utilisateurs
-  - Permettre la recherche par NIR.
-  - Correctif sur le champ notifications au niveau des structures qui étaient éditable sans raison et prenaient trop de place.
-  - Correctif sur l'ajout de nouvelles memberships qui n'était pas possible (structures+organisations+institutions) car le champ PK n'était pas éditable.
-  - Correctif sur le champ "modifié par" au niveau des institutions qui était éditable sans raison.
+  - Permettre la recherche par NIR
+  - Correctif sur le champ notifications au niveau des structures qui étaient éditable sans raison et prenaient trop de place
+  - Correctif sur l'ajout de nouvelles memberships qui n'était pas possible (structures+organisations+institutions) car le champ PK n'était pas éditable
+  - Correctif sur le champ "modifié par" au niveau des institutions qui était éditable sans raison
 - Admin des conventions
-  - Montrer l'ID ASP de structure ASP.
-  - Les employeurs peuvent prolonger un PASS IAE sans l'avis d'un prescripteur habilité pour deux motifs _CDI conclu avec une personne âgée de + de 57 ans_ et _Fin de formation_.
+  - Montrer l'ID ASP de structure ASP
 
 ### Modifié
 
@@ -28,25 +27,21 @@
 - Amélioration de la visibilité dans la recherche :
   - Des métiers ouverts au recrutement
   - Des structurent qui sont ouvertes au recrutement en candidatures spontanées
-- Redirection des liens de [la communauté](https://communaute.inclusion.beta.gouv.fr) vers [la nouvelle plateforme](https://forum.inclusion.beta.gouv.fr)
-- Données de pilotage
-  - Mis à jour du département de conventionnement pour gérer le cas particulier du département 59
-  - Filtre des tableaux de bord de pilotage du suivi des recrutements par département de conventionnement au lieu du département de la structure.
-  - Limitation des données analysées pour le suivi. _Les données n'étaient pas limitées, dorénavant, nous analysons les données sur les deux dernières années et l'année en cours._
-- Admin des structures
-  - Correctif sur le champ notifications qui étaient éditable sans raison et prenaient trop de place.
-  - Correctif sur les fiches de poste : les champs "date de création" et "date de modification" ne sont plus éditables.
-  - Renommage du nom de la configuration des cronjobs qui passe de `c1-prod-config` à `c1-fast-machine-config`.
-  - Clarification de la documentation pour les paramètres d'utilisation d'API de pôle emploi.
-  - Remise de la fonctionnalité de modification des mots de passe utilisateurs depuis l'interface d'admin.
-- Environnement de développement
+  - Redirection des liens de [la communauté](https://communaute.inclusion.beta.gouv.fr) vers [la nouvelle plateforme](https://forum.inclusion.beta.gouv.fr)
+  - Admin des structures :
+  - Correctif sur le champ notifications qui étaient éditable sans raison et prenaient trop de place
+  - Correctif sur les fiches de poste : les champs "date de création" et "date de modification" ne sont plus éditables
+  - Renommage du nom de la configuration des cronjobs qui passe de `c1-prod-config` à `c1-fast-machine-config`
+  - Clarification de la documentation pour les paramètres d'utilisation d'API de pôle emploi
+  - Remise de la fonctionnalité de modification des mots de passe utilisateurs depuis l'interface d'admin
+  - Environnement de développement
   - Résolutions des erreurs de l'agent Elastic APM qui permet de suivre les performances de l'application
   - Correctif des tests concernant la génération du NIR
-  - Correctif des données de l'environnement de tests des utilisateurs.
+  - Correctif des données de l'environnement de tests des utilisateurs
 
 ### Supprimé
 
-- Suppression du menu "Bloquer les nouvelles candidatures" dans le tableau de bord. Il est déplacé dans le menu "Gérer les métiers et recrutements", anciennement nommé "Publier/gérer les fiches de postes".
+- Suppression du menu "Bloquer les nouvelles candidatures" dans le tableau de bord. Il est déplacé dans le menu "Gérer les métiers et recrutements", anciennement nommé "Publier/gérer les fiches de postes"
 
 ## [29] - 2021-10-22
 
