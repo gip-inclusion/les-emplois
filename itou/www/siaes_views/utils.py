@@ -14,23 +14,27 @@ def refresh_card_list(request, siae):
     codes_to_create = set(request.POST.getlist("code-create"))
     codes_to_delete = set(request.POST.getlist("code-delete"))
     codes_to_update = set(request.POST.getlist("code-update"))
-
-    for code in codes_to_create.union(codes_to_update):
-        data = {
-            # Omit `SiaeJobDescription.appellation` since the field is
-            # hidden and `Appellation.objects.get()` will fail anyway.
-            "custom_name": request.POST.get(f"custom-name-{code}", ""),
-            "description": request.POST.get(f"description-{code}", ""),
-            "is_active": bool(request.POST.get(f"is_active-{code}")),
-        }
-        # We use a single ModelForm instance to validate each submitted group of data.
-        form = ValidateSiaeJobDescriptionForm(data=data)
-        if not form.is_valid():
-            for key, value in form.errors.items():
-                verbose_name = form.fields[key].label
-                error = value[0]
-                # The key of the dict is used in tests.
-                errors[code] = f"{verbose_name} : {error}"
+    # quick fix not to avoid integrity error
+    list_intersect_create_update = codes_to_create & codes_to_update
+    if list_intersect_create_update:
+        errors["integrityError"] = f"Duplication des métiers ayant le code {', '.join(list_intersect_create_update)}"
+    if not errors:
+        for code in codes_to_create.union(codes_to_update):
+            data = {
+                "appellation": request.POST.get(f"appellation-{code}", ""),
+                "custom_name": request.POST.get(f"custom-name-{code}", ""),
+                "description": request.POST.get(f"description-{code}", ""),
+                "is_active": bool(request.POST.get(f"is_active-{code}")),
+                "siae": siae.id,
+            }
+            # We use a single ModelForm instance to validate each submitted group of data.
+            form = ValidateSiaeJobDescriptionForm(data=data)
+            if not form.is_valid():
+                for key, value in form.errors.items():
+                    verbose_name = form.fields[key].label
+                    error = value[0]
+                    # The key of the dict is used in tests.
+                    errors[code] = f"{verbose_name} : {error}"
 
     if not errors:
         if codes_to_create or codes_to_delete or codes_to_update:

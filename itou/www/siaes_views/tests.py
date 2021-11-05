@@ -164,6 +164,41 @@ class ConfigureJobsViewTest(TestCase):
         )
         self.assertTrue(self.siae.job_description_through.get(appellation_id=16361, is_active=False))
 
+    def test_update_with_same_appellation_id(self):
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            # List of appellations codes that we will operate on.
+            "code-update": ["10579", "10750"],
+            "code-create": ["10579", "16361"],
+            # Exclude code `11999` from POST payload.
+            "code-delete": ["11999"],
+            # Do nothing for "Agent / Agente cariste de livraison ferroviaire"
+            "is_active-10357": "on",  # "on" is set when the checkbox is checked.
+            # Update "Agent / Agente de quai manutentionnaire"
+            "custom-name-10579": "Agent de quai",
+            "description-10579": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "is_active-10579": "",
+            # Update "Agent magasinier / Agente magasinière gestionnaire de stocks"
+            "is_active-10750": "",
+            "custom-name-10750": "",
+            "description-10750": "",
+            # Delete for "Chauffeur-livreur / Chauffeuse-livreuse"
+            # Add "Aide-livreur / Aide-livreuse"
+            "is_active-10579": "on",
+            "custom-name-10579": "Aide-livreur hebdomadaire",
+            "description-10579": "Pellentesque ex ex, elementum sed sollicitudin sit amet, dictum vel elit.",
+            # Add "Manutentionnaire"
+            "is_active-16361": "",
+        }
+        response = self.client.post(self.url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["errors"])
+        self.assertTrue(response.context["errors"]["integrityError"])
+
     def test_error_custom_name_max_length(self):
         """
         Given two job descriptions, when setting a custom-name too long,
