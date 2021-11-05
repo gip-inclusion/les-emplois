@@ -20,7 +20,7 @@ class JobsAutocompleteTest(TestCase):
         expected = [
             {
                 "value": "Agent / Agente cariste de livraison ferroviaire (N1101)",
-                "code-update": "10357",
+                "code": "10357",
                 "rome": "N1101",
                 "name": "Agent / Agente cariste de livraison ferroviaire",
             }
@@ -39,9 +39,36 @@ class JobsAutocompleteTest(TestCase):
         expected = [
             {
                 "value": "Chauffeur-livreur / Chauffeuse-livreuse (N4105)",
-                "code-update": "11999",
+                "code": "11999",
                 "rome": "N4105",
                 "name": "Chauffeur-livreur / Chauffeuse-livreuse",
+            }
+        ]
+        self.assertEqual(json.loads(response.content), expected)
+
+    def test_update_rome_code(self):
+        response = self.client.get(self.url, {"term": "CHAUFFEUR livreuse n4105", "code-update": "11999"})
+        self.assertEqual(response.status_code, 200)
+        expected = []
+        self.assertEqual(json.loads(response.content), expected)
+
+    def test_delete_rome_code(self):
+        response = self.client.get(
+            self.url,
+            {
+                "term": "CHAUFFEUR",
+                "code-update": ["11999", "12001", "11998"],
+                "code-create": "12000",
+                "code-delete": "11998",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        expected = [
+            {
+                "value": "Chauffeur-jockey / Chauffeuse-jockey (N4105)",
+                "code": "11998",
+                "rome": "N4105",
+                "name": "Chauffeur-jockey / Chauffeuse-jockey",
             }
         ]
         self.assertEqual(json.loads(response.content), expected)
@@ -60,7 +87,7 @@ class JobsAutocompleteTest(TestCase):
         expected = [
             {
                 "value": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
-                "code-update": "12918",
+                "code": "12918",
                 "rome": "N1101",
                 "name": "Conducteur / Conductrice de chariot élévateur de l'armée",
             }
@@ -75,7 +102,7 @@ class JobsAutocompleteTest(TestCase):
         expected = [
             {
                 "value": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
-                "code-update": "12918",
+                "code": "12918",
                 "rome": "N1101",
                 "name": "Conducteur / Conductrice de chariot élévateur de l'armée",
             }
