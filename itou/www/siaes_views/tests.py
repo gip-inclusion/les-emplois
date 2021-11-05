@@ -164,6 +164,24 @@ class ConfigureJobsViewTest(TestCase):
         )
         self.assertTrue(self.siae.job_description_through.get(appellation_id=16361, is_active=False))
 
+    def test_update_with_same_appellation_id(self):
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            # List of appellations codes that we will operate on.
+            "code-update": ["10579", "10750"],
+            "code-create": ["10579", "16361"],
+            # Exclude code `11999` from POST payload.
+            "code-delete": ["11999"],
+        }
+        response = self.client.post(self.url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["errors"])
+        self.assertTrue(response.context["errors"]["integrityError"])
+
     def test_error_custom_name_max_length(self):
         """
         Given two job descriptions, when setting a custom-name too long,

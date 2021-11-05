@@ -43,7 +43,10 @@ def jobs_autocomplete(request):
     appellations = []
 
     if term:
-        codes_to_exclude = request.GET.getlist("code", [])
+        codes_to_delete = request.GET.getlist("code-delete", [])
+        codes_to_create_update = request.GET.getlist("code-create", [])
+        codes_to_create_update += request.GET.getlist("code-update", [])
+        codes_to_exclude = list(set(codes_to_create_update) - set(codes_to_delete))
         appellations = [
             {
                 "value": f"{appellation.name} ({appellation.rome.code})",

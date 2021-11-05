@@ -28,7 +28,7 @@ class JobsAutocompleteTest(TestCase):
         self.assertEqual(json.loads(response.content), expected)
 
     def test_search_multi_words_with_exclusion(self):
-        response = self.client.get(self.url, {"term": "cariste ferroviaire", "code": "10357"})
+        response = self.client.get(self.url, {"term": "cariste ferroviaire", "code-update": "10357"})
         self.assertEqual(response.status_code, 200)
         expected = b"[]"
         self.assertEqual(response.content, expected)
@@ -42,6 +42,33 @@ class JobsAutocompleteTest(TestCase):
                 "code": "11999",
                 "rome": "N4105",
                 "name": "Chauffeur-livreur / Chauffeuse-livreuse",
+            }
+        ]
+        self.assertEqual(json.loads(response.content), expected)
+
+    def test_update_rome_code(self):
+        response = self.client.get(self.url, {"term": "CHAUFFEUR livreuse n4105", "code-update": "11999"})
+        self.assertEqual(response.status_code, 200)
+        expected = []
+        self.assertEqual(json.loads(response.content), expected)
+
+    def test_delete_rome_code(self):
+        response = self.client.get(
+            self.url,
+            {
+                "term": "CHAUFFEUR",
+                "code-update": ["11999", "12001", "11998"],
+                "code-create": "12000",
+                "code-delete": "11998",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        expected = [
+            {
+                "value": "Chauffeur-jockey / Chauffeuse-jockey (N4105)",
+                "code": "11998",
+                "rome": "N4105",
+                "name": "Chauffeur-jockey / Chauffeuse-jockey",
             }
         ]
         self.assertEqual(json.loads(response.content), expected)
