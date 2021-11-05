@@ -20,7 +20,7 @@ class JobsAutocompleteTest(TestCase):
         expected = [
             {
                 "value": "Agent / Agente cariste de livraison ferroviaire (N1101)",
-                "code": "10357",
+                "code-update": "10357",
                 "rome": "N1101",
                 "name": "Agent / Agente cariste de livraison ferroviaire",
             }
@@ -28,7 +28,7 @@ class JobsAutocompleteTest(TestCase):
         self.assertEqual(json.loads(response.content), expected)
 
     def test_search_multi_words_with_exclusion(self):
-        response = self.client.get(self.url, {"term": "cariste ferroviaire", "code": "10357"})
+        response = self.client.get(self.url, {"term": "cariste ferroviaire", "code-update": "10357"})
         self.assertEqual(response.status_code, 200)
         expected = b"[]"
         self.assertEqual(response.content, expected)
@@ -39,7 +39,7 @@ class JobsAutocompleteTest(TestCase):
         expected = [
             {
                 "value": "Chauffeur-livreur / Chauffeuse-livreuse (N4105)",
-                "code": "11999",
+                "code-update": "11999",
                 "rome": "N4105",
                 "name": "Chauffeur-livreur / Chauffeuse-livreuse",
             }
@@ -60,7 +60,7 @@ class JobsAutocompleteTest(TestCase):
         expected = [
             {
                 "value": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
-                "code": "12918",
+                "code-update": "12918",
                 "rome": "N1101",
                 "name": "Conducteur / Conductrice de chariot élévateur de l'armée",
             }
@@ -75,7 +75,7 @@ class JobsAutocompleteTest(TestCase):
         expected = [
             {
                 "value": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
-                "code": "12918",
+                "code-update": "12918",
                 "rome": "N1101",
                 "name": "Conducteur / Conductrice de chariot élévateur de l'armée",
             }

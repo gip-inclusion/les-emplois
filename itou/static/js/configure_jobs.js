@@ -37,7 +37,7 @@ $(document).ready(() => {
 
   // Autocomplete.
 
-  let codesSelector = '[name="code"]'
+  let codesSelector = '[name^="code-"]'
   let codesToExclude = $(codesSelector).serialize()
 
   let jobSearchInput = $('.js-job-autocomplete-input')
@@ -107,6 +107,7 @@ $(document).ready(() => {
       minLength: 1,
       source: (request, response) => {
         let term = encodeURIComponent(request.term)
+        codesToExclude = $(codesSelector).serialize()
         $.getJSON(
           jobSearchInput.data('autocomplete-source-url'),
           `term=${term}&${codesToExclude}`,
@@ -118,7 +119,6 @@ $(document).ready(() => {
         event.preventDefault()
         jobsTable.removeClass('d-none')
         addJob(ui.item)
-        codesToExclude = $(codesSelector).serialize()
         jobSearchInput.val('')
       },
       search: (event, ui) => {
