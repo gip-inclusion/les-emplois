@@ -146,7 +146,7 @@ def card_search_preview(request, template_name="siaes/includes/_card_siae.html")
         html = render_to_string(template_name, context)
     else:
         context = {"errors": refreshed_cards["errors"]}
-        template_name_errors = "siaes/includes/_alerte_configure_job.html"
+        template_name_errors = "siaes/includes/_alert_configure_job.html"
         html = render_to_string(template_name_errors, context)
     return HttpResponse(html)
 
