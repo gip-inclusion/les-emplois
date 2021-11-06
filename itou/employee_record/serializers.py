@@ -1,4 +1,5 @@
 import re
+from typing import OrderedDict
 
 from rest_framework import serializers
 from unidecode import unidecode
@@ -85,6 +86,9 @@ class _EmployeeAddress(serializers.ModelSerializer):
 
     class Meta:
         model = User
+        # Fields adrMail, adrTelephone
+        # are faked out, but kept for conformity with
+        # ASP specifications.
         fields = [
             "adrTelephone",
             "adrMail",
@@ -96,6 +100,15 @@ class _EmployeeAddress(serializers.ModelSerializer):
             "codeinseecom",
             "codepostalcedex",
         ]
+
+    def _update_address_and_phone_number(self, result, instance):
+        if result.get("adrMail"):
+            result["adrMail"] = None
+
+        if result.get("adrTelephone"):
+            result["adrTelephone"] = None
+
+        return result
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
@@ -124,11 +137,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
         # ASP has some weird filtering of technically valid email adresses
         # and a phone number format not suitable for most real cases
         # leading to rejection of some employee records
-        if result.get("adrMail"):
-            result["adrMail"] = None
-
-        if result.get("adrTelephone"):
-            result["adrTelephone"] = None
+        result = self._update_address_and_phone_number(result, instance)
 
         # Remove diacritics and parenthesis from adrLibelleVoie field fixes ASP error 3330
         # (parenthesis are not described as invalid characters in specification document)
@@ -295,6 +304,25 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         return result
 
 
+class _API_EmployeeAddress(_EmployeeAddress):
+    # This class in only useful for compatibilty
+    # We decided not to send phone and email (business and bad ASP address filters)
+    # But we make it available for API for compatibility with original document
+    # (these fiels should really be actual data, not fake, by implicit contract)
+
+    def _update_address_and_phone_number(self, result, instance) -> OrderedDict:
+        """
+        Allow overriding these 2 fields:
+        - adrTelephone
+        - adrMail
+        Make data readable again for API users.
+        """
+        result["adrTelephone"] = instance.phone
+        result["adrMail"] = instance.email
+
+        return result
+
+
 class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
     """
     This serializer is a version with the `numeroAnnexe` field added (financial annex number).
@@ -304,6 +332,7 @@ class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
     """
 
     numeroAnnexe = serializers.CharField(source="financial_annex_number")
+    adresse = _API_EmployeeAddress(source="job_application.job_seeker")
 
     class Meta:
         model = EmployeeRecord
