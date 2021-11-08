@@ -124,53 +124,61 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
+    def setUp(self, _mock):
+        # We only care about status filtering: no coherence check on ASP return values
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        self.employee_record = EmployeeRecord.from_job_application(job_application)
+        self.employee_record.update_as_ready()
+
+        self.siae = job_application.to_siae
+        self.siae_member = self.siae.members.first()
+        self.user = job_application.job_seeker
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
     def test_fetch_employee_record_list(self, _mock):
         """
         Fetch list of employee records with and without `status` query param
         """
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
-        siae = job_application.to_siae
-        user = siae.members.first()
-
         # Using session auth (same as token but less steps)
-        self.client.login(username=user.username, password=DEFAULT_PASSWORD)
+        self.client.login(username=self.siae_member.username, password=DEFAULT_PASSWORD)
 
         # Get list without filtering by status (PROCESSED)
         # note: there is no way to create a processed employee record
         # (and this is perfectly normal)
-        employee_record_processed = EmployeeRecord.from_job_application(job_application=job_application)
-        employee_record_processed.update_as_ready()
-        employee_record_processed.update_as_sent("RIAE_FS_20210410130000.json", 1)
+        self.employee_record.update_as_sent("RIAE_FS_20210410130000.json", 1)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
 
         # There should be no result at this point
         response = self.client.get(ENDPOINT_URL, format="json")
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         result = response.json()
 
         self.assertEqual(len(result.get("results")), 0)
 
-        employee_record_processed.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_accepted(process_code, process_message, "{}")
         response = self.client.get(ENDPOINT_URL, format="json")
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         result = response.json()
 
         self.assertEqual(len(result.get("results")), 1)
-        self.assertContains(response, siae.siret)
+        self.assertContains(response, self.siae.siret)
 
         # status = SENT
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=siae)
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
         employee_record_sent = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_sent.update_as_ready()
 
         # There should be no result at this point
         response = self.client.get(ENDPOINT_URL + "?status=SENT", format="json")
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         result = response.json()
 
@@ -179,22 +187,22 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         employee_record_sent.update_as_sent("RIAE_FS_20210410130001.json", 1)
         response = self.client.get(ENDPOINT_URL + "?status=SENT", format="json")
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         result = response.json()
 
         self.assertEqual(len(result.get("results")), 1)
-        self.assertContains(response, siae.siret)
+        self.assertContains(response, self.siae.siret)
 
         # status = REJECTED
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=siae)
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
         employee_record_rejected = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_rejected.update_as_ready()
         employee_record_rejected.update_as_sent("RIAE_FS_20210410130002.json", 1)
 
         # There should be no result at this point
         response = self.client.get(ENDPOINT_URL + "?status=REJECTED", format="json")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         result = response.json()
 
@@ -205,9 +213,32 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
 
         # Status case is not important
         response = self.client.get(ENDPOINT_URL + "?status=rEjEcTeD", format="json")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         result = response.json()
 
         self.assertEqual(len(result.get("results")), 1)
-        self.assertContains(response, siae.siret)
+        self.assertContains(response, self.siae.siret)
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_show_phone_email_api(self, _mock):
+        # BUGFIX:
+        # Test that employee phone number and email address are passed
+        # to API serializer.
+        self.client.login(username=self.siae_member.username, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        json = response.json()
+
+        self.assertEqual(len(json.get("results")), 1)
+
+        results = json["results"][0]
+
+        self.assertEqual(results.get("adresse").get("adrTelephone"), self.user.phone)
+        self.assertEqual(results.get("adresse").get("adrMail"), self.user.email)
