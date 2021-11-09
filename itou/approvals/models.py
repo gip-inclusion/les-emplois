@@ -659,13 +659,29 @@ class Prolongation(models.Model):
         HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire"
 
     MAX_CUMULATIVE_DURATION = {
+        Reason.SENIOR_CDI.value: {
+            "duration": relativedelta(years=10),
+            "label": "10 ans",
+        },
         Reason.COMPLETE_TRAINING.value: {
-            "duration": datetime.timedelta(days=183),  # A leap year can contain 183 days in 6 months.
-            "label": "6 mois",
+            "duration": relativedelta(years=2),
+            "label": "2 ans",
+        },
+        Reason.RQTH.value: {
+            "duration": relativedelta(years=3),
+            "label": "3 ans",
+        },
+        Reason.SENIOR.value: {
+            "duration": relativedelta(years=5),
+            "label": "5 ans",
         },
         Reason.PARTICULAR_DIFFICULTIES.value: {
-            "duration": datetime.timedelta(days=365 * 5),
-            "label": "5 ans",
+            "duration": relativedelta(years=3),
+            "label": "3 ans",
+        },
+        Reason.HEALTH_CONTEXT.value: {
+            "duration": relativedelta(months=12),
+            "label": "12 mois",
         },
     }
 
