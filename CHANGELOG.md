@@ -28,13 +28,13 @@
   - Des métiers ouverts au recrutement
   - Des structurent qui sont ouvertes au recrutement en candidatures spontanées
   - Redirection des liens de [la communauté](https://communaute.inclusion.beta.gouv.fr) vers [la nouvelle plateforme](https://forum.inclusion.beta.gouv.fr)
-  - Admin des structures :
+- Admin des structures :
   - Correctif sur le champ notifications qui étaient éditable sans raison et prenaient trop de place
   - Correctif sur les fiches de poste : les champs "date de création" et "date de modification" ne sont plus éditables
   - Renommage du nom de la configuration des cronjobs qui passe de `c1-prod-config` à `c1-fast-machine-config`
   - Clarification de la documentation pour les paramètres d'utilisation d'API de pôle emploi
   - Remise de la fonctionnalité de modification des mots de passe utilisateurs depuis l'interface d'admin
-  - Environnement de développement
+- Environnement de développement
   - Résolutions des erreurs de l'agent Elastic APM qui permet de suivre les performances de l'application
   - Correctif des tests concernant la génération du NIR
   - Correctif des données de l'environnement de tests des utilisateurs
