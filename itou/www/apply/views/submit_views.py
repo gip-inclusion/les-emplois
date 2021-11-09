@@ -57,14 +57,15 @@ def get_approvals_wrapper(request, job_seeker, siae):
             error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
         raise PermissionDenied(error)
 
-    if approvals_wrapper.has_valid and approvals_wrapper.latest_approval.is_pass_iae:
+    # if approvals_wrapper.has_valid and approvals_wrapper.latest_approval.is_pass_iae:
 
-        # Ensure that an existing approval is not suspended.
-        if approvals_wrapper.latest_approval.is_suspended:
-            error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY
-            if user_info.user == job_seeker:
-                error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
-            raise PermissionDenied(error)
+    #     # Ensure that an existing approval is not suspended.
+    #     # + si suspension pour un autre que motif ("contrat de travail terminé ou contrat de travail rompu")
+    #     if approvals_wrapper.latest_approval.is_suspended:
+    #         error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY
+    #         if user_info.user == job_seeker:
+    #             error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
+    #         raise PermissionDenied(error)
 
     return approvals_wrapper
 
