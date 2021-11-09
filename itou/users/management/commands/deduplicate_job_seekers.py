@@ -64,6 +64,7 @@ class Command(BaseCommand):
         assert target.email
 
         users_to_delete = [u for u in duplicates if u != target]
+        nirs = [u.nir for u in duplicates if u.nir]
 
         user_admin_path = reverse("admin:users_user_change", args=[target.pk])
         user_admin_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{user_admin_path}"
@@ -88,6 +89,14 @@ class Command(BaseCommand):
                 )
                 user.eligibility_diagnoses.update(job_seeker=target)
                 user.delete()
+
+        # If only one NIR exists for all the duplicates, it is reassigned to
+        # the target account. This must be executed at the end because of the
+        # uniqueness constraint.
+        if len(nirs) == 1 and not target.nir:
+            target.nir = nirs[0]
+            if not self.dry_run:
+                target.save()
 
     def handle(self, dry_run=False, **options):
 
