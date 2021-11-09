@@ -130,19 +130,26 @@
     {# Clicking on a reason that does not require the opinion of a prescriber hide email field  #}
     <script type="text/javascript">
         $(document).ready(() => {
+            var reasons_max_durations = {{ form.reasons_max_duration_labels|js }};
             var reasons_not_need_prescriber_opinion = {{ form.reasons_not_need_prescriber_opinion|js }};
             $('#js-field-email').css("display", "none");
             
-            function toggle_email_field_visibility() {
+            function ajust_form_according_reason() {
                 const value = $('input[name="reason"]:checked').val();
                 if (reasons_not_need_prescriber_opinion.includes(value)) {
                     $('#js-field-email').hide("slidedown").find('.form-group').removeClass("form-group-required");
                 } else {
                     $('#js-field-email').show("slideup").find('.form-group').addClass("form-group-required");
                 }
+
+                if (value in reasons_max_durations) {
+                    $('#js-duration-label').text(" (jusqu'à " + reasons_max_durations[value] + " maximum)").show();
+                } else {
+                    $('#js-duration-label').text("").hide();
+                }
             }
-            $('#id_reason input').on('change', toggle_email_field_visibility);
-            toggle_email_field_visibility();
+            $('#id_reason input').on('change', ajust_form_according_reason);
+            ajust_form_according_reason();
         });
     </script>
 {% endblock %}
