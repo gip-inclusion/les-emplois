@@ -124,7 +124,7 @@ class ItouLogoutView(LogoutView):
         ajax_response = super().post(*args, **kwargs)
 
         # Logouts user from the app and from France Connect (FC).
-        if fc_token and not settings.ITOU_ENVIRONMENT == "DEV":
+        if fc_token:
             # In the dev environment, user is not logged out from FC because for some reason
             # on FC’s end, it throws an error and crash so post-logout
             # redirection is not performed
@@ -151,9 +151,12 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
         with transaction.atomic():
             request.user.email = form.cleaned_data["email"]
             request.user.save()
-            request.user.emailaddress_set.first().delete()
+            if request.user.emailaddress_set and request.user.emailaddress_set.first():
+                request.user.emailaddress_set.first().delete()
+        # we perform the redirection like this in order to ensure every logout
+        # route performs the same operations
         auth.logout(request)
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect(reverse("account_logout"))
 
     context = {
         "form": form,

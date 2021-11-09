@@ -149,7 +149,8 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         return HttpResponseRedirect(reverse("account_login"))
 
     if "sub" not in user_data:
-        message = "Le paramètre « sub » n'a pas été retourné par FranceConnect."
+        # 'sub' is the unique identifier from France Connect, we need that to match a user later on
+        message = "Le paramètre « sub » n'a pas été retourné par FranceConnect. Il est nécessaire pour identifier un utilisateur."  # noqa E501
         logger.error(message)
         return HttpResponseRedirect(reverse("account_login"))
 
