@@ -161,21 +161,21 @@ class ManagementCommandsTest(TestCase):
         }
 
         # Create `user1` through a job application sent by him.
-        job_app1 = JobApplicationSentByJobSeekerFactory(**kwargs)
+        job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__nir=None, **kwargs)
         user1 = job_app1.job_seeker
 
         self.assertEqual(1, user1.job_applications.count())
         self.assertEqual(job_app1.sender, user1)
 
         # Create `user2` through a job application sent by him.
-        job_app2 = JobApplicationSentByJobSeekerFactory(**kwargs)
+        job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__nir=None, **kwargs)
         user2 = job_app2.job_seeker
 
         self.assertEqual(1, user2.job_applications.count())
         self.assertEqual(job_app2.sender, user2)
 
         # Create `user3` through a job application sent by a prescriber.
-        job_app3 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        job_app3 = JobApplicationWithEligibilityDiagnosis(job_seeker__nir=None, **kwargs)
         user3 = job_app3.job_seeker
         self.assertNotEqual(job_app3.sender, user3)
         job_app3_sender = job_app3.sender  # The sender is a prescriber.
