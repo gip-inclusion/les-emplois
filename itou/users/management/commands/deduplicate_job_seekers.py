@@ -127,24 +127,24 @@ class Command(BaseCommand):
             if len(users_with_approval) <= 1:
 
                 count_easy_cases += 1
-
-                user_with_approval = next((u for u in duplicates if u.approvals.exists()), None)
+                target = None
 
                 # Give priority to the user with a PASS IAE.
+                user_with_approval = next((u for u in duplicates if u.approvals.exists()), None)
                 if user_with_approval:
-                    self.merge_easy_cases(duplicates, target=user_with_approval)
+                    target = user_with_approval
 
                 # Handle duplicates without any PASS IAE.
                 else:
-
-                    # Give priority to the first user who already logged in.
+                    # Give priority to the first user who already logged in…
                     first_autonomous_user = next((u for u in duplicates if u.last_login), None)
                     if first_autonomous_user:
-                        self.merge_easy_cases(duplicates, target=first_autonomous_user)
-
-                    # Choose an arbitrary user to merge others into.
+                        target = first_autonomous_user
+                    # …or choose an arbitrary user to merge others into.
                     else:
-                        self.merge_easy_cases(duplicates, target=duplicates[0])
+                        target = duplicates[0]
+
+                self.merge_easy_cases(duplicates, target=target)
 
             # Hard cases.
             # More than one PASS IAE was issued for the same person.
