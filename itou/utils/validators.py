@@ -45,7 +45,7 @@ def validate_pole_emploi_id(pole_emploi_id):
 
 
 def validate_nir(nir):
-    # http://nourtier.net/cle_NIR/cle_NIR.htm
+    ## http://nourtier.net/cle_NIR/cle_NIR.htm
     nir = str(nir).replace(" ", "").upper()
     # Replace 2A and 2B by 19 and 18 to handle digits.
     nir = nir.replace("2A", "19").replace("2B", "18")
