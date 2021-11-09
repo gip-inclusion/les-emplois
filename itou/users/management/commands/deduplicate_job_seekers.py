@@ -56,7 +56,7 @@ class Command(BaseCommand):
         if verbosity >= 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def merge_easy_cases(self, duplicates, target):
+    def merge_easy_cases(self, duplicates, target, nirs):
         """
         Merge easy cases: when None or 1 PASS IAE was issued accross multiple accounts.
         """
@@ -64,7 +64,6 @@ class Command(BaseCommand):
         assert target.email
 
         users_to_delete = [u for u in duplicates if u != target]
-        nirs = [u.nir for u in duplicates if u.nir]
 
         user_admin_path = reverse("admin:users_user_change", args=[target.pk])
         user_admin_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{user_admin_path}"
@@ -135,6 +134,14 @@ class Command(BaseCommand):
             # None or 1 PASS IAE was issued for the same person with multiple accounts.
             if len(users_with_approval) <= 1:
 
+                nirs = [u.nir for u in duplicates if u.nir]
+
+                if len(nirs) > 1:
+                    # Finally there may still be duplicates, even with the NIR.
+                    # We do nothing with them for the moment because it is
+                    # impossible to identify which NIR is the right one.
+                    continue
+
                 count_easy_cases += 1
                 target = None
 
@@ -153,7 +160,7 @@ class Command(BaseCommand):
                     else:
                         target = duplicates[0]
 
-                self.merge_easy_cases(duplicates, target=target)
+                self.merge_easy_cases(duplicates, target=target, nirs=nirs)
 
             # Hard cases.
             # More than one PASS IAE was issued for the same person.
