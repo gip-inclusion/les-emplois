@@ -13,8 +13,21 @@ class Command(BaseCommand):
     """
     Deduplicate job seekers.
 
-    This is temporary and should be deleted after the release of the NIR
-    which should prevent duplication.
+    How are duplicates created?
+    The identification of a person was done on the basis of the `email` field.
+    But it happens that a SIAE (or a prescriber):
+    - makes a typing error in the email
+    - creates an email on the fly because job seekers do not remember their own
+    - enters a fancy email
+    - enters another family member's email
+    This results in duplicates that we try to correct when possible whith this
+    management command.
+
+    The NIR is now used to ensure the uniqueness of job seekers and should be
+    the safety pin that prevents duplicates.
+
+    This command is temporary and should be deleted as soon as a sufficient
+    number of users have a NIR.
 
     To run the command without any change in DB and have a preview of which
     accounts will be merged:
