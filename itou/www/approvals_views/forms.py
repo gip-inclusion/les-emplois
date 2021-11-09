@@ -20,6 +20,7 @@ class DeclareProlongationForm(forms.ModelForm):
         self.siae = kwargs.pop("siae")
         self.validated_by = None
         self.reasons_not_need_prescriber_opinion = Prolongation.REASONS_NOT_NEED_PRESCRIBER_OPINION
+        self.reasons_max_duration_labels = {k: v["label"] for (k, v) in Prolongation.MAX_CUMULATIVE_DURATION.items()}
         super().__init__(*args, **kwargs)
 
         if not self.instance.pk:
@@ -83,7 +84,7 @@ class DeclareProlongationForm(forms.ModelForm):
         help_texts = {
             "end_at": mark_safe(
                 (
-                    "Date jusqu'à laquelle le PASS IAE doit être prolongé."
+                    'Date jusqu\'à laquelle le PASS IAE doit être prolongé<strong id="js-duration-label"></strong>.'
                     "<br>"
                     "Au format JJ/MM/AAAA, par exemple 20/12/1978."
                 )
