@@ -20,7 +20,6 @@ class DeclareProlongationForm(forms.ModelForm):
         self.siae = kwargs.pop("siae")
         self.validated_by = None
         self.reasons_not_need_prescriber_opinion = Prolongation.REASONS_NOT_NEED_PRESCRIBER_OPINION
-        self.reasons_max_duration_labels = {k: v["label"] for (k, v) in Prolongation.MAX_CUMULATIVE_DURATION.items()}
         super().__init__(*args, **kwargs)
 
         if not self.instance.pk:
@@ -30,6 +29,11 @@ class DeclareProlongationForm(forms.ModelForm):
             # `approval` must be set before model validation to avoid violating a not-null constraint.
             self.instance.approval = self.approval
             self.fields["reason"].initial = None  # Uncheck radio buttons.
+
+        self.reasons_max_duration_labels = {
+            k: {"l": v["label"], "d": str(Prolongation.get_max_end_at(self.instance.start_at, k))}
+            for (k, v) in Prolongation.MAX_CUMULATIVE_DURATION.items()
+        }
 
         # `PARTICULAR_DIFFICULTIES` is allowed only for ACI.
         if self.siae.kind not in [self.siae.KIND_ACI, self.siae.KIND_AI]:
