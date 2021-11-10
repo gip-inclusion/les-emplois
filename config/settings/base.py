@@ -3,8 +3,8 @@ Base settings to build other settings files upon.
 https://docs.djangoproject.com/en/dev/ref/settings
 """
 import datetime
-import os
 import json
+import os
 
 import pytz
 from django.utils import timezone
@@ -441,7 +441,7 @@ ITOU_PROTOCOL = "https"
 ITOU_FQDN = "emplois.inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
 ITOU_EMAIL_PROLONGATION = "prolongation@inclusion.beta.gouv.fr"
-ITOU_ASSISTANCE_URL = "https://assistance.inclusion.beta.gouv.fr"
+ITOU_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/assistance/"
 
 DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
