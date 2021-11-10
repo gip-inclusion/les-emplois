@@ -644,8 +644,8 @@ class Prolongation(models.Model):
     `trigger_update_approval_end_at_for_prolongation`.
     """
 
-    # Max duration: 12 months but it depends on the `reason` field, see `get_max_end_at`.
-    MAX_DURATION_MONTHS = 12
+    # Max duration: 10 years but it depends on the `reason` field, see `get_max_end_at`.
+    MAX_DURATION = relativedelta(years=10)
 
     class Reason(models.TextChoices):
         SENIOR_CDI = "SENIOR_CDI", "CDI conclu avec une personne de plus de 57 ans"
@@ -883,10 +883,10 @@ class Prolongation(models.Model):
         """
         Returns the maximum date on which a prolongation can end.
         """
-        max_duration_months = Prolongation.MAX_DURATION_MONTHS
-        if reason == Prolongation.Reason.COMPLETE_TRAINING.value:
-            max_duration_months = 6
-        return start_at + relativedelta(months=max_duration_months) - relativedelta(days=1)
+        max_duration = Prolongation.MAX_DURATION
+        if reason in Prolongation.MAX_CUMULATIVE_DURATION:
+            max_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]["duration"]
+        return start_at + max_duration - relativedelta(days=1)
 
 
 class PoleEmploiApprovalManager(models.Manager):
