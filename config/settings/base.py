@@ -441,7 +441,7 @@ ITOU_PROTOCOL = "https"
 ITOU_FQDN = "emplois.inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
 ITOU_EMAIL_PROLONGATION = "prolongation@inclusion.beta.gouv.fr"
-ITOU_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/assistance/"
+ITOU_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/assistance"
 
 DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
