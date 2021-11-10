@@ -10,8 +10,6 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form_errors form type="all" %}
-
         {% bootstrap_form form %}
 
         {% if redirect_field_value %}
