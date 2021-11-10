@@ -1,5 +1,4 @@
 import datetime
-import logging
 
 from dateutil.relativedelta import relativedelta
 from django import forms
@@ -18,9 +17,6 @@ from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget
-
-
-logger = logging.getLogger(__name__)
 
 
 class UserExistsForm(forms.Form):
@@ -82,12 +78,6 @@ class CheckJobSeekerNirForm(forms.Form):
                     "cliquer sur « mot de passe oublié ». "
                     f'En cas de souci, vous pouvez <a href="{settings.ITOU_ASSISTANCE_URL}" rel="noopener" '
                     'target="_blank" aria-label="Ouverture dans un nouvel onglet">nous contacter</a>.'
-                )
-                logger.warning(
-                    forms.ValidationError(
-                        "Un utilisateur avec ce NIR (%s) existe déjà. Email compte connecté: %s"
-                        % (existing_account.nir, self.job_seeker.email)
-                    )
                 )
                 raise forms.ValidationError(mark_safe(error_message))
         else:
