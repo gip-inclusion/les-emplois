@@ -3,7 +3,7 @@
 {% load static %}
 {% load format_filters %}
 
-{% block title %}Postuler{{ block.super }}{% endblock %}
+{% block title %}{{ block.super }}{% endblock %}
 
 {% block right_column %}
     <form method="post" action="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="js-prevent-multiple-submit js-format-nir">
