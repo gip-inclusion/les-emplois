@@ -235,6 +235,13 @@ class Approval(CommonApprovalMixin):
         return self.jobapplication_set.get().state == state_accepted
 
     @cached_property
+    def can_update_suspension(self):
+        return self.is_suspended and self.suspension_set.in_progress().last().reason in [
+            Suspension.Reason.BROKEN_CONTRACT.value,
+            Suspension.Reason.FINISHED_CONTRACT.value,
+        ]
+
+    @cached_property
     def is_last_for_user(self):
         """
         Returns True if the current Approval is the most recent for the user, False otherwise.
