@@ -884,7 +884,10 @@ class Prolongation(models.Model):
         Returns the maximum date on which a prolongation can end.
         """
         max_duration = Prolongation.MAX_DURATION
-        if reason in Prolongation.MAX_CUMULATIVE_DURATION:
+        if reason == Prolongation.Reason.PARTICULAR_DIFFICULTIES.value:
+            # 12 months renewable up to 3 years for this reason
+            max_duration = relativedelta(months=12)
+        elif reason in Prolongation.MAX_CUMULATIVE_DURATION:
             max_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]["duration"]
         return start_at + max_duration - relativedelta(days=1)
 
