@@ -2,8 +2,10 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
@@ -64,9 +66,23 @@ class CheckJobSeekerNirForm(forms.Form):
     def clean_nir(self):
         nir = self.cleaned_data["nir"]
         nir = nir.replace(" ", "")
-        if not self.job_seeker:
+        existing_account = User.objects.filter(nir=nir).first()
+
+        # Job application sent by autonomous job seeker.
+        if self.job_seeker:
+            if existing_account:
+                error_message = (
+                    "Ce numéro de sécurité sociale est déjà utilisé par un autre compte. "
+                    f"Merci de vous reconnecter avec l'adresse e-mail <b>{existing_account.email}</b>. "
+                    "Si vous ne vous souvenez plus de votre mot de passe, vous pourrez "
+                    "cliquer sur « mot de passe oublié ». "
+                    f'En cas de souci, vous pouvez <a href="{settings.ITOU_ASSISTANCE_URL}" rel="noopener" '
+                    'target="_blank" aria-label="Ouverture dans un nouvel onglet">nous contacter</a>.'
+                )
+                raise forms.ValidationError(mark_safe(error_message))
+        else:
             # For the moment, consider NIR to be unique among users.
-            self.job_seeker = User.objects.filter(nir=nir).first()
+            self.job_seeker = existing_account
         return nir
 
     def get_job_seeker(self):
