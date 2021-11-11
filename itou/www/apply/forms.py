@@ -74,7 +74,7 @@ class CheckJobSeekerNirForm(forms.Form):
                 error_message = (
                     "Ce numéro de sécurité sociale est déjà utilisé par un autre compte. "
                     f"Merci de vous reconnecter avec l'adresse e-mail <b>{existing_account.email}</b>. "
-                    "Si vous ne vous souvenez plus de votre mot de passe, vous pouvez "
+                    "Si vous ne vous souvenez plus de votre mot de passe, vous pourrez "
                     "cliquer sur « mot de passe oublié ». "
                     f'En cas de souci, vous pouvez <a href="{settings.ITOU_ASSISTANCE_URL}" rel="noopener" '
                     'target="_blank" aria-label="Ouverture dans un nouvel onglet">nous contacter</a>.'
