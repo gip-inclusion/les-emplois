@@ -496,7 +496,7 @@ class EmployeeRecord(models.Model):
     @staticmethod
     def siret_from_asp_source(siae):
         """
-        Fetch SIRET number or ASP source structure ("mother" SIAE)
+        Fetch SIRET number of ASP source structure ("mother" SIAE)
         """
         if siae.source != Siae.SOURCE_ASP:
             main_siae = Siae.objects.get(convention=siae.convention, source=Siae.SOURCE_ASP)
