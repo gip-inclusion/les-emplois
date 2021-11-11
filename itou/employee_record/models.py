@@ -116,6 +116,8 @@ class EmployeeRecord(models.Model):
     ERROR_EMPLOYEE_RECORD_IS_DUPLICATE = "Une fiche salarié pour ce PASS IAE et cette SIAE existe déjà"
     ERROR_EMPLOYEE_RECORD_INVALID_STATE = "La fiche salarié n'est pas dans l'état requis pour cette action"
 
+    ERROR_NO_CONVENTION_AVAILABLE = "La structure actuelle ne dispose d'aucune convention"
+
     # 'C' stands for Creation
     ASP_MOVEMENT_TYPE = "C"
 
@@ -222,6 +224,8 @@ class EmployeeRecord(models.Model):
         """
         Check if job application is valid for FS
         """
+        if not self.job_application.to_siae.convention:
+            raise ValidationError(self.ERROR_NO_CONVENTION_AVAILABLE)
 
         if not self.job_application.state.is_accepted:
             raise ValidationError(self.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED)
@@ -289,6 +293,17 @@ class EmployeeRecord(models.Model):
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
+
+        # There could be a delay between the moment the object
+        # is created and the moment it is sent to ASP.
+        # In the meantime asp_id / SIRET *can change*
+        # (mainly because of weekly ASP import scripts).
+        # To prevent some ASP processing errors, we do a refresh
+        # on some mutable fields before sending:
+        # - ASP ID
+        # - SIRET number
+        self.siret = EmployeeRecord.siret_from_asp_source(self.job_application.to_siae)
+        self.asp_id = self.job_application.to_siae.convention.asp_id
 
         self.asp_batch_file = asp_filename
         self.asp_batch_line_number = line_number
@@ -478,6 +493,17 @@ class EmployeeRecord(models.Model):
 
         return self._batch_line_number
 
+    @staticmethod
+    def siret_from_asp_source(siae):
+        """
+        Fetch SIRET number of ASP source structure ("mother" SIAE)
+        """
+        if siae.source != Siae.SOURCE_ASP:
+            main_siae = Siae.objects.get(convention=siae.convention, source=Siae.SOURCE_ASP)
+            return main_siae.siret
+
+        return siae.siret
+
     @classmethod
     def from_job_application(cls, job_application):
         """
@@ -507,11 +533,7 @@ class EmployeeRecord(models.Model):
         fs.approval_number = job_application.approval.number
 
         # Fetch correct number if SIAE is an antenna
-        if job_application.to_siae.source == Siae.SOURCE_USER_CREATED:
-            main_siae = Siae.objects.get(convention=job_application.to_siae.convention, source=Siae.SOURCE_ASP)
-            fs.siret = main_siae.siret
-        else:
-            fs.siret = job_application.to_siae.siret
+        fs.siret = EmployeeRecord.siret_from_asp_source(job_application.to_siae)
 
         return fs
 
