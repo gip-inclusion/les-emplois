@@ -16,9 +16,9 @@ TABLE_COLUMNS = [
         "fn": lambda o: o.appellation.rome.name,
     },
     {
-        "name": "active",
+        "name": "recrutement_ouvert",
         "type": "boolean",
-        "comment": "Fiche de poste active à ce jour",
+        "comment": "Recrutement ouvert à ce jour",
         "fn": lambda o: o.is_active,
     },
     {"name": "id_employeur", "type": "integer", "comment": "ID employeur", "fn": lambda o: o.siae.id},
