@@ -45,7 +45,7 @@ jobs:
 
     - name: 🏷 Setup app name
       run:
-        echo "CRON_TASK_APP_NAME=`echo \"c1-cron-populate-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
+        echo "CRON_TASK_APP_NAME=`echo \"c1-cron-daily-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
 
     - name: 🏷 Setup worker command
       run:
