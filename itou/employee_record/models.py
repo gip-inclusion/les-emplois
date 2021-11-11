@@ -498,7 +498,7 @@ class EmployeeRecord(models.Model):
         """
         Fetch SIRET number or ASP source structure ("mother" SIAE)
         """
-        if siae.source == Siae.SOURCE_USER_CREATED:
+        if siae.source != Siae.SOURCE_ASP:
             main_siae = Siae.objects.get(convention=siae.convention, source=Siae.SOURCE_ASP)
             return main_siae.siret
 
