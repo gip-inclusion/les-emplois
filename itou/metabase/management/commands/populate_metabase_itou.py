@@ -165,7 +165,9 @@ class Command(BaseCommand):
                     "name": "date_mise_à_jour_metabase",
                     "type": "date",
                     "comment": "Date de dernière mise à jour de Metabase",
-                    "fn": lambda o: timezone.now(),
+                    # As metabase daily updates run typically every night after midnight, the last day with
+                    # complete data is yesterday, not today.
+                    "fn": lambda o: timezone.now() + timezone.timedelta(days=-1),
                 },
             ]
 
