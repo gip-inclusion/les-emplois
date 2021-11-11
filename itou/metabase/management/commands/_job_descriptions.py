@@ -51,4 +51,10 @@ TABLE_COLUMNS += [
         "comment": "Date de création",
         "fn": lambda o: o.created_at,
     },
+    {
+        "name": "date_dernière_modification",
+        "type": "date",
+        "comment": "Date de dernière modification",
+        "fn": lambda o: o.updated_at,
+    },
 ]
