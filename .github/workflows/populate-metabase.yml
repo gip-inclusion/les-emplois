@@ -3,7 +3,8 @@ name: Populate metabase
 # Runs "populate_itou_metabase".
 # A github action takes care of the cron task that:
 # - creates a machine on demand
-# - runs the desired command through CC_RUN_SUCCEEDED_HOOK
+# - runs the desired command via a worker
+# - waits a reasonable amount of time for the script to complete
 # - destroys the machine once the update is done
 on:
   workflow_dispatch: # allows us to run this action manually
@@ -46,13 +47,9 @@ jobs:
       run:
         echo "CRON_TASK_APP_NAME=`echo \"c1-cron-populate-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
 
-    # CC_RUN_SUCCEEDED_HOOK is a clever-cloud-specific environment variable.
-    # We set the command we want to run once the app is started
-    # The goal of this entire file relies on this variable !
-    # https://www.clever-cloud.com/doc/develop/build-hooks/
-    - name: 🏷 Setup post-deployment hook
+    - name: 🏷 Setup worker command
       run:
-        echo 'CC_RUN_SUCCEEDED_HOOK=./manage.py populate_metabase_itou --verbosity 2' >> $GITHUB_ENV
+        echo 'CC_WORKER_COMMAND=./manage.py populate_metabase_itou --verbosity 2' >> $GITHUB_ENV
 
     - name: 🧫 Create a cron app on Clever Cloud on a strong machine
       run: |
@@ -80,18 +77,16 @@ jobs:
         $CLEVER_CLI service link-addon c1-prod-database-encrypted
         $CLEVER_CLI service link-addon c1-itou-redis
 
-    - name: "🚀 Deploy post-deploy hook to Clever"
+    - name: 🚀 Deploy worker command to Clever
       run:
-        $CLEVER_CLI env import-vars CC_RUN_SUCCEEDED_HOOK
+        $CLEVER_CLI env import-vars CC_WORKER_COMMAND
 
-# OK, here is the tricky part: we use a hook, so in the following 2 tasks
-# we deploy and destroy the app, but in fact we sequentially:
-# - deploy the application
-# - run what’s in CC_RUN_SUCCEEDED_HOOK
-# - destroy the app once the task is over
-    - name: 🚀 Deploy to Clever Cloud
+    - name: 🚀 Deploy app to Clever Cloud
       run: $CLEVER_CLI deploy --alias $CRON_TASK_APP_NAME --branch $DEPLOY_BRANCH --force
 
-    - name: 🗑 Delete the app once the work is done
+    - name: 🕒 Wait one hour which should be more than enough for the script to complete
+      run: sleep 3600
+
+    - name: 🔪 Delete the app once the work is done
       run:
         $CLEVER_CLI delete --yes
