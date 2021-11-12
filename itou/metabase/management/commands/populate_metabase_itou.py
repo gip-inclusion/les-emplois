@@ -147,94 +147,102 @@ class Command(BaseCommand):
         new_table_name = f"{table_name}_new"
         old_table_name = f"{table_name}_old"
 
-        self.cleanup_tables(table_name)
+        with MetabaseDatabaseCursor() as (cur, conn):
+            self.cur = cur
+            self.conn = conn
 
-        if self.dry_run:
-            total_rows = sum(
-                [min(queryset.count(), settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET) for queryset in querysets]
-            )
-        else:
-            total_rows = sum([queryset.count() for queryset in querysets])
+            self.cleanup_tables(table_name)
 
-        table_columns += [
-            {
-                "name": "date_mise_à_jour_metabase",
-                "type": "date",
-                "comment": "Date de dernière mise à jour de Metabase",
-                "fn": lambda o: timezone.now(),
-            },
-        ]
+            if self.dry_run:
+                total_rows = sum(
+                    [min(queryset.count(), settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET) for queryset in querysets]
+                )
+            else:
+                total_rows = sum([queryset.count() for queryset in querysets])
 
-        # Transform boolean fields into 0-1 integer fields as
-        # metabase cannot sum or average boolean columns ¯\_(ツ)_/¯
-        for c in table_columns:
-            if c["type"] == "boolean":
-                c["type"] = "integer"
-                c["fn"] = compose(convert_boolean_to_int, c["fn"])
+            table_columns += [
+                {
+                    "name": "date_mise_à_jour_metabase",
+                    "type": "date",
+                    "comment": "Date de dernière mise à jour de Metabase",
+                    # As metabase daily updates run typically every night after midnight, the last day with
+                    # complete data is yesterday, not today.
+                    "fn": lambda o: timezone.now() + timezone.timedelta(days=-1),
+                },
+            ]
 
-        self.log(f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:")
+            # Transform boolean fields into 0-1 integer fields as
+            # metabase cannot sum or average boolean columns ¯\_(ツ)_/¯
+            for c in table_columns:
+                if c["type"] == "boolean":
+                    c["type"] = "integer"
+                    c["fn"] = compose(convert_boolean_to_int, c["fn"])
 
-        # Create table.
-        create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields_with_type})").format(
-            new_table_name=sql.Identifier(new_table_name),
-            fields_with_type=sql.SQL(",").join(
-                [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table_columns]
-            ),
-        )
-        self.cur.execute(create_table_query)
+            self.log(f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:")
 
-        self.commit()
-
-        # Add comments on table columns.
-        for c in table_columns:
-            assert set(c.keys()) == set(["name", "type", "comment", "fn"])
-            column_name = c["name"]
-            column_comment = c["comment"]
-            comment_query = sql.SQL("comment on column {new_table_name}.{column_name} is {column_comment}").format(
+            # Create table.
+            create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields_with_type})").format(
                 new_table_name=sql.Identifier(new_table_name),
-                column_name=sql.Identifier(column_name),
-                column_comment=sql.Literal(column_comment),
+                fields_with_type=sql.SQL(",").join(
+                    [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table_columns]
+                ),
             )
-            self.cur.execute(comment_query)
+            self.cur.execute(create_table_query)
 
-        self.commit()
+            self.commit()
 
-        if extra_object:
-            # Insert extra object without counter/tqdm for simplicity.
-            self.inject_chunk(table_columns=table_columns, chunk=[extra_object], new_table_name=new_table_name)
+            # Add comments on table columns.
+            for c in table_columns:
+                assert set(c.keys()) == set(["name", "type", "comment", "fn"])
+                column_name = c["name"]
+                column_comment = c["comment"]
+                comment_query = sql.SQL("comment on column {new_table_name}.{column_name} is {column_comment}").format(
+                    new_table_name=sql.Identifier(new_table_name),
+                    column_name=sql.Identifier(column_name),
+                    column_comment=sql.Literal(column_comment),
+                )
+                self.cur.execute(comment_query)
 
-        with tqdm(total=total_rows) as progress_bar:
-            for queryset in querysets:
-                injections = 0
-                total_injections = queryset.count()
-                if self.dry_run:
-                    total_injections = min(total_injections, settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET)
+            self.commit()
 
-                # Insert rows by batch of settings.METABASE_INSERT_BATCH_SIZE.
-                for chunk_qs in chunked_queryset(queryset, chunk_size=settings.METABASE_INSERT_BATCH_SIZE):
-                    injections_left = total_injections - injections
-                    if chunk_qs.count() > injections_left:
-                        chunk_qs = chunk_qs[:injections_left]
-                    self.inject_chunk(table_columns=table_columns, chunk=chunk_qs, new_table_name=new_table_name)
-                    injections += chunk_qs.count()
-                    progress_bar.update(chunk_qs.count())
+            if extra_object:
+                # Insert extra object without counter/tqdm for simplicity.
+                self.inject_chunk(table_columns=table_columns, chunk=[extra_object], new_table_name=new_table_name)
 
-                # Trigger garbage collection to optimize memory use.
-                gc.collect()
+            with tqdm(total=total_rows) as progress_bar:
+                for queryset in querysets:
+                    injections = 0
+                    total_injections = queryset.count()
+                    if self.dry_run:
+                        total_injections = min(total_injections, settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET)
 
-        # Swap new and old table nicely to minimize downtime.
-        self.cur.execute(
-            sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
-                sql.Identifier(table_name), sql.Identifier(old_table_name)
+                    # Insert rows by batch of settings.METABASE_INSERT_BATCH_SIZE.
+                    for chunk_qs in chunked_queryset(queryset, chunk_size=settings.METABASE_INSERT_BATCH_SIZE):
+                        injections_left = total_injections - injections
+                        if chunk_qs.count() > injections_left:
+                            chunk_qs = chunk_qs[:injections_left]
+                        self.inject_chunk(table_columns=table_columns, chunk=chunk_qs, new_table_name=new_table_name)
+                        injections += chunk_qs.count()
+                        progress_bar.update(chunk_qs.count())
+
+                    # Trigger garbage collection to optimize memory use.
+                    gc.collect()
+
+            # Swap new and old table nicely to minimize downtime.
+            self.cur.execute(
+                sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
+                    sql.Identifier(table_name), sql.Identifier(old_table_name)
+                )
             )
-        )
-        self.cur.execute(
-            sql.SQL("ALTER TABLE {} RENAME TO {}").format(sql.Identifier(new_table_name), sql.Identifier(table_name))
-        )
-        self.commit()
-        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
-        self.commit()
-        self.log("")
+            self.cur.execute(
+                sql.SQL("ALTER TABLE {} RENAME TO {}").format(
+                    sql.Identifier(new_table_name), sql.Identifier(table_name)
+                )
+            )
+            self.commit()
+            self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
+            self.commit()
+            self.log("")
 
     def populate_siaes(self):
         """
@@ -434,21 +442,19 @@ class Command(BaseCommand):
         if not settings.ALLOW_POPULATING_METABASE:
             self.log("Populating metabase is not allowed in this environment.")
             return
-        with MetabaseDatabaseCursor() as (cur, conn):
-            self.cur = cur
-            self.conn = conn
-            self.populate_siaes()
-            self.populate_job_descriptions()
-            self.populate_organizations()
-            self.populate_job_seekers()
-            self.populate_job_applications()
-            self.populate_selected_jobs()
-            self.populate_approvals()
-            self.populate_rome_codes()
-            self.populate_insee_codes()
-            self.populate_departments()
 
-            self.report_data_inconsistencies()
+        self.populate_siaes()
+        self.populate_job_descriptions()
+        self.populate_organizations()
+        self.populate_job_seekers()
+        self.populate_job_applications()
+        self.populate_selected_jobs()
+        self.populate_approvals()
+        self.populate_rome_codes()
+        self.populate_insee_codes()
+        self.populate_departments()
+
+        self.report_data_inconsistencies()
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))

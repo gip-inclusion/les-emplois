@@ -14,6 +14,10 @@ class MetabaseDatabaseCursor:
             dbname=settings.METABASE_DATABASE,
             user=settings.METABASE_USER,
             password=settings.METABASE_PASSWORD,
+            keepalives=1,
+            keepalives_idle=30,
+            keepalives_interval=5,
+            keepalives_count=5,
         )
         self.cursor = self.connection.cursor()
         return self.cursor, self.connection
