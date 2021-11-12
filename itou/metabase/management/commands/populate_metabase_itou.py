@@ -47,6 +47,11 @@ from itou.metabase.management.commands import (
     _siaes,
 )
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
+from itou.metabase.management.commands._database_tables import (
+    get_dry_table_name,
+    get_new_table_name,
+    get_old_table_name,
+)
 from itou.metabase.management.commands._dataframes import get_df_from_rows, store_df
 from itou.metabase.management.commands._utils import anonymize, chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
@@ -71,7 +76,7 @@ class Command(BaseCommand):
     Populate metabase database.
 
     The `dry-run` mode is useful for quickly testing changes and iterating.
-    It builds tables with a *_dry_run suffix added to their name, to avoid
+    It builds tables with a dry prefix added to their name, to avoid
     touching any real table, and injects only a sample of data.
 
     To populate alternate tables with sample data:
@@ -118,8 +123,10 @@ class Command(BaseCommand):
         self.conn.commit()
 
     def cleanup_tables(self, table_name):
-        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_new")))
-        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(table_name))))
+        # Dry run tables are periodically dropped by wet runs.
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_dry_table_name(table_name))))
         self.commit()
 
     def inject_chunk(self, table_columns, chunk, new_table_name):
@@ -148,9 +155,9 @@ class Command(BaseCommand):
             queryset = None
 
         if self.dry_run:
-            table_name = f"{table_name}_dry_run"
-        new_table_name = f"{table_name}_new"
-        old_table_name = f"{table_name}_old"
+            table_name = get_dry_table_name(table_name)
+        new_table_name = get_new_table_name(table_name)
+        old_table_name = get_old_table_name(table_name)
 
         with MetabaseDatabaseCursor() as (cur, conn):
             self.cur = cur
@@ -245,8 +252,7 @@ class Command(BaseCommand):
                 )
             )
             self.commit()
-            self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
-            self.commit()
+            self.cleanup_tables(table_name)
             self.log("")
 
     def populate_siaes(self):

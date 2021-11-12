@@ -66,6 +66,7 @@ from django.core.management.base import BaseCommand
 from psycopg2 import sql
 
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
+from itou.metabase.management.commands._database_tables import get_dry_table_name, get_new_table_name
 from itou.metabase.management.commands._dataframes import store_df, switch_table_atomically
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
 
@@ -85,7 +86,7 @@ class Command(BaseCommand):
     Populate metabase database with fluxIAE data.
 
     The `dry-run` mode is useful for quickly testing changes and iterating.
-    It builds tables with a *_dry_run suffix added to their name, to avoid
+    It builds tables with a dry prefix added to their name, to avoid
     touching any real table, and injects only a sample of data.
 
     To populate alternate tables with sample data:
@@ -136,13 +137,15 @@ class Command(BaseCommand):
         if self.dry_run:
             # Note that during a dry run, the dry run version of the current table will be built
             # from the wet run version of the underlying tables.
-            table_name += "_dry_run"
+            table_name = get_dry_table_name(table_name)
 
         with MetabaseDatabaseCursor() as (cur, conn):
-            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_new")))
+            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
             conn.commit()
             cur.execute(
-                sql.SQL("CREATE TABLE {} AS {}").format(sql.Identifier(f"{table_name}_new"), sql.SQL(sql_request))
+                sql.SQL("CREATE TABLE {} AS {}").format(
+                    sql.Identifier(get_new_table_name(table_name)), sql.SQL(sql_request)
+                )
             )
             conn.commit()
 
