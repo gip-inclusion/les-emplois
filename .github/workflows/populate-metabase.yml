@@ -86,8 +86,8 @@ jobs:
     - name: 🚀 Deploy app to Clever Cloud
       run: $CLEVER_CLI deploy --alias $CRON_TASK_APP_NAME --branch $DEPLOY_BRANCH --force
 
-    - name: 🕒 Wait one hour which should be more than enough for the script to complete
-      run: sleep 3600
+    - name: 🕒 Wait a reasonable amount of time for the script to complete
+      run: sleep 5400
 
     - name: 🔪 Delete the app once the work is done
       run:
