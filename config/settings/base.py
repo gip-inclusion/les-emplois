@@ -529,6 +529,9 @@ DREETS_STATS_DASHBOARD_ID = 117
 DGEFP_STATS_DASHBOARD_ID = 117
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
 
+# Slack notifications sent by Metabase cronjobs.
+SLACK_CRON_WEBHOOK_URL = os.environ.get("SLACK_CRON_WEBHOOK_URL", None)
+
 # Huey / async
 # Workers are run in prod via `CC_WORKER_COMMAND = django-admin run_huey`.
 # ------------------------------------------------------------------------------

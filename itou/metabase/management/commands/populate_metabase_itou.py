@@ -52,6 +52,11 @@ from itou.metabase.management.commands._utils import anonymize, chunked_queryset
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
+from itou.utils.slack import send_slack_message
+
+
+# Emit more verbose slack messages about every step, not just the beginning and the ending of the command.
+VERBOSE_SLACK_MESSAGES = False
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:
@@ -443,18 +448,34 @@ class Command(BaseCommand):
             self.log("Populating metabase is not allowed in this environment.")
             return
 
-        self.populate_siaes()
-        self.populate_job_descriptions()
-        self.populate_organizations()
-        self.populate_job_seekers()
-        self.populate_job_applications()
-        self.populate_selected_jobs()
-        self.populate_approvals()
-        self.populate_rome_codes()
-        self.populate_insee_codes()
-        self.populate_departments()
+        send_slack_message(
+            ":rocket: Début de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"
+        )
 
-        self.report_data_inconsistencies()
+        updates = [
+            self.populate_siaes,
+            self.populate_job_descriptions,
+            self.populate_organizations,
+            self.populate_job_seekers,
+            self.populate_job_applications,
+            self.populate_selected_jobs,
+            self.populate_approvals,
+            self.populate_rome_codes,
+            self.populate_insee_codes,
+            self.populate_departments,
+            self.report_data_inconsistencies,
+        ]
+
+        for update in updates:
+            if VERBOSE_SLACK_MESSAGES:
+                send_slack_message(f"Début de l'étape {update.__name__} :rocket:")
+            update()
+            if VERBOSE_SLACK_MESSAGES:
+                send_slack_message(f"Fin de l'étape {update.__name__} :white_check_mark:")
+
+        send_slack_message(
+            ":rocket: Fin de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"
+        )
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
