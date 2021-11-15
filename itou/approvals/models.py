@@ -648,7 +648,7 @@ class Prolongation(models.Model):
     MAX_DURATION = datetime.timedelta(days=365 * 10)
 
     class Reason(models.TextChoices):
-        SENIOR_CDI = "SENIOR_CDI", "CDI conclu avec une personne de plus de 57 ans"
+        SENIOR_CDI = "SENIOR_CDI", "CDI conclu avec une personne de plus de 57 ans"
         COMPLETE_TRAINING = "COMPLETE_TRAINING", "Fin d'une formation"
         RQTH = "RQTH", "RQTH"
         SENIOR = "SENIOR", "50 ans et plus"
