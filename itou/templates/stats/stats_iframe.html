@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+​
+  <head>
+    <style>
+      html,
+      body,
+      iframe {
+        margin: 0;
+        padding: 0;
+        font-size: 0;
+        line-height: 0;
+      }
+​
+      html,
+      body {
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+​
+      iframe {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+​
+  <body>
+    <div id="embedMetabase">
+        {% block content %}
+            <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
+            <iframe
+                src="{{ iframeurl }}"
+                width="100%"
+                onload="iFrameResize({}, this)"
+                frameborder="0">
+            </iframe>
+        {% endblock %}
+    </div>
+  </body>
+​
+</html>
