@@ -154,7 +154,7 @@ class EmployeeRecord(models.Model):
         related_name="employee_record",
     )
 
-    # Employee records must be linked to a valid financial annex
+    # Employee records may be linked to a valid financial annex
     # This field can't be automatically filled, the user will be asked
     # to select a valid one manually
     financial_annex = models.ForeignKey(

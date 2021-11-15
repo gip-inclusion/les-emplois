@@ -350,6 +350,7 @@ class NewEmployeeRecordStep4(forms.Form):
             state__in=SiaeFinancialAnnex.STATES_ACTIVE, end_at__gt=timezone.now()
         )
         self.fields["financial_annex"].initial = employee_record.financial_annex
+        self.fields["financial_annex"].required = False
 
     def clean(self):
         super().clean()

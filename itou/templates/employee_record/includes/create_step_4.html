@@ -3,6 +3,10 @@
 
 <h4>Annexe financière</h4>
 
+<div class="alert alert-info">
+  Le choix d'une annexe financière est <b>optionnel</b>, et dans tous les cas, l'information n'est pas transmise à l'ASP.
+</div>
+
 <form method="post" action="{% url "employee_record_views:create_step_4" job_application.id %}" class="js-prevent-multiple-submit">
         
     {% csrf_token %}
@@ -15,4 +19,3 @@
     {% endbuttons %}
 
 </form>
-
