@@ -1408,7 +1408,7 @@ class ProlongationModelTest(TestCase):
         prolongation1 = ProlongationFactory(
             approval=approval,
             start_at=approval.end_at,
-            end_at=approval.end_at + datetime.timedelta(days=365 * 4),  # 4 years
+            end_at=approval.end_at + datetime.timedelta(days=365 * 2),  # 2 years
             reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
         )
 

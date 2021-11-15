@@ -645,7 +645,7 @@ class Prolongation(models.Model):
     """
 
     # Max duration: 10 years but it depends on the `reason` field, see `get_max_end_at`.
-    MAX_DURATION = relativedelta(years=10)
+    MAX_DURATION = datetime.timedelta(days=365 * 10)
 
     class Reason(models.TextChoices):
         SENIOR_CDI = "SENIOR_CDI", "CDI conclu avec une personne de plus de 57 ans"
@@ -660,27 +660,27 @@ class Prolongation(models.Model):
 
     MAX_CUMULATIVE_DURATION = {
         Reason.SENIOR_CDI.value: {
-            "duration": relativedelta(years=10),
+            "duration": datetime.timedelta(days=365 * 10),  # 10 years
             "label": "10 ans",
         },
         Reason.COMPLETE_TRAINING.value: {
-            "duration": relativedelta(years=2),
+            "duration": datetime.timedelta(days=365 * 2),  # 2 years
             "label": "2 ans",
         },
         Reason.RQTH.value: {
-            "duration": relativedelta(years=3),
+            "duration": datetime.timedelta(days=365 * 3),  # 3 years
             "label": "3 ans",
         },
         Reason.SENIOR.value: {
-            "duration": relativedelta(years=5),
+            "duration": datetime.timedelta(days=365 * 5),  # 5 years
             "label": "5 ans",
         },
         Reason.PARTICULAR_DIFFICULTIES.value: {
-            "duration": relativedelta(years=3),
+            "duration": datetime.timedelta(days=365 * 3),  # 3 years
             "label": "3 ans",
         },
         Reason.HEALTH_CONTEXT.value: {
-            "duration": relativedelta(months=12),
+            "duration": datetime.timedelta(days=365),  # one year
             "label": "12 mois",
         },
     }
