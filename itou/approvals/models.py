@@ -677,7 +677,7 @@ class Prolongation(models.Model):
         },
         Reason.PARTICULAR_DIFFICULTIES.value: {
             "duration": datetime.timedelta(days=365.25 * 3),  # 3 years
-            "label": "3 ans",
+            "label": "12 mois, reconductibles dans la limite de 5 ans de parcours",
         },
         Reason.HEALTH_CONTEXT.value: {
             "duration": datetime.timedelta(days=365),  # one year
