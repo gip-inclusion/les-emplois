@@ -466,13 +466,25 @@ class PoleEmploiApprovalModelTest(TestCase):
             end_at = now_date - relativedelta(days=1)
             start_at = end_at - relativedelta(years=2)
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-            self.assertFalse(approval.is_valid())
+            self.assertTrue(approval.is_valid())
 
             # Starts tomorrow.
             start_at = now_date + relativedelta(days=1)
             end_at = start_at + relativedelta(years=2)
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
             self.assertTrue(approval.is_valid())
+
+            # Ended last month
+            end_at = now_date - relativedelta(months=1)
+            start_at = end_at - relativedelta(years=2)
+            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+            self.assertTrue(approval.is_valid())
+
+            # Ended 3 months and a day ago
+            end_at = now_date - relativedelta(days=1, months=3)
+            start_at = end_at - relativedelta(years=2)
+            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+            self.assertFalse(approval.is_valid())
 
     def test_is_valid_overlaps_covid_lockdown(self):
         now_date = PoleEmploiApproval.LOCKDOWN_END_AT + relativedelta(months=6)
@@ -487,10 +499,17 @@ class PoleEmploiApprovalModelTest(TestCase):
 
         # Overlaps COVID lockdown but is expired even with the prolongation
         with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
-            end_at = now_date - relativedelta(months=PoleEmploiApproval.LOCKDOWN_EXTENSION_DELAY_MONTHS, days=1)
+            end_at = now_date - relativedelta(months=PoleEmploiApproval.LOCKDOWN_EXTENSION_DELAY_MONTHS + 3, days=1)
             start_at = end_at - relativedelta(years=2)
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
             self.assertFalse(approval.is_valid())
+
+        # Overlaps COVID lockdown but is not expired even with the prolongation thanks to the 3 month extension
+        with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
+            end_at = now_date - relativedelta(months=PoleEmploiApproval.LOCKDOWN_EXTENSION_DELAY_MONTHS, days=1)
+            start_at = end_at - relativedelta(years=2)
+            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+            self.assertTrue(approval.is_valid())
 
         # Does not overlap COVID lockdown: should not be prolonged
         end_at = PoleEmploiApproval.LOCKDOWN_START_AT - relativedelta(days=1)

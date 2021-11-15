@@ -968,6 +968,8 @@ class PoleEmploiApproval(CommonApprovalMixin):
     at the time of issuance.
     """
 
+    SUPPORT_EXTENSION_DELAY_MONTHS = 3
+
     # Matches prescriber_organization.code_safir_pole_emploi.
     pe_structure_code = models.CharField("Code structure Pôle emploi", max_length=5)
 
@@ -1055,6 +1057,11 @@ class PoleEmploiApproval(CommonApprovalMixin):
         end_at = self.end_at
         if self.overlaps_covid_lockdown:
             end_at = self.get_extended_covid_end_at(end_at)
+
+        # On top of a potential lockdown, we want to add a few extra months in order to reduce
+        # the issues of importing expired PE approvals that fill our support
+        end_at = end_at + relativedelta(months=PoleEmploiApproval.SUPPORT_EXTENSION_DELAY_MONTHS)
+
         return end_at
 
     @property
