@@ -1,4 +1,4 @@
-name: Populate metabase itou
+name: 🌈 Populate metabase itou
 
 # Runs "populate_metabase_itou".
 # A github action takes care of the cron task that:
