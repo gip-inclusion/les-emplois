@@ -338,9 +338,9 @@ class ProcessViewsTest(TestCase):
             "city_slug": city.slug,
         }
         response = self.client.post(url, data=post_data)
-
+        self.assertEqual(response.status_code, 302)
         get_job_application = JobApplication.objects.get(pk=job_application.pk)
-        user_job_seeker = get_job_application.job_seeker
+        # user_job_seeker = get_job_application.job_seeker
         g_suspension = get_job_application.approval.suspension_set.in_progress().last()
 
         # Le pass IAE n'est plus suspendu
