@@ -66,8 +66,12 @@ from django.core.management.base import BaseCommand
 from psycopg2 import sql
 
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
-from itou.metabase.management.commands._database_tables import get_dry_table_name, get_new_table_name
-from itou.metabase.management.commands._dataframes import store_df, switch_table_atomically
+from itou.metabase.management.commands._database_tables import (
+    get_dry_table_name,
+    get_new_table_name,
+    switch_table_atomically,
+)
+from itou.metabase.management.commands._dataframes import store_df
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
 
 

@@ -3,37 +3,14 @@ Helper methods for manipulating dataframes used by both populate_metabase_itou a
 """
 
 import pandas as pd
-from psycopg2 import sql
 from tqdm import tqdm
 
-from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_sqlalchemy import get_pg_engine
 from itou.metabase.management.commands._database_tables import (
     get_dry_table_name,
     get_new_table_name,
-    get_old_table_name,
+    switch_table_atomically,
 )
-
-
-def switch_table_atomically(table_name):
-    with MetabaseDatabaseCursor() as (cur, conn):
-        cur.execute(
-            sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
-                sql.Identifier(table_name),
-                sql.Identifier(get_old_table_name(table_name)),
-            )
-        )
-        cur.execute(
-            sql.SQL("ALTER TABLE {} RENAME TO {}").format(
-                sql.Identifier(get_new_table_name(table_name)),
-                sql.Identifier(table_name),
-            )
-        )
-        conn.commit()
-        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(table_name))))
-        # Dry run tables are periodically dropped by wet runs.
-        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_dry_table_name(table_name))))
-        conn.commit()
 
 
 def store_df(df, table_name, dry_run, max_attempts=5):
