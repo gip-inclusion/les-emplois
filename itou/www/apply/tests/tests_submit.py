@@ -256,7 +256,7 @@ class ApplyAsJobSeekerTest(TestCase):
         with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
             siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
             user = JobSeekerFactory()
-            end_at = now_date - relativedelta(days=30)
+            end_at = now_date - relativedelta(days=30, months=PoleEmploiApproval.SUPPORT_EXTENSION_DELAY_MONTHS)
             start_at = end_at - relativedelta(years=2)
             PoleEmploiApprovalFactory(
                 pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
