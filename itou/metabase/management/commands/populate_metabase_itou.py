@@ -53,7 +53,13 @@ from itou.metabase.management.commands._database_tables import (
     get_old_table_name,
 )
 from itou.metabase.management.commands._dataframes import get_df_from_rows, store_df
-from itou.metabase.management.commands._utils import anonymize, chunked_queryset, compose, convert_boolean_to_int
+from itou.metabase.management.commands._utils import (
+    anonymize,
+    build_custom_tables,
+    chunked_queryset,
+    compose,
+    convert_boolean_to_int,
+)
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
@@ -449,6 +455,9 @@ class Command(BaseCommand):
                 "manual resolution, see command output"
             )
 
+    def build_custom_tables(self):
+        build_custom_tables(dry_run=self.dry_run)
+
     def populate_metabase_itou(self):
         if not settings.ALLOW_POPULATING_METABASE:
             self.log("Populating metabase is not allowed in this environment.")
@@ -469,6 +478,7 @@ class Command(BaseCommand):
             self.populate_rome_codes,
             self.populate_insee_codes,
             self.populate_departments,
+            self.build_custom_tables,
             self.report_data_inconsistencies,
         ]
 
