@@ -336,7 +336,7 @@ class NewEmployeeRecordStep4(forms.Form):
     financial_annex = forms.ModelChoiceField(
         queryset=None,
         label="Annexe financière",
-        help_text="Vous devez rattacher la fiche salarié à une annexe financière validée ou provisoire",
+        help_text="Vous pouvez rattacher la fiche salarié à une annexe financière validée ou provisoire",
     )
 
     def __init__(self, employee_record, *args, **kwargs):
