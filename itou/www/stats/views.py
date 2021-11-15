@@ -68,7 +68,7 @@ def public_pilotage_stats(request, dashboard_id, template_name="stats/stats_pilo
     We do it because we want to allow users to download chart data which
     is only possible via embedded dashboards and not via public dashboards.
     """
-    if not dashboard_id in settings.PILOTAGE_DASHBOARDS_WHITELIST:
+    if dashboard_id not in settings.PILOTAGE_DASHBOARDS_WHITELIST:
         raise PermissionDenied
 
     context = {
