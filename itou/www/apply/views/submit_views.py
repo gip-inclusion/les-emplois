@@ -63,7 +63,7 @@ def get_approvals_wrapper(request, job_seeker, siae):
         if not approvals_wrapper.latest_approval.can_update_suspension:
             error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY
             if user_info.user == job_seeker:
-                error = Approval.ERRROR_PASS_IAE_SUSPENDED_FOR_USER
+                error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
             raise PermissionDenied(error)
 
     return approvals_wrapper
