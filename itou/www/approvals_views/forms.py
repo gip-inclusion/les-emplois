@@ -35,8 +35,8 @@ class DeclareProlongationForm(forms.ModelForm):
             for (k, v) in Prolongation.MAX_CUMULATIVE_DURATION.items()
         }
 
-        # `PARTICULAR_DIFFICULTIES` is allowed only for ACI.
-        if self.siae.kind not in [self.siae.KIND_ACI, self.siae.KIND_AI]:
+        # `PARTICULAR_DIFFICULTIES` is allowed only for AI, ACI and ACIPHC.
+        if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI, self.siae.KIND_ACIPHC]:
             self.fields["reason"].choices = [
                 item
                 for item in self.fields["reason"].choices
