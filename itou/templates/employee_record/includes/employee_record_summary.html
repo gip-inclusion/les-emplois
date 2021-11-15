@@ -76,7 +76,11 @@
         <h5>Annexe financière </h5>
 
         <div>    
-            {{ employee_record.financial_annex.number }} ({{ employee_record.financial_annex.get_state_display|lower }})
+            {% if employee_record.financial_annex %}
+              {{ employee_record.financial_annex.number }} ({{ employee_record.financial_annex.get_state_display|lower }})
+            {% else %}
+              Aucune annexe financière n'a été selectionnée.
+            {% endif %}
         </div>
 
     </div>
