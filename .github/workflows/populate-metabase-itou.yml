@@ -1,6 +1,6 @@
-name: Populate metabase
+name: Populate metabase itou
 
-# Runs "populate_itou_metabase".
+# Runs "populate_metabase_itou".
 # A github action takes care of the cron task that:
 # - creates a machine on demand
 # - runs the desired command via a worker
