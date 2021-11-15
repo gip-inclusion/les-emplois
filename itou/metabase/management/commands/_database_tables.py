@@ -7,15 +7,24 @@ from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabas
 
 
 def get_new_table_name(table_name):
-    return f"{table_name}_new"
+    """
+    We use the `z` prefix so that temporary tables are listed last and do not get in the way of Metabase power users.
+    """
+    return f"z_new_{table_name}"
 
 
 def get_old_table_name(table_name):
-    return f"{table_name}_old"
+    """
+    We use the `z` prefix so that temporary tables are listed last and do not get in the way of Metabase power users.
+    """
+    return f"z_old_{table_name}"
 
 
 def get_dry_table_name(table_name):
-    return f"{table_name}_dry_run"
+    """
+    We use the `z` prefix so that temporary tables are listed last and do not get in the way of Metabase power users.
+    """
+    return f"z_dry_{table_name}"
 
 
 def switch_table_atomically(table_name):
