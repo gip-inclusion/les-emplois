@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Case, F, Value, When
 from django.urls import reverse
+from tqdm import tqdm
 
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
@@ -187,7 +188,11 @@ class Command(BaseCommand):
             prefetch_related_lookups=["approvals", "eligibility_diagnoses"]
         )
 
+        pbar = tqdm(total=len(duplicates_dict.items()))
+
         for pe_id, duplicates in duplicates_dict.items():
+
+            pbar.update(1)
 
             users_with_approval = [u for u in duplicates if u.approvals.exists()]
 
