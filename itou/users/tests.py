@@ -127,7 +127,7 @@ class ManagementCommandsTest(TestCase):
         self.assertEqual(1, user3.eligibility_diagnoses.count())
 
         # Merge all users into `user1`.
-        call_command("deduplicate_job_seekers", verbosity=0)
+        call_command("deduplicate_job_seekers", verbosity=0, no_csv=True)
 
         # If only one NIR exists for all the duplicates, it should
         # be reassigned to the target account.
@@ -188,7 +188,7 @@ class ManagementCommandsTest(TestCase):
         ApprovalFactory(user=user1)
 
         # Merge all users into `user1`.
-        call_command("deduplicate_job_seekers", verbosity=0)
+        call_command("deduplicate_job_seekers", verbosity=0, no_csv=True)
 
         self.assertEqual(3, user1.job_applications.count())
 

@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
     To run the command without any change in DB and have a preview of which
     accounts will be merged:
-        django-admin deduplicate_job_seekers --dry-run
+        django-admin deduplicate_job_seekers --dry-run --no-csv
 
     To merge duplicates job seekers in the database:
         django-admin deduplicate_job_seekers
@@ -46,6 +46,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only display data to deduplicate")
+        parser.add_argument("--no-csv", dest="no_csv", action="store_true", help="Do not export results in CSV")
 
     def set_logger(self, verbosity):
         """
@@ -138,11 +139,12 @@ class Command(BaseCommand):
 
             self.HARD_CASES_LOGS.append(log_info)
 
-    def handle(self, dry_run=False, **options):
+    def handle(self, dry_run=False, no_csv=False, **options):
 
         self.set_logger(options.get("verbosity"))
 
         self.dry_run = dry_run
+        self.no_csv = no_csv
 
         self.logger.debug("Starting. Good luck…")
 
@@ -199,7 +201,7 @@ class Command(BaseCommand):
                 count_hard_cases += 1
                 self.handle_hard_cases(duplicates, count_hard_cases)
 
-        if settings.ITOU_ENVIRONMENT != "TEST" and not self.dry_run:
+        if not self.no_csv:
             self.to_csv(
                 "easy-duplicates",
                 [
@@ -213,7 +215,7 @@ class Command(BaseCommand):
             self.to_csv(
                 "hard-duplicates",
                 [
-                    "Numéro",
+                    "Numéro",  # Lines with the same number are duplicates.
                     "Nombre de doublons",
                     "Email",
                     "Numéro PASS IAE",
