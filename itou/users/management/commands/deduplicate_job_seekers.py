@@ -45,6 +45,10 @@ class Command(BaseCommand):
     HARD_DUPLICATES_LOGS = []
     NIR_DUPLICATES_LOGS = []
 
+    EASY_DUPLICATES_COUNT = 0
+    HARD_DUPLICATES_COUNT = 0
+    NIR_DUPLICATES_COUNT = 0
+
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only display data to deduplicate")
         parser.add_argument("--no-csv", dest="no_csv", action="store_true", help="Do not export results in CSV")
@@ -111,7 +115,7 @@ class Command(BaseCommand):
             if not self.dry_run:
                 target.save()
 
-    def handle_hard_duplicates(self, duplicates, num):
+    def handle_hard_duplicates(self, duplicates):
         """
         Hard duplicates: there are several PASS IAE in the group of duplicates.
 
@@ -122,7 +126,7 @@ class Command(BaseCommand):
         """
         for duplicate in duplicates:
             log_info = {
-                "Numéro": num,
+                "Numéro": self.HARD_DUPLICATES_COUNT,
                 "Nombre de doublons": len(duplicates),
                 "Email": duplicate.email,
                 "Numéro PASS IAE": "",
@@ -146,7 +150,7 @@ class Command(BaseCommand):
             # We are only logging for now.
             self.HARD_DUPLICATES_LOGS.append(log_info)
 
-    def handle_nir_duplicates(self, duplicates, num):
+    def handle_nir_duplicates(self, duplicates):
         """
         Duplicates with different NIR.
 
@@ -158,14 +162,14 @@ class Command(BaseCommand):
         """
         for duplicate in duplicates:
             log_info = {
-                "Numéro": num,
+                "Numéro": self.NIR_DUPLICATES_COUNT,
                 "Nombre de doublons": len(duplicates),
                 "Email": duplicate.email,
                 "NIR": duplicate.nir,
             }
 
             # Debug info (when verbosity >= 1).
-            self.logger.debug(f"[nir] {log_info.values()}")
+            self.logger.debug(f"[NIR] {log_info.values()}")
 
             # We are only logging for now.
             self.NIR_DUPLICATES_LOGS.append(log_info)
@@ -177,11 +181,7 @@ class Command(BaseCommand):
         self.dry_run = dry_run
         self.no_csv = no_csv
 
-        self.logger.debug("Starting. Good luck…")
-
-        count_easy_duplicates = 0
-        count_hard_duplicates = 0
-        count_nir_duplicates = 0
+        self.stdout.write("Starting. Good luck…")
 
         duplicates_dict = User.objects.get_duplicates_by_pole_emploi_id(
             prefetch_related_lookups=["approvals", "eligibility_diagnoses"]
@@ -196,15 +196,15 @@ class Command(BaseCommand):
 
             nirs = [u.nir for u in duplicates if u.nir]
             if len(nirs) > 1:
-                count_nir_duplicates += 1
-                self.handle_nir_duplicates(duplicates, count_nir_duplicates)
+                self.NIR_DUPLICATES_COUNT += 1
+                self.handle_nir_duplicates(duplicates)
                 continue
 
             # Easy cases.
             # None or 1 PASS IAE was issued for the same person with multiple accounts.
             if len(users_with_approval) <= 1:
 
-                count_easy_duplicates += 1
+                self.EASY_DUPLICATES_COUNT += 1
                 target = None
 
                 # Give priority to the user with a PASS IAE.
@@ -227,8 +227,8 @@ class Command(BaseCommand):
             # Hard cases.
             # More than one PASS IAE was issued for the same person.
             elif len(users_with_approval) > 1:
-                count_hard_duplicates += 1
-                self.handle_hard_duplicates(duplicates, count_hard_duplicates)
+                self.HARD_DUPLICATES_COUNT += 1
+                self.handle_hard_duplicates(duplicates)
 
         if not self.no_csv:
             self.to_csv(
@@ -265,17 +265,19 @@ class Command(BaseCommand):
                 self.NIR_DUPLICATES_LOGS,
             )
 
-        self.logger.debug("-" * 80)
-        self.logger.debug(f"{count_easy_duplicates} easy cases merged.")
-        self.logger.debug(f"{count_hard_duplicates} hard cases found.")
+        self.stdout.write("-" * 80)
+        self.stdout.write(f"{self.EASY_DUPLICATES_COUNT} easy duplicates merged.")
+        self.stdout.write(f"{self.HARD_DUPLICATES_COUNT} hard duplicates found.")
+        self.stdout.write(f"{self.NIR_DUPLICATES_COUNT} NIR duplicates found.")
 
-        self.logger.debug("-" * 80)
-        self.logger.debug("Done.")
+        self.stdout.write("-" * 80)
+        self.stdout.write("Done!")
 
     def to_csv(self, filename, fieldnames, data):
-        log_datetime = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+        log_datetime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         path = f"{settings.EXPORT_DIR}/{log_datetime}-{filename}-{settings.ITOU_ENVIRONMENT.lower()}.csv"
         with open(path, "w") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
             writer.writeheader()
             writer.writerows(data)
+        self.stdout.write(f"CSV file created `{path}`")
