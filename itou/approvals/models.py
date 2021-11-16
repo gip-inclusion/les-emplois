@@ -414,6 +414,7 @@ class Suspension(models.Model):
     # Max duration: 12 months (could be adjusted according to user feedback).
     # 12-months suspensions can be consecutive and there can be any number of them.
     MAX_DURATION_MONTHS = 12
+    MAX_RETROACTIVITY_DURATION_DAYS = 30
 
     class Reason(models.TextChoices):
         # Displayed choices
@@ -539,7 +540,6 @@ class Suspension(models.Model):
             )
 
         if hasattr(self, "approval"):
-
             # The start of a suspension must be contained in its approval boundaries.
             if not self.start_in_approval_boundaries:
                 raise ValidationError(
@@ -548,6 +548,16 @@ class Suspension(models.Model):
                             f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
                             f"{self.approval.start_at.strftime('%d/%m/%Y')} - "
                             f"{self.approval.end_at.strftime('%d/%m/%Y')}."
+                        )
+                    }
+                )
+            next_min_start_at = self.next_min_start_at(self.approval)
+            if self.start_at < next_min_start_at:
+                raise ValidationError(
+                    {
+                        "start_at": (
+                            f"La date de déclaration rétroactive d'une suspension est limitée {self.MAX_RETROACTIVITY_DURATION_DAYS} jours. "
+                            f"Date de début minimum: {next_min_start_at.strftime('%d/%m/%Y')}."
                         )
                     }
                 )
@@ -615,11 +625,20 @@ class Suspension(models.Model):
         """
         Returns the minimum date on which a suspension can begin.
         """
+        min_suspension_start_at = approval.user.last_accepted_job_application.hiring_start_at
+        today = datetime.date.today()
+
         if approval.last_old_suspension:
-            return approval.last_old_suspension.end_at + relativedelta(days=1)
-        if approval.user.last_accepted_job_application.created_from_pe_approval:
-            return datetime.date.today()
-        return approval.user.last_accepted_job_application.hiring_start_at
+            min_suspension_start_at = approval.last_old_suspension.end_at + relativedelta(days=1)
+
+        elif approval.user.last_accepted_job_application.created_from_pe_approval:
+            min_suspension_start_at = today
+
+        return (
+            min_suspension_start_at
+            if today - min_suspension_start_at <= datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
+            else today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
+        )
 
 
 class ProlongationQuerySet(models.QuerySet):
