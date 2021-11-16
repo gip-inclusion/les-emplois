@@ -644,31 +644,45 @@ class Prolongation(models.Model):
     `trigger_update_approval_end_at_for_prolongation`.
     """
 
-    # Max duration: 12 months but it depends on the `reason` field, see `get_max_end_at`.
-    MAX_DURATION_MONTHS = 12
+    # Max duration: 10 years but it depends on the `reason` field, see `get_max_end_at`.
+    # The addition of 0.25 day per year makes it possible to better manage leap years.
+    MAX_DURATION = datetime.timedelta(days=365.25 * 10)
 
     class Reason(models.TextChoices):
-        SENIOR_CDI = "SENIOR_CDI", "CDI conclu avec une personne âgée d'au moins 57 ans (12 mois maximum)"
-        COMPLETE_TRAINING = "COMPLETE_TRAINING", "Fin d'une formation (6 mois maximum)"
-        RQTH = "RQTH", "RQTH (12 mois maximum)"
-        SENIOR = "SENIOR", "50 ans et plus (12 mois maximum)"
+        SENIOR_CDI = "SENIOR_CDI", "CDI conclu avec une personne de plus de 57 ans"
+        COMPLETE_TRAINING = "COMPLETE_TRAINING", "Fin d'une formation"
+        RQTH = "RQTH", "RQTH"
+        SENIOR = "SENIOR", "50 ans et plus"
         PARTICULAR_DIFFICULTIES = (
             "PARTICULAR_DIFFICULTIES",
-            (
-                "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi "
-                "(12 mois maximum dans la limite de 5 ans)"
-            ),
+            "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi",
         )
-        HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire (12 mois maximum)"
+        HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire"
 
     MAX_CUMULATIVE_DURATION = {
+        Reason.SENIOR_CDI.value: {
+            "duration": datetime.timedelta(days=365.25 * 10),  # 10 years
+            "label": "10 ans",
+        },
         Reason.COMPLETE_TRAINING.value: {
-            "duration": datetime.timedelta(days=183),  # A leap year can contain 183 days in 6 months.
-            "label": "6 mois",
+            "duration": datetime.timedelta(days=365.25 * 2),  # 2 years
+            "label": "2 ans",
+        },
+        Reason.RQTH.value: {
+            "duration": datetime.timedelta(days=365.25 * 3),  # 3 years
+            "label": "3 ans",
+        },
+        Reason.SENIOR.value: {
+            "duration": datetime.timedelta(days=365.25 * 5),  # 5 years
+            "label": "5 ans",
         },
         Reason.PARTICULAR_DIFFICULTIES.value: {
-            "duration": datetime.timedelta(days=365 * 5),
-            "label": "5 ans",
+            "duration": datetime.timedelta(days=365.25 * 3),  # 3 years
+            "label": "12 mois, reconductibles dans la limite de 5 ans de parcours",
+        },
+        Reason.HEALTH_CONTEXT.value: {
+            "duration": datetime.timedelta(days=365),  # one year
+            "label": "12 mois",
         },
     }
 
@@ -788,6 +802,7 @@ class Prolongation(models.Model):
             if not self.declared_by_siae or self.declared_by_siae.kind not in [
                 self.declared_by_siae.KIND_AI,
                 self.declared_by_siae.KIND_ACI,
+                self.declared_by_siae.KIND_ACIPHC,
             ]:
                 raise ValidationError(f"Le motif « {self.get_reason_display()} » est réservé aux AI et ACI.")
 
@@ -870,10 +885,13 @@ class Prolongation(models.Model):
         """
         Returns the maximum date on which a prolongation can end.
         """
-        max_duration_months = Prolongation.MAX_DURATION_MONTHS
-        if reason == Prolongation.Reason.COMPLETE_TRAINING.value:
-            max_duration_months = 6
-        return start_at + relativedelta(months=max_duration_months) - relativedelta(days=1)
+        max_duration = Prolongation.MAX_DURATION
+        if reason == Prolongation.Reason.PARTICULAR_DIFFICULTIES.value:
+            # 12 months renewable up to 3 years for this reason
+            max_duration = relativedelta(months=12)
+        elif reason in Prolongation.MAX_CUMULATIVE_DURATION:
+            max_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]["duration"]
+        return start_at + max_duration - relativedelta(days=1)
 
 
 class PoleEmploiApprovalManager(models.Manager):

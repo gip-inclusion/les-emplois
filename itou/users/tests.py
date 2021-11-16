@@ -99,17 +99,19 @@ class ManagementCommandsTest(TestCase):
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationWithApprovalFactory(**kwargs)
+        job_app1 = JobApplicationWithApprovalFactory(job_seeker__nir=None, **kwargs)
         user1 = job_app1.job_seeker
 
+        self.assertIsNone(user1.nir)
+        self.assertEqual(1, user1.approvals.count())
         self.assertEqual(1, user1.job_applications.count())
         self.assertEqual(1, user1.eligibility_diagnoses.count())
-        self.assertEqual(1, user1.approvals.count())
 
         # Create `user2`.
-        job_app2 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        job_app2 = JobApplicationWithEligibilityDiagnosis(job_seeker__nir=None, **kwargs)
         user2 = job_app2.job_seeker
 
+        self.assertIsNone(user2.nir)
         self.assertEqual(0, user2.approvals.count())
         self.assertEqual(1, user2.job_applications.count())
         self.assertEqual(1, user2.eligibility_diagnoses.count())
@@ -117,13 +119,20 @@ class ManagementCommandsTest(TestCase):
         # Create `user3`.
         job_app3 = JobApplicationWithEligibilityDiagnosis(**kwargs)
         user3 = job_app3.job_seeker
+        expected_nir = user3.nir
 
+        self.assertIsNotNone(user3.nir)
         self.assertEqual(0, user3.approvals.count())
         self.assertEqual(1, user3.job_applications.count())
         self.assertEqual(1, user3.eligibility_diagnoses.count())
 
         # Merge all users into `user1`.
         call_command("deduplicate_job_seekers", verbosity=0)
+
+        # If only one NIR exists for all the duplicates, it should
+        # be reassigned to the target account.
+        user1.refresh_from_db()
+        self.assertEqual(user1.nir, expected_nir)
 
         self.assertEqual(3, user1.job_applications.count())
         self.assertEqual(3, user1.eligibility_diagnoses.count())
@@ -152,21 +161,21 @@ class ManagementCommandsTest(TestCase):
         }
 
         # Create `user1` through a job application sent by him.
-        job_app1 = JobApplicationSentByJobSeekerFactory(**kwargs)
+        job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__nir=None, **kwargs)
         user1 = job_app1.job_seeker
 
         self.assertEqual(1, user1.job_applications.count())
         self.assertEqual(job_app1.sender, user1)
 
         # Create `user2` through a job application sent by him.
-        job_app2 = JobApplicationSentByJobSeekerFactory(**kwargs)
+        job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__nir=None, **kwargs)
         user2 = job_app2.job_seeker
 
         self.assertEqual(1, user2.job_applications.count())
         self.assertEqual(job_app2.sender, user2)
 
         # Create `user3` through a job application sent by a prescriber.
-        job_app3 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        job_app3 = JobApplicationWithEligibilityDiagnosis(job_seeker__nir=None, **kwargs)
         user3 = job_app3.job_seeker
         self.assertNotEqual(job_app3.sender, user3)
         job_app3_sender = job_app3.sender  # The sender is a prescriber.

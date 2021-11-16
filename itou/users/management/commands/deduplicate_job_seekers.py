@@ -13,8 +13,21 @@ class Command(BaseCommand):
     """
     Deduplicate job seekers.
 
-    This is temporary and should be deleted after the release of the NIR
-    which should prevent duplication.
+    How are duplicates created?
+    The identification of a person was done on the basis of the `email` field.
+    But it happens that a SIAE (or a prescriber):
+    - makes a typing error in the email
+    - creates an email on the fly because job seekers do not remember their own
+    - enters a fancy email
+    - enters another family member's email
+    This results in duplicates that we try to correct when possible whith this
+    management command.
+
+    The NIR is now used to ensure the uniqueness of job seekers and should be
+    the safety pin that prevents duplicates.
+
+    This command is temporary and should be deleted as soon as a sufficient
+    number of users have a NIR.
 
     To run the command without any change in DB and have a preview of which
     accounts will be merged:
@@ -43,7 +56,7 @@ class Command(BaseCommand):
         if verbosity >= 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def merge_easy_cases(self, duplicates, target):
+    def merge_easy_cases(self, duplicates, target, nirs):
         """
         Merge easy cases: when None or 1 PASS IAE was issued accross multiple accounts.
         """
@@ -75,6 +88,14 @@ class Command(BaseCommand):
                 )
                 user.eligibility_diagnoses.update(job_seeker=target)
                 user.delete()
+
+        # If only one NIR exists for all the duplicates, it is reassigned to
+        # the target account. This must be executed at the end because of the
+        # uniqueness constraint.
+        if len(nirs) == 1 and not target.nir:
+            target.nir = nirs[0]
+            if not self.dry_run:
+                target.save()
 
     def handle(self, dry_run=False, **options):
 
@@ -113,25 +134,33 @@ class Command(BaseCommand):
             # None or 1 PASS IAE was issued for the same person with multiple accounts.
             if len(users_with_approval) <= 1:
 
-                count_easy_cases += 1
+                nirs = [u.nir for u in duplicates if u.nir]
 
-                user_with_approval = next((u for u in duplicates if u.approvals.exists()), None)
+                if len(nirs) > 1:
+                    # Finally there may still be duplicates, even with the NIR.
+                    # We do nothing with them for the moment because it is
+                    # impossible to identify which NIR is the right one.
+                    continue
+
+                count_easy_cases += 1
+                target = None
 
                 # Give priority to the user with a PASS IAE.
+                user_with_approval = next((u for u in duplicates if u.approvals.exists()), None)
                 if user_with_approval:
-                    self.merge_easy_cases(duplicates, target=user_with_approval)
+                    target = user_with_approval
 
                 # Handle duplicates without any PASS IAE.
                 else:
-
-                    # Give priority to the first user who already logged in.
+                    # Give priority to the first user who already logged in…
                     first_autonomous_user = next((u for u in duplicates if u.last_login), None)
                     if first_autonomous_user:
-                        self.merge_easy_cases(duplicates, target=first_autonomous_user)
-
-                    # Choose an arbitrary user to merge others into.
+                        target = first_autonomous_user
+                    # …or choose an arbitrary user to merge others into.
                     else:
-                        self.merge_easy_cases(duplicates, target=duplicates[0])
+                        target = duplicates[0]
+
+                self.merge_easy_cases(duplicates, target=target, nirs=nirs)
 
             # Hard cases.
             # More than one PASS IAE was issued for the same person.

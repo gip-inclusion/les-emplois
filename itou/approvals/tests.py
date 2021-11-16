@@ -1282,23 +1282,28 @@ class ProlongationModelTest(TestCase):
 
         start_at = datetime.date(2021, 2, 1)
 
+        reason = Prolongation.Reason.SENIOR_CDI.value
+        expected_max_end_at = datetime.date(2031, 1, 31)  # 10 years.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
         reason = Prolongation.Reason.COMPLETE_TRAINING.value
-        expected_max_end_at = datetime.date(2021, 7, 31)  # 6 months.
+        expected_max_end_at = datetime.date(2023, 1, 31)  # 2 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         self.assertEqual(max_end_at, expected_max_end_at)
 
         reason = Prolongation.Reason.RQTH.value
-        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        expected_max_end_at = datetime.date(2024, 1, 31)  # 3 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         self.assertEqual(max_end_at, expected_max_end_at)
 
         reason = Prolongation.Reason.SENIOR.value
-        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        expected_max_end_at = datetime.date(2026, 1, 31)  # 5 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         self.assertEqual(max_end_at, expected_max_end_at)
 
         reason = Prolongation.Reason.PARTICULAR_DIFFICULTIES.value
-        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 3 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         self.assertEqual(max_end_at, expected_max_end_at)
 
@@ -1403,7 +1408,7 @@ class ProlongationModelTest(TestCase):
         prolongation1 = ProlongationFactory(
             approval=approval,
             start_at=approval.end_at,
-            end_at=approval.end_at + datetime.timedelta(days=365 * 4),  # 4 years
+            end_at=approval.end_at + datetime.timedelta(days=365 * 2),  # 2 years
             reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
         )
 

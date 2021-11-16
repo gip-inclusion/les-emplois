@@ -30,8 +30,13 @@ class DeclareProlongationForm(forms.ModelForm):
             self.instance.approval = self.approval
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
-        # `PARTICULAR_DIFFICULTIES` is allowed only for ACI.
-        if self.siae.kind not in [self.siae.KIND_ACI, self.siae.KIND_AI]:
+        self.reasons_max_duration_labels = {
+            k: {"l": v["label"], "d": str(Prolongation.get_max_end_at(self.instance.start_at, k))}
+            for (k, v) in Prolongation.MAX_CUMULATIVE_DURATION.items()
+        }
+
+        # `PARTICULAR_DIFFICULTIES` is allowed only for AI, ACI and ACIPHC.
+        if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI, self.siae.KIND_ACIPHC]:
             self.fields["reason"].choices = [
                 item
                 for item in self.fields["reason"].choices
@@ -83,7 +88,7 @@ class DeclareProlongationForm(forms.ModelForm):
         help_texts = {
             "end_at": mark_safe(
                 (
-                    "Date jusqu'à laquelle le PASS IAE doit être prolongé."
+                    'Date jusqu\'à laquelle le PASS IAE doit être prolongé<strong id="js-duration-label"></strong>.'
                     "<br>"
                     "Au format JJ/MM/AAAA, par exemple 20/12/1978."
                 )
