@@ -340,27 +340,20 @@ class ProcessViewsTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         get_job_application = JobApplication.objects.get(pk=job_application.pk)
-        # user_job_seeker = get_job_application.job_seeker
         g_suspension = get_job_application.approval.suspension_set.in_progress().last()
 
-        # Le pass IAE n'est plus suspendu
-        # self.assertFalse(get_job_application.approval.is_suspended)
-        # La date de fin de suspension est égale à j-1 de la date de début du nouvel emploi
+        # The end date of suspension is set to d-1 of hiring start day
         self.assertEqual(g_suspension.end_at, get_job_application.hiring_start_at - relativedelta(days=1))
-        # La durée du PASS IAE est rallongé de la durée de suspension
+        # Check if the duration of approval was updated correctly
         self.assertEqual(
             get_job_application.approval.end_at,
             approval_job_seeker.end_at + relativedelta(days=(g_suspension.end_at - g_suspension.start_at).days),
         )
-        # gestion du cas de l'annulation d'embauche
-        # annulation
-        # assertEqual old Date = new Date de fin de suspension et de Pass IAE
-        # assertEqual old Date = new Date du Pass IAE
+        # for know, we dont manage the cancel case
 
     def test_accept_with_manual_approval_delivery(self):
         """
         Test the "manual approval delivery mode" path of the view.
-        update maybe
         """
         create_test_cities(["57"], num_per_department=1)
         city = City.objects.first()
