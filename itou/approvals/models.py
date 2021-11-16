@@ -645,6 +645,7 @@ class Prolongation(models.Model):
     """
 
     # Max duration: 10 years but it depends on the `reason` field, see `get_max_end_at`.
+    # The addition of 0.25 day per year makes it possible to better manage leap years.
     MAX_DURATION = datetime.timedelta(days=365.25 * 10)
 
     class Reason(models.TextChoices):
@@ -654,7 +655,7 @@ class Prolongation(models.Model):
         SENIOR = "SENIOR", "50 ans et plus"
         PARTICULAR_DIFFICULTIES = (
             "PARTICULAR_DIFFICULTIES",
-            "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi ",
+            "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi",
         )
         HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire"
 
