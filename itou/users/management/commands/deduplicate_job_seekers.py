@@ -41,8 +41,9 @@ class Command(BaseCommand):
 
     help = "Deduplicate job seekers."
 
-    EASY_CASES_LOGS = []
-    HARD_CASES_LOGS = []
+    EASY_DUPLICATES_LOGS = []
+    HARD_DUPLICATES_LOGS = []
+    NIR_DUPLICATES_LOGS = []
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only display data to deduplicate")
@@ -62,18 +63,19 @@ class Command(BaseCommand):
         if verbosity >= 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def merge_easy_cases(self, duplicates, target, nirs):
+    def handle_easy_duplicates(self, duplicates, target, nirs):
         """
-        Merge easy cases: when None or 1 PASS IAE was issued accross multiple accounts.
-        """
+        Easy duplicates: there is 0 or 1 PASS IAE in the duplicates group.
 
+        We can merge duplicates.
+        """
         assert target.email
 
         users_to_delete = [u for u in duplicates if u != target]
 
         target_admin_path = reverse("admin:users_user_change", args=[target.pk])
         target_admin_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{target_admin_path}"
-        self.EASY_CASES_LOGS.append(
+        self.EASY_DUPLICATES_LOGS.append(
             {
                 "Compte de destination": target.email,
                 "URL admin du compte de destination": target_admin_url,
@@ -82,8 +84,8 @@ class Command(BaseCommand):
             }
         )
 
-        # Debug info.
-        self.logger.debug(f"[easy] {self.EASY_CASES_LOGS[-1].values()}")
+        # Debug info (when verbosity >= 1).
+        self.logger.debug(f"[easy] {self.EASY_DUPLICATES_LOGS[-1].values()}")
 
         for user in users_to_delete:
 
@@ -109,11 +111,15 @@ class Command(BaseCommand):
             if not self.dry_run:
                 target.save()
 
-    def handle_hard_cases(self, duplicates, num):
+    def handle_hard_duplicates(self, duplicates, num):
         """
-        Only log hard cases.
-        """
+        Hard duplicates: there are several PASS IAE in the group of duplicates.
 
+        These cases will not be merged because they may have already been used
+        (ASP, FSE etc.).
+
+        We will live with this technical debt until further notice.
+        """
         for duplicate in duplicates:
             log_info = {
                 "Numéro": num,
@@ -134,10 +140,35 @@ class Command(BaseCommand):
                 log_info["Fin PASS IAE"] = approval.end_at.strftime("%d/%m/%Y")
                 log_info["Lien admin PASS IAE"] = approval_admin_url
 
-            # Debug info.
+            # Debug info (when verbosity >= 1).
             self.logger.debug(f"[hard] {log_info.values()}")
 
-            self.HARD_CASES_LOGS.append(log_info)
+            # We are only logging for now.
+            self.HARD_DUPLICATES_LOGS.append(log_info)
+
+    def handle_nir_duplicates(self, duplicates, num):
+        """
+        Duplicates with different NIR.
+
+        There may still be duplicates, even with the NIR.
+        We do nothing with them for the moment because it is impossible to
+        identify which NIR is the right one.
+
+        We can transfer this information to the support for manual correction.
+        """
+        for duplicate in duplicates:
+            log_info = {
+                "Numéro": num,
+                "Nombre de doublons": len(duplicates),
+                "Email": duplicate.email,
+                "NIR": duplicate.nir,
+            }
+
+            # Debug info (when verbosity >= 1).
+            self.logger.debug(f"[nir] {log_info.values()}")
+
+            # We are only logging for now.
+            self.NIR_DUPLICATES_LOGS.append(log_info)
 
     def handle(self, dry_run=False, no_csv=False, **options):
 
@@ -148,8 +179,9 @@ class Command(BaseCommand):
 
         self.logger.debug("Starting. Good luck…")
 
-        count_easy_cases = 0
-        count_hard_cases = 0
+        count_easy_duplicates = 0
+        count_hard_duplicates = 0
+        count_nir_duplicates = 0
 
         duplicates_dict = User.objects.get_duplicates_by_pole_emploi_id(
             prefetch_related_lookups=["approvals", "eligibility_diagnoses"]
@@ -162,19 +194,17 @@ class Command(BaseCommand):
             # Ensure all users have the same birthdate.
             assert all(user.birthdate == duplicates[0].birthdate for user in duplicates)
 
+            nirs = [u.nir for u in duplicates if u.nir]
+            if len(nirs) > 1:
+                count_nir_duplicates += 1
+                self.handle_nir_duplicates(duplicates, count_nir_duplicates)
+                continue
+
             # Easy cases.
             # None or 1 PASS IAE was issued for the same person with multiple accounts.
             if len(users_with_approval) <= 1:
 
-                nirs = [u.nir for u in duplicates if u.nir]
-
-                if len(nirs) > 1:
-                    # Finally there may still be duplicates, even with the NIR.
-                    # We do nothing with them for the moment because it is
-                    # impossible to identify which NIR is the right one.
-                    continue
-
-                count_easy_cases += 1
+                count_easy_duplicates += 1
                 target = None
 
                 # Give priority to the user with a PASS IAE.
@@ -192,14 +222,13 @@ class Command(BaseCommand):
                     else:
                         target = duplicates[0]
 
-                self.merge_easy_cases(duplicates, target=target, nirs=nirs)
+                self.handle_easy_duplicates(duplicates, target=target, nirs=nirs)
 
             # Hard cases.
             # More than one PASS IAE was issued for the same person.
-            # We only handle logs for the moment, we don't know yet how to merge them.
             elif len(users_with_approval) > 1:
-                count_hard_cases += 1
-                self.handle_hard_cases(duplicates, count_hard_cases)
+                count_hard_duplicates += 1
+                self.handle_hard_duplicates(duplicates, count_hard_duplicates)
 
         if not self.no_csv:
             self.to_csv(
@@ -210,7 +239,7 @@ class Command(BaseCommand):
                     "Nombre de doublons",
                     "Doublons fusionnés",
                 ],
-                self.EASY_CASES_LOGS,
+                self.EASY_DUPLICATES_LOGS,
             )
             self.to_csv(
                 "hard-duplicates",
@@ -223,12 +252,22 @@ class Command(BaseCommand):
                     "Fin PASS IAE",
                     "Lien admin PASS IAE",
                 ],
-                self.HARD_CASES_LOGS,
+                self.HARD_DUPLICATES_LOGS,
+            )
+            self.to_csv(
+                "nir-duplicates",
+                [
+                    "Numéro",  # Lines with the same number are duplicates.
+                    "Nombre de doublons",
+                    "Email",
+                    "NIR",
+                ],
+                self.NIR_DUPLICATES_LOGS,
             )
 
         self.logger.debug("-" * 80)
-        self.logger.debug(f"{count_easy_cases} easy cases merged.")
-        self.logger.debug(f"{count_hard_cases} hard cases found.")
+        self.logger.debug(f"{count_easy_duplicates} easy cases merged.")
+        self.logger.debug(f"{count_hard_duplicates} hard cases found.")
 
         self.logger.debug("-" * 80)
         self.logger.debug("Done.")
