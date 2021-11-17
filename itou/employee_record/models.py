@@ -524,11 +524,11 @@ class EmployeeRecord(models.Model):
 
         fs.clean()
 
-        # Mandatory check, must be done only once
+        # Mandatory check, must be done only once:
+        # - no dups for a given SIAE and approval_number
         if EmployeeRecord.objects.filter(
-            asp_id=job_application.to_siae.convention.asp_id,
             approval_number=job_application.approval.number,
-            job_application=job_application,
+            job_application__to_siae=job_application.to_siae,
         ).exists():
             raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
