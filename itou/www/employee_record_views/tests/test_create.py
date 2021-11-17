@@ -553,6 +553,43 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             "Il est impossible de créer cette fiche salarié pour la raison suivante",
         )
 
+    def test_same_siret_different_kind(self):
+        # Check if is possible to create an employee record
+        # - for the same approval
+        # - for 2 distinct SIAE provided they don't have the same kind
+
+        similar_siae = self.siae = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", kind="ACI")
+        job_application = JobApplicationWithApprovalNotCancellableFactory(
+            to_siae=similar_siae, job_seeker=self.job_seeker, approval=self.job_application.approval
+        )
+
+        self.pass_step_2()
+        url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
+        self.client.get(url)
+
+        # Correct data :
+        data = {
+            "education_level": "00",
+            # Factory user is registed to Pôle emploi: all fields must be filled
+            "pole_emploi_since": "02",
+            # "pole_emploi_id": "1234567X",
+            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi": True,
+        }
+        commune = Commune.objects.by_insee_code("81093").first()
+
+        job_application.job_seeker.jobseeker_profile.education_level = "00"
+        job_application.job_seeker.jobseeker_profile.commune = commune
+        job_application.job_seeker.birth_place = commune
+        job_application.job_seeker.birth_country = Country.objects.get(code=Country._CODE_FRANCE)
+        job_application.save()
+
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record.save()
+
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+
 
 class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
     """
