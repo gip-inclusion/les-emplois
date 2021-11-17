@@ -435,6 +435,93 @@ class ApprovalModelTest(TestCase):
         approval = ApprovalFactory(created_at=approval_created_at, created_by=developer)
         self.assertTrue(approval.is_from_ai_stock)
 
+    def test_is_open_to_application_process_with_suspension(self):
+        today = timezone.now().date()
+        approval_start_at = today - relativedelta(months=3)
+        approval = ApprovalFactory(start_at=approval_start_at)
+        SuspensionFactory(
+            approval=approval,
+            start_at=today - relativedelta(days=1),
+            end_at=today + relativedelta(months=1),
+            reason=Suspension.Reason.BROKEN_CONTRACT.value,
+        )
+        self.assertTrue(approval.is_open_to_application_process)
+
+    def test_is_open_to_application_process_with_suspension_bad_reason(self):
+        today = timezone.now().date()
+        approval_start_at = today - relativedelta(months=3)
+        approval = ApprovalFactory(start_at=approval_start_at)
+        SuspensionFactory(
+            approval=approval,
+            start_at=today - relativedelta(days=1),
+            end_at=today + relativedelta(months=2),
+            reason=Suspension.Reason.SUSPENDED_CONTRACT.value,
+        )
+        self.assertFalse(approval.is_open_to_application_process)
+
+    def test_is_open_to_application_process_without_suspension(self):
+        today = timezone.now().date()
+        approval_start_at = today - relativedelta(months=3)
+        approval = ApprovalFactory(start_at=approval_start_at)
+        self.assertTrue(approval.is_open_to_application_process)
+
+    def test_last_in_progress_suspension(self):
+        today = timezone.now().date()
+        approval_start_at = today - relativedelta(months=3)
+        approval = ApprovalFactory(start_at=approval_start_at)
+        SuspensionFactory(
+            approval=approval,
+            start_at=approval_start_at + relativedelta(months=1),
+            end_at=approval_start_at + relativedelta(months=2),
+        )
+        suspension = SuspensionFactory(
+            approval=approval,
+            start_at=today - relativedelta(days=1),
+            end_at=today + relativedelta(months=2),
+            reason=Suspension.Reason.BROKEN_CONTRACT.value,
+        )
+        self.assertEquals(suspension.pk, approval.last_in_progress_suspension.pk)
+
+    def test_last_in_progress_without_suspension_in_progress(self):
+        today = timezone.now().date()
+        approval_start_at = today - relativedelta(months=3)
+        approval = ApprovalFactory(start_at=approval_start_at)
+        SuspensionFactory(
+            approval=approval,
+            start_at=approval_start_at + relativedelta(months=1),
+            end_at=approval_start_at + relativedelta(months=2),
+        )
+        self.assertIsNone(approval.last_in_progress_suspension)
+
+    def test_update_last_suspension(self):
+        today = timezone.now().date()
+        approval_start_at = today - relativedelta(months=3)
+        approval = ApprovalFactory(start_at=approval_start_at)
+        suspension = SuspensionFactory(
+            approval=approval,
+            start_at=approval_start_at + relativedelta(months=1),
+            end_at=today + relativedelta(months=2),
+            reason=Suspension.Reason.BROKEN_CONTRACT.value,
+        )
+        approval.update_last_suspension(hiring_start_at=today)
+        suspension.refresh_from_db()
+        self.assertEquals(suspension.end_at, today - relativedelta(days=1))
+
+    def test_update_last_suspension_invalid(self):
+        today = timezone.now().date()
+        approval_start_at = today - relativedelta(months=3)
+        approval = ApprovalFactory(start_at=approval_start_at)
+        suspension_end_at = today + relativedelta(months=2)
+        suspension = SuspensionFactory(
+            approval=approval,
+            start_at=approval_start_at + relativedelta(months=1),
+            end_at=suspension_end_at,
+            reason=Suspension.Reason.SUSPENDED_CONTRACT.value,
+        )
+        approval.update_last_suspension(hiring_start_at=today)
+        suspension.refresh_from_db()
+        self.assertEquals(suspension.end_at, suspension_end_at)
+
 
 class PoleEmploiApprovalModelTest(TestCase):
     """
