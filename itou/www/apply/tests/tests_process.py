@@ -279,7 +279,7 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response, "form_user_address", "post_code", "Ce champ est obligatoire.")
 
     def test_accept_with_active_suspension(self):
-        """Test the `accept` transition with suspension for active user"""
+        """Test the `accept` transition with active suspension for active user"""
         create_test_cities(["54", "57"], num_per_department=2)
         city = City.objects.first()
         today = timezone.localdate()
@@ -308,7 +308,7 @@ class ProcessViewsTest(TestCase):
             reason=Suspension.Reason.BROKEN_CONTRACT.value,
         )
 
-        # Now, other Siae want to hired the job seeker
+        # Now, another Siae wants to hire the job seeker
         other_siae = SiaeWithMembershipFactory()
         job_application = JobApplicationSentByJobSeekerFactory(
             approval=approval_job_seeker,
@@ -349,7 +349,7 @@ class ProcessViewsTest(TestCase):
             get_job_application.approval.end_at,
             approval_job_seeker.end_at + relativedelta(days=(g_suspension.end_at - g_suspension.start_at).days),
         )
-        # for know, we dont manage the cancel case
+        # for now, we don't manage the cancel case
 
     def test_accept_with_manual_approval_delivery(self):
         """
