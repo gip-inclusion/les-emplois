@@ -206,7 +206,9 @@ class EmployeeRecord(models.Model):
         verbose_name = "Fiche salarié"
         verbose_name_plural = "Fiches salarié"
         constraints = [
-            models.UniqueConstraint(fields=["asp_id", "approval_number"], name="unique_asp_id_approval_number")
+            models.UniqueConstraint(
+                fields=["asp_id", "job_application", "approval_number"], name="unique_asp_id_approval_number"
+            )
         ]
         unique_together = ["asp_batch_file", "asp_batch_line_number"]
         ordering = ["-created_at"]
@@ -526,6 +528,7 @@ class EmployeeRecord(models.Model):
         if EmployeeRecord.objects.filter(
             asp_id=job_application.to_siae.convention.asp_id,
             approval_number=job_application.approval.number,
+            job_application=job_application,
         ).exists():
             raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
