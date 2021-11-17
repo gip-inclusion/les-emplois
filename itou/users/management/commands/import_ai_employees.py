@@ -218,11 +218,13 @@ class Command(BaseCommand):
                     already_existing_approvals += 1
                     approval = job_seeker.approvals_wrapper.latest_approval
                 else:
+                    # create_employee_record will prevent "Fiche salariés" from being created.
                     approval = Approval(
                         start_at=datetime.date(2021, 12, 1),
                         end_at=datetime.date(2023, 11, 30),
                         user_id=job_seeker.pk,
                         created_by=developer,
+                        create_employee_record=False,
                     )
                     created_approvals += 1
                     if not self.dry_run:
@@ -297,11 +299,12 @@ class Command(BaseCommand):
         df = df.fillna("")
 
         self.logger.info("🚮 STEP 2: remove rows!")
+        cleaned_df = df.copy()
         # Exclude ended contracts.
-        ended_contracts = df[df[CONTRACT_ENDDATE_COL] != ""]
-        cleaned_df = df.drop(ended_contracts.index)
-        self.logger.info(f"Ended contract: excluding {len(ended_contracts)} rows.")
-        df.loc[ended_contracts.index, "Commentaire"] = "Ligne ignorée : contrat terminé."
+        # ended_contracts = cleaned_df[cleaned_df[CONTRACT_ENDDATE_COL] != ""]
+        # cleaned_df = cleaned_df.drop(ended_contracts.index)
+        # self.logger.info(f"Ended contract: excluding {len(ended_contracts)} rows.")
+        # df.loc[ended_contracts.index, "Commentaire"] = "Ligne ignorée : contrat terminé."
 
         # Exclude inexistent SIAE.
         inexistent_sirets = self.get_inexistent_structures(df)
