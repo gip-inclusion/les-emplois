@@ -556,7 +556,8 @@ class Suspension(models.Model):
                 raise ValidationError(
                     {
                         "start_at": (
-                            f"La date de déclaration rétroactive d'une suspension est limitée {self.MAX_RETROACTIVITY_DURATION_DAYS} jours. "
+                            f"Pour la date de début de suspension, vous pouvez remonter "
+                            f"{self.MAX_RETROACTIVITY_DURATION_DAYS} jours avant la date du jour."
                             f"Date de début minimum: {next_min_start_at.strftime('%d/%m/%Y')}."
                         )
                     }
