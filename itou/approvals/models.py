@@ -283,6 +283,9 @@ class Approval(CommonApprovalMixin):
 
     @cached_property
     def last_in_progress_suspension(self):
+        """
+        Returns the last in progress suspension if exists else None
+        """
         if self.is_suspended:
             return self.suspensions_by_start_date_asc.last()
 
@@ -296,6 +299,11 @@ class Approval(CommonApprovalMixin):
         return True
 
     def update_last_suspension(self, hiring_start_at):
+        """
+        An SIAE can reduce the delay of a suspension when they hired job seeker.
+        So, if approval is open to application process and have an active suspension,
+        We save the end date to the d-1 hiring start.
+        """
         active_suspension = self.last_in_progress_suspension
         if self.is_open_to_application_process and active_suspension:
             active_suspension.end_at = hiring_start_at - relativedelta(days=1)
