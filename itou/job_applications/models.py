@@ -667,10 +667,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_by_email = True
             self.approval_number_sent_at = timezone.now()
             self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_AUTOMATIC
-            if self.approval.can_update_suspension:
-                active_suspension = self.approval.suspension_set.in_progress().last()
-                active_suspension.end_at = self.hiring_start_at - relativedelta(days=1)
-                active_suspension.save()
+            self.approval.update_last_suspension(self.hiring_start_at)
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):

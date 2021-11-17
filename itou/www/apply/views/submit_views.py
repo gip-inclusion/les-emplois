@@ -60,7 +60,7 @@ def get_approvals_wrapper(request, job_seeker, siae):
     if approvals_wrapper.has_valid and approvals_wrapper.latest_approval.is_pass_iae:
 
         # Ensure that an existing approval can be unsuspended.
-        if not approvals_wrapper.latest_approval.can_update_suspension:
+        if not approvals_wrapper.latest_approval.is_open_to_application_process:
             error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY
             if user_info.user == job_seeker:
                 error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
