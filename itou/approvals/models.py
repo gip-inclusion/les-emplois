@@ -235,13 +235,6 @@ class Approval(CommonApprovalMixin):
         return self.jobapplication_set.get().state == state_accepted
 
     @cached_property
-    def can_update_suspension(self):
-        return self.is_suspended and self.suspension_set.in_progress().last().reason in [
-            Suspension.Reason.BROKEN_CONTRACT.value,
-            Suspension.Reason.FINISHED_CONTRACT.value,
-        ]
-
-    @cached_property
     def is_last_for_user(self):
         """
         Returns True if the current Approval is the most recent for the user, False otherwise.
@@ -287,6 +280,26 @@ class Approval(CommonApprovalMixin):
             and self.user.last_hire_was_made_by_siae(siae)
             and not self.user.last_accepted_job_application.can_be_cancelled
         )
+
+    @cached_property
+    def last_in_progress_suspension(self):
+        if self.is_suspended:
+            return self.suspensions_by_start_date_asc.last()
+
+    @cached_property
+    def is_open_to_application_process(self):
+        if self.is_suspended:
+            return self.last_in_progress_suspension.reason in [
+                Suspension.Reason.BROKEN_CONTRACT.value,
+                Suspension.Reason.FINISHED_CONTRACT.value,
+            ]
+        return True
+
+    def update_last_suspension(self, hiring_start_at):
+        active_suspension = self.last_in_progress_suspension
+        if self.is_open_to_application_process and active_suspension:
+            active_suspension.end_at = hiring_start_at - relativedelta(days=1)
+            active_suspension.save()
 
     # Postpone start date.
 
