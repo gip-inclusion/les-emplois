@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, REGIONS
 from itou.utils.apis.metabase import DEPARTMENT_FILTER_KEY, REGION_FILTER_KEY, SIAE_FILTER_KEY, metabase_embedded_url
@@ -56,6 +57,22 @@ def public_advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
         "page_title": "Statistiques avancées",
         "related_link": "stats:public_basic_stats",
         "related_title": "Vers les statistiques simplifiées",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+@xframe_options_exempt
+def public_pilotage_stats(request, dashboard_id, template_name="stats/stats_pilotage.html"):
+    """
+    We do it because we want to allow users to download chart data which
+    is only possible via embedded dashboards and not via public dashboards.
+    """
+    if dashboard_id not in settings.PILOTAGE_DASHBOARDS_WHITELIST:
+        raise PermissionDenied
+
+    context = {
+        "iframeurl": metabase_embedded_url(dashboard_id),
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)

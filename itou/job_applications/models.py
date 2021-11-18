@@ -200,8 +200,11 @@ class JobApplicationQuerySet(models.QuerySet):
         """
         today = datetime.date.today()
         cancellation_date = today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+        # Approvals can be used to prevent employee records creation.
+        # See Approval.create_employee_record for more information.
         return (
             self.exclude(approval=None)
+            .exclude(approval__create_employee_record=False)
             .accepted()
             .filter(Q(employee_record__status="NEW") | Q(employee_record__isnull=True))
             .filter(

@@ -13,4 +13,5 @@ urlpatterns = [
     path("ddets/", views.stats_ddets, name="stats_ddets"),
     path("dreets/", views.stats_dreets, name="stats_dreets"),
     path("dgefp/", views.stats_dgefp, name="stats_dgefp"),
+    path("pilotage/<int:dashboard_id>/", views.public_pilotage_stats, name="public_pilotage_stats"),
 ]
