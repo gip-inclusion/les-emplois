@@ -537,9 +537,7 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_application.state.is_cancelled)
 
     def test_cannot_cancel(self):
-        cancellation_period_end = timezone.localdate() - relativedelta(
-            days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
-        )
+        cancellation_period_end = timezone.localdate()
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=(cancellation_period_end - relativedelta(days=1)),

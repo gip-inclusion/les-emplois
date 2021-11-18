@@ -23,9 +23,7 @@ class ApprovalSuspendViewTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
-            hiring_start_at=today
-            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            - relativedelta(days=1),
+            hiring_start_at=today - relativedelta(days=1),
         )
 
         approval = job_application.approval
@@ -82,9 +80,7 @@ class ApprovalSuspendViewTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
-            hiring_start_at=today
-            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            - relativedelta(days=1),
+            hiring_start_at=today - relativedelta(days=1),
         )
 
         approval = job_application.approval
@@ -132,9 +128,7 @@ class ApprovalSuspendViewTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
-            hiring_start_at=today
-            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            - relativedelta(days=1),
+            hiring_start_at=today - relativedelta(days=1),
         )
 
         approval = job_application.approval

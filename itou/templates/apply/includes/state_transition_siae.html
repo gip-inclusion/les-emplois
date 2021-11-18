@@ -165,9 +165,7 @@
             <hr>
 
             <h3 class="font-weight-normal text-muted">Rétractation</h3>
-            <p>
-                Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit jusqu'au {{ job_application.cancellation_delay_end|date:"d/m/Y" }} inclus.
-            </p>
+
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
                 <p>
                     Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.

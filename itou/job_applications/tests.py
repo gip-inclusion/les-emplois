@@ -124,14 +124,11 @@ class JobApplicationModelTest(TestCase):
 
     def test_can_be_cancelled(self):
         today = datetime.date.today()
-        cancellation_days_in_future = relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-        cancellation_period_end = today - cancellation_days_in_future
-
-        job_application_future_ok = JobApplicationWithApprovalFactory(hiring_start_at=cancellation_period_end)
+        job_application_future_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
         self.assertTrue(job_application_future_ok.can_be_cancelled)
 
         job_application_future_not_ok = JobApplicationWithApprovalFactory(
-            hiring_start_at=(cancellation_period_end - relativedelta(days=365))
+            hiring_start_at=(today - relativedelta(days=365))
         )
         self.assertFalse(job_application_future_not_ok.can_be_cancelled)
 
