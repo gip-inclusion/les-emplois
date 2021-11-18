@@ -8,6 +8,8 @@ services:
     container_name: itou_postgres
     env_file:
       - ./envs/dev.env
+    # https://stackoverflow.com/questions/56839975/docker-shm-size-dev-shm-resizing-shared-memory
+    shm_size: 1g
     build:
       context: .
       dockerfile: ./docker/dev/postgres/Dockerfile
