@@ -7,7 +7,7 @@ from django.utils.http import urlencode
 
 from itou.approvals.models import Approval, Prolongation
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
