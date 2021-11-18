@@ -438,26 +438,35 @@ class ApprovalModelTest(TestCase):
     def test_is_open_to_application_process_with_suspension(self):
         today = timezone.now().date()
         approval_start_at = today - relativedelta(months=3)
-        approval = ApprovalFactory(start_at=approval_start_at)
-        SuspensionFactory(
-            approval=approval,
-            start_at=today - relativedelta(days=1),
-            end_at=today + relativedelta(months=1),
-            reason=Suspension.Reason.BROKEN_CONTRACT.value,
-        )
-        self.assertTrue(approval.is_open_to_application_process)
+        reasons_to_open_process = [Suspension.Reason.BROKEN_CONTRACT.value, Suspension.Reason.FINISHED_CONTRACT.value]
+        reasons_to_not_open_process = [
+            reason.value for reason in Suspension.Reason if reason not in reasons_to_open_process
+        ]
 
-    def test_is_open_to_application_process_with_suspension_bad_reason(self):
-        today = timezone.now().date()
-        approval_start_at = today - relativedelta(months=3)
-        approval = ApprovalFactory(start_at=approval_start_at)
-        SuspensionFactory(
-            approval=approval,
-            start_at=today - relativedelta(days=1),
-            end_at=today + relativedelta(months=2),
-            reason=Suspension.Reason.SUSPENDED_CONTRACT.value,
-        )
-        self.assertFalse(approval.is_open_to_application_process)
+        for reason_to_refuse in reasons_to_not_open_process:
+            approval = ApprovalFactory(start_at=approval_start_at)
+            suspension = SuspensionFactory(
+                approval=approval,
+                start_at=today - relativedelta(days=1),
+                end_at=today + relativedelta(months=1),
+                reason=reason_to_refuse,
+            )
+            self.assertFalse(approval.is_open_to_application_process)
+            suspension.delete()
+            approval.delete()
+
+        for reason in reasons_to_open_process:
+            approval = ApprovalFactory(start_at=approval_start_at)
+            suspension = SuspensionFactory(
+                approval=approval,
+                start_at=today - relativedelta(days=1),
+                end_at=today + relativedelta(months=1),
+                reason=reason,
+            )
+
+            self.assertTrue(approval.is_open_to_application_process)
+            suspension.delete()
+            approval.delete()
 
     def test_is_open_to_application_process_without_suspension(self):
         today = timezone.now().date()
