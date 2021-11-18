@@ -50,6 +50,7 @@ jobs:
     - name: 🏷 Setup worker to run django command
       run: |
         echo 'CC_WORKER_COMMAND=./manage.py populate_metabase_itou --verbosity 2' >> $GITHUB_ENV
+        # By default, workers always restart on failure. We want to avoid an infinite loop if it happens.
         echo 'CC_WORKER_RESTART=no' >> $GITHUB_ENV
 
     - name: 🧫 Create a cron app on Clever Cloud on a strong machine
