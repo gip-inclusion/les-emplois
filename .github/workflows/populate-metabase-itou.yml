@@ -1,6 +1,6 @@
-name: Populate metabase
+name: 🌈 Populate metabase itou
 
-# Runs "populate_itou_metabase".
+# Runs "populate_metabase_itou".
 # A github action takes care of the cron task that:
 # - creates a machine on demand
 # - runs the desired command via a worker
@@ -47,9 +47,11 @@ jobs:
       run:
         echo "CRON_TASK_APP_NAME=`echo \"c1-cron-daily-$(date +%y-%m-%d-%Hh-%M)"`" >> $GITHUB_ENV
 
-    - name: 🏷 Setup worker command
-      run:
+    - name: 🏷 Setup worker to run django command
+      run: |
         echo 'CC_WORKER_COMMAND=./manage.py populate_metabase_itou --verbosity 2' >> $GITHUB_ENV
+        # By default, workers always restart on failure. We want to avoid an infinite loop if it happens.
+        echo 'CC_WORKER_RESTART=no' >> $GITHUB_ENV
 
     - name: 🧫 Create a cron app on Clever Cloud on a strong machine
       run: |
@@ -77,15 +79,16 @@ jobs:
         $CLEVER_CLI service link-addon c1-prod-database-encrypted
         $CLEVER_CLI service link-addon c1-itou-redis
 
-    - name: 🚀 Deploy worker command to Clever
-      run:
+    - name: 🚀 Deploy worker configuration to Clever
+      run: |
         $CLEVER_CLI env import-vars CC_WORKER_COMMAND
+        $CLEVER_CLI env import-vars CC_WORKER_RESTART
 
     - name: 🚀 Deploy app to Clever Cloud
       run: $CLEVER_CLI deploy --alias $CRON_TASK_APP_NAME --branch $DEPLOY_BRANCH --force
 
-    - name: 🕒 Wait one hour which should be more than enough for the script to complete
-      run: sleep 3600
+    - name: 🕒 Wait a reasonable amount of time for the script to complete
+      run: sleep 5400
 
     - name: 🔪 Delete the app once the work is done
       run:

@@ -1,11 +1,22 @@
+import os
 from operator import attrgetter
 
 from django.conf import settings
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
+from psycopg2 import sql
 
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
+from itou.metabase.management.commands._database_tables import (
+    get_dry_table_name,
+    get_new_table_name,
+    switch_table_atomically,
+)
+
+
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 def convert_boolean_to_int(b):
@@ -178,3 +189,50 @@ def chunked_queryset(queryset, chunk_size=10000):
         yield queryset.filter(pk__gte=start_pk, pk__lt=end_pk)
         start_pk = end_pk
     yield queryset.filter(pk__gte=start_pk)
+
+
+def build_custom_table(table_name, sql_request, dry_run):
+    """
+    Build a new table with given sql_request.
+    Minimize downtime by building a temporary table first then swap the two tables atomically.
+    """
+    if dry_run:
+        # Note that during a dry run, the dry run version of the current table will be built
+        # from the wet run version of the underlying tables.
+        table_name = get_dry_table_name(table_name)
+
+    with MetabaseDatabaseCursor() as (cur, conn):
+        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
+        conn.commit()
+        cur.execute(
+            sql.SQL("CREATE TABLE {} AS {}").format(
+                sql.Identifier(get_new_table_name(table_name)), sql.SQL(sql_request)
+            )
+        )
+        conn.commit()
+
+    switch_table_atomically(table_name=table_name)
+
+
+def build_custom_tables(dry_run):
+    """
+    Build custom tables one by one by playing SQL requests in `sql` folder.
+
+    Typically:
+    - 001_fluxIAE_DateDerniereMiseAJour.sql
+    - 002_missions_ai_ehpad.sql
+    - ...
+
+    The numerical prefixes ensure the order of execution is deterministic.
+
+    The name of the table being created with the query is derived from the filename,
+    # e.g. '002_missions_ai_ehpad.sql' => 'missions_ai_ehpad'
+    """
+    path = f"{CURRENT_DIR}/sql"
+    for filename in sorted([f for f in os.listdir(path) if f.endswith(".sql")]):
+        print(f"Running {filename} ...")
+        table_name = "_".join(filename.split(".")[0].split("_")[1:])
+        with open(os.path.join(path, filename), "r") as file:
+            sql_request = file.read()
+        build_custom_table(table_name=table_name, sql_request=sql_request, dry_run=dry_run)
+        print("Done.")

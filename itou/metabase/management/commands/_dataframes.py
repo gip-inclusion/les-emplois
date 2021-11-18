@@ -3,28 +3,14 @@ Helper methods for manipulating dataframes used by both populate_metabase_itou a
 """
 
 import pandas as pd
-from psycopg2 import sql
 from tqdm import tqdm
 
-from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_sqlalchemy import get_pg_engine
-
-
-def switch_table_atomically(table_name):
-    with MetabaseDatabaseCursor() as (cur, conn):
-        cur.execute(
-            sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
-                sql.Identifier(table_name), sql.Identifier(f"{table_name}_old")
-            )
-        )
-        cur.execute(
-            sql.SQL("ALTER TABLE {} RENAME TO {}").format(
-                sql.Identifier(f"{table_name}_new"), sql.Identifier(table_name)
-            )
-        )
-        conn.commit()
-        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
-        conn.commit()
+from itou.metabase.management.commands._database_tables import (
+    get_dry_table_name,
+    get_new_table_name,
+    switch_table_atomically,
+)
 
 
 def store_df(df, table_name, dry_run, max_attempts=5):
@@ -37,7 +23,7 @@ def store_df(df, table_name, dry_run, max_attempts=5):
     Try up to `max_attempts` times.
     """
     if dry_run:
-        table_name += "_dry_run"
+        table_name = get_dry_table_name(table_name)
         df = df.head(1000)
 
     # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
@@ -54,7 +40,7 @@ def store_df(df, table_name, dry_run, max_attempts=5):
             for df_chunk in tqdm(df_chunks):
                 pg_engine = get_pg_engine()
                 df_chunk.to_sql(
-                    name=f"{table_name}_new",
+                    name=get_new_table_name(table_name),
                     # Use a new connection for each chunk to avoid random disconnections.
                     con=pg_engine,
                     if_exists=if_exists,

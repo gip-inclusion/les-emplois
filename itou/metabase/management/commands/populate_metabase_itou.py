@@ -47,11 +47,27 @@ from itou.metabase.management.commands import (
     _siaes,
 )
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
+from itou.metabase.management.commands._database_tables import (
+    get_dry_table_name,
+    get_new_table_name,
+    get_old_table_name,
+)
 from itou.metabase.management.commands._dataframes import get_df_from_rows, store_df
-from itou.metabase.management.commands._utils import anonymize, chunked_queryset, compose, convert_boolean_to_int
+from itou.metabase.management.commands._utils import (
+    anonymize,
+    build_custom_tables,
+    chunked_queryset,
+    compose,
+    convert_boolean_to_int,
+)
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
+from itou.utils.slack import send_slack_message
+
+
+# Emit more verbose slack messages about every step, not just the beginning and the ending of the command.
+VERBOSE_SLACK_MESSAGES = False
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:
@@ -66,7 +82,7 @@ class Command(BaseCommand):
     Populate metabase database.
 
     The `dry-run` mode is useful for quickly testing changes and iterating.
-    It builds tables with a *_dry_run suffix added to their name, to avoid
+    It builds tables with a dry prefix added to their name, to avoid
     touching any real table, and injects only a sample of data.
 
     To populate alternate tables with sample data:
@@ -113,8 +129,10 @@ class Command(BaseCommand):
         self.conn.commit()
 
     def cleanup_tables(self, table_name):
-        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_new")))
-        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(table_name))))
+        # Dry run tables are periodically dropped by wet runs.
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_dry_table_name(table_name))))
         self.commit()
 
     def inject_chunk(self, table_columns, chunk, new_table_name):
@@ -143,9 +161,9 @@ class Command(BaseCommand):
             queryset = None
 
         if self.dry_run:
-            table_name = f"{table_name}_dry_run"
-        new_table_name = f"{table_name}_new"
-        old_table_name = f"{table_name}_old"
+            table_name = get_dry_table_name(table_name)
+        new_table_name = get_new_table_name(table_name)
+        old_table_name = get_old_table_name(table_name)
 
         with MetabaseDatabaseCursor() as (cur, conn):
             self.cur = cur
@@ -240,8 +258,7 @@ class Command(BaseCommand):
                 )
             )
             self.commit()
-            self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
-            self.commit()
+            self.cleanup_tables(table_name)
             self.log("")
 
     def populate_siaes(self):
@@ -438,23 +455,43 @@ class Command(BaseCommand):
                 "manual resolution, see command output"
             )
 
+    def build_custom_tables(self):
+        build_custom_tables(dry_run=self.dry_run)
+
     def populate_metabase_itou(self):
         if not settings.ALLOW_POPULATING_METABASE:
             self.log("Populating metabase is not allowed in this environment.")
             return
 
-        self.populate_siaes()
-        self.populate_job_descriptions()
-        self.populate_organizations()
-        self.populate_job_seekers()
-        self.populate_job_applications()
-        self.populate_selected_jobs()
-        self.populate_approvals()
-        self.populate_rome_codes()
-        self.populate_insee_codes()
-        self.populate_departments()
+        send_slack_message(
+            ":rocket: Début de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"
+        )
 
-        self.report_data_inconsistencies()
+        updates = [
+            self.populate_siaes,
+            self.populate_job_descriptions,
+            self.populate_organizations,
+            self.populate_job_seekers,
+            self.populate_job_applications,
+            self.populate_selected_jobs,
+            self.populate_approvals,
+            self.populate_rome_codes,
+            self.populate_insee_codes,
+            self.populate_departments,
+            self.build_custom_tables,
+            self.report_data_inconsistencies,
+        ]
+
+        for update in updates:
+            if VERBOSE_SLACK_MESSAGES:
+                send_slack_message(f"Début de l'étape {update.__name__} :rocket:")
+            update()
+            if VERBOSE_SLACK_MESSAGES:
+                send_slack_message(f"Fin de l'étape {update.__name__} :white_check_mark:")
+
+        send_slack_message(
+            ":rocket: Fin de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"
+        )
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))

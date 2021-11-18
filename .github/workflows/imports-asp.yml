@@ -1,4 +1,4 @@
-name: Imports ASP
+name: 🐡 Imports ASP
 
 # Runs the various ASP data imports.
 # A github action takes care of the cron task that:

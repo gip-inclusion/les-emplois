@@ -59,18 +59,13 @@ An EMI does not necessarily have a mission.
 
 """
 import logging
-import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from psycopg2 import sql
 
-from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
-from itou.metabase.management.commands._dataframes import store_df, switch_table_atomically
+from itou.metabase.management.commands._dataframes import store_df
+from itou.metabase.management.commands._utils import build_custom_tables
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
-
-
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:
@@ -85,7 +80,7 @@ class Command(BaseCommand):
     Populate metabase database with fluxIAE data.
 
     The `dry-run` mode is useful for quickly testing changes and iterating.
-    It builds tables with a *_dry_run suffix added to their name, to avoid
+    It builds tables with a dry prefix added to their name, to avoid
     touching any real table, and injects only a sample of data.
 
     To populate alternate tables with sample data:
@@ -128,50 +123,6 @@ class Command(BaseCommand):
         for filename in get_fluxiae_referential_filenames():
             self.populate_fluxiae_view(vue_name=filename)
 
-    def build_custom_table(self, table_name, sql_request):
-        """
-        Build a new table with given sql_request.
-        Minimize downtime by building a temporary table first then swap the two tables atomically.
-        """
-        if self.dry_run:
-            # Note that during a dry run, the dry run version of the current table will be built
-            # from the wet run version of the underlying tables.
-            table_name += "_dry_run"
-
-        with MetabaseDatabaseCursor() as (cur, conn):
-            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_new")))
-            conn.commit()
-            cur.execute(
-                sql.SQL("CREATE TABLE {} AS {}").format(sql.Identifier(f"{table_name}_new"), sql.SQL(sql_request))
-            )
-            conn.commit()
-
-        switch_table_atomically(table_name=table_name)
-        self.log("Done.")
-
-    @timeit
-    def build_custom_tables(self):
-        """
-        Build custom tables one by one by playing SQL requests in `sql` folder.
-
-        Typically:
-        - 001_fluxIAE_DateDerniereMiseAJour.sql
-        - 002_missions_ai_ehpad.sql
-        - ...
-
-        The numerical prefixes ensure the order of execution is deterministic.
-
-        The name of the table being created with the query is derived from the filename,
-        # e.g. '002_missions_ai_ehpad.sql' => 'missions_ai_ehpad'
-        """
-        path = f"{CURRENT_DIR}/sql"
-        for filename in sorted([f for f in os.listdir(path) if f.endswith(".sql")]):
-            self.log(f"Running {filename} ...")
-            table_name = "_".join(filename.split(".")[0].split("_")[1:])
-            with open(os.path.join(path, filename), "r") as file:
-                sql_request = file.read()
-            self.build_custom_table(table_name=table_name, sql_request=sql_request)
-
     @timeit
     def populate_metabase_fluxiae(self):
         if not settings.ALLOW_POPULATING_METABASE:
@@ -194,7 +145,7 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_Structure")
 
         # Build custom tables by running raw SQL queries on existing tables.
-        self.build_custom_tables()
+        build_custom_tables(dry_run=self.dry_run)
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
