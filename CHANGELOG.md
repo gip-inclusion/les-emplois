@@ -1,5 +1,32 @@
 # Journal des modifications
 
+## [31] - 2021-11-18
+
+### Ajouté
+
+- Nouveau motif de refus de candidature : « Candidature pas assez renseignée ».
+- Ajout du champ `create_employee_record` sur `Approval` (PASS IAE) afin d'empêcher la création automatique de fiches salariés. Non visible dans l'admin Django.
+- Nouvelle page de statistiques chargée dans une iframe.
+- Ajout des champs e-mail et téléphone dans l'API fiches salariés.
+
+### Modifié
+
+- Réparation : les candidats autonomes qui ont un compte en double (dont un avec un NIR) peuvent de nouveau candidater. Ils voient un message d'erreur les invitant à se reconnecter.
+- Réparation : le mécanisme de mise à jour quotidien des données de Metabase fonctionne de nouveau.
+- Réparation : les employeurs peuvent ajouter deux métiers identiques à leur SIAE.
+- Réactivation du script d'import des EA dans celui qui est lancé hebdomadairement par Supportix.
+- La durée des prolongations a été modifiée.
+- Corrections d'erreurs diverses liées aux fiches salariés.
+- Pendant l'enregistrement des fiches salariés, la sélection d'une annexe financière est désormais optionnelle.
+- Mise à jour de l'URL du portail assistance : il pointe désormais vers la Communauté.
+- Prise en compte du NIR dans le script de déduplication des candidats.
+- Gestion plus propre des logs des doublons avec export en CSV pour faciliter la vie de Supportix.
+- Mise à jour vers Django 3.2.9.
+
+### Supprimé
+
+- Suppression des contrôles sur la date de fin d'embauche et la durée maximum d'un PASS IAE.
+
 ## [30] - 2021-11-05
 
 ### Ajouté
