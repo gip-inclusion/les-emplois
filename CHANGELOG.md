@@ -15,7 +15,7 @@
 - Réparation : le mécanisme de mise à jour quotidien des données de Metabase fonctionne de nouveau.
 - Réparation : les employeurs peuvent ajouter deux métiers identiques à leur SIAE.
 - Réactivation du script d'import des EA dans celui qui est lancé hebdomadairement par Supportix.
-- La durée des prolongations a été modifiée.
+- Les durées maximales des prolongations (différentes selon le motif) ont été modifiées.
 - Corrections d'erreurs diverses liées aux fiches salariés.
 - Pendant l'enregistrement des fiches salariés, la sélection d'une annexe financière est désormais optionnelle.
 - Mise à jour de l'URL du portail assistance : il pointe désormais vers la Communauté.
