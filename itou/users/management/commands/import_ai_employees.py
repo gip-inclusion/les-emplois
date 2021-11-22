@@ -150,29 +150,21 @@ class Command(BaseCommand):
 
             with transaction.atomic():
                 # Get city by its INSEE code to fill in the `User.city` attribute with a valid name.
-                if row[CITY_INSEE_COL] in [
-                    "59540",
-                    "50173",
-                    "14115",
-                    "50602",
-                    "50416",
-                    "50416",
-                    "50203",
-                    "50134",
-                    "50416",
-                    "56037",
-                    "22303",
-                    "02325",
-                    "98507",
-                    "98506",
-                    "97411",
-                ]:
+                try:
+                    commune = Commune.objects.current().get(code=row[CITY_INSEE_COL])
+                except Commune.DoesNotExist:
                     # Communes stores the history of city names and INSEE codes.
                     # Sometimes, a commune is found twice but with the same name.
                     # As we just need a human name, we can take the first one.
                     commune = Commune.objects.filter(code=row[CITY_INSEE_COL]).first()
+                except Commune.MultipleObjectsReturned:
+                    commune = Commune.objects.current().filter(code=row[CITY_INSEE_COL]).first()
                 else:
                     commune = Commune.objects.current().get(code=row[CITY_INSEE_COL])
+
+                if row[CITY_INSEE_COL] == "01440":
+                    # Veyziat has been merged with Oyonnax.
+                    commune = Commune(name="Veyziat", code="01283")
 
                 # Data has been formatted previously.
                 user_data = {
