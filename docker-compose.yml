@@ -8,6 +8,7 @@ services:
     container_name: itou_postgres
     env_file:
       - ./envs/dev.env
+    # The default memory setting (64M) is not enough anymore due to the size of the database we import
     # https://stackoverflow.com/questions/56839975/docker-shm-size-dev-shm-resizing-shared-memory
     shm_size: 1g
     build:
