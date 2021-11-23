@@ -1,8 +1,11 @@
 from random import randint
+from typing import OrderedDict
 
 from django.conf import settings
 from django.utils.crypto import salted_hmac
 from rest_framework import serializers
+from itou.employee_record.serializers import _EmployeeAddress, EmployeeRecordSerializer
+from itou.employee_record.models import EmployeeRecord
 
 
 class DummyEmployeeRecordSerializer(serializers.Serializer):
@@ -84,3 +87,59 @@ class DummyEmployeeRecordSerializer(serializers.Serializer):
         }
 
         return fiche_salarie
+
+
+# Employe record serializer is mostly the same as the one used
+# for serialization transfers.
+# Except some fields are "unobfuscated" and added for third-party
+# software connecting to the API
+
+
+class _API_EmployeeAddress(_EmployeeAddress):
+    # This class in only useful for compatibilty
+    # We decided not to send phone and email (business concerns and bad ASP address filters)
+    # But we make it available for API for compatibility with original document
+    # (these fiels should really be actual data, not fake, by implicit contract)
+
+    def _update_address_and_phone_number(self, result, instance) -> OrderedDict:
+        """
+        Allow overriding these 2 fields:
+        - adrTelephone
+        - adrMail
+        Make data readable again for API users.
+        """
+        result["adrTelephone"] = instance.phone
+        result["adrMail"] = instance.email
+
+        return result
+
+
+class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
+    """
+    This serializer is a version with the `numeroAnnexe` field added (financial annex number).
+
+    This field not needed by ASP was simply ignored in earlier versions of the
+    main SFTP serializer but was removed for RGPD concerns.
+    """
+
+    numeroAnnexe = serializers.CharField(source="financial_annex_number")
+    adresse = _API_EmployeeAddress(source="job_application.job_seeker")
+
+    class Meta:
+        model = EmployeeRecord
+        fields = [
+            "passIae",
+            "passDateDeb",
+            "passDateFin",
+            "numLigne",
+            "typeMouvement",
+            "numeroAnnexe",
+            "mesure",
+            "siret",
+            "personnePhysique",
+            "adresse",
+            "situationSalarie",
+            "codeTraitement",
+            "libelleTraitement",
+        ]
+        read_only_fields = fields
