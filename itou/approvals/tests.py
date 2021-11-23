@@ -946,6 +946,30 @@ class SuspensionModelTest(TestCase):
     Test Suspension model.
     """
 
+    def test_clean(self):
+        today = timezone.now().date()
+        start_at = timezone.now().date() - relativedelta(months=2)
+        end_at = start_at + relativedelta(months=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        suspension = SuspensionFactory(approval=approval)
+
+        # test the when suspension is out of boundaries
+        suspension.start_at = start_at - relativedelta(months=1)
+        with self.assertRaises(ValidationError):
+            suspension.clean()
+
+        # the case when end_at < start_at
+        suspension.start_at = start_at
+        suspension.end_at = start_at - relativedelta(months=1)
+        with self.assertRaises(ValidationError):
+            suspension.clean()
+
+        # declare suspension in the future
+        suspension.start_at = today + relativedelta(days=2)
+        suspension.end_at = end_at
+        with self.assertRaises(ValidationError):
+            suspension.clean()
+
     def test_duration(self):
         expected_duration = datetime.timedelta(days=2)
         start_at = timezone.now().date()
