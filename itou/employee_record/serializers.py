@@ -70,7 +70,7 @@ class _EmployeeSerializer(serializers.ModelSerializer):
         return result
 
 
-class _EmployeeAddress(serializers.ModelSerializer):
+class _EmployeeAddressSerializer(serializers.ModelSerializer):
 
     adrTelephone = serializers.CharField(source="phone", allow_blank=True)
     adrMail = serializers.CharField(source="email", allow_blank=True)
@@ -151,7 +151,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
         return result
 
 
-class _EmployeeSituation(serializers.ModelSerializer):
+class _EmployeeSituationSerializer(serializers.ModelSerializer):
 
     # Placeholder: updated at top-level serialization
     orienteur = serializers.CharField(required=False)
@@ -246,8 +246,8 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
     siret = serializers.CharField()
 
     personnePhysique = _EmployeeSerializer(source="job_application.job_seeker")
-    adresse = _EmployeeAddress(source="job_application.job_seeker")
-    situationSalarie = _EmployeeSituation(source="job_application.job_seeker")
+    adresse = _EmployeeAddressSerializer(source="job_application.job_seeker")
+    situationSalarie = _EmployeeSituationSerializer(source="job_application.job_seeker")
 
     # These fields are null at the beginning of the ASP processing
     codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True)
