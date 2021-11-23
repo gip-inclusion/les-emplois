@@ -286,5 +286,41 @@
         ],
         "resume_link": ""
     }
+},
+{
+    "model": "job_applications.jobapplication",
+    "pk": "76a64dcd-eacb-42b2-a396-0ce8077da37a",
+    "fields": {
+        "job_seeker": 26,
+        "eligibility_diagnosis": null,
+        "resume_link": "",
+        "sender": 26,
+        "sender_kind": "job_seeker",
+        "sender_siae": null,
+        "sender_prescriber_organization": null,
+        "to_siae": 857,
+        "state": "new",
+        "message": "J'ai la main verte et je suis ultra motivé !\r\n\r\nLaissez-moi vous en convaincre lors d'un entretien.",
+        "answer": "",
+        "answer_to_prescriber": "",
+        "refusal_reason": "",
+        "hiring_start_at": null,
+        "hiring_end_at": null,
+        "hiring_without_approval": false,
+        "created_from_pe_approval": false,
+        "approval": null,
+        "approval_delivery_mode": "",
+        "approval_number_sent_by_email": false,
+        "approval_number_sent_at": null,
+        "approval_manually_delivered_by": null,
+        "approval_manually_refused_by": null,
+        "approval_manually_refused_at": null,
+        "hidden_for_siae": false,
+        "created_at": "2021-11-23T17:06:19.317Z",
+        "updated_at": "2021-11-23T17:06:19.356Z",
+        "selected_jobs": [
+            12
+        ]
+    }
 }
 ]

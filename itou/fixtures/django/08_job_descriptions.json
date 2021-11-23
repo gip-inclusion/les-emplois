@@ -152,5 +152,19 @@
       "description": "",
       "ui_rank": 32767
    }
+},
+{
+   "model": "siaes.siaejobdescription",
+   "pk": 12,
+   "fields": {
+      "appellation": "16067",
+      "siae": 857,
+      "created_at": "2021-11-23T16:18:42.985Z",
+      "updated_at": null,
+      "is_active": true,
+      "custom_name": "",
+      "description": "Technicien de la nature, le jardinier d’espaces verts effectue toute une série de travaux qui varient en fonction des saisons, de la préparation des sols en amont jusqu’au remplacement des plantations en fin de cycle.",
+      "ui_rank": 32767
+   }
 }
 ]
