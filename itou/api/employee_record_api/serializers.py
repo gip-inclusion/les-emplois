@@ -4,8 +4,9 @@ from typing import OrderedDict
 from django.conf import settings
 from django.utils.crypto import salted_hmac
 from rest_framework import serializers
-from itou.employee_record.serializers import _EmployeeAddress, EmployeeRecordSerializer
+from itou.employee_record.serializers import _EmployeeAddressSerializer, _EmployeeSerializer, EmployeeRecordSerializer
 from itou.employee_record.models import EmployeeRecord
+from itou.users.models import User
 
 
 class DummyEmployeeRecordSerializer(serializers.Serializer):
@@ -95,7 +96,7 @@ class DummyEmployeeRecordSerializer(serializers.Serializer):
 # software connecting to the API
 
 
-class _API_EmployeeAddress(_EmployeeAddress):
+class _API_EmployeeAddressSerializer(_EmployeeAddressSerializer):
     # This class in only useful for compatibilty
     # We decided not to send phone and email (business concerns and bad ASP address filters)
     # But we make it available for API for compatibility with original document
@@ -114,6 +115,30 @@ class _API_EmployeeAddress(_EmployeeAddress):
         return result
 
 
+class _API_EmployeeSerializer(_EmployeeSerializer):
+    """
+    Specific fields added to the API (not used in ASP transfers)
+    """
+
+    NIR = serializers.CharField(source="nir")
+
+    class Meta:
+        model = User
+        fields = [
+            "sufPassIae",
+            "idItou",
+            "NIR",
+            "civilite",
+            "nomUsage",
+            "prenom",
+            "dateNaissance",
+            "codeComInsee",
+            "codeDpt",
+            "codeInseePays",
+            "codeGroupePays",
+        ]
+
+
 class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
     """
     This serializer is a version with the `numeroAnnexe` field added (financial annex number).
@@ -123,7 +148,8 @@ class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
     """
 
     numeroAnnexe = serializers.CharField(source="financial_annex_number")
-    adresse = _API_EmployeeAddress(source="job_application.job_seeker")
+    adresse = _API_EmployeeAddressSerializer(source="job_application.job_seeker")
+    personnePhysique = _API_EmployeeSerializer(source="job_application.job_seeker")
 
     class Meta:
         model = EmployeeRecord
