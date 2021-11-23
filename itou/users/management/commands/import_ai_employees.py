@@ -117,6 +117,41 @@ class Command(BaseCommand):
             return None
         return nir
 
+    def siret_is_valid(self, row):
+        # ASP-validated list.
+        excluded_sirets = [
+            "88763724700016",
+            "34536738700031",
+            "82369160500013",
+            "49185002000026",
+            "33491197100029",
+            "43196860100887",
+            "47759309900054",
+            "34229040000031",
+            "89020637800014",
+            "40136283500035",
+            "88309441900024",
+            "34526210900043",
+            "35050254800034",
+            "48856661300045",
+            "81054375100012",
+            "39359706700023",
+            "38870926300023",
+            "38403628100010",
+            "37980819900010",
+            "42385382900129",
+            "43272738600018",
+            "34280044800033",
+            "51439409700018",
+            "50088443200054",
+            "26300199200019",
+            "38420642100040",
+            "33246830500021",
+            "75231474000016",
+            "34112012900034",
+        ]
+        return row[SIRET_COL] not in excluded_sirets
+
     def fake_email(self, first_name, last_name):
         random_number = random.randrange(100, 10000)
         first_name = slugify(first_name)
@@ -132,6 +167,26 @@ class Command(BaseCommand):
         self.logger.debug(f"{len(not_existing_structures)} not existing structures:")
         self.logger.debug(not_existing_structures)
         return not_existing_structures
+
+    def drop_excluded_structures(self, df, cleaned_df):
+        df = df.copy()
+        cleaned_df = cleaned_df.copy()
+        # List provided by the ASP.
+        inexistent_structures = cleaned_df[~cleaned_df.siret_is_valid]
+        self.logger.info(f"Inexistent structures: excluding {len(inexistent_structures)} rows.")
+        cleaned_df = cleaned_df.drop(inexistent_structures.index)
+        df.loc[
+            inexistent_structures.index, "Commentaire"
+        ] = "Ligne ignorée : entreprise inexistante communiquée par l'ASP."
+
+        # Remaining inexistent SIRETS.
+        inexisting_sirets = self.get_inexistent_structures(cleaned_df)
+        inexistent_structures = cleaned_df[cleaned_df[SIRET_COL].isin(inexisting_sirets)]
+        self.logger.info(f"Inexistent structures: excluding {len(inexistent_structures)} rows.")
+        cleaned_df = cleaned_df.drop(inexistent_structures.index)
+        df.loc[inexistent_structures.index, "Commentaire"] = "Ligne ignorée : entreprise inexistante."
+
+        return df, cleaned_df
 
     def import_data_into_itou(self, df):
         created_users = 0
@@ -282,6 +337,7 @@ class Command(BaseCommand):
         df[CONTRACT_STARTDATE_COL] = pd.to_datetime(df[CONTRACT_STARTDATE_COL], format=DATE_FORMAT)
         df[NIR_COL] = df.apply(self.clean_nir, axis=1)
         df["nir_is_valid"] = ~df[NIR_COL].isnull()
+        df["siret_is_valid"] = df.apply(self.siret_is_valid, axis=1)
 
         # Users with invalid NIRS are stored but without a NIR.
         invalid_nirs = df[~df.nir_is_valid]
@@ -292,18 +348,15 @@ class Command(BaseCommand):
 
         self.logger.info("🚮 STEP 2: remove rows!")
         cleaned_df = df.copy()
+
         # Exclude ended contracts.
-        # ended_contracts = cleaned_df[cleaned_df[CONTRACT_ENDDATE_COL] != ""]
-        # cleaned_df = cleaned_df.drop(ended_contracts.index)
-        # self.logger.info(f"Ended contract: excluding {len(ended_contracts)} rows.")
-        # df.loc[ended_contracts.index, "Commentaire"] = "Ligne ignorée : contrat terminé."
+        ended_contracts = cleaned_df[cleaned_df[CONTRACT_ENDDATE_COL] != ""]
+        cleaned_df = cleaned_df.drop(ended_contracts.index)
+        self.logger.info(f"Ended contract: excluding {len(ended_contracts)} rows.")
+        df.loc[ended_contracts.index, "Commentaire"] = "Ligne ignorée : contrat terminé."
 
         # Exclude inexistent SIAE.
-        inexistent_sirets = self.get_inexistent_structures(df)
-        inexistent_structures = cleaned_df[cleaned_df[SIRET_COL].isin(inexistent_sirets)]
-        cleaned_df = cleaned_df.drop(inexistent_structures.index)
-        self.logger.info(f"Inexistent structures: excluding {len(inexistent_structures)} rows.")
-        df.loc[inexistent_structures.index, "Commentaire"] = "Ligne ignorée : entreprise inexistante."
+        df, cleaned_df = self.drop_excluded_structures(df, cleaned_df)
 
         # Exclude rows with an approval.
         rows_with_approval = cleaned_df[cleaned_df[APPROVAL_COL] != ""]
