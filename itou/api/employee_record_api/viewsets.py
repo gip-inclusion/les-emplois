@@ -4,11 +4,10 @@ from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from itou.employee_record.models import EmployeeRecord
-from itou.employee_record.serializers import EmployeeRecordAPISerializer
 from itou.job_applications.models import JobApplication
 
 from .perms import EmployeeRecordAPIPermission
-from .serializers import DummyEmployeeRecordSerializer
+from .serializers import DummyEmployeeRecordSerializer, EmployeeRecordAPISerializer
 
 
 logger = logging.getLogger("api_drf")
