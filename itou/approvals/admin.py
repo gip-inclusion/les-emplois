@@ -7,7 +7,7 @@ from itou.approvals.admin_views import manually_add_approval, manually_refuse_ap
 from itou.job_applications.models import JobApplication
 
 
-class JobApplicationInline(admin.StackedInline):
+class JobApplicat(admin.StackedInline):
     model = JobApplication
     extra = 0
     show_change_link = True
