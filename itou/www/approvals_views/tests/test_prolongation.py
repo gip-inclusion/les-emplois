@@ -3,6 +3,7 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import escape
 from django.utils.http import urlencode
 
 from itou.approvals.models import Approval, Prolongation
@@ -72,6 +73,22 @@ class ApprovalProlongationTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["preview"], False)
 
+        # Since December 1, 2021, health context reason can no longer be used
+        reason = Prolongation.Reason.HEALTH_CONTEXT
+        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        post_data = {
+            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "reason": reason,
+            "reason_explanation": "Reason explanation is required.",
+            "email": self.prescriber.email,
+            # Preview.
+            "preview": "1",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, escape("Sélectionnez un choix valide."))
+
+        # With valid reason
         reason = Prolongation.Reason.SENIOR
         end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
 
