@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, When
+from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, When
 from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -203,12 +203,20 @@ class JobApplicationQuerySet(models.QuerySet):
         # Approvals can be used to prevent employee records creation.
         # See Approval.create_employee_record for more information.
         return (
+            # Job application without approval are out of scope
             self.exclude(approval=None)
+            # Exclude flagged approvals (batch creation or import of approvals)
             .exclude(approval__create_employee_record=False)
+            # Exclude existing employee records with the same PASS IAE and to_siae.asp_id (considered as dups by ASP)
+            .exclude(employee_record__asp_id=siae.asp_id, employee_record__approval_number=F("approval__number"))
+            # Only ACCEPTED job applications can be transformed into employee records
             .accepted()
+            # Accept only job applications without linked or processed employee record
             .filter(Q(employee_record__status="NEW") | Q(employee_record__isnull=True))
+            # Focus on current SIAE and allowed period (since deployment)
             .filter(
                 to_siae=siae,
+                # Soon deprecated: cancellation date
                 hiring_start_at__lt=cancellation_date,
                 # Hiring must start after production date:
                 hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
