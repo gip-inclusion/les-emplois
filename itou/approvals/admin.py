@@ -5,7 +5,6 @@ from django.utils.html import format_html
 from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
-from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 
 

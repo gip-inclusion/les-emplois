@@ -1,5 +1,4 @@
 import re
-from typing import OrderedDict
 
 from rest_framework import serializers
 from unidecode import unidecode
