@@ -4,8 +4,9 @@ from typing import OrderedDict
 from django.conf import settings
 from django.utils.crypto import salted_hmac
 from rest_framework import serializers
-from itou.employee_record.serializers import _EmployeeAddressSerializer, _EmployeeSerializer, EmployeeRecordSerializer
+
 from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.serializers import EmployeeRecordSerializer, _EmployeeAddressSerializer, _EmployeeSerializer
 from itou.users.models import User
 
 
