@@ -297,9 +297,20 @@ class Command(BaseCommand):
         """
         Upload a file composed of all ready employee records
         """
+        ready_employee_records = EmployeeRecord.objects.ready()
+
+        # As requested by ASP, we can now send employee records in bigger batches
+        if len(ready_employee_records) < EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS:
+            self.logger.info(
+                "No enough employee records to initiate a transfer (%s / %s)",
+                len(ready_employee_records),
+                EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS,
+            )
+            return
+
         self.logger.info("Starting UPLOAD")
 
-        for batch in chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
+        for batch in chunks(ready_employee_records, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
     def archive(self, dry_run):
