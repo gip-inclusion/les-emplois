@@ -16,7 +16,7 @@ Si vous êtes bien un prescripteur habilité, nous avons besoin d'une preuve de 
 
 - si vous êtes une organisation conventionnée par un PLIE : vous devez demander à l'organisme gestionnaire du PLIE de nous contacter via {{ itou_assistance_url }}, rubrique « Habilitation / Prescripteur » afin de nous confirmer votre conventionnement (nous n'acceptons pas les transferts de mail)
 
-Pour les autres cas, utilisez également le portail {{ itou_assistance_url }}, rubrique « Habilitation / Prescripteur » pour nous faire part du motif et justificatif de demande d’habilitation.
+Pour les autres cas, utilisez également le support {{ itou_assistance_url }}, en bas de page, rubrique « Je suis Prescripteur » pour nous faire part du motif et justificatif de demande d’habilitation.
 
 Nous restons à votre disposition pour tout renseignement complémentaire.
 
