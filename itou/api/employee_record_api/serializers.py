@@ -91,7 +91,7 @@ class DummyEmployeeRecordSerializer(serializers.Serializer):
         return fiche_salarie
 
 
-# Employe record serializer is mostly the same as the one used
+# Employee record serializer is mostly the same as the one used
 # for serialization transfers.
 # Except some fields are "unobfuscated" and added for third-party
 # software connecting to the API
