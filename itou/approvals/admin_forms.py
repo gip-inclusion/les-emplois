@@ -10,7 +10,10 @@ class ApprovalFormMixin:
         f"Les numéros préfixés par {Approval.ASP_ITOU_PREFIX} sont attribués automatiquement. "
         "Laissez le champ vide pour une génération automatique."
     )
-    ERROR_NUMBER_CANNOT_BE_CHANGED = "Vous ne pouvez pas modifier le numéro existant du PASS IAE %s."
+    ERROR_NUMBER_CANNOT_BE_CHANGED = (
+        "Vous ne pouvez modifier le numéro existant du PASS IAE %s "
+        f"que vers un numéro ne commencant pas par {Approval.ASP_ITOU_PREFIX}."
+    )
 
     def clean_number(self):
         number = self.cleaned_data["number"]
@@ -21,8 +24,9 @@ class ApprovalFormMixin:
         if is_new and number and number.startswith(Approval.ASP_ITOU_PREFIX):
             raise forms.ValidationError(self.ERROR_NUMBER)
 
-        # Allow to modify an existing PASS IAE to change its dates, but not its number.
-        if not is_new and number != self.instance.number:
+        # Allow to modify an existing PASS IAE to change its dates, but its number can only be changed if the new
+        # number doesn't start with `ASP_ITOU_PREFIX`.
+        if not is_new and number != self.instance.number and number.startswith(Approval.ASP_ITOU_PREFIX):
             raise forms.ValidationError(self.ERROR_NUMBER_CANNOT_BE_CHANGED % self.instance.number)
 
         return number
