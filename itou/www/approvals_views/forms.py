@@ -145,7 +145,13 @@ class SuspensionForm(forms.ModelForm):
                     "La suspension ne peut pas commencer dans le futur."
                 )
             ),
-            "end_at": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
+            "end_at": mark_safe(
+                (
+                    "Au format JJ/MM/AAAA, par exemple 20/12/1978."
+                    "<br>"
+                    "Renseignez une date de fin à 12 mois si le contrat de travail est terminé ou rompu."
+                )
+            ),
             "reason_explanation": "Obligatoire seulement en cas de force majeure.",
         }
 
