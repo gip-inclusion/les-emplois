@@ -45,7 +45,7 @@ def get_ea_eatt_df():
         "CODE_VOIE_Signataire": "address_part3",
         "LIB_VOIE_Signataire": "address_part4",
         post_code_field_name: "post_code",
-        "LIB_COM_COM_Signataire": "city",
+        "LIB_COM_Signataire": "city",
         siret_field_name: "siret",
         "CRL_CONT_Signataire": "auth_email",
         phone_field_name: "phone",
