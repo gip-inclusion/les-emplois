@@ -299,14 +299,15 @@ class Command(BaseCommand):
         """
         ready_employee_records = EmployeeRecord.objects.ready()
 
+        # FIXME: temp disabled, too much impact, must be discussed
         # As requested by ASP, we can now send employee records in bigger batches
-        if len(ready_employee_records) < EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS:
-            self.logger.info(
-                "No enough employee records to initiate a transfer (%s / %s)",
-                len(ready_employee_records),
-                EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS,
-            )
-            return
+        # if len(ready_employee_records) < EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS:
+        #     self.logger.info(
+        #         "Not enough employee records to initiate a transfer (%s / %s)",
+        #        len(ready_employee_records),
+        #         EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS,
+        #     )
+        #     return
 
         self.logger.info("Starting UPLOAD")
 

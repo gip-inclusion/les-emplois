@@ -94,14 +94,16 @@ class DummyEmployeeRecordSerializer(serializers.Serializer):
 # Employee record serializer is mostly the same as the one used
 # for serialization transfers.
 # Except some fields are "unobfuscated" and added for third-party
-# software connecting to the API
+# software connecting to the API.
 
 
 class _API_EmployeeAddressSerializer(_EmployeeAddressSerializer):
-    # This class in only useful for compatibilty
-    # We decided not to send phone and email (business concerns and bad ASP address filters)
-    # But we make it available for API for compatibility with original document
-    # (these fiels should really be actual data, not fake, by implicit contract)
+    """
+    This class in only useful for compatibility.
+    We decided not to send phone and email (business concerns and bad ASP address filters).
+    But we make it available in the API for compatibility with original document
+    (these fields should really be actual data, not fake, by implicit contract).
+    """
 
     def _update_address_and_phone_number(self, result, instance) -> OrderedDict:
         """

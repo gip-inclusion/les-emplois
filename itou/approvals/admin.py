@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+from django.urls.base import reverse
 from django.utils.html import format_html
 
 from itou.approvals import models
@@ -46,7 +47,7 @@ class JobApplicationInline(admin.StackedInline):
     @admin.display(description="Statut de la fiche salarié")
     def employee_record_status(self, obj):
         if employee_record := obj.employee_record.first():
-            url = f"/admin/employee_record/employeerecord/{employee_record.id}"
+            url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
             display = employee_record.get_status_display()
             return format_html(f"<a href='{url}'><b>{display} (ID : {employee_record.id})</b></a>")
 
