@@ -72,7 +72,7 @@ def public_pilotage_stats(request, dashboard_id, template_name="stats/stats_pilo
         raise PermissionDenied
 
     context = {
-        "iframeurl": metabase_embedded_url(dashboard_id),
+        "iframeurl": metabase_embedded_url(dashboard_id, with_title=True),
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
