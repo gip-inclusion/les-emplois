@@ -302,6 +302,9 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertIsNone(self.employee_record.archived_json)
 
 
+# There is no need to create 700 employee record for a single batch
+# so this class var is changed to 1 for tests.
+@mock.patch("itou.employee_record.models.EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS", new=1)
 class EmployeeRecordManagementCommandTest(TestCase):
     """
     Employee record management command, testing:
