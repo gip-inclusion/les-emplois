@@ -367,7 +367,7 @@
                         {% include "includes/icon.html" with icon="log-in" %}
                         <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
                             {% if current_siae.is_subject_to_eligibility_rules %}
-                                Obtenir un PASS IAE (candidature spontanée)
+                                Déclarer une embauche
                             {% else %}
                                 Candidature spontanée
                             {% endif %}
