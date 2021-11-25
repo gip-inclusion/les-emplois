@@ -626,19 +626,24 @@ class Suspension(models.Model):
         """
         Returns the minimum date on which a suspension can begin.
         """
+        # by default the next min start is the date of last hiring start of user
         min_suspension_start_at = approval.user.last_accepted_job_application.hiring_start_at
         today = datetime.date.today()
-
+        # We set the next min to the date of last old suspension if suspension exist
         if approval.last_old_suspension:
             min_suspension_start_at = approval.last_old_suspension.end_at + relativedelta(days=1)
-
+        # else we set the next min to the date of last accepted job from the pe approval
         elif approval.user.last_accepted_job_application.created_from_pe_approval:
             min_suspension_start_at = today
 
+        is_old_than_max_retroactivity = today - min_suspension_start_at > datetime.timedelta(
+            days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS
+        )
+
         return (
-            min_suspension_start_at
-            if today - min_suspension_start_at <= datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
-            else today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
+            today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
+            if is_old_than_max_retroactivity
+            else min_suspension_start_at
         )
 
 
