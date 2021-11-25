@@ -451,7 +451,7 @@ class ApprovalModelTest(TestCase):
                 end_at=today + relativedelta(months=1),
                 reason=reason_to_refuse,
             )
-            self.assertFalse(approval.is_open_to_application_process)
+            self.assertFalse(approval.can_be_unsuspended)
             suspension.delete()
             approval.delete()
 
@@ -464,15 +464,15 @@ class ApprovalModelTest(TestCase):
                 reason=reason,
             )
 
-            self.assertTrue(approval.is_open_to_application_process)
+            self.assertTrue(approval.can_be_unsuspended)
             suspension.delete()
             approval.delete()
 
-    def test_is_open_to_application_process_without_suspension(self):
+    def test_can_be_unsuspended_without_suspension(self):
         today = timezone.now().date()
         approval_start_at = today - relativedelta(months=3)
         approval = ApprovalFactory(start_at=approval_start_at)
-        self.assertTrue(approval.is_open_to_application_process)
+        self.assertTrue(approval.can_be_unsuspended)
 
     def test_last_in_progress_suspension(self):
         today = timezone.now().date()
@@ -502,7 +502,7 @@ class ApprovalModelTest(TestCase):
         )
         self.assertIsNone(approval.last_in_progress_suspension)
 
-    def test_update_last_suspension(self):
+    def test_unsuspend(self):
         today = timezone.now().date()
         approval_start_at = today - relativedelta(months=3)
         approval = ApprovalFactory(start_at=approval_start_at)
@@ -512,11 +512,11 @@ class ApprovalModelTest(TestCase):
             end_at=today + relativedelta(months=2),
             reason=Suspension.Reason.BROKEN_CONTRACT.value,
         )
-        approval.update_last_suspension(hiring_start_at=today)
+        approval.unsuspend(hiring_start_at=today)
         suspension.refresh_from_db()
         self.assertEquals(suspension.end_at, today - relativedelta(days=1))
 
-    def test_update_last_suspension_invalid(self):
+    def test_unsuspend_invalid(self):
         today = timezone.now().date()
         approval_start_at = today - relativedelta(months=3)
         approval = ApprovalFactory(start_at=approval_start_at)
@@ -527,7 +527,7 @@ class ApprovalModelTest(TestCase):
             end_at=suspension_end_at,
             reason=Suspension.Reason.SUSPENDED_CONTRACT.value,
         )
-        approval.update_last_suspension(hiring_start_at=today)
+        approval.unsuspend(hiring_start_at=today)
         suspension.refresh_from_db()
         self.assertEquals(suspension.end_at, suspension_end_at)
 
