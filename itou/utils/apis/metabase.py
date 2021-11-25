@@ -18,7 +18,7 @@ def _get_token(payload):
     return jwt.encode(payload, settings.METABASE_SECRET_KEY, algorithm="HS256")
 
 
-def metabase_embedded_url(dashboard_id, params={}):
+def metabase_embedded_url(dashboard_id, params={}, with_title=False):
     """
     Creates an embed/signed URL for embedded Metabase dashboards:
     * expiration delay of token set at 10 minutes, kept short on purpose due to the fact that during this short time
@@ -27,4 +27,5 @@ def metabase_embedded_url(dashboard_id, params={}):
     * optional parameters typically for locked filters (e.g. allow viewing data of one departement only)
     """
     payload = {"resource": {"dashboard": dashboard_id}, "params": params, "exp": round(time.time()) + (10 * 60)}
-    return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + "#titled=false"
+    is_titled = "true" if with_title else "false"
+    return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + f"#titled={is_titled}"
