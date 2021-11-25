@@ -509,7 +509,17 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def can_be_cancelled(self):
         if self.hiring_start_at:
             today = datetime.date.today()
-            return today <= self.hiring_start_at
+            # A job application can be cancelled provided that
+            # there is no employee record linked with a status :
+            # - SENT
+            # - ACCEPTED
+            # (likely to be registered or already accepted by ASP)
+            employee_record = self.employee_record.first()
+            has_blocking_employee_record_status = employee_record and employee_record.status in [
+                "SENT",
+                "ACCEPTED",
+            ]
+            return not has_blocking_employee_record_status and today <= self.hiring_start_at
         return False
 
     @property
