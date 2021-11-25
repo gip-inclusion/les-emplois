@@ -15,7 +15,7 @@ def get_current_org_or_404(request):
 def get_all_available_job_applications_as_prescriber(request):
     """
     As a prescriber, I can have access to job_applications
-    through my own user our through my organization.
+    through my own user or through my organization.
     This helper filters the data accordingly.
     """
     from itou.job_applications.models import JobApplication
