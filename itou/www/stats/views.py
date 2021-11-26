@@ -40,6 +40,7 @@ def public_basic_stats(request, template_name=_STATS_HTML_TEMPLATE):
         "iframeurl": metabase_embedded_url(settings.PUBLIC_BASIC_STATS_DASHBOARD_ID),
         "page_title": "Statistiques",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "is_public_basic_stats": True,
     }
     return render(request, template_name, context)
 

@@ -6,15 +6,12 @@
 {% block content %}
     <h1>{{ page_title }}</h1>
 
-    {% if related_link %}
+    {% if is_public_basic_stats %}
         <div class="mb-4">
             {% include "includes/icon.html" with icon="arrow-right" %}
-            <a href="{% url related_link %}">{{ related_title }}</a>
-        </div>
-        <div class="mb-4">
-            {% include "includes/icon.html" with icon="arrow-right" %}
-            <a href="{{ ITOU_PILOTAGE_URL }}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                Accès au site pilotage de l'inclusion
+            Cette page a pour objectif de présenter l'impact des emplois de l'inclusion. Pour retrouver les indicateurs qui étaient présentés ici, merci de vous rendre sur le
+            <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                pilotage de l'inclusion
             </a>
         </div>
     {% endif %}
