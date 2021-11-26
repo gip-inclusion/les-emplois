@@ -58,6 +58,7 @@ def public_advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
         "related_link": "stats:public_basic_stats",
         "related_title": "Vers les statistiques simplifiées",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "pilotage_base_url": settings.PILOTAGE_SITE_URL,
     }
     return render(request, template_name, context)
 
