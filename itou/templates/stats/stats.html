@@ -1,4 +1,5 @@
 {% extends "layout/content.html" %}
+{% load static %}
 
 {% block title %}Statistiques et pilotage{{ block.super }}{% endblock %}
 
@@ -25,4 +26,35 @@
         onload="iFrameResize({}, this)"
         frameborder="0">
     </iframe>
+
+    <h3>Aide à la lecture et à l'utilisation de ces indicateurs/graphiques</h3>
+
+    <h4>Comment obtenir le nombre (ou la répartition) exacte correspondant à un élément de réponse ?</h4>
+    <p>En survolant la couleur attribuée à cet élément de réponse sur le graphique, vous trouverez le nombre (ou la part) de cet élément dans une infobulle.</p>
+
+    <h4>Comment obtenir la définition d'un chiffre ou d'un indicateur/graphique ?</h4>
+    <p>En cliquant dessus, notre dictionnaire des indicateurs s’ouvrira (directement au niveau de celui demandé).</p>
+
+    <h4>Vous n’êtes pas sûr(e) de comprendre les termes/sigles utilisés ?</h4>
+    <p>
+        L'ensemble des termes/sigles utilisés ici est défini dans le
+        <a href="https://doc.inclusion.beta.gouv.fr/glossaire-inclusion" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+            glossaire de l’inclusion
+        </a>.
+    </p>
+
+    <h4>Est-il possible de sélectionner seulement certaines données pour générer ces indicateurs/graphiques ?</h4>
+    <p>
+        Oui, vous pouvez sélectionner les données que vous souhaitez en utilisant les filtres en haut de l’écran, voici un exemple :
+        <br>
+        <img class="mt-5 img-fluid" src="{% static 'img/stats/metabase-department-filter.png' %}">
+    </p>
+
+    <h4>Comment télécharger les données d'un indicateur/graphique ?</h4>
+    <p>
+        En cliquant sur cette icône qui apparaît en haut à droite d’un graphique au survol de la souris :
+        <br>
+        <img class="mt-5 img-fluid" src="{% static 'img/stats/metabase-download-icon.png' %}">
+    </p>
+
 {% endblock %}
