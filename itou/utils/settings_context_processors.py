@@ -16,6 +16,7 @@ def expose_settings(request):
         "ITOU_EMAIL_PROLONGATION": settings.ITOU_EMAIL_PROLONGATION,
         "ITOU_ENVIRONMENT": settings.ITOU_ENVIRONMENT,
         "ITOU_FQDN": settings.ITOU_FQDN,
+        "ITOU_PILOTAGE_URL": settings.PILOTAGE_SITE_URL,
         "ITOU_PROTOCOL": settings.ITOU_PROTOCOL,
         "SHOW_TEST_ACCOUNTS_BANNER": settings.SHOW_TEST_ACCOUNTS_BANNER,
         "TYPEFORM_URL": settings.TYPEFORM_URL,
