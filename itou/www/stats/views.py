@@ -39,24 +39,6 @@ def public_basic_stats(request, template_name=_STATS_HTML_TEMPLATE):
     context = {
         "iframeurl": metabase_embedded_url(settings.PUBLIC_BASIC_STATS_DASHBOARD_ID),
         "page_title": "Statistiques",
-        "related_link": "stats:public_advanced_stats",
-        "related_title": "Vers les statistiques avancées",
-        "stats_base_url": settings.METABASE_SITE_URL,
-    }
-    return render(request, template_name, context)
-
-
-def public_advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
-    """
-    Public advanced stats (signed and embedded version)
-    Public link:
-    https://stats.inclusion.beta.gouv.fr/public/dashboard/c65faf79-3b89-4416-9faa-ff5182f41468
-    """
-    context = {
-        "iframeurl": metabase_embedded_url(settings.PUBLIC_ADVANCED_STATS_DASHBOARD_ID),
-        "page_title": "Statistiques avancées",
-        "related_link": "stats:public_basic_stats",
-        "related_title": "Vers les statistiques simplifiées",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
