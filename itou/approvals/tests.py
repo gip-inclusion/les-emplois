@@ -948,23 +948,25 @@ class SuspensionModelTest(TestCase):
 
     def test_clean(self):
         today = timezone.now().date()
-        start_at = timezone.now().date() - relativedelta(months=2)
+        start_at = today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS * 2)
         end_at = start_at + relativedelta(months=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        suspension = SuspensionFactory(approval=approval)
+        approval = ApprovalFactory.build(start_at=start_at, end_at=end_at)
 
-        # test the when suspension is out of boundaries
-        suspension.start_at = start_at - relativedelta(months=1)
+        # Suspension.start_date is too old.
+        suspension = SuspensionFactory.build(approval=approval)
+        suspension.start_at = start_at - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS + 1)
         with self.assertRaises(ValidationError):
             suspension.clean()
 
-        # the case when end_at < start_at
+        # suspension.end_at < suspension.start_at
+        suspension = SuspensionFactory.build(approval=approval)
         suspension.start_at = start_at
         suspension.end_at = start_at - relativedelta(months=1)
         with self.assertRaises(ValidationError):
             suspension.clean()
 
-        # declare suspension in the future
+        # Suspension.start_at is in the future.
+        suspension = SuspensionFactory.build(approval=approval)
         suspension.start_at = today + relativedelta(days=2)
         suspension.end_at = end_at
         with self.assertRaises(ValidationError):
