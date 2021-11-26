@@ -13,7 +13,8 @@ JOB_APPLICATION_CSV_HEADERS = [
     "Type employeur",
     "Métiers",
     "Source de la candidature",
-    "Nom prescripteur",
+    "Nom organisation prescripteur",
+    "Nom utilisateur prescripteur",
     "Date de la candidature",
     "Statut de la candidature",
     "Dates de début d’embauche",
@@ -32,13 +33,18 @@ def _format_date(dt):
     return dt.strftime(DATE_FMT) if dt else ""
 
 
-def _get_prescriber_name(job_application):
-    prescriber_name = ""
-    if job_application.sender is not None:
-        prescriber_name = job_application.sender.get_full_name()
+def _get_prescriber_orgname(job_application):
+    orgname = ""
     if job_application.sender_prescriber_organization:
-        prescriber_name = prescriber_name
-    return prescriber_name
+        orgname = job_application.sender_prescriber_organization.display_name
+    return orgname
+
+
+def _get_prescriber_username(job_application):
+    username = ""
+    if job_application.sender is not None:
+        username = job_application.sender.get_full_name()
+    return username
 
 
 def _get_selected_jobs(job_application):
@@ -85,7 +91,8 @@ def _job_application_as_dict(job_application):
         "Type employeur": siae.kind,
         "Métiers": _get_selected_jobs(job_application),
         "Source de la candidature": job_application.display_sender_kind,
-        "Nom prescripteur": _get_prescriber_name(job_application),
+        "Nom organisation prescripteur": _get_prescriber_orgname(job_application),
+        "Nom utilisateur prescripteur": _get_prescriber_username(job_application),
         "Date de la candidature": _format_date(job_application.created_at),
         "Statut de la candidature": job_application.get_state_display(),
         "Dates de début d’embauche": _format_date(job_application.hiring_start_at),
