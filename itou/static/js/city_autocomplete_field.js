@@ -17,7 +17,7 @@ $(document).ready(() => {
   citySearchInput
     // https://api.jqueryui.com/autocomplete/
     .autocomplete({
-      delay: 150,
+      delay: 300,
       minLength: 1,
       source: citySearchInput.data('autocomplete-source-url'),
       autoFocus: true,

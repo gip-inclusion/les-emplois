@@ -21,7 +21,7 @@ $(document).ready(() => {
   communeSearchInput
     // https://api.jqueryui.com/autocomplete/
     .autocomplete({
-      delay: 150,
+      delay: 300,
       minLength: 1,
       // Use a callback to add custom parameter 'date':
       source: function(request, response) {
