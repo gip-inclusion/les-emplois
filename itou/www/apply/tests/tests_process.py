@@ -349,7 +349,6 @@ class ProcessViewsTest(TestCase):
             get_job_application.approval.end_at,
             approval_job_seeker.end_at + relativedelta(days=(g_suspension.end_at - g_suspension.start_at).days),
         )
-        # for now, we don't manage the cancel case
 
     def test_accept_with_manual_approval_delivery(self):
         """
