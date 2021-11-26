@@ -288,10 +288,7 @@ class Approval(CommonApprovalMixin):
     @cached_property
     def can_be_unsuspended(self):
         if self.is_suspended:
-            return self.last_in_progress_suspension.reason in [
-                Suspension.Reason.BROKEN_CONTRACT.value,
-                Suspension.Reason.FINISHED_CONTRACT.value,
-            ]
+            return self.last_in_progress_suspension.reason in Suspension.REASONS_TO_UNSUSPEND
         return False
 
     def unsuspend(self, hiring_start_at):
@@ -470,6 +467,11 @@ class Suspension(models.Model):
             """
             reasons = [cls.SUSPENDED_CONTRACT, cls.BROKEN_CONTRACT, cls.FINISHED_CONTRACT]
             return [(reason.value, reason.label) for reason in reasons]
+
+    REASONS_TO_UNSUSPEND = [
+        Reason.BROKEN_CONTRACT.value,
+        Reason.FINISHED_CONTRACT.value,
+    ]
 
     approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
