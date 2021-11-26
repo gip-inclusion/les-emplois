@@ -472,7 +472,7 @@ class ApprovalModelTest(TestCase):
         today = timezone.now().date()
         approval_start_at = today - relativedelta(months=3)
         approval = ApprovalFactory(start_at=approval_start_at)
-        self.assertTrue(approval.can_be_unsuspended)
+        self.assertFalse(approval.can_be_unsuspended)
 
     def test_last_in_progress_suspension(self):
         today = timezone.now().date()
