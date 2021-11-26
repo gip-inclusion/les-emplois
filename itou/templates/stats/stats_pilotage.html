@@ -29,6 +29,13 @@
   <body>
     <div id="embedMetabase">
         {% block content %}
+            <script>
+                window.iFrameResizer = {
+                    targetOrigin: "{{ pilotage_base_url }}"
+                }
+            </script>
+            <script src="https://cdn.jsdelivr.net/npm/iframe-resizer@4.3.2/js/iframeResizer.contentWindow.min.js"></script>
+            {% comment %} we took the scripts from {{stats_base_url}} to have always the same version than metabase{% endcomment %}
             <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
             <iframe
                 src="{{ iframeurl }}"

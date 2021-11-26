@@ -528,6 +528,7 @@ DDETS_STATS_ALLOWED_DEPARTMENTS = ["38", "62", "67", "93"]
 DREETS_STATS_DASHBOARD_ID = 117
 DGEFP_STATS_DASHBOARD_ID = 117
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
+PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
 
 # Slack notifications sent by Metabase cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.environ.get("SLACK_CRON_WEBHOOK_URL", None)
