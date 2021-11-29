@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, When
+from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, Subquery, When
 from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -200,6 +200,15 @@ class JobApplicationQuerySet(models.QuerySet):
         """
         today = datetime.date.today()
         cancellation_date = today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+
+        # Exclude existing employee records with the same PASS IAE and to_siae.asp_id (considered as dups by ASP)
+        subquery = Subquery(
+            self.exclude(to_siae=siae).filter(
+                employee_record__asp_id=siae.asp_id,
+                employee_record__approval_number=OuterRef("approval__number"),
+            )
+        )
+
         # Approvals can be used to prevent employee records creation.
         # See Approval.create_employee_record for more information.
         return (
@@ -207,12 +216,8 @@ class JobApplicationQuerySet(models.QuerySet):
             self.exclude(approval=None)
             # Exclude flagged approvals (batch creation or import of approvals)
             .exclude(approval__create_employee_record=False)
-            # Exclude existing employee records with the same PASS IAE and to_siae.asp_id (considered as dups by ASP)
-            .exclude(
-                ~Q(to_siae=siae),
-                employee_record__asp_id=siae.asp_id,
-                employee_record__approval_number=F("approval__number"),
-            )
+            # See `subquery` above : exclude ASP duplicates
+            .exclude(Exists(subquery))
             # Only ACCEPTED job applications can be transformed into employee records
             .accepted()
             # Accept only job applications without linked or processed employee record
