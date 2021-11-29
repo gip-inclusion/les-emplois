@@ -513,11 +513,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             # there is no employee record linked with a status :
             # - SENT
             # - ACCEPTED
-            # (likely to be registered or already accepted by ASP)
+            # (likely to be accepted or already accepted by ASP)
             employee_record = self.employee_record.first()
             has_blocking_employee_record_status = employee_record and employee_record.status in [
                 "SENT",
-                "ACCEPTED",
+                "PROCESSED",
             ]
             return not has_blocking_employee_record_status and today <= self.hiring_start_at
         return False
