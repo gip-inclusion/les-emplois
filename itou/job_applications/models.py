@@ -208,7 +208,11 @@ class JobApplicationQuerySet(models.QuerySet):
             # Exclude flagged approvals (batch creation or import of approvals)
             .exclude(approval__create_employee_record=False)
             # Exclude existing employee records with the same PASS IAE and to_siae.asp_id (considered as dups by ASP)
-            .exclude(employee_record__asp_id=siae.asp_id, employee_record__approval_number=F("approval__number"))
+            .exclude(
+                ~Q(to_siae=siae),
+                employee_record__asp_id=siae.asp_id,
+                employee_record__approval_number=F("approval__number"),
+            )
             # Only ACCEPTED job applications can be transformed into employee records
             .accepted()
             # Accept only job applications without linked or processed employee record
