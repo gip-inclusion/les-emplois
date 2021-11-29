@@ -47,7 +47,36 @@ DATE_FORMAT = "%Y-%m-%d"
 
 
 class Command(BaseCommand):
-    """ """
+    """
+    On December 1st, 2021, every AI were asked to present a PASS IAE for each of their employees.
+    Before that date, they were able to hire without one. To catch up with the ongoing stock,
+    the platform has to create missing users and deliver brand new PASS IAE.
+    AI employees list was provided by the ASP in a CSV file.
+
+    This is what this script does:
+    1/ Parse a file provided by the ASP.
+    2/ Clean data.
+    3/ Create job seekers, approvals and job applications when needed.
+
+    Mandatory arguments
+    -------------------
+    File path: path to the CSV file.
+    django-admin import_ai_employees --file-path=/imports/file.csv
+
+    Developer email: email of the person running this script. It must belong to
+    a user account registered in the database.
+    Job applications, users and approvals will be marked as created by this person.
+    django-admin import_ai_employees --email=funky@developer.com
+
+    Optional arguments
+    ------------------
+    Run without writing to the database:
+    django-admin import_ai_employees --dry-run
+
+    Run with a small amount of data (sample):
+    django-admin import_ai_employees --sample-size=100
+
+    """
 
     help = "Import AI employees and deliver a PASS IAE."
 
