@@ -4,7 +4,7 @@
 import csv
 import datetime
 import logging
-import random
+import uuid
 from pathlib import Path
 
 import pandas as pd
@@ -181,11 +181,8 @@ class Command(BaseCommand):
         ]
         return row[SIRET_COL] not in excluded_sirets
 
-    def fake_email(self, first_name, last_name):
-        random_number = random.randrange(100, 10000)
-        first_name = slugify(first_name)
-        last_name = slugify(last_name)
-        return f"{first_name}-{last_name}-{random_number}@faux-email.com"
+    def fake_email(self):
+        return f"{uuid.uuid4().hex}@email-temp.com"
 
     def get_inexistent_structures(self, df):
         unique_ai = set(df[SIRET_COL])  # Between 600 and 700.
@@ -256,7 +253,7 @@ class Command(BaseCommand):
                     "last_name": row[LAST_NAME_COL].capitalize(),
                     "birthdate": row[BIRTHDATE_COL],
                     # If no email: create a fake one.
-                    "email": row[EMAIL_COL] or self.fake_email(row[FIRST_NAME_COL], row[LAST_NAME_COL]),
+                    "email": row[EMAIL_COL] or self.fake_email(),
                     "address_line_1": f"{row['adr_numero_voie']} {row['codeextensionvoie']} {row['codetypevoie']} {row['adr_libelle_voie']}",
                     "address_line_2": f"{row['adr_cplt_distribution']} {row['adr_point_remise']}",
                     "post_code": row[POST_CODE_COL],
@@ -278,7 +275,7 @@ class Command(BaseCommand):
                 # Some e-mail addresses belong to prescribers!
                 if job_seeker and not job_seeker.is_job_seeker:
                     # If job seeker is not a job seeker, create a new one.
-                    user_data["email"] = self.fake_email(row[FIRST_NAME_COL], row[LAST_NAME_COL])
+                    user_data["email"] = self.fake_email()
                     job_seeker = None
 
                 # Create a job seeker.
