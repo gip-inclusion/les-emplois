@@ -695,6 +695,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval.delete()
             self.approval = None
 
+            # Remove flags on the job application about approval
+            self.approval_number_sent_by_email = False
+            self.approval_number_sent_at = None
+            self.approval_delivery_mode = ""
+            self.approval_manually_delivered_by = None
+
         # Send notification.
         user = kwargs.get("user")
         connection = mail.get_connection()
