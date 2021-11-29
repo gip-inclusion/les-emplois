@@ -125,9 +125,6 @@ class ItouLogoutView(LogoutView):
 
         # Logouts user from the app and from France Connect (FC).
         if fc_token:
-            # In the dev environment, user is not logged out from FC because for some reason
-            # on FC’s end, it throws an error and crash so post-logout
-            # redirection is not performed
             params = {"id_token": fc_token, "state": fc_state}
             fc_base_logout_url = get_absolute_url(reverse("france_connect:logout"))
             fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
