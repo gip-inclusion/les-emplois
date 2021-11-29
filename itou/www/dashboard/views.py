@@ -152,7 +152,16 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
                 request.user.emailaddress_set.first().delete()
         # we perform the redirection like this in order to ensure every logout
         # route performs the same operations
+        fc_token = request.session.get(settings.FRANCE_CONNECT_SESSION_TOKEN)
+        fc_state = request.session.get(settings.FRANCE_CONNECT_SESSION_STATE)
+
         auth.logout(request)
+        # Logouts user from the app and from France Connect (FC).
+        if fc_token:
+            params = {"id_token": fc_token, "state": fc_state}
+            fc_base_logout_url = get_absolute_url(reverse("france_connect:logout"))
+            fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
+            return HttpResponseRedirect(fc_logout_url)
         return HttpResponseRedirect(reverse("account_logout"))
 
     context = {
