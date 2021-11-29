@@ -83,7 +83,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         CAP_EMPLOI = "CAP_EMPLOI", "CAP emploi"
         ML = "ML", "Mission locale"
         OIL = "OIL", "Opérateur d'intermédiation locative"
-        ODC = "ODC", "Organisation délégataires d'un CD"
+        ODC = "ODC", "Organisation délégataire d'un CD"
         PENSION = "PENSION", "Pension de famille / résidence accueil"
         PE = "PE", "Pôle emploi"
         RS_FJT = "RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"
@@ -96,7 +96,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
             ("CAARUD - Centre d'accueil et d'accompagnement à la réduction de risques pour usagers de drogues"),
         )
         CADA = "CADA", "CADA - Centre d'accueil de demandeurs d'asile"
-        CAF = "CAF", "CAF - Caisse d'allocation familiale"
+        CAF = "CAF", "CAF - Caisse d'allocations familiales"
         CAVA = "CAVA", "CAVA - Centre d'adaptation à la vie active"
         CCAS = ("CCAS", "CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale")
         CHRS = "CHRS", "CHRS - Centre d'hébergement et de réinsertion sociale"

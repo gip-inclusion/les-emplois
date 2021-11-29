@@ -367,7 +367,7 @@
                         {% include "includes/icon.html" with icon="log-in" %}
                         <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
                             {% if current_siae.is_subject_to_eligibility_rules %}
-                                Obtenir un PASS IAE (candidature spontanée)
+                                Déclarer une embauche
                             {% else %}
                                 Candidature spontanée
                             {% endif %}
@@ -424,11 +424,9 @@
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="activity" %}
-                        <a href="{% url 'stats:public_basic_stats' %}">Voir les statistiques simplifiées France entière</a>
-                    </p>
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="activity" %}
-                        <a href="{% url 'stats:public_advanced_stats' %}">Voir les statistiques avancées France entière</a>
+                        <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                            Accéder au Pilotage de l'inclusion
+                        </a>
                     </p>
                     {% if can_view_stats_siae %}
                         <p class="card-text">
@@ -440,27 +438,27 @@
                     {% if can_view_stats_cd %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_cd' %}">Voir les données de mon département</a>
+                            <a href="{% url 'stats:stats_cd' %}">Voir mes statistiques privées</a>
                         </p>
                     {% endif %}
                     {% if can_view_stats_ddets %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_ddets' %}">Voir les données de mon département</a>
+                            <a href="{% url 'stats:stats_ddets' %}">Voir mes statistiques privées</a>
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
                     {% if can_view_stats_dreets %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_dreets' %}">Voir les données de ma région</a>
+                            <a href="{% url 'stats:stats_dreets' %}">Voir mes statistiques privées</a>
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
                     {% if can_view_stats_dgefp %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_dgefp' %}">Voir les données des régions</a>
+                            <a href="{% url 'stats:stats_dgefp' %}">Voir mes statistiques privées</a>
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
