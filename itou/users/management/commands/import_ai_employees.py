@@ -216,8 +216,9 @@ class Command(BaseCommand):
 
         return df, cleaned_df
 
-    def import_data_into_itou(self, df):
-        df = df.copy()
+    def import_data_into_itou(self, original_df, cleaned_df):
+        original_df = original_df.copy()
+        cleaned_df = cleaned_df.copy()
 
         created_users = 0
         ignored_nirs = 0
@@ -229,8 +230,8 @@ class Command(BaseCommand):
         # Used to store who created the following users, approvals and job applications.
         developer = User.objects.get(email=self.developer_email)
 
-        pbar = tqdm(total=len(df))
-        for i, row in df.iterrows():
+        pbar = tqdm(total=len(cleaned_df))
+        for i, row in cleaned_df.iterrows():
             pbar.update(1)
 
             with transaction.atomic():
@@ -331,8 +332,9 @@ class Command(BaseCommand):
 
             # Update dataframe values.
             # https://stackoverflow.com/questions/25478528/updating-value-in-iterrow-for-pandas
-            df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
-            df.loc[i, USER_PK] = job_seeker.pk
+            cleaned_df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
+            cleaned_df.loc[i, USER_PK] = job_seeker.pk
+            original_df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
 
         self.logger.info("Import is over!")
         self.logger.info(f"Created users: {created_users}.")
@@ -341,7 +343,7 @@ class Command(BaseCommand):
         self.logger.info(f"Created approvals: {created_approvals}.")
         self.logger.info(f"Created job applications: {created_job_applications}.")
 
-        return df
+        return original_df, cleaned_df
 
     def create_emailing_file(self, df):
         emailing_rows = []
@@ -442,7 +444,7 @@ class Command(BaseCommand):
 
         # Step 3: import data.
         self.logger.info("🔥 STEP 3: create job seekers, approvals and job applications.")
-        cleaned_df = self.import_data_into_itou(df=cleaned_df)
+        df, cleaned_df = self.import_data_into_itou(original_df=df, cleaned_df=cleaned_df)
 
         # Step 4: create a CSV file including comments to be shared with the ASP.
         df = df.drop([USER_PK, "nir_is_valid", "siret_is_valid"], axis=1)  # Remove useless columns.
