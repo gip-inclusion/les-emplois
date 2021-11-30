@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, Subquery, When
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, Subquery, When
 from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
