@@ -194,6 +194,7 @@ class JobApplicationQuerySet(models.QuerySet):
 
         An eligible job application *may* or *may not* have an employee record object linked
         to it.
+
         For instance, when creating a new employee record from an eligible job application
         and NOT finishing the entire creation process.
         (employee record object creation occurs half-way of the "tunnel")
@@ -201,7 +202,8 @@ class JobApplicationQuerySet(models.QuerySet):
         today = datetime.date.today()
         cancellation_date = today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
 
-        # Exclude existing employee records with the same PASS IAE and to_siae.asp_id (considered as dups by ASP)
+        # Exclude existing employee records with same approval and asp_id
+        # Rule: you can only create *one* employee record for a given asp_id / approval pair
         subquery = Subquery(
             self.exclude(to_siae=siae).filter(
                 employee_record__asp_id=siae.asp_id,
@@ -216,14 +218,14 @@ class JobApplicationQuerySet(models.QuerySet):
             self.exclude(approval=None)
             # Exclude flagged approvals (batch creation or import of approvals)
             .exclude(approval__create_employee_record=False)
-            # See `subquery` above : exclude ASP duplicates
+            # See `subquery` above : exclude possible ASP duplicates
             .exclude(Exists(subquery))
             # Only ACCEPTED job applications can be transformed into employee records
             .accepted()
             # Accept only job applications without linked or processed employee record
             .filter(Q(employee_record__status="NEW") | Q(employee_record__isnull=True))
-            # Focus on current SIAE and allowed period (since deployment)
             .filter(
+                # Only for current SIAE
                 to_siae=siae,
                 # Soon deprecated: cancellation date
                 hiring_start_at__lt=cancellation_date,
