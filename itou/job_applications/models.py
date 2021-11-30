@@ -531,10 +531,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         ]
 
     @property
-    def cancellation_delay_end(self):
-        return self.hiring_start_at
-
-    @property
     def is_refused_due_to_deactivation(self):
         return (
             self.state == JobApplicationWorkflow.STATE_REFUSED
