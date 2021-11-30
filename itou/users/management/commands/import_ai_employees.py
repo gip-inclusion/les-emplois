@@ -42,6 +42,8 @@ PHONE_COL = "adr_telephone"
 POST_CODE_COL = "codepostalcedex"
 SIAE_NAME_COL = "pmo_denom_soc"
 SIRET_COL = "pmo_siret"
+PASS_IAE_NUMBER_COL = "Numéro de PASS IAE"
+USER_PK = "ID utilisateur"
 
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -215,6 +217,8 @@ class Command(BaseCommand):
         return df, cleaned_df
 
     def import_data_into_itou(self, df):
+        df = df.copy()
+
         created_users = 0
         ignored_nirs = 0
         already_existing_approvals = 0
@@ -226,7 +230,7 @@ class Command(BaseCommand):
         developer = User.objects.get(email=self.developer_email)
 
         pbar = tqdm(total=len(df))
-        for _, row in df.iterrows():
+        for i, row in df.iterrows():
             pbar.update(1)
 
             with transaction.atomic():
@@ -249,15 +253,15 @@ class Command(BaseCommand):
 
                 # Data has been formatted previously.
                 user_data = {
-                    "first_name": row[FIRST_NAME_COL].capitalize(),
-                    "last_name": row[LAST_NAME_COL].capitalize(),
+                    "first_name": row[FIRST_NAME_COL].title(),
+                    "last_name": row[LAST_NAME_COL].title(),
                     "birthdate": row[BIRTHDATE_COL],
                     # If no email: create a fake one.
                     "email": row[EMAIL_COL] or self.fake_email(),
                     "address_line_1": f"{row['adr_numero_voie']} {row['codeextensionvoie']} {row['codetypevoie']} {row['adr_libelle_voie']}",
                     "address_line_2": f"{row['adr_cplt_distribution']} {row['adr_point_remise']}",
                     "post_code": row[POST_CODE_COL],
-                    "city": commune.name.capitalize(),
+                    "city": commune.name.title(),
                     "department": department_from_postcode(row[POST_CODE_COL]),
                     "phone": row[PHONE_COL],
                     "nir": row[NIR_COL],
@@ -325,12 +329,50 @@ class Command(BaseCommand):
                 if not self.dry_run:
                     job_application.save()
 
+            # Update dataframe values.
+            # https://stackoverflow.com/questions/25478528/updating-value-in-iterrow-for-pandas
+            df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
+            df.loc[i, USER_PK] = job_seeker.pk
+
         self.logger.info("Import is over!")
         self.logger.info(f"Created users: {created_users}.")
         self.logger.info(f"Ignored NIRs: {ignored_nirs}.")
         self.logger.info(f"Already existing approvals: {already_existing_approvals}.")
         self.logger.info(f"Created approvals: {created_approvals}.")
         self.logger.info(f"Created job applications: {created_job_applications}.")
+
+        return df
+
+    def create_emailing_file(self, df):
+        emailing_rows = []
+
+        for _, row in df.iterrows():
+            siae = Siae.objects.prefetch_related("memberships__user").get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
+            admin = siae.active_admin_members.first()
+            admin_address = admin.email if admin else ""
+            emailing_row = {
+                "Nom SIAE": siae.display_name,
+                "Administrateur": admin_address,
+                "Structure active ?": siae.is_active,
+                "SIRET": row[SIRET_COL],
+                "Prénom employé": row[FIRST_NAME_COL],
+                "Nom employé": row[LAST_NAME_COL],
+                "PASS IAE": row[PASS_IAE_NUMBER_COL],
+            }
+
+            if not self.dry_run:
+                approval = Approval.objects.prefetch_related("user").get(number=row[PASS_IAE_NUMBER_COL])
+                job_seeker = approval.user
+                emailing_row = emailing_row | {
+                    "PASS IAE début": approval.start_at,
+                    "PASS IAE fin": approval.end_at,
+                    "Prénom employé": job_seeker.first_name,
+                    "Nom employé": job_seeker.last_name,
+                    "Email employé": job_seeker.email,
+                }
+            emailing_rows.append(emailing_row)
+
+        self.log_to_csv("emailing", emailing_rows)
 
     def handle(self, file_path, developer_email, dry_run=False, **options):
         """
@@ -355,6 +397,10 @@ class Command(BaseCommand):
         # Add a comment column to document why it may be removed.
         # Will be shared with the ASP.
         df["Commentaire"] = ""
+
+        # Add an "approval" column to share with the ASP the PASS IAE number.
+        df[PASS_IAE_NUMBER_COL] = ""
+        df[USER_PK] = ""
 
         # Step 1: clean data
         self.logger.info("✨ STEP 1: clean data!")
@@ -396,12 +442,18 @@ class Command(BaseCommand):
 
         # Step 3: import data.
         self.logger.info("🔥 STEP 3: create job seekers, approvals and job applications.")
-        self.import_data_into_itou(df=cleaned_df)
+        cleaned_df = self.import_data_into_itou(df=cleaned_df)
 
         # Step 4: create a CSV file including comments to be shared with the ASP.
-        self.log_to_csv("fichier_final.csv", df)
+        df = df.drop([USER_PK, "nir_is_valid", "siret_is_valid"], axis=1)  # Remove useless columns.
+        self.log_to_csv("fichier_final", df)
         self.logger.info("📖 STEP 4: log final results.")
-        self.logger.info("You can transfer this file to the ASP: /exports/fichier_final.csv")
+        self.logger.info("You can transfer this file to the ASP: /exports/import_ai_bilan.csv")
+
+        # STEP 5: file to be used by the communication team in a mailing.
+        self.create_emailing_file(cleaned_df)
+        self.logger.info("📖 STEP 5: export data for emailing.")
+        self.logger.info("Emailing file: /exports/emailing.csv")
 
         self.logger.info("-" * 80)
         self.logger.info("👏 Good job!")
