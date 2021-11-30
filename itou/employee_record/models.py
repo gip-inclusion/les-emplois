@@ -489,6 +489,17 @@ class EmployeeRecord(models.Model):
 
         return self._batch_line_number
 
+    @property
+    def is_blocking_job_application_cancellation(self):
+        """
+        Linked job application can't be cancelled if the employee record
+        is sent or already processed.
+        """
+        return self.status in [
+            EmployeeRecord.Status.SENT,
+            EmployeeRecord.Status.PROCESSED,
+        ]
+
     @staticmethod
     def siret_from_asp_source(siae):
         """
