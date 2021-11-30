@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.utils import IntegrityError
 from django.utils.text import slugify
 from tqdm import tqdm
 
@@ -306,8 +307,16 @@ class Command(BaseCommand):
                     )
                     created_approvals += 1
                     if not self.dry_run:
-                        # `Approval.save()` delivers an automatic number.
-                        approval.save()
+                        # In production, it can raise an IntegrityError if another PASS has just been delivered a few seconds ago.
+                        # Try to save with another number until it succeeds.
+                        succedded = None
+                        while succedded is None:
+                            try:
+                                # `Approval.save()` delivers an automatic number.
+                                approval.save()
+                                succedded = True
+                            except IntegrityError:
+                                pass
                         # Make sure approval.pk is set.
                         approval.refresh_from_db()
 
