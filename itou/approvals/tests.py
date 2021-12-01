@@ -424,7 +424,7 @@ class ApprovalModelTest(TestCase):
     def test_is_from_ai_stock(self):
         approval_created_at = timezone.datetime(2021, 11, 30)
         approval_created_at = timezone.make_aware(approval_created_at)
-        developer = UserFactory(email="celine@hello-birds.com")
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
 
         approval = ApprovalFactory()
         self.assertFalse(approval.is_from_ai_stock)

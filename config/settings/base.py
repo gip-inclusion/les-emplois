@@ -476,6 +476,10 @@ ITOU_COMMUNITY_URL = "https://communaute.inclusion.beta.gouv.fr"
 # Approval numbering prefix can be different for non-production envs
 ASP_ITOU_PREFIX = "99999"
 
+# On November 30th, 2021, we delivered approvals for AI structures.
+# See itou.users.management.commands.import_ai_employees
+AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = os.environ.get("AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL", "")
+
 # Metabase
 # ------------------------------------------------------------------------------
 

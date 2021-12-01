@@ -266,7 +266,7 @@ class Approval(CommonApprovalMixin):
         """
         # Avoid a circular import.
         user_manager = self.user._meta.model.objects
-        developer_qs = user_manager.filter(email="celine@hello-birds.com")
+        developer_qs = user_manager.filter(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         if not developer_qs:
             return False
         developer = developer_qs.first()
