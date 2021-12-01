@@ -80,8 +80,7 @@ class TestDownloadApprovalAsPDF(TestCase):
 
         # On November 30th, 2021, AI were delivered approvals without a diagnosis.
         # See itou.users.management.commands.import_ai_employees.
-        approval_created_at = timezone.datetime(2021, 11, 30)
-        approval_created_at = timezone.make_aware(approval_created_at)
+        approval_created_at = timezone.datetime(2021, 11, 30, tzinfo=timezone.utc)
         approval_created_by = UserFactory(email="celine@hello-birds.com")
         job_application = JobApplicationWithApprovalFactory(
             eligibility_diagnosis=None,
