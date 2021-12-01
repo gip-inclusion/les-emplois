@@ -421,6 +421,20 @@ class ApprovalModelTest(TestCase):
         approval = ApprovalFactory(number="999990000001", start_at=start_at, end_at=end_at)
         self.assertEqual(approval.end_at, end_at)  # Should NOT extended.
 
+    def test_is_from_ai_stock(self):
+        approval_created_at = timezone.datetime(2021, 11, 30)
+        approval_created_at = timezone.make_aware(approval_created_at)
+        developer = UserFactory(email="celine@hello-birds.com")
+
+        approval = ApprovalFactory()
+        self.assertFalse(approval.is_from_ai_stock)
+
+        approval = ApprovalFactory(created_at=approval_created_at)
+        self.assertFalse(approval.is_from_ai_stock)
+
+        approval = ApprovalFactory(created_at=approval_created_at, created_by=developer)
+        self.assertTrue(approval.is_from_ai_stock)
+
 
 class PoleEmploiApprovalModelTest(TestCase):
     """

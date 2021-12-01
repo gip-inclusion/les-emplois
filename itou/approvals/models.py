@@ -259,6 +259,20 @@ class Approval(CommonApprovalMixin):
     def can_be_suspended(self):
         return self.is_in_progress and not self.is_suspended
 
+    @property
+    def is_from_ai_stock(self):
+        """On November 30th, 2021, AI were delivered approvals without a diagnosis.
+        See itou.users.management.commands.import_ai_employees.
+        """
+        # Avoid a circular import.
+        user_manager = self.user._meta.model.objects
+        developer_qs = user_manager.filter(email="celine@hello-birds.com")
+        if not developer_qs:
+            return False
+        developer = developer_qs.first()
+        approval_creation_date = datetime.date(2021, 11, 30)
+        return self.created_by == developer and self.created_at.date() == approval_creation_date
+
     def can_be_suspended_by_siae(self, siae):
         return (
             self.can_be_suspended
