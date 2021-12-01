@@ -498,12 +498,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_download_approval_as_pdf(self):
-        return (
-            self.state.is_accepted
-            and not self.can_be_cancelled
-            and self.to_siae.is_subject_to_eligibility_rules
-            and self.approval
-        )
+        return self.state.is_accepted and self.to_siae.is_subject_to_eligibility_rules and self.approval
 
     @property
     def can_be_cancelled(self):
