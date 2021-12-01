@@ -666,6 +666,8 @@ STORAGE_UPLOAD_KINDS = {
     },
 }
 
+# Employee records
+# ------------------------------------------------------------------------------
 # Employee record data archiving / pruning:
 # "Proof of record" model field is erased after this delay (in days)
 EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS = int(os.environ.get("EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS", 13 * 30))
