@@ -1,5 +1,38 @@
 # Journal des modifications
 
+## [32] - 2021-12-02
+
+### Ajouté
+
+- Ajout d'un profil de démo pour les AI.
+- Ajout du nom de la structure prescripteur dans l'export des candidatures.
+- Ajout d'un mécanisme d'import de salarié ASP (AI) vers la plateforme.
+- Ajout du NIR à l'API "fiche salarié".
+- Ajout d'une vérification du type de SIAE pour contrôler les doublons de fiches salarié.
+- Affichage dans l'admin du statut de la fiche salarié dans la page PASS IAE.
+- Ajout d'un texte explicatif au champ « fin de contrat » pour indiquer « 12 mois » pour les suspensions.
+- Envoi à l'ASP d'un fichier contenant des informations sur les PASS délivrés pour les AI.
+- Ajout de la possibilité aux employeurs de récupérer un agrément expiré depuis moins de 3 mois dans le module « Prolonger ou suspendre un agrément Pole Emploi ».
+- Ouverture des stats employeur à quelques SIAE expérimentatrices.
+- Ajout d'un texte statique en bas des pages de statistiques Metabase.
+- Mise en place de la limite de la rétroactivité des suspensions à 30 jours avant la date du jour.
+- Répertoriage des candidats sans solution à 45 jours.
+
+### Modifié
+
+- Augmentation de la mémoire disponible pour le conteneur PostgreSQL en environnement de développement local.
+- Résolution d'un bug dans la délivrance de PASS IAE.
+- Résolution d'une erreur 500 quand un employeur tente d'obtenir un PASS IAE pour un candidat en doublon.
+- Amélioration des liens des Emplois vers le Pilotage.
+- Correctif orthographique de `Organisation délégataire d'un CD` et `CAF - Caisse d'allocations familiales`.
+- Le support peut à nouveau modifier le numéro d'un PASS IAE tant que le nouveau numéro ne commence pas par `99999`.
+- Renommage du lien « Obtenir un PASS IAE (candidature spontanée) » en « Déclarer une embauche ».
+- Renommage du bouton « Je l'embauche et j'obtiens un PASS IAE » en « Oui, j'ai besoin d'une aide au poste ».
+
+### Supprimé
+
+- Suppression du motif de prolongation « Contexte sanitaire » le 1er décembre.
+
 ## [31] - 2021-11-18
 
 ### Ajouté
