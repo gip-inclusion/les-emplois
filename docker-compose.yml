@@ -29,6 +29,9 @@ services:
       - ./envs/secrets.env
     depends_on:
       - postgres
+      # - redis
+    # links:
+    #   - redis
     build:
       context: .
       dockerfile: ./docker/dev/django/Dockerfile
@@ -39,6 +42,16 @@ services:
     ports:
       - "${DJANGO_PORT_ON_DOCKER_HOST:-8080}:8000"
 
+  # redis:
+  #   container_name: itou_redis
+  #   image: "redis:alpine"
+  #   command: redis-server
+  #   expose:
+  #    - "6379"
+  #   volumes:
+  #     - redis_data:/data
+
 volumes:
   postgres_data:
   postgres_data_backups:
+  # redis_data:

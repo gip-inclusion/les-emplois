@@ -3,11 +3,45 @@ import logging
 import httpx
 from django.conf import settings
 
-from itou.job_applications.models import JobApplication
 from itou.siaes.models import Siae
 
 
 logger = logging.getLogger(__name__)
+
+
+class PoleEmploiTechnicalException(Exception):
+    pass
+
+
+class PoleEmploiTokenException(Exception):
+    pass
+
+
+class PoleEmploiIndividualException(Exception):
+    pass
+
+
+class PoleEmploiMiseAJourPassException(Exception):
+    pass
+
+
+#
+# def get_mise_a_jour_token(mode):
+#     api_mode = PoleEmploiMiseAJourPassIAEAPI.USE_SANDBOX_ROUTE
+#     token_recherche_et_maj = self.get_token(api_mode)
+#     # if token_recherche_et_maj is None:
+#     #     log = JobApplicationPoleEmploiNotificationLog(
+#     #         job_application=job_application,
+#     #         status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION,
+#     #         # details="code retour=S023"
+#     #     )
+#     #     log.save()
+#
+# def get_individual_from_pole_emploi(job_seeker, token):
+#     pass
+#
+# def notify_pole_emploi_accepted(job_application, token):
+#     pass
 
 
 class PoleEmploiIndividu:
@@ -16,7 +50,11 @@ class PoleEmploiIndividu:
         self.last_name = last_name.upper()
         self.birthdate = birthdate.strftime("%Y-%m-%d")
         self.nir = nir
-        assert self.is_valid()
+        # assert self.is_valid()
+
+    @classmethod
+    def from_job_seeker(cls, job_seeker):
+        return PoleEmploiIndividu(job_seeker.first_name, job_seeker.last_name, job_seeker.birth_date, job_seeker.nir)
 
     def is_valid(self):
         return self.first_name != "" and self.last_name != "" and len(self.nir) == 13 and self.birthdate != ""
@@ -74,7 +112,6 @@ class PoleEmploiRechercheIndividuCertifieAPI:
         self.data, self.error = self.post(params, token)
 
     def post(self, individu, token):
-
         data = None
         error = None
 
@@ -104,7 +141,7 @@ class PoleEmploiRechercheIndividuCertifieAPI:
         return self.data is not None and self.code_sortie == "S001"
 
     @property
-    def id_national_demandeur(self):
+    def id_national_demandeur(self) -> str:
         """Identifiant national Pôle Emploi chiffré"""
         return self.data.get("idNationalDE")
 
@@ -159,18 +196,22 @@ class PoleEmploiMiseAJourPass:
 
         return mapping[siae_kind]
 
+    @staticmethod
     def sender_kind(sender_kind):
-        sender_kind_mapping = {
-            JobApplication.SENDER_KIND_JOB_SEEKER: PoleEmploiMiseAJourPass.ORIGIN_DEMANDEUR,
-            JobApplication.SENDER_KIND_PRESCRIBER: PoleEmploiMiseAJourPass.ORIGIN_PRESCRIPTEUR,
-            JobApplication.SENDER_KIND_SIAE_STAFF: PoleEmploiMiseAJourPass.ORIGIN_EMPLOYEUR,
-        }
+        # raise "Todo: fix me, I cause a circular reference"
+        # sender_kind_mapping = {
+        #     JobApplication.SENDER_KIND_JOB_SEEKER: PoleEmploiMiseAJourPass.ORIGIN_DEMANDEUR,
+        #     JobApplication.SENDER_KIND_PRESCRIBER: PoleEmploiMiseAJourPass.ORIGIN_PRESCRIPTEUR,
+        #     JobApplication.SENDER_KIND_SIAE_STAFF: PoleEmploiMiseAJourPass.ORIGIN_EMPLOYEUR,
+        # }
 
-        if sender_kind not in sender_kind_mapping.keys():
-            raise ValueError("sender kind is not handled by pole emploi")
+        # if sender_kind not in sender_kind_mapping.keys():
+        #     raise ValueError("sender kind is not handled by pole emploi")
 
-        return sender_kind_mapping[sender_kind]
+        # return sender_kind_mapping[sender_kind]
+        return PoleEmploiMiseAJourPass.ORIGIN_DEMANDEUR
 
+    @staticmethod
     def refused_parameters(encrypted_identifier, siae):
         """
         The necessary parameters to notify Pole Emploi of a refusal
@@ -181,7 +222,8 @@ class PoleEmploiMiseAJourPass:
             "origineCandidature": PoleEmploiMiseAJourPass.sender_kind(siae),
         }
 
-    def approved_parameters(encrypted_identifier, siae, approval):
+    @staticmethod
+    def accepted_parameters(encrypted_identifier, siae, approval):
         """
         The necessary parameters to notify Pole Emploi that a Pass has been granted
         """
@@ -189,10 +231,8 @@ class PoleEmploiMiseAJourPass:
             "idNational": encrypted_identifier,
             "statutReponsePassIAE": PoleEmploiMiseAJourPass.PASS_APPROVED,
             "typeSIAE": PoleEmploiMiseAJourPass.kind(siae),
-            "dateDebutPassIAE": PoleEmploiMiseAJourPass.approval.start_at.strftime(
-                PoleEmploiMiseAJourPass.DATE_FORMAT
-            ),
-            "dateFinPassIAE": PoleEmploiMiseAJourPass.approval.end_at.strftime(PoleEmploiMiseAJourPass.DATE_FORMAT),
+            "dateDebutPassIAE": approval.start_at.strftime(PoleEmploiMiseAJourPass.DATE_FORMAT),
+            "dateFinPassIAE": approval.end_at.strftime(PoleEmploiMiseAJourPass.DATE_FORMAT),
             "numPassIAE": approval.number,
             "numSIRETsiae": siae.siret,
             "origineCandidature": PoleEmploiMiseAJourPass.sender_kind(siae),

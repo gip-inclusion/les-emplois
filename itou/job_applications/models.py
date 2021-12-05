@@ -1,7 +1,9 @@
 import datetime
 import logging
 import uuid
+from time import sleep
 
+import httpx
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
@@ -14,6 +16,16 @@ from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.utils.apis.esd import get_access_token
+from itou.utils.apis.pole_emploi import PoleEmploiMiseAJourPass  # noqa
+from itou.utils.apis.pole_emploi import PoleEmploiMiseAJourPassIAEAPI  # noqa
+from itou.utils.apis.pole_emploi import PoleEmploiRechercheIndividuCertifieAPI  # noqa
+from itou.utils.apis.pole_emploi import (  # noqa
+    PoleEmploiIndividu,
+    PoleEmploiIndividualException,
+    PoleEmploiTechnicalException,
+    PoleEmploiTokenException,
+)
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
@@ -617,7 +629,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def accept(self, *args, **kwargs):
-
         accepted_by = kwargs.get("user")
 
         # Mark other related job applications as obsolete.
@@ -686,6 +697,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_at = timezone.now()
             self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_AUTOMATIC
             self.approval.unsuspend(self.hiring_start_at)
+            # JobApplicationPoleEmploiNotificationLog.notify_job_application_accepted(
+            #     self.job_seeker, self, self.approval
+            # )
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):
@@ -695,6 +709,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if self.is_sent_by_proxy:
             emails.append(self.email_refuse_for_proxy)
         connection.send_messages(emails)
+        # JobApplicationPoleEmploiNotificationLog.notify_pe_refused(self)
 
     @xwf_models.transition()
     def cancel(self, *args, **kwargs):
@@ -847,6 +862,26 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email = self.email_manually_refuse_approval
         email.send()
 
+    def notify_pole_employ_accepted(self, mode) -> bool:
+        individual = PoleEmploiIndividu.from_job_seeker(self.job_seeker)
+        try:
+            token = JobApplicationPoleEmploiNotificationLog.get_token(mode)  # noqa
+        except PoleEmploiTokenException as token_exception:  # noqa
+            # store error, and be done with it
+            return False
+        try:
+
+            encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(  # noqa:F841
+                individual, token
+            )
+        except PoleEmploiIndividualException as individual_exception:  # noqa:F841
+            return False
+        # try:
+        #     mise_a_jour = notify_pole_emploi_accepted(self, token)
+        # except PoleEmploiMiseAJourPassException as e:
+        #     return False
+        return True
+
 
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     """
@@ -871,3 +906,140 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     def pretty_to_state(self):
         choices = dict(JobApplicationWorkflow.STATE_CHOICES)
         return choices[self.to_state]
+
+
+class JobApplicationPoleEmploiNotificationLog(models.Model):
+    """
+    A log used to store what happens when we notify pole emploi
+    that a JobApplication has been accepted or refused
+    """
+
+    STATUS_OK = "ok"
+    STATUS_FAIL_AUTHENTICATION = "authentication_failure"
+    STATUS_FAIL_SEARCH_INDIVIDUAL = "search individual failure"
+    STATUS_FAIL_NOTIFY_POLE_EMPLOI = "update failure"
+    STATUS_TECHNICAL_FAILURE = "technical_failure"
+
+    STATUS_CHOICES = (
+        (STATUS_OK, "La mise à jour a abouti"),
+        (STATUS_FAIL_AUTHENTICATION, "Mise à jour échouée suite à l’échec d’authentifications aux API pôle emploi"),
+        (STATUS_FAIL_SEARCH_INDIVIDUAL, "Mise à jour échouée car candidat non trouvé chez Pôle Emploi"),
+        (STATUS_FAIL_NOTIFY_POLE_EMPLOI, "Mise à jour échouée car installation du pass chez pole emploi refusée"),
+        (STATUS_TECHNICAL_FAILURE, "Mise à jour échouée suite à un problème technique"),
+    )
+
+    status = models.CharField(verbose_name="Motifs d’erreurs", max_length=30, choices=STATUS_CHOICES, blank=True)
+    details = models.TextField(verbose_name="Précisions concernant le comportement obtenu", blank=True)
+
+    job_application = models.ForeignKey(
+        "job_applications.JobApplication", verbose_name="Candidature", null=True, blank=True, on_delete=models.SET_NULL
+    )
+
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
+
+    class Meta:
+        verbose_name = "Log des notifications PoleEmploi"
+        verbose_name_plural = "Logs des notifications PoleEmploi"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return str(self.id)
+
+    API_DATE_FORMAT = "%Y-%m-%d"
+
+    def notify_job_application_accepted(self):
+        pass
+
+    # @staticmethod
+    # def _run(self, job_seeker, job_application, params):
+    #     print("running update")
+    #     return
+    #     # api_mode = PoleEmploiMiseAJourPassIAEAPI.USE_PRODUCTION_ROUTE
+    #     api_mode = PoleEmploiMiseAJourPassIAEAPI.USE_SANDBOX_ROUTE
+    #     token_recherche_et_maj = self.get_token(api_mode)
+    #     if token_recherche_et_maj is None:
+    #         log = JobApplicationPoleEmploiNotificationLog(
+    #             job_application=job_application,
+    #             status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION,
+    #             # details="code retour=S023"
+    #         )
+    #         log.save()
+    #         return False
+    #     # print(token_recherche_et_maj)
+    #     job_seeker = job_application.job_seeker
+    #
+    #     individual = PoleEmploiIndividu(
+    #         job_seeker.first_name, job_seeker.last_name, job_seeker.birth_date, job_seeker.nir
+    #     )
+    #
+    #     # for i in range(len(individuals)):
+    #     #     individual, code_siae, code_prescripteur = individuals[i]
+    #
+    #     individual_pole_emploi = self.get_pole_emploi_individual(individual, token_recherche_et_maj)
+    #     if individual_pole_emploi.is_valid:
+    #         try:
+    #             params["idNational"] = individual_pole_emploi.id_national_demandeur()
+    #             maj = PoleEmploiMiseAJourPassIAEAPI(params, token_recherche_et_maj, api_mode)
+    #
+    #             # 1 request/second max, taking a bit of margin here due to occasionnal timeouts
+    #             sleep(1.5)
+    #             print(maj.data)
+    #
+    #         except httpx.HTTPStatusError as error:
+    #             print(error.response.content)
+    #             return False
+    #
+    #             # print(individual.last_name)
+    #             # print(maj.data)
+
+    # def generate_sample_api_params(self, encrypted_identifier):
+    #     approval_start_at = date(2021, 11, 1)
+    #     approval_end_at = date(2022, 7, 1)
+    #     approved_pass = "A"
+    #     approval_number = "999992139048"
+    #     siae_siret = "42373532300044"
+    #     prescriber_siret = "36252187900034"
+
+    #     return {
+    #         "idNational": encrypted_identifier,
+    #         "statutReponsePassIAE": approved_pass,
+    #         "typeSIAE": PoleEmploiMiseAJourPass.kind(Siae.KIND_EI),
+    #         "dateDebutPassIAE": approval_start_at.strftime(self.API_DATE_FORMAT),
+    #         "dateFinPassIAE": approval_end_at.strftime(self.API_DATE_FORMAT),
+    #         "numPassIAE": approval_number,
+    #         "numSIRETsiae": siae_siret,
+    #         "numSIRETprescripteur": prescriber_siret,
+    #         "origineCandidature": PoleEmploiMiseAJourPass.sender_kind(JobApplication.SENDER_KIND_JOB_SEEKER),
+    #     }
+
+    @staticmethod
+    def get_token(api_production_or_sandbox):
+        try:
+            maj_pass_iae_api_scope = "passIAE api_maj-pass-iaev1"
+            # The sandbox mode involves a slightly different scope
+            if api_production_or_sandbox == PoleEmploiMiseAJourPassIAEAPI.USE_SANDBOX_ROUTE:
+                maj_pass_iae_api_scope = "passIAE api_testmaj-pass-iaev1"
+            # It is not obvious but we can ask for one token only with all the necessary rights
+            token_recherche_et_maj = get_access_token(
+                f"api_rechercheindividucertifiev1 rechercherIndividuCertifie {maj_pass_iae_api_scope}"
+            )
+            sleep(1)
+            return token_recherche_et_maj
+        except httpx.HTTPStatusError as error:
+            raise PoleEmploiTokenException(error.response.status_code)
+        return ""
+
+    @staticmethod
+    def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
+        try:
+            individual_pole_emploi = PoleEmploiRechercheIndividuCertifieAPI(individual.as_api_params(), api_token)
+            # 3 requests/second max. I had timeout issues so 1 second take some margins
+            sleep(1)
+            if individual_pole_emploi.is_valid:
+                return individual_pole_emploi.id_national_demandeur
+            else:
+                raise PoleEmploiIndividualException(individual_pole_emploi.code_sortie)
+        except httpx.HTTPStatusError as error:
+            raise PoleEmploiTechnicalException(error.response.status_code)
+        return ""
