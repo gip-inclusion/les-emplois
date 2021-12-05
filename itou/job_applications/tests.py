@@ -1,7 +1,8 @@
 import datetime
 import io
-from unittest.mock import PropertyMock, patch
+from unittest.mock import ANY, PropertyMock, patch
 
+import httpx
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
@@ -28,7 +29,11 @@ from itou.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithoutApprovalFactory,
 )
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import (
+    JobApplication,
+    JobApplicationPoleEmploiNotificationLog,
+    JobApplicationWorkflow,
+)
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
@@ -36,10 +41,25 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
+from itou.utils.apis.pole_emploi import PoleEmploiIndividu, PoleEmploiMiseAJourPassIAEAPI, PoleEmploiTokenException
 from itou.utils.templatetags import format_filters
 
 
 class JobApplicationModelTest(TestCase):
+    # def setUp(self):
+    #     self.notify_accepted_mock = patch.object(
+    #         JobApplicationPoleEmploiNotificationLog,
+    #         "notify_job_application_accepted",
+    #         new_callable=PropertyMock,
+    #         return_value=None,
+    #     )
+    #     self.notify_refused_mock = patch.object(
+    #         JobApplicationPoleEmploiNotificationLog,
+    #         "notify_job_application_refused",
+    #         new_callable=PropertyMock,
+    #         return_value=None,
+    #     )
+
     def test_eligibility_diagnosis_by_siae_required(self):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
@@ -66,6 +86,7 @@ class JobApplicationModelTest(TestCase):
         user = job_application.to_siae.members.first()
         job_application.accept(user=user)
         self.assertEqual(job_application.accepted_by, user)
+        self.notify_accepted_mock.assert_called_once_with(ANY, ANY)
 
     def test_is_sent_by_authorized_prescriber(self):
         job_application = JobApplicationSentByJobSeekerFactory()
@@ -1151,3 +1172,40 @@ class JobApplicationCsvExportTest(TestCase):
 
         self.assertIn("Candidature déclinée", csv_output.getvalue())
         self.assertIn("Candidat non venu ou non joignable", csv_output.getvalue())
+
+
+class JobApplicationPoleEmploiNotificationLogTest(TestCase):
+    """Test that the notification system for Pole Emploi works as expected."""
+
+    sample_token = "abc123"
+    sample_encrypted_nir = "some_nir"
+
+    sample_pole_emploi_individual = PoleEmploiIndividu("john", "doe", datetime.date(1987, 5, 8), "1870275051055")
+    sample_pole_emploi_individual = PoleEmploiIndividu("john", "doe", datetime.date(1987, 5, 8), "1870275051055")
+
+    # non-trivial `unittest.patch` thing to note:
+    # get_access_token is defined in itou.utils.apis.esd.get_access_token
+    # BUT it is imported in itou.job_applications.models. We CAN patch both,
+    # but we NEED to patch the latter in order to correctly set what we want
+    @patch("itou.job_applications.models.get_access_token", return_value=sample_token)
+    def test_get_token_nominal(self, get_access_token_mock):
+        token = JobApplicationPoleEmploiNotificationLog.get_token(PoleEmploiMiseAJourPassIAEAPI.USE_SANDBOX_ROUTE)
+        get_access_token_mock.assert_called_with(ANY)
+        self.assertEqual(token, self.sample_token)
+
+    @patch(
+        "itou.job_applications.models.get_access_token",
+        side_effect=httpx.HTTPStatusError("", request=None, response=httpx.Response(400)),
+    )
+    def test_get_token_error(self, get_access_token_mock):
+        with self.assertRaises(PoleEmploiTokenException):
+            JobApplicationPoleEmploiNotificationLog.get_token(PoleEmploiMiseAJourPassIAEAPI.USE_SANDBOX_ROUTE)
+            get_access_token_mock.assert_called_with(ANY)
+
+    @patch("itou.job_applications.models.PoleEmploiRechercheIndividuCertifieAPI", return_value=sample_encrypted_nir)
+    def test_get_individual_nominal(self, get_individual_mock):
+        pe_individual = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
+            self.sample_pole_emploi_individual, self.sample_token
+        )
+        get_individual_mock.assert_called_with(self.sample_pole_emploi_individual, self.sample_token)
+        self.assertEqual(pe_individual, self.sample_encrypted_nir)
