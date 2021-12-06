@@ -167,7 +167,7 @@ TABLE_COLUMNS = [
         "name": "actif",
         "type": "boolean",
         "comment": "Dernière connexion dans les 7 jours",
-        "fn": lambda o: o.last_login > timezone.now() + timedelta(days=-7) if o.last_login else None,
+        "fn": lambda o: o.last_login > timezone.now() + timedelta(days=-7) if o.last_login else False,
     },
 ]
 
