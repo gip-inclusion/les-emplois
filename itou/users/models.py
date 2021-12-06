@@ -430,7 +430,6 @@ class User(AbstractUser, AddressMixin):
             and current_org.is_authorized
             and current_org.authorization_status == current_org.AuthorizationStatus.VALIDATED
             and not current_org.is_brsa
-            and current_org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS
         )
 
     def get_stats_cd_department(self, current_org):
@@ -451,7 +450,6 @@ class User(AbstractUser, AddressMixin):
             self.is_labor_inspector
             and isinstance(current_org, Institution)
             and current_org.kind == current_org.Kind.DDETS
-            and current_org.department in settings.DDETS_STATS_ALLOWED_DEPARTMENTS
         )
 
     def get_stats_ddets_department(self, current_org):
