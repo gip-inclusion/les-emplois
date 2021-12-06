@@ -475,7 +475,6 @@ class ModelTest(TestCase):
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
             kind=PrescriberOrganization.Kind.DEPT, department="93"
         )
-        self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
@@ -485,19 +484,9 @@ class ModelTest(TestCase):
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
             kind=PrescriberOrganization.Kind.DEPT, membership__is_admin=False, department="93"
         )
-        self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
-
-        # Member of CD of not yet allowed department cannot access.
-        org = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganization.Kind.DEPT, department="02"
-        )
-        self.assertFalse(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
-        user = org.members.get()
-        self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Non authorized organization does not give access.
         org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
