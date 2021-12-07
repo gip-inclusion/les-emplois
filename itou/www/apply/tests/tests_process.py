@@ -289,10 +289,7 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             job_seeker=job_seeker_user,
             # Ensure that the old_job_application cannot be canceled.
-            hiring_start_at=today
-            - relativedelta(days=100)
-            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            - relativedelta(days=1),
+            hiring_start_at=today - relativedelta(days=100),
         )
         # create suspension for the job seeker
         approval_job_seeker = old_job_application.approval
