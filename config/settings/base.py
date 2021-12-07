@@ -476,6 +476,10 @@ ITOU_COMMUNITY_URL = "https://communaute.inclusion.beta.gouv.fr"
 # Approval numbering prefix can be different for non-production envs
 ASP_ITOU_PREFIX = "99999"
 
+# On November 30th, 2021, we delivered approvals for AI structures.
+# See itou.users.management.commands.import_ai_employees
+AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = os.environ.get("AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL", "")
+
 # Metabase
 # ------------------------------------------------------------------------------
 
@@ -518,13 +522,10 @@ RELEASE_SIAE_STATS = False
 SIAE_STATS_USER_PK_WHITELIST = json.loads(os.environ.get("SIAE_STATS_USER_PK_WHITELIST", "[]"))
 
 # Metabase embedded dashboard IDs
-PUBLIC_BASIC_STATS_DASHBOARD_ID = 34
-PUBLIC_ADVANCED_STATS_DASHBOARD_ID = 43
+PUBLIC_BASIC_STATS_DASHBOARD_ID = 119
 SIAE_STATS_DASHBOARD_ID = 128
 CD_STATS_DASHBOARD_ID = 118
-CD_STATS_ALLOWED_DEPARTMENTS = ["38", "62", "67", "93"]
 DDETS_STATS_DASHBOARD_ID = 117
-DDETS_STATS_ALLOWED_DEPARTMENTS = ["38", "62", "67", "93"]
 DREETS_STATS_DASHBOARD_ID = 117
 DGEFP_STATS_DASHBOARD_ID = 117
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
@@ -666,6 +667,8 @@ STORAGE_UPLOAD_KINDS = {
     },
 }
 
+# Employee records
+# ------------------------------------------------------------------------------
 # Employee record data archiving / pruning:
 # "Proof of record" model field is erased after this delay (in days)
 EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS = int(os.environ.get("EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS", 13 * 30))

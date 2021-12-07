@@ -2,7 +2,6 @@ import datetime
 import uuid
 from unittest import mock
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import TestCase
@@ -475,7 +474,6 @@ class ModelTest(TestCase):
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
             kind=PrescriberOrganization.Kind.DEPT, department="93"
         )
-        self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
@@ -485,19 +483,9 @@ class ModelTest(TestCase):
         org = AuthorizedPrescriberOrganizationWithMembershipFactory(
             kind=PrescriberOrganization.Kind.DEPT, membership__is_admin=False, department="93"
         )
-        self.assertTrue(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
-
-        # Member of CD of not yet allowed department cannot access.
-        org = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganization.Kind.DEPT, department="02"
-        )
-        self.assertFalse(org.department in settings.CD_STATS_ALLOWED_DEPARTMENTS)
-        user = org.members.get()
-        self.assertFalse(user.can_view_stats_cd(current_org=org))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Non authorized organization does not give access.
         org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
@@ -523,7 +511,6 @@ class ModelTest(TestCase):
         """
         # Admin member of DDETS can access.
         institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DDETS, department="93")
-        self.assertTrue(institution.department in settings.DDETS_STATS_ALLOWED_DEPARTMENTS)
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_ddets(current_org=institution))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
@@ -533,18 +520,10 @@ class ModelTest(TestCase):
         institution = InstitutionWithMembershipFactory(
             kind=Institution.Kind.DDETS, membership__is_admin=False, department="93"
         )
-        self.assertTrue(institution.department in settings.DDETS_STATS_ALLOWED_DEPARTMENTS)
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_ddets(current_org=institution))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
         self.assertEqual(user.get_stats_ddets_department(current_org=institution), institution.department)
-
-        # Member of institution of a non allowed department cannot access.
-        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DDETS, department="18")
-        self.assertFalse(institution.department in settings.DDETS_STATS_ALLOWED_DEPARTMENTS)
-        user = institution.members.get()
-        self.assertFalse(user.can_view_stats_ddets(current_org=institution))
-        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=institution))
 
         # Member of institution of wrong kind cannot access.
         institution = InstitutionWithMembershipFactory(kind=Institution.Kind.OTHER, department="93")

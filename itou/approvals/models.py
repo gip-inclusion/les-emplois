@@ -259,6 +259,20 @@ class Approval(CommonApprovalMixin):
     def can_be_suspended(self):
         return self.is_in_progress and not self.is_suspended
 
+    @property
+    def is_from_ai_stock(self):
+        """On November 30th, 2021, AI were delivered approvals without a diagnosis.
+        See itou.users.management.commands.import_ai_employees.
+        """
+        # Avoid a circular import.
+        user_manager = self.user._meta.model.objects
+        developer_qs = user_manager.filter(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        if not developer_qs:
+            return False
+        developer = developer_qs.first()
+        approval_creation_date = datetime.date(2021, 11, 30)
+        return self.created_by == developer and self.created_at.date() == approval_creation_date
+
     def can_be_suspended_by_siae(self, siae):
         return (
             self.can_be_suspended
@@ -400,6 +414,7 @@ class Suspension(models.Model):
     # Max duration: 12 months (could be adjusted according to user feedback).
     # 12-months suspensions can be consecutive and there can be any number of them.
     MAX_DURATION_MONTHS = 12
+    MAX_RETROACTIVITY_DURATION_DAYS = 30
 
     class Reason(models.TextChoices):
         # Displayed choices
@@ -525,7 +540,6 @@ class Suspension(models.Model):
             )
 
         if hasattr(self, "approval"):
-
             # The start of a suspension must be contained in its approval boundaries.
             if not self.start_in_approval_boundaries:
                 raise ValidationError(
@@ -534,6 +548,17 @@ class Suspension(models.Model):
                             f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
                             f"{self.approval.start_at.strftime('%d/%m/%Y')} - "
                             f"{self.approval.end_at.strftime('%d/%m/%Y')}."
+                        )
+                    }
+                )
+            next_min_start_at = self.next_min_start_at(self.approval)
+            if self.start_at < next_min_start_at:
+                raise ValidationError(
+                    {
+                        "start_at": (
+                            f"Pour la date de début de suspension, vous pouvez remonter "
+                            f"{self.MAX_RETROACTIVITY_DURATION_DAYS} jours avant la date du jour."
+                            f"Date de début minimum : {next_min_start_at.strftime('%d/%m/%Y')}."
                         )
                     }
                 )
@@ -601,11 +626,20 @@ class Suspension(models.Model):
         """
         Returns the minimum date on which a suspension can begin.
         """
+        today = datetime.date.today()
+        # Default starting date.
+        start_at = approval.user.last_accepted_job_application.hiring_start_at
+        start_at_threshold = today - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
+
+        # Start at overrides to handle edge cases.
         if approval.last_old_suspension:
-            return approval.last_old_suspension.end_at + relativedelta(days=1)
-        if approval.user.last_accepted_job_application.created_from_pe_approval:
-            return datetime.date.today()
-        return approval.user.last_accepted_job_application.hiring_start_at
+            start_at = approval.last_old_suspension.end_at + relativedelta(days=1)
+        elif approval.user.last_accepted_job_application.created_from_pe_approval:
+            start_at = today
+
+        if start_at < start_at_threshold:
+            return start_at_threshold
+        return start_at
 
 
 class ProlongationQuerySet(models.QuerySet):

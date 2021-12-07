@@ -35,6 +35,13 @@ def employers_accounts_tag():
             "location": "Fontvieille (13)",
             "title": "Entreprise Adaptée (E.A.)",
         },
+        {
+            "email": "test+ai@inclusion.beta.gouv.fr",
+            "description": "1 poste ouvert au recrutement",
+            "image": "ai.svg",
+            "location": "Tours (37)",
+            "title": "Association intermédiaire (A.I.)",
+        },
     ]
 
 

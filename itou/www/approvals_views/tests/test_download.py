@@ -1,12 +1,14 @@
 from unittest.mock import PropertyMock, patch
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
-from itou.users.factories import DEFAULT_PASSWORD
+from itou.users.factories import DEFAULT_PASSWORD, UserFactory
 
 from .pdfshift_mock import BITES_FILE
 
@@ -58,6 +60,33 @@ class TestDownloadApprovalAsPDF(TestCase):
         # Therefore, the linked diagnosis exists but is not in our database.
         job_application = JobApplicationWithApprovalFactory(
             eligibility_diagnosis=None, approval__number="625741810181"
+        )
+
+        siae_member = job_application.to_siae.members.first()
+        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(
+            reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("pdf", response.get("Content-Type"))
+
+    @patch("itou.utils.pdf.HtmlToPdf.html_to_bytes", return_value=BITES_FILE)
+    def test_download_approval_missing_diagnosis_ai(self, *args, **kwargs):
+        """
+        Given an existing job application with an approval delivered by Itou
+        when importing AI employees, when an AI tries to download it as PDF, it works.
+        """
+
+        # On November 30th, 2021, AI were delivered approvals without a diagnosis.
+        # See itou.users.management.commands.import_ai_employees.
+        approval_created_at = timezone.datetime(2021, 11, 30, tzinfo=timezone.utc)
+        approval_created_by = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        job_application = JobApplicationWithApprovalFactory(
+            eligibility_diagnosis=None,
+            approval__created_at=approval_created_at,
+            approval__created_by=approval_created_by,
         )
 
         siae_member = job_application.to_siae.members.first()

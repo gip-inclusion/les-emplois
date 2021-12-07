@@ -45,12 +45,15 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
             diagnosis_author_org_name = diagnosis_author_org.display_name
 
     if not diagnosis and job_application.approval and job_application.approval.originates_from_itou:
-        # Keep track of job applications without a proper eligibility diagnosis because
-        # it shouldn't happen.
-        # If this occurs too much we may have to change `can_download_approval_as_pdf()`
-        # and investigate a lot more about what's going on.
-        # See also migration `0035_link_diagnoses.py`.
-        raise ObjectDoesNotExist("Job application %s has no eligibility diagnosis." % job_application.pk)
+        # On November 30th, 2021, AI were delivered a PASS IAE
+        # without a diagnosis for all of their employees.
+        if not job_application.approval.is_from_ai_stock:
+            # Keep track of job applications without a proper eligibility diagnosis because
+            # it shouldn't happen.
+            # If this occurs too much we may have to change `can_download_approval_as_pdf()`
+            # and investigate a lot more about what's going on.
+            # See also migration `0035_link_diagnoses.py`.
+            raise ObjectDoesNotExist("Job application %s has no eligibility diagnosis." % job_application.pk)
 
     # The PDFShift API can load styles only if it has the full URL.
     base_url = request.build_absolute_uri("/")[:-1]

@@ -33,7 +33,13 @@ class DeclareProlongationForm(forms.ModelForm):
         self.reasons_max_duration_labels = {
             k: {"l": v["label"], "d": str(Prolongation.get_max_end_at(self.instance.start_at, k))}
             for (k, v) in Prolongation.MAX_CUMULATIVE_DURATION.items()
+            if k != Prolongation.Reason.HEALTH_CONTEXT.value
         }
+
+        # Since December 1, 2021, health context reason can no longer be used
+        self.fields["reason"].choices = [
+            item for item in self.fields["reason"].choices if item[0] != Prolongation.Reason.HEALTH_CONTEXT
+        ]
 
         # `PARTICULAR_DIFFICULTIES` is allowed only for AI, ACI and ACIPHC.
         if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI, self.siae.KIND_ACIPHC]:
@@ -60,7 +66,7 @@ class DeclareProlongationForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if self.cleaned_data["reason"] in self.reasons_not_need_prescriber_opinion:
+        if self.cleaned_data.get("reason") in self.reasons_not_need_prescriber_opinion:
             email = None
         else:
             self.validated_by = User.objects.filter(email=email).first()

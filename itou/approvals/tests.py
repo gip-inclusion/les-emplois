@@ -421,6 +421,20 @@ class ApprovalModelTest(TestCase):
         approval = ApprovalFactory(number="999990000001", start_at=start_at, end_at=end_at)
         self.assertEqual(approval.end_at, end_at)  # Should NOT extended.
 
+    def test_is_from_ai_stock(self):
+        approval_created_at = timezone.datetime(2021, 11, 30)
+        approval_created_at = timezone.make_aware(approval_created_at)
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+
+        approval = ApprovalFactory()
+        self.assertFalse(approval.is_from_ai_stock)
+
+        approval = ApprovalFactory(created_at=approval_created_at)
+        self.assertFalse(approval.is_from_ai_stock)
+
+        approval = ApprovalFactory(created_at=approval_created_at, created_by=developer)
+        self.assertTrue(approval.is_from_ai_stock)
+
 
 class PoleEmploiApprovalModelTest(TestCase):
     """
@@ -931,6 +945,32 @@ class SuspensionModelTest(TestCase):
     """
     Test Suspension model.
     """
+
+    def test_clean(self):
+        today = timezone.now().date()
+        start_at = today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS * 2)
+        end_at = start_at + relativedelta(months=2)
+        approval = ApprovalFactory.build(start_at=start_at, end_at=end_at)
+
+        # Suspension.start_date is too old.
+        suspension = SuspensionFactory.build(approval=approval)
+        suspension.start_at = start_at - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS + 1)
+        with self.assertRaises(ValidationError):
+            suspension.clean()
+
+        # suspension.end_at < suspension.start_at
+        suspension = SuspensionFactory.build(approval=approval)
+        suspension.start_at = start_at
+        suspension.end_at = start_at - relativedelta(months=1)
+        with self.assertRaises(ValidationError):
+            suspension.clean()
+
+        # Suspension.start_at is in the future.
+        suspension = SuspensionFactory.build(approval=approval)
+        suspension.start_at = today + relativedelta(days=2)
+        suspension.end_at = end_at
+        with self.assertRaises(ValidationError):
+            suspension.clean()
 
     def test_duration(self):
         expected_duration = datetime.timedelta(days=2)

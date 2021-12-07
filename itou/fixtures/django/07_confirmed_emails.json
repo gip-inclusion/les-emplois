@@ -168,5 +168,25 @@
       "verified": true,
       "primary": true
    }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 18,
+   "fields": {
+      "user": 25,
+      "email": "test+ai@inclusion.beta.gouv.fr",
+      "verified": true,
+      "primary": true
+   }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 19,
+   "fields": {
+      "user": 26,
+      "email": "vchevallier-benoit@example.org",
+      "verified": true,
+      "primary": true
+   }
 }
 ]

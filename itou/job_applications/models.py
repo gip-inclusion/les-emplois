@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, When
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, Subquery, When
 from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -194,10 +194,23 @@ class JobApplicationQuerySet(models.QuerySet):
 
         An eligible job application *may* or *may not* have an employee record object linked
         to it.
+
         For instance, when creating a new employee record from an eligible job application
         and NOT finishing the entire creation process.
         (employee record object creation occurs half-way of the "tunnel")
         """
+        today = datetime.date.today()
+        cancellation_date = today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+
+        # Exclude existing employee records with same approval and asp_id
+        # Rule: you can only create *one* employee record for a given asp_id / approval pair
+        subquery = Subquery(
+            self.exclude(to_siae=siae).filter(
+                employee_record__asp_id=siae.asp_id,
+                employee_record__approval_number=OuterRef("approval__number"),
+            )
+        )
+        
         # Approvals can be used to prevent employee records creation.
         # See Approval.create_employee_record for more information.
         return (
@@ -205,14 +218,14 @@ class JobApplicationQuerySet(models.QuerySet):
             self.exclude(approval=None)
             # Exclude flagged approvals (batch creation or import of approvals)
             .exclude(approval__create_employee_record=False)
-            # Exclude existing employee records with the same PASS IAE and to_siae.asp_id (considered as dups by ASP)
-            .exclude(employee_record__asp_id=siae.asp_id, employee_record__approval_number=F("approval__number"))
+            # See `subquery` above : exclude possible ASP duplicates
+            .exclude(Exists(subquery))
             # Only ACCEPTED job applications can be transformed into employee records
             .accepted()
             # Accept only job applications without linked or processed employee record
             .filter(Q(employee_record__status="NEW") | Q(employee_record__isnull=True))
-            # Focus on current SIAE and allowed period (since deployment)
             .filter(
+                # Only for current SIAE
                 to_siae=siae,
                 # Hiring must start after production date:
                 hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
@@ -675,6 +688,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval.delete()
             self.approval = None
 
+            # Remove flags on the job application about approval
+            self.approval_number_sent_by_email = False
+            self.approval_number_sent_at = None
+            self.approval_delivery_mode = ""
+            self.approval_manually_delivered_by = None
+            
         # Delete matching employee record, if any
         employee_record = self.employee_record.first()
         if employee_record:
