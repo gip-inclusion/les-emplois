@@ -174,7 +174,8 @@
                     {{ job_application.job_seeker.get_full_name|title }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
                 </p>
                 <p>
-                </p>Si une fiche salarié a été saisie pour cette embauche, elle sera annulée.</p>
+                    Si une fiche salarié a été saisie pour cette embauche, elle sera annulée.
+                </p>
             {% endif %}
             <p>
                 <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="text-decoration-none">

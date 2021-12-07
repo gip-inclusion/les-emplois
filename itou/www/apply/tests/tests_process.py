@@ -541,7 +541,7 @@ class ProcessViewsTest(TestCase):
     def test_cannot_cancel(self):
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
-            hiring_start_at=(timezone.localdate()) + relativedelta(days=1),
+            hiring_start_at=timezone.localdate() + relativedelta(days=1),
         )
         siae_user = job_application.to_siae.members.first()
         # Add a blocking employee record

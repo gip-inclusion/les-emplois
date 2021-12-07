@@ -279,6 +279,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         else:
             # Reset "inner" fields
             self.cleaned_data["rsa_allocation_since"] = self.cleaned_data["rsa_markup"] = ""
+            self.instance.has_rsa_allocation = RSAAllocation.NO
 
         # Collapsible blocks field validation
         collapsible_errors = {
