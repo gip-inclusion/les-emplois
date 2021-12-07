@@ -199,8 +199,6 @@ class JobApplicationQuerySet(models.QuerySet):
         and NOT finishing the entire creation process.
         (employee record object creation occurs half-way of the "tunnel")
         """
-        today = datetime.date.today()
-        cancellation_date = today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
 
         # Exclude existing employee records with same approval and asp_id
         # Rule: you can only create *one* employee record for a given asp_id / approval pair
@@ -210,7 +208,7 @@ class JobApplicationQuerySet(models.QuerySet):
                 employee_record__approval_number=OuterRef("approval__number"),
             )
         )
-        
+
         # Approvals can be used to prevent employee records creation.
         # See Approval.create_employee_record for more information.
         return (
@@ -517,7 +515,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def can_be_cancelled(self):
         if self.hiring_start_at:
             # A job application can be cancelled provided that
-            # there is no employee record linked with a status :
+            # there is no employee record linked with a status:
             # - SENT
             # - ACCEPTED
             # (likely to be accepted or already accepted by ASP)
@@ -693,7 +691,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_at = None
             self.approval_delivery_mode = ""
             self.approval_manually_delivered_by = None
-            
+
         # Delete matching employee record, if any
         employee_record = self.employee_record.first()
         if employee_record:
