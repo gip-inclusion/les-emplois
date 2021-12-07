@@ -1,4 +1,5 @@
 import json
+from datetime import date, timedelta
 from unittest import mock
 
 from django.conf import settings
@@ -49,11 +50,6 @@ class EmployeeRecordModelTest(TestCase):
         # Job application is not accepted
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED):
             job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_NEW)
-            employee_record = EmployeeRecord.from_job_application(job_application)
-
-        # Job application can be cancelled
-        with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_TOO_RECENT):
-            job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
             employee_record = EmployeeRecord.from_job_application(job_application)
 
         # Job application has no approval
@@ -492,3 +488,51 @@ class EmployeeRecordManagementCommandTest(TestCase):
         # Check correct status and empty archived JSON
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.ARCHIVED)
         self.assertIsNone(self.employee_record.archived_json)
+
+
+class JobApplicationConstraintsTest(TestCase):
+    """
+    Check constraints between job applications and employee records
+    """
+
+    fixtures = ["test_INSEE_communes.json", "test_asp_INSEE_countries.json"]
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def setUp(self, _mock):
+        # Make job application cancellable
+        hiring_date = date.today() + timedelta(days=7)
+
+        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(hiring_start_at=hiring_date)
+        self.employee_record = EmployeeRecord.from_job_application(self.job_application)
+        self.employee_record.update_as_ready()
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_job_application_is_cancellable(self, _mock):
+        # A job application can be cancelled only if there is no
+        # linked employee records with ACCEPTED or SENT status
+
+        # status is READY
+        self.assertTrue(self.job_application.can_be_cancelled)
+
+        # status is SENT
+        filename = "RIAE_FS_20210410130000.json"
+        self.employee_record.update_as_sent(filename, 1)
+        self.assertFalse(self.job_application.can_be_cancelled)
+
+        # status is REJECTED
+        err_code, err_message = "12", "JSON Invalide"
+        self.employee_record.update_as_rejected(err_code, err_message)
+        self.assertTrue(self.job_application.can_be_cancelled)
+
+        # status is PROCESSED
+        self.employee_record.update_as_ready()
+        self.employee_record.update_as_sent(filename, 1)
+        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.assertFalse(self.job_application.can_be_cancelled)

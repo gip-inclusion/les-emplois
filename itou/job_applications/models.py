@@ -188,7 +188,7 @@ class JobApplicationQuerySet(models.QuerySet):
         via the employee record app.
 
         These job applications must:
-        - be definitely accepted (hiring can't be cancelled after CANCELLATION_DAYS_AFTER_HIRING_STARTED days)
+        - be definitely accepted
         - have no one-to-one relationship with an employee record
         - have been created after production date
 
@@ -199,8 +199,6 @@ class JobApplicationQuerySet(models.QuerySet):
         and NOT finishing the entire creation process.
         (employee record object creation occurs half-way of the "tunnel")
         """
-        today = datetime.date.today()
-        cancellation_date = today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
 
         # Exclude existing employee records with same approval and asp_id
         # Rule: you can only create *one* employee record for a given asp_id / approval pair
@@ -227,8 +225,6 @@ class JobApplicationQuerySet(models.QuerySet):
             .filter(
                 # Only for current SIAE
                 to_siae=siae,
-                # Soon deprecated: cancellation date
-                hiring_start_at__lt=cancellation_date,
                 # Hiring must start after production date:
                 hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
             )
@@ -314,7 +310,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         (APPROVAL_DELIVERY_MODE_MANUAL, "Manuel"),
     )
 
-    CANCELLATION_DAYS_AFTER_HIRING_STARTED = 4
     WEEKS_BEFORE_CONSIDERED_OLD = 3
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -514,19 +509,19 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_download_approval_as_pdf(self):
-        return (
-            self.state.is_accepted
-            and not self.can_be_cancelled
-            and self.to_siae.is_subject_to_eligibility_rules
-            and self.approval
-        )
+        return self.state.is_accepted and self.to_siae.is_subject_to_eligibility_rules and self.approval
 
     @property
     def can_be_cancelled(self):
         if self.hiring_start_at:
-            today = datetime.date.today()
-            delay_ends_at = self.hiring_start_at + relativedelta(days=self.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            return today <= delay_ends_at
+            # A job application can be cancelled provided that
+            # there is no employee record linked with a status:
+            # - SENT
+            # - ACCEPTED
+            # (likely to be accepted or already accepted by ASP)
+            employee_record = self.employee_record.first()
+            blocked = employee_record and employee_record.is_blocking_job_application_cancellation
+            return not blocked
         return False
 
     @property
@@ -536,10 +531,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             JobApplicationWorkflow.STATE_CANCELLED,
             JobApplicationWorkflow.STATE_OBSOLETE,
         ]
-
-    @property
-    def cancellation_delay_end(self):
-        return self.hiring_start_at + relativedelta(days=self.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
 
     @property
     def is_refused_due_to_deactivation(self):
@@ -700,6 +691,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_at = None
             self.approval_delivery_mode = ""
             self.approval_manually_delivered_by = None
+
+        # Delete matching employee record, if any
+        employee_record = self.employee_record.first()
+        if employee_record:
+            employee_record.delete()
 
         # Send notification.
         user = kwargs.get("user")

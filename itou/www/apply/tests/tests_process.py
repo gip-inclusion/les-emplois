@@ -9,6 +9,8 @@ from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.employee_record.factories import EmployeeRecordFactory
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -537,14 +539,14 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_application.state.is_cancelled)
 
     def test_cannot_cancel(self):
-        cancellation_period_end = timezone.localdate() - relativedelta(
-            days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
-        )
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
-            hiring_start_at=(cancellation_period_end - relativedelta(days=1)),
+            hiring_start_at=timezone.localdate() + relativedelta(days=1),
         )
         siae_user = job_application.to_siae.members.first()
+        # Add a blocking employee record
+        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.PROCESSED)
+
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
@@ -580,6 +582,7 @@ class ProcessViewsTest(TestCase):
             "city_slug": city.slug,
         }
         response = self.client.post(url_accept, data=post_data)
+
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url)
 

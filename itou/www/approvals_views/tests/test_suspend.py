@@ -6,8 +6,10 @@ from django.utils.http import urlencode
 
 from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
+from itou.employee_record.factories import EmployeeRecordFactory
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -22,11 +24,11 @@ class ApprovalSuspendViewTest(TestCase):
 
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
-            # Ensure that the job_application cannot be canceled.
-            hiring_start_at=today
-            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            - relativedelta(days=1),
+            hiring_start_at=today - relativedelta(days=1),
         )
+
+        # Ensure that the job_application cannot be canceled.
+        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.PROCESSED)
 
         approval = job_application.approval
         self.assertEqual(0, approval.suspension_set.count())
@@ -82,9 +84,7 @@ class ApprovalSuspendViewTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
-            hiring_start_at=today
-            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            - relativedelta(days=1),
+            hiring_start_at=today - relativedelta(days=1),
         )
 
         approval = job_application.approval
@@ -132,9 +132,7 @@ class ApprovalSuspendViewTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
-            hiring_start_at=today
-            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            - relativedelta(days=1),
+            hiring_start_at=today - relativedelta(days=1),
         )
 
         approval = job_application.approval

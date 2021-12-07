@@ -104,7 +104,6 @@ class EmployeeRecord(models.Model):
     """
 
     ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED = "La candidature doit être acceptée"
-    ERROR_JOB_APPLICATION_TOO_RECENT = "L'embauche a été validé trop récemment"
     ERROR_JOB_SEEKER_TITLE = "La civilité du salarié est obligatoire"
     ERROR_JOB_SEEKER_BIRTH_COUNTRY = "Le pays de naissance est obligatoire"
     ERROR_JOB_APPLICATION_WITHOUT_APPROVAL = "L'embauche n'est pas reliée à un PASS IAE"
@@ -232,9 +231,6 @@ class EmployeeRecord(models.Model):
 
         if not self.job_application.approval:
             raise ValidationError(self.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL)
-
-        if self.job_application.can_be_cancelled:
-            raise ValidationError(self.ERROR_JOB_APPLICATION_TOO_RECENT)
 
     def _clean_job_seeker(self):
         """
@@ -492,6 +488,17 @@ class EmployeeRecord(models.Model):
             self._batch_line_number = 1
 
         return self._batch_line_number
+
+    @property
+    def is_blocking_job_application_cancellation(self):
+        """
+        Linked job application can't be cancelled if the employee record
+        is sent or already processed.
+        """
+        return self.status in [
+            EmployeeRecord.Status.SENT,
+            EmployeeRecord.Status.PROCESSED,
+        ]
 
     @staticmethod
     def siret_from_asp_source(siae):
