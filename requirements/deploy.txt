@@ -2,4 +2,4 @@
 
 uwsgi==2.0.19.1  # https://github.com/unbit/uwsgi
 sentry-sdk==1.5.0  # https://github.com/getsentry/sentry-python
-elastic-apm==6.7.1  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
+elastic-apm==6.7.2  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
