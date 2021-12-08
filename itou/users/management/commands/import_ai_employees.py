@@ -274,7 +274,7 @@ class Command(BaseCommand):
                 if not row.nir_is_valid:
                     ignored_nirs += 1
 
-                job_seeker = User.objects.filter(nir=row[NIR_COL]).first()
+                job_seeker = User.objects.filter(nir=row[NIR_COL]).exclude(nir="").first()
                 if not job_seeker:
                     job_seeker = User.objects.filter(email=row[EMAIL_COL]).first()
 
@@ -421,12 +421,13 @@ class Command(BaseCommand):
         df["nir_is_valid"] = ~df[NIR_COL].isnull()
         df["siret_is_valid"] = df.apply(self.siret_is_valid, axis=1)
 
+        # Replace empty values by "" instead of NaN.
+        df = df.fillna("")
+
         # Users with invalid NIRS are stored but without a NIR.
         invalid_nirs = df[~df.nir_is_valid]
         df.loc[invalid_nirs.index, "Commentaire"] = "NIR invalide. Utilisateur potentiellement créé sans NIR."
-
-        # Replace empty values by "" instead of NaN.
-        df = df.fillna("")
+        self.logger.info(f"Invalid nirs: {len(invalid_nirs)}.")
 
         self.logger.info("🚮 STEP 2: remove rows!")
         cleaned_df = df.copy()
