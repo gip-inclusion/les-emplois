@@ -1,7 +1,6 @@
 import datetime
 from unittest import mock
 
-import pytz
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.test import TestCase
@@ -251,7 +250,7 @@ class ApplyAsJobSeekerTest(TestCase):
 
         # Avoid COVID lockdown specific cases
         now_date = PoleEmploiApproval.LOCKDOWN_START_AT - relativedelta(months=1)
-        now = timezone.datetime(year=now_date.year, month=now_date.month, day=now_date.day, tzinfo=pytz.utc)
+        now = timezone.datetime(year=now_date.year, month=now_date.month, day=now_date.day, tzinfo=timezone.utc)
 
         with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
             siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
