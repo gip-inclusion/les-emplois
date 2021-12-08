@@ -10,6 +10,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.core.mail.message import EmailMessage
+from django.http import HttpResponse
 from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from factory import Faker
@@ -51,6 +52,17 @@ from itou.utils.validators import (
 )
 
 
+def get_response_for_middlewaremixin(request):
+    """
+    `SessionMiddleware` inherits from `MiddlewareMixin` which requires
+    a `get_response` argument since Django 4.0:
+    https://github.com/django/django/pull/11828
+
+    An empty `HttpResponse` does the trick.
+    """
+    return HttpResponse()
+
+
 class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
     """Test `itou.utils.perms.context_processors.get_current_organization_and_perms` processor."""
 
@@ -75,7 +87,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         factory = RequestFactory()
         request = factory.get("/")
         request.user = user
-        middleware = SessionMiddleware()
+        middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         request.session[establishment_session_key] = establishment_pk
         request.session.save()
@@ -486,7 +498,7 @@ class PermsUserTest(TestCase):
         factory = RequestFactory()
         request = factory.get("/")
         request.user = user
-        middleware = SessionMiddleware()
+        middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
@@ -506,7 +518,7 @@ class PermsUserTest(TestCase):
         factory = RequestFactory()
         request = factory.get("/")
         request.user = user
-        middleware = SessionMiddleware()
+        middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
         request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
@@ -526,7 +538,7 @@ class PermsUserTest(TestCase):
         factory = RequestFactory()
         request = factory.get("/")
         request.user = user
-        middleware = SessionMiddleware()
+        middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
         request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
@@ -545,7 +557,7 @@ class PermsUserTest(TestCase):
         factory = RequestFactory()
         request = factory.get("/")
         request.user = user
-        middleware = SessionMiddleware()
+        middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         request.session.save()
 
@@ -562,7 +574,7 @@ class PermsUserTest(TestCase):
         factory = RequestFactory()
         request = factory.get("/")
         request.user = user
-        middleware = SessionMiddleware()
+        middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         request.session.save()
 
