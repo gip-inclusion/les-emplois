@@ -92,6 +92,14 @@ class Command(BaseCommand):
             dest="sample_size",
             help="Sample size to run this script with (instead of the whole file).",
         )
+
+        parser.add_argument(
+            "--invalid-nirs-only",
+            dest="invalid_nirs_only",
+            action="store_true",
+            help="Only save users whose NIR is invalid.",
+        )
+
         parser.add_argument(
             "--file-path",
             dest="file_path",
@@ -382,7 +390,7 @@ class Command(BaseCommand):
 
         self.log_to_csv("emailing", emailing_rows)
 
-    def handle(self, file_path, developer_email, dry_run=False, **options):
+    def handle(self, file_path, developer_email, dry_run=False, invalid_nirs_only=False, **options):
         """
         Each line represents a contract.
         1/ Read the file and clean data.
@@ -428,6 +436,9 @@ class Command(BaseCommand):
         self.logger.info(f"Invalid nirs: {len(invalid_nirs)}.")
 
         self.logger.info("🚮 STEP 2: remove rows!")
+        if invalid_nirs_only:
+            df = invalid_nirs
+
         cleaned_df = df.copy()
 
         # Exclude ended contracts.
