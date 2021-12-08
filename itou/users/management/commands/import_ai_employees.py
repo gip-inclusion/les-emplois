@@ -315,8 +315,6 @@ class Command(BaseCommand):
                                 succedded = True
                             except IntegrityError:
                                 pass
-                        # Make sure approval.pk is set.
-                        approval.refresh_from_db()
 
                 # Create a new job application.
                 siae = Siae.objects.get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
