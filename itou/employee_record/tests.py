@@ -180,7 +180,7 @@ class EmployeeRecordBatchTest(TestCase):
         with self.assertRaises(ValidationError):
             EmployeeRecordBatch.feedback_filename("test.json")
 
-        self.assertEquals(
+        self.assertEqual(
             "RIAE_FS_20210410130000_FichierRetour.json",
             EmployeeRecordBatch.feedback_filename("RIAE_FS_20210410130000.json"),
         )

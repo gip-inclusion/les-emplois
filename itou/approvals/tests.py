@@ -487,7 +487,7 @@ class ApprovalModelTest(TestCase):
             end_at=today + relativedelta(months=2),
             reason=Suspension.Reason.BROKEN_CONTRACT.value,
         )
-        self.assertEquals(suspension.pk, approval.last_in_progress_suspension.pk)
+        self.assertEqual(suspension.pk, approval.last_in_progress_suspension.pk)
 
     def test_last_in_progress_without_suspension_in_progress(self):
         today = timezone.now().date()
@@ -512,7 +512,7 @@ class ApprovalModelTest(TestCase):
         )
         approval.unsuspend(hiring_start_at=today)
         suspension.refresh_from_db()
-        self.assertEquals(suspension.end_at, today - relativedelta(days=1))
+        self.assertEqual(suspension.end_at, today - relativedelta(days=1))
 
     def test_unsuspend_invalid(self):
         today = timezone.now().date()
@@ -527,7 +527,7 @@ class ApprovalModelTest(TestCase):
         )
         approval.unsuspend(hiring_start_at=today)
         suspension.refresh_from_db()
-        self.assertEquals(suspension.end_at, suspension_end_at)
+        self.assertEqual(suspension.end_at, suspension_end_at)
 
 
 class PoleEmploiApprovalModelTest(TestCase):

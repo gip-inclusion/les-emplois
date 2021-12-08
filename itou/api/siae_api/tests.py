@@ -64,8 +64,8 @@ class SiaeAPIFetchListTest(APITestCase):
         query_params = {"code_insee": 12345, "distance_max_km": 10}
         response = self.client.get(ENDPOINT_URL, query_params, format="json")
 
-        self.assertEquals(response.content, b'{"detail":"Pas de ville avec pour code_insee 12345"}')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.content, b'{"detail":"Pas de ville avec pour code_insee 12345"}')
+        self.assertEqual(response.status_code, 404)
 
     def test_fetch_siae_list(self):
         """
@@ -76,8 +76,8 @@ class SiaeAPIFetchListTest(APITestCase):
         response = self.client.get(ENDPOINT_URL, query_params, format="json")
 
         body = json.loads(response.content)
-        self.assertEquals(body["count"], 2)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(body["count"], 2)
+        self.assertEqual(response.status_code, 200)
 
     def test_fetch_siae_list_too_far(self):
         """
@@ -88,5 +88,5 @@ class SiaeAPIFetchListTest(APITestCase):
         response = self.client.get(ENDPOINT_URL, query_params, format="json")
 
         body = json.loads(response.content)
-        self.assertEquals(body["count"], 0)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(body["count"], 0)
+        self.assertEqual(response.status_code, 200)
