@@ -7,7 +7,7 @@ ipdb==0.13.9  # https://github.com/gotcha/ipdb
 tblib==1.7.0  # https://github.com/ionelmc/python-tblib
 
 # Werkzeug is required to use django-extensions's runserver_plus.
-Werkzeug==1.0.1  # pyup: < 2 # https://github.com/pallets/werkzeug
+Werkzeug==2.0.2 # https://github.com/pallets/werkzeug
 
 # Last jedi release (0.18.0) is incompatible with ipython
 # https://github.com/ipython/ipython/issues/12740
@@ -19,23 +19,23 @@ jedi==0.17.2
 flake8==3.9.2  # https://github.com/PyCQA/flake8
 black==21.7b0  # https://github.com/psf/black
 isort==5.9.3  # https://github.com/timothycrosley/isort
-pylint==2.9.6  # https://github.com/PyCQA/pylint
+pylint==2.12.2  # https://github.com/PyCQA/pylint
 pylint-django==2.4.3  # https://github.com/PyCQA/pylint-django
-pre-commit==2.13.0  # https://github.com/pre-commit/pre-commit
-coverage==5.5  # https://github.com/nedbat/coveragepy
+pre-commit==2.16.0  # https://github.com/pre-commit/pre-commit
+coverage==6.2  # https://github.com/nedbat/coveragepy
 
 # Django
 # ------------------------------------------------------------------------------
-factory-boy==3.2.0  # https://github.com/FactoryBoy/factory_boy
+factory-boy==3.2.1  # https://github.com/FactoryBoy/factory_boy
 
-django-debug-toolbar==3.2.1  # https://github.com/jazzband/django-debug-toolbar
-django-extensions==3.1.3  # https://github.com/django-extensions/django-extensions
+django-debug-toolbar==3.2.2  # https://github.com/jazzband/django-debug-toolbar
+django-extensions==3.1.5  # https://github.com/django-extensions/django-extensions
 django-admin-logs==1.0.2  # https://pypi.org/project/django-admin-logs/
 
 # Test & Mock
 # ------------------------------------------------------------------------------
 requests-mock==1.9.3  # https://github.com/jamielennox/requests-mock
-respx==0.17.1  # https://lundberg.github.io/respx/
+respx==0.19.0  # https://lundberg.github.io/respx/
 
 # Data extracts
 # ------------------------------------------------------------------------------
