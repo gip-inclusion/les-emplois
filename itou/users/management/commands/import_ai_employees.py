@@ -8,6 +8,7 @@ import uuid
 from pathlib import Path
 
 import pandas as pd
+import pytz
 import unidecode
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -326,6 +327,7 @@ class Command(BaseCommand):
 
                 # Create a new job application.
                 siae = Siae.objects.get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
+                job_app_created_at = datetime.datetime(2021, 11, 30, 20, 50, 00, tzinfo=pytz.utc)
                 job_app_dict = {
                     "sender": siae.active_admin_members.first(),
                     "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
@@ -338,6 +340,7 @@ class Command(BaseCommand):
                     "approval_id": approval.pk,
                     "approval_manually_delivered_by": developer,
                     "create_employee_record": False,
+                    "created_at": job_app_created_at,
                 }
                 job_application = JobApplication(**job_app_dict)
                 created_job_applications += 1
