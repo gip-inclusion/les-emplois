@@ -513,6 +513,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_be_cancelled(self):
+        if self.is_from_ai_stock:
+            return False
         if self.hiring_start_at:
             # A job application can be canceled provided that
             # there is no employee record linked with a status:
