@@ -514,7 +514,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def can_be_cancelled(self):
         if self.hiring_start_at:
-            # A job application can be cancelled provided that
+            # A job application can be canceled provided that
             # there is no employee record linked with a status:
             # - SENT
             # - ACCEPTED
@@ -537,6 +537,22 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return (
             self.state == JobApplicationWorkflow.STATE_REFUSED
             and self.refusal_reason == self.REFUSAL_REASON_DEACTIVATION
+        )
+
+    @property
+    def is_from_ai_stock(self):
+        """On November 30th, 2021, we created job applications to deliver approvals.
+        See itou.users.management.commands.import_ai_employees.
+        """
+        # Avoid a circular import.
+        user_manager = self.job_seeker._meta.model.objects
+        developer_qs = user_manager.filter(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        if not developer_qs:
+            return False
+        developer = developer_qs.first()
+        return (
+            self.approval_manually_delivered_by == developer
+            and self.created_at.date() == settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date()
         )
 
     @property

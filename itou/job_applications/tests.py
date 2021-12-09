@@ -175,6 +175,24 @@ class JobApplicationModelTest(TestCase):
             job_application = JobApplicationFactory(state=state)
             self.assertTrue(job_application.can_be_archived)
 
+    def test_is_from_ai_stock(self):
+        job_application_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+
+        job_application = JobApplicationFactory.build()
+        self.assertFalse(job_application.is_from_ai_stock)
+
+        job_application = JobApplicationFactory.build(created_at=job_application_created_at)
+        self.assertFalse(job_application.is_from_ai_stock)
+
+        job_application = JobApplicationFactory.build(approval_manually_delivered_by=developer)
+        self.assertFalse(job_application.is_from_ai_stock)
+
+        job_application = JobApplicationFactory.build(
+            created_at=job_application_created_at, approval_manually_delivered_by=developer
+        )
+        self.assertTrue(job_application.is_from_ai_stock)
+
 
 class JobApplicationQuerySetTest(TestCase):
     def test_created_in_past(self):
