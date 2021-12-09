@@ -229,6 +229,7 @@ class Command(BaseCommand):
         cleaned_df = cleaned_df.copy()
 
         created_users = 0
+        already_existing_users = 0
         ignored_nirs = 0
         already_existing_approvals = 0
         created_approvals = 0
@@ -289,6 +290,7 @@ class Command(BaseCommand):
                     user_data["nir"] = None
 
                 job_seeker = User.objects.filter(nir=user_data["nir"]).exclude(nir__isnull=True).first()
+
                 if not job_seeker:
                     job_seeker = User.objects.filter(email=user_data["email"]).first()
 
@@ -298,8 +300,21 @@ class Command(BaseCommand):
                     user_data["email"] = self.fake_email()
                     job_seeker = None
 
-                # Create a job seeker.
                 if not job_seeker:
+                    # Find users created previously by this script,
+                    # either because a bug forced us to interrupt it
+                    # or because we had to run it twice to import new users.
+                    job_seeker = User.objects.filter(
+                        first_name=user_data["first_name"],
+                        last_name=user_data["last_name"],
+                        birthdate=user_data["birthdate"].date(),
+                        created_by=developer,
+                        date_joined__date=objects_created_at.date(),
+                    ).first()
+
+                if job_seeker:
+                    already_existing_users += 1
+                else:
                     if self.dry_run:
                         job_seeker = User(**user_data)
                     else:
@@ -359,6 +374,7 @@ class Command(BaseCommand):
             original_df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
 
         self.logger.info("Import is over!")
+        self.logger.info(f"Already existing users: {already_existing_users}.")
         self.logger.info(f"Created users: {created_users}.")
         self.logger.info(f"Ignored NIRs: {ignored_nirs}.")
         self.logger.info(f"Already existing approvals: {already_existing_approvals}.")
