@@ -127,7 +127,8 @@ class JobApplicationModelTest(TestCase):
     def test_can_be_cancelled(self):
         """
         A user can cancel a job application provided that it has no related
-        employee record in SENT or PROCESSED state.
+        employee record in SENT or PROCESSED state or that is does not come from
+        AI stock.
         """
         today = datetime.date.today()
         job_application_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
@@ -150,6 +151,14 @@ class JobApplicationModelTest(TestCase):
 
         EmployeeRecordFactory(job_application=job_application_not_ok, status=EmployeeRecord.Status.PROCESSED)
         self.assertFalse(job_application_not_ok.can_be_cancelled)
+
+        # Comes from AI stock.
+        # See users.management.commands.import_ai_employees
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        job_application = JobApplicationFactory.build(
+            approval_manually_delivered_by=developer, created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
+        )
+        self.assertFalse(job_application.can_be_cancelled)
 
     def test_can_be_archived(self):
         """
