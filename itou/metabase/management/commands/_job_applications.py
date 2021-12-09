@@ -206,4 +206,10 @@ TABLE_COLUMNS += [
         "comment": "Date embauche le cas échéant",
         "fn": get_ja_hiring_date,
     },
+    {
+        "name": "injection_ai",
+        "type": "boolean",
+        "comment": "Provient des injections AI",
+        "fn": lambda o: o.approval.is_from_ai_stock if o.approval else False,
+    },
 ]
