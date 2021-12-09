@@ -6,6 +6,7 @@ L'objectif est de créer une table agrégée avec l'indicateur nombre de sorties
     - niveau de formation du salarié
     - commune de la structure
     - établissement public territorial
+    - établissements publics de coopération intercommunale
     - département et région de l'annexe financière
   
 Un filtre est appliqué pour récupérer un historique de 2 ans en plus de l'année en cours
@@ -15,7 +16,8 @@ Un filtre est appliqué pour récupérer un historique de 2 ans en plus de l'ann
 select 
     count(distinct(identifiant_salarie)) as nombre_sorties, 
     date_part('year', date_sortie) as annee_sortie,
-    etablissement_Public_Territorial, 
+    etablissement_Public_Territorial,
+    nom_epci,
     niveau_formation_salarie,
     genre_salarie,
     rsa, 
@@ -36,10 +38,10 @@ where
     date_part('year', date_sortie) >= (date_part('year', current_date) - 2)
     /* Prendre en compte les salariés qui ont travaillé au moins une heure dans la structure */
     and nombre_heures_travaillees >= 1
-    and date_part('year', date_sortie) = date_part('year', date_saisie) 
 group by 
     annee_sortie,  
-    etablissement_Public_Territorial, 
+    etablissement_Public_Territorial,
+    nom_epci,
     niveau_formation_salarie,
     genre_salarie,
     rsa, 
