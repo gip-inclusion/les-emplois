@@ -347,6 +347,8 @@ class UtilsValidatorsTest(TestCase):
         validate_nir("141062a78200555")
         # Haute-Corse
         validate_nir("141062B78200582")
+        # Valid number with fictitious month
+        validate_nir("141208078200587")
         self.assertRaises(ValidationError, validate_nir, "123456789")
         self.assertRaises(ValidationError, validate_nir, "141068078200557123")
         # Should start with 1 or 2.
