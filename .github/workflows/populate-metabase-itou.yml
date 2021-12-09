@@ -88,7 +88,7 @@ jobs:
       run: $CLEVER_CLI deploy --alias $CRON_TASK_APP_NAME --branch $DEPLOY_BRANCH --force
 
     - name: 🕒 Wait a reasonable amount of time for the script to complete
-      run: sleep 5400
+      run: sleep 10800
 
     - name: 🔪 Delete the app once the work is done
       run:
