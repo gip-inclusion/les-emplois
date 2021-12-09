@@ -9,13 +9,11 @@ from pathlib import Path
 
 import pandas as pd
 import pytz
-import unidecode
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.utils import IntegrityError
-from django.utils.text import slugify
 from tqdm import tqdm
 
 from itou.approvals.models import Approval
