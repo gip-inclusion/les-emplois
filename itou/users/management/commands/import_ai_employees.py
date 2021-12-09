@@ -233,6 +233,7 @@ class Command(BaseCommand):
         ignored_nirs = 0
         already_existing_approvals = 0
         created_approvals = 0
+        already_existing_job_apps = 0
         created_job_applications = 0
 
         # A fixed creation date allows us to retrieve objects
@@ -347,25 +348,38 @@ class Command(BaseCommand):
                     created_approvals += 1
 
                 # Create a new job application.
-                siae = Siae.objects.get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
-                job_app_dict = {
-                    "sender": siae.active_admin_members.first(),
-                    "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
-                    "sender_siae": siae,
-                    "to_siae": siae,
-                    "job_seeker": job_seeker,
-                    "state": JobApplicationWorkflow.STATE_ACCEPTED,
-                    "hiring_start_at": row[CONTRACT_STARTDATE_COL],
-                    "approval_delivery_mode": JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
-                    "approval_id": approval.pk,
-                    "approval_manually_delivered_by": developer,
-                    "create_employee_record": False,
-                    "created_at": objects_created_at,
-                }
-                job_application = JobApplication(**job_app_dict)
-                created_job_applications += 1
-                if not self.dry_run:
-                    job_application.save()
+                siae = Siae.objects.prefetch_related("memberships").get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
+
+                # Find job applications created previously by this script,
+                # either because a bug forced us to interrupt it
+                # or because we had to run it twice to import new users.
+                job_application_exists = JobApplication.objects.filter(
+                    to_siae=siae,
+                    approval_manually_delivered_by=developer,
+                    created_at__date=objects_created_at.date(),
+                    job_seeker=job_seeker,
+                ).exists()
+                if job_application_exists:
+                    already_existing_job_apps += 1
+                else:
+                    job_app_dict = {
+                        "sender": siae.active_admin_members.first(),
+                        "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
+                        "sender_siae": siae,
+                        "to_siae": siae,
+                        "job_seeker": job_seeker,
+                        "state": JobApplicationWorkflow.STATE_ACCEPTED,
+                        "hiring_start_at": row[CONTRACT_STARTDATE_COL],
+                        "approval_delivery_mode": JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
+                        "approval_id": approval.pk,
+                        "approval_manually_delivered_by": developer,
+                        "create_employee_record": False,
+                        "created_at": objects_created_at,
+                    }
+                    job_application = JobApplication(**job_app_dict)
+                    if not self.dry_run:
+                        job_application.save()
+                    created_job_applications += 1
 
             # Update dataframe values.
             # https://stackoverflow.com/questions/25478528/updating-value-in-iterrow-for-pandas
@@ -379,6 +393,7 @@ class Command(BaseCommand):
         self.logger.info(f"Ignored NIRs: {ignored_nirs}.")
         self.logger.info(f"Already existing approvals: {already_existing_approvals}.")
         self.logger.info(f"Created approvals: {created_approvals}.")
+        self.logger.info(f"Already existing job applications: {already_existing_job_apps}.")
         self.logger.info(f"Created job applications: {created_job_applications}.")
 
         return original_df, cleaned_df
