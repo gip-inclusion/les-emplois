@@ -236,6 +236,11 @@ class Command(BaseCommand):
         created_approvals = 0
         created_job_applications = 0
 
+        # A fixed creation date allows us to retrieve objects
+        # created by  this script.
+        # See Approval.is_from_ai_stock for example.
+        objects_created_at = datetime.datetime(2021, 11, 30, 20, 50, 00, tzinfo=pytz.utc)
+
         # Get developer account by email.
         # Used to store who created the following users, approvals and job applications.
         developer = User.objects.get(email=self.developer_email)
@@ -276,6 +281,7 @@ class Command(BaseCommand):
                     "department": department_from_postcode(row[POST_CODE_COL]),
                     "phone": row[PHONE_COL],
                     "nir": row[NIR_COL],
+                    "date_joined": objects_created_at,
                 }
 
                 # If NIR is not valid, row[NIR_COL] is empty.
@@ -312,6 +318,7 @@ class Command(BaseCommand):
                         end_at=datetime.date(2023, 11, 30),
                         user_id=job_seeker.pk,
                         created_by=developer,
+                        created_at=objects_created_at,
                     )
                     created_approvals += 1
                     if not self.dry_run:
@@ -328,7 +335,6 @@ class Command(BaseCommand):
 
                 # Create a new job application.
                 siae = Siae.objects.get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
-                job_app_created_at = datetime.datetime(2021, 11, 30, 20, 50, 00, tzinfo=pytz.utc)
                 job_app_dict = {
                     "sender": siae.active_admin_members.first(),
                     "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
@@ -341,7 +347,7 @@ class Command(BaseCommand):
                     "approval_id": approval.pk,
                     "approval_manually_delivered_by": developer,
                     "create_employee_record": False,
-                    "created_at": job_app_created_at,
+                    "created_at": objects_created_at,
                 }
                 job_application = JobApplication(**job_app_dict)
                 created_job_applications += 1
