@@ -54,9 +54,17 @@ def validate_nir(nir):
     if len(nir) < 15:
         raise ValidationError("Le numéro de sécurité sociale est trop court (15 caractères autorisés).")
     # God bless forums.
-    nir_regex = r"^[12][0-9]{2}[0-1][0-9](2[AB]|[0-9]{2})[0-9]{3}[0-9]{3}[0-9]{2}$"
+    nir_regex = r"^[12][0-9]{2}[0-9]{2}(2[AB]|[0-9]{2})[0-9]{3}[0-9]{3}[0-9]{2}$"
+
     match = re.match(nir_regex, nir)
     if not match:
+        raise ValidationError("Ce numéro n'est pas valide.")
+
+    # For the month of birth, fictitious codes are assigned for persons registered on the basis of an incomplete civil
+    # status certificate. A valid month can also be between 20 and 42 or between 50 and 99.
+    # Source : https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France#ancrage_B
+    month = int(nir[3:5])
+    if (month > 12 and month < 20) or (month > 42 and month < 50):
         raise ValidationError("Ce numéro n'est pas valide.")
 
     # Last 2 digits validate previous 13 characters.
