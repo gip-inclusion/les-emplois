@@ -67,7 +67,7 @@ from itou.utils.slack import send_slack_message
 
 
 # Emit more verbose slack messages about every step, not just the beginning and the ending of the command.
-VERBOSE_SLACK_MESSAGES = False
+VERBOSE_SLACK_MESSAGES = True
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:
