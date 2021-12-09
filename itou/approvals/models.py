@@ -270,8 +270,9 @@ class Approval(CommonApprovalMixin):
         if not developer_qs:
             return False
         developer = developer_qs.first()
-        approval_creation_date = datetime.date(2021, 11, 30)
-        return self.created_by == developer and self.created_at.date() == approval_creation_date
+        return (
+            self.created_by == developer and self.created_at.date() == settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date()
+        )
 
     def can_be_suspended_by_siae(self, siae):
         return (

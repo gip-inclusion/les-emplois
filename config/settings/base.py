@@ -479,6 +479,7 @@ ASP_ITOU_PREFIX = "99999"
 # On November 30th, 2021, we delivered approvals for AI structures.
 # See itou.users.management.commands.import_ai_employees
 AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = os.environ.get("AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL", "")
+AI_EMPLOYEES_STOCK_IMPORT_DATE = datetime.datetime(2021, 11, 30, tzinfo=pytz.utc)
 
 # Metabase
 # ------------------------------------------------------------------------------
