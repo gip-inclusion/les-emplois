@@ -95,3 +95,12 @@ TABLE_COLUMNS += get_department_and_region_columns(
     comment_suffix=(" de la structure qui a embauché si PASS IAE ou du PE qui a délivré l agrément si Agrément PE"),
     custom_fn=get_siae_or_pe_org_from_approval,
 )
+
+TABLE_COLUMNS += [
+    {
+        "name": "injection_ai",
+        "type": "boolean",
+        "comment": "Provient des injections AI",
+        "fn": lambda o: o.is_from_ai_stock if isinstance(o, Approval) else False,
+    },
+]
