@@ -6,7 +6,8 @@ select
     /* On prend le min des dates de recrutement par salarié et par convention */
     min(date_recrutement) as min_date_recrutement,
     date_part('year', date_recrutement) as annee_recrutement, 
-    etablissement_Public_Territorial, 
+    etablissement_Public_Territorial,
+    nom_epci,
     niveau_formation_salarie,
     genre_salarie,
     rsa, 
@@ -25,7 +26,8 @@ from
 where date_part('year', date_recrutement) >= (date_part('year', current_date) - 2)
 group by 
     annee_recrutement,
-    etablissement_Public_Territorial, 
+    etablissement_Public_Territorial,
+    nom_epci,
     niveau_formation_salarie,
     genre_salarie,
     rsa, 
