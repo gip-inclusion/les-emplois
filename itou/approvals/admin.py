@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.urls import path
 from django.urls.base import reverse
 from django.utils.html import format_html
@@ -6,6 +6,7 @@ from django.utils.html import format_html
 from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 
 
@@ -119,6 +120,18 @@ class ApprovalAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             obj.created_by = request.user
+
+        # Is there an employee record linked ?
+        employee_record = EmployeeRecord.objects.filter(approval_number=obj.number).first()
+        if employee_record and employee_record.status in [EmployeeRecord.Status.PROCESSED, EmployeeRecord.Status.SENT]:
+            messages.set_level(request, messages.ERROR)
+            messages.error(
+                request,
+                f"Il existe une fiche salarié bloquante (ID: {employee_record.pk})"
+                "pour la modification de ce PASS IAE ({obj.number}).",
+            )
+            return
+
         super().save_model(request, obj, form, change)
 
     def is_valid(self, obj):

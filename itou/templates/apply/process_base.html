@@ -61,11 +61,6 @@
                                     Télécharger le PASS IAE
                             </a>
                         {% endif %}
-                        {% if job_application.can_be_cancelled %}
-                            <a class="btn btn-outline-secondary disabled w-100">
-                                Disponible au téléchargement après le {{ job_application.hiring_start_at|date:"d/m/Y" }}
-                            </a>
-                        {% endif %}
                     {% endif %}
 
                 </div>
