@@ -123,7 +123,7 @@ class ApprovalAdmin(admin.ModelAdmin):
 
         # Is there an employee record linked ?
         employee_record = EmployeeRecord.objects.filter(approval_number=obj.number).first()
-        if employee_record and employee_record.status in [EmployeeRecord.Status.PROCESSED, EmployeeRecord.Status.SENT]:
+        if employee_record and employee_record.is_blocking_job_application_cancellation:
             messages.set_level(request, messages.ERROR)
             messages.error(
                 request,
