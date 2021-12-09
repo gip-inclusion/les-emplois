@@ -43,7 +43,7 @@ POST_CODE_COL = "codepostalcedex"
 SIAE_NAME_COL = "pmo_denom_soc"
 SIRET_COL = "pmo_siret"
 PASS_IAE_NUMBER_COL = "Numéro de PASS IAE"
-USER_PK = "ID utilisateur"
+USER_PK = "ID salarié"
 
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -384,7 +384,7 @@ class Command(BaseCommand):
             # Update dataframe values.
             # https://stackoverflow.com/questions/25478528/updating-value-in-iterrow-for-pandas
             cleaned_df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
-            cleaned_df.loc[i, USER_PK] = job_seeker.pk
+            original_df.loc[i, USER_PK] = job_seeker.jobseeker_hash_id
             original_df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
 
         self.logger.info("Import is over!")
@@ -453,7 +453,7 @@ class Command(BaseCommand):
         # Will be shared with the ASP.
         df["Commentaire"] = ""
 
-        # Add an "approval" column to share with the ASP the PASS IAE number.
+        # Add columns to share data with the ASP.
         df[PASS_IAE_NUMBER_COL] = ""
         df[USER_PK] = ""
 
@@ -504,7 +504,7 @@ class Command(BaseCommand):
         df, cleaned_df = self.import_data_into_itou(original_df=df, cleaned_df=cleaned_df)
 
         # Step 4: create a CSV file including comments to be shared with the ASP.
-        df = df.drop([USER_PK, "nir_is_valid", "siret_is_valid"], axis=1)  # Remove useless columns.
+        df = df.drop(["nir_is_valid", "siret_is_valid"], axis=1)  # Remove useless columns.
         self.log_to_csv("fichier_final", df)
         self.logger.info("📖 STEP 4: log final results.")
         self.logger.info("You can transfer this file to the ASP: /exports/import_ai_bilan.csv")
