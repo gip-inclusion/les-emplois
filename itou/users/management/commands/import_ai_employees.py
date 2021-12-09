@@ -300,11 +300,11 @@ class Command(BaseCommand):
 
                 # Create a job seeker.
                 if not job_seeker:
-                    created_users += 1
                     if self.dry_run:
                         job_seeker = User(**user_data)
                     else:
                         job_seeker = User.create_job_seeker_by_proxy(developer, **user_data)
+                    created_users += 1
 
                 # If job seeker has already a valid approval: don't redeliver it.
                 if job_seeker.approvals.valid().exists():
@@ -318,7 +318,6 @@ class Command(BaseCommand):
                         created_by=developer,
                         created_at=objects_created_at,
                     )
-                    created_approvals += 1
                     if not self.dry_run:
                         # In production, it can raise an IntegrityError if another PASS has just been delivered a few seconds ago.
                         # Try to save with another number until it succeeds.
@@ -330,6 +329,7 @@ class Command(BaseCommand):
                                 succedded = True
                             except IntegrityError:
                                 pass
+                    created_approvals += 1
 
                 # Create a new job application.
                 siae = Siae.objects.get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
