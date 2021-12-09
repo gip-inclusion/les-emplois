@@ -282,10 +282,11 @@ class Command(BaseCommand):
                 # See `self.clean_nir`.
                 if not row.nir_is_valid:
                     ignored_nirs += 1
+                    user_data["nir"] = None
 
-                job_seeker = User.objects.filter(nir=row[NIR_COL]).exclude(nir="").first()
+                job_seeker = User.objects.filter(nir=user_data["nir"]).exclude(nir__isnull=True).first()
                 if not job_seeker:
-                    job_seeker = User.objects.filter(email=row[EMAIL_COL]).first()
+                    job_seeker = User.objects.filter(email=user_data["email"]).first()
 
                 # Some e-mail addresses belong to prescribers!
                 if job_seeker and not job_seeker.is_job_seeker:
