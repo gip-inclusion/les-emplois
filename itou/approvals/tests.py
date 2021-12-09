@@ -422,8 +422,7 @@ class ApprovalModelTest(TestCase):
         self.assertEqual(approval.end_at, end_at)  # Should NOT extended.
 
     def test_is_from_ai_stock(self):
-        approval_created_at = timezone.datetime(2021, 11, 30)
-        approval_created_at = timezone.make_aware(approval_created_at)
+        approval_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
 
         approval = ApprovalFactory()

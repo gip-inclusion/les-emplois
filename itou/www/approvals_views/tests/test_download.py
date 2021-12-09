@@ -4,7 +4,6 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
-from django.utils import timezone
 
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
@@ -81,7 +80,7 @@ class TestDownloadApprovalAsPDF(TestCase):
 
         # On November 30th, 2021, AI were delivered approvals without a diagnosis.
         # See itou.users.management.commands.import_ai_employees.
-        approval_created_at = timezone.datetime(2021, 11, 30, tzinfo=timezone.utc)
+        approval_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
         approval_created_by = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         job_application = JobApplicationWithApprovalFactory(
             eligibility_diagnosis=None,
