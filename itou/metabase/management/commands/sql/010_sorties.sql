@@ -1,6 +1,6 @@
 /*
  
-L'objectif est de créer une table agrégée avec l'indicateur nombre de sorties pas type de public cible:
+L'objectif est de créer une table agrégée avec l'indicateur nombre de sorties par type de public cible :
     - genre du salarié
     - RSA
     - niveau de formation du salarié
