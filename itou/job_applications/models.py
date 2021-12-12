@@ -17,14 +17,15 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.utils.apis.esd import get_access_token
-from itou.utils.apis.pole_emploi import PoleEmploiMiseAJourPass  # noqa
 from itou.utils.apis.pole_emploi import PoleEmploiMiseAJourPassIAEAPI  # noqa
 from itou.utils.apis.pole_emploi import PoleEmploiRechercheIndividuCertifieAPI  # noqa
 from itou.utils.apis.pole_emploi import (  # noqa
     PoleEmploiIndividu,
     PoleEmploiIndividualException,
+    PoleEmploiMiseAJourPass,
     PoleEmploiTechnicalException,
     PoleEmploiTokenException,
+    recherche_individu_certifie_api,
 )
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
@@ -870,7 +871,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             # store error, and be done with it
             return False
         try:
-
             encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(  # noqa:F841
                 individual, token
             )
@@ -1033,7 +1033,7 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
     @staticmethod
     def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
         try:
-            individual_pole_emploi = PoleEmploiRechercheIndividuCertifieAPI(individual.as_api_params(), api_token)
+            individual_pole_emploi = recherche_individu_certifie_api(individual.as_api_params(), api_token)
             # 3 requests/second max. I had timeout issues so 1 second take some margins
             sleep(1)
             if individual_pole_emploi.is_valid:
