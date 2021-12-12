@@ -24,7 +24,7 @@ from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import process_geocoding_data
-from itou.utils.apis.pole_emploi import PoleEmploiRechercheIndividuCertifieAPI
+from itou.utils.apis.pole_emploi import PoleEmploiIndividu, recherche_individu_certifie_api
 from itou.utils.emails import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -712,24 +712,27 @@ class ApiEntrepriseTest(SimpleTestCase):
 
 class PoleEmploiTest(SimpleTestCase):
     @mock.patch(
-        "itou.utils.apis.pole_emploi.PoleEmploiRechercheIndividuCertifieAPI.post",
-        return_value=(POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK, None),
+        "httpx.post",
+        return_value=httpx.Response(200, json=POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK),
     )
     def test_recherche_individu_certifie_api_nominal(self, mock_api_entreprise):
-        individu = PoleEmploiRechercheIndividuCertifieAPI({}, "")
+        individual = PoleEmploiIndividu("EVARISTE", "GALOIS", datetime.date(1979, 6, 3), "152062441001270")
+        individu_result = recherche_individu_certifie_api(individual, "")
 
-        self.assertTrue(individu.is_valid)
-        self.assertEqual(individu.id_national_demandeur, "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ")
-        self.assertEqual(individu.code_sortie, "S001")
+        self.assertTrue(individu_result.is_valid)
+        self.assertEqual(individu_result.id_national_demandeur, "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ")
+        self.assertEqual(individu_result.code_sortie, "S001")
 
     @mock.patch(
-        "itou.utils.apis.pole_emploi.PoleEmploiRechercheIndividuCertifieAPI.post",
-        return_value=(POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK, "Unable to fetch user data."),
+        "httpx.post",
+        return_value=httpx.Response(200, json=POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK),
     )
     def test_recherche_individu_certifie_api_error(self, mock_api_entreprise):
-        individu = PoleEmploiRechercheIndividuCertifieAPI({}, "")
+        individual = PoleEmploiIndividu("EVARISTE", "GALOIS", datetime.date(1979, 6, 3), "152062441001270")
+        individu_result = recherche_individu_certifie_api(individual, "")
 
-        self.assertFalse(individu.is_valid)
+        self.assertEqual(individu_result.code_sortie, "R010")
+        self.assertFalse(individu_result.is_valid())
 
 
 class UtilsEmailsSplitRecipientTest(TestCase):

@@ -27,32 +27,12 @@ class PoleEmploiMiseAJourPassException(Exception):
     pass
 
 
-#
-# def get_mise_a_jour_token(mode):
-#     api_mode = PoleEmploiMiseAJourPassIAEAPI.USE_SANDBOX_ROUTE
-#     token_recherche_et_maj = self.get_token(api_mode)
-#     # if token_recherche_et_maj is None:
-#     #     log = JobApplicationPoleEmploiNotificationLog(
-#     #         job_application=job_application,
-#     #         status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION,
-#     #         # details="code retour=S023"
-#     #     )
-#     #     log.save()
-#
-# def get_individual_from_pole_emploi(job_seeker, token):
-#     pass
-#
-# def notify_pole_emploi_accepted(job_application, token):
-#     pass
-
-
 class PoleEmploiIndividu:
-    def __init__(self, first_name, last_name, birthdate, nir):
+    def __init__(self, first_name: str, last_name: str, birthdate, nir: str):
         self.first_name = first_name.upper()
         self.last_name = last_name.upper()
         self.birthdate = birthdate.strftime("%Y-%m-%d")
         self.nir = nir
-        # assert self.is_valid()
 
     @classmethod
     def from_job_seeker(cls, job_seeker):
@@ -63,8 +43,13 @@ class PoleEmploiIndividu:
 
     def as_api_params(self):
         """converts the user data for use in the RechercheIndividuCertifie API"""
+        nir = self.nir
+        if nir is not None and len(nir) > 13:
+            # Pole emploi only wants the first 13 digits
+            nir = nir[:13]
+
         return {
-            "nirCertifie": self.nir,
+            "nirCertifie": nir,
             "nomNaissance": self.last_name,
             "prenom": self.first_name,
             "dateNaissance": self.birthdate,
@@ -87,7 +72,9 @@ class PoleEmploiIndividuResult:
     @staticmethod
     def from_data(data):
         if data is not None:
-            return PoleEmploiIndividu(data.get("id_national_demandeur"), data.get("codeSortie"), data.get("certifDE"))
+            return PoleEmploiIndividuResult(
+                data.get("idNationalDE", ""), data.get("codeSortie", ""), data.get("certifDE", "")
+            )
         return None
 
 
@@ -107,7 +94,7 @@ CODE_SORTIE_MAPPING_RECHERCHE_INDIVIDU_CERTIFIE = {
 }
 
 
-def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) -> Optional[PoleEmploiIndividu]:
+def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) -> Optional[PoleEmploiIndividuResult]:
     """
     So we post this :
     {
@@ -125,8 +112,6 @@ def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) ->
         "certifDE":false
     }
     """
-    data = None
-
     url = f"{settings.API_ESD_BASE_URL}/rechercheindividucertifie/v1/rechercheIndividuCertifie"
     headers = {"Authorization": token}
 
@@ -134,17 +119,20 @@ def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) ->
         r = httpx.post(url, json=individu.as_api_params(), headers=headers)
         data = r.json()
         # we can’t use `raise_for_error` since actual data are stored with status code 4xx
-        if r.status_code not in [200, 400, 401, 404, 429]:
-            raise ValueError("Invalid user data sent")
+        # if r.status_code not in [200, 400, 401, 404, 429]
+        # for now we only care about 200 (-> successful search, someone may have been found)
+        if r.status_code != 200:
+            raise PoleEmploiIndividualException(r.status_code)
+        return PoleEmploiIndividuResult.from_data(data)
 
     except httpx.HTTPError as e:
-        logger.error("Error while fetching `%s` with %s, got %s", url, individu.as_api_params(), e.response.content)
-        # error = "Unable to fetch user data."
+        # logger.error(
+        #     "httpx Error while fetching `%s` with %s, got %s", url, individu.as_api_params(), e.response.content
+        # )
+        raise PoleEmploiTechnicalException(e.response.status_code)
     except ValueError:
-        logger.error("Error while fetching `%s` with %s, got %s", url, individu.as_api_params(), r.content)
-        # error = "Unable to fetch user data."
-
-    return PoleEmploiIndividuResult.from_data(data)
+        # logger.error("Error while fetching `%s` with %s, got %s", url, individu.as_api_params(), r.content)
+        raise PoleEmploiTechnicalException(r.status_code)
 
 
 # class PoleEmploiMiseAJourPass:

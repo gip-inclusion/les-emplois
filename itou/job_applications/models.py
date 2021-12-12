@@ -860,10 +860,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email = self.email_manually_refuse_approval
         email.send()
 
-    def notify_pole_employ_accepted(self, mode) -> bool:
+    def notify_pole_employ_accepted(self) -> bool:
         individual = PoleEmploiIndividu.from_job_seeker(self.job_seeker)
         try:
-            token = JobApplicationPoleEmploiNotificationLog.get_token(mode)  # noqa
+            token = JobApplicationPoleEmploiNotificationLog.get_token()  # noqa
         except PoleEmploiTokenException as token_exception:  # noqa
             # store error, and be done with it
             return False
@@ -1030,13 +1030,15 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
     @staticmethod
     def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
         try:
-            individual_pole_emploi = recherche_individu_certifie_api(individual.as_api_params(), api_token)
+            individual_pole_emploi_result = recherche_individu_certifie_api(individual, api_token)
             # 3 requests/second max. I had timeout issues so 1 second take some margins
             sleep(1)
-            if individual_pole_emploi.is_valid:
-                return individual_pole_emploi.id_national_demandeur
+            if individual is not None and individual_pole_emploi_result.is_valid:
+                return individual_pole_emploi_result.id_national_demandeur
             else:
-                raise PoleEmploiIndividualException(individual_pole_emploi.code_sortie)
+                raise PoleEmploiIndividualException(individual_pole_emploi_result.code_sortie)
         except httpx.HTTPStatusError as error:
             raise PoleEmploiTechnicalException(error.response.status_code)
+        except Exception as e:
+            print(e)
         return ""
