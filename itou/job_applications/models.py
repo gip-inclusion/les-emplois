@@ -17,12 +17,9 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.utils.apis.esd import get_access_token
-from itou.utils.apis.pole_emploi import PoleEmploiMiseAJourPassIAEAPI  # noqa
-from itou.utils.apis.pole_emploi import PoleEmploiRechercheIndividuCertifieAPI  # noqa
 from itou.utils.apis.pole_emploi import (  # noqa
     PoleEmploiIndividu,
     PoleEmploiIndividualException,
-    PoleEmploiMiseAJourPass,
     PoleEmploiTechnicalException,
     PoleEmploiTokenException,
     recherche_individu_certifie_api,
@@ -1014,11 +1011,11 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
     #     }
 
     @staticmethod
-    def get_token(api_production_or_sandbox):
+    def get_token():
         try:
             maj_pass_iae_api_scope = "passIAE api_maj-pass-iaev1"
             # The sandbox mode involves a slightly different scope
-            if api_production_or_sandbox == PoleEmploiMiseAJourPassIAEAPI.USE_SANDBOX_ROUTE:
+            if settings.API_ESD_MISE_A_JOUR_PASS_MODE != "production":
                 maj_pass_iae_api_scope = "passIAE api_testmaj-pass-iaev1"
             # It is not obvious but we can ask for one token only with all the necessary rights
             token_recherche_et_maj = get_access_token(
