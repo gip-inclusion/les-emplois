@@ -368,6 +368,10 @@ API_ESD_KEY = os.environ.get("API_ESD_KEY", "")
 API_ESD_SECRET = os.environ.get("API_ESD_SECRET", "")
 API_ESD_AUTH_BASE_URL = os.environ.get("API_ESD_AUTH_BASE_URL", "https://entreprise.pole-emploi.fr")
 API_ESD_BASE_URL = os.environ.get("API_ESD_BASE_URL", "https://api.emploi-store.fr/partenaire")
+# Pole emploi mise à jour API can be run in sandboxed mode (updates are not saved to the database,
+# but the API confirms everything was alright), or in production mode (updates ARE saved)
+# the values can be: sandbox|production
+API_ESD_MISE_A_JOUR_PASS_MODE = os.environ.get("API_ESD_MISE_A_JOUR_PASS_MODE", "sandbox")
 
 
 # PE Connect aka PEAMU - technically one of ESD's APIs.
