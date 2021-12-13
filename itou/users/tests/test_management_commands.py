@@ -14,7 +14,7 @@ from itou.job_applications.models import JobApplication
 from itou.users.models import User
 
 
-class ManagementCommandsTest(TestCase):
+class DeduplicateJobSeekersManagementCommandsTest(TestCase):
     """
     Test the deduplication of several users.
 
