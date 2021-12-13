@@ -1,5 +1,5 @@
 # flake8: noqa
-# pylint: disable=[logging-fstring-interpolation, singleton-comparison]
+# pylint: disable=logging-fstring-interpolation, singleton-comparison, invalid-name
 
 import csv
 import datetime
@@ -204,29 +204,27 @@ class Command(BaseCommand):
         self.logger.debug(not_existing_structures)
         return not_existing_structures
 
-    def drop_excluded_structures(self, df, cleaned_df):
+    def drop_excluded_structures(self, df):
         df = df.copy()
-        cleaned_df = cleaned_df.copy()
         # List provided by the ASP.
-        inexistent_structures = cleaned_df[~cleaned_df.siret_is_valid]
+        inexistent_structures = df[~df.siret_is_valid]
         self.logger.info(f"Inexistent structures: excluding {len(inexistent_structures)} rows.")
-        cleaned_df = cleaned_df.drop(inexistent_structures.index)
+        df = df.drop(inexistent_structures.index)
         df.loc[
             inexistent_structures.index, "Commentaire"
         ] = "Ligne ignorée : entreprise inexistante communiquée par l'ASP."
 
         # Remaining inexistent SIRETS.
-        inexisting_sirets = self.get_inexistent_structures(cleaned_df)
-        inexistent_structures = cleaned_df[cleaned_df[SIRET_COL].isin(inexisting_sirets)]
+        inexisting_sirets = self.get_inexistent_structures(df)
+        inexistent_structures = df[df[SIRET_COL].isin(inexisting_sirets)]
         self.logger.info(f"Inexistent structures: excluding {len(inexistent_structures)} rows.")
-        cleaned_df = cleaned_df.drop(inexistent_structures.index)
+        df = df.drop(inexistent_structures.index)
         df.loc[inexistent_structures.index, "Commentaire"] = "Ligne ignorée : entreprise inexistante."
 
-        return df, cleaned_df
+        return df
 
-    def import_data_into_itou(self, original_df, cleaned_df):
-        original_df = original_df.copy()
-        cleaned_df = cleaned_df.copy()
+    def import_data_into_itou(self, df):
+        df = df.copy()
 
         created_users = 0
         already_existing_users = 0
@@ -245,8 +243,8 @@ class Command(BaseCommand):
         # Used to store who created the following users, approvals and job applications.
         developer = User.objects.get(email=self.developer_email)
 
-        pbar = tqdm(total=len(cleaned_df))
-        for i, row in cleaned_df.iterrows():
+        pbar = tqdm(total=len(df))
+        for i, row in df.iterrows():
             pbar.update(1)
 
             with transaction.atomic():
@@ -383,9 +381,8 @@ class Command(BaseCommand):
 
             # Update dataframe values.
             # https://stackoverflow.com/questions/25478528/updating-value-in-iterrow-for-pandas
-            cleaned_df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
-            original_df.loc[i, USER_PK] = job_seeker.jobseeker_hash_id
-            original_df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
+            df.loc[i, USER_PK] = job_seeker.jobseeker_hash_id
+            df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
 
         self.logger.info("Import is over!")
         self.logger.info(f"Already existing users: {already_existing_users}.")
@@ -396,38 +393,7 @@ class Command(BaseCommand):
         self.logger.info(f"Already existing job applications: {already_existing_job_apps}.")
         self.logger.info(f"Created job applications: {created_job_applications}.")
 
-        return original_df, cleaned_df
-
-    def create_emailing_file(self, df):
-        emailing_rows = []
-
-        for _, row in df.iterrows():
-            siae = Siae.objects.prefetch_related("memberships__user").get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
-            admin = siae.active_admin_members.first()
-            admin_address = admin.email if admin else ""
-            emailing_row = {
-                "Nom SIAE": siae.display_name,
-                "Administrateur": admin_address,
-                "Structure active ?": siae.is_active,
-                "SIRET": row[SIRET_COL],
-                "Prénom employé": row[FIRST_NAME_COL],
-                "Nom employé": row[LAST_NAME_COL],
-                "PASS IAE": row[PASS_IAE_NUMBER_COL],
-            }
-
-            if not self.dry_run:
-                approval = Approval.objects.prefetch_related("user").get(number=row[PASS_IAE_NUMBER_COL])
-                job_seeker = approval.user
-                emailing_row = emailing_row | {
-                    "PASS IAE début": approval.start_at,
-                    "PASS IAE fin": approval.end_at,
-                    "Prénom employé": job_seeker.first_name,
-                    "Nom employé": job_seeker.last_name,
-                    "Email employé": job_seeker.email,
-                }
-            emailing_rows.append(emailing_row)
-
-        self.log_to_csv("emailing", emailing_rows)
+        return df
 
     def handle(self, file_path, developer_email, dry_run=False, invalid_nirs_only=False, **options):
         """
@@ -478,41 +444,32 @@ class Command(BaseCommand):
         if invalid_nirs_only:
             df = invalid_nirs
 
-        cleaned_df = df.copy()
-
         # Exclude ended contracts.
-        ended_contracts = cleaned_df[cleaned_df[CONTRACT_ENDDATE_COL] != ""]
-        cleaned_df = cleaned_df.drop(ended_contracts.index)
+        ended_contracts = df[df[CONTRACT_ENDDATE_COL] != ""]
+        df = df.drop(ended_contracts.index)
         self.logger.info(f"Ended contract: excluding {len(ended_contracts)} rows.")
         df.loc[ended_contracts.index, "Commentaire"] = "Ligne ignorée : contrat terminé."
 
         # Exclude inexistent SIAE.
-        df, cleaned_df = self.drop_excluded_structures(df, cleaned_df)
+        df = self.drop_excluded_structures(df)
 
         # Exclude rows with an approval.
-        rows_with_approval = cleaned_df[cleaned_df[APPROVAL_COL] != ""]
-        cleaned_df = cleaned_df.drop(rows_with_approval.index)
+        rows_with_approval = df[df[APPROVAL_COL] != ""]
+        df = df.drop(rows_with_approval.index)
         self.logger.info(f"Existing approval: excluding {len(rows_with_approval)} rows.")
         df.loc[rows_with_approval.index, "Commentaire"] = "Ligne ignorée : agrément ou PASS IAE renseigné."
 
-        self.logger.info(
-            f"Continuing with {len(cleaned_df)} rows left ({self.get_ratio(len(cleaned_df), len(df))} %)."
-        )
+        self.logger.info(f"Continuing with {len(df)} rows left ({self.get_ratio(len(df), len(df))} %).")
 
         # Step 3: import data.
         self.logger.info("🔥 STEP 3: create job seekers, approvals and job applications.")
-        df, cleaned_df = self.import_data_into_itou(original_df=df, cleaned_df=cleaned_df)
+        df = self.import_data_into_itou(df=df)
 
         # Step 4: create a CSV file including comments to be shared with the ASP.
         df = df.drop(["nir_is_valid", "siret_is_valid"], axis=1)  # Remove useless columns.
         self.log_to_csv("fichier_final", df)
         self.logger.info("📖 STEP 4: log final results.")
         self.logger.info("You can transfer this file to the ASP: /exports/import_ai_bilan.csv")
-
-        # STEP 5: file to be used by the communication team in a mailing.
-        self.create_emailing_file(cleaned_df)
-        self.logger.info("📖 STEP 5: export data for emailing.")
-        self.logger.info("Emailing file: /exports/emailing.csv")
 
         self.logger.info("-" * 80)
         self.logger.info("👏 Good job!")
