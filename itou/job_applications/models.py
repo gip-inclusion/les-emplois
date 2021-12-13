@@ -3,7 +3,6 @@ import logging
 import uuid
 from time import sleep
 
-import httpx
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
@@ -17,11 +16,9 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.utils.apis.esd import get_access_token
-from itou.utils.apis.pole_emploi import (  # noqa
+from itou.utils.apis.pole_emploi import (
     PoleEmploiIndividu,
-    PoleEmploiIndividualException,
-    PoleEmploiTechnicalException,
-    PoleEmploiTokenException,
+    PoleEmploiMiseAJourPassIAEException,
     recherche_individu_certifie_api,
 )
 from itou.utils.emails import get_email_message
@@ -871,7 +868,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(  # noqa:F841
                 individual, token
             )
-        except PoleEmploiIndividualException as individual_exception:  # noqa:F841
+        except PoleEmploiMiseAJourPassIAEException:  # noqa:F841
             return False
         # try:
         #     mise_a_jour = notify_pole_emploi_accepted(self, token)
@@ -1023,9 +1020,9 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
             )
             sleep(1)
             return token_recherche_et_maj
-        except httpx.HTTPStatusError as error:
-            raise PoleEmploiTokenException(error.response.status_code)
-        return ""
+        except PoleEmploiMiseAJourPassIAEException:
+            return None
+        # return "", None
 
     @staticmethod
     def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
@@ -1036,9 +1033,6 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
             if individual is not None and individual_pole_emploi_result.is_valid:
                 return individual_pole_emploi_result.id_national_demandeur
             else:
-                raise PoleEmploiIndividualException(individual_pole_emploi_result.code_sortie)
-        except httpx.HTTPStatusError as error:
-            raise PoleEmploiTechnicalException(error.response.status_code)
-        except Exception as e:
-            print(e)
-        return ""
+                return ""
+        except PoleEmploiMiseAJourPassIAEException:
+            return ""
