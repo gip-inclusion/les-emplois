@@ -43,7 +43,8 @@ POST_CODE_COL = "codepostalcedex"
 SIAE_NAME_COL = "pmo_denom_soc"
 SIRET_COL = "pmo_siret"
 PASS_IAE_NUMBER_COL = "Numéro de PASS IAE"
-USER_PK = "ID salarié"
+USER_PK_COL = "ID salarié"
+COMMENTS_COL = "Commentaire"
 
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -156,7 +157,7 @@ class Command(BaseCommand):
             return None
         return nir
 
-    def siret_is_valid(self, row):
+    def siret_validated_by_asp(self, row):
         # ASP-validated list.
         excluded_sirets = [
             "88763724700016",
@@ -204,24 +205,83 @@ class Command(BaseCommand):
         self.logger.debug(not_existing_structures)
         return not_existing_structures
 
-    def drop_excluded_structures(self, df):
-        df = df.copy()
-        # List provided by the ASP.
-        inexistent_structures = df[~df.siret_is_valid]
-        self.logger.info(f"Inexistent structures: excluding {len(inexistent_structures)} rows.")
-        df = df.drop(inexistent_structures.index)
-        df.loc[
-            inexistent_structures.index, "Commentaire"
-        ] = "Ligne ignorée : entreprise inexistante communiquée par l'ASP."
+    def commune_from_insee_col(self, insee_code):
+        try:
+            commune = Commune.objects.current().get(code=insee_code)
+        except Commune.DoesNotExist:
+            # Communes stores the history of city names and INSEE codes.
+            # Sometimes, a commune is found twice but with the same name.
+            # As we just need a human name, we can take the first one.
+            commune = Commune.objects.filter(code=insee_code).first()
+        except Commune.MultipleObjectsReturned:
+            commune = Commune.objects.current().filter(code=insee_code).first()
+        else:
+            commune = Commune.objects.current().get(code=insee_code)
 
-        # Remaining inexistent SIRETS.
-        inexisting_sirets = self.get_inexistent_structures(df)
-        inexistent_structures = df[df[SIRET_COL].isin(inexisting_sirets)]
-        self.logger.info(f"Inexistent structures: excluding {len(inexistent_structures)} rows.")
-        df = df.drop(inexistent_structures.index)
-        df.loc[inexistent_structures.index, "Commentaire"] = "Ligne ignorée : entreprise inexistante."
+        if insee_code == "01440":
+            # Veyziat has been merged with Oyonnax.
+            commune = Commune(name="Veyziat", code="01283")
+        return commune
 
-        return df
+    def find_or_create_job_seeker(self, row, created_by):
+        # Data has been formatted previously.
+        created = False
+        # Get city by its INSEE code to fill in the `User.city` attribute with a valid name.
+        commune = self.commune_from_insee_col(row[CITY_INSEE_COL])
+
+        user_data = {
+            "first_name": row[FIRST_NAME_COL].title(),
+            "last_name": row[LAST_NAME_COL].title(),
+            "birthdate": row[BIRTHDATE_COL],
+            # If no email: create a fake one.
+            "email": row[EMAIL_COL] or self.fake_email(),
+            "address_line_1": f"{row['adr_numero_voie']} {row['codeextensionvoie']} {row['codetypevoie']} {row['adr_libelle_voie']}",
+            "address_line_2": f"{row['adr_cplt_distribution']} {row['adr_point_remise']}",
+            "post_code": row[POST_CODE_COL],
+            "city": commune.name.title(),
+            "department": department_from_postcode(row[POST_CODE_COL]),
+            "phone": row[PHONE_COL],
+            "nir": row[NIR_COL],
+            "date_joined": settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+        }
+
+        # If NIR is not valid, row[NIR_COL] is empty.
+        # See `self.clean_nir`.
+        if not row.nir_is_valid:
+            # ignored_nirs += 1
+            user_data["nir"] = None
+
+        job_seeker = User.objects.filter(nir=user_data["nir"]).exclude(nir__isnull=True).first()
+
+        if not job_seeker:
+            job_seeker = User.objects.filter(email=user_data["email"]).first()
+
+        # Some e-mail addresses belong to prescribers!
+        if job_seeker and not job_seeker.is_job_seeker:
+            # If job seeker is not a job seeker, create a new one.
+            user_data["email"] = self.fake_email()
+            job_seeker = None
+
+        if not job_seeker:
+            # Find users created previously by this script,
+            # either because a bug forced us to interrupt it
+            # or because we had to run it twice to import new users.
+            job_seeker = User.objects.filter(
+                first_name=user_data["first_name"],
+                last_name=user_data["last_name"],
+                birthdate=user_data["birthdate"].date(),
+                created_by=created_by,
+                date_joined__date=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date(),
+            ).first()
+
+        if not job_seeker:
+            if self.dry_run:
+                job_seeker = User(**user_data)
+            else:
+                job_seeker = User.create_job_seeker_by_proxy(created_by, **user_data)
+            created = True
+
+        return created, job_seeker
 
     def import_data_into_itou(self, df):
         df = df.copy()
@@ -248,77 +308,13 @@ class Command(BaseCommand):
             pbar.update(1)
 
             with transaction.atomic():
-                # Get city by its INSEE code to fill in the `User.city` attribute with a valid name.
-                try:
-                    commune = Commune.objects.current().get(code=row[CITY_INSEE_COL])
-                except Commune.DoesNotExist:
-                    # Communes stores the history of city names and INSEE codes.
-                    # Sometimes, a commune is found twice but with the same name.
-                    # As we just need a human name, we can take the first one.
-                    commune = Commune.objects.filter(code=row[CITY_INSEE_COL]).first()
-                except Commune.MultipleObjectsReturned:
-                    commune = Commune.objects.current().filter(code=row[CITY_INSEE_COL]).first()
-                else:
-                    commune = Commune.objects.current().get(code=row[CITY_INSEE_COL])
 
-                if row[CITY_INSEE_COL] == "01440":
-                    # Veyziat has been merged with Oyonnax.
-                    commune = Commune(name="Veyziat", code="01283")
+                created, job_seeker = self.find_or_create_job_seeker(row=row, created_by=developer)
 
-                # Data has been formatted previously.
-                user_data = {
-                    "first_name": row[FIRST_NAME_COL].title(),
-                    "last_name": row[LAST_NAME_COL].title(),
-                    "birthdate": row[BIRTHDATE_COL],
-                    # If no email: create a fake one.
-                    "email": row[EMAIL_COL] or self.fake_email(),
-                    "address_line_1": f"{row['adr_numero_voie']} {row['codeextensionvoie']} {row['codetypevoie']} {row['adr_libelle_voie']}",
-                    "address_line_2": f"{row['adr_cplt_distribution']} {row['adr_point_remise']}",
-                    "post_code": row[POST_CODE_COL],
-                    "city": commune.name.title(),
-                    "department": department_from_postcode(row[POST_CODE_COL]),
-                    "phone": row[PHONE_COL],
-                    "nir": row[NIR_COL],
-                    "date_joined": objects_created_at,
-                }
-
-                # If NIR is not valid, row[NIR_COL] is empty.
-                # See `self.clean_nir`.
-                if not row.nir_is_valid:
-                    ignored_nirs += 1
-                    user_data["nir"] = None
-
-                job_seeker = User.objects.filter(nir=user_data["nir"]).exclude(nir__isnull=True).first()
-
-                if not job_seeker:
-                    job_seeker = User.objects.filter(email=user_data["email"]).first()
-
-                # Some e-mail addresses belong to prescribers!
-                if job_seeker and not job_seeker.is_job_seeker:
-                    # If job seeker is not a job seeker, create a new one.
-                    user_data["email"] = self.fake_email()
-                    job_seeker = None
-
-                if not job_seeker:
-                    # Find users created previously by this script,
-                    # either because a bug forced us to interrupt it
-                    # or because we had to run it twice to import new users.
-                    job_seeker = User.objects.filter(
-                        first_name=user_data["first_name"],
-                        last_name=user_data["last_name"],
-                        birthdate=user_data["birthdate"].date(),
-                        created_by=developer,
-                        date_joined__date=objects_created_at.date(),
-                    ).first()
-
-                if job_seeker:
-                    already_existing_users += 1
-                else:
-                    if self.dry_run:
-                        job_seeker = User(**user_data)
-                    else:
-                        job_seeker = User.create_job_seeker_by_proxy(developer, **user_data)
+                if created:
                     created_users += 1
+                else:
+                    already_existing_users += 1
 
                 # If job seeker has already a valid approval: don't redeliver it.
                 if job_seeker.approvals.valid().exists():
@@ -381,7 +377,7 @@ class Command(BaseCommand):
 
             # Update dataframe values.
             # https://stackoverflow.com/questions/25478528/updating-value-in-iterrow-for-pandas
-            df.loc[i, USER_PK] = job_seeker.jobseeker_hash_id
+            df.loc[i, USER_PK_COL] = job_seeker.jobseeker_hash_id
             df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
 
         self.logger.info("Import is over!")
@@ -394,6 +390,71 @@ class Command(BaseCommand):
         self.logger.info(f"Created job applications: {created_job_applications}.")
 
         return df
+
+    def clean_df(self, df):
+        df[BIRTHDATE_COL] = df[BIRTHDATE_COL].apply(self.fix_dates)
+        df[BIRTHDATE_COL] = pd.to_datetime(df[BIRTHDATE_COL], format=DATE_FORMAT)
+        df[CONTRACT_STARTDATE_COL] = pd.to_datetime(df[CONTRACT_STARTDATE_COL], format=DATE_FORMAT)
+        df[NIR_COL] = df.apply(self.clean_nir, axis=1)
+        df["nir_is_valid"] = ~df[NIR_COL].isnull()
+        df["siret_validated_by_asp"] = df.apply(self.siret_validated_by_asp, axis=1)
+
+        # Replace empty values by "" instead of NaN.
+        df = df.fillna("")
+        return df
+
+    def add_columns_for_asp(self, df):
+        df[COMMENTS_COL] = ""
+        df[PASS_IAE_NUMBER_COL] = ""
+        df[USER_PK_COL] = ""
+        return df
+
+    def assert_asp_columns(self, df):
+        expected_columns = [
+            COMMENTS_COL,
+            PASS_IAE_NUMBER_COL,
+            USER_PK_COL,
+        ]
+        assert all(item in df.columns for item in expected_columns)
+
+    def filter_invalid_nirs(self, df):
+        total_df = df.copy()
+        invalid_nirs_df = total_df[~total_df.nir_is_valid].copy()
+        comment = "NIR invalide. Utilisateur potentiellement créé sans NIR."
+        total_df.loc[invalid_nirs_df.index, COMMENTS_COL] = comment
+        invalid_nirs_df.loc[invalid_nirs_df.index, COMMENTS_COL] = comment
+        return total_df, invalid_nirs_df
+
+    def remove_ignored_rows(self, total_df):
+        # Exclude ended contracts.
+        total_df = total_df.copy()
+        filtered_df = total_df.copy()
+        ended_contracts = total_df[total_df[CONTRACT_ENDDATE_COL] != ""]
+        filtered_df = filtered_df.drop(ended_contracts.index)
+        self.logger.info(f"Ended contract: excluding {len(ended_contracts)} rows.")
+        total_df.loc[ended_contracts.index, COMMENTS_COL] = "Ligne ignorée : contrat terminé."
+
+        # List provided by the ASP.
+        excluded_structures_df = filtered_df[~filtered_df.siret_validated_by_asp]
+        self.logger.info(f"Inexistent structures: excluding {len(excluded_structures_df)} rows.")
+        filtered_df = filtered_df.drop(excluded_structures_df.index)
+        total_df.loc[
+            excluded_structures_df.index, COMMENTS_COL
+        ] = "Ligne ignorée : entreprise inexistante communiquée par l'ASP."
+
+        # Inexistent SIRETS.
+        inexisting_sirets = self.get_inexistent_structures(filtered_df)
+        inexistent_structures_df = filtered_df[filtered_df[SIRET_COL].isin(inexisting_sirets)]
+        self.logger.info(f"Inexistent structures: excluding {len(inexistent_structures_df)} rows.")
+        filtered_df = filtered_df.drop(inexistent_structures_df.index)
+        total_df.loc[inexistent_structures_df.index, COMMENTS_COL] = "Ligne ignorée : entreprise inexistante."
+
+        # Exclude rows with an approval.
+        rows_with_approval_df = filtered_df[filtered_df[APPROVAL_COL] != ""]
+        filtered_df = filtered_df.drop(rows_with_approval_df.index)
+        self.logger.info(f"Existing approval: excluding {len(rows_with_approval_df)} rows.")
+        total_df.loc[rows_with_approval_df.index, COMMENTS_COL] = "Ligne ignorée : agrément ou PASS IAE renseigné."
+        return total_df, filtered_df
 
     def handle(self, file_path, developer_email, dry_run=False, invalid_nirs_only=False, **options):
         """
@@ -415,50 +476,22 @@ class Command(BaseCommand):
         else:
             df = pd.read_csv(file_path, dtype=str, encoding="latin_1")
 
-        # Add a comment column to document why it may be removed.
-        # Will be shared with the ASP.
-        df["Commentaire"] = ""
-
         # Add columns to share data with the ASP.
-        df[PASS_IAE_NUMBER_COL] = ""
-        df[USER_PK] = ""
+        df = self.add_columns_for_asp(df)
 
         # Step 1: clean data
         self.logger.info("✨ STEP 1: clean data!")
-        df[BIRTHDATE_COL] = df[BIRTHDATE_COL].apply(self.fix_dates)
-        df[BIRTHDATE_COL] = pd.to_datetime(df[BIRTHDATE_COL], format=DATE_FORMAT)
-        df[CONTRACT_STARTDATE_COL] = pd.to_datetime(df[CONTRACT_STARTDATE_COL], format=DATE_FORMAT)
-        df[NIR_COL] = df.apply(self.clean_nir, axis=1)
-        df["nir_is_valid"] = ~df[NIR_COL].isnull()
-        df["siret_is_valid"] = df.apply(self.siret_is_valid, axis=1)
-
-        # Replace empty values by "" instead of NaN.
-        df = df.fillna("")
+        df = self.clean_df(df)
 
         # Users with invalid NIRS are stored but without a NIR.
-        invalid_nirs = df[~df.nir_is_valid]
-        df.loc[invalid_nirs.index, "Commentaire"] = "NIR invalide. Utilisateur potentiellement créé sans NIR."
-        self.logger.info(f"Invalid nirs: {len(invalid_nirs)}.")
+        df, invalid_nirs_df = self.filter_invalid_nirs(df)
+        self.logger.info(f"Invalid nirs: {len(invalid_nirs_df)}.")
 
         self.logger.info("🚮 STEP 2: remove rows!")
         if invalid_nirs_only:
-            df = invalid_nirs
+            df = invalid_nirs_df
 
-        # Exclude ended contracts.
-        ended_contracts = df[df[CONTRACT_ENDDATE_COL] != ""]
-        df = df.drop(ended_contracts.index)
-        self.logger.info(f"Ended contract: excluding {len(ended_contracts)} rows.")
-        df.loc[ended_contracts.index, "Commentaire"] = "Ligne ignorée : contrat terminé."
-
-        # Exclude inexistent SIAE.
-        df = self.drop_excluded_structures(df)
-
-        # Exclude rows with an approval.
-        rows_with_approval = df[df[APPROVAL_COL] != ""]
-        df = df.drop(rows_with_approval.index)
-        self.logger.info(f"Existing approval: excluding {len(rows_with_approval)} rows.")
-        df.loc[rows_with_approval.index, "Commentaire"] = "Ligne ignorée : agrément ou PASS IAE renseigné."
-
+        df = self.remove_ignored_rows(df)
         self.logger.info(f"Continuing with {len(df)} rows left ({self.get_ratio(len(df), len(df))} %).")
 
         # Step 3: import data.
@@ -466,7 +499,10 @@ class Command(BaseCommand):
         df = self.import_data_into_itou(df=df)
 
         # Step 4: create a CSV file including comments to be shared with the ASP.
-        df = df.drop(["nir_is_valid", "siret_is_valid"], axis=1)  # Remove useless columns.
+        df = df.drop(["nir_is_valid", "siret_validated_by_asp"], axis=1)  # Remove useless columns.
+
+        # Make sure expected columns are present.
+        self.assert_asp_columns(df)
         self.log_to_csv("fichier_final", df)
         self.logger.info("📖 STEP 4: log final results.")
         self.logger.info("You can transfer this file to the ASP: /exports/import_ai_bilan.csv")
