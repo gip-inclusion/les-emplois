@@ -237,9 +237,9 @@ class Command(BaseCommand):
         created_job_applications = 0
 
         # A fixed creation date allows us to retrieve objects
-        # created by  this script.
+        # created by this script.
         # See Approval.is_from_ai_stock for example.
-        objects_created_at = datetime.datetime(2021, 11, 30, 20, 50, 00, tzinfo=pytz.utc)
+        objects_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
 
         # Get developer account by email.
         # Used to store who created the following users, approvals and job applications.
