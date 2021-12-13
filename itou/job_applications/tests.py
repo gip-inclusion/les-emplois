@@ -48,8 +48,9 @@ from itou.utils.apis.pole_emploi import (
 from itou.utils.templatetags import format_filters
 
 
+@patch("itou.job_applications.models.JobApplication._notify_pole_employ", return_value=False)
 class JobApplicationModelTest(TestCase):
-    def test_eligibility_diagnosis_by_siae_required(self):
+    def test_eligibility_diagnosis_by_siae_required(self, *args, **kwargs):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
         )
@@ -68,16 +69,16 @@ class JobApplicationModelTest(TestCase):
         self.assertFalse(has_considered_valid_diagnoses)
         self.assertTrue(job_application.eligibility_diagnosis_by_siae_required)
 
-    def test_accepted_by(self):
+    def test_accepted_by(self, notification_mock):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING
         )
         user = job_application.to_siae.members.first()
         job_application.accept(user=user)
         self.assertEqual(job_application.accepted_by, user)
-        # self.notify_accepted_mock.assert_called_once_with(ANY, ANY)
+        notification_mock.assert_called()
 
-    def test_is_sent_by_authorized_prescriber(self):
+    def test_is_sent_by_authorized_prescriber(self, *args, **kwargs):
         job_application = JobApplicationSentByJobSeekerFactory()
         self.assertFalse(job_application.is_sent_by_authorized_prescriber)
 
@@ -94,7 +95,7 @@ class JobApplicationModelTest(TestCase):
         self.assertTrue(job_application.is_sent_by_authorized_prescriber)
 
     @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
-    def test_can_download_approval_as_pdf(self, mock_can_be_cancelled):
+    def test_can_download_approval_as_pdf(self, *args, **kwargs):
         """
         A user can download an approval only when certain conditions
         are met:
@@ -121,7 +122,7 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         self.assertFalse(job_application.can_download_approval_as_pdf)
 
-    def test_can_download_expired_approval_as_pdf(self):
+    def test_can_download_expired_approval_as_pdf(self, *args, **kwargs):
         """
         A user can download an expired approval PDF.
         """
@@ -134,7 +135,7 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(approval=ended_approval, hiring_start_at=start)
         self.assertTrue(job_application.can_download_approval_as_pdf)
 
-    def test_can_be_cancelled(self):
+    def test_can_be_cancelled(self, *args, **kwargs):
         """
         A user can cancel a job application provided that it has no related
         employee record in SENT or PROCESSED state or that is does not come from
@@ -170,7 +171,7 @@ class JobApplicationModelTest(TestCase):
         )
         self.assertFalse(job_application.can_be_cancelled)
 
-    def test_can_be_archived(self):
+    def test_can_be_archived(self, *args, **kwargs):
         """
         Only cancelled, refused and obsolete job_applications can be archived.
         """
@@ -194,7 +195,7 @@ class JobApplicationModelTest(TestCase):
             job_application = JobApplicationFactory(state=state)
             self.assertTrue(job_application.can_be_archived)
 
-    def test_is_from_ai_stock(self):
+    def test_is_from_ai_stock(self, *args, **kwargs):
         job_application_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
 
