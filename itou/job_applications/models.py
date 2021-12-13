@@ -17,8 +17,10 @@ from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.utils.apis.esd import get_access_token
 from itou.utils.apis.pole_emploi import (
+    POLE_EMPLOI_PASS_APPROVED,
     PoleEmploiIndividu,
     PoleEmploiMiseAJourPassIAEException,
+    mise_a_jour_pass_iae,
     recherche_individu_certifie_api,
 )
 from itou.utils.emails import get_email_message
@@ -868,12 +870,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(  # noqa:F841
                 individual, token
             )
-        except PoleEmploiMiseAJourPassIAEException:  # noqa:F841
+        except PoleEmploiMiseAJourPassIAEException:
             return False
-        # try:
-        #     mise_a_jour = notify_pole_emploi_accepted(self, token)
-        # except PoleEmploiMiseAJourPassException as e:
-        #     return False
+        try:
+            mise_a_jour = mise_a_jour_pass_iae(self, POLE_EMPLOI_PASS_APPROVED, encrypted_nir, token)  # noqa
+        except PoleEmploiMiseAJourPassIAEException:
+            return False
         return True
 
 
@@ -1034,5 +1036,18 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
                 return individual_pole_emploi_result.id_national_demandeur
             else:
                 return ""
+        except PoleEmploiMiseAJourPassIAEException:
+            return ""
+
+    @staticmethod
+    def mise_a_jour_pass(
+        job_application: JobApplication, pass_approved_code: str, encrypted_identifier: str, api_token: str
+    ) -> str:
+        try:
+            result = mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifier, api_token)  # noqa
+            # if individual is not None and individual_pole_emploi_result.is_valid:
+            #     return individual_pole_emploi_result.id_national_demandeur
+            # else:
+            #     return ""
         except PoleEmploiMiseAJourPassIAEException:
             return ""

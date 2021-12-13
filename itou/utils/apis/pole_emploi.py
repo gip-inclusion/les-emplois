@@ -11,8 +11,8 @@ from itou.siaes.models import Siae  # noqa
 logger = logging.getLogger(__name__)
 
 # The values for the pass status in the mise à jour API
-PASS_APPROVED = "A"
-PASS_REFUSED = "R"
+POLE_EMPLOI_PASS_APPROVED = "A"
+POLE_EMPLOI_PASS_REFUSED = "R"
 
 DATE_FORMAT = "%Y-%m-%d"
 CODE_SORTIE_MAPPING_RECHERCHE_INDIVIDU_CERTIFIE = {
@@ -161,6 +161,7 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
         # r.raise_for_status()
         # data = r.json()
         # return data
+        return {}
     except httpx.HTTPError as e:
         raise PoleEmploiMiseAJourPassIAEException(e.response.status_code)
         # if e.response.status_code == 401:
@@ -231,13 +232,13 @@ def _mise_a_jour_parameters(encrypted_identifier, job_application, approval, pas
         # The necessary parameters to notify Pole Emploi of a refusal
         return {
             "idNational": encrypted_identifier,
-            "statutReponsePassIAE": PASS_REFUSED,
+            "statutReponsePassIAE": POLE_EMPLOI_PASS_REFUSED,
             "origineCandidature": _mise_a_jour_sender_kind_param(siae.sender_kind),
         }
     # The necessary parameters to notify Pole Emploi that a Pass has been granted
     return {
         "idNational": encrypted_identifier,
-        "statutReponsePassIAE": PASS_APPROVED,
+        "statutReponsePassIAE": POLE_EMPLOI_PASS_APPROVED,
         "typeSIAE": _mise_a_jour_siae_kind_param(siae),
         "dateDebutPassIAE": approval.start_at.strftime(DATE_FORMAT),
         "dateFinPassIAE": approval.end_at.strftime(DATE_FORMAT),
