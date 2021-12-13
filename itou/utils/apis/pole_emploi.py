@@ -56,7 +56,7 @@ class PoleEmploiIndividu:
     def from_job_seeker(cls, job_seeker):
         if job_seeker is not None:
             return PoleEmploiIndividu(
-                job_seeker.first_name, job_seeker.last_name, job_seeker.birth_date, job_seeker.nir
+                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir[:13]
             )
         return None
 
