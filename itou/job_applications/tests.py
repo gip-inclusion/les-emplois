@@ -40,7 +40,11 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
-from itou.utils.apis.pole_emploi import PoleEmploiIndividu, PoleEmploiMiseAJourPassIAEException
+from itou.utils.apis.pole_emploi import (
+    PoleEmploiIndividu,
+    PoleEmploiIndividuResult,
+    PoleEmploiMiseAJourPassIAEException,
+)
 from itou.utils.templatetags import format_filters
 
 
@@ -1180,6 +1184,8 @@ class JobApplicationPoleEmploiNotificationLogTest(TestCase):
     sample_encrypted_nir = "some_nir"
 
     sample_pole_emploi_individual = PoleEmploiIndividu("john", "doe", datetime.date(1987, 5, 8), "1870275051055")
+    sample_individual_search_success = PoleEmploiIndividuResult("some_id", "S001", "")
+    sample_individual_search_failure = PoleEmploiIndividuResult("", "R10", "")
 
     # non-trivial `unittest.patch` thing to note:
     # get_access_token is defined in itou.utils.apis.esd.get_access_token
@@ -1197,10 +1203,22 @@ class JobApplicationPoleEmploiNotificationLogTest(TestCase):
             JobApplicationPoleEmploiNotificationLog.get_token()
             get_access_token_mock.assert_called_with(ANY)
 
-    # @patch("itou.job_applications.models.PoleEmploiRechercheIndividuCertifieAPI", return_value=sample_encrypted_nir)
-    # def test_get_individual_nominal(self, get_individual_mock):
-    #     pe_individual = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
-    #         self.sample_pole_emploi_individual, self.sample_token
-    #     )
-    #     get_individual_mock.assert_called_with(self.sample_pole_emploi_individual, self.sample_token)
-    #     self.assertEqual(pe_individual, self.sample_encrypted_nir)
+    @patch(
+        "itou.job_applications.models.recherche_individu_certifie_api", return_value=sample_individual_search_success
+    )
+    def test_get_individual_nominal(self, get_individual_mock):
+        encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
+            self.sample_pole_emploi_individual, self.sample_token
+        )
+        get_individual_mock.assert_called_with(self.sample_pole_emploi_individual, self.sample_token)
+        self.assertEqual(encrypted_nir, self.sample_individual_search_success.id_national_demandeur)
+
+    @patch(
+        "itou.job_applications.models.recherche_individu_certifie_api", return_value=sample_individual_search_failure
+    )
+    def test_get_individual_not_found(self, get_individual_mock):
+        encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
+            self.sample_pole_emploi_individual, self.sample_token
+        )
+        get_individual_mock.assert_called_with(self.sample_pole_emploi_individual, self.sample_token)
+        self.assertEqual(encrypted_nir, self.sample_individual_search_failure.id_national_demandeur)
