@@ -889,24 +889,24 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             # We may not have a valid user (missing NIR, for instance),
             # in which case we can bypass this process entirely
             return False
-
+        log = JobApplicationPoleEmploiNotificationLog(
+            job_application=self, status=JobApplicationPoleEmploiNotificationLog.STATUS_OK
+        )
+        # Step 1: we get the API token
         try:
-            token = JobApplicationPoleEmploiNotificationLog.get_token()  # noqa
+            token = JobApplicationPoleEmploiNotificationLog.get_token()
             sleep(1)
         except Exception as e:  # noqa
-            # store error, and be done with it
-            log = JobApplicationPoleEmploiNotificationLog(
-                job_application=self,
-                status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION,
-                details=str(e),
-            )
+            log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION
+            log.details = str(e)
             log.save()
             return False
+        # Step 2 : we fetch the encrypted NIR
         try:
-            encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(  # noqa:F841
+            encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
                 individual, token
             )
-            # 3 requests/second max. I had timeout issues so 1 second take some margins
+            # 3 requests/second max. I had timeout issues so 1 second takes some margins
             sleep(1)
         except PoleEmploiMiseAJourPassIAEException as e:
             log = JobApplicationPoleEmploiNotificationLog(
@@ -916,20 +916,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             )
             log.save()
             return False
+        # Step 3: we finally notify Pole Emploi that something happened for this user
         try:
-            mise_a_jour = mise_a_jour_pass_iae(self, mode, encrypted_nir, token)  # noqa
+            mise_a_jour_pass_iae(self, mode, encrypted_nir, token)  # noqa
         except PoleEmploiMiseAJourPassIAEException as e:
-            log = JobApplicationPoleEmploiNotificationLog(
-                job_application=self,
-                status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI,
-                details=f"{e.http_code} {e.response_code}",
-            )
+            log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
+            log.details = f"{e.http_code} {e.response_code}"
             log.save()
             return False
 
-        log = JobApplicationPoleEmploiNotificationLog(
-            job_application=self, status=JobApplicationPoleEmploiNotificationLog.STATUS_OK
-        )
         log.save()
         return True
 
@@ -1034,24 +1029,8 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
 
     @staticmethod
     def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
-        try:
-            individual_pole_emploi_result = recherche_individu_certifie_api(individual, api_token)
-            if individual is not None and individual_pole_emploi_result.is_valid:
-                return individual_pole_emploi_result.id_national_demandeur
-            else:
-                return ""
-        except PoleEmploiMiseAJourPassIAEException:
-            return ""
-
-    @staticmethod
-    def mise_a_jour_pass(
-        job_application: JobApplication, pass_approved_code: str, encrypted_identifier: str, api_token: str
-    ) -> str:
-        try:
-            result = mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifier, api_token)  # noqa
-            # if individual is not None and individual_pole_emploi_result.is_valid:
-            #     return individual_pole_emploi_result.id_national_demandeur
-            # else:
-            #     return ""
-        except PoleEmploiMiseAJourPassIAEException:
+        individual_pole_emploi_result = recherche_individu_certifie_api(individual, api_token)
+        if individual is not None and individual_pole_emploi_result.is_valid:
+            return individual_pole_emploi_result.id_national_demandeur
+        else:
             return ""
