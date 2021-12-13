@@ -18,6 +18,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.utils.apis.esd import get_access_token
 from itou.utils.apis.pole_emploi import (
     POLE_EMPLOI_PASS_APPROVED,
+    POLE_EMPLOI_PASS_REFUSED,
     PoleEmploiIndividu,
     PoleEmploiMiseAJourPassIAEException,
     mise_a_jour_pass_iae,
@@ -859,23 +860,77 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email = self.email_manually_refuse_approval
         email.send()
 
-    def notify_pole_employ_accepted(self) -> bool:
+    def notify_pole_emploi_accepted(self):
+        self._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED)
+
+    def notify_pole_emploi_refused(self):
+        self._notify_pole_employ(POLE_EMPLOI_PASS_REFUSED)
+
+    def _notify_pole_employ(self, mode) -> bool:
+        """
+        The entire logic for notifying Pole Emploi when a job_application is accepted:
+            - first, we authenticate to pole-emploi.io with the proper credentials, scopes, environment and
+            dry-run/wet run settings
+            - then, we search for the job_seeker on their backend. They reply with an encrypted NIR.
+            - finally, we use the encrypted NIR to notify them that a job application was accepted or refused.
+            We provide what we have about this job application.
+
+        This is VERY error prone and can break in a lot of places. PE’s servers can be down, we may not find
+        the job_seeker, the update may fail for various reasons. The rate limiting is low, hence…
+        those terrible `sleep` for lack of a better idea for now.
+
+        In order to ensure the rest of the application process will behave properly no matter what happens here:
+         - there is a lot of broad exception catching
+         - we keep logs of the successful/failed attempts
+         - when anything break, we quit early
+        """
         individual = PoleEmploiIndividu.from_job_seeker(self.job_seeker)
+        if individual is None or not individual.is_valid():
+            # We may not have a valid user (missing NIR, for instance),
+            # in which case we can bypass this process entirely
+            return False
+
         try:
             token = JobApplicationPoleEmploiNotificationLog.get_token()  # noqa
-        except PoleEmploiTokenException as token_exception:  # noqa
+            sleep(1)
+        except Exception as e:  # noqa
             # store error, and be done with it
+            log = JobApplicationPoleEmploiNotificationLog(
+                job_application=self,
+                status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION,
+                details=str(e),
+            )
+            log.save()
             return False
         try:
             encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(  # noqa:F841
                 individual, token
             )
-        except PoleEmploiMiseAJourPassIAEException:
+            # 3 requests/second max. I had timeout issues so 1 second take some margins
+            sleep(1)
+        except PoleEmploiMiseAJourPassIAEException as e:
+            log = JobApplicationPoleEmploiNotificationLog(
+                job_application=self,
+                status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
+                details=f"{e.http_code} {e.response_code}",
+            )
+            log.save()
             return False
         try:
-            mise_a_jour = mise_a_jour_pass_iae(self, POLE_EMPLOI_PASS_APPROVED, encrypted_nir, token)  # noqa
-        except PoleEmploiMiseAJourPassIAEException:
+            mise_a_jour = mise_a_jour_pass_iae(self, mode, encrypted_nir, token)  # noqa
+        except PoleEmploiMiseAJourPassIAEException as e:
+            log = JobApplicationPoleEmploiNotificationLog(
+                job_application=self,
+                status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI,
+                details=f"{e.http_code} {e.response_code}",
+            )
+            log.save()
             return False
+
+        log = JobApplicationPoleEmploiNotificationLog(
+            job_application=self, status=JobApplicationPoleEmploiNotificationLog.STATUS_OK
+        )
+        log.save()
         return True
 
 
@@ -944,51 +999,6 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
 
     API_DATE_FORMAT = "%Y-%m-%d"
 
-    def notify_job_application_accepted(self):
-        pass
-
-    # @staticmethod
-    # def _run(self, job_seeker, job_application, params):
-    #     print("running update")
-    #     return
-    #     # api_mode = PoleEmploiMiseAJourPassIAEAPI.USE_PRODUCTION_ROUTE
-    #     api_mode = PoleEmploiMiseAJourPassIAEAPI.USE_SANDBOX_ROUTE
-    #     token_recherche_et_maj = self.get_token(api_mode)
-    #     if token_recherche_et_maj is None:
-    #         log = JobApplicationPoleEmploiNotificationLog(
-    #             job_application=job_application,
-    #             status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION,
-    #             # details="code retour=S023"
-    #         )
-    #         log.save()
-    #         return False
-    #     # print(token_recherche_et_maj)
-    #     job_seeker = job_application.job_seeker
-    #
-    #     individual = PoleEmploiIndividu(
-    #         job_seeker.first_name, job_seeker.last_name, job_seeker.birth_date, job_seeker.nir
-    #     )
-    #
-    #     # for i in range(len(individuals)):
-    #     #     individual, code_siae, code_prescripteur = individuals[i]
-    #
-    #     individual_pole_emploi = self.get_pole_emploi_individual(individual, token_recherche_et_maj)
-    #     if individual_pole_emploi.is_valid:
-    #         try:
-    #             params["idNational"] = individual_pole_emploi.id_national_demandeur()
-    #             maj = PoleEmploiMiseAJourPassIAEAPI(params, token_recherche_et_maj, api_mode)
-    #
-    #             # 1 request/second max, taking a bit of margin here due to occasionnal timeouts
-    #             sleep(1.5)
-    #             print(maj.data)
-    #
-    #         except httpx.HTTPStatusError as error:
-    #             print(error.response.content)
-    #             return False
-    #
-    #             # print(individual.last_name)
-    #             # print(maj.data)
-
     # def generate_sample_api_params(self, encrypted_identifier):
     #     approval_start_at = date(2021, 11, 1)
     #     approval_end_at = date(2022, 7, 1)
@@ -1011,27 +1021,21 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
 
     @staticmethod
     def get_token():
-        try:
-            maj_pass_iae_api_scope = "passIAE api_maj-pass-iaev1"
-            # The sandbox mode involves a slightly different scope
-            if settings.API_ESD_MISE_A_JOUR_PASS_MODE != "production":
-                maj_pass_iae_api_scope = "passIAE api_testmaj-pass-iaev1"
-            # It is not obvious but we can ask for one token only with all the necessary rights
-            token_recherche_et_maj = get_access_token(
-                f"api_rechercheindividucertifiev1 rechercherIndividuCertifie {maj_pass_iae_api_scope}"
-            )
-            sleep(1)
-            return token_recherche_et_maj
-        except Exception as e:
-            raise PoleEmploiMiseAJourPassIAEException("", e)
-        return ""
+        """returns the necessary token for Updating PoleEmploi, or raise exceptions"""
+        maj_pass_iae_api_scope = "passIAE api_maj-pass-iaev1"
+        # The sandbox mode involves a slightly different scope
+        if settings.API_ESD_MISE_A_JOUR_PASS_MODE != "production":
+            maj_pass_iae_api_scope = "passIAE api_testmaj-pass-iaev1"
+        # It is not obvious but we can ask for one token only with all the necessary rights
+        token_recherche_et_maj = get_access_token(
+            f"api_rechercheindividucertifiev1 rechercherIndividuCertifie {maj_pass_iae_api_scope}"
+        )
+        return token_recherche_et_maj
 
     @staticmethod
     def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
         try:
             individual_pole_emploi_result = recherche_individu_certifie_api(individual, api_token)
-            # 3 requests/second max. I had timeout issues so 1 second take some margins
-            sleep(1)
             if individual is not None and individual_pole_emploi_result.is_valid:
                 return individual_pole_emploi_result.id_national_demandeur
             else:

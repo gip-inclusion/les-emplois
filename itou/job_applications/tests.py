@@ -1191,17 +1191,12 @@ class JobApplicationPoleEmploiNotificationLogTest(TestCase):
         get_access_token_mock.assert_called_with(ANY)
         self.assertEqual(token, self.sample_token)
 
-    # @patch(
-    #     "itou.job_applications.models.get_access_token",
-    #     side_effect=httpx.HTTPStatusError("", request=None, response=httpx.Response(400)),
-    # )
     @patch("itou.job_applications.models.get_access_token", side_effect=PoleEmploiMiseAJourPassIAEException("", ""))
     def test_get_token_error(self, get_access_token_mock):
         with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
             JobApplicationPoleEmploiNotificationLog.get_token()
             get_access_token_mock.assert_called_with(ANY)
 
-    #
     # @patch("itou.job_applications.models.PoleEmploiRechercheIndividuCertifieAPI", return_value=sample_encrypted_nir)
     # def test_get_individual_nominal(self, get_individual_mock):
     #     pe_individual = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
