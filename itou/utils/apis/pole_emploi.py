@@ -16,12 +16,13 @@ class PoleEmploiMiseAJourPassIAEException(Exception):
     The mise a jour process has errors in 2 locations:
      - http response code: can be 401, 400…
      - we can have non-200 response code, plus sometimes some details in the json response
+    So we store whatever we may have
     """
 
-    def __init__(self, http_code, response_code=""):
+    def __init__(self, http_code, message=""):
         super().__init__()
         self.http_code = http_code
-        self.response_code = response_code
+        self.response_code = message
 
 
 class PoleEmploiIndividu:

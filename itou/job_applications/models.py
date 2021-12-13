@@ -1020,9 +1020,9 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
             )
             sleep(1)
             return token_recherche_et_maj
-        except PoleEmploiMiseAJourPassIAEException:
-            return None
-        # return "", None
+        except Exception as e:
+            raise PoleEmploiMiseAJourPassIAEException("", e)
+        return ""
 
     @staticmethod
     def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
