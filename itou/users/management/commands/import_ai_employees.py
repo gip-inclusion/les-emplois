@@ -331,12 +331,12 @@ class Command(BaseCommand):
                     if not self.dry_run:
                         # In production, it can raise an IntegrityError if another PASS has just been delivered a few seconds ago.
                         # Try to save with another number until it succeeds.
-                        succedded = None
-                        while succedded is None:
+                        succeeded = None
+                        while succeeded is None:
                             try:
                                 # `Approval.save()` delivers an automatic number.
                                 approval.save()
-                                succedded = True
+                                succeeded = True
                             except IntegrityError:
                                 pass
                     created_approvals += 1
