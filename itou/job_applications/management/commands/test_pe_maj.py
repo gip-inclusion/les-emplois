@@ -48,11 +48,11 @@ class Command(BaseCommand):
 
     def send_pass_update(self):
         self.dump_settings()
-        # token = JobApplicationPoleEmploiNotificationLog.get_token()
-        # print(token)
-        individual = PoleEmploiIndividu("GREGOIRE", "DELMAS", date(1979, 6, 3), "179062452001390")
-        encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(individual, "test")
-        print(encrypted_nir)
+        token = JobApplicationPoleEmploiNotificationLog.get_token()
+        print(token)
+        PoleEmploiIndividu("GREGOIRE", "DELMAS", date(1979, 6, 3), "179062452001390")
+        # encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(individual, token)
+        # print(encrypted_nir)
 
     def handle(self, dry_run=False, **options):
         self.send_pass_update()

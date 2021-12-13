@@ -11,20 +11,17 @@ from itou.siaes.models import Siae  # noqa
 logger = logging.getLogger(__name__)
 
 
-class PoleEmploiTechnicalException(Exception):
-    pass
+class PoleEmploiMiseAJourPassIAEException(Exception):
+    """
+    The mise a jour process has errors in 2 locations:
+     - http response code: can be 401, 400…
+     - we can have non-200 response code, plus sometimes some details in the json response
+    """
 
-
-class PoleEmploiTokenException(Exception):
-    pass
-
-
-class PoleEmploiIndividualException(Exception):
-    pass
-
-
-class PoleEmploiMiseAJourPassException(Exception):
-    pass
+    def __init__(self, http_code, response_code=""):
+        super().__init__()
+        self.http_code = http_code
+        self.response_code = response_code
 
 
 class PoleEmploiIndividu:
@@ -71,7 +68,7 @@ class PoleEmploiIndividuResult:
 
     @staticmethod
     def from_data(data):
-        if data is not None:
+        if data is not None and type(data) == dict:
             return PoleEmploiIndividuResult(
                 data.get("idNationalDE", ""), data.get("codeSortie", ""), data.get("certifDE", "")
             )
@@ -92,6 +89,12 @@ CODE_SORTIE_MAPPING_RECHERCHE_INDIVIDU_CERTIFIE = {
     "R041": "Date de naissance incorrecte",
     "R042": "Date de naissance invalide",
 }
+
+
+def extract_code_sortie(data) -> str:
+    if data is not None and type(data) == dict:
+        return data.get("codeSortie", "")
+    return ""
 
 
 def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) -> Optional[PoleEmploiIndividuResult]:
@@ -122,17 +125,15 @@ def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) ->
         # if r.status_code not in [200, 400, 401, 404, 429]
         # for now we only care about 200 (-> successful search, someone may have been found)
         if r.status_code != 200:
-            raise PoleEmploiIndividualException(r.status_code)
+            # The only thing we care about is http code 200
+            raise PoleEmploiMiseAJourPassIAEException(r.status_code, extract_code_sortie(data))
         return PoleEmploiIndividuResult.from_data(data)
-
     except httpx.HTTPError as e:
-        # logger.error(
-        #     "httpx Error while fetching `%s` with %s, got %s", url, individu.as_api_params(), e.response.content
-        # )
-        raise PoleEmploiTechnicalException(e.response.status_code)
+        raise PoleEmploiMiseAJourPassIAEException(e.response.status_code)
     except ValueError:
-        # logger.error("Error while fetching `%s` with %s, got %s", url, individu.as_api_params(), r.content)
-        raise PoleEmploiTechnicalException(r.status_code)
+        raise PoleEmploiMiseAJourPassIAEException(r.status_code)
+    # should not happen, but we never want to miss an exception
+    raise PoleEmploiMiseAJourPassIAEException("no response code")
 
 
 # class PoleEmploiMiseAJourPass:
