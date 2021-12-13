@@ -695,9 +695,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_at = timezone.now()
             self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_AUTOMATIC
             self.approval.unsuspend(self.hiring_start_at)
-            # JobApplicationPoleEmploiNotificationLog.notify_job_application_accepted(
-            #     self.job_seeker, self, self.approval
-            # )
+            self.notify_pole_emploi_accepted()
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):
@@ -707,7 +705,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if self.is_sent_by_proxy:
             emails.append(self.email_refuse_for_proxy)
         connection.send_messages(emails)
-        # JobApplicationPoleEmploiNotificationLog.notify_pe_refused(self)
+        self.notify_pole_emploi_refused()
 
     @xwf_models.transition()
     def cancel(self, *args, **kwargs):
@@ -885,6 +883,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
          - when anything break, we quit early
         """
         individual = PoleEmploiIndividu.from_job_seeker(self.job_seeker)
+        print(individual)
         if individual is None or not individual.is_valid():
             # We may not have a valid user (missing NIR, for instance),
             # in which case we can bypass this process entirely
@@ -896,7 +895,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         try:
             token = JobApplicationPoleEmploiNotificationLog.get_token()
             sleep(1)
-        except Exception as e:  # noqa
+        except Exception as e:
             log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION
             log.details = str(e)
             log.save()
@@ -918,7 +917,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             return False
         # Step 3: we finally notify Pole Emploi that something happened for this user
         try:
-            mise_a_jour_pass_iae(self, mode, encrypted_nir, token)  # noqa
+            mise_a_jour_pass_iae(self, mode, encrypted_nir, token)
+            sleep(1)
         except PoleEmploiMiseAJourPassIAEException as e:
             log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
             log.details = f"{e.http_code} {e.response_code}"
@@ -993,26 +993,6 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
         return str(self.id)
 
     API_DATE_FORMAT = "%Y-%m-%d"
-
-    # def generate_sample_api_params(self, encrypted_identifier):
-    #     approval_start_at = date(2021, 11, 1)
-    #     approval_end_at = date(2022, 7, 1)
-    #     approved_pass = "A"
-    #     approval_number = "999992139048"
-    #     siae_siret = "42373532300044"
-    #     prescriber_siret = "36252187900034"
-
-    #     return {
-    #         "idNational": encrypted_identifier,
-    #         "statutReponsePassIAE": approved_pass,
-    #         "typeSIAE": PoleEmploiMiseAJourPass.kind(Siae.KIND_EI),
-    #         "dateDebutPassIAE": approval_start_at.strftime(self.API_DATE_FORMAT),
-    #         "dateFinPassIAE": approval_end_at.strftime(self.API_DATE_FORMAT),
-    #         "numPassIAE": approval_number,
-    #         "numSIRETsiae": siae_siret,
-    #         "numSIRETprescripteur": prescriber_siret,
-    #         "origineCandidature": PoleEmploiMiseAJourPass.sender_kind(JobApplication.SENDER_KIND_JOB_SEEKER),
-    #     }
 
     @staticmethod
     def get_token():

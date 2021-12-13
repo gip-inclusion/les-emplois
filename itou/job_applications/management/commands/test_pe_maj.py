@@ -1,10 +1,7 @@
-from datetime import date
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from itou.job_applications.models import JobApplicationPoleEmploiNotificationLog
-from itou.utils.apis.pole_emploi import PoleEmploiIndividu
+from itou.job_applications.models import JobApplication
 
 
 class Command(BaseCommand):
@@ -48,9 +45,10 @@ class Command(BaseCommand):
 
     def send_pass_update(self):
         self.dump_settings()
-        token = JobApplicationPoleEmploiNotificationLog.get_token()
-        print(token)
-        individual = PoleEmploiIndividu("GREGOIRE", "DELMAS", date(1979, 6, 3), "179062452001390")  # noqa
+        job_application = JobApplication.objects.last()
+        # print(job_application)
+        job_application.notify_pole_emploi_accepted()
+        # individual = PoleEmploiIndividu("GREGOIRE", "DELMAS", date(1979, 6, 3), "179062452001390")  # noqa
         # encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
         #     individual, token
         # )
