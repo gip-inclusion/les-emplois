@@ -5,7 +5,7 @@ from typing import Optional
 import httpx
 from django.conf import settings
 
-from itou.siaes.models import Siae  # noqa
+from itou.siaes.models import Siae
 
 
 logger = logging.getLogger(__name__)
@@ -55,9 +55,8 @@ class PoleEmploiIndividu:
     @classmethod
     def from_job_seeker(cls, job_seeker):
         if job_seeker is not None:
-            return PoleEmploiIndividu(
-                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir[:13]
-            )
+            nir = "" if job_seeker.nir is None else job_seeker.nir[0:13]
+            return PoleEmploiIndividu(job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, nir)
         return None
 
     def is_valid(self):
@@ -68,7 +67,7 @@ class PoleEmploiIndividu:
         nir = self.nir
         if nir is not None and len(nir) > 13:
             # Pole emploi only wants the first 13 digits
-            nir = nir[:13]
+            nir = nir[0:13]
 
         return {
             "nirCertifie": nir,
@@ -101,9 +100,13 @@ class PoleEmploiIndividuResult:
 
 
 def extract_code_sortie(data) -> str:
-    #     A 4 letter value in the form "Sxxx":
-    #      - S001 to S043 for errors
-    #      - S100 for success
+    """
+    Returns a 4 letter value in the form "Sxxx".
+    This is used both for recherche individu and mise à jour pass IAE.
+    Most of the time we’ll only care about the success code (S000).
+    We store non-success code in the logs for statistics, but there’s nothing we can do to improve the situation:
+    They may stem from data mismatch on PE’s end, which are business-related, not tied to a technical issue
+    """
     if data is not None and type(data) == dict:
         return data.get("codeSortie", "")
     return ""
@@ -149,11 +152,26 @@ def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) ->
 
 
 def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifier, token):
+    """
+    We post some data (see _mise_a_jour_parameters), and as an output we get a JSON response:
+    {'codeSortie': 'S000', 'idNational': 'some identifier', 'message': 'Pass IAE prescrit'}
+    The only valid result is HTTP 200 + codeSortie = "S000".
+    Everything else (other HTTP code, or different code_sortie) means that our notification has been discarded.
+    Here is an excerpt of those status codes ; there is nothing we can do to fix it on our end.
+        S008 Individu radié
+        S013 Individu sans référent de suivi principal
+        S015 Individu avec Suivi Délégué déjà en cours
+        S017 Individu en suivi CRP (donc non EDS)
+        S032 Organisme ou structure inexistant dans le référentiel Partenaire
+        S036 Lien inexistant entre structure et organisme
+    """
+    CODE_SORTIE_PASS_IAE_PRESCRIT = "S000"  # noqa constant that comes from Pole Emploi’s documentation
+
     # The production URL
     url = f"{settings.API_ESD_BASE_URL}/maj-pass-iae/v1/passIAE/miseAjour"
     if settings.API_ESD_MISE_A_JOUR_PASS_MODE != "production":
         # The test URL in recette, sandboxed mode
-        url = f"{settings.API_ESD_BASE_URL}/testmaj-pass-iae/v1/passIAE/miseAjour"
+        url = f"{settings.API_ESD_BASE_URL}/testmaj-pass-iae/v1/passIAE/miseAjour"  # noqa
     url = f"{settings.API_ESD_BASE_URL}/testmaj-pass-iae/v1/passIAE/miseAjour"  # noqa
 
     headers = {"Authorization": token, "Content-Type": "application/json"}  # noqa
@@ -162,22 +180,15 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
         params = _mise_a_jour_parameters(encrypted_identifier, job_application, pass_approved_code)
         print(params)
         # r = httpx.post(url, json=params, headers=headers)
-        # r.raise_for_status()
         # data = r.json()
-        # return data
-        return {}
+        # code_sortie = extract_code_sortie(data)
+        # # The only way the process can be entirely realized is with
+        # # code HTTP 200 + a specific code sortie
+        # if r.status_code != 200 or code_sortie != CODE_SORTIE_PASS_IAE_PRESCRIT:
+        #     raise PoleEmploiMiseAJourPassIAEException(r.status_code, code_sortie)
+        # return True
     except httpx.HTTPError as e:
         raise PoleEmploiMiseAJourPassIAEException(e.response.status_code)
-        # if e.response.status_code == 401:
-        #     error = f"Error with code: {code_sortie_maj(data)}"
-        # if e.response.status_code == 404:
-        #     # surprise !? PE's authentication layer can trigger 404
-        #     # if the scope does not allow access to this API
-        #     error = "Authentication error"
-        # else:
-        #     # In general when input data cannot be processed, a 500 is returned
-        #     logger.error("Error while fetching `%s`: %s", url, e)
-        #     error = "Unable to update data."
 
     raise PoleEmploiMiseAJourPassIAEException("undetected failure to update")
 
