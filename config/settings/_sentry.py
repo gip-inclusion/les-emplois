@@ -3,7 +3,7 @@ import os
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.logging import ignore_logger, LoggingIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 
 
 def strip_sentry_sensitive_data(event, hint):
@@ -40,7 +40,7 @@ def sentry_init(dsn):
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         # We recommend adjusting this value in production.
-        traces_sample_rate=1.0,
+        traces_sample_rate=0,
         # Associate users (ID+email+username+IP) to errors.
         # https://docs.sentry.io/platforms/python/django/
         send_default_pii=True,
