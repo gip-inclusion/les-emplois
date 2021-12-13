@@ -861,10 +861,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
 
     def notify_pole_emploi_accepted(self):
-        self._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED)
+        return self._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED)
 
     def notify_pole_emploi_refused(self):
-        self._notify_pole_employ(POLE_EMPLOI_PASS_REFUSED)
+        return self._notify_pole_employ(POLE_EMPLOI_PASS_REFUSED)
 
     def _notify_pole_employ(self, mode) -> bool:
         """
