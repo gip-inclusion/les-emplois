@@ -54,7 +54,11 @@ class PoleEmploiIndividu:
 
     @classmethod
     def from_job_seeker(cls, job_seeker):
-        return PoleEmploiIndividu(job_seeker.first_name, job_seeker.last_name, job_seeker.birth_date, job_seeker.nir)
+        if job_seeker is not None:
+            return PoleEmploiIndividu(
+                job_seeker.first_name, job_seeker.last_name, job_seeker.birth_date, job_seeker.nir
+            )
+        return None
 
     def is_valid(self):
         return self.first_name != "" and self.last_name != "" and len(self.nir) == 13 and self.birthdate != ""
