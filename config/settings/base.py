@@ -680,3 +680,8 @@ EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS = int(os.environ.get("EMPLOYEE_RECORD_AR
 # It is used as parameter to filter the eligible job applications for the feature.
 # (no job application before this date can be used for this feature)
 EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 7, 1, tzinfo=timezone.utc)
+
+# Only PROD or temporary tests environments are able to transfer employee records data to ASP 
+# This is disabled by default, overidden in prod settings, and can be set 
+# via local dev settings or env vars for a temporary environment.
+EMPLOYEE_RECORD_TRANSFER_ENABLED = bool(os.environ.get("EMPLOYEE_RECORD_TRANSFER_ENABLED", False))

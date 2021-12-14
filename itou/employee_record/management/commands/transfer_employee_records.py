@@ -354,6 +354,13 @@ class Command(BaseCommand):
         """
         Employee Record Management Command
         """
+        if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
+            self.logger.info(
+                "This management command can't be used in this environment. Update Django settings if needed."
+            )
+            # Goodbye Marylou
+            return
+
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
 
