@@ -279,7 +279,6 @@ class Approval(CommonApprovalMixin):
             self.can_be_suspended
             # Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
             and self.user.last_hire_was_made_by_siae(siae)
-            and not self.user.last_accepted_job_application.can_be_cancelled
         )
 
     @cached_property
