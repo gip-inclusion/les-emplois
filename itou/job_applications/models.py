@@ -12,6 +12,7 @@ from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
+from huey.contrib.djhuey import db_task
 
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
@@ -860,13 +861,17 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     def notify_pole_emploi_accepted(self) -> bool:
         if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
-            return self._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED)
+            return self._huey_notify_pole_employ(POLE_EMPLOI_PASS_APPROVED)
         return False
 
     def notify_pole_emploi_refused(self) -> bool:
         if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
-            return self._notify_pole_employ(POLE_EMPLOI_PASS_REFUSED)
+            return self._huey_notify_pole_employ(POLE_EMPLOI_PASS_REFUSED)
         return False
+
+    @db_task()
+    def _huey_notify_pole_employ(self, mode: str):
+        return self._notify_pole_employ(mode)
 
     def _notify_pole_employ(self, mode: str) -> bool:
         """
