@@ -26,3 +26,15 @@ POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK = {
     "codeSortie": "R010",
     "certifDE": False,
 }
+
+POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_OK_MOCK = {
+    "codeSortie": "S000",
+    "idNational": "some_id_national",
+    "message": "Pass IAE prescrit",
+}
+
+POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_ERROR_MOCK = {
+    "codeSortie": "S022",
+    "idNational": "some_id_national",
+    "message": "SD non installé : : Refus du PASS IAE",
+}

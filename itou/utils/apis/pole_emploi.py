@@ -88,7 +88,9 @@ class PoleEmploiIndividuResult:
     certif_de: str
 
     def is_valid(self):
-        return self.code_sortie == "S001"
+        # This specific value is provided by Pole Emploi as part of their API spec
+        CODE_SORTIE_INDIVIDU_TROUVE = "S001"
+        return self.code_sortie == CODE_SORTIE_INDIVIDU_TROUVE
 
     @staticmethod
     def from_data(data):
@@ -178,15 +180,14 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
 
     try:
         params = _mise_a_jour_parameters(encrypted_identifier, job_application, pass_approved_code)
-        print(params)
-        # r = httpx.post(url, json=params, headers=headers)
-        # data = r.json()
-        # code_sortie = extract_code_sortie(data)
-        # # The only way the process can be entirely realized is with
-        # # code HTTP 200 + a specific code sortie
-        # if r.status_code != 200 or code_sortie != CODE_SORTIE_PASS_IAE_PRESCRIT:
-        #     raise PoleEmploiMiseAJourPassIAEException(r.status_code, code_sortie)
-        # return True
+        r = httpx.post(url, json=params, headers=headers)
+        data = r.json()
+        code_sortie = extract_code_sortie(data)
+        # The only way the process can be entirely realized is with
+        # code HTTP 200 + a specific code sortie
+        if r.status_code != 200 or code_sortie != CODE_SORTIE_PASS_IAE_PRESCRIT:
+            raise PoleEmploiMiseAJourPassIAEException(r.status_code, code_sortie)
+        return True
     except httpx.HTTPError as e:
         raise PoleEmploiMiseAJourPassIAEException(e.response.status_code)
 
@@ -237,18 +238,19 @@ def _mise_a_jour_sender_kind_param(sender_kind):
     return sender_kind_mapping[JobApplication.SENDER_KIND_JOB_SEEKER]
 
 
-def _mise_a_jour_parameters(encrypted_identifier, job_application, approval, pass_approved_code):
+def _mise_a_jour_parameters(encrypted_identifier: str, job_application, pass_approved_code: str):
     """
     The necessary parameters to notify Pole Emploi that a Pass has been granted
     """
-    siae = job_application.siae
+    siae = job_application.to_siae
+    approval = job_application.approval
 
-    if approval is None:
+    if pass_approved_code == POLE_EMPLOI_PASS_REFUSED:
         # The necessary parameters to notify Pole Emploi of a refusal
         return {
             "idNational": encrypted_identifier,
             "statutReponsePassIAE": POLE_EMPLOI_PASS_REFUSED,
-            "origineCandidature": _mise_a_jour_sender_kind_param(siae.sender_kind),
+            "origineCandidature": _mise_a_jour_sender_kind_param(job_application.sender_kind),
         }
     # The necessary parameters to notify Pole Emploi that a Pass has been granted
     return {
@@ -259,5 +261,5 @@ def _mise_a_jour_parameters(encrypted_identifier, job_application, approval, pas
         "dateFinPassIAE": approval.end_at.strftime(DATE_FORMAT),
         "numPassIAE": approval.number,
         "numSIRETsiae": siae.siret,
-        "origineCandidature": _mise_a_jour_sender_kind_param(siae.sender_kind),
+        "origineCandidature": _mise_a_jour_sender_kind_param(job_application.sender_kind),
     }
