@@ -31,6 +31,8 @@ ASP_FS_KNOWN_HOSTS = None
 
 # Employee record production deployment
 EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 1, 1, tzinfo=timezone.utc)
+# Allow for testing
+EMPLOYEE_RECORD_TRANSFER_ENABLED = True
 
 FRANCE_CONNECT_CLIENT_ID = "FC_CLIENT_ID_123"
 FRANCE_CONNECT_CLIENT_SECRET = "FC_CLIENT_SECRET_123"
