@@ -883,7 +883,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
          - when anything break, we quit early
         """
         individual = PoleEmploiIndividu.from_job_seeker(self.job_seeker)
-        print(individual)
+        # print(individual)
         if individual is None or not individual.is_valid():
             # We may not have a valid user (missing NIR, for instance),
             # in which case we can bypass this process entirely

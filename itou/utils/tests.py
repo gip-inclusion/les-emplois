@@ -17,6 +17,7 @@ from factory import Faker
 
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
@@ -25,14 +26,19 @@ from itou.users.models import User
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.pole_emploi import (
+    POLE_EMPLOI_PASS_APPROVED,
+    POLE_EMPLOI_PASS_REFUSED,
     PoleEmploiIndividu,
     PoleEmploiMiseAJourPassIAEException,
+    mise_a_jour_pass_iae,
     recherche_individu_certifie_api,
 )
 from itou.utils.emails import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.pole_emploi import (
+    POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_ERROR_MOCK,
+    POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_OK_MOCK,
     POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK,
     POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK,
 )
@@ -714,14 +720,14 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertTrue(etablissement.is_head_office)
 
 
-class PoleEmploiTest(SimpleTestCase):
-    """All the test cases around function recherche_individu_certifie_api"""
+class PoleEmploiTest(TestCase):
+    """All the test cases around function recherche_individu_certifie_api and mise_a_jour_pass_iae"""
 
     @mock.patch(
         "httpx.post",
         return_value=httpx.Response(200, json=POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK),
     )
-    def test_recherche_individu_certifie_api_nominal(self, mock_api_entreprise):
+    def test_recherche_individu_certifie_api_nominal(self, mock_post):
         individual = PoleEmploiIndividu("EVARISTE", "GALOIS", datetime.date(1979, 6, 3), "152062441001270")
         individu_result = recherche_individu_certifie_api(individual, "some_valid_token")
 
@@ -733,7 +739,7 @@ class PoleEmploiTest(SimpleTestCase):
         "httpx.post",
         return_value=httpx.Response(200, json=POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK),
     )
-    def test_recherche_individu_certifie_individual_not_found(self, mock_api_entreprise):
+    def test_recherche_individu_certifie_individual_not_found(self, mock_post):
         individual = PoleEmploiIndividu("EVARISTE", "GALOIS", datetime.date(1979, 6, 3), "152062441001270")
         individu_result = recherche_individu_certifie_api(individual, "some_valid_token")
 
@@ -744,11 +750,70 @@ class PoleEmploiTest(SimpleTestCase):
         "httpx.post",
         return_value=httpx.Response(401, json=""),
     )
-    def test_recherche_individu_certifie_invalid_token(self, mock_api_entreprise):
+    def test_recherche_individu_certifie_invalid_token(self, mock_post):
         individual = PoleEmploiIndividu("EVARISTE", "GALOIS", datetime.date(1979, 6, 3), "152062441001270")
         with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
             individu_result = recherche_individu_certifie_api(individual, "broken_token")
             self.assertIsNone(individu_result)
+
+    @mock.patch(
+        "httpx.post",
+        return_value=httpx.Response(200, json=POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_OK_MOCK),
+    )
+    def test_mise_a_jour_pass_iae_success_with_approval_accepted(self, mock_post):
+        """
+        Nominal scenario: an approval is **accepted**
+        HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae will return True"""
+        job_application = JobApplicationWithApprovalFactory()
+        result = mise_a_jour_pass_iae(
+            job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
+        )
+        mock_post.assert_called()
+        self.assertTrue(result)
+
+    @mock.patch(
+        "httpx.post",
+        return_value=httpx.Response(200, json=POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_OK_MOCK),
+    )
+    def test_mise_a_jour_pass_iae_success_with_approval_refused(self, mock_post):
+        """
+        Nominal scenario: an approval is **refused**
+        HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae will return True"""
+        job_application = JobApplicationFactory()
+        result = mise_a_jour_pass_iae(
+            job_application, POLE_EMPLOI_PASS_REFUSED, "some_valid_encrypted_identifier", "some_valid_token"
+        )
+        mock_post.assert_called()
+        self.assertTrue(result)
+
+    @mock.patch(
+        "httpx.post",
+        return_value=httpx.Response(200, json=POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_ERROR_MOCK),
+    )
+    def test_mise_a_jour_pass_iae_failure(self, mock_post):
+        """
+        If the API answers with a non-S001 codeSortie (this is something in the json output)
+        mise_a_jour_pass_iae will return false
+        """
+        job_application = JobApplicationWithApprovalFactory()
+        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+            mise_a_jour_pass_iae(
+                job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
+            )
+            mock_post.assert_called()
+
+    @mock.patch(
+        "httpx.post",
+        return_value=httpx.Response(401, json=""),
+    )
+    def test_mise_a_jour_pass_iae_invalid_token(self, mock_post):
+        """If the API answers with a non-200 http code, mise_a_jour_pass_iae will return false"""
+        job_application = JobApplicationWithApprovalFactory()
+        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+            mise_a_jour_pass_iae(
+                job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
+            )
+            mock_post.assert_called()
 
 
 class UtilsEmailsSplitRecipientTest(TestCase):
