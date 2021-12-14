@@ -37,3 +37,7 @@ FRANCE_CONNECT_CLIENT_SECRET = "FC_CLIENT_SECRET_123"
 
 # Approvals
 AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = "colette@ratatouille.com"
+
+# We enable the notifications in the test environment so that can ensure it behaves as expected,
+# then we mock the objects accordingly
+API_ESD_SHOUlD_PERFORM_MISE_A_JOUR_PASS = True
