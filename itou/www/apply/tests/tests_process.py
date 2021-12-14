@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
@@ -26,8 +28,9 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
+@patch("itou.job_applications.models.JobApplication._huey_notify_pole_employ", return_value=False)
 class ProcessViewsTest(TestCase):
-    def test_details_for_siae(self):
+    def test_details_for_siae(self, *args, **kwargs):
         """Display the details of a job application."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
@@ -65,7 +68,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertContains(response, resume_link)
 
-    def test_details_for_siae_hidden(self):
+    def test_details_for_siae_hidden(self, *args, **kwargs):
         """A hidden job_application is not displayed."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -78,7 +81,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(404, response.status_code)
 
-    def test_details_for_siae_as_prescriber(self):
+    def test_details_for_siae_as_prescriber(self, *args, **kwargs):
         """As a prescriber, I cannot access the job_applications details for SIAEs."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
@@ -90,7 +93,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_details_for_prescriber(self):
+    def test_details_for_prescriber(self, *args, **kwargs):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
@@ -102,7 +105,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_details_for_prescriber_as_siae(self):
+    def test_details_for_prescriber_as_siae(self, *args, **kwargs):
         """As a SIAE user, I cannot access the job_applications details for prescribers."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
@@ -113,7 +116,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-    def test_process(self):
+    def test_process(self, *args, **kwargs):
         """Ensure that the `process` transition is triggered."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
@@ -128,7 +131,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_processing)
 
-    def test_refuse(self):
+    def test_refuse(self, *args, **kwargs):
         """Ensure that the `refuse` transition is triggered."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -158,7 +161,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_refused)
 
-    def test_postpone(self):
+    def test_postpone(self, *args, **kwargs):
         """Ensure that the `postpone` transition is triggered."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -180,7 +183,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_postponed)
 
-    def test_accept(self):
+    def test_accept(self, *args, **kwargs):
         """Test the `accept` transition."""
         create_test_cities(["54", "57"], num_per_department=2)
         city = City.objects.first()
@@ -278,7 +281,7 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response, "form_user_address", "city", "Ce champ est obligatoire.")
         self.assertFormError(response, "form_user_address", "post_code", "Ce champ est obligatoire.")
 
-    def test_accept_with_active_suspension(self):
+    def test_accept_with_active_suspension(self, *args, **kwargs):
         """Test the `accept` transition with active suspension for active user"""
         create_test_cities(["54", "57"], num_per_department=2)
         city = City.objects.first()
@@ -347,7 +350,7 @@ class ProcessViewsTest(TestCase):
             approval_job_seeker.end_at + relativedelta(days=(g_suspension.end_at - g_suspension.start_at).days),
         )
 
-    def test_accept_with_manual_approval_delivery(self):
+    def test_accept_with_manual_approval_delivery(self, *args, **kwargs):
         """
         Test the "manual approval delivery mode" path of the view.
         """
@@ -391,7 +394,7 @@ class ProcessViewsTest(TestCase):
         job_application.refresh_from_db()
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
 
-    def test_accept_and_update_hiring_start_date_of_two_job_applications(self):
+    def test_accept_and_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
         create_test_cities(["54", "57"], num_per_department=2)
         city = City.objects.first()
         job_seeker = JobSeekerWithAddressFactory()
@@ -492,7 +495,7 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_app_starting_later.state.is_accepted)
         self.assertEqual(job_app_starting_later.approval.start_at, job_app_starting_earlier.hiring_start_at)
 
-    def test_eligibility(self):
+    def test_eligibility(self, *args, **kwargs):
         """Test eligibility."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -550,7 +553,7 @@ class ProcessViewsTest(TestCase):
         self.assertIn(criterion2, administrative_criteria)
         self.assertIn(criterion3, administrative_criteria)
 
-    def test_eligibility_for_siae_not_subject_to_eligibility_rules(self):
+    def test_eligibility_for_siae_not_subject_to_eligibility_rules(self, *args, **kwargs):
         """Test eligibility for an Siae not subject to eligibility rules."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -563,7 +566,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_eligibility_state_for_job_application(self):
+    def test_eligibility_state_for_job_application(self, *args, **kwargs):
         """The eligibility diagnosis page must only be accessible
         in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
         siae = SiaeWithMembershipFactory()
@@ -589,7 +592,7 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.status_code, 404)
         self.client.logout()
 
-    def test_cancel(self):
+    def test_cancel(self, *args, **kwargs):
         # Hiring date is today: cancellation should be possible.
         job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         siae_user = job_application.to_siae.members.first()
@@ -608,7 +611,7 @@ class ProcessViewsTest(TestCase):
         job_application.refresh_from_db()
         self.assertTrue(job_application.state.is_cancelled)
 
-    def test_cannot_cancel(self):
+    def test_cannot_cancel(self, *args, **kwargs):
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=timezone.localdate() + relativedelta(days=1),
@@ -626,7 +629,7 @@ class ProcessViewsTest(TestCase):
         job_application.refresh_from_db()
         self.assertFalse(job_application.state.is_cancelled)
 
-    def test_accept_after_cancel(self):
+    def test_accept_after_cancel(self, *args, **kwargs):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
         create_test_cities(["54", "57"], num_per_department=2)
@@ -662,7 +665,7 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(approval.start_at, job_application.hiring_start_at)
         self.assertTrue(job_application.state.is_accepted)
 
-    def test_archive(self):
+    def test_archive(self, *args, **kwargs):
         """Ensure that when an SIAE archives a job_application, the hidden_for_siae flag is updated."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
