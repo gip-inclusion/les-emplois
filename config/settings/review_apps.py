@@ -29,7 +29,6 @@ EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
 
 SHOW_TEST_ACCOUNTS_BANNER = True
-API_ESD_SHOUlD_PERFORM_MISE_A_JOUR_PASS = False
 
 # Active Elastic APM metrics
 # See https://www.elastic.co/guide/en/apm/agent/python/current/configuration.html
