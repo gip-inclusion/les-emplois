@@ -98,4 +98,5 @@ class JobApplicationTransitionLogAdmin(admin.ModelAdmin):
 @admin.register(models.JobApplicationPoleEmploiNotificationLog)
 class JobApplicationPoleEmploiNotificationLogAdmin(admin.ModelAdmin):
     actions = None
+    list_display = ("created_at", "status", "details")
     readonly_fields = ("created_at", "updated_at", "status", "details")
