@@ -49,7 +49,7 @@ class PoleEmploiIndividu:
     def __init__(self, first_name: str, last_name: str, birthdate, nir: str):
         self.first_name = first_name.upper()
         self.last_name = last_name.upper()
-        self.birthdate = birthdate.strftime("%Y-%m-%d")
+        self.birthdate = birthdate.strftime("%Y-%m-%d") if birthdate else ""
         self.nir = nir
 
     @classmethod
@@ -253,12 +253,14 @@ def _mise_a_jour_parameters(encrypted_identifier: str, job_application, pass_app
             "origineCandidature": _mise_a_jour_sender_kind_param(job_application.sender_kind),
         }
     # The necessary parameters to notify Pole Emploi that a Pass has been granted
+    date_debut_pass = approval.start_at.strftime(DATE_FORMAT) if approval.start_at else ""
+    date_fin_pass = approval.end_at.strftime(DATE_FORMAT) if approval.start_at else ""
     return {
         "idNational": encrypted_identifier,
         "statutReponsePassIAE": POLE_EMPLOI_PASS_APPROVED,
         "typeSIAE": _mise_a_jour_siae_kind_param(siae),
-        "dateDebutPassIAE": approval.start_at.strftime(DATE_FORMAT),
-        "dateFinPassIAE": approval.end_at.strftime(DATE_FORMAT),
+        "dateDebutPassIAE": date_debut_pass,
+        "dateFinPassIAE": date_fin_pass,
         "numPassIAE": approval.number,
         "numSIRETsiae": siae.siret,
         "origineCandidature": _mise_a_jour_sender_kind_param(job_application.sender_kind),
