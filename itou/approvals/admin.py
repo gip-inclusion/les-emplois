@@ -127,8 +127,8 @@ class ApprovalAdmin(admin.ModelAdmin):
             messages.set_level(request, messages.ERROR)
             messages.error(
                 request,
-                f"Il existe une fiche salarié bloquante (ID: {employee_record.pk})"
-                "pour la modification de ce PASS IAE ({obj.number}).",
+                f"Il existe une fiche salarié bloquante (ID: {employee_record.pk}) "
+                f"pour la modification de ce PASS IAE ({obj.number}).",
             )
             return
 
