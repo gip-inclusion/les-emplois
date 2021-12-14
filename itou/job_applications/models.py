@@ -859,12 +859,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
 
     def notify_pole_emploi_accepted(self):
-        if settings.API_ESD_SHOUlD_PERFORM_MISE_A_JOUR_PASS:
+        if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
             return self._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED)
         return False
 
     def notify_pole_emploi_refused(self):
-        if settings.API_ESD_SHOUlD_PERFORM_MISE_A_JOUR_PASS:
+        if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
             return self._notify_pole_employ(POLE_EMPLOI_PASS_REFUSED)
         return False
 
