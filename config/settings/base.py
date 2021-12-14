@@ -372,6 +372,7 @@ API_ESD_BASE_URL = os.environ.get("API_ESD_BASE_URL", "https://api.emploi-store.
 # but the API confirms everything was alright), or in production mode (updates ARE saved)
 # the values can be: sandbox|production
 API_ESD_MISE_A_JOUR_PASS_MODE = os.environ.get("API_ESD_MISE_A_JOUR_PASS_MODE", "sandbox")
+API_ESD_SHOUlD_PERFORM_MISE_A_JOUR_PASS = os.environ.get("API_ESD_MISE_A_JOUR_PASS_MODE", "False") == "True"
 
 
 # PE Connect aka PEAMU - technically one of ESD's APIs.
