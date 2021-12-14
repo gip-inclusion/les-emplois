@@ -50,3 +50,6 @@ ELASTIC_APM = {
     "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
     "TRANSACTION_SAMPLE_RATE": 0.1,
 }
+
+# Overrides base settings, only PROD should be allowed to do this
+EMPLOYEE_RECORD_TRANSFER_ENABLED = True
