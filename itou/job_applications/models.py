@@ -858,17 +858,17 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email = self.email_manually_refuse_approval
         email.send()
 
-    def notify_pole_emploi_accepted(self):
+    def notify_pole_emploi_accepted(self) -> bool:
         if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
             return self._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED)
         return False
 
-    def notify_pole_emploi_refused(self):
+    def notify_pole_emploi_refused(self) -> bool:
         if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
             return self._notify_pole_employ(POLE_EMPLOI_PASS_REFUSED)
         return False
 
-    def _notify_pole_employ(self, mode) -> bool:
+    def _notify_pole_employ(self, mode: str) -> bool:
         """
         The entire logic for notifying Pole Emploi when a job_application is accepted:
             - first, we authenticate to pole-emploi.io with the proper credentials, scopes, environment and
@@ -887,7 +887,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
          - when anything break, we quit early
         """
         individual = PoleEmploiIndividu.from_job_seeker(self.job_seeker)
-        # print(individual)
         if individual is None or not individual.is_valid():
             # We may not have a valid user (missing NIR, for instance),
             # in which case we can bypass this process entirely
@@ -999,7 +998,7 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
     API_DATE_FORMAT = "%Y-%m-%d"
 
     @staticmethod
-    def get_token():
+    def get_token() -> str:
         """returns the necessary token for Updating PoleEmploi, or raise exceptions"""
         maj_pass_iae_api_scope = "passIAE api_maj-pass-iaev1"
         # The sandbox mode involves a slightly different scope
