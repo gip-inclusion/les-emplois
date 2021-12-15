@@ -616,6 +616,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertFalse(created)
         self.assertFalse(redelivered_approval)
         self.assertTrue(previous_approval.pk, approval.pk)
+        job_seeker.delete()
 
     # Find or create job applications.
     def test_find_or_create_job_application__find(self):
@@ -669,6 +670,32 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertFalse(new_job_application.can_be_cancelled)
         self.assertTrue(new_job_application.is_from_ai_stock)
         self.assertEqual(JobApplication.objects.all().count, 1)
+        job_application.job_seeker.delete()
+
+        # Different contract starting date.
+        siae = SiaeFactory()
+        job_application = JobApplicationFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            job_seeker__nir=getattr(CleanedAiCsvFile(), NIR_COL),
+            approval_id="",
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
+            approval_manually_delivered_by=developer,
+            created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+            hiring_start_at=datetime.date("2021-01-01"),
+        )
+        df = pandas.DataFrame([CleanedAiCsvFile(**{SIRET_COL: siae.siret})])
+        created, new_job_application, cancelled_job_app_deleted = command.find_or_create_job_application(
+            approval=job_application.approval,
+            job_seeker=job_application.job_seeker,
+            row=df.iloc[0],
+            approval_manually_delivered_by=developer,
+        )
+        self.assertTrue(created)
+        self.assertNotEqual(job_application.pk, new_job_application.pk)
+        self.assertFalse(cancelled_job_app_deleted)
+        job_application.job_seeker.delete()
 
     def test_import_data_into_itou(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
@@ -708,8 +735,8 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(JobApplication.objects.count(), 1)
         job_seeker.delete()
 
-        # # Only values to be imported are imported but the whole input data frame
-        # # is updated for logging purposes.
+        # Only values to be imported are imported but the whole input data frame
+        # is updated for logging purposes.
         input_df = pandas.DataFrame(
             [
                 CleanedAiCsvFile(**{CONTRACT_ENDDATE_COL: "2020-05-11"}),  # Ended contracts are ignored.
