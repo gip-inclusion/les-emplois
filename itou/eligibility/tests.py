@@ -177,7 +177,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         self.assertEqual(last_considered_valid, prescriber_diagnosis)
         self.assertIsNone(last_expired)
 
-        # Has a expired Itou diagnoses made by an other SIAE
+        # Has an expired Itou diagnoses made by another SIAE.
         job_seeker = JobSeekerFactory()
         siae1 = SiaeWithMembershipFactory()
         siae2 = SiaeWithMembershipFactory()
@@ -189,7 +189,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker, for_siae=siae2)
         self.assertIsNone(last_expired)
 
-        # Has 2 Itou diagnoses: 1 is concidered expired and second is concidered valid
+        # Has 2 Itou diagnoses: 1 is considered expired and the second is considered valid.
         job_seeker = JobSeekerFactory()
         ExpiredEligibilityDiagnosisFactory(job_seeker=job_seeker)
         EligibilityDiagnosisFactory(job_seeker=job_seeker)
@@ -200,7 +200,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         self.assertIsNotNone(last_considered_valid)
         self.assertIsNone(last_expired)
 
-        # Has 2 Itou diagnoses are concidered expired : the last one expired must be returned
+        # Has 2 Itou diagnoses expired: the last one expired must be returned.
         job_seeker = JobSeekerFactory()
 
         date_6m = (
