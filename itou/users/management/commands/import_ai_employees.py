@@ -44,9 +44,12 @@ PHONE_COL = "adr_telephone"
 POST_CODE_COL = "codepostalcedex"
 SIAE_NAME_COL = "pmo_denom_soc"
 SIRET_COL = "pmo_siret"
-PASS_IAE_NUMBER_COL = "Numéro de PASS IAE"
-USER_PK_COL = "ID salarié"
-COMMENTS_COL = "Commentaire"
+COMMENTS_COL = "commentaire"
+USER_PK_COL = "salarie_id_pour_asp"
+USER_ITOU_EMAIL_COL = "salarie_itou_email"
+PASS_IAE_NUMBER_COL = "pass_iaa_numero"
+PASS_IAE_START_DATE_COL = "pass_iae_date_debut"
+PASS_IAE_END_DATE_COL = "pass_iae_date_fin"
 
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -483,8 +486,11 @@ class Command(BaseCommand):
 
             # Update dataframe values.
             # https://stackoverflow.com/questions/25478528/updating-value-in-iterrow-for-pandas
-            df.loc[i, USER_PK_COL] = job_seeker.jobseeker_hash_id
             df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
+            df.loc[i, PASS_IAE_START_DATE_COL] = approval.start_at.strftime(DATE_FORMAT)
+            df.loc[i, PASS_IAE_END_DATE_COL] = approval.end_at.strftime(DATE_FORMAT)
+            df.loc[i, USER_PK_COL] = job_seeker.jobseeker_hash_id
+            df.loc[i, USER_ITOU_EMAIL_COL] = job_seeker.email
 
         self.logger.info("Import is over!")
         self.logger.info(f"Already existing users: {found_users}.")
@@ -513,17 +519,12 @@ class Command(BaseCommand):
 
     def add_columns_for_asp(self, df):
         df[COMMENTS_COL] = ""
-        df[PASS_IAE_NUMBER_COL] = ""
         df[USER_PK_COL] = ""
+        df[USER_ITOU_EMAIL_COL] = ""
+        df[PASS_IAE_NUMBER_COL] = ""
+        df[PASS_IAE_START_DATE_COL] = ""
+        df[PASS_IAE_END_DATE_COL] = ""
         return df
-
-    def assert_asp_columns(self, df):
-        expected_columns = [
-            COMMENTS_COL,
-            PASS_IAE_NUMBER_COL,
-            USER_PK_COL,
-        ]
-        assert all(item in df.columns for item in expected_columns)
 
     def filter_invalid_nirs(self, df):
         total_df = df.copy()
@@ -610,8 +611,6 @@ class Command(BaseCommand):
         # Step 4: create a CSV file including comments to be shared with the ASP.
         df = df.drop(["nir_is_valid", "siret_validated_by_asp"], axis=1)  # Remove useless columns.
 
-        # Make sure expected columns are present.
-        self.assert_asp_columns(df)
         self.log_to_csv("fichier_final", df)
         self.logger.info("📖 STEP 4: log final results.")
         self.logger.info("You can transfer this file to the ASP: /exports/import_ai_bilan.csv")
