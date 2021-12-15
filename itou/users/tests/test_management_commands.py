@@ -372,10 +372,12 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         first_name = getattr(base_data, FIRST_NAME_COL).title()
         last_name = getattr(base_data, LAST_NAME_COL).title()
         birthdate = getattr(base_data, BIRTHDATE_COL)
+        nir = getattr(base_data, NIR_COL)
         JobSeekerFactory(
             first_name=first_name,
             last_name=last_name,
             birthdate=birthdate,
+            nir=nir,
             created_by=developer,
             date_joined=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
         )
@@ -452,6 +454,16 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # If no email provided: fake email.
         df = pandas.DataFrame([CleanedAiCsvFile(**{EMAIL_COL: ""})])
+        created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
+        self.assertTrue(created)
+        self.assertTrue(job_seeker.email.endswith("@email-temp.com"))
+        job_seeker.delete()
+
+        # A job seeker is found by email address but its NIR is different.
+        # Create a new one.
+        email = getattr(CleanedAiCsvFile(), EMAIL_COL)
+        JobSeekerFactory(nir="141062a78200555", email=email)
+        df = pandas.DataFrame([CleanedAiCsvFile()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertTrue(created)
         self.assertTrue(job_seeker.email.endswith("@email-temp.com"))
@@ -709,6 +721,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
                         BIRTHDATE_COL: datetime.date(1997, 3, 12),
                     }
                 ),
+                # Different contract start date.
                 CleanedAiCsvFile(**{CONTRACT_STARTDATE_COL: datetime.date(2020, 4, 12)}),
                 CleanedAiCsvFile(),
             ]
@@ -725,6 +738,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(job_seeker.job_applications.count(), 2)
         self.assertEqual(job_seeker.approvals.count(), 1)
 
+        # Different contract start date.
         job_seeker = User.objects.get(email="tartarin@gmail.fr")
         self.assertEqual(job_seeker.job_applications.count(), 1)
         self.assertEqual(job_seeker.approvals.count(), 1)
