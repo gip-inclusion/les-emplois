@@ -28,7 +28,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
-@patch("itou.job_applications.models.JobApplication._huey_notify_pole_employ", return_value=False)
+@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class ProcessViewsTest(TestCase):
     def test_details_for_siae(self, *args, **kwargs):
         """Display the details of a job application."""
