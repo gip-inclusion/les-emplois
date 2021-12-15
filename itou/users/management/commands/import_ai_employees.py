@@ -67,15 +67,10 @@ class Command(BaseCommand):
     2/ Clean data.
     3/ Create job seekers, approvals and job applications when needed.
 
-    Mandatory arguments
+    Mandatory argument
     -------------------
     File path: path to the CSV file.
     django-admin import_ai_employees --file-path=/imports/file.csv
-
-    Developer email: email of the person running this script. It must belong to
-    a user account registered in the database.
-    Job applications, users and approvals will be marked as created by this person.
-    django-admin import_ai_employees --email=funky@developer.com
 
     Optional arguments
     ------------------
@@ -112,13 +107,6 @@ class Command(BaseCommand):
             required=True,
             action="store",
             help="Absolute path of the CSV file to import",
-        )
-        parser.add_argument(
-            "--email",
-            dest="developer_email",
-            required=True,
-            action="store",
-            help="Developer email account (in the Itou database).",
         )
 
     def set_logger(self, verbosity):
@@ -391,6 +379,7 @@ class Command(BaseCommand):
             approval_manually_delivered_by=approval_manually_delivered_by,
             created_at__date=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date(),
             job_seeker=job_seeker,
+            hiring_start_at=row[CONTRACT_STARTDATE_COL],
         )
 
         # Employers cancelled job applications created by us with this script,
@@ -448,7 +437,7 @@ class Command(BaseCommand):
 
         # Get developer account by email.
         # Used to store who created the following users, approvals and job applications.
-        developer = User.objects.get(email=self.developer_email)
+        developer = User.objects.get(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
 
         pbar = tqdm(total=len(to_be_imported_df))
         for i, row in to_be_imported_df.iterrows():
@@ -569,7 +558,7 @@ class Command(BaseCommand):
         total_df.loc[rows_with_approval_df.index, COMMENTS_COL] = "Ligne ignorée : agrément ou PASS IAE renseigné."
         return total_df, filtered_df
 
-    def handle(self, file_path, developer_email, dry_run=False, invalid_nirs_only=False, **options):
+    def handle(self, file_path, dry_run=False, invalid_nirs_only=False, **options):
         """
         Each line represents a contract.
         1/ Read the file and clean data.
@@ -577,7 +566,6 @@ class Command(BaseCommand):
         3/ Create job seekers, approvals and job applications.
         """
         self.dry_run = dry_run
-        self.developer_email = developer_email
         sample_size = options.get("sample_size")
         self.set_logger(options.get("verbosity"))
 
