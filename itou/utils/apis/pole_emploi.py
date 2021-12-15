@@ -221,7 +221,6 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
     if settings.API_ESD_MISE_A_JOUR_PASS_MODE != "production":
         # The test URL in recette, sandboxed mode
         url = f"{settings.API_ESD_BASE_URL}/testmaj-pass-iae/v1/passIAE/miseAjour"  # noqa
-    url = f"{settings.API_ESD_BASE_URL}/testmaj-pass-iae/v1/passIAE/miseAjour"  # noqa
 
     headers = {"Authorization": token, "Content-Type": "application/json"}  # noqa
 
