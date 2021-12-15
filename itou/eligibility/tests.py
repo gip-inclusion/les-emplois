@@ -66,6 +66,17 @@ class EligibilityDiagnosisManagerTest(TestCase):
         self.assertIsNone(last_expired)
         self.assertTrue(has_considered_valid)
 
+        # Has a valid PASS IAE but NO diagnosis.
+        approval = ApprovalFactory()
+        job_seeker = approval.user
+        self.assertEqual(0, job_seeker.eligibility_diagnoses.count())
+        has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_seeker)
+        last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker)
+        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
+        self.assertTrue(has_considered_valid)
+        self.assertIsNone(last_considered_valid)
+        self.assertIsNone(last_expired)
+
         # Has valid Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
         PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
