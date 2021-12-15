@@ -309,6 +309,8 @@ def _mise_a_jour_parameters(encrypted_identifier: str, job_application, pass_app
         # The necessary parameters to notify Pole Emploi of a refusal
         return {
             "idNational": encrypted_identifier,
+            "typeSIAE": _mise_a_jour_siae_kind_param(siae),
+            "numSIRETsiae": siae.siret,
             "statutReponsePassIAE": POLE_EMPLOI_PASS_REFUSED,
             "origineCandidature": _mise_a_jour_sender_kind_param(job_application.sender_kind),
         }
