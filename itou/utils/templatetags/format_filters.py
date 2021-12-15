@@ -46,6 +46,6 @@ def format_siret(siret):
 @stringfilter
 def format_nir(nir):
     nir = nir.replace(" ", "")
-    nir_regex = r"^([12])([0-9]{2})([0-1][0-9])(2[AB]|[0-9]{2})([0-9]{3})([0-9]{3})([0-9]{2})$"
+    nir_regex = r"^([12])([0-9]{2})([0-9]{2})(2[AB]|[0-9]{2})([0-9]{3})([0-9]{3})([0-9]{2})$"
     match = re.match(nir_regex, nir)
     return " ".join(match.groups())
