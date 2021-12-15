@@ -347,8 +347,6 @@ class Command(BaseCommand):
                 redelivered_approval = True
             elif count > 1:
                 self.logger.info(f"Multiple accepted job applications linked to this approval: {approval.pk}.")
-                if not self.dry_run:
-                    raise NotImplementedError()
 
         if not approval:
             # `create_employee_record` prevents "Fiche salariés" from being created.
