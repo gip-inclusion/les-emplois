@@ -228,13 +228,27 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
     try:
         params = _mise_a_jour_parameters(encrypted_identifier, job_application, pass_approved_code)
         r = httpx.post(url, json=params, headers=headers)
-        data = r.json()
-        code_sortie = extract_code_sortie(data)
-        # The only way the process can be entirely realized is with
-        # code HTTP 200 + a specific code sortie
-        if r.status_code != 200 or code_sortie != CODE_SORTIE_PASS_IAE_PRESCRIT:
-            raise PoleEmploiMiseAJourPassIAEException(r.status_code, code_sortie)
-        return True
+        # The status code are 200, 401, 500.
+        # Visibly non-200 HTTP codes do not return parsable json but I do not have samples
+        if r.status_code != 200:
+            # we are supposed to receive 401 or 500 with a short message (I have no example)
+            raise PoleEmploiMiseAJourPassIAEException(r.status_code, r.content)
+        try:
+            # a 200 HTTP response is supposed to be parsable and look like this:
+            # {
+            #   "codeSortie": "S022",
+            #   "idNational": "some_encrypted_identifier",
+            #   "message": "SD non installé : : Refus du PASS IAE"
+            # }
+            data = r.json()
+            code_sortie = extract_code_sortie(data)
+            # The only way the process can be entirely realized is with
+            # code HTTP 200 + a specific code sortie
+            if code_sortie != CODE_SORTIE_PASS_IAE_PRESCRIT:
+                raise PoleEmploiMiseAJourPassIAEException(r.status_code, code_sortie)
+            return True
+        except Exception as e:
+            raise PoleEmploiMiseAJourPassIAEException(r.status_code, str(e))
     except httpx.HTTPError as e:
         raise PoleEmploiMiseAJourPassIAEException(e.response.status_code)
 
