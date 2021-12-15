@@ -53,7 +53,7 @@ def validate_nir(nir):
         raise ValidationError("Le numéro de sécurité sociale est trop long (15 caractères autorisés).")
     if len(nir) < 15:
         raise ValidationError("Le numéro de sécurité sociale est trop court (15 caractères autorisés).")
-    # God bless forums.
+    # Warning : any change to this regex must be reflected on format filter "format_nir"
     nir_regex = r"^[12][0-9]{2}[0-9]{2}(2[AB]|[0-9]{2})[0-9]{3}[0-9]{3}[0-9]{2}$"
 
     match = re.match(nir_regex, nir)
