@@ -1154,6 +1154,9 @@ class JobApplicationCsvExportTest(TestCase):
         )
         job_application.accept(user=job_application.to_siae.members.first())
 
+        # The accept transition above will create a valid PASS IAE for the job seeker.
+        self.assertTrue(job_seeker.approvals.last().is_valid)
+
         csv_output = io.StringIO()
         generate_csv_export(JobApplication.objects, csv_output)
         self.maxDiff = None
@@ -1173,7 +1176,7 @@ class JobApplicationCsvExportTest(TestCase):
         self.assertIn(job_application.created_at.strftime("%d/%m/%Y"), csv_output.getvalue())
         self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), csv_output.getvalue())
         self.assertIn(job_application.hiring_end_at.strftime("%d/%m/%Y"), csv_output.getvalue())
-        self.assertIn("non", csv_output.getvalue())
+        self.assertIn("oui", csv_output.getvalue())  # Eligibility status.
         self.assertIn(job_application.approval.number, csv_output.getvalue())
         self.assertIn(job_application.approval.start_at.strftime("%d/%m/%Y"), csv_output.getvalue())
         self.assertIn(job_application.approval.end_at.strftime("%d/%m/%Y"), csv_output.getvalue())
