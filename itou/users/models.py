@@ -1,4 +1,3 @@
-import re
 import uuid
 from collections import Counter
 
@@ -336,12 +335,6 @@ class User(AbstractUser, AddressMixin):
             self.is_prescriber
             and self.prescriberorganization_set.filter(is_authorized=True, members__is_active=True).exists()
         )
-
-    @property
-    def nir_with_spaces(self):
-        nir_regex = r"^([12])([0-9]{2})([0-1][0-9])(2[AB]|[0-9]{2})([0-9]{3})([0-9]{3})([0-9]{2})$"
-        match = re.match(nir_regex, self.nir)
-        return " ".join(match.groups())
 
     def is_prescriber_of_authorized_organization(self, organization_id):
         return self.prescriberorganization_set.filter(
