@@ -608,11 +608,6 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC,
         )
 
-        # Only if dry_run is False.
-        with self.assertRaises(NotImplementedError):
-            command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
-
-        command.dry_run = True
         created, approval, redelivered_approval = command.find_or_create_approval(
             job_seeker=job_seeker, created_by=developer
         )
