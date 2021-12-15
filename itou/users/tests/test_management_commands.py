@@ -12,6 +12,7 @@ from itou.approvals.models import Approval
 from itou.asp.factories import CommuneFactory
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.factories import (
+    JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentBySiaeFactory,
     JobApplicationWithApprovalFactory,
@@ -33,9 +34,11 @@ from itou.users.management.commands.import_ai_employees import (
     FIRST_NAME_COL,
     LAST_NAME_COL,
     NIR_COL,
+    PASS_IAE_NUMBER_COL,
     PHONE_COL,
     POST_CODE_COL,
     SIRET_COL,
+    USER_PK_COL,
     Command as ImportAiEmployeesCommand,
 )
 from itou.users.models import User
@@ -612,6 +615,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             to_siae__kind=Siae.KIND_AI,
             approval_manually_delivered_by=developer,
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+            hiring_start_at=getattr(CleanedAiCsvFile(), CONTRACT_STARTDATE_COL),
         )
         job_seeker = expected_job_app.job_seeker
         df = pandas.DataFrame([CleanedAiCsvFile(**{SIRET_COL: expected_job_app.to_siae.siret})])
@@ -655,8 +659,84 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(JobApplication.objects.all().count, 1)
 
     def test_import_data_into_itou(self):
-        pass
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        CommuneFactory(code=getattr(CleanedAiCsvFile, CITY_INSEE_COL))
+        command = self.command
+        base_data = CleanedAiCsvFile()
+        siae = SiaeFactory(siret=getattr(base_data, SIRET_COL), kind=Siae.KIND_AI)
 
-    # Test calling the management command.
+        # User, approval and job application creation.
+        input_df = pandas.DataFrame([base_data])
+        output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=input_df)
+        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(Approval.objects.count(), 1)
+        self.assertEqual(JobApplication.objects.count(), 1)
+        job_seeker = User.objects.filter(is_job_seeker=True).get()
+        self.assertEqual(job_seeker.job_applications.count(), 1)
+        self.assertEqual(job_seeker.approvals.count(), 1)
+        job_seeker.delete()
 
-    # Test calling command with option `--invalid-nirs-only`.
+        # User, approval and job application retrieval.
+        job_seeker = JobSeekerFactory(nir=getattr(base_data, NIR_COL))
+        ApprovalFactory(user=job_seeker)
+        JobApplicationFactory(
+            sender_kind=JobApplication.SENDER_KIND_SIAE_STAFF,
+            sender_siae=siae,
+            to_siae=siae,
+            created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+            approval_manually_delivered_by=developer,
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
+            job_seeker=job_seeker,
+            hiring_start_at=getattr(base_data, CONTRACT_STARTDATE_COL),
+        )
+        input_df = pandas.DataFrame([CleanedAiCsvFile()])
+        output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=input_df)
+        self.assertEqual(User.objects.filter(is_job_seeker=True).count(), 1)
+        self.assertEqual(Approval.objects.count(), 1)
+        self.assertEqual(JobApplication.objects.count(), 1)
+        job_seeker.delete()
+
+        # # Only values to be imported are imported but the whole input data frame
+        # # is updated for logging purposes.
+        input_df = pandas.DataFrame(
+            [
+                CleanedAiCsvFile(**{CONTRACT_ENDDATE_COL: "2020-05-11"}),  # Ended contracts are ignored.
+                CleanedAiCsvFile(**{SIRET_COL: "598742121322354"}),  # Not existing SIAE.
+                CleanedAiCsvFile(
+                    **{
+                        NIR_COL: "141062a78200555",
+                        EMAIL_COL: "tartarin@gmail.fr",
+                        BIRTHDATE_COL: datetime.date(1997, 3, 12),
+                    }
+                ),
+                CleanedAiCsvFile(**{CONTRACT_STARTDATE_COL: datetime.date(2020, 4, 12)}),
+                CleanedAiCsvFile(),
+            ]
+        )
+        input_df = command.add_columns_for_asp(input_df)
+        input_df, to_be_imported_df = command.remove_ignored_rows(input_df)
+        output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=to_be_imported_df)
+
+        self.assertEqual(User.objects.count(), 3)
+        self.assertEqual(Approval.objects.count(), 2)
+        self.assertEqual(JobApplication.objects.count(), 3)
+
+        job_seeker = User.objects.get(email=getattr(base_data, EMAIL_COL))
+        self.assertEqual(job_seeker.job_applications.count(), 2)
+        self.assertEqual(job_seeker.approvals.count(), 1)
+
+        job_seeker = User.objects.get(email="tartarin@gmail.fr")
+        self.assertEqual(job_seeker.job_applications.count(), 1)
+        self.assertEqual(job_seeker.approvals.count(), 1)
+
+        # Ignored rows.
+        for _, row in output_df[:2].iterrows():
+            self.assertTrue(row[COMMENTS_COL])
+            self.assertFalse(row[PASS_IAE_NUMBER_COL])
+            self.assertFalse(row[USER_PK_COL])
+
+        for _, row in output_df[2:].iterrows():
+            job_seeker = User.objects.get(nir=row[NIR_COL])
+            approval = job_seeker.approvals.first()
+            self.assertEqual(row[PASS_IAE_NUMBER_COL], approval.number)
+            self.assertEqual(row[USER_PK_COL], job_seeker.jobseeker_hash_id)
