@@ -50,7 +50,7 @@ from itou.utils.apis.pole_emploi import (
 from itou.utils.templatetags import format_filters
 
 
-@patch("itou.job_applications.models.JobApplication._huey_notify_pole_employ", return_value=False)
+@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self, *args, **kwargs):
         job_application = JobApplicationFactory(
@@ -311,7 +311,7 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
 
-@patch("itou.job_applications.models.JobApplication._huey_notify_pole_employ", return_value=False)
+@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationNotificationsTest(TestCase):
     """
     Test JobApplication notifications: emails content and receivers.
@@ -708,7 +708,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         self.assertEqual(len(notification.recipients_emails), 0)
 
 
-@patch("itou.job_applications.models.JobApplication._huey_notify_pole_employ", return_value=False)
+@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationWorkflowTest(TestCase):
     """Test JobApplication workflow."""
 
@@ -1140,7 +1140,7 @@ class JobApplicationWorkflowTest(TestCase):
             job_application.cancel(user=cancellation_user)
 
 
-@patch("itou.job_applications.models.JobApplication._huey_notify_pole_employ", return_value=False)
+@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationCsvExportTest(TestCase):
     """Test csv export of a list of job applications."""
 
