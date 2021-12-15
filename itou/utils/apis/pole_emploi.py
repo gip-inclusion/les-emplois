@@ -246,8 +246,8 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
             if code_sortie != CODE_SORTIE_PASS_IAE_PRESCRIT:
                 raise PoleEmploiMiseAJourPassIAEException(r.status_code, code_sortie)
             return True
-        except Exception as e:
-            raise PoleEmploiMiseAJourPassIAEException(r.status_code, str(e))
+        except Exception:
+            raise PoleEmploiMiseAJourPassIAEException(r.status_code, r.content)
     except httpx.HTTPError as e:
         raise PoleEmploiMiseAJourPassIAEException(e.response.status_code)
 
