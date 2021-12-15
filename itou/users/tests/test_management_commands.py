@@ -34,10 +34,13 @@ from itou.users.management.commands.import_ai_employees import (
     FIRST_NAME_COL,
     LAST_NAME_COL,
     NIR_COL,
+    PASS_IAE_END_DATE_COL,
     PASS_IAE_NUMBER_COL,
+    PASS_IAE_START_DATE_COL,
     PHONE_COL,
     POST_CODE_COL,
     SIRET_COL,
+    USER_ITOU_EMAIL_COL,
     USER_PK_COL,
     Command as ImportAiEmployeesCommand,
 )
@@ -210,7 +213,7 @@ class CleanedAiCsvFile(AiCSVFile):
     ctr_date_embauche: datetime.datetime = datetime.datetime(2021, 8, 12)
     nir_is_valid: bool = True
     siret_validated_by_asp: bool = True
-    Commentaire: str = ""
+    commentaire: str = ""
 
 
 class ImportAiEmployeesManagementCommandTest(TestCase):
@@ -780,4 +783,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             job_seeker = User.objects.get(nir=row[NIR_COL])
             approval = job_seeker.approvals.first()
             self.assertEqual(row[PASS_IAE_NUMBER_COL], approval.number)
+            self.assertEqual(row[PASS_IAE_START_DATE_COL], approval.start_at.strftime(DATE_FORMAT))
+            self.assertEqual(row[PASS_IAE_END_DATE_COL], approval.end_at.strftime(DATE_FORMAT))
             self.assertEqual(row[USER_PK_COL], job_seeker.jobseeker_hash_id)
+            self.assertEqual(row[USER_ITOU_EMAIL_COL], job_seeker.email)
