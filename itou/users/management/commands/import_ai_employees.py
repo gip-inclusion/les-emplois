@@ -287,12 +287,6 @@ class Command(BaseCommand):
         if not job_seeker:
             job_seeker = User.objects.filter(email=user_data["email"]).first()
 
-        # Some e-mail addresses belong to prescribers!
-        if job_seeker and not job_seeker.is_job_seeker:
-            # If job seeker is not a job seeker, create a new one.
-            user_data["email"] = self.fake_email()
-            job_seeker = None
-
         if not job_seeker:
             # Find users created previously by this script,
             # either because a bug forced us to interrupt it
@@ -304,6 +298,17 @@ class Command(BaseCommand):
                 created_by=created_by,
                 date_joined__date=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date(),
             ).first()
+
+        # Some e-mail addresses belong to prescribers!
+        if job_seeker:
+            # Probably same corporate email.
+            not_same_nir = job_seeker.nir and job_seeker.nir != row[NIR_COL]
+            if not_same_nir:
+                self.logger.info(f"User found but with a different NIR: {job_seeker.email}. Creating a new one.")
+            if not job_seeker.is_job_seeker or not_same_nir:
+                # If job seeker is not a job seeker, create a new one.
+                user_data["email"] = self.fake_email()
+                job_seeker = None
 
         if not job_seeker:
             if self.dry_run:
