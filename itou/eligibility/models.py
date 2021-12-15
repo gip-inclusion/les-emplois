@@ -57,9 +57,23 @@ class EligibilityDiagnosisQuerySet(models.QuerySet):
 class EligibilityDiagnosisManager(models.Manager):
     def has_considered_valid(self, job_seeker, for_siae=None):
         """
-        Returns True if the given job seeker has a considered valid diagnosis, False otherwise.
+        Returns True if the given job seeker has a considered valid diagnosis,
+        False otherwise.
+
+        We consider the eligibility as valid when a PASS IAE is valid but
+        the eligibility diagnosis is missing.
+
+        This can happen when we have to:
+        - import approvals previously issued by Pôle emploi
+        - create PASS IAE manually for AI (16K+)
+        - etc.
+
+        In these cases, the diagnoses have been made outside of Itou.
+
+        Hence the Trello #2604 decision: if a PASS IAE is valid, we do not
+        check the presence of an eligibility diagnosis.
         """
-        return job_seeker.approvals_wrapper.has_valid_pole_emploi_eligibility_diagnosis or bool(
+        return job_seeker.approvals_wrapper.has_valid or bool(
             self.last_considered_valid(job_seeker, for_siae=for_siae)
         )
 
