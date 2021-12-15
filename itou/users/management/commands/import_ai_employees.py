@@ -4,6 +4,7 @@
 import csv
 import datetime
 import logging
+import re
 import uuid
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models import F, Q
 from django.db.utils import IntegrityError
 from tqdm import tqdm
 
@@ -55,6 +57,10 @@ class Command(BaseCommand):
     Before that date, they were able to hire without one. To catch up with the ongoing stock,
     the platform has to create missing users and deliver brand new PASS IAE.
     AI employees list was provided by the ASP in a CSV file.
+
+    A fixed creation date (settings.AI_EMPLOYEES_STOCK_IMPORT_DATE) allows us to retrieve objects
+    created by this script.
+    See Approval.is_from_ai_stock for example.
 
     This is what this script does:
     1/ Parse a file provided by the ASP.
@@ -157,6 +163,45 @@ class Command(BaseCommand):
             return None
         return nir
 
+    def clean_email(self, row):
+        """
+        Some employers gave their email address instead of the job seeker's one.
+        Delete them whenever possible.
+        """
+        row = row.fillna("")
+        email = row[EMAIL_COL]
+        if not email:
+            return email
+        siret = row[SIRET_COL]
+        domain = re.search(r"@(\w+)", email).groups()[0]
+        generic_domains = [
+            "google",
+            "yahoo",
+            "laposte",
+            "live",
+            "orange",
+            "icloud",
+            "outlook",
+            "wanadoo",
+            "aol",
+            "hotmail",
+            "sfr",
+            "neuf",
+            "gmail",
+            "free",
+        ]
+        if domain in generic_domains:
+            return email
+        siae_qs = Siae.objects.filter(kind=Siae.KIND_AI, siret=siret)
+        if not siae_qs.exists():
+            return email
+        siae = siae_qs.get()
+        siae_domain = re.search(r"@(.*)$", siae.auth_email).groups()[0]
+        if email.endswith(siae_domain):
+            self.logger.info(f"Corporate email found: {email}.")
+            return ""
+        return email
+
     def siret_validated_by_asp(self, row):
         # ASP-validated list.
         excluded_sirets = [
@@ -224,7 +269,6 @@ class Command(BaseCommand):
         return commune
 
     def find_or_create_job_seeker(self, row, created_by):
-        # Data has been formatted previously.
         created = False
         # Get city by its INSEE code to fill in the `User.city` attribute with a valid name.
         commune = self.commune_from_insee_col(row[CITY_INSEE_COL])
@@ -248,10 +292,9 @@ class Command(BaseCommand):
         # If NIR is not valid, row[NIR_COL] is empty.
         # See `self.clean_nir`.
         if not row.nir_is_valid:
-            # ignored_nirs += 1
             user_data["nir"] = None
 
-        job_seeker = User.objects.filter(nir=user_data["nir"]).exclude(nir__isnull=True).first()
+        job_seeker = User.objects.filter(nir=user_data["nir"]).exclude(Q(nir__isnull=True) | Q(nir="")).first()
 
         if not job_seeker:
             job_seeker = User.objects.filter(email=user_data["email"]).first()
@@ -283,97 +326,165 @@ class Command(BaseCommand):
 
         return created, job_seeker
 
-    def import_data_into_itou(self, df):
+    def find_or_create_approval(self, job_seeker, created_by):
+        created = False
+        redelivered_approval = False
+        approval = None
+        # If job seeker has already a valid approval: don't redeliver it.
+        if job_seeker.approvals.valid().exists():
+            approval = job_seeker.approvals_wrapper.latest_approval
+            # Unless it was issued by an AI who did not want to wait for our script to run.
+            job_app_qs = approval.jobapplication_set.filter(
+                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                to_siae=F("sender_siae"),
+                created_at__gt=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+                approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+            )
+            count = job_app_qs.count()
+            if count == 1:
+                self.logger.info(f"Approval delivered by employer: {approval.pk}. Deleting it.")
+                self.logger.info(f"Job application sent by employer: {job_app_qs.get().pk}. Deleting it.")
+                if not self.dry_run:
+                    job_app_qs.delete()
+                    approval.delete()
+                approval = None
+                redelivered_approval = True
+            elif count > 1:
+                self.logger.info(f"Multiple accepted job applications linked to this approval: {approval.pk}.")
+                if not self.dry_run:
+                    raise NotImplementedError()
+
+        if not approval:
+            # `create_employee_record` prevents "Fiche salariés" from being created.
+            approval = Approval(
+                start_at=datetime.date(2021, 12, 1),
+                end_at=datetime.date(2023, 11, 30),
+                user_id=job_seeker.pk,
+                created_by=created_by,
+                create_employee_record=False,
+                created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+            )
+            if not self.dry_run:
+                # In production, it can raise an IntegrityError if another PASS has just been delivered a few seconds ago.
+                # Try to save with another number until it succeeds.
+                succeeded = None
+                while succeeded is None:
+                    try:
+                        # `Approval.save()` delivers an automatic number.
+                        approval.save()
+                        succeeded = True
+                    except IntegrityError:
+                        pass
+            created = True
+        return created, approval, redelivered_approval
+
+    def find_or_create_job_application(self, approval, job_seeker, row, approval_manually_delivered_by):
+        """Find job applications created previously by this script,
+        either because a bug forced us to interrupt it
+        or because we had to run it twice to import new users.
+        """
+        created = False
+        cancelled_job_app_deleted = False
+        siae = Siae.objects.prefetch_related("memberships").get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
+        job_application_qs = JobApplication.objects.filter(
+            to_siae=siae,
+            approval_manually_delivered_by=approval_manually_delivered_by,
+            created_at__date=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date(),
+            job_seeker=job_seeker,
+        )
+
+        # Employers cancelled job applications created by us with this script,
+        # deleting at the same time the approval we issued.
+        # Delete this job application to start from new.
+        cancelled_job_application_qs = job_application_qs.filter(state=JobApplicationWorkflow.STATE_CANCELLED)
+        if cancelled_job_application_qs.exists():
+            if not self.dry_run:
+                cancelled_job_application_qs.delete()
+            cancelled_job_app_deleted = True
+
+        if job_application_qs.exists():
+            total_job_applications = job_application_qs.count()
+            if total_job_applications != 1:
+                # Make sure it's different contracts.
+                job_applications_dates = job_application_qs.all().values_list("hiring_start_at", flat=True)
+                if len(set(job_applications_dates)) != total_job_applications:
+                    self.logger.info(
+                        f"{job_application_qs.count()} job applications found for job_seeker: {job_seeker.email} - {job_seeker.pk}."
+                    )
+
+        job_application = job_application_qs.first()
+        if not job_application:
+            job_app_dict = {
+                "sender": siae.active_admin_members.first(),
+                "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
+                "sender_siae": siae,
+                "to_siae": siae,
+                "job_seeker": job_seeker,
+                "state": JobApplicationWorkflow.STATE_ACCEPTED,
+                "hiring_start_at": row[CONTRACT_STARTDATE_COL],
+                "approval_delivery_mode": JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
+                "approval_id": approval.pk,
+                "approval_manually_delivered_by": approval_manually_delivered_by,
+                "created_at": settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+            }
+            job_application = JobApplication(**job_app_dict)
+            if not self.dry_run:
+                job_application.save()
+            created = True
+        return created, job_application, cancelled_job_app_deleted
+
+    def import_data_into_itou(self, df, to_be_imported_df):
         df = df.copy()
 
         created_users = 0
-        already_existing_users = 0
+        found_users = 0
         ignored_nirs = 0
-        already_existing_approvals = 0
+        found_approvals = 0
         created_approvals = 0
-        already_existing_job_apps = 0
+        found_job_applications = 0
         created_job_applications = 0
-
-        # A fixed creation date allows us to retrieve objects
-        # created by this script.
-        # See Approval.is_from_ai_stock for example.
-        objects_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
+        redelivered_approvals = 0
+        cancelled_job_apps_deleted = 0
 
         # Get developer account by email.
         # Used to store who created the following users, approvals and job applications.
         developer = User.objects.get(email=self.developer_email)
 
-        pbar = tqdm(total=len(df))
-        for i, row in df.iterrows():
+        pbar = tqdm(total=len(to_be_imported_df))
+        for i, row in to_be_imported_df.iterrows():
             pbar.update(1)
 
             with transaction.atomic():
 
-                created, job_seeker = self.find_or_create_job_seeker(row=row, created_by=developer)
+                user_creation, job_seeker = self.find_or_create_job_seeker(row=row, created_by=developer)
 
-                if created:
+                if user_creation:
                     created_users += 1
                 else:
-                    already_existing_users += 1
+                    found_users += 1
 
-                # If job seeker has already a valid approval: don't redeliver it.
-                if job_seeker.approvals.valid().exists():
-                    already_existing_approvals += 1
-                    approval = job_seeker.approvals_wrapper.latest_approval
-                else:
-                    approval = Approval(
-                        start_at=datetime.date(2021, 12, 1),
-                        end_at=datetime.date(2023, 11, 30),
-                        user_id=job_seeker.pk,
-                        created_by=developer,
-                        created_at=objects_created_at,
-                    )
-                    if not self.dry_run:
-                        # In production, it can raise an IntegrityError if another PASS has just been delivered a few seconds ago.
-                        # Try to save with another number until it succeeds.
-                        succeeded = None
-                        while succeeded is None:
-                            try:
-                                # `Approval.save()` delivers an automatic number.
-                                approval.save()
-                                succeeded = True
-                            except IntegrityError:
-                                pass
+                approval_creation, approval, redelivered_approval = self.find_or_create_approval(
+                    job_seeker=job_seeker, created_by=developer
+                )
+
+                if approval_creation:
                     created_approvals += 1
-
-                # Create a new job application.
-                siae = Siae.objects.prefetch_related("memberships").get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
-
-                # Find job applications created previously by this script,
-                # either because a bug forced us to interrupt it
-                # or because we had to run it twice to import new users.
-                job_application_exists = JobApplication.objects.filter(
-                    to_siae=siae,
-                    approval_manually_delivered_by=developer,
-                    created_at__date=objects_created_at.date(),
-                    job_seeker=job_seeker,
-                ).exists()
-                if job_application_exists:
-                    already_existing_job_apps += 1
                 else:
-                    job_app_dict = {
-                        "sender": siae.active_admin_members.first(),
-                        "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
-                        "sender_siae": siae,
-                        "to_siae": siae,
-                        "job_seeker": job_seeker,
-                        "state": JobApplicationWorkflow.STATE_ACCEPTED,
-                        "hiring_start_at": row[CONTRACT_STARTDATE_COL],
-                        "approval_delivery_mode": JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
-                        "approval_id": approval.pk,
-                        "approval_manually_delivered_by": developer,
-                        "create_employee_record": False,
-                        "created_at": objects_created_at,
-                    }
-                    job_application = JobApplication(**job_app_dict)
-                    if not self.dry_run:
-                        job_application.save()
+                    found_approvals += 1
+
+                if redelivered_approval:
+                    redelivered_approvals += 1
+
+                job_application_creation, _, cancelled_job_app_deleted = self.find_or_create_job_application(
+                    approval=approval, job_seeker=job_seeker, row=row, approval_manually_delivered_by=developer
+                )
+                if job_application_creation:
                     created_job_applications += 1
+                else:
+                    found_job_applications += 1
+
+                if cancelled_job_app_deleted:
+                    cancelled_job_apps_deleted += 1
 
             # Update dataframe values.
             # https://stackoverflow.com/questions/25478528/updating-value-in-iterrow-for-pandas
@@ -381,13 +492,14 @@ class Command(BaseCommand):
             df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
 
         self.logger.info("Import is over!")
-        self.logger.info(f"Already existing users: {already_existing_users}.")
+        self.logger.info(f"Already existing users: {found_users}.")
         self.logger.info(f"Created users: {created_users}.")
-        self.logger.info(f"Ignored NIRs: {ignored_nirs}.")
-        self.logger.info(f"Already existing approvals: {already_existing_approvals}.")
+        self.logger.info(f"Already existing approvals: {found_approvals}.")
         self.logger.info(f"Created approvals: {created_approvals}.")
-        self.logger.info(f"Already existing job applications: {already_existing_job_apps}.")
+        self.logger.info(f"Already existing job applications: {found_job_applications}.")
         self.logger.info(f"Created job applications: {created_job_applications}.")
+        self.logger.info(f"Redelivered approvals: {redelivered_approvals}.")
+        self.logger.info(f"Deleted previously canceled job applications: {cancelled_job_apps_deleted}.")
 
         return df
 
@@ -396,6 +508,7 @@ class Command(BaseCommand):
         df[BIRTHDATE_COL] = pd.to_datetime(df[BIRTHDATE_COL], format=DATE_FORMAT)
         df[CONTRACT_STARTDATE_COL] = pd.to_datetime(df[CONTRACT_STARTDATE_COL], format=DATE_FORMAT)
         df[NIR_COL] = df.apply(self.clean_nir, axis=1)
+        df[EMAIL_COL] = df.apply(self.clean_email, axis=1)
         df["nir_is_valid"] = ~df[NIR_COL].isnull()
         df["siret_validated_by_asp"] = df.apply(self.siret_validated_by_asp, axis=1)
 
@@ -491,12 +604,14 @@ class Command(BaseCommand):
         if invalid_nirs_only:
             df = invalid_nirs_df
 
-        df = self.remove_ignored_rows(df)
-        self.logger.info(f"Continuing with {len(df)} rows left ({self.get_ratio(len(df), len(df))} %).")
+        df, to_be_imported_df = self.remove_ignored_rows(df)
+        self.logger.info(
+            f"Continuing with {len(to_be_imported_df)} rows left ({self.get_ratio(len(to_be_imported_df), len(df))} %)."
+        )
 
         # Step 3: import data.
         self.logger.info("🔥 STEP 3: create job seekers, approvals and job applications.")
-        df = self.import_data_into_itou(df=df)
+        df = self.import_data_into_itou(df=df, to_be_imported_df=to_be_imported_df)
 
         # Step 4: create a CSV file including comments to be shared with the ASP.
         df = df.drop(["nir_is_valid", "siret_validated_by_asp"], axis=1)  # Remove useless columns.

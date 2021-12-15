@@ -2,22 +2,25 @@ import datetime
 from dataclasses import dataclass
 
 import pandas
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
 
 from itou.approvals.factories import ApprovalFactory
+from itou.approvals.models import Approval
 from itou.asp.factories import CommuneFactory
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
+    JobApplicationSentBySiaeFactory,
     JobApplicationWithApprovalFactory,
     JobApplicationWithEligibilityDiagnosis,
 )
-from itou.job_applications.models import JobApplication
-from itou.siaes.factories import SiaeFactory
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
-from itou.users.factories import JobSeekerFactory, UserFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.management.commands.import_ai_employees import (
     APPROVAL_COL,
     BIRTHDATE_COL,
@@ -30,6 +33,8 @@ from itou.users.management.commands.import_ai_employees import (
     FIRST_NAME_COL,
     LAST_NAME_COL,
     NIR_COL,
+    PHONE_COL,
+    POST_CODE_COL,
     SIRET_COL,
     Command as ImportAiEmployeesCommand,
 )
@@ -210,9 +215,19 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
     See users.management.commands.import_ai_employees.
     """
 
+    @property
+    def command(self):
+        """
+        Instantiate the command without calling call_command to make it faster.
+        """
+        command = ImportAiEmployeesCommand()
+        command.set_logger(verbosity=0)
+        command.dry_run = False
+        return command
+
     def test_cleaning(self):
         """Test dataframe cleaning: rows formatting and validation."""
-        command = ImportAiEmployeesCommand()
+        command = self.command
 
         # Perfect data.
         df = pandas.DataFrame([AiCSVFile()])
@@ -245,10 +260,26 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(row[SIRET_COL], siret)
         self.assertFalse(row["siret_validated_by_asp"])
 
+        # # Employer email.
+        domain = "unenouvellechance.fr"
+        siae = SiaeFactory(auth_email=f"accueil@{domain}", kind=Siae.KIND_AI)
+        df = pandas.DataFrame([AiCSVFile(**{EMAIL_COL: f"colette@{domain}", SIRET_COL: siae.siret})])
+        df = command.clean_df(df)
+        row = df.iloc[0]
+        self.assertEqual(row[EMAIL_COL], "")
+
+        # Generic email.
+        domain = "gmail.fr"
+        siae = SiaeFactory(auth_email=f"accueil@{domain}", kind=Siae.KIND_AI)
+        df = pandas.DataFrame([AiCSVFile(**{EMAIL_COL: f"colette@{domain}"})])
+        df = command.clean_df(df)
+        row = df.iloc[0]
+        self.assertEqual(row[EMAIL_COL], "colette@gmail.fr")
+
     # Test added comments.
     def test_filter_invalid_nirs(self):
         # Create a dataframe with one valid and one invalid NIR.
-        command = ImportAiEmployeesCommand()
+        command = self.command
         df = pandas.DataFrame([CleanedAiCsvFile(), CleanedAiCsvFile(**{NIR_COL: "56987534", "nir_is_valid": False})])
         df, invalid_nirs_df = command.filter_invalid_nirs(df)
 
@@ -265,8 +296,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
     # Test excluded rows.
     def test_remove_ignored_rows(self):
-        command = ImportAiEmployeesCommand()
-        command.set_logger(verbosity=0)
+        command = self.command
         SiaeFactory(kind=Siae.KIND_AI, siret=getattr(CleanedAiCsvFile(), SIRET_COL))
 
         # Ended contracts are removed.
@@ -308,9 +338,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
     def test_find_or_create_job_seeker__find(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         CommuneFactory(code=getattr(CleanedAiCsvFile, CITY_INSEE_COL))
-        command = ImportAiEmployeesCommand()
-        command.set_logger(verbosity=0)
-        command.dry_run = False
+        command = self.command
 
         # Find existing user with NIR.
         nir = getattr(CleanedAiCsvFile(), NIR_COL)
@@ -358,24 +386,276 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_seeker.delete()
 
     def test_find_or_create_job_seeker__create(self):
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        commune = CommuneFactory(code=getattr(CleanedAiCsvFile, CITY_INSEE_COL))
+        command = self.command
+
         # Job seeker not found: create user.
+        df = pandas.DataFrame([CleanedAiCsvFile()])
+        created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
+        self.assertTrue(created)
+        self.assertTrue(job_seeker)
+        self.assertEqual(User.objects.all().count(), 2)
+        # Clean
+        job_seeker.delete()
 
-        # NIR is empty: create user with NIR None, even if another one exists.
+        # # NIR is empty: create user with NIR None, even if another one exists.
+        previous_job_seekers_pk = [JobSeekerFactory(nir="").pk, JobSeekerFactory(nir=None).pk]
+        df = pandas.DataFrame([CleanedAiCsvFile(**{NIR_COL: "", "nir_is_valid": False})])
+        created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
+        self.assertTrue(created)
+        self.assertTrue(job_seeker)
+        self.assertEqual(User.objects.all().count(), 4)
+        self.assertEqual(job_seeker.nir, None)
+        # Clean
+        job_seeker.delete()
+        User.objects.filter(pk__in=previous_job_seekers_pk).delete()
 
-        # If found job_seeker is not a job seeker: create one with no NIR and a fake email address.
+        # # If found job_seeker is not a job seeker: create one with a fake email address.
+        prescriber = PrescriberFactory(email=getattr(CleanedAiCsvFile(), EMAIL_COL))
+        df = pandas.DataFrame([CleanedAiCsvFile()])
+        created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
+        self.assertTrue(created)
+        self.assertTrue(job_seeker)
+        self.assertEqual(User.objects.all().count(), 3)
+        self.assertEqual(job_seeker.nir, getattr(CleanedAiCsvFile(), NIR_COL))
+        self.assertNotEqual(job_seeker.email, prescriber.email)
+        # Clean
+        job_seeker.delete()
+        prescriber.delete()
 
         # Check expected attributes.
         # Perfect path: NIR, email, ...
         # Created by developer on XX date.
+        base_data = CleanedAiCsvFile()
+        df = pandas.DataFrame([base_data])
+        created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
+        self.assertTrue(created)
+        self.assertEqual(job_seeker.created_by.pk, developer.pk)
+        self.assertEqual(job_seeker.date_joined, settings.AI_EMPLOYEES_STOCK_IMPORT_DATE)
+        self.assertEqual(job_seeker.first_name, getattr(base_data, FIRST_NAME_COL).title())
+        self.assertEqual(job_seeker.last_name, getattr(base_data, LAST_NAME_COL).title())
+        self.assertEqual(job_seeker.birthdate, getattr(base_data, BIRTHDATE_COL))
+        self.assertEqual(job_seeker.email, getattr(base_data, EMAIL_COL))
+        self.assertTrue(job_seeker.address_line_1)
+        self.assertTrue(job_seeker.address_line_2)
+        self.assertEqual(job_seeker.post_code, getattr(base_data, POST_CODE_COL))
+        self.assertEqual(job_seeker.city, commune.name.title())
+        self.assertTrue(job_seeker.department)
+        self.assertEqual(job_seeker.phone, getattr(base_data, PHONE_COL))
+        self.assertEqual(job_seeker.nir, getattr(base_data, NIR_COL))
+        # Clean
+        job_seeker.delete()
 
         # If no email provided: fake email.
-
-        #
-        pass
+        df = pandas.DataFrame([CleanedAiCsvFile(**{EMAIL_COL: ""})])
+        created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
+        self.assertTrue(created)
+        self.assertTrue(job_seeker.email.endswith("@email-temp.com"))
+        job_seeker.delete()
 
     # - Test find_or_create_approval
+    def test_find_or_create_approval__find(self):
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        command = self.command
+
+        # Existing valid PASS IAE delivered after a job application has been accepted.
+        approval_start_at = datetime.date(2021, 11, 10)  # Approval should start before November 30th.
+        existing_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL), start_at=approval_start_at)
+        created, expected_approval, _ = command.find_or_create_approval(
+            job_seeker=existing_approval.user, created_by=developer
+        )
+        self.assertFalse(created)
+        self.assertTrue(expected_approval.is_valid)
+        # Make sure no update was made.
+        self.assertEqual(existing_approval.pk, expected_approval.pk)
+        self.assertEqual(existing_approval.start_at, expected_approval.start_at)
+        self.assertEqual(existing_approval.user.pk, expected_approval.user.pk)
+        # Clean
+        existing_approval.user.delete()
+
+        # PASS IAE created previously by this script.
+        existing_approval = ApprovalFactory(
+            user__nir=getattr(CleanedAiCsvFile(), NIR_COL),
+            start_at=datetime.date(2021, 12, 1),
+            created_by=developer,
+            create_employee_record=False,
+            created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+        )
+        created, expected_approval, _ = command.find_or_create_approval(
+            job_seeker=existing_approval.user, created_by=developer
+        )
+        self.assertFalse(created)
+        self.assertEqual(existing_approval.pk, expected_approval.pk)
+        self.assertTrue(expected_approval.is_valid)
+        # Clean
+        existing_approval.user.delete()
 
     # - Test find_or_create_job_applications
+    def test_find_or_create_approval__create(self):
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        command = self.command
+
+        # No PASS IAE.
+        job_seeker = JobSeekerFactory(nir=getattr(CleanedAiCsvFile(), NIR_COL))
+        created, approval, _ = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
+        self.assertTrue(created)
+        self.assertTrue(approval.is_valid)
+        # Check attributes
+        self.assertEqual(approval.user.pk, job_seeker.pk)
+        self.assertEqual(approval.start_at, datetime.date(2021, 12, 1))
+        self.assertEqual(approval.end_at, datetime.date(2023, 11, 30))
+        self.assertEqual(approval.created_by.pk, developer.pk)
+        self.assertEqual(approval.created_at, settings.AI_EMPLOYEES_STOCK_IMPORT_DATE)
+        self.assertTrue(approval.is_from_ai_stock)
+
+        # Clean
+        job_seeker.delete()
+
+        # Expired PASS IAE.
+        approval_start_at = datetime.date.today() - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS, days=2)
+        expired_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL), start_at=approval_start_at)
+        job_seeker = expired_approval.user
+        created, approval, _ = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
+        self.assertTrue(created)
+        self.assertEqual(approval.user.pk, job_seeker.pk)
+        self.assertTrue(approval.is_valid)
+        self.assertEqual(job_seeker.approvals.count(), 2)
+        # Clean
+        job_seeker.delete()
+
+        # PASS created after November 30th with a job application:
+        # the employer tried to get a PASS IAE quicker.
+        siae = SiaeWithMembershipFactory()
+        previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL))
+        job_seeker = previous_approval.user
+        job_application = JobApplicationSentBySiaeFactory(
+            job_seeker=job_seeker,
+            to_siae=siae,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=previous_approval,
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+        )
+        created, _, redelivered_approval = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
+
+        # assert previous approval does not exist anymore.
+        self.assertFalse(Approval.objects.filter(pk=previous_approval.pk).exists())
+        # assert previous job application does not exist anymore.
+        self.assertFalse(JobApplication.objects.filter(pk=job_application.pk).exists())
+        # assert a new PASS IAE has been delivered.
+        self.assertTrue(created)
+        self.assertTrue(redelivered_approval)
+
+        # Clean
+        job_seeker.delete()
+
+        # PASS created after November 30th with a job application but not sent by this employer.
+        siae = SiaeWithMembershipFactory()
+        previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL))
+        job_seeker = previous_approval.user
+        job_application = JobApplicationSentBySiaeFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=previous_approval,
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+        )
+        created, _, redelivered_approval = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
+
+        # assert previous approval does not exist anymore.
+        self.assertFalse(Approval.objects.filter(pk=previous_approval.pk).exists())
+        # assert previous job application does not exist anymore.
+        self.assertFalse(JobApplication.objects.filter(pk=job_application.pk).exists())
+        # assert a new PASS IAE has been delivered.
+        self.assertTrue(created)
+        self.assertTrue(redelivered_approval)
+
+        # Clean
+        job_seeker.delete()
+
+        # Multiple accepted job applications linked to this approval. Raise an error if dry run is not set.
+        siae = SiaeWithMembershipFactory()
+        previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL))
+        job_seeker = previous_approval.user
+        job_application = JobApplicationSentBySiaeFactory(
+            job_seeker=job_seeker,
+            to_siae=siae,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=previous_approval,
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+        )
+        JobApplicationSentBySiaeFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=previous_approval,
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+        )
+
+        # Only if dry_run is False.
+        with self.assertRaises(NotImplementedError):
+            command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
+
+        command.dry_run = True
+        created, approval, redelivered_approval = command.find_or_create_approval(
+            job_seeker=job_seeker, created_by=developer
+        )
+        self.assertFalse(created)
+        self.assertFalse(redelivered_approval)
+        self.assertTrue(previous_approval.pk, approval.pk)
+
+    # Find or create job applications.
+    def test_find_or_create_job_application__find(self):
+        # Find job applications created previously by this script.
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        command = self.command
+
+        expected_job_app = JobApplicationSentBySiaeFactory(
+            to_siae__kind=Siae.KIND_AI,
+            approval_manually_delivered_by=developer,
+            created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+        )
+        job_seeker = expected_job_app.job_seeker
+        df = pandas.DataFrame([CleanedAiCsvFile(**{SIRET_COL: expected_job_app.to_siae.siret})])
+        created, found_job_application, _ = command.find_or_create_job_application(
+            approval=expected_job_app.approval,
+            job_seeker=job_seeker,
+            row=df.iloc[0],
+            approval_manually_delivered_by=developer,
+        )
+        self.assertFalse(created)
+        self.assertEqual(expected_job_app.pk, found_job_application.pk)
+        self.assertFalse(found_job_application.can_be_cancelled)
+
+    def find_or_create_job_application__create(self):
+        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        command = self.command
+
+        # Employers cancelled the job application we created, hence removing the PASS IAE we delivered.
+        # Remove those job applications and deliver a new PASS IAE.
+        job_application = JobApplicationSentBySiaeFactory(
+            to_siae__kind=Siae.KIND_AI,
+            state=JobApplicationWorkflow.STATE_CANCELLED,
+            job_seeker__nir=getattr(CleanedAiCsvFile(), NIR_COL),
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
+            approval_id="",
+            approval_manually_delivered_by=developer,
+            created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+        )
+        df = pandas.DataFrame([CleanedAiCsvFile(**{SIRET_COL: job_application.to_siae.siret})])
+        created, new_job_application, cancelled_job_app_deleted = command.find_or_create_job_application(
+            approval=job_application.approval,
+            job_seeker=job_application.job_seeker,
+            row=df.iloc[0],
+            approval_manually_delivered_by=developer,
+        )
+        self.assertTrue(created)
+        self.assertTrue(cancelled_job_app_deleted)
+        self.assertFalse(JobApplication.objects.filter(pk=job_application.pk).exists())
+        self.assertFalse(new_job_application.can_be_cancelled)
+        self.assertTrue(new_job_application.is_from_ai_stock)
+        self.assertEqual(JobApplication.objects.all().count, 1)
+
+    def test_import_data_into_itou(self):
+        pass
 
     # Test calling the management command.
 
