@@ -420,6 +420,7 @@ class Command(BaseCommand):
                 "approval_id": approval.pk,
                 "approval_manually_delivered_by": approval_manually_delivered_by,
                 "created_at": settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+                "approval_number_sent_by_email": True,
             }
             job_application = JobApplication(**job_app_dict)
             if not self.dry_run:
