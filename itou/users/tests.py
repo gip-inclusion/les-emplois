@@ -423,10 +423,6 @@ class ModelTest(TestCase):
         self.assertTrue(siae_staff.can_add_nir(job_seeker_no_nir))
         self.assertFalse(authorized_prescriber.can_add_nir(job_seeker_with_nir))
 
-    def test_nir_with_spaces(self):
-        job_seeker = JobSeekerFactory.build(nir="141068078200557")
-        self.assertEqual(job_seeker.nir_with_spaces, "1 41 06 80 782 005 57")
-
     def test_is_account_creator(self):
         user = UserFactory()
 
