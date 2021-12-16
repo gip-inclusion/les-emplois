@@ -880,6 +880,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
          - we keep logs of the successful/failed attempts
          - when anything break, we quit early
         """
+        # We do not send approvals that start in the future to PE, because the information system in front
+        # can’t handle them. I’ll keep my opinion about this for talks that involve an unreasonnable amount of beer.
+        # Another mechanism will be in charge of sending them on their start date
+        if self.approval.start_at > timezone.now().date():
+            return False
         individual = PoleEmploiIndividu.from_job_seeker(self.job_seeker)
         if individual is None or not individual.is_valid():
             # We may not have a valid user (missing NIR, for instance),

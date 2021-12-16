@@ -1303,6 +1303,30 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
         self.assertEqual(notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_OK)
 
+    # Since there are multiple patch, the order matters: the parameters are injected in reverse order
+    @patch("itou.job_applications.models.mise_a_jour_pass_iae")
+    @patch("itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual")
+    @patch("itou.job_applications.models.get_access_token")
+    def test_notification_accepted_but_in_the_future(self, access_token_mock, nir_mock, maj_mock, sleep_mock):
+        """
+        Nominal scenario: an approval is created, but its start date is in the future.
+         - we do not send it: no API call is performed
+         - no notification log is created
+        """
+        tomorrow = (timezone.now() + relativedelta(days=1)).date()
+        job_application = JobApplicationWithApprovalFactory(approval__start_at=tomorrow)
+
+        # our job seeker is valid
+        pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
+        self.assertTrue(pe_individual.is_valid())
+        self.assertFalse(job_application._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED))
+
+        access_token_mock.assert_not_called()
+        nir_mock.assert_not_called()
+        maj_mock.assert_not_called()
+        notification_log = JobApplicationPoleEmploiNotificationLog.objects.filter(job_application=job_application)
+        self.assertFalse(notification_log.exists())
+
     @patch("itou.job_applications.models.mise_a_jour_pass_iae", return_value=True)
     @patch(
         "itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual",
