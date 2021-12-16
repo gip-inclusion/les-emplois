@@ -19,7 +19,6 @@ from itou.job_applications.tasks import huey_notify_pole_employ
 from itou.utils.apis.esd import get_access_token
 from itou.utils.apis.pole_emploi import (
     POLE_EMPLOI_PASS_APPROVED,
-    POLE_EMPLOI_PASS_REFUSED,
     PoleEmploiIndividu,
     PoleEmploiMiseAJourPassIAEException,
     mise_a_jour_pass_iae,
@@ -706,7 +705,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if self.is_sent_by_proxy:
             emails.append(self.email_refuse_for_proxy)
         connection.send_messages(emails)
-        self.notify_pole_emploi_refused()
 
     @xwf_models.transition()
     def cancel(self, *args, **kwargs):
@@ -862,11 +860,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def notify_pole_emploi_accepted(self) -> bool:
         if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
             return huey_notify_pole_employ(self, POLE_EMPLOI_PASS_APPROVED)
-        return False
-
-    def notify_pole_emploi_refused(self) -> bool:
-        if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
-            return huey_notify_pole_employ(self, POLE_EMPLOI_PASS_REFUSED)
         return False
 
     def _notify_pole_employ(self, mode: str) -> bool:
