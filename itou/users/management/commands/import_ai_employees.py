@@ -47,11 +47,15 @@ SIRET_COL = "pmo_siret"
 COMMENTS_COL = "commentaire"
 USER_PK_COL = "salarie_id_pour_asp"
 USER_ITOU_EMAIL_COL = "salarie_itou_email"
-PASS_IAE_NUMBER_COL = "pass_iaa_numero"
+PASS_IAE_NUMBER_COL = "pass_iae_numero"
 PASS_IAE_START_DATE_COL = "pass_iae_date_debut"
 PASS_IAE_END_DATE_COL = "pass_iae_date_fin"
 
+# First file.
 DATE_FORMAT = "%Y-%m-%d"
+
+# Second file.
+DATE_FORMAT = "%d/%m/%Y"
 
 
 class Command(BaseCommand):
@@ -536,10 +540,12 @@ class Command(BaseCommand):
         # Exclude ended contracts.
         total_df = total_df.copy()
         filtered_df = total_df.copy()
-        ended_contracts = total_df[total_df[CONTRACT_ENDDATE_COL] != ""]
-        filtered_df = filtered_df.drop(ended_contracts.index)
-        self.logger.info(f"Ended contract: excluding {len(ended_contracts)} rows.")
-        total_df.loc[ended_contracts.index, COMMENTS_COL] = "Ligne ignorée : contrat terminé."
+
+        if CONTRACT_ENDDATE_COL in total_df.columns:
+            ended_contracts = total_df[total_df[CONTRACT_ENDDATE_COL] != ""]
+            filtered_df = filtered_df.drop(ended_contracts.index)
+            self.logger.info(f"Ended contract: excluding {len(ended_contracts)} rows.")
+            total_df.loc[ended_contracts.index, COMMENTS_COL] = "Ligne ignorée : contrat terminé."
 
         # List provided by the ASP.
         excluded_structures_df = filtered_df[~filtered_df.siret_validated_by_asp]
@@ -578,9 +584,9 @@ class Command(BaseCommand):
         self.logger.info("-" * 80)
 
         if sample_size:
-            df = pd.read_csv(file_path, dtype=str, encoding="latin_1").sample(int(sample_size))
+            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=";").sample(int(sample_size))
         else:
-            df = pd.read_csv(file_path, dtype=str, encoding="latin_1")
+            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=";")
 
         # Add columns to share data with the ASP.
         df = self.add_columns_for_asp(df)

@@ -313,6 +313,13 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         expected_comment = "Ligne ignorée : contrat terminé."
         self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
 
+        # Continue even if df.CONTRACT_ENDDATE_COL does not exists.
+        df = pandas.DataFrame([CleanedAiCsvFile(), CleanedAiCsvFile(**{CONTRACT_ENDDATE_COL: "2020-11-30"})])
+        df = df.drop(columns=[CONTRACT_ENDDATE_COL])
+        total_df, filtered_df = command.remove_ignored_rows(df)
+        self.assertEqual(len(total_df), 2)
+        self.assertEqual(len(filtered_df), 2)
+
         # SIRET provided by the ASP are removed.
         df = pandas.DataFrame(
             [CleanedAiCsvFile(), CleanedAiCsvFile(**{SIRET_COL: "33491197100029", "siret_validated_by_asp": False})]
