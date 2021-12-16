@@ -331,6 +331,7 @@ class Command(BaseCommand):
                     "approval_delivery_mode": JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
                     "approval_id": approval.pk,
                     "approval_manually_delivered_by": developer,
+                    "create_employee_record": False,
                 }
                 job_application = JobApplication(**job_app_dict)
                 created_job_applications += 1
