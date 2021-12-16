@@ -219,11 +219,11 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
-        # Approvals can be used to prevent employee records creation.
-        # See Approval.create_employee_record for more information.
         return (
             # Job application without approval are out of scope
             self.exclude(approval=None)
+            # Prevent employee records creation (batch import for example).
+            .filter(create_employee_record=True)
             # See `subquery` above : exclude possible ASP duplicates
             .exclude(Exists(subquery))
             # Only ACCEPTED job applications can be transformed into employee records
@@ -341,6 +341,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+
+    # Exclude flagged approvals (batch creation or import of approvals).
+    # See itou.users.management.commands.import_ai_employees.
+    create_employee_record = models.BooleanField(default=True, verbose_name="Création d'une fiche salarié")
 
     # The job seeker's resume used for this job application.
     resume_link = models.URLField(max_length=500, verbose_name="Lien vers un CV", blank=True)
