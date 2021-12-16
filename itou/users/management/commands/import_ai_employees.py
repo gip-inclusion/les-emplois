@@ -297,13 +297,11 @@ class Command(BaseCommand):
                     already_existing_approvals += 1
                     approval = job_seeker.approvals_wrapper.latest_approval
                 else:
-                    # create_employee_record will prevent "Fiche salariés" from being created.
                     approval = Approval(
                         start_at=datetime.date(2021, 12, 1),
                         end_at=datetime.date(2023, 11, 30),
                         user_id=job_seeker.pk,
                         created_by=developer,
-                        create_employee_record=False,
                     )
                     created_approvals += 1
                     if not self.dry_run:
