@@ -42,7 +42,6 @@ from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.apis.pole_emploi import (
     POLE_EMPLOI_PASS_APPROVED,
-    POLE_EMPLOI_PASS_REFUSED,
     PoleEmploiIndividu,
     PoleEmploiIndividuResult,
     PoleEmploiMiseAJourPassIAEException,
@@ -1085,8 +1084,8 @@ class JobApplicationWorkflowTest(TestCase):
             self.assertEqual(len(mail.outbox), 1)
             self.assertIn("Candidature déclinée", mail.outbox[0].subject)
             mail.outbox = []
-            # Approval refused -> Pole Emploi is notified
-            notify_mock.assert_called()
+            # Approval refused -> Pole Emploi is not notified, because they don’t care
+            notify_mock.assert_not_called()
 
     def test_cancel_delete_linked_approval(self, *args, **kwargs):
         job_application = JobApplicationWithApprovalFactory()
@@ -1255,8 +1254,8 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
     - the possible ways the process can break
     - that all the notification logs are created as expected
 
-    Due to the fact that the core function we want to test (`JobApplication.notify_pole_emploi_accepted` and
-    `JobApplication.notify_pole_emploi_refused`) make use of huey for async, those tests call
+    Due to the fact that the core function we want to test (`JobApplication.notify_pole_emploi_accepted`)
+    make use of huey for async, those tests call
     _notify_pole_employ directly in order to bypass the need for a task runner
     """
 
@@ -1300,30 +1299,6 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertTrue(pe_individual.is_valid())
         self.assertTrue(job_application._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED))
-
-        access_token_mock.assert_called_with(ANY)
-        nir_mock.assert_called_with(ANY, self.token)
-        maj_mock.assert_called_with(job_application, ANY, self.encrypted_nir, self.token)
-        notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
-        self.assertEqual(notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_OK)
-
-    @patch("itou.job_applications.models.mise_a_jour_pass_iae", return_value=True)
-    @patch(
-        "itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual",
-        return_value=encrypted_nir,
-    )
-    @patch("itou.job_applications.models.get_access_token", return_value=token)
-    def test_notification_refused_nominal(self, access_token_mock, nir_mock, maj_mock, sleep_mock):
-        """
-        Nominal scenario: we sent a notification for refusal and everything worked
-         - All the APIs should be called
-         - An entry in the notification log should be added with status OK
-        """
-        job_application = JobApplicationWithApprovalFactory()
-        # our job seeker is valid
-        pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
-        self.assertTrue(pe_individual.is_valid())
-        self.assertTrue(job_application._notify_pole_employ(POLE_EMPLOI_PASS_REFUSED))
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
