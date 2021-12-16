@@ -166,11 +166,6 @@ class Approval(CommonApprovalMixin):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name="Créé par", null=True, blank=True, on_delete=models.SET_NULL
     )
-    # Employee records are created based on approvals and job applications.
-    # If this flag is set to False, no employee record will be created.
-    # Used for the first time when delivering approvals to AI employees.
-    # See itou.users.management.commands.import_ai_employees.
-    create_employee_record = models.BooleanField(default=True, verbose_name="Création d'une fiche salarié")
 
     objects = models.Manager.from_queryset(CommonApprovalQuerySet)()
 

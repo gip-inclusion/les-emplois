@@ -224,8 +224,6 @@ class JobApplicationQuerySet(models.QuerySet):
         return (
             # Job application without approval are out of scope
             self.exclude(approval=None)
-            # Exclude flagged approvals (batch creation or import of approvals)
-            .exclude(approval__create_employee_record=False)
             # See `subquery` above : exclude possible ASP duplicates
             .exclude(Exists(subquery))
             # Only ACCEPTED job applications can be transformed into employee records
