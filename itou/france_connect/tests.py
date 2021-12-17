@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from ..users.factories import UserFactory
+from ..users.models import User
 from . import models as france_connect_models, views as france_connect_views
 
 
@@ -60,8 +61,14 @@ class FranceConnectTest(TestCase):
         )
 
     def test_create_user_from_user_data(self):
+        """
+        Nominal scenario: there is no user with the FranceConnect id or FranceConnect email
+        that is sent, so we create one
+        """
         user_data = FRANCE_CONNECT_USERINFO
         fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+        self.assertFalse(User.objects.filter(username=fc_user_data.username).exists())
+        self.assertFalse(User.objects.filter(email=fc_user_data.email).exists())
         user, created = france_connect_models.create_or_update_user(fc_user_data)
         self.assertTrue(created)
         self.assertEqual(user.last_name, user_data["family_name"])
@@ -79,14 +86,29 @@ class FranceConnectTest(TestCase):
         If there already is an existing user with this FranceConnectId, we do not create it again,
         we use it and we update it
         """
-        UserFactory(username=FRANCE_CONNECT_USERINFO["sub"], last_name="will_be_forgotten")
         user_data = FRANCE_CONNECT_USERINFO
         fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+        UserFactory(username=fc_user_data.username, last_name="will_be_forgotten")
         user, created = france_connect_models.create_or_update_user(fc_user_data)
         self.assertFalse(created)
         self.assertEqual(user.last_name, user_data["family_name"])
         self.assertEqual(user.first_name, user_data["given_name"])
         self.assertEqual(user.external_data_source_history["last_name"]["source"], "franceconnect")
+
+    def test_create_user_from_user_data_with_already_existing_fc_email(self):
+        """
+        If there already is an existing user with email FranceConnect sent us, we do not create it again,
+        we use it but we do not update it
+        """
+        user_data = FRANCE_CONNECT_USERINFO
+        fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+        UserFactory(email=fc_user_data.email)
+        user, created = france_connect_models.create_or_update_user(fc_user_data)
+        self.assertFalse(created)
+        self.assertNotEqual(user.last_name, user_data["family_name"])
+        self.assertNotEqual(user.first_name, user_data["given_name"])
+        # We did not fill this data using external data, so it is not set
+        self.assertIsNone(user.external_data_source_history)
 
     def test_callback_no_code(self):
         url = reverse("france_connect:callback")
