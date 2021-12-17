@@ -96,6 +96,12 @@ def update_fields_from_user_data(user: User, fc_user_data: FranceConnectUserData
 
 
 def create_or_update_user(fc_user_data: FranceConnectUserData):
+    """
+    Create a user using FranceConnect:
+     - if there is already a user with this FranceConnect ID, we return it
+     - if there is already a user with the email sent by FranceConnect, we return this user
+     - otherwise, we create a new user based on the data FC sent us
+    """
     # We can't use a get_or_create here because we have to set the provider data for each field
     try:
         user = User.objects.get(username=fc_user_data.username)
@@ -104,9 +110,15 @@ def create_or_update_user(fc_user_data: FranceConnectUserData):
         update_fields_from_user_data(user, fc_user_data)
         created = False
     except User.DoesNotExist:
-        # Create a new user
-        user = create_user_from_fc_user_data(fc_user_data)
-        created = True
+        try:
+            user = User.objects.get(email=fc_user_data.email)
+            # Should we update the user fields on user authenticate?
+            # it seems safer not to do that
+            created = False
+        except User.DoesNotExist:
+            # There is no existing user, so we create one
+            user = create_user_from_fc_user_data(fc_user_data)
+            created = True
     user.save()
 
     return user, created
