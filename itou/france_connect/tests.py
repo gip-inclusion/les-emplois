@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from ..users.factories import UserFactory
 from . import models as france_connect_models, views as france_connect_views
 
 
@@ -72,6 +73,20 @@ class FranceConnectTest(TestCase):
         user, created = france_connect_models.create_or_update_user(fc_user_data)
         self.assertFalse(created)
         self.assertEqual(user.last_name, "DUPUIS")
+
+    def test_create_user_from_user_data_with_already_existing_fc_id(self):
+        """
+        If there already is an existing user with this FranceConnectId, we do not create it again,
+        we use it and we update it
+        """
+        UserFactory(username=FRANCE_CONNECT_USERINFO["sub"], last_name="will_be_forgotten")
+        user_data = FRANCE_CONNECT_USERINFO
+        fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+        user, created = france_connect_models.create_or_update_user(fc_user_data)
+        self.assertFalse(created)
+        self.assertEqual(user.last_name, user_data["family_name"])
+        self.assertEqual(user.first_name, user_data["given_name"])
+        self.assertEqual(user.external_data_source_history["last_name"]["source"], "franceconnect")
 
     def test_callback_no_code(self):
         url = reverse("france_connect:callback")
