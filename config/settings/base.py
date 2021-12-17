@@ -393,7 +393,8 @@ SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountA
 
 # France Connect
 # https://partenaires.franceconnect.gouv.fr/
-FRANCE_CONNECT_ENABLED = True
+# France Connect is enabled by default, but a feature flag allows to deactivate it
+FRANCE_CONNECT_ENABLED = os.environ.get("FRANCE_CONNECT_ENABLED", "True") == "True"
 FRANCE_CONNECT_BASE_URL = "https://app.franceconnect.gouv.fr/api/v1/"
 FRANCE_CONNECT_SCOPES = "openid gender given_name family_name email birthdate birthplace birthcountry"
 FRANCE_CONNECT_ENDPOINT_AUTHORIZE = "authorize"
@@ -687,7 +688,7 @@ EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS = int(os.environ.get("EMPLOYEE_RECORD_AR
 # (no job application before this date can be used for this feature)
 EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 7, 1, tzinfo=timezone.utc)
 
-# Only PROD or temporary tests environments are able to transfer employee records data to ASP 
-# This is disabled by default, overidden in prod settings, and can be set 
+# Only PROD or temporary tests environments are able to transfer employee records data to ASP
+# This is disabled by default, overidden in prod settings, and can be set
 # via local dev settings or env vars for a temporary environment.
 EMPLOYEE_RECORD_TRANSFER_ENABLED = bool(os.environ.get("EMPLOYEE_RECORD_TRANSFER_ENABLED", False))
