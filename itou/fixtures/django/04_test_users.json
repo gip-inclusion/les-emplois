@@ -35,7 +35,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -76,7 +76,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -117,7 +117,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -158,7 +158,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -199,7 +199,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -240,7 +240,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -281,7 +281,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -322,7 +322,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -363,7 +363,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -404,7 +404,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -445,7 +445,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -486,7 +486,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -527,7 +527,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -568,7 +568,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -609,7 +609,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 6,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -650,7 +650,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -691,7 +691,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -732,7 +732,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -773,7 +773,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -814,7 +814,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -855,7 +855,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": false,
       "created_by": 3,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -896,7 +896,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -937,7 +937,7 @@
       "resume_link": "",
       "has_completed_welcoming_tour": true,
       "created_by": null,
-      "provider_json": null,
+      "external_data_source_history": null,
       "groups": [],
       "user_permissions": []
    }
@@ -978,7 +978,7 @@
         "resume_link": "",
         "has_completed_welcoming_tour": false,
         "created_by": null,
-        "provider_json": null,
+        "external_data_source_history": null,
         "groups": [],
         "user_permissions": []
     }
