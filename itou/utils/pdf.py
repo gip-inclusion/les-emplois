@@ -59,7 +59,7 @@ class HtmlToPdf:
             "auth": ("api", settings.PDFSHIFT_API_KEY),
             "json": {"source": html, "sandbox": settings.PDFSHIFT_SANDBOX_MODE},
         }
-        with httpx.stream("POST", self.url, **kwargs) as response:
+        with httpx.stream("POST", self.url, timeout=10.0, **kwargs) as response:
             response.raise_for_status()
             result = io.BytesIO()
             for chunk in response.iter_bytes(1024):
