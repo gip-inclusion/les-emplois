@@ -360,7 +360,6 @@ class Command(BaseCommand):
                 end_at=datetime.date(2023, 11, 30),
                 user_id=job_seeker.pk,
                 created_by=created_by,
-                create_employee_record=False,
                 created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
             )
             if not self.dry_run:
