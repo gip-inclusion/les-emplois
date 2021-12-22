@@ -246,9 +246,8 @@ class Approval(CommonApprovalMixin):
     def suspensions_by_start_date_asc(self):
         return self.suspension_set.all().order_by("start_at")
 
-    @cached_property
-    def last_old_suspension(self):
-        return self.suspensions_by_start_date_asc.old().last()
+    def last_old_suspension(self, this_one_pk=None):
+        return self.suspensions_by_start_date_asc.exclude(pk=this_one_pk).old().last()
 
     @cached_property
     def can_be_suspended(self):
@@ -573,7 +572,7 @@ class Suspension(models.Model):
                 )
 
             referent_date = self.created_at.date() if self.pk else None
-            next_min_start_at = self.next_min_start_at(self.approval, referent_date, False)
+            next_min_start_at = self.next_min_start_at(self.approval, self.pk, referent_date, False)
             if next_min_start_at and self.start_at < next_min_start_at:
                 raise ValidationError(
                     {"start_at": (f"La date de début minimum est : {next_min_start_at.strftime('%d/%m/%Y')}.")}
@@ -638,7 +637,7 @@ class Suspension(models.Model):
         return start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS) - relativedelta(days=1)
 
     @staticmethod
-    def next_min_start_at(approval, referent_date=None, with_retroactivity_limitation=True):
+    def next_min_start_at(approval, pk_suspension=None, referent_date=None, with_retroactivity_limitation=True):
         """
         Returns the minimum date on which a suspension can begin.
         """
@@ -649,8 +648,8 @@ class Suspension(models.Model):
         start_at = approval.user.last_accepted_job_application.hiring_start_at
 
         # Start at overrides to handle edge cases.
-        if approval.last_old_suspension:
-            start_at = approval.last_old_suspension.end_at + relativedelta(days=1)
+        if approval.last_old_suspension(pk_suspension):
+            start_at = approval.last_old_suspension(pk_suspension).end_at + relativedelta(days=1)
         elif approval.user.last_accepted_job_application.created_from_pe_approval:
             start_at = referent_date
 
