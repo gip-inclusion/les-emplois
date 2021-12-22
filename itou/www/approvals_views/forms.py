@@ -116,14 +116,18 @@ class SuspensionForm(forms.ModelForm):
         # Show new reasons but keep old ones for history.
         self.fields["reason"].choices = Suspension.Reason.displayed_choices
 
-        if not self.instance.pk:
+        today = timezone.now().date()
+        if self.instance.pk:
+            referent_date = self.instance.created_at.date()
+            suspension_pk = self.instance.pk
+        else:
+            referent_date = today
+            suspension_pk = None
             self.instance.siae = self.siae
             self.instance.approval = self.approval
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
-        today = timezone.now().date()
-        referent_date = self.instance.created_at.date() if self.instance.pk else today
-        min_start_at = Suspension.next_min_start_at(self.approval, referent_date, True)
+        min_start_at = Suspension.next_min_start_at(self.approval, suspension_pk, referent_date, True)
         # A suspension is backdatable but cannot start in the future.
         self.fields["start_at"].widget = DuetDatePickerWidget({"min": min_start_at, "max": today})
         self.fields["end_at"].widget = DuetDatePickerWidget(
@@ -166,8 +170,13 @@ class SuspensionForm(forms.ModelForm):
         start_at = self.cleaned_data.get("start_at")
 
         # The start of a suspension must follow retroactivity rule
-        referent_date = self.instance.created_at.date() if self.instance.pk else None
-        next_min_start_at = Suspension.next_min_start_at(self.approval, referent_date, True)
+        suspension_pk = None
+        referent_date = None
+        if self.instance.pk:
+            suspension_pk = self.instance.pk
+            referent_date = self.instance.created_at.date()
+
+        next_min_start_at = Suspension.next_min_start_at(self.approval, suspension_pk, referent_date, True)
         if start_at < next_min_start_at:
             raise ValidationError(
                 f"Pour la date de début de suspension, vous pouvez remonter "
