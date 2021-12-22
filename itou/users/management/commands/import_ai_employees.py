@@ -591,9 +591,9 @@ class Command(BaseCommand):
         self.logger.info("-" * 80)
 
         if sample_size:
-            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=";").sample(int(sample_size))
+            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=",").sample(int(sample_size))
         else:
-            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=";")
+            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=",")
 
         # Add columns to share data with the ASP.
         df = self.add_columns_for_asp(df)
