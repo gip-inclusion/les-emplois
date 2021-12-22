@@ -180,7 +180,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
 
 
 @dataclass
-class AiCSVFile:
+class AiCSVFileMock:
     """Mock the CSV file transmitted by the AFP."""
 
     pmo_siret: str = "33491262300058"
@@ -206,7 +206,7 @@ class AiCSVFile:
 
 
 @dataclass
-class CleanedAiCsvFile(AiCSVFile):
+class CleanedAiCsvFileMock(AiCSVFileMock):
     """Add expected cleaned values."""
 
     pph_date_naissance: datetime.datetime = datetime.datetime(1983, 7, 11)
@@ -236,7 +236,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         command = self.command
 
         # Perfect data.
-        df = pandas.DataFrame([AiCSVFile()])
+        df = pandas.DataFrame([AiCSVFileMock()])
         df = command.clean_df(df)
         row = df.iloc[0]
         self.assertTrue(isinstance(row[BIRTHDATE_COL], datetime.datetime))
@@ -245,14 +245,14 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertTrue(row["siret_validated_by_asp"])
 
         # Invalid birth date.
-        df = pandas.DataFrame([AiCSVFile(**{BIRTHDATE_COL: "1668-11-09"})])
+        df = pandas.DataFrame([AiCSVFileMock(**{BIRTHDATE_COL: "1668-11-09"})])
         df = command.clean_df(df)
         row = df.iloc[0]
         self.assertEqual(row[BIRTHDATE_COL].strftime(DATE_FORMAT), "1968-11-09")
         self.assertTrue(isinstance(row[BIRTHDATE_COL], datetime.datetime))
 
         # Invalid NIR.
-        df = pandas.DataFrame([AiCSVFile(**{NIR_COL: "56987534"})])
+        df = pandas.DataFrame([AiCSVFileMock(**{NIR_COL: "56987534"})])
         df = command.clean_df(df)
         row = df.iloc[0]
         self.assertEqual(row[NIR_COL], "")
@@ -260,7 +260,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # Excluded SIRET from the ASP.
         siret = "33491197100029"
-        df = pandas.DataFrame([AiCSVFile(**{SIRET_COL: siret})])
+        df = pandas.DataFrame([AiCSVFileMock(**{SIRET_COL: siret})])
         df = command.clean_df(df)
         row = df.iloc[0]
         self.assertEqual(row[SIRET_COL], siret)
@@ -269,7 +269,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # # Employer email.
         domain = "unenouvellechance.fr"
         siae = SiaeFactory(auth_email=f"accueil@{domain}", kind=Siae.KIND_AI)
-        df = pandas.DataFrame([AiCSVFile(**{EMAIL_COL: f"colette@{domain}", SIRET_COL: siae.siret})])
+        df = pandas.DataFrame([AiCSVFileMock(**{EMAIL_COL: f"colette@{domain}", SIRET_COL: siae.siret})])
         df = command.clean_df(df)
         row = df.iloc[0]
         self.assertEqual(row[EMAIL_COL], "")
@@ -277,7 +277,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # Generic email.
         domain = "gmail.fr"
         siae = SiaeFactory(auth_email=f"accueil@{domain}", kind=Siae.KIND_AI)
-        df = pandas.DataFrame([AiCSVFile(**{EMAIL_COL: f"colette@{domain}"})])
+        df = pandas.DataFrame([AiCSVFileMock(**{EMAIL_COL: f"colette@{domain}"})])
         df = command.clean_df(df)
         row = df.iloc[0]
         self.assertEqual(row[EMAIL_COL], "colette@gmail.fr")
@@ -286,7 +286,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
     def test_filter_invalid_nirs(self):
         # Create a dataframe with one valid and one invalid NIR.
         command = self.command
-        df = pandas.DataFrame([CleanedAiCsvFile(), CleanedAiCsvFile(**{NIR_COL: "56987534", "nir_is_valid": False})])
+        df = pandas.DataFrame(
+            [CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{NIR_COL: "56987534", "nir_is_valid": False})]
+        )
         df, invalid_nirs_df = command.filter_invalid_nirs(df)
 
         # Filtered rows.
@@ -303,10 +305,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
     # Test excluded rows.
     def test_remove_ignored_rows(self):
         command = self.command
-        SiaeFactory(kind=Siae.KIND_AI, siret=getattr(CleanedAiCsvFile(), SIRET_COL))
+        SiaeFactory(kind=Siae.KIND_AI, siret=getattr(CleanedAiCsvFileMock(), SIRET_COL))
 
         # Ended contracts are removed.
-        df = pandas.DataFrame([CleanedAiCsvFile(), CleanedAiCsvFile(**{CONTRACT_ENDDATE_COL: "2020-11-30"})])
+        df = pandas.DataFrame([CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{CONTRACT_ENDDATE_COL: "2020-11-30"})])
         total_df, filtered_df = command.remove_ignored_rows(df)
         self.assertEqual(len(total_df), 2)
         self.assertEqual(len(filtered_df), 1)
@@ -314,7 +316,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
 
         # Continue even if df.CONTRACT_ENDDATE_COL does not exists.
-        df = pandas.DataFrame([CleanedAiCsvFile(), CleanedAiCsvFile(**{CONTRACT_ENDDATE_COL: "2020-11-30"})])
+        df = pandas.DataFrame([CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{CONTRACT_ENDDATE_COL: "2020-11-30"})])
         df = df.drop(columns=[CONTRACT_ENDDATE_COL])
         total_df, filtered_df = command.remove_ignored_rows(df)
         self.assertEqual(len(total_df), 2)
@@ -322,7 +324,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # SIRET provided by the ASP are removed.
         df = pandas.DataFrame(
-            [CleanedAiCsvFile(), CleanedAiCsvFile(**{SIRET_COL: "33491197100029", "siret_validated_by_asp": False})]
+            [
+                CleanedAiCsvFileMock(),
+                CleanedAiCsvFileMock(**{SIRET_COL: "33491197100029", "siret_validated_by_asp": False}),
+            ]
         )
         total_df, filtered_df = command.remove_ignored_rows(df)
         self.assertEqual(len(total_df), 2)
@@ -331,7 +336,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
 
         # Inexistent structures are removed.
-        df = pandas.DataFrame([CleanedAiCsvFile(), CleanedAiCsvFile(**{SIRET_COL: "202020202"})])
+        df = pandas.DataFrame([CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{SIRET_COL: "202020202"})])
         total_df, filtered_df = command.remove_ignored_rows(df)
         self.assertEqual(len(total_df), 2)
         self.assertEqual(len(filtered_df), 1)
@@ -339,7 +344,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
 
         # Rows with approvals are removed.
-        df = pandas.DataFrame([CleanedAiCsvFile(), CleanedAiCsvFile(**{APPROVAL_COL: "670929"})])
+        df = pandas.DataFrame([CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{APPROVAL_COL: "670929"})])
         total_df, filtered_df = command.remove_ignored_rows(df)
         self.assertEqual(len(total_df), 2)
         self.assertEqual(len(filtered_df), 1)
@@ -350,13 +355,13 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
     def test_find_or_create_job_seeker__find(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-        CommuneFactory(code=getattr(CleanedAiCsvFile, CITY_INSEE_COL))
+        CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
         command = self.command
 
         # Find existing user with NIR.
-        nir = getattr(CleanedAiCsvFile(), NIR_COL)
+        nir = getattr(CleanedAiCsvFileMock(), NIR_COL)
         JobSeekerFactory(nir=nir)
-        df = pandas.DataFrame([CleanedAiCsvFile()])
+        df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertFalse(created)
         self.assertTrue(job_seeker)
@@ -366,9 +371,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_seeker.delete()
 
         # Find existing user with email address.
-        email = getattr(CleanedAiCsvFile(), EMAIL_COL)
+        email = getattr(CleanedAiCsvFileMock(), EMAIL_COL)
         JobSeekerFactory(nir="", email=email)
-        df = pandas.DataFrame([CleanedAiCsvFile()])
+        df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertFalse(created)
         self.assertTrue(job_seeker)
@@ -378,7 +383,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_seeker.delete()
 
         # Find existing user created previously by this script.
-        base_data = CleanedAiCsvFile()
+        base_data = CleanedAiCsvFileMock()
         first_name = getattr(base_data, FIRST_NAME_COL).title()
         last_name = getattr(base_data, LAST_NAME_COL).title()
         birthdate = getattr(base_data, BIRTHDATE_COL)
@@ -391,7 +396,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             created_by=developer,
             date_joined=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
         )
-        df = pandas.DataFrame([CleanedAiCsvFile()])
+        df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertFalse(created)
         self.assertTrue(job_seeker)
@@ -402,11 +407,11 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
     def test_find_or_create_job_seeker__create(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-        commune = CommuneFactory(code=getattr(CleanedAiCsvFile, CITY_INSEE_COL))
+        commune = CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
         command = self.command
 
         # Job seeker not found: create user.
-        df = pandas.DataFrame([CleanedAiCsvFile()])
+        df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertTrue(created)
         self.assertTrue(job_seeker)
@@ -416,7 +421,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # # NIR is empty: create user with NIR None, even if another one exists.
         previous_job_seekers_pk = [JobSeekerFactory(nir="").pk, JobSeekerFactory(nir=None).pk]
-        df = pandas.DataFrame([CleanedAiCsvFile(**{NIR_COL: "", "nir_is_valid": False})])
+        df = pandas.DataFrame([CleanedAiCsvFileMock(**{NIR_COL: "", "nir_is_valid": False})])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertTrue(created)
         self.assertTrue(job_seeker)
@@ -427,13 +432,13 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         User.objects.filter(pk__in=previous_job_seekers_pk).delete()
 
         # # If found job_seeker is not a job seeker: create one with a fake email address.
-        prescriber = PrescriberFactory(email=getattr(CleanedAiCsvFile(), EMAIL_COL))
-        df = pandas.DataFrame([CleanedAiCsvFile()])
+        prescriber = PrescriberFactory(email=getattr(CleanedAiCsvFileMock(), EMAIL_COL))
+        df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertTrue(created)
         self.assertTrue(job_seeker)
         self.assertEqual(User.objects.all().count(), 3)
-        self.assertEqual(job_seeker.nir, getattr(CleanedAiCsvFile(), NIR_COL))
+        self.assertEqual(job_seeker.nir, getattr(CleanedAiCsvFileMock(), NIR_COL))
         self.assertNotEqual(job_seeker.email, prescriber.email)
         # Clean
         job_seeker.delete()
@@ -442,7 +447,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # Check expected attributes.
         # Perfect path: NIR, email, ...
         # Created by developer on XX date.
-        base_data = CleanedAiCsvFile()
+        base_data = CleanedAiCsvFileMock()
         df = pandas.DataFrame([base_data])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertTrue(created)
@@ -463,7 +468,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_seeker.delete()
 
         # If no email provided: fake email.
-        df = pandas.DataFrame([CleanedAiCsvFile(**{EMAIL_COL: ""})])
+        df = pandas.DataFrame([CleanedAiCsvFileMock(**{EMAIL_COL: ""})])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertTrue(created)
         self.assertTrue(job_seeker.email.endswith("@email-temp.com"))
@@ -471,9 +476,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # A job seeker is found by email address but its NIR is different.
         # Create a new one.
-        email = getattr(CleanedAiCsvFile(), EMAIL_COL)
+        email = getattr(CleanedAiCsvFileMock(), EMAIL_COL)
         JobSeekerFactory(nir="141062a78200555", email=email)
-        df = pandas.DataFrame([CleanedAiCsvFile()])
+        df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
         self.assertTrue(created)
         self.assertTrue(job_seeker.email.endswith("@email-temp.com"))
@@ -486,7 +491,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # Existing valid PASS IAE delivered after a job application has been accepted.
         approval_start_at = datetime.date(2021, 11, 10)  # Approval should start before November 30th.
-        existing_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL), start_at=approval_start_at)
+        existing_approval = ApprovalFactory(
+            user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL), start_at=approval_start_at
+        )
         created, expected_approval, _ = command.find_or_create_approval(
             job_seeker=existing_approval.user, created_by=developer
         )
@@ -501,7 +508,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # PASS IAE created previously by this script.
         existing_approval = ApprovalFactory(
-            user__nir=getattr(CleanedAiCsvFile(), NIR_COL),
+            user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL),
             start_at=datetime.date(2021, 12, 1),
             created_by=developer,
             create_employee_record=False,
@@ -522,7 +529,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         command = self.command
 
         # No PASS IAE.
-        job_seeker = JobSeekerFactory(nir=getattr(CleanedAiCsvFile(), NIR_COL))
+        job_seeker = JobSeekerFactory(nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         created, approval, _ = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
         self.assertTrue(created)
         self.assertTrue(approval.is_valid)
@@ -539,7 +546,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # Expired PASS IAE.
         approval_start_at = datetime.date.today() - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS, days=2)
-        expired_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL), start_at=approval_start_at)
+        expired_approval = ApprovalFactory(
+            user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL), start_at=approval_start_at
+        )
         job_seeker = expired_approval.user
         created, approval, _ = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
         self.assertTrue(created)
@@ -552,7 +561,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # PASS created after November 30th with a job application:
         # the employer tried to get a PASS IAE quicker.
         siae = SiaeWithMembershipFactory()
-        previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL))
+        previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         job_seeker = previous_approval.user
         job_application = JobApplicationSentBySiaeFactory(
             job_seeker=job_seeker,
@@ -576,7 +585,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # PASS created after November 30th with a job application but not sent by this employer.
         siae = SiaeWithMembershipFactory()
-        previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL))
+        previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         job_seeker = previous_approval.user
         job_application = JobApplicationSentBySiaeFactory(
             job_seeker=job_seeker,
@@ -599,7 +608,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # Multiple accepted job applications linked to this approval. Raise an error if dry run is not set.
         siae = SiaeWithMembershipFactory()
-        previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFile(), NIR_COL))
+        previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         job_seeker = previous_approval.user
         job_application = JobApplicationSentBySiaeFactory(
             job_seeker=job_seeker,
@@ -633,10 +642,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             to_siae__kind=Siae.KIND_AI,
             approval_manually_delivered_by=developer,
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
-            hiring_start_at=getattr(CleanedAiCsvFile(), CONTRACT_STARTDATE_COL),
+            hiring_start_at=getattr(CleanedAiCsvFileMock(), CONTRACT_STARTDATE_COL),
         )
         job_seeker = expected_job_app.job_seeker
-        df = pandas.DataFrame([CleanedAiCsvFile(**{SIRET_COL: expected_job_app.to_siae.siret})])
+        df = pandas.DataFrame([CleanedAiCsvFileMock(**{SIRET_COL: expected_job_app.to_siae.siret})])
         created, found_job_application, _ = command.find_or_create_job_application(
             approval=expected_job_app.approval,
             job_seeker=job_seeker,
@@ -656,13 +665,13 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_application = JobApplicationSentBySiaeFactory(
             to_siae__kind=Siae.KIND_AI,
             state=JobApplicationWorkflow.STATE_CANCELLED,
-            job_seeker__nir=getattr(CleanedAiCsvFile(), NIR_COL),
+            job_seeker__nir=getattr(CleanedAiCsvFileMock(), NIR_COL),
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
             approval_id="",
             approval_manually_delivered_by=developer,
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
         )
-        df = pandas.DataFrame([CleanedAiCsvFile(**{SIRET_COL: job_application.to_siae.siret})])
+        df = pandas.DataFrame([CleanedAiCsvFileMock(**{SIRET_COL: job_application.to_siae.siret})])
         created, new_job_application, cancelled_job_app_deleted = command.find_or_create_job_application(
             approval=job_application.approval,
             job_seeker=job_application.job_seeker,
@@ -682,7 +691,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_application = JobApplicationFactory(
             to_siae=siae,
             sender_siae=siae,
-            job_seeker__nir=getattr(CleanedAiCsvFile(), NIR_COL),
+            job_seeker__nir=getattr(CleanedAiCsvFileMock(), NIR_COL),
             approval_id="",
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
@@ -690,7 +699,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
             hiring_start_at=datetime.date("2021-01-01"),
         )
-        df = pandas.DataFrame([CleanedAiCsvFile(**{SIRET_COL: siae.siret})])
+        df = pandas.DataFrame([CleanedAiCsvFileMock(**{SIRET_COL: siae.siret})])
         created, new_job_application, cancelled_job_app_deleted = command.find_or_create_job_application(
             approval=job_application.approval,
             job_seeker=job_application.job_seeker,
@@ -704,9 +713,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
     def test_import_data_into_itou(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-        CommuneFactory(code=getattr(CleanedAiCsvFile, CITY_INSEE_COL))
+        CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
         command = self.command
-        base_data = CleanedAiCsvFile()
+        base_data = CleanedAiCsvFileMock()
         siae = SiaeFactory(siret=getattr(base_data, SIRET_COL), kind=Siae.KIND_AI)
 
         # User, approval and job application creation.
@@ -733,7 +742,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             job_seeker=job_seeker,
             hiring_start_at=getattr(base_data, CONTRACT_STARTDATE_COL),
         )
-        input_df = pandas.DataFrame([CleanedAiCsvFile()])
+        input_df = pandas.DataFrame([CleanedAiCsvFileMock()])
         output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=input_df)
         self.assertEqual(User.objects.filter(is_job_seeker=True).count(), 1)
         self.assertEqual(Approval.objects.count(), 1)
@@ -744,9 +753,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # is updated for logging purposes.
         input_df = pandas.DataFrame(
             [
-                CleanedAiCsvFile(**{CONTRACT_ENDDATE_COL: "2020-05-11"}),  # Ended contracts are ignored.
-                CleanedAiCsvFile(**{SIRET_COL: "598742121322354"}),  # Not existing SIAE.
-                CleanedAiCsvFile(
+                CleanedAiCsvFileMock(**{CONTRACT_ENDDATE_COL: "2020-05-11"}),  # Ended contracts are ignored.
+                CleanedAiCsvFileMock(**{SIRET_COL: "598742121322354"}),  # Not existing SIAE.
+                CleanedAiCsvFileMock(
                     **{
                         NIR_COL: "141062a78200555",
                         EMAIL_COL: "tartarin@gmail.fr",
@@ -754,8 +763,8 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
                     }
                 ),
                 # Different contract start date.
-                CleanedAiCsvFile(**{CONTRACT_STARTDATE_COL: datetime.date(2020, 4, 12)}),
-                CleanedAiCsvFile(),
+                CleanedAiCsvFileMock(**{CONTRACT_STARTDATE_COL: datetime.date(2020, 4, 12)}),
+                CleanedAiCsvFileMock(),
             ]
         )
         input_df = command.add_columns_for_asp(input_df)
