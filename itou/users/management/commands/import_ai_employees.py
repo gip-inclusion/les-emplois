@@ -12,9 +12,8 @@ import pandas as pd
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import F, Q
-from django.db.utils import IntegrityError
 from tqdm import tqdm
 
 from itou.approvals.models import Approval
@@ -460,38 +459,40 @@ class Command(BaseCommand):
         pbar = tqdm(total=len(to_be_imported_df))
         for i, row in to_be_imported_df.iterrows():
             pbar.update(1)
+            try:
+                with transaction.atomic():
+                    user_creation, job_seeker = self.find_or_create_job_seeker(row=row, created_by=developer)
 
-            with transaction.atomic():
+                    if user_creation:
+                        created_users += 1
+                    else:
+                        found_users += 1
 
-                user_creation, job_seeker = self.find_or_create_job_seeker(row=row, created_by=developer)
+                    approval_creation, approval, redelivered_approval = self.find_or_create_approval(
+                        job_seeker=job_seeker, created_by=developer
+                    )
 
-                if user_creation:
-                    created_users += 1
-                else:
-                    found_users += 1
+                    if approval_creation:
+                        created_approvals += 1
+                    else:
+                        found_approvals += 1
 
-                approval_creation, approval, redelivered_approval = self.find_or_create_approval(
-                    job_seeker=job_seeker, created_by=developer
-                )
+                    if redelivered_approval:
+                        redelivered_approvals += 1
 
-                if approval_creation:
-                    created_approvals += 1
-                else:
-                    found_approvals += 1
+                    job_application_creation, _, cancelled_job_app_deleted = self.find_or_create_job_application(
+                        approval=approval, job_seeker=job_seeker, row=row, approval_manually_delivered_by=developer
+                    )
+                    if job_application_creation:
+                        created_job_applications += 1
+                    else:
+                        found_job_applications += 1
 
-                if redelivered_approval:
-                    redelivered_approvals += 1
-
-                job_application_creation, _, cancelled_job_app_deleted = self.find_or_create_job_application(
-                    approval=approval, job_seeker=job_seeker, row=row, approval_manually_delivered_by=developer
-                )
-                if job_application_creation:
-                    created_job_applications += 1
-                else:
-                    found_job_applications += 1
-
-                if cancelled_job_app_deleted:
-                    cancelled_job_apps_deleted += 1
+                    if cancelled_job_app_deleted:
+                        cancelled_job_apps_deleted += 1
+            except (ValidationError, IntegrityError) as e:
+                self.logger.critical("ValidationError or IntegrityError during import: %s" % e)
+                continue
 
             # Update dataframe values.
             # https://stackoverflow.com/questions/25478528/updating-value-in-iterrow-for-pandas
@@ -591,9 +592,9 @@ class Command(BaseCommand):
         self.logger.info("-" * 80)
 
         if sample_size:
-            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=",").sample(int(sample_size))
+            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=";").sample(int(sample_size))
         else:
-            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=",")
+            df = pd.read_csv(file_path, dtype=str, encoding="latin_1", sep=";")
 
         # Add columns to share data with the ASP.
         df = self.add_columns_for_asp(df)

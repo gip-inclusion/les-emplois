@@ -811,3 +811,30 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             self.assertEqual(row[PASS_IAE_END_DATE_COL], approval.end_at.strftime(DATE_FORMAT))
             self.assertEqual(row[USER_PK_COL], job_seeker.jobseeker_hash_id)
             self.assertEqual(row[USER_ITOU_EMAIL_COL], job_seeker.email)
+
+        # Clean
+        job_seeker = User.objects.get(nir=getattr(base_data, NIR_COL))
+        job_seeker.delete()
+        job_seeker = User.objects.get(email="tartarin@gmail.fr")
+        job_seeker.delete()
+
+        # If transaction: raise and pass.
+        job_seeker = JobSeekerFactory(nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
+        future_date = datetime.date.today() + relativedelta(months=2)
+        ApprovalFactory(user=job_seeker, start_at=future_date)
+        input_df = pandas.DataFrame(
+            [
+                base_data,
+                CleanedAiCsvFileMock(
+                    **{
+                        NIR_COL: "141062a78200555",
+                        EMAIL_COL: "tartarin@gmail.fr",
+                        BIRTHDATE_COL: datetime.date(1997, 3, 12),
+                    }
+                ),
+            ]
+        )
+
+        output_df = None
+        output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=input_df)
+        self.assertEqual(len(output_df), 2)
