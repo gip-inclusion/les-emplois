@@ -630,8 +630,13 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
 
+        # An approval is mandatory to test employee records creation (FS).
+        approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         expected_job_app = JobApplicationSentBySiaeFactory(
             to_siae__kind=Siae.KIND_AI,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,  # Mandatory for FS.
+            job_seeker=approval.user,
+            approval=approval,
             approval_manually_delivered_by=developer,
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
             hiring_start_at=getattr(CleanedAiCsvFileMock(), CONTRACT_STARTDATE_COL),
@@ -647,6 +652,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertFalse(created)
         self.assertEqual(expected_job_app.pk, found_job_application.pk)
         self.assertFalse(found_job_application.can_be_cancelled)
+        # Assert job application has been updated to block employee records creation.
+        self.assertNotIn(
+            found_job_application, JobApplication.objects.eligible_as_employee_record(found_job_application.to_siae)
+        )
 
     def test_find_or_create_job_application__create(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
@@ -677,6 +686,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         )
         self.assertTrue(created)
         self.assertTrue(cancelled_job_app_deleted)
+        # Assert employee records creation is blocked.
+        self.assertNotIn(
+            new_job_application, JobApplication.objects.eligible_as_employee_record(new_job_application.to_siae)
+        )
         self.assertEqual(new_job_application.approval.pk, approval.pk)
         self.assertFalse(JobApplication.objects.filter(pk=job_application.pk).exists())
         self.assertFalse(new_job_application.can_be_cancelled)

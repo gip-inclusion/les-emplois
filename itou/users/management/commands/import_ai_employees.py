@@ -412,6 +412,12 @@ class Command(BaseCommand):
                     )
 
         job_application = job_application_qs.first()
+
+        # Previously create job applications may still allow employee records creation.
+        if job_application and job_application.create_employee_record:
+            job_application.create_employee_record = False
+            if not self.dry_run:
+                job_application.save()
         if not job_application:
             job_app_dict = {
                 "sender": siae.active_admin_members.first(),
@@ -425,6 +431,7 @@ class Command(BaseCommand):
                 "approval_id": approval.pk,
                 "approval_manually_delivered_by": approval_manually_delivered_by,
                 "created_at": settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+                "create_employee_record": False,
                 "approval_number_sent_by_email": True,
             }
             job_application = JobApplication(**job_app_dict)
