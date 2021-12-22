@@ -266,7 +266,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(row[SIRET_COL], siret)
         self.assertFalse(row["siret_validated_by_asp"])
 
-        # # Employer email.
+        # Employer email.
         domain = "unenouvellechance.fr"
         siae = SiaeFactory(auth_email=f"accueil@{domain}", kind=Siae.KIND_AI)
         df = pandas.DataFrame([AiCSVFileMock(**{EMAIL_COL: f"colette@{domain}", SIRET_COL: siae.siret})])
