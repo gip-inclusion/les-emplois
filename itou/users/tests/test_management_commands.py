@@ -282,7 +282,6 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         row = df.iloc[0]
         self.assertEqual(row[EMAIL_COL], "colette@gmail.fr")
 
-    # Test added comments.
     def test_filter_invalid_nirs(self):
         # Create a dataframe with one valid and one invalid NIR.
         command = self.command
@@ -302,7 +301,6 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(df.iloc[1][COMMENTS_COL], expected_comment)
         self.assertEqual(invalid_nirs_df.iloc[0][COMMENTS_COL], expected_comment)
 
-    # Test excluded rows.
     def test_remove_ignored_rows(self):
         command = self.command
         SiaeFactory(kind=Siae.KIND_AI, siret=getattr(CleanedAiCsvFileMock(), SIRET_COL))
@@ -350,8 +348,6 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(len(filtered_df), 1)
         expected_comment = "Ligne ignorée : agrément ou PASS IAE renseigné."
         self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
-
-    # Test importing data to Itou.
 
     def test_find_or_create_job_seeker__find(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
@@ -484,7 +480,6 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertTrue(job_seeker.email.endswith("@email-temp.com"))
         job_seeker.delete()
 
-    # - Test find_or_create_approval
     def test_find_or_create_approval__find(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
@@ -522,7 +517,6 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # Clean
         existing_approval.user.delete()
 
-    # - Test find_or_create_job_applications
     def test_find_or_create_approval__create(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
@@ -631,7 +625,6 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertTrue(previous_approval.pk, approval.pk)
         job_seeker.delete()
 
-    # Find or create job applications.
     def test_find_or_create_job_application__find(self):
         # Find job applications created previously by this script.
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
