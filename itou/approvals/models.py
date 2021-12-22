@@ -571,16 +571,12 @@ class Suspension(models.Model):
                         )
                     }
                 )
-            next_min_start_at = self.next_min_start_at(self.approval)
-            if self.start_at < next_min_start_at:
+
+            referent_date = self.created_at.date() if self.pk else None
+            next_min_start_at = self.next_min_start_at(self.approval, referent_date, False)
+            if next_min_start_at and self.start_at < next_min_start_at:
                 raise ValidationError(
-                    {
-                        "start_at": (
-                            f"Pour la date de début de suspension, vous pouvez remonter "
-                            f"{self.MAX_RETROACTIVITY_DURATION_DAYS} jours avant la date du jour."
-                            f"Date de début minimum : {next_min_start_at.strftime('%d/%m/%Y')}."
-                        )
-                    }
+                    {"start_at": (f"La date de début minimum est : {next_min_start_at.strftime('%d/%m/%Y')}.")}
                 )
 
             # A suspension cannot overlap another one for the same SIAE.
@@ -642,23 +638,27 @@ class Suspension(models.Model):
         return start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS) - relativedelta(days=1)
 
     @staticmethod
-    def next_min_start_at(approval):
+    def next_min_start_at(approval, referent_date=None, with_retroactivity_limitation=True):
         """
         Returns the minimum date on which a suspension can begin.
         """
-        today = datetime.date.today()
+        if referent_date is None:
+            referent_date = datetime.date.today()
+
         # Default starting date.
         start_at = approval.user.last_accepted_job_application.hiring_start_at
-        start_at_threshold = today - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
 
         # Start at overrides to handle edge cases.
         if approval.last_old_suspension:
             start_at = approval.last_old_suspension.end_at + relativedelta(days=1)
         elif approval.user.last_accepted_job_application.created_from_pe_approval:
-            start_at = today
+            start_at = referent_date
 
-        if start_at < start_at_threshold:
-            return start_at_threshold
+        if with_retroactivity_limitation:
+            start_at_threshold = referent_date - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
+            if start_at < start_at_threshold:
+                return start_at_threshold
+
         return start_at
 
 

@@ -122,7 +122,8 @@ class SuspensionForm(forms.ModelForm):
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
         today = timezone.now().date()
-        min_start_at = Suspension.next_min_start_at(self.approval)
+        referent_date = self.instance.created_at.date() if self.instance.pk else today
+        min_start_at = Suspension.next_min_start_at(self.approval, referent_date, True)
         # A suspension is backdatable but cannot start in the future.
         self.fields["start_at"].widget = DuetDatePickerWidget({"min": min_start_at, "max": today})
         self.fields["end_at"].widget = DuetDatePickerWidget(
@@ -160,6 +161,21 @@ class SuspensionForm(forms.ModelForm):
             ),
             "reason_explanation": "Obligatoire seulement en cas de force majeure.",
         }
+
+    def clean_start_at(self):
+        start_at = self.cleaned_data.get("start_at")
+
+        # The start of a suspension must follow retroactivity rule
+        referent_date = self.instance.created_at.date() if self.instance.pk else None
+        next_min_start_at = Suspension.next_min_start_at(self.approval, referent_date, True)
+        if start_at < next_min_start_at:
+            raise ValidationError(
+                f"Pour la date de début de suspension, vous pouvez remonter "
+                f"{Suspension.MAX_RETROACTIVITY_DURATION_DAYS} jours avant la date du jour. "
+                f"Date de début minimum : {next_min_start_at.strftime('%d/%m/%Y')}."
+            )
+
+        return start_at
 
 
 class PoleEmploiApprovalSearchForm(forms.Form):
