@@ -180,7 +180,8 @@ class SuspensionForm(forms.ModelForm):
         if start_at < next_min_start_at:
             raise ValidationError(
                 f"Pour la date de début de suspension, vous pouvez remonter "
-                f"{Suspension.MAX_RETROACTIVITY_DURATION_DAYS} jours avant la date du jour. "
+                f"{Suspension.MAX_RETROACTIVITY_DURATION_DAYS} jours avant la date de saisie "
+                f"et elle ne doit pas chevaucher une suspension déjà existante. "
                 f"Date de début minimum : {next_min_start_at.strftime('%d/%m/%Y')}."
             )
 
