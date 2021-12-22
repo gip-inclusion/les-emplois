@@ -10,21 +10,6 @@
 
         {% csrf_token %}
 
-        {% if siae.kind == siae.KIND_AI %}
-            <div class="alert alert-danger" role="alert">
-                <p>
-                    <b>IMPORTANT</b><br>
-                    La bascule automatique des salariés embauchés en AI avant le 01/12/2021 est toujours en cours.
-                    <ul>
-                        <li>Attendez la fin de la procédure de transfert.</li>
-                        <li>N'enregistrez pas vous-même les salariés embauchés avant le 01/12/2021.</li>
-                        <li>N'annulez pas les candidatures créées automatiquement par le système.</li>
-                        <li>Le versement des aides au poste ne sera pas impacté.</li>
-                    </ul>
-                </p>
-            </div>
-        {% endif %}
-
         {% bootstrap_form_errors form type="all" %}
 
         {% bootstrap_form form %}
