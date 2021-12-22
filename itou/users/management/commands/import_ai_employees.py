@@ -54,7 +54,7 @@ PASS_IAE_END_DATE_COL = "pass_iae_date_fin"
 DATE_FORMAT = "%Y-%m-%d"
 
 # Second file.
-DATE_FORMAT = "%d/%m/%Y"
+# DATE_FORMAT = "%d/%m/%Y"
 
 
 class Command(BaseCommand):
@@ -288,7 +288,9 @@ class Command(BaseCommand):
         if not row.nir_is_valid:
             user_data["nir"] = None
 
-        job_seeker = User.objects.filter(nir=user_data["nir"]).exclude(Q(nir__isnull=True) | Q(nir="")).first()
+        job_seeker = None
+        if row.nir_is_valid:
+            job_seeker = User.objects.filter(nir=user_data["nir"]).exclude(Q(nir__isnull=True) | Q(nir="")).first()
 
         if not job_seeker:
             job_seeker = User.objects.filter(email=user_data["email"]).first()
