@@ -9,7 +9,6 @@ import uuid
 from pathlib import Path
 
 import pandas as pd
-import pytz
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
