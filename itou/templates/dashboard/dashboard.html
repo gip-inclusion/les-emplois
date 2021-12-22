@@ -5,6 +5,17 @@
 {% block messages %}
     {{ block.super }}
 
+    {# Alerte pour gérer les cas d'exception lors de l'importation des AI. #}
+    {% if siae.kind == siae.KIND_AI %}
+        <div class="alert alert-warning" role="alert">
+            <p>Tous les salariés déclarés auprès de l'ASP avant le 1er décembre ont été ajoutés au tableau de bord de la SIAE porteuse de l’annexe financière. Nous travaillons à vous permettre de les transférer dans le tableau de bord d’une structure fille.</p>
+            <p>Pour les salariés qui ne seraient plus en poste, il vous est demandé de procéder à une suspension d’un an au motif « contrat de travail terminé ». Dans la mesure où ces salariés sont connus dans l’Extranet IAE 2.0 de l'ASP, ces PASS IAE ne peuvent pas être annulés.</p>
+            <p>Certains salariés en insertion déclarés dans le logiciel GTA n’ont pas pu être déclarés dans l’Extranet IAE 2.0 de l'ASP avant le 1er décembre 2021. Pour ce cas particulier, des échanges sont en cours pour définir une méthode d’intégration, nous vous tiendrons informés.</p>
+            <p>Pour les salariés entrés en parcours avant le 1er décembre 2021 qui n’auraient pas été déclarés dans l’Extranet avant le 1er décembre 2021, vous devez procéder à une déclaration d’éligibilité sur la plateforme de l’inclusion.</p>
+            <p>Pour toute question liée à un cas individuel, <a href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/#support" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">une assistance est disponible ici {% include "includes/icon.html" with icon="external-link" %}</a>.</p>
+        </div>
+    {% endif %}
+
     {% if current_siae and not current_siae.jobs.exists %}
         <div class="alert alert-warning" role="alert">
             Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
@@ -82,21 +93,6 @@
         {% include "welcoming_tour/includes/message.html" %}
     {% endif %}
 
-
-    {% if can_show_employee_records %}
-    {# Employee record #}
-    <div class="alert alert-warning pb-0">
-        <p>
-            Suite à la fermeture de la saisie de fiches salarié dans l'Extranet 2.0 de l'ASP à compter du 27 septembre 2021 (saisie manuelle ou inter-opérabilité depuis votre système d'information),
-            nous vous permettons d'introduire de nouvelles fiches salariés (depuis votre tableau de bord) pour toutes embauches non déclarées dans l'Extranet 2.0 de l'ASP à compter du <b>1er juillet 2021</b>.
-        </p>
-        <p>
-            Vous pouvez accéder à cette fonctionnalité via le lien <b>"Mes candidatures / Gérer mes fiches salarié"</b> du tableau de bord.
-        </p>
-    </div>
-    {% endif %}
-
-
 {% endblock %}
 
 {% block content %}
@@ -112,24 +108,6 @@
                 <p class="mb-0">
                     <a href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" class="btn btn-primary">
                         Partagez et découvrez les outils qui facilitent votre quotidien
-                        {% include "includes/icon.html" with icon="external-link" %}
-                    </a>
-                </p>
-            </div>
-        </div>
-    {% endif %}
-
-    {# Mise en avant temporaire du marché pour les employeurs. #}
-    {% if user.is_siae_staff %}
-        <div class="card mb-7 bg-light text-center">
-            <div class="card-body">
-                <p class="h4 mb-3">
-                    <span class="badge badge-warning">Nouveau</span>
-                    Améliorez la visibilité de votre structure
-                </p>
-                <p class="mb-0">
-                    <a href="{% url_add_query TYPEFORM_URL|add:'/to/xGF5FMel' structure=current_siae.name type=current_siae.kind ville=current_siae.city siret=current_siae.siret %}" rel="noopener" target="_blank" class="btn btn-primary">
-                        C'est parti !
                         {% include "includes/icon.html" with icon="external-link" %}
                     </a>
                 </p>
@@ -374,7 +352,6 @@
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="file" %}
                             <a href="{% url 'employee_record_views:list' %}?status=NEW">Gérer mes fiches salarié (ASP)</a>
-                            <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
 
