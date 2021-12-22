@@ -511,7 +511,6 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL),
             start_at=datetime.date(2021, 12, 1),
             created_by=developer,
-            create_employee_record=False,
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
         )
         created, expected_approval, _ = command.find_or_create_approval(
