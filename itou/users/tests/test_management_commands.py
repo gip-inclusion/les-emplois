@@ -648,48 +648,56 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(expected_job_app.pk, found_job_application.pk)
         self.assertFalse(found_job_application.can_be_cancelled)
 
-    def find_or_create_job_application__create(self):
+    def test_find_or_create_job_application__create(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
 
-        # Employers cancelled the job application we created, hence removing the PASS IAE we delivered.
+        # Employers canceled the job application we created, hence removing the PASS IAE we delivered.
         # Remove those job applications and deliver a new PASS IAE.
+        nir = getattr(CleanedAiCsvFileMock(), NIR_COL)
+        siret = getattr(CleanedAiCsvFileMock(), SIRET_COL)
+        approval = ApprovalFactory(user__nir=nir)
+        df = pandas.DataFrame([CleanedAiCsvFileMock(**{SIRET_COL: siret})])
         job_application = JobApplicationSentBySiaeFactory(
             to_siae__kind=Siae.KIND_AI,
+            to_siae__siret=siret,
             state=JobApplicationWorkflow.STATE_CANCELLED,
-            job_seeker__nir=getattr(CleanedAiCsvFileMock(), NIR_COL),
+            job_seeker=approval.user,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
-            approval_id="",
+            approval=None,
             approval_manually_delivered_by=developer,
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+            hiring_start_at=df.iloc[0][CONTRACT_STARTDATE_COL],
         )
-        df = pandas.DataFrame([CleanedAiCsvFileMock(**{SIRET_COL: job_application.to_siae.siret})])
         created, new_job_application, cancelled_job_app_deleted = command.find_or_create_job_application(
-            approval=job_application.approval,
+            approval=approval,
             job_seeker=job_application.job_seeker,
             row=df.iloc[0],
             approval_manually_delivered_by=developer,
         )
         self.assertTrue(created)
         self.assertTrue(cancelled_job_app_deleted)
+        self.assertEqual(new_job_application.approval.pk, approval.pk)
         self.assertFalse(JobApplication.objects.filter(pk=job_application.pk).exists())
         self.assertFalse(new_job_application.can_be_cancelled)
         self.assertTrue(new_job_application.is_from_ai_stock)
-        self.assertEqual(JobApplication.objects.all().count, 1)
+        self.assertEqual(JobApplication.objects.count(), 1)
         job_application.job_seeker.delete()
 
         # Different contract starting date.
-        siae = SiaeFactory()
+        nir = getattr(CleanedAiCsvFileMock(), NIR_COL)
+        approval = ApprovalFactory(user__nir=nir)
+        siae = SiaeFactory(kind=Siae.KIND_AI)
         job_application = JobApplicationFactory(
             to_siae=siae,
             sender_siae=siae,
-            job_seeker__nir=getattr(CleanedAiCsvFileMock(), NIR_COL),
-            approval_id="",
+            job_seeker=approval.user,
+            approval=approval,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
             approval_manually_delivered_by=developer,
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
-            hiring_start_at=datetime.date("2021-01-01"),
+            hiring_start_at=datetime.date(2021, 1, 1),
         )
         df = pandas.DataFrame([CleanedAiCsvFileMock(**{SIRET_COL: siae.siret})])
         created, new_job_application, cancelled_job_app_deleted = command.find_or_create_job_application(
