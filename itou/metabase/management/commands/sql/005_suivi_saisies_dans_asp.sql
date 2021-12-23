@@ -11,9 +11,9 @@ dans l'extranet ASP avec pour chaque structure:
     - le dernier mois saisi
     - une adresse mail à contacter en cas de besoin de vérification
     
- */
+*/
 
-select 
+select
     /* Récupérer le mois de la dernière déclaration faite par la structure 
     dans l'extranet ASP sous le format MM/YYYY */
     to_char(
@@ -23,7 +23,6 @@ select
     ) as dernier_mois_saisi_asp,
     /* Calculer le nombre de mois de retard de saisie de la sructure 
     dans l'extranet ASP par rapport au mois en cours */
-    date_part('month', current_date ) - max(emi.emi_sme_mois) - 1 as retard_en_mois,
     af.type_siae, 
     af.af_id_annexe_financiere,
     af_numero_annexe_financiere, 
@@ -43,11 +42,17 @@ FROM
         left join "fluxIAE_AnnexeFinanciere_v2" af
             on emi.emi_afi_id = af.af_id_annexe_financiere
             /* Ne prendre en compte que les structures qui ont une annexe financière 
-            valide  pour l'année en cours */
+            valide  pour l'année en cours et prendre en compte les structures qui sont en retard de saisie dans l'asp */
             and af_etat_annexe_financiere_code in ('VALIDE', 'SAISI')
-            and date_part('year', to_date(af.af_date_debut_effet, 'dd/mm/yyyy')) = date_part('year', current_date)
-            /* Ne prendre que les déclarations mensuelles de l'année en cours */
-            and  emi.emi_sme_annee = date_part('year', current_date)
+            and date_part('year', af.af_date_debut_effet_v2) >= (date_part('year', current_date) - 1)
+            and af.af_date_fin_effet_v2 
+                    >= 
+                    make_date(
+                        cast (date_part('year', current_date) as integer), 
+                        cast((date_part('month', current_date) - 3) as integer),1
+                             )
+            /* On prend les déclarations mensuelles de l'année en cours */
+            and  emi.emi_sme_annee >= (date_part('year', current_date) - 1)
         left  join "fluxIAE_Structure_v2"  as structure
             on af.af_id_structure = structure.structure_id_siae  
 group by  
