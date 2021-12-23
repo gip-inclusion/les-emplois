@@ -246,8 +246,8 @@ class Approval(CommonApprovalMixin):
     def suspensions_by_start_date_asc(self):
         return self.suspension_set.all().order_by("start_at")
 
-    def last_old_suspension(self, this_one_pk=None):
-        return self.suspensions_by_start_date_asc.exclude(pk=this_one_pk).old().last()
+    def last_old_suspension(self, exclude_pk=None):
+        return self.suspensions_by_start_date_asc.exclude(pk=exclude_pk).old().last()
 
     @cached_property
     def can_be_suspended(self):
