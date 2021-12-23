@@ -3,8 +3,6 @@
 SiaeConvention object logic used by the import_siae.py script is gathered here.
 
 """
-from collections import defaultdict
-
 from django.utils import timezone
 
 from itou.siaes.management.commands._import_siae.siae import does_siae_have_an_active_convention
@@ -12,19 +10,12 @@ from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_
 from itou.siaes.models import Siae, SiaeConvention
 
 
-# In general we deactivate conventions which should be deactivated, but some timings are tricky like the beginning of
-# each year. For example in ASP dataset of Jan 4 2021, no structure had any valid AF for 2021 yet, which means we
-# would have deactivated 4013 conventions o_O. In these cases we temporarily no longer deactivate any convention
-# until AF data catches up several weeks or months later.
-DEACTIVATE_CONVENTIONS = True
-
-
 def update_existing_conventions():
     """
     Update existing conventions, mainly the is_active field,
     and check data integrity on the fly.
     """
-    deactivations = 0
+    conventions_to_deactivate = []
     reactivations = 0
     three_months_ago = timezone.now() - timezone.timedelta(days=90)
 
@@ -75,25 +66,29 @@ def update_existing_conventions():
                 pass
             else:
                 # Active convention should be deactivated.
-                deactivations += 1
-                # Break if too many deactivations have occurred without waiting for the end of the loop.
-                # This way we avoid shutting down 100% of our conventions on January 1st of the year.
-                assert deactivations <= 200
-                if DEACTIVATE_CONVENTIONS:
-                    convention.is_active = False
-                    # Start the grace period now.
-                    convention.deactivated_at = timezone.now()
-                    convention.save()
+                conventions_to_deactivate.append(convention)
 
     print(f"{reactivations} conventions have been reactivated")
 
     total = SiaeConvention.objects.count()
+    deactivation_ratio = len(conventions_to_deactivate) / total
 
-    if DEACTIVATE_CONVENTIONS:
-        print(f"{deactivations} of {total} conventions have been deactivated")
+    if deactivation_ratio >= 0.05:
+        # Early each year, all or most AF for the new year are missing in ASP AF data.
+        # Instead of brutally deactivating all SIAE, we patiently wait until enough AF data is present.
+        # While we wait, no SIAE is deactivated whatsoever.
+        print(
+            f"ERROR: too many conventions should be deactivated ({100*deactivation_ratio}%)"
+            f" thus none will actually be!"
+        )
         return
 
-    print(f"{deactivations} of {total} conventions should have been deactivated but have *not* been")
+    for convention in conventions_to_deactivate:
+        convention.is_active = False
+        # Start the grace period now.
+        convention.deactivated_at = timezone.now()
+        convention.save()
+    print(f"{len(conventions_to_deactivate)} conventions have been deactivated")
 
 
 def get_creatable_conventions():
@@ -116,12 +111,7 @@ def get_creatable_conventions():
 
         siret_signature = ASP_ID_TO_SIRET_SIGNATURE.get(asp_id)
 
-        if DEACTIVATE_CONVENTIONS:
-            is_active = does_siae_have_an_active_convention(siae)
-        else:
-            # At the beginning of each year, when AFs of the new year are not there yet, we temporarily
-            # consider all new conventions as active by default even though they do not have a valid AF yet.
-            is_active = True
+        is_active = does_siae_have_an_active_convention(siae)
 
         assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
 
