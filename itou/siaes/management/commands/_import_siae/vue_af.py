@@ -79,10 +79,7 @@ def get_vue_af_df():
         assert row.kind in Siae.ASP_MANAGED_KINDS
         validate_af_number(row.number)
 
-    df["start_at"] = df.start_at.apply(timezone.make_aware)
-    df["end_date"] = df.end_date.apply(timezone.make_aware)
-
-    df["ends_in_the_future"] = df.end_date > timezone.now()
+    df["ends_in_the_future"] = df.end_date.apply(timezone.make_aware) > timezone.now()
     df["has_active_state"] = df.state.isin(SiaeFinancialAnnex.STATES_ACTIVE)
     df["is_active"] = df.has_active_state & df.ends_in_the_future
 
@@ -169,5 +166,5 @@ def get_siae_key_to_convention_end_date():
 ACTIVE_SIAE_KEYS = [
     siae_key
     for siae_key, convention_end_date in get_siae_key_to_convention_end_date().items()
-    if timezone.now() < convention_end_date
+    if timezone.now() < timezone.make_aware(convention_end_date)
 ]
