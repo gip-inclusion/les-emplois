@@ -326,7 +326,7 @@
                             {% endif %}
                         </p>
                     {% endif %}
-                    {% if current_siae.is_active and user_is_siae_admin %}
+                    {% if current_siae.is_active and user_is_siae_admin and current_siae.convention %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="plus-square" %}
                             <a href="{% url 'siaes_views:create_siae' %}">Créer/rejoindre une autre structure</a>
