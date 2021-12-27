@@ -70,7 +70,7 @@ def update_existing_conventions():
 
     print(f"{reactivations} conventions have been reactivated")
 
-    if len(conventions_to_deactivate) >= 100:
+    if len(conventions_to_deactivate) >= 200:
         # Early each year, all or most AF for the new year are missing in ASP AF data.
         # Instead of brutally deactivating all SIAE, we patiently wait until enough AF data is present.
         # While we wait, no SIAE is deactivated whatsoever.
