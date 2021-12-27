@@ -84,7 +84,8 @@ def update_existing_conventions():
         convention.is_active = False
         # Start the grace period now.
         convention.deactivated_at = timezone.now()
-        convention.save()
+    SiaeConvention.objects.bulk_update(conventions_to_deactivate, ["is_active", "deactivated_at"])
+
     print(f"{len(conventions_to_deactivate)} conventions have been deactivated")
 
 
