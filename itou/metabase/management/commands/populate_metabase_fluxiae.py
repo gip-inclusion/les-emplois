@@ -66,6 +66,7 @@ from django.core.management.base import BaseCommand
 from itou.metabase.management.commands._dataframes import store_df
 from itou.metabase.management.commands._utils import build_custom_tables
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
+from itou.utils.slack import send_slack_message
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:
@@ -129,6 +130,10 @@ class Command(BaseCommand):
             self.log("Populating metabase is not allowed in this environment.")
             return
 
+        send_slack_message(
+            ":rocket: Début de la mise à jour hebdomadaire de Metabase avec les dernières données FluxIAE :rocket:"
+        )
+
         self.populate_fluxiae_referentials()
 
         self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
@@ -146,6 +151,11 @@ class Command(BaseCommand):
 
         # Build custom tables by running raw SQL queries on existing tables.
         build_custom_tables(dry_run=self.dry_run)
+
+        send_slack_message(
+            ":white_check_mark: Fin de la mise à jour hebdomadaire de Metabase avec les"
+            " dernières données FluxIAE :white_check_mark:"
+        )
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))

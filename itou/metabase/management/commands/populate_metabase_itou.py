@@ -490,7 +490,8 @@ class Command(BaseCommand):
                 send_slack_message(f"Fin de l'étape {update.__name__} :white_check_mark:")
 
         send_slack_message(
-            ":rocket: Fin de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"
+            ":white_check_mark: Fin de la mise à jour quotidienne de Metabase avec les"
+            " dernières données C1 :white_check_mark:"
         )
 
     def handle(self, dry_run=False, **options):
