@@ -70,15 +70,12 @@ def update_existing_conventions():
 
     print(f"{reactivations} conventions have been reactivated")
 
-    total = SiaeConvention.objects.count()
-    deactivation_ratio = len(conventions_to_deactivate) / total
-
-    if deactivation_ratio >= 0.05:
+    if len(conventions_to_deactivate) >= 100:
         # Early each year, all or most AF for the new year are missing in ASP AF data.
         # Instead of brutally deactivating all SIAE, we patiently wait until enough AF data is present.
         # While we wait, no SIAE is deactivated whatsoever.
         print(
-            f"ERROR: too many conventions should be deactivated ({100*deactivation_ratio}%)"
+            f"ERROR: too many conventions would be deactivated ({len(conventions_to_deactivate)})"
             f" thus none will actually be!"
         )
         return
