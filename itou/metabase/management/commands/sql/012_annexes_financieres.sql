@@ -1,7 +1,7 @@
 /* L'objectif est de construire un tableau de bord pour suivre en début de chaque année 
  les structures conventionnées (avec une annexe financière valide) */
 
-/* Paramètres à changer */
+/* Paramètres à changer tous les ans */
 with constantes as 
 ( 
 select 2021 as annee_n_1,
@@ -14,15 +14,15 @@ structure_af as (
         af.af_mesure_dispositif_code,
         max(af.af_date_debut_effet_v2) as date_debut_af_plus_recente,
         af.af_date_fin_effet_v2,
-        struc.structure_denomination as structure_denomination,
-        struc.structure_siret_actualise as structure_siret,
-        struc.nom_departement_structure,
-        struc.nom_region_structure,
-        struc.code_departement
+        s.structure_denomination as structure_denomination,
+        s.structure_siret_actualise as structure_siret,
+        s.nom_departement_structure,
+        s.nom_region_structure,
+        s.code_departement
     from 
         fluxIAE_annexefinanciere_v2 as af
-    left join "fluxIAE_Structure_v2"  as struc 
-        on  af.af_id_structure = struc.structure_id_siae
+    left join "fluxIAE_Structure_v2"  as s 
+        on  af.af_id_structure = s.structure_id_siae
     where
         af_mesure_dispositif_code not like '%MP%' and af_mesure_dispositif_code not like '%FDI%'
     group by 
@@ -32,9 +32,9 @@ structure_af as (
         af.af_date_fin_effet_v2,
         structure_denomination,
         structure_siret,
-        struc.nom_departement_structure,
-        struc.nom_region_structure,
-        struc.code_departement
+        s.nom_departement_structure,
+        s.nom_region_structure,
+        s.code_departement
 )
 select 
     constantes.*,
