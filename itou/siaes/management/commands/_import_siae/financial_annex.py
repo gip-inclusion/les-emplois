@@ -3,6 +3,8 @@
 SiaeFinancialAnnex object logic used by the import_siae.py script is gathered here.
 
 """
+from django.utils import timezone
+
 from itou.siaes.management.commands._import_siae.vue_af import AF_NUMBER_TO_ROW
 from itou.siaes.models import SiaeConvention, SiaeFinancialAnnex
 
@@ -32,13 +34,13 @@ def get_creatable_and_deletable_afs():
         assert af.convention.kind == row.kind
 
         # Sometimes an AF start date changes.
-        if af.start_at != row.start_at:
-            af.start_at = row.start_at
+        if af.start_at != timezone.make_aware(row.start_at):
+            af.start_at = timezone.make_aware(row.start_at)
             af.save()
 
         # Sometimes an AF end date changes.
-        if af.end_at != row.end_date:
-            af.end_at = row.end_date
+        if af.end_at != timezone.make_aware(row.end_date):
+            af.end_at = timezone.make_aware(row.end_date)
             af.save()
 
         # Sometimes an AF state changes.
@@ -77,7 +79,7 @@ def build_financial_annex_from_number(number):
     return SiaeFinancialAnnex(
         number=row.number,
         state=row.state,
-        start_at=row.start_at,
-        end_at=row.end_date,
+        start_at=timezone.make_aware(row.start_at),
+        end_at=timezone.make_aware(row.end_date),
         convention=convention_query.get(),
     )
