@@ -1,5 +1,5 @@
-/* 
-
+/*
+  
 L'objectif est de développer pour la DDETS un suivi des structures qui sous-consomment ou sur-consomment 
 les etp par rapport à ce qui est conventionné.
 Les DDETS pourront donc redistribuer les aides aux postes en se basant sur la consommation réelle des etp 
@@ -10,16 +10,16 @@ with calcul_ETP as (
     select 
         /* En Janvier de l'année en cours, moyenne_nb_etp_depuis_debut_annee = (consommé sur l'année n-1) / (le dernier mois travaillé sur l'année n-1) */
         case 
-            when (max(emi.emi_sme_annee) = date_part('year', current_date - 1)) then (sum(emi.emi_part_etp) / max(emi.emi_sme_mois))
+            when (max(emi.emi_sme_annee) = date_part('year', current_date)-1) then (sum(emi.emi_part_etp) / max(emi.emi_sme_mois))
             else (sum(emi.emi_part_etp) filter (where emi.emi_sme_annee = (date_part('year', current_date)))) 
                     / (max(emi.emi_sme_mois) filter (where emi.emi_sme_annee = (date_part('year', current_date))))
         end moyenne_nb_etp_depuis_debut_annee,
         case 
-           when (max(emi.emi_sme_annee) = date_part('year', current_date - 1)) then max(af.af_etp_postes_insertion)
+           when (max(emi.emi_sme_annee) = date_part('year', current_date)-1) then max(af.af_etp_postes_insertion)
            else max(af.af_etp_postes_insertion) filter (where emi.emi_sme_annee = (date_part('year', current_date)))
         end nb_etp_subventionne,
         case 
-           when (max(emi.emi_sme_annee) = date_part('year', current_date - 1)) then sum(emi.emi_nb_heures_travail)
+           when (max(emi.emi_sme_annee) = date_part('year', current_date)-1) then sum(emi.emi_nb_heures_travail)
            else sum(emi.emi_nb_heures_travail)  filter (where emi.emi_sme_annee = (date_part('year', current_date))) 
         end nb_heures_travaillees_depuis_debut_annee,
         saisie_asp.dernier_mois_saisi_asp,
