@@ -101,12 +101,33 @@ class IsValidFilter(admin.SimpleListFilter):
         return queryset
 
 
+class StartDateFilter(admin.SimpleListFilter):
+    title = "Date de début"
+    parameter_name = "starts"
+
+    def lookups(self, request, model_admin):
+        return (("past", "< aujourd’hui"), ("today", "= aujourd’hui"), ("future", "> aujourd’hui"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "past":
+            return queryset.starts_in_the_past()
+        if value == "today":
+            return queryset.starts_today()
+        if value == "future":
+            return queryset.starts_in_the_future()
+        return queryset
+
+
 @admin.register(models.Approval)
 class ApprovalAdmin(admin.ModelAdmin):
     form = ApprovalAdminForm
     list_display = ("pk", "number", "user", "birthdate", "start_at", "end_at", "is_valid", "created_at")
     search_fields = ("pk", "number", "user__first_name", "user__last_name", "user__email")
-    list_filter = (IsValidFilter,)
+    list_filter = (
+        IsValidFilter,
+        StartDateFilter,
+    )
     list_display_links = ("pk", "number")
     raw_id_fields = ("user", "created_by")
     readonly_fields = ("created_at", "created_by")
