@@ -22,6 +22,11 @@ connection_options = None
 if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
     connection_options = pysftp.CnOpts(knownhosts=settings.ASP_FS_KNOWN_HOSTS)
 
+# Fixes transfer issue after ASP SFTP server upgrade (27.12.2021)
+# Apparently, ssh-rsa public keys are not accepted by default anymore
+if connection_options:
+    connection_options.PubkeyAcceptedKeyTypes = "+ssh-rsa"
+
 
 class Command(BaseCommand):
     """
