@@ -123,6 +123,18 @@ class CommonApprovalQuerySet(models.QuerySet):
     def invalid(self):
         return self.exclude(self.valid_lookup)
 
+    def starts_in_the_past(self):
+        now = timezone.now().date()
+        return self.filter(Q(start_at__lt=now))
+
+    def starts_today(self):
+        now = timezone.now().date()
+        return self.filter(start_at=now)
+
+    def starts_in_the_future(self):
+        now = timezone.now().date()
+        return self.filter(Q(start_at__gt=now))
+
 
 class Approval(CommonApprovalMixin):
     """
