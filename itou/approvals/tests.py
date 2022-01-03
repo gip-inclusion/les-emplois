@@ -120,6 +120,27 @@ class CommonApprovalQuerySetTest(TestCase):
         )
         self.assertFalse(approval.can_be_deleted)
 
+    def test_starts_date_filters_for_approval_model(self):
+        """
+        tests for starts_in_the_past, starts_today and starts_in_the_future
+        """
+        start_at = timezone.now().date() - relativedelta(years=1)
+        end_at = start_at + relativedelta(years=1)
+        approval_past = ApprovalFactory(start_at=start_at, end_at=end_at)
+
+        start_at = timezone.now().date()
+        end_at = start_at + relativedelta(years=2)
+        approval_today = ApprovalFactory(start_at=start_at, end_at=end_at)
+
+        start_at = timezone.now().date() + relativedelta(years=2)
+        end_at = start_at + relativedelta(years=2)
+        approval_future = ApprovalFactory(start_at=start_at, end_at=end_at)
+
+        self.assertEqual(3, Approval.objects.count())
+        self.assertEqual([approval_past], list(Approval.objects.starts_in_the_past()))
+        self.assertEqual([approval_today], list(Approval.objects.starts_today()))
+        self.assertEqual([approval_future], list(Approval.objects.starts_in_the_future()))
+
 
 class CommonApprovalMixinTest(TestCase):
     """
