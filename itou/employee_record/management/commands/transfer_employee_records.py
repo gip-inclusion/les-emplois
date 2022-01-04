@@ -77,7 +77,6 @@ class Command(BaseCommand):
             username=settings.ASP_FS_SFTP_USER,
             private_key=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
             cnopts=connection_options,
-            log="pysftp.log",
         )
 
     def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_REMOTE_DOWNLOAD_DIR):
