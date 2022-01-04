@@ -43,14 +43,9 @@ FROM
             on emi.emi_afi_id = af.af_id_annexe_financiere
             /* Ne prendre en compte que les structures qui ont une annexe financière 
             valide  pour l'année en cours et prendre en compte les structures qui sont en retard de saisie dans l'asp */
-            and af_etat_annexe_financiere_code in ('VALIDE', 'SAISI')
+            and af_etat_annexe_financiere_code in ('VALIDE')
             and date_part('year', af.af_date_debut_effet_v2) >= (date_part('year', current_date) - 1)
-            and af.af_date_fin_effet_v2 
-                    >= 
-                    make_date(
-                        cast (date_part('year', current_date) as integer), 
-                        cast((date_part('month', current_date) - 3) as integer),1
-                             )
+            and af.af_date_fin_effet_v2 >= CURRENT_DATE - INTERVAL '3 months'
             /* On prend les déclarations mensuelles de l'année en cours */
             and  emi.emi_sme_annee >= (date_part('year', current_date) - 1)
         left  join "fluxIAE_Structure_v2"  as structure
