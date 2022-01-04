@@ -74,6 +74,8 @@ PyJWT==2.3.0  # https://github.com/jpadilla/pyjwt
 httpx==0.21.1  # https://github.com/encode/httpx/
 
 # SFTP file transfer for ASP
+# Paramiko is explicitly defined to solve an "issue" (RSA order) of 2.9.x versions
+paramiko==2.8.1  # https://github.com/paramiko/paramiko
 pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
 
 # S3
