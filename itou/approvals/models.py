@@ -308,10 +308,15 @@ class Approval(CommonApprovalMixin):
 
         Returns True if date has been updated, False otherwise
         """
+        # Only approvals which are not started yet can be postponed.
         if self.can_postpone_start_date:
-            delay = new_start_date - self.start_at
             self.start_at = new_start_date
-            self.end_at = self.end_at + delay
+            # At first, we computed the end date applying a delay like this:
+            # delay = new_start_date - self.start_at
+            # self.end_at = self.end_at + delay
+            # But this is error-prone on leap years!
+            # Instead, set the default end date.
+            self.end_at = self.get_default_end_date(new_start_date)
             self.save()
             return True
         return False
