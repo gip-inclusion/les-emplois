@@ -1,5 +1,44 @@
 # Journal des modifications
 
+## [33] - 2021-12-30
+
+### Ajouté
+
+- Ajout de la possibilité de se connecter par France Connect.
+- Intégration d'un fichier complémentaire de 50 000 contrats AI en plus des 36 000 contrats déjà traités précédemment.
+- Import des GEIQ avec ajout de 4 nouvelles structures. Le dernier import datait d'il y a 12 mois.
+- Ajout d'un bouton « Exporter » à la page qui liste les candidatures.
+- Ajout d'un message informatif à destination des AI pour les accompagner pendant la reprise de stock.
+- Ajout d'un message informatif à destination des AI à propos de la bascule automatique des salariés embauchés en AI avant le 01/12/2021.
+- Pôle emploi est maintenant notifié lorsqu'un PASS IAE est accepté.
+- Ajout de la permission de lever une suspension au moment de l'embauche.
+
+### Modifié
+
+- La restriction à 30 jours pour les suspensions ne s'applique plus aux administrateurs.
+- Il est maintenant possible de candidater même si un PASS IAE est suspendu.
+- Résolution d'une incohérence entre la rétroactivité à 30 jours des suspensions et la date de création.
+- Résolution d'un bug qui faisait qu'une même candidature apparaissait plusieurs fois dans la liste des résultats.
+- On considère dorénavant une éligibilité valide si un PASS IAE valide existe sans diagnostic afin de ne pas forcer les SIAE à repasser par la case « Valider les critères d'éligibilité » pour une nouvelle embauche d'un candidat qui dispose d'un PASS IAE hérité de l'import des AI.
+- La création de fiche salarié est maintenant bloquable directement au niveau des candidatures et non plus des PASS IAE.
+- Les SIAE peuvent maintenant déclarer leur fiche salarié sans attendre le délai des 96h après l'embauche.
+- Mise à jour de la page de conformité concernant l'accessibilité.
+- Automatisation de la gestion de la crise du manque d'annexes financières en début d'année : les déconventionnements s'interrompent chaque 1er janvier et reprennent d'eux-mêmes quelques mois plus tard une fois que 95% des conventions ont bien leur annexe financière pour la nouvelle année.
+- Réinitialisation du secret d'intégration des tableaux de bord C2 dans le C1 suite à la faille Log4j.
+- Résolution d'un bug qui faisait que le lien de suspension d'un PASS IAE manquait à l'appel.
+- Correctif sur le lien montré au candidat pour se renseigner sur le numéro de sécurité sociale.
+- Correctif du contrôle du NIR dans le rare cas où le mois de naissance n'est pas connu : les mois de naissance fictifs 20 à 30 ou 50 ou plus caractérisent le NIR d'une personne inscrite sur la base d'une pièce d'état civil ne précisant pas le mois de naissance.
+- Mise à jour technique vers Django 4.0.
+- Mise à jour de la [page statistiques](https://emplois.inclusion.beta.gouv.fr/stats).
+- Correctif du message montré aux employeurs non administrateurs dans le cas d'une géolocalisation incorrecte de la structure.
+- Le support des emplois ne peut plus modifier les dates d'un PASS IAE si la fiche salarié associée est déjà envoyée ou intégrée.
+
+### Supprimé
+
+- Suppresion du message spécifique aux utilisateurs du logiciel GTA sur le tableau de bord des AI.
+- Suppression des PASS IAE refusés et des PASS IAE avec une date dans le futur des notifications pour Pôle emploi.
+- Suppression de la page de statistiques avancées.
+
 ## [32] - 2021-12-02
 
 ### Ajouté
@@ -191,38 +230,38 @@
 
 ### Ajouté
 
-- Ajout d'une étape de confirmation au processus de candidature afin d'éviter qu'une adresse e-mail soit utilisée par différents candidats
+- Ajout d'une étape de confirmation au processus de candidature afin d'éviter qu'une adresse e-mail soit utilisée par différents candidats.
 - Ajout d'une étape supplémentaire à la fin du parcours de candidature pour permettre aux prescripteurs de revenir à leur recherche ou d'aller au tableau de bord.
 - Ajout du motif de prolongation "CDI conclu avec une personne âgée d'au moins 57 ans (12 mois max)"
-- Création et exécution d'un script de fusion des doublons de candidats
-- Brique technique de gestion de France Connect, en vue de faciliter l'identification candidat
-- Ajout d'une page de destination pour présenter l'API
-- Ajout du motif de refus de candidature "Candidat non mobile"
-- Ajout d'un champ « Précisez » si le motif du refus sélectionné est « Autre »
+- Création et exécution d'un script de fusion des doublons de candidats.
+- Brique technique de gestion de France Connect, en vue de faciliter l'identification candidat.
+- Ajout d'une page de destination pour présenter l'API.
+- Ajout du motif de refus de candidature "Candidat non mobile".
+- Ajout d'un champ « Précisez » si le motif du refus sélectionné est « Autre ».
 
 ### Modifié
 
-- Mise à jour des motifs et de la durée maximum de suspension
-- Ajout du SIRET dans le message d'avertissement lorsqu'une structure n'est plus conventionnée
+- Mise à jour des motifs et de la durée maximum de suspension.
+- Ajout du SIRET dans le message d'avertissement lorsqu'une structure n'est plus conventionnée.
 - Remplacement de l'image du logo dans les meta tags par une image au format 1200x630 pixels.
-- Ajout le nom de la SIAE dans l'e-mail de confirmation d'envoi transmis au prescripteur
-- Correction des erreurs d'envois d'e-mail en réduisant la longueur du sujet lorsque le nom de la structure est trop long
-- Ajout de la possibilité d'ordonner les différents résultats de l'API SIAE
-- Correctifs sur l'import EA
-- Correctifs mineurs concernant l'envoi des données des fiches salarié
-- Mise en production et ouverture progressive des fiches salarié
+- Ajout le nom de la SIAE dans l'e-mail de confirmation d'envoi transmis au prescripteur.
+- Correction des erreurs d'envois d'e-mail en réduisant la longueur du sujet lorsque le nom de la structure est trop long.
+- Ajout de la possibilité d'ordonner les différents résultats de l'API SIAE.
+- Correctifs sur l'import EA.
+- Correctifs mineurs concernant l'envoi des données des fiches salarié.
+- Mise en production et ouverture progressive des fiches salarié.
 
 ### Supprimé
 
-- Suppression de la mention obsolète sur les motifs de suspension sur le formulaire de suspension
-- Suppression de la mention "(socle)" du critère d'éligibilité "Bénéficiaire du RSA"
+- Suppression de la mention obsolète sur les motifs de suspension sur le formulaire de suspension.
+- Suppression de la mention "(socle)" du critère d'éligibilité "Bénéficiaire du RSA".
 
 ## [26] - 2021-09-09
 
 ### Ajouté
 - Automatisation des imports de données de l'ASP.
 - Refonte et réorganisation de la documentation technique.
-- Integration du nouveau `datepicker` au thème
+- Integration du nouveau `datepicker` au thème.
 - Ajout d'une option de suppression du suivi Matomo (opt-in / `tarteaucitron`).
 - Ajout d'évènements Matomo sur les liens de la page de résultats employeurs.
 - Ajout d’une API `/api/v1/siaes` (et sa documentation) pour obtenir la liste des SIAE à proximité d’une ville.
