@@ -160,7 +160,12 @@ class Command(BaseCommand):
             help="ID of the the siae to move data to.",
             required=True,
         )
-        parser.add_argument("--only-job-applications", action=argparse.BooleanOptionalAction, default=False)
+        parser.add_argument(
+            "--only-job-applications",
+            action=argparse.BooleanOptionalAction,
+            default=False,
+            help="Set to True to move only job applications and job descriptions, nothing else!",
+        )
         parser.add_argument("--dry-run", action=argparse.BooleanOptionalAction, default=False)
 
     def handle(self, *args, **options):
