@@ -67,7 +67,7 @@ class PrescriberWithOrgInvitationAdmin(BaseInvitationAdmin):
 class LaborInspectorInvitationAdmin(BaseInvitationAdmin):
     list_display = BaseInvitationAdmin.list_display + ("institution",)
     raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("institution",)
-    search_fields = BaseInvitationAdmin.search_fields + ("organization__name",)
+    search_fields = BaseInvitationAdmin.search_fields + ("institution__name",)
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("institution")
