@@ -38,7 +38,7 @@ HELP_TEXT = """
 """
 
 
-def move_siae_data(from_id, to_id, dry_run=False):
+def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
     if from_id == to_id:
         logger.error("Unable to use the same siae as source and destination (ID %s)", from_id)
         return
@@ -78,27 +78,28 @@ def move_siae_data(from_id, to_id, dry_run=False):
     job_descriptions = siaes_models.SiaeJobDescription.objects.filter(siae_id=from_id)
     logger.info("| Job descriptions: %s", job_descriptions.count())
 
-    # Move users not already present in siae destination
-    members = siaes_models.SiaeMembership.objects.filter(siae_id=from_id).exclude(
-        user__in=users_models.User.objects.filter(siaemembership__siae_id=to_id)
-    )
-    logger.info("| Members: %s", members.count())
+    if not only_job_applications:
+        # Move users not already present in siae destination
+        members = siaes_models.SiaeMembership.objects.filter(siae_id=from_id).exclude(
+            user__in=users_models.User.objects.filter(siaemembership__siae_id=to_id)
+        )
+        logger.info("| Members: %s", members.count())
 
-    diagnoses = eligibility_models.EligibilityDiagnosis.objects.filter(author_siae_id=from_id)
-    logger.info("| Diagnoses: %s", diagnoses.count())
+        diagnoses = eligibility_models.EligibilityDiagnosis.objects.filter(author_siae_id=from_id)
+        logger.info("| Diagnoses: %s", diagnoses.count())
 
-    prolongations = approvals_models.Prolongation.objects.filter(declared_by_siae_id=from_id)
-    logger.info("| Prolongations: %s", prolongations.count())
+        prolongations = approvals_models.Prolongation.objects.filter(declared_by_siae_id=from_id)
+        logger.info("| Prolongations: %s", prolongations.count())
 
-    suspensions = approvals_models.Suspension.objects.filter(siae_id=from_id)
-    logger.info("| Suspensions: %s", suspensions.count())
+        suspensions = approvals_models.Suspension.objects.filter(siae_id=from_id)
+        logger.info("| Suspensions: %s", suspensions.count())
 
-    # Don't move invitations for existing members
-    # The goal is to keep information about the original information
-    invitations = invitations_models.SiaeStaffInvitation.objects.filter(siae_id=from_id).exclude(
-        email__in=users_models.User.objects.filter(siaemembership__siae_id=to_id).values_list("email", flat=True)
-    )
-    logger.info("| Invitations: %s", invitations.count())
+        # Don't move invitations for existing members
+        # The goal is to keep information about the original information
+        invitations = invitations_models.SiaeStaffInvitation.objects.filter(siae_id=from_id).exclude(
+            email__in=users_models.User.objects.filter(siaemembership__siae_id=to_id).values_list("email", flat=True)
+        )
+        logger.info("| Invitations: %s", invitations.count())
 
     logger.info(
         "INTO siae.id=%s - %s %s - %s",
@@ -116,25 +117,27 @@ def move_siae_data(from_id, to_id, dry_run=False):
         job_applications_sent.update(sender_siae_id=to_id)
         job_applications_received.update(to_siae_id=to_id)
         job_descriptions.update(siae_id=to_id)
-        members.update(siae_id=to_id)
-        diagnoses.update(author_siae_id=to_id)
-        prolongations.update(declared_by_siae_id=to_id)
-        suspensions.update(siae_id=to_id)
-        invitations.update(siae_id=to_id)
-        to_siae_qs.update(
-            brand=from_siae.display_name,
-            description=from_siae.description,
-            phone=from_siae.phone,
-            coords=from_siae.coords,
-            geocoding_score=from_siae.geocoding_score,
-        )
-        from_siae_qs.update(
-            block_job_applications=True,
-            job_applications_blocked_at=timezone.now(),
-            # Make sure the old siae no longer appears in results
-            coords=None,
-            geocoding_score=None,
-        )
+
+        if not only_job_applications:
+            members.update(siae_id=to_id)
+            diagnoses.update(author_siae_id=to_id)
+            prolongations.update(declared_by_siae_id=to_id)
+            suspensions.update(siae_id=to_id)
+            invitations.update(siae_id=to_id)
+            to_siae_qs.update(
+                brand=from_siae.display_name,
+                description=from_siae.description,
+                phone=from_siae.phone,
+                coords=from_siae.coords,
+                geocoding_score=from_siae.geocoding_score,
+            )
+            from_siae_qs.update(
+                block_job_applications=True,
+                job_applications_blocked_at=timezone.now(),
+                # Make sure the old siae no longer appears in results
+                coords=None,
+                geocoding_score=None,
+            )
 
 
 class Command(BaseCommand):
@@ -157,7 +160,8 @@ class Command(BaseCommand):
             help="ID of the the siae to move data to.",
             required=True,
         )
+        parser.add_argument("--only-job-applications", action=argparse.BooleanOptionalAction, default=False)
         parser.add_argument("--dry-run", action=argparse.BooleanOptionalAction, default=False)
 
     def handle(self, *args, **options):
-        move_siae_data(options["from_id"], options["to_id"], options["dry_run"])
+        move_siae_data(options["from_id"], options["to_id"], options["dry_run"], options["only_job_applications"])
