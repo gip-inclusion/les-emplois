@@ -19,6 +19,7 @@ from itou.prescribers.factories import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
@@ -306,6 +307,33 @@ class ModelTest(TestCase):
 
         user.emailaddress_set.create(email=user.email, verified=True)
         self.assertTrue(user.has_verified_email)
+
+    def test_siae_admin_can_create_siae_antenna(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.get()
+        self.assertTrue(user.can_create_siae_antenna(siae))
+
+    def test_siae_normal_member_cannot_create_siae_antenna(self):
+        siae = SiaeWithMembershipFactory(membership__is_admin=False)
+        user = siae.members.get()
+        self.assertFalse(user.can_create_siae_antenna(siae))
+
+    def test_siae_admin_without_convention_cannot_create_siae_antenna(self):
+        siae = SiaeWithMembershipFactory(convention=None)
+        user = siae.members.get()
+        self.assertFalse(user.can_create_siae_antenna(siae))
+
+    def test_geiq_admin_can_create_siae_antenna(self):
+        # A GEIQ never has a convention.
+        siae = SiaeWithMembershipFactory(kind=Siae.KIND_GEIQ, convention=None)
+        user = siae.members.get()
+        self.assertTrue(user.can_create_siae_antenna(siae))
+
+    def test_ea_admin_can_create_siae_antenna(self):
+        # An EA never has a convention.
+        siae = SiaeWithMembershipFactory(kind=Siae.KIND_EA, convention=None)
+        user = siae.members.get()
+        self.assertTrue(user.can_create_siae_antenna(siae))
 
     def test_can_view_stats_siae(self):
         # An employer can only view stats of their own SIAE.

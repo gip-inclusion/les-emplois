@@ -372,6 +372,24 @@ class User(AbstractUser, AddressMixin):
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
 
+    def can_create_siae_antenna(self, parent_siae):
+        """
+        Only admin employers can create an antenna for their SIAE.
+
+        For non SIAE structures (GEIQ, EA...) the convention logic is not implemented thus no convention ever exists.
+        Antennas can be freely created and technically are not rigorously linked to the parent structure.
+
+        For SIAE structures (AI, ACI...) the convention has to be present to link the parent SIAE and its antenna.
+        In some edge cases (e.g. SIAE created by staff and not yet officialized) the convention is absent,
+        in that case we must absolutely not allow any antenna to be created.
+        """
+        return (
+            self.is_siae_staff
+            and parent_siae.is_active
+            and parent_siae.has_admin(self)
+            and (parent_siae.convention is not None or not parent_siae.is_asp_managed)
+        )
+
     def can_view_stats_dashboard_widget(self, current_org):
         """
         Whether a stats section should be displayed on the user's dashboard.

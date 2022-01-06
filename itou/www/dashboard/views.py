@@ -79,6 +79,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     context = {
         "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
         "job_applications_categories": job_applications_categories,
+        "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
         "can_show_financial_annexes": can_show_financial_annexes,
         "can_show_employee_records": can_show_employee_records,
         "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(current_org=current_org),

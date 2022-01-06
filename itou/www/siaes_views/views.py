@@ -240,12 +240,9 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     Create a new SIAE (Antenne in French).
     """
     current_siae = get_current_siae_or_404(request)
-    if not current_siae.is_active or not current_siae.has_admin(request.user):
+    if not request.user.can_create_siae_antenna(parent_siae=current_siae):
         raise PermissionDenied
-    if current_siae.convention is None:
-        # We need a convention to exist in order to link the mother siae and its antenna.
-        # In some edge cases (e.g. siae created by staff) the convention might not be present yet.
-        raise PermissionDenied
+
     form = CreateSiaeForm(
         current_siae=current_siae,
         current_user=request.user,
