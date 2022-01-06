@@ -114,6 +114,14 @@
         </div>
     {% endif %}
 
+    {# Message d'information temporaire pour les fiches salarié / annexes financières #}
+    {% if can_show_employee_records %}
+        <div class="alert alert-info">
+          <p>La fin de validité des annexes financières de 2021 n'a pas d'incidence sur l'envoi de vos fiches salarié vers l'ASP.</p> 
+          <p>Vous pouvez donc continuer à recruter et générer vos fiches, il n'y a pas de blocage.</p>
+        </div>
+    {% endif %}
+
     <h1 class="h2">
         Tableau de bord
         {% if user.is_job_seeker and user.get_full_name %} - <span class="text-muted">{{ user.get_full_name }}</span>{% endif %}
