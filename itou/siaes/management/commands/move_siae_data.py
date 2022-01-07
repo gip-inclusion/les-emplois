@@ -16,7 +16,8 @@ from itou.users import models as users_models
 logger = logging.getLogger(__name__)
 
 HELP_TEXT = """
-    Move all data from siae A to siae B. After this move siae A is no longer supposed to be used or even accessible.
+    Move all data from siae A to siae B (or only the job applications if `only-job-applications` option is set).
+    After this move siae A is no longer supposed to be used or even accessible.
     Members of siae A are detached, geolocalization is removed and new job applications are blocked.
 
     This command should be used when users have been using the wrong siae A instead of using the correct siae B.
