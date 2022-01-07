@@ -34,6 +34,7 @@ from itou.job_applications.models import (
     JobApplicationWorkflow,
 )
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
+from itou.job_applications.tasks import notify_pole_emploi_pass
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
@@ -1247,7 +1248,7 @@ class JobApplicationPoleEmploiNotificationLogTest(TestCase):
 
 
 # We patch sleep since it is used in the real calls, but we don’t want to slow down the tests
-@patch("itou.job_applications.models.sleep", return_value=False)
+@patch("itou.job_applications.tasks.sleep", return_value=False)
 class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
     """
     Integration test to ensure that the entire pole emploi process works as expected. We want to document:
@@ -1274,7 +1275,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(job_seeker=job_seeker)
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertFalse(pe_individual.is_valid())
-        notif_result = job_application._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED)
+        notif_result = notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
         self.assertFalse(notif_result)
         access_token_mock.assert_not_called()
         self.assertFalse(
@@ -1282,7 +1283,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         )
 
     # Since there are multiple patch, the order matters: the parameters are injected in reverse order
-    @patch("itou.job_applications.models.mise_a_jour_pass_iae", return_value=True)
+    @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", return_value=True)
     @patch(
         "itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual",
         return_value=encrypted_nir,
@@ -1298,7 +1299,9 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         # our job seeker is valid
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertTrue(pe_individual.is_valid())
-        self.assertTrue(job_application._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED))
+        self.assertTrue(
+            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
+        )
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
@@ -1307,7 +1310,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         self.assertEqual(notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_OK)
 
     # Since there are multiple patch, the order matters: the parameters are injected in reverse order
-    @patch("itou.job_applications.models.mise_a_jour_pass_iae")
+    @patch("itou.job_applications.tasks.mise_a_jour_pass_iae")
     @patch("itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual")
     @patch("itou.job_applications.models.get_access_token")
     def test_notification_accepted_but_in_the_future(self, access_token_mock, nir_mock, maj_mock, sleep_mock):
@@ -1322,7 +1325,9 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         # our job seeker is valid
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertTrue(pe_individual.is_valid())
-        self.assertFalse(job_application._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED))
+        self.assertFalse(
+            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
+        )
 
         access_token_mock.assert_not_called()
         nir_mock.assert_not_called()
@@ -1330,7 +1335,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.filter(job_application=job_application)
         self.assertFalse(notification_log.exists())
 
-    @patch("itou.job_applications.models.mise_a_jour_pass_iae", return_value=True)
+    @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", return_value=True)
     @patch(
         "itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual",
         return_value=encrypted_nir,
@@ -1341,7 +1346,9 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         Authentication failed: only the get_token call should be made, and an entry with the failure should be added
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertFalse(job_application._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED))
+        self.assertFalse(
+            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
+        )
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_not_called()
@@ -1349,7 +1356,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
         self.assertEqual(notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION)
 
-    @patch("itou.job_applications.models.mise_a_jour_pass_iae", return_value=True)
+    @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", return_value=True)
     @patch(
         "itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual",
         side_effect=PoleEmploiMiseAJourPassIAEException("200", "R010"),
@@ -1362,7 +1369,9 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
          - an entry should be created, showing the problem came from recherche individu
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertFalse(job_application._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED))
+        self.assertFalse(
+            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
+        )
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
@@ -1372,7 +1381,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
             notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL
         )
 
-    @patch("itou.job_applications.models.mise_a_jour_pass_iae", side_effect=PoleEmploiMiseAJourPassIAEException("500"))
+    @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", side_effect=PoleEmploiMiseAJourPassIAEException("500"))
     @patch(
         "itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual",
         return_value=encrypted_nir,
@@ -1386,7 +1395,9 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
          - an entry should be created, showing the problem came from mise_a_jour_pass_iae
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertFalse(job_application._notify_pole_employ(POLE_EMPLOI_PASS_APPROVED))
+        self.assertFalse(
+            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
+        )
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
