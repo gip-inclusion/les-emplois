@@ -1,7 +1,6 @@
 import datetime
 import logging
 import uuid
-from time import sleep
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -17,13 +16,7 @@ from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.tasks import huey_notify_pole_employ
 from itou.utils.apis.esd import get_access_token
-from itou.utils.apis.pole_emploi import (
-    POLE_EMPLOI_PASS_APPROVED,
-    PoleEmploiIndividu,
-    PoleEmploiMiseAJourPassIAEException,
-    mise_a_jour_pass_iae,
-    recherche_individu_certifie_api,
-)
+from itou.utils.apis.pole_emploi import POLE_EMPLOI_PASS_APPROVED, PoleEmploiIndividu, recherche_individu_certifie_api
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
@@ -865,74 +858,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
             return huey_notify_pole_employ(self, POLE_EMPLOI_PASS_APPROVED)
         return False
-
-    def _notify_pole_employ(self, mode: str) -> bool:
-        """
-        The entire logic for notifying Pole Emploi when a job_application is accepted:
-            - first, we authenticate to pole-emploi.io with the proper credentials, scopes, environment and
-            dry-run/wet run settings
-            - then, we search for the job_seeker on their backend. They reply with an encrypted NIR.
-            - finally, we use the encrypted NIR to notify them that a job application was accepted or refused.
-            We provide what we have about this job application.
-
-        This is VERY error prone and can break in a lot of places. PE’s servers can be down, we may not find
-        the job_seeker, the update may fail for various reasons. The rate limiting is low, hence…
-        those terrible `sleep` for lack of a better idea for now.
-
-        In order to ensure the rest of the application process will behave properly no matter what happens here:
-         - there is a lot of broad exception catching
-         - we keep logs of the successful/failed attempts
-         - when anything break, we quit early
-        """
-        # We do not send approvals that start in the future to PE, because the information system in front
-        # can’t handle them. I’ll keep my opinion about this for talks that involve an unreasonnable amount of beer.
-        # Another mechanism will be in charge of sending them on their start date
-        if self.approval.start_at > timezone.now().date():
-            return False
-        individual = PoleEmploiIndividu.from_job_seeker(self.job_seeker)
-        if individual is None or not individual.is_valid():
-            # We may not have a valid user (missing NIR, for instance),
-            # in which case we can bypass this process entirely
-            return False
-        log = JobApplicationPoleEmploiNotificationLog(
-            job_application=self, status=JobApplicationPoleEmploiNotificationLog.STATUS_OK
-        )
-        # Step 1: we get the API token
-        try:
-            token = JobApplicationPoleEmploiNotificationLog.get_token()
-            sleep(1)
-        except Exception as e:
-            log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION
-            log.details = str(e)
-            log.save()
-            return False
-        # Step 2 : we fetch the encrypted NIR
-        try:
-            encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
-                individual, token
-            )
-            # 3 requests/second max. I had timeout issues so 1 second takes some margins
-            sleep(1)
-        except PoleEmploiMiseAJourPassIAEException as e:
-            log = JobApplicationPoleEmploiNotificationLog(
-                job_application=self,
-                status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
-                details=f"{e.http_code} {e.response_code}",
-            )
-            log.save()
-            return False
-        # Step 3: we finally notify Pole Emploi that something happened for this user
-        try:
-            mise_a_jour_pass_iae(self, mode, encrypted_nir, token)
-            sleep(1)
-        except PoleEmploiMiseAJourPassIAEException as e:
-            log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
-            log.details = f"{e.http_code} {e.response_code}"
-            log.save()
-            return False
-
-        log.save()
-        return True
 
 
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
