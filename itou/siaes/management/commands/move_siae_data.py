@@ -75,10 +75,10 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
     job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=from_id)
     logger.info("| Job applications received: %s", job_applications_received.count())
 
-    job_descriptions = siaes_models.SiaeJobDescription.objects.filter(siae_id=from_id)
-    logger.info("| Job descriptions: %s", job_descriptions.count())
-
     if not only_job_applications:
+        job_descriptions = siaes_models.SiaeJobDescription.objects.filter(siae_id=from_id)
+        logger.info("| Job descriptions: %s", job_descriptions.count())
+
         # Move users not already present in siae destination
         members = siaes_models.SiaeMembership.objects.filter(siae_id=from_id).exclude(
             user__in=users_models.User.objects.filter(siaemembership__siae_id=to_id)
@@ -114,11 +114,19 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
         return
 
     with transaction.atomic():
+
+        # remove job description relation (not job description object)
+        if only_job_applications:
+            for job_application in job_applications_sent:
+                job_application.selected_jobs.clear()
+            for job_application in job_applications_received:
+                job_application.selected_jobs.clear()
+
         job_applications_sent.update(sender_siae_id=to_id)
         job_applications_received.update(to_siae_id=to_id)
-        job_descriptions.update(siae_id=to_id)
 
         if not only_job_applications:
+            job_descriptions.update(siae_id=to_id)
             members.update(siae_id=to_id)
             diagnoses.update(author_siae_id=to_id)
             prolongations.update(declared_by_siae_id=to_id)
