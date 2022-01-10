@@ -298,10 +298,48 @@ def _mise_a_jour_sender_kind_param(sender_kind):
     return sender_kind_mapping[JobApplication.SENDER_KIND_JOB_SEEKER]
 
 
+def prescriber_kind_param(prescriber_organization):
+    kind = prescriber_organization.kind
+    # key = the values we have
+    # values = the values expected by Pole Emploi’s API
+    mapping = {
+        "PE": "PE",
+        "CAP_EMPLOI": "CAP_EMPLOI",
+        "ML": "ML",
+        "DEPT": "DEPT",
+        "SPIP": "SPIP",
+        "PJJ": "PJJ",
+        "CCAS": "CCAS",
+        "PLIE": "PLIE",
+        "CHRS": "CHRS",
+        "CIDFF": "CIDFF",
+        "PREVENTION": "PREVENTION",
+        "AFPA": "AFPA",
+        "PIJ_BIJ": "PIJ-BIJ",  # _ on the left, - on the right on purpose
+        "CAF": "CAF",
+        "CADA": "CADA",
+        "ASE": "ASE",
+        "CAVA": "CAVA",
+        "CPH": "CPH",
+        "CHU": "CHU",
+        "OACAS": "OACAS",
+        "OTHER": "OTHER",
+    }
+    # PE has a special API value for the department services available to brsa job seekers.
+    if kind == "DEPT":
+        if prescriber_organization.is_brsa:
+            return "DEPT_BRSA"
+    if kind in mapping:
+        return mapping[kind]
+    return "OTHER"
+
+
 def _mise_a_jour_parameters(encrypted_identifier: str, job_application, pass_approved_code: str):
     """
     The necessary parameters to notify Pole Emploi that a Pass has been granted
     """
+    from itou.job_applications.models import JobApplication
+
     siae = job_application.to_siae
     approval = job_application.approval
 
@@ -317,7 +355,7 @@ def _mise_a_jour_parameters(encrypted_identifier: str, job_application, pass_app
     # The necessary parameters to notify Pole Emploi that a Pass has been granted
     date_debut_pass = approval.start_at.strftime(DATE_FORMAT) if approval.start_at else ""
     date_fin_pass = approval.end_at.strftime(DATE_FORMAT) if approval.start_at else ""
-    return {
+    data = {
         "idNational": encrypted_identifier,
         "statutReponsePassIAE": POLE_EMPLOI_PASS_APPROVED,
         "typeSIAE": _mise_a_jour_siae_kind_param(siae),
@@ -327,3 +365,9 @@ def _mise_a_jour_parameters(encrypted_identifier: str, job_application, pass_app
         "numSIRETsiae": siae.siret,
         "origineCandidature": _mise_a_jour_sender_kind_param(job_application.sender_kind),
     }
+    if job_application.sender_kind == JobApplication.SENDER_KIND_PRESCRIBER:
+        organization = job_application.sender_prescriber_organization
+        data["numSIRETPrescripteur"] = organization.siret
+        # we are supposed to provide the raison sociale too but… its not documented anywhere how to provide it
+        data["typologiePrescripteur"] = prescriber_kind_param(organization)
+    return data
