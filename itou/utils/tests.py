@@ -18,7 +18,10 @@ from factory import Faker
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import (
+    AuthorizedPrescriberOrganizationWithMembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
+)
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
@@ -801,6 +804,24 @@ class PoleEmploiTest(TestCase):
                 job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
             )
             mock_post.assert_called()
+
+    @mock.patch(
+        "httpx.post",
+        return_value=httpx.Response(200, json=POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_OK_MOCK),
+    )
+    def test_mise_a_jour_pass_iae_with_prescriber(self, mock_post):
+        """
+        Our code should be able to call the API even if we provide prescriber information
+        """
+        sender_prescriber_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        sender = sender_prescriber_organization.members.first()
+        job_application = JobApplicationWithApprovalFactory(
+            sender_prescriber_organization=sender_prescriber_organization, sender=sender
+        )
+        mise_a_jour_pass_iae(
+            job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
+        )
+        mock_post.assert_called()
 
     @mock.patch(
         "httpx.post",
