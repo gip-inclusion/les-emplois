@@ -331,6 +331,8 @@ def prescriber_kind_param(prescriber_organization):
             return "DEPT_BRSA"
     if kind in mapping:
         return mapping[kind]
+    # The mapping does not entirely matches all the possible prescriber kind we have.
+    # by default (if the prescriber kind is not in PE’s possible list), we send "OTHER"
     return "OTHER"
 
 
@@ -365,9 +367,11 @@ def _mise_a_jour_parameters(encrypted_identifier: str, job_application, pass_app
         "numSIRETsiae": siae.siret,
         "origineCandidature": _mise_a_jour_sender_kind_param(job_application.sender_kind),
     }
+
+    # Whenever possible, we send details about the prescriber
     if job_application.sender_kind == JobApplication.SENDER_KIND_PRESCRIBER:
         organization = job_application.sender_prescriber_organization
         data["numSIRETPrescripteur"] = organization.siret
-        # we are supposed to provide the raison sociale too but… its not documented anywhere how to provide it
         data["typologiePrescripteur"] = prescriber_kind_param(organization)
+
     return data
