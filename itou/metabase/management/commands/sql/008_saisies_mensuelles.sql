@@ -7,7 +7,9 @@ Le choix a été fait d'avoir les données de l'année en cours + 2 ans d'histor
 */
 
 with constantes as ( 
+    /* historique de 2 ans */
     select 
+        (max(emi.emi_sme_annee) - 2) as annee_en_cours_2,
         max(emi.emi_sme_annee) as annee_en_cours
     from 
         "fluxIAE_EtatMensuelIndiv" as emi
@@ -27,7 +29,7 @@ salarie_v0 as (
             when trim(substr(trim(salarie.salarie_codeinseecom), 1, char_length(salarie.salarie_codeinseecom)-2)) like ('%98%') 
             then trim(substr(trim(salarie.salarie_codeinseecom), 1, char_length(salarie.salarie_codeinseecom)-2)) 
             else trim(substr(trim(salarie.salarie_codeinseecom), 1, char_length(salarie.salarie_codeinseecom)-3))
-        end as code_departetement_salarie
+        end as code_departement_salarie
     from 
         "fluxIAE_Salarie" salarie
 ),
@@ -54,7 +56,7 @@ salarie as (
     left join 
         departements as departement_com_salarie
         on 
-        code_departetement_salarie = departement_com_salarie.code_departement
+        code_departement_salarie = departement_com_salarie.code_departement
 ),
 coordonnees_gps as (
     select 
@@ -132,7 +134,7 @@ cross join
     "fluxIAE_EtatMensuelIndiv" as emi 
     left join "fluxIAE_ContratMission" as ctr_mis 
         on emi.emi_ctr_id = ctr_mis.contrat_id_ctr and emi.emi_pph_id = ctr_mis.contrat_id_pph
-        and emi.emi_sme_annee >= (annee_en_cours - 2)
+        and emi.emi_sme_annee >= annee_en_cours_2
     left join public.codes_rome as code_rome 
         on code_rome.code_rome = ctr_mis.contrat_code_rome
     left join 
@@ -140,7 +142,7 @@ cross join
         on ctr_mis."contrat_niveau_de_formation_id" = niv_formation.rnf_id
     left join salarie
         on emi.emi_pph_id = salarie.salarie_id 
-        and emi.emi_sme_annee >= (annee_en_cours - 2) 
+        and emi.emi_sme_annee >= annee_en_cours_2 
     left join coordonnees_gps as commune_salarie 
         on salarie.salarie_codeinseecom = commune_salarie.code_insee
     left join "fluxIAE_RefMotifSort" as sortie 
@@ -149,7 +151,7 @@ cross join
         on categoriesort.rcs_id = sortie.rcs_id
     left  join "fluxIAE_AnnexeFinanciere_v2" as af 
         on emi.emi_afi_id=af.af_id_annexe_financiere and af_etat_annexe_financiere_code in ('VALIDE', 'PROVISOIRE')
-        and emi.emi_sme_annee >= (annee_en_cours - 2)
+        and emi.emi_sme_annee >= annee_en_cours_2
         and af_mesure_dispositif_code not like '%MP%' 
         and af_mesure_dispositif_code not like '%FDI%'
     left join "fluxIAE_Structure_v2" as structure
@@ -159,4 +161,4 @@ cross join
 /* On récupère le découpage établissement public territorial */   
     left join sa_ept ept on ept.code_comm = structure.structure_adresse_admin_code_insee
     left join sa_zones_infradepartementales infra on infra.code_commune = structure.structure_adresse_admin_code_insee
-where emi.emi_sme_annee >= (annee_en_cours - 2)
+where emi.emi_sme_annee >= annee_en_cours_2
