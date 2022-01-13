@@ -30,8 +30,9 @@ HELP_TEXT = """
     same convention. So be sure to read your trello ticket instructions thoroughly and don't assume this command
     does everything.
 
-    Example of use in local dev:
+    Examples of use in local dev:
     $ make django_admin COMMAND="move_siae_data --from 3243 --to 9612 --dry-run"
+    $ make django_admin COMMAND="move_siae_data --from 3243 --to 9612 --only-job-applications --dry-run"
 
     And in production:
     $ cd && cd app_* && django-admin move_siae_data --from 3243 --to 9612 --dry-run
