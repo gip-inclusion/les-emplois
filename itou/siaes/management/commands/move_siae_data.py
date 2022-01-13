@@ -62,8 +62,12 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
         logger.error("Both siaes should have the same kind but they don't")
         return
 
+    # Intermediate variable for better readability
+    move_all_data = not only_job_applications
+
     logger.info(
-        "MOVE DATA OF siae.id=%s - %s %s - %s",
+        "MOVE %s OF siae.id=%s - %s %s - %s",
+        "DATA" if move_all_data else "JOB APPLICATIONS",
         from_siae.pk,
         from_siae.kind,
         from_siae.siret,
@@ -76,7 +80,7 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
     job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=from_id)
     logger.info("| Job applications received: %s", job_applications_received.count())
 
-    if not only_job_applications:
+    if move_all_data:
         job_descriptions = siaes_models.SiaeJobDescription.objects.filter(siae_id=from_id)
         logger.info("| Job descriptions: %s", job_descriptions.count())
 
@@ -116,7 +120,8 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
 
     with transaction.atomic():
 
-        # remove job description relation (not job description object)
+        # If we move the job applications without moving the job descriptions as well, we need to unlink them,
+        # as job applications will be attached to siae B but job descriptions will stay attached to siae A.
         if only_job_applications:
             for job_application in job_applications_sent:
                 job_application.selected_jobs.clear()
@@ -126,7 +131,7 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
         job_applications_sent.update(sender_siae_id=to_id)
         job_applications_received.update(to_siae_id=to_id)
 
-        if not only_job_applications:
+        if move_all_data:
             job_descriptions.update(siae_id=to_id)
             members.update(siae_id=to_id)
             diagnoses.update(author_siae_id=to_id)
@@ -173,7 +178,7 @@ class Command(BaseCommand):
             "--only-job-applications",
             action=argparse.BooleanOptionalAction,
             default=False,
-            help="Set to True to move only job applications and job descriptions, nothing else!",
+            help="Set to True to move only job applications, nothing else!",
         )
         parser.add_argument("--dry-run", action=argparse.BooleanOptionalAction, default=False)
 
