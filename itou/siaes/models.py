@@ -225,6 +225,12 @@ class Siae(AddressMixin, OrganizationAbstract):
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
     ELIGIBILITY_REQUIRED_KINDS = ASP_MANAGED_KINDS + [KIND_ACIPHC]
 
+    # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
+    # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently
+    # e.g. each time a SIAE moves to a new location.
+    # The second one is the "SIRET à la signature" which we store as `siae.convention.siret_signature`. By design it
+    # almost never changes.
+    # Both SIRET numbers are kept up to date by the weekly `import_siae.py` script.
     siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name="Naf", max_length=5, validators=[validate_naf], blank=True)
     kind = models.CharField(verbose_name="Type", max_length=6, choices=KIND_CHOICES, default=KIND_EI)
@@ -617,13 +623,12 @@ class SiaeConvention(models.Model):
 
     kind = models.CharField(verbose_name="Type", max_length=4, choices=KIND_CHOICES, default=KIND_EI)
 
-    # This field is stored for reference but never actually used.
-    # Siaes in ASP's "Vue Structure" not only have a "SIRET actualisé",
-    # which is the main SIRET we store in `siae.siret` and which often changes
-    # over time e.g. when the siae moves to a new location, but they also
-    # have a second SIRET field called "SIRET à la signature" in this export.
-    # This field is almost unique (one exception, see unique_together clause below)
-    # and is almost constant over time, at least much more than the "SIRET actualisé".
+    # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
+    # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently
+    # e.g. each time a SIAE moves to a new location.
+    # The second one is the "SIRET à la signature" which we store as `siae.convention.siret_signature`. By design it
+    # almost never changes.
+    # Both SIRET numbers are kept up to date by the weekly `import_siae.py` script.
     siret_signature = models.CharField(
         verbose_name="Siret à la signature",
         max_length=14,
