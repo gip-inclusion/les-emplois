@@ -45,6 +45,12 @@ def get_job_application_detailed_origin(ja):
     return detailed_origin
 
 
+def get_ja_sender_organization_pk(ja):
+    if ja.sender_prescriber_organization:
+        return ja.sender_prescriber_organization.pk
+    return None
+
+
 def get_ja_sender_organization_name(ja):
     if ja.sender_prescriber_organization:
         return ja.sender_prescriber_organization.display_name
@@ -136,7 +142,7 @@ TABLE_COLUMNS = [
         "name": "délai_prise_en_compte",
         "type": "interval",
         "comment": (
-            "Temps écoulé rétroactivement de état nouveau à état étude" " si la candidature est passée par ces états"
+            "Temps écoulé rétroactivement de état nouveau à état étude si la candidature est passée par ces états"
         ),
         "fn": get_ja_time_spent_from_new_to_processing,
     },
@@ -179,6 +185,21 @@ TABLE_COLUMNS = [
         "comment": "Nom de la structure destinaire de la candidature",
         "fn": lambda o: o.to_siae.display_name,
     },
+]
+
+TABLE_COLUMNS += get_department_and_region_columns(
+    name_suffix="_structure",
+    comment_suffix=" de la structure destinaire de la candidature",
+    custom_fn=lambda o: o.to_siae,
+)
+
+TABLE_COLUMNS += [
+    {
+        "name": "id_org_prescripteur",
+        "type": "integer",
+        "comment": "ID de l''organisation prescriptrice",
+        "fn": get_ja_sender_organization_pk,
+    },
     {
         "name": "nom_org_prescripteur",
         "type": "varchar",
@@ -191,15 +212,6 @@ TABLE_COLUMNS = [
         "comment": "SAFIR de l''organisation prescriptrice",
         "fn": get_ja_sender_organization_safir,
     },
-]
-
-TABLE_COLUMNS += get_department_and_region_columns(
-    name_suffix="_structure",
-    comment_suffix=" de la structure destinaire de la candidature",
-    custom_fn=lambda o: o.to_siae,
-)
-
-TABLE_COLUMNS += [
     {
         "name": "date_embauche",
         "type": "date",
