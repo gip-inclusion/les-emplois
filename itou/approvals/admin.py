@@ -104,7 +104,7 @@ class IsValidFilter(admin.SimpleListFilter):
 @admin.register(models.Approval)
 class ApprovalAdmin(admin.ModelAdmin):
     form = ApprovalAdminForm
-    list_display = ("pk", "number", "user", "start_at", "end_at", "is_valid", "created_at")
+    list_display = ("pk", "number", "user", "birthdate", "start_at", "end_at", "is_valid", "created_at")
     search_fields = ("pk", "number", "user__first_name", "user__last_name", "user__email")
     list_filter = (IsValidFilter,)
     list_display_links = ("pk", "number")
@@ -166,6 +166,15 @@ class ApprovalAdmin(admin.ModelAdmin):
             ),
         ]
         return additional_urls + super().get_urls()
+
+    def birthdate(self, obj):
+        """
+        User birthdate as custom value in display
+
+        """
+        return obj.user.birthdate
+
+    birthdate.short_description = "Date de naissance"
 
 
 class IsInProgressFilter(admin.SimpleListFilter):
