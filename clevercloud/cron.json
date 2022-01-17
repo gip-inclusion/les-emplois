@@ -1,6 +1,6 @@
 [
   "1 0 * * * $ROOT/clevercloud/update-prescriber-organization-with-api-entreprise.sh",
   "25 6-22/1 * * 1-5 $ROOT/clevercloud/download_employee_records.sh",
-  "55 6-22/1 * * 1-5 $ROOT/clevercloud/upload_employee_records.sh",
+  "55 6-22/2 * * 1-5 $ROOT/clevercloud/upload_employee_records.sh",
   "5 23 * * 1-5 $ROOT/clevercloud/archive_employee_records.sh"
 ]
