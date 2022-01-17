@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## [34] - 2022-01-14
+
+### Ajouté
+
+- Ajout d'un script permettant de transférer les canditatures entre SIAE.
+- Ajout d'un message d'information sur la validité des annexes financières.
+
+### Modifié
+
+- Correction d'une erreur de calcul de date pour les années bissextiles. 
+- Mise à jour vers Django 4.0.1.
+- Correctif dans l'administration des invitations.
+- Correctif permettant aux EA et GEIQ de pouvoir à nouveau créer des antennes pour leurs structures.
+- Configuration de la connexion avec les serveurs SFTP de l'ASP et mise à jour de `paramiko`.
+
 ## [33] - 2021-12-30
 
 ### Ajouté
