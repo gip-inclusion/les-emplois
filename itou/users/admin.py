@@ -161,6 +161,7 @@ class ItouUserAdmin(UserAdmin):
         "email",
         "first_name",
         "last_name",
+        "birthdate",
         "is_staff",
         "is_peamu",
         "is_created_by_a_proxy",
