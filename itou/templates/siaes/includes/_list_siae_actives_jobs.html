@@ -1,6 +1,15 @@
 {% comment %} takes 2 argument siae<Siae> and jobs_descriptions <List of SiaeJobDescription> {% endcomment %}
 <h4 class="pb-2">Recrutement(s) en cours</h4>
 {% for job in jobs_descriptions %}
+    {# Collapsing block start (more than 5 jobs descriptions) #}
+    {% if forloop.counter0 == 5 and not forloop.last %}
+      <div class="pt-2">
+        <button class="btn collapsed collapse-caret p-0" data-toggle="collapse" data-target="#collapse_{{ forloop.parentloop.counter0 }}" type="button" aria-expanded="false" aria-controls="collapse_{{ forloop.parentloop.counter0 }}">
+          <h6>Voir tous les recrutements en cours ({{ jobs_descriptions.count }})</h6>
+        </button>
+      </div>
+      <div class="collapse" id="collapse_{{forloop.parentloop.counter0}}">
+    {% endif %}
     {% if job.is_active and not siae.block_job_applications %}
         <a class="matomo-event btn btn-outline-primary mb-2"
             href="{% if job.pk %}{{job.get_absolute_url}}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
@@ -16,5 +25,9 @@
             </small>
         {% endif %}
         <br >
+    {% endif %}
+    {# Collapsing block end #}
+    {% if forloop.last and forloop.counter0 > 5 %}
+      </div>
     {% endif %}
 {% endfor %}
