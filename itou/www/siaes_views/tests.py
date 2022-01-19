@@ -327,7 +327,7 @@ class ConfigureJobsViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["siae"], self.siae)
         response_content = str(response.content)
-        self.assertIn("Recrutement(s) en cours", response_content)
+        self.assertIn("Recrutements en cours", response_content)
 
         # get job description
         url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
@@ -335,7 +335,7 @@ class ConfigureJobsViewTest(TestCase):
         response_content = str(response.content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["job"], job_description)
-        self.assertIn("Recrutement(s) en cours", response_content)
+        self.assertIn("Recrutement en cours", response_content)
 
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
