@@ -9,7 +9,7 @@
 
 ### Modifié
 
-- Correction d'une erreur de calcul de date pour les années bissextiles. 
+- Correction d'une erreur de calcul de dates pour les années bissextiles. 
 - Mise à jour vers Django 4.0.1.
 - Correctif dans l'administration des invitations.
 - Correctif permettant aux EA et GEIQ de pouvoir à nouveau créer des antennes pour leurs structures.
