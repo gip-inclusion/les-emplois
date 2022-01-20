@@ -102,7 +102,7 @@ def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
 
 
 @login_required
-def stats_ddets(request, template_name=_STATS_HTML_TEMPLATE):
+def stats_ddets_overview(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
     They can only view data for their own departement.
@@ -116,7 +116,7 @@ def stats_ddets(request, template_name=_STATS_HTML_TEMPLATE):
         REGION_FILTER_KEY: DEPARTMENT_TO_REGION[department],
     }
     context = {
-        "iframeurl": metabase_embedded_url(settings.DDETS_STATS_DASHBOARD_ID, params=params),
+        "iframeurl": metabase_embedded_url(settings.DDETS_STATS_OVERVIEW_DASHBOARD_ID, params=params),
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
