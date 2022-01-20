@@ -37,7 +37,7 @@ def stats_public(request, template_name=_STATS_HTML_TEMPLATE):
     https://stats.inclusion.beta.gouv.fr/public/dashboard/f1527a13-1508-498d-8014-b2fe487a3a70
     """
     context = {
-        "iframeurl": metabase_embedded_url(settings.STATS_PUBLIC_DASHBOARD_ID),
+        "iframeurl": metabase_embedded_url(request=request),
         "page_title": "Statistiques",
         "stats_base_url": settings.METABASE_SITE_URL,
         "is_stats_public": True,
@@ -56,7 +56,7 @@ def stats_pilotage(request, dashboard_id, template_name="stats/stats_pilotage.ht
         raise PermissionDenied
 
     context = {
-        "iframeurl": metabase_embedded_url(dashboard_id, with_title=True),
+        "iframeurl": metabase_embedded_url(dashboard_id=dashboard_id, with_title=True),
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
@@ -73,7 +73,7 @@ def stats_siae(request, template_name=_STATS_HTML_TEMPLATE):
         raise PermissionDenied
     params = {SIAE_FILTER_KEY: current_org.convention.asp_id}
     context = {
-        "iframeurl": metabase_embedded_url(settings.STATS_SIAE_DASHBOARD_ID, params=params),
+        "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": "Données de ma structure",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
@@ -95,7 +95,7 @@ def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
         REGION_FILTER_KEY: DEPARTMENT_TO_REGION[department],
     }
     context = {
-        "iframeurl": metabase_embedded_url(settings.STATS_CD_DASHBOARD_ID, params=params),
+        "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
@@ -118,7 +118,7 @@ def stats_ddets_overview(request, template_name=_STATS_HTML_TEMPLATE):
         REGION_FILTER_KEY: DEPARTMENT_TO_REGION[department],
     }
     context = {
-        "iframeurl": metabase_embedded_url(settings.STATS_DDETS_OVERVIEW_DASHBOARD_ID, params=params),
+        "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
@@ -140,7 +140,7 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
         REGION_FILTER_KEY: DEPARTMENT_TO_REGION[department],
     }
     context = {
-        "iframeurl": metabase_embedded_url(settings.STATS_DDETS_DIAGNOSIS_CONTROL_DASHBOARD_ID, params=params),
+        "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": f"FIXME : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
@@ -163,7 +163,7 @@ def stats_dreets(request, template_name=_STATS_HTML_TEMPLATE):
         REGION_FILTER_KEY: region,
     }
     context = {
-        "iframeurl": metabase_embedded_url(settings.STATS_DREETS_DASHBOARD_ID, params=params),
+        "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": f"Données de ma région : {region}",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
@@ -184,7 +184,7 @@ def stats_dgefp(request, template_name=_STATS_HTML_TEMPLATE):
         REGION_FILTER_KEY: list(REGIONS.keys()),
     }
     context = {
-        "iframeurl": metabase_embedded_url(settings.STATS_DGEFP_DASHBOARD_ID, params=params),
+        "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": "Données des régions",
         "stats_base_url": settings.METABASE_SITE_URL,
     }

@@ -532,13 +532,15 @@ RELEASE_STATS_SIAE = False
 STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 
 # Metabase embedded dashboards
-STATS_CD_DASHBOARD_ID = 118
-STATS_DDETS_OVERVIEW_DASHBOARD_ID = 117
-STATS_DDETS_DIAGNOSIS_CONTROL_DASHBOARD_ID = "FIXME"
-STATS_DGEFP_DASHBOARD_ID = 117
-STATS_DREETS_DASHBOARD_ID = 117
-STATS_PUBLIC_DASHBOARD_ID = 119
-STATS_SIAE_DASHBOARD_ID = 128
+METABASE_DASHBOARD_IDS = {
+    "stats_cd": 118,
+    "stats_ddets_overview": 117,
+    "stats_ddets_diagnosis_control": "FIXME",
+    "stats_dgefp": 117,
+    "stats_dreets": 117,
+    "stats_public": 119,
+    "stats_siae": 128,
+}
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
 
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
