@@ -2,7 +2,7 @@
 # =============================================================================
 PYTHON_VERSION := python3.9
 
-.PHONY: run clean cdsitepackages quality style setup_git_pre_commit_hook
+.PHONY: run clean cdsitepackages quality style
 
 # Run Docker images
 run:
