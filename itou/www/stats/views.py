@@ -107,6 +107,7 @@ def stats_ddets_overview(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
     They can only view data for their own departement.
+    This dashboard shows an overview of their data.
     """
     current_institution = get_current_institution_or_404(request)
     if not request.user.can_view_stats_ddets(current_org=current_institution):
@@ -119,6 +120,28 @@ def stats_ddets_overview(request, template_name=_STATS_HTML_TEMPLATE):
     context = {
         "iframeurl": metabase_embedded_url(settings.STATS_DDETS_OVERVIEW_DASHBOARD_ID, params=params),
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
+    They can only view data for their own departement.
+    This dashboard shows data about diagnosis control.
+    """
+    current_institution = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_ddets(current_org=current_institution):
+        raise PermissionDenied
+    department = request.user.get_stats_ddets_department(current_org=current_institution)
+    params = {
+        DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
+        REGION_FILTER_KEY: DEPARTMENT_TO_REGION[department],
+    }
+    context = {
+        "iframeurl": metabase_embedded_url(settings.STATS_DDETS_DIAGNOSIS_CONTROL_DASHBOARD_ID, params=params),
+        "page_title": f"FIXME : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
