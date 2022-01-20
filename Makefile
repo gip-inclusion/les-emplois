@@ -59,6 +59,9 @@ populate_db_venv:
 COMMAND_GRAPH_MODELS := graph_models --group-models jobs users siaes prescribers job_applications approvals eligibility invitations asp --pygraphviz -o itou-graph-models.png
 
 graph_models_itou:
+	# Install these packages first:
+	# apt-get install gcc graphviz graphviz-dev
+	# pip install pygraphviz
 	docker exec -ti itou_django django-admin $(COMMAND_GRAPH_MODELS)
 
 graph_models_itou_venv:
