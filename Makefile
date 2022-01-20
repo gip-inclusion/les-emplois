@@ -56,7 +56,7 @@ populate_db_venv:
 	pg_restore -d itou --if-exists --clean --no-owner --no-privileges itou/fixtures/postgres/cities.sql
 	ls -d itou/fixtures/django/* | xargs ./manage.py loaddata
 
-COMMAND_GRAPH_MODELS := graph_models --group-models jobs users siaes prescribers job_applications approvals eligibility invitations asp --pygraphviz -o itou-graph-models.png
+COMMAND_GRAPH_MODELS := graph_models --group-models jobs users siaes prescribers job_applications approvals eligibility invitations asp cities employee_record external_data institutions --pygraphviz -o itou-graph-models.png
 
 graph_models_itou:
 	# Install these packages first:
