@@ -443,7 +443,11 @@
                     {% if can_view_stats_ddets %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_ddets' %}">Voir mes statistiques privées</a>
+                            <a href="{% url 'stats:stats_ddets_overview' %}">Voir mes statistiques privées</a>
+                        </p>
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="activity" %}
+                            <a href="{% url 'stats:stats_ddets_diagnosis_control' %}">Voir mes données 2021 du contrôle a posteriori (Version beta)</a>
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}

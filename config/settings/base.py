@@ -528,17 +528,21 @@ METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 
 # Once SIAE stats are released, all SIAE can view their data.
 # Until then, only whitelisted users can view them.
-RELEASE_SIAE_STATS = False
-SIAE_STATS_USER_PK_WHITELIST = json.loads(os.environ.get("SIAE_STATS_USER_PK_WHITELIST", "[]"))
+RELEASE_STATS_SIAE = False
+STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 
-# Metabase embedded dashboard IDs
-PUBLIC_BASIC_STATS_DASHBOARD_ID = 119
-SIAE_STATS_DASHBOARD_ID = 128
-CD_STATS_DASHBOARD_ID = 118
-DDETS_STATS_DASHBOARD_ID = 117
-DREETS_STATS_DASHBOARD_ID = 117
-DGEFP_STATS_DASHBOARD_ID = 117
+# Metabase embedded dashboards
+METABASE_DASHBOARD_IDS = {
+    "stats_cd": 118,
+    "stats_ddets_overview": 117,
+    "stats_ddets_diagnosis_control": 144,
+    "stats_dgefp": 117,
+    "stats_dreets": 117,
+    "stats_public": 119,
+    "stats_siae": 128,
+}
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
+
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
 
 # Slack notifications sent by Metabase cronjobs.
