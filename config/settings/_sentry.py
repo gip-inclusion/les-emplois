@@ -1,5 +1,4 @@
 import logging
-import os
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -29,7 +28,7 @@ def strip_sentry_sensitive_data(event, hint):
 
 sentry_logging = LoggingIntegration(
     level=logging.INFO,  # Capture info and above as breadcrumbs.
-    event_level=logging.WARNING,  # Send warnings as events.
+    event_level=logging.ERROR,  # Send only errors as events.
 )
 
 
