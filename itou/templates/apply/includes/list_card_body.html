@@ -1,6 +1,6 @@
 <div class="card-body row no-gutters">
     <div class="col-md-5">
-        <h6 class="card-subtitle text-muted">Métier(s) recherché(s) :</h6>
+        <h6 class="h4 card-subtitle text-muted">Métier(s) recherché(s) :</h6>
         {% if not job_application.selected_jobs.exists %}
             <p class="card-text">Candidature spontanée</p>
         {% else %}
@@ -13,7 +13,7 @@
     </div>
 
     <div class="col-md-4">
-        <h6 class="card-subtitle text-muted">Envoyée par :</h6>
+        <h6 class="h5 card-subtitle text-muted">Envoyée par :</h6>
         <p class="card-text">
 
             {% if request.user == job_application.sender %}
@@ -48,7 +48,7 @@
     </div>
 
     <div class="col-md-3">
-        <h6 class="card-subtitle text-muted">Statut :</h6>
+        <h6 class="h5 card-subtitle text-muted">Statut :</h6>
         <p class="card-text">
             <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>
             {% if job_application.has_suspended_approval %}

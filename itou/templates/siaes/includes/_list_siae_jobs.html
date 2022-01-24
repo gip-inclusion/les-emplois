@@ -1,7 +1,7 @@
 {% comment %} takes 2 arguments siae <Siae> and jobs_descriptions <List of SiaeJobDescription> {% endcomment %}
 <div class="py-3">
     <button class="p-0 btn collapsed collapse-caret" data-toggle="collapse"  data-target="#collapse{{siae.id}}" type="button" aria-expanded="false" aria-controls="collapse{{siae.id}}">
-        <h6 class="mb-1">Voir les métiers exercés au sein de la structure</h6>
+        <h6 class="h5 mb-1">Voir les métiers exercés au sein de la structure</h6>
     </button>
     <ul class="collapse" id="collapse{{siae.id}}">
         {% for job in jobs_descriptions %}
