@@ -21,7 +21,7 @@
     {% if forloop.counter == 5 and not forloop.last %}
       <div class="pt-2">
         <button class="btn collapsed collapse-caret p-0" data-toggle="collapse" data-target="#collapse_{{ forloop.parentloop.counter0 }}" type="button" aria-expanded="false" aria-controls="collapse_{{ forloop.parentloop.counter0 }}">
-          <h6>Voir tous les recrutements en cours ({{ forloop.revcounter0 }} de plus)</h6>
+          <h6 class="h5">Voir tous les recrutements en cours ({{ forloop.revcounter0 }} de plus)</h6>
         </button>
       </div>
       <div class="collapse" id="collapse_{{forloop.parentloop.counter0}}">
