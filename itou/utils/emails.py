@@ -1,3 +1,4 @@
+import logging
 import re
 import textwrap
 
@@ -10,6 +11,10 @@ from django.template.loader import get_template
 from huey.contrib.djhuey import task
 
 from itou.utils.iterators import chunks
+
+
+# Reduce verbosity of huey logs (INFO by default)
+logging.getLogger("huey").setLevel(logging.WARNING)
 
 
 # This is the "real" email backend used by the async wrapper / email backend
