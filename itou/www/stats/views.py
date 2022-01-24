@@ -141,7 +141,7 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
     }
     context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
-        "page_title": f"FIXME : {DEPARTMENTS[department]}",
+        "page_title": "Données 2021 (version beta) du contrôle à postériori",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)

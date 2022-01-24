@@ -535,7 +535,7 @@ STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHI
 METABASE_DASHBOARD_IDS = {
     "stats_cd": 118,
     "stats_ddets_overview": 117,
-    "stats_ddets_diagnosis_control": "FIXME",
+    "stats_ddets_diagnosis_control": 144,
     "stats_dgefp": 117,
     "stats_dreets": 117,
     "stats_public": 119,
