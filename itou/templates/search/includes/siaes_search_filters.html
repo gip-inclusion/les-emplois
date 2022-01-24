@@ -4,25 +4,25 @@
         Filtres des résultats {% include "includes/icon.html" with icon="filter" %}
     </a>
     <div id="search-filter-form" class="card-body collapse show">
-        {% bootstrap_field form.distance form_group_class="form-group" label_class="h5 font-weight-bold text-muted" %}
+        {% bootstrap_field form.distance form_group_class="form-group" label_class="h4 font-weight-bold text-muted" %}
 
         {% if form.departments %}
-            {% bootstrap_field form.departments form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+            {% bootstrap_field form.departments form_group_class="form-group mt-2" label_class="h4 font-weight-bold text-muted" %}
         {% endif %}
 
         {# getattr and list still painful in Django template #}
         {% if form.districts_13 %}
-            {% bootstrap_field form.districts_13 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+            {% bootstrap_field form.districts_13 form_group_class="form-group mt-2" label_class="h4 font-weight-bold text-muted" %}
         {% endif %}
 
         {% if form.districts_69 %}
-            {% bootstrap_field form.districts_69 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+            {% bootstrap_field form.districts_69 form_group_class="form-group mt-2" label_class="h4 font-weight-bold text-muted" %}
         {% endif %}
 
         {% if form.districts_75 %}
-            {% bootstrap_field form.districts_75 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+            {% bootstrap_field form.districts_75 form_group_class="form-group mt-2" label_class="h4 font-weight-bold text-muted" %}
         {% endif %}
 
-        {% bootstrap_field form.kinds form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+        {% bootstrap_field form.kinds form_group_class="form-group mt-2" label_class="h4 font-weight-bold text-muted" %}
     </div>
 </div>

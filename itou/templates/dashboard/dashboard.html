@@ -108,7 +108,7 @@
     {% if user.is_prescriber %}
         <div class="card mb-5 bg-gray-400 text-center">
             <div class="card-body">
-                <p class="h5 mb-3">
+                <p class="h4 mb-3">
                     <span class="badge badge-warning">Nouveau</span>
                     Bénéficiez des bonnes pratiques et actualités de la 1ère communauté des professionnels de l'inclusion !
                 </p>
@@ -167,7 +167,7 @@
         {% if user.is_job_seeker %}
 
             <div class="card">
-                <h5 class="card-header">Candidatures</h5>
+                <h5 class="h4 card-header">Candidatures</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
@@ -183,7 +183,7 @@
             {% with user.approvals_wrapper as approvals_wrapper %}
                 {% if approvals_wrapper.latest_approval %}
                     <div class="card">
-                        <h5 class="card-header">Numéro d'agrément</h5>
+                        <h5 class="h4 card-header">Numéro d'agrément</h5>
                         <div class="card-body">
                             {# Approval status. #}
                             <div class="card-text">
@@ -211,7 +211,7 @@
 
             {% if current_prescriber_organization %}
                 <div class="card">
-                    <h5 class="card-header">
+                    <h5 class="h4 card-header">
                         Organisation <span class="ml-1 badge badge-secondary">{{ current_prescriber_organization.kind }} - ID {{ current_prescriber_organization.id }}</span>
                     </h5>
                     <div class="card-body">
@@ -262,7 +262,7 @@
             {% endif %}
 
             <div class="card">
-                <h5 class="card-header">Candidatures</h5>
+                <h5 class="h4 card-header">Candidatures</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
@@ -286,7 +286,7 @@
         {% if user.is_siae_staff %}
 
             <div class="card">
-                <h5 class="card-header">
+                <h5 class="h4 card-header">
                     Ma structure
                     <span class="ml-1 badge badge-secondary">{{ current_siae.kind }} - ID {{ current_siae.id }}</span>
                 </h5>
@@ -343,7 +343,7 @@
             </div>
 
             <div class="card">
-                <h5 class="card-header">Mes candidatures</h5>
+                <h5 class="h4 card-header">Mes candidatures</h5>
                 <div class="card-body">
                     {% for category in job_applications_categories %}
                         {% if category.counter %}
@@ -401,7 +401,7 @@
 
         {% if user.is_labor_inspector %}
             <div class="card">
-                <h5 class="card-header">
+                <h5 class="h4 card-header">
                     Organisation <span class="ml-1 badge badge-secondary">{{ current_institution.kind }} - ID {{ current_institution.id }}</span>
                 </h5>
                 <div class="card-body">
@@ -419,7 +419,7 @@
         {% if can_view_stats_dashboard_widget %}
 
             <div class="card">
-                <h5 class="card-header">Statistiques et pilotage</h5>
+                <h5 class="h4 card-header">Statistiques et pilotage</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="activity" %}
