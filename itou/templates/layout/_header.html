@@ -1,7 +1,7 @@
 {% load static %}
 {% load theme_inclusion %}
 
-<header class="s-header s-header--emploi" role="banner" id="header">
+<header class="s-header s-header--emploi sticky-top" role="banner" id="header">
   <section class="s-header__container container">
     <div class="s-header__row row">
       <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center pr-0 pr-md-3">
@@ -11,7 +11,7 @@
         <a href="/"><img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion"></a>
       </div>
       <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
-        <nav role="navigation">
+        <nav role="navigation" id="nav-primary" role="navigation" aria-label="Navigation principale">
           <ul>
             {% include 'layout/_nav_btn_items.html' %}
           </ul>
