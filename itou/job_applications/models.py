@@ -689,8 +689,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.job_seeker, for_siae=self.to_siae
             )
-            if not self.eligibility_diagnosis and self.approval and self.approval.originates_from_itou:
-                logger.error("An eligibility diagnosis should've been found for job application %s", self.pk)
 
         # Send emails in batch.
         connection = mail.get_connection()
