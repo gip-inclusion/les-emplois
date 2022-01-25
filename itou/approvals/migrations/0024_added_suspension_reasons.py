@@ -20,7 +20,8 @@ class Migration(migrations.Migration):
                     ("FINISHED_CONTRACT", "Contrat de travail terminé"),
                     (
                         "APPROVAL_BETWEEN_CTA_MEMBERS",
-                        "Situation faisant l'objet d'un accord entre les acteurs membres du CTA (Comité technique d'animation)",
+                        "Situation faisant l'objet d'un accord entre les acteurs membres du CTA (Comité technique "
+                        "d'animation)",
                     ),
                     ("CONTRAT_PASSERELLE", "Bascule dans l'expérimentation contrat passerelle"),
                     ("SICKNESS", "Arrêt pour longue maladie"),
@@ -28,12 +29,14 @@ class Migration(migrations.Migration):
                     ("INCARCERATION", "Incarcération"),
                     (
                         "TRIAL_OUTSIDE_IAE",
-                        "Période d'essai auprès d'un employeur ne relevant pas de l'insertion par l'activité économique",
+                        "Période d'essai auprès d'un employeur ne relevant pas de l'insertion "
+                        "par l'activité économique",
                     ),
                     ("DETOXIFICATION", "Période de cure pour désintoxication"),
                     (
                         "FORCE_MAJEURE",
-                        "Raison de force majeure conduisant le salarié à quitter son emploi ou toute autre situation faisant l'objet d'un accord entre les acteurs membres du CTA",
+                        "Raison de force majeure conduisant le salarié à quitter son emploi ou toute autre situation "
+                        "faisant l'objet d'un accord entre les acteurs membres du CTA",
                     ),
                 ],
                 default="CONTRACT_SUSPENDED",
