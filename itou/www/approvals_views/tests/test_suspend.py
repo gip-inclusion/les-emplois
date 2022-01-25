@@ -159,3 +159,10 @@ class ApprovalSuspendViewTest(TestCase):
         self.assertRedirects(response, back_url)
 
         self.assertEqual(0, approval.suspension_set.count())
+
+    def test_using_contrat_passerelle(self):
+        """
+        Test conditional CONTRAT_PASSERELLE suspension reason
+        (only for ACI and SIAE EI kinds).
+        """
+        # TODO
