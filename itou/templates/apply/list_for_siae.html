@@ -9,7 +9,7 @@
 
 
     <h1 class="h1-hero">Candidatures reçues</h1>
-    <h2 class="text-muted">{{ siae.display_name }}</h2>
+    <h2 class="h1 text-muted">{{ siae.display_name }}</h2>
 
     {% if siae.is_subject_to_eligibility_rules %}
         <div class="alert alert-emploi mt-3" role="alert">
@@ -21,7 +21,7 @@
     {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
 
     {% if not job_applications_page %}
-        <h2 class="font-weight-normal text-muted mt-4">
+        <h2 class="h1 font-weight-normal text-muted mt-4">
             Aucune candidature pour le moment.
         </h2>
     {% endif %}
