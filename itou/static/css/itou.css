@@ -95,6 +95,9 @@ body:after {
     display: block !important;
 }
 
+.select2-dropdown {
+    z-index: 4051 !important;
+}
 
 /*
 Force the display of `.invalid-feedback` for Duet Date Picker with Bootstrap 4.
@@ -372,3 +375,6 @@ Usage:
 .itou-france-connect:hover {
   background-image: url(../img/franceconnect-bouton-hover.svg);
 }
+
+
+
