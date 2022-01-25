@@ -26,14 +26,16 @@
     {% endif %}
 </ul>
 
-<div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="filtersModalLabel" aria-hidden="true">
+<div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="filtersModalLabel" aria-modal="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="get" action="">
                 <div class="modal-header">
-                    <h4 class="modal-title">Filtres</h4>
+                    <h3 class="modal-title" id="filtersModalLabel">Filtres</h3>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                        <span aria-hidden="true">&times;</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                            <path fill="none" d="M0 0h24v24H0z"/><path fill="currentColor" d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/>
+                        </svg>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -86,8 +88,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                    <button type="submit" class="btn btn-primary">Appliquer</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Appliquer</button>
                 </div>
             </form>
         </div> <!-- .modal-content -->

@@ -14,9 +14,19 @@
     tabindex="-1"
     role="dialog"
     aria-labelledby="no-email-modal-label"
-    aria-hidden="true">
+    aria-modal="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="no-email-modal-label">
+                    Créer une adresse e-mail
+                </h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                        <path fill="none" d="M0 0h24v24H0z"/><path fill="currentColor" d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/>
+                    </svg>
+                </button>                
+            </div>
             <div class="modal-body">
                 <div class="container">
                     <div class="row">
@@ -24,30 +34,26 @@
                             <img src="{% static 'img/no_email.svg' %}">
                         </div>
                         <div class="col">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            <h5 class="modal-title" id="no-email-modal-label">
-                                Créer une adresse e-mail
-                            </h5>
                             <br>
                             <p>Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net.</p>
                             <p>Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici.</p>
-                            <a
-                                aria-label="Ouverture dans un nouvel onglet"
-                                href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI"
-                                class="btn btn-primary matomo-event"
-                                data-matomo-category="inscription-candidat"
-                                data-matomo-action="clic"
-                                data-matomo-option="je-n-ai-pas-d-adresse-email"
-                                rel="noopener"
-                                target="_blank">
-                                Créer une adresse e-mail {% include "includes/icon.html" with icon="external-link" %}
-                            </a>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <a
+                    aria-label="Ouverture dans un nouvel onglet"
+                    href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI"
+                    class="btn btn-sm btn-primary matomo-event"
+                    data-matomo-category="inscription-candidat"
+                    data-matomo-action="clic"
+                    data-matomo-option="je-n-ai-pas-d-adresse-email"
+                    rel="noopener"
+                    target="_blank">
+                    Créer une adresse e-mail {% include "includes/icon.html" with icon="external-link" %}
+                </a>
+            </div>            
         </div>
     </div>
 </div>

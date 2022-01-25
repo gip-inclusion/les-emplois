@@ -68,20 +68,22 @@
         </div>
 
         <div id="preview"></div>
-        <div class="modal modal-md fade" id="js-modal-preview" tabindex="-1" aria-labelledby="modalPrevisualisationTitle" aria-hidden="true">
+        <div class="modal modal-md fade" id="js-modal-preview" tabindex="-1" role="dialog" aria-labelledby="modalPrevisualisationTitle" aria-modal="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 id="modalPrevisualisationTitle" class="modal-title">Vu de votre structure depuis la liste de résultats</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                                <path fill="none" d="M0 0h24v24H0z"/><path fill="currentColor" d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/>
+                            </svg>
                         </button>
                     </div>
                     <div id="js-modal-preview-body" class="modal-body">
                     </div>
                     <div class="modal-footer">
-                        <a class="btn" href="{% url 'dashboard:index' %}" data-dismiss="modal">Annuler</a>
-                        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'dashboard:index' %}" data-dismiss="modal">Annuler</a>
+                        <button type="submit" class="btn btn-sm btn-primary">Enregistrer les modifications</button>
                     </div>
                 </div>
             </div>
