@@ -1,4 +1,6 @@
 import datetime
+import os
+import unittest
 from dataclasses import dataclass
 
 import pandas
@@ -55,6 +57,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
     which should prevent duplication.
     """
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_deduplicate_job_seekers(self):
         """
         Easy case : among all the duplicates, only one has a PASS IAE.
@@ -116,6 +119,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user2).count())
         self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user3).count())
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_deduplicate_job_seekers_without_empty_sender_field(self):
         """
         Easy case: among all the duplicates, only one has a PASS IAE.
@@ -231,6 +235,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         command.dry_run = False
         return command
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_cleaning(self):
         """Test dataframe cleaning: rows formatting and validation."""
         command = self.command
@@ -282,6 +287,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         row = df.iloc[0]
         self.assertEqual(row[EMAIL_COL], "colette@gmail.fr")
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_filter_invalid_nirs(self):
         # Create a dataframe with one valid and one invalid NIR.
         command = self.command
@@ -301,6 +307,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertEqual(df.iloc[1][COMMENTS_COL], expected_comment)
         self.assertEqual(invalid_nirs_df.iloc[0][COMMENTS_COL], expected_comment)
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_remove_ignored_rows(self):
         command = self.command
         SiaeFactory(kind=Siae.KIND_AI, siret=getattr(CleanedAiCsvFileMock(), SIRET_COL))
@@ -349,6 +356,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         expected_comment = "Ligne ignorée : agrément ou PASS IAE renseigné."
         self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_find_or_create_job_seeker__find(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
@@ -401,6 +409,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # Clean
         job_seeker.delete()
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_find_or_create_job_seeker__create(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         commune = CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
@@ -480,6 +489,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertTrue(job_seeker.email.endswith("@email-temp.com"))
         job_seeker.delete()
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_find_or_create_approval__find(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
@@ -517,6 +527,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # Clean
         existing_approval.user.delete()
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_find_or_create_approval__create(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
@@ -625,6 +636,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertTrue(previous_approval.pk, approval.pk)
         job_seeker.delete()
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_find_or_create_job_application__find(self):
         # Find job applications created previously by this script.
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
@@ -657,6 +669,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             found_job_application, JobApplication.objects.eligible_as_employee_record(found_job_application.to_siae)
         )
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_find_or_create_job_application__create(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
@@ -724,6 +737,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         self.assertFalse(cancelled_job_app_deleted)
         job_application.job_seeker.delete()
 
+    @unittest.skipUnless(os.getenv("CI", False), "It is a management command")
     def test_import_data_into_itou(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
