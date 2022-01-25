@@ -8,13 +8,13 @@
 
     {# Job seeker info ------------------------------------------------------------------------- #}
 
-    <h3 class="font-weight-normal text-muted">Candidat</h3>
+    <h3 class="h2 font-weight-normal text-muted">Candidat</h3>
     {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
 
     {# Job application info ------------------------------------------------------------------------- #}
 
     <hr>
-    <h3 class="font-weight-normal text-muted">Candidature</h3>
+    <h3 class="h2 font-weight-normal text-muted">Candidature</h3>
 
     {% include "apply/includes/job_application_info.html" with job_application=job_application %}
 
@@ -26,7 +26,7 @@
 
     <hr>
 
-    <h3 class="font-weight-normal text-muted">Candidature envoyée par</h3>
+    <h3 class="h2 font-weight-normal text-muted">Candidature envoyée par</h3>
 
     {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 
@@ -36,7 +36,7 @@
 
         <hr>
 
-        <h3 class="font-weight-normal text-muted">Réponse</h3>
+        <h3 class="h2 font-weight-normal text-muted">Réponse</h3>
 
         {% if job_application.refusal_reason %}
             <p>
@@ -67,7 +67,7 @@
 
         <hr>
 
-        <h3 class="font-weight-normal text-muted">Historique des modifications</h3>
+        <h3 class="h2 font-weight-normal text-muted">Historique des modifications</h3>
         {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
 
     {% endif %}

@@ -12,7 +12,7 @@
     <form method="post" action="" class="d-block mt-3 js-prevent-multiple-submit">
         {% csrf_token %}
         <div class="border-top py-4">
-            <h3>Bloquer les nouvelles candidatures</h3>
+            <h3 class="h2">Bloquer les nouvelles candidatures</h3>
             <div class="custom-control custom-switch is-rtl mb-3">
                 <input name="block_job_applications"
                     type="checkbox" id="block_job_applications"
@@ -28,7 +28,7 @@
             {% endif %}
         </div>
         <div class="border-top py-3">
-            <h3>Métiers et recrutements</h3>
+            <h3 class="h2">Métiers et recrutements</h3>
 
             {% include "siaes/includes/_alert_configure_job.html" with errors=errors%}
 

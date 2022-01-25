@@ -21,7 +21,7 @@
 
         <hr>
 
-        <h3 class="font-weight-normal text-muted">Réponse</h3>
+        <h3 class="h2 font-weight-normal text-muted">Réponse</h3>
 
         {% if job_application.refusal_reason %}
             <p>
@@ -143,7 +143,7 @@
     {% if job_application.state.is_accepted %}
         <hr>
 
-        <h3 class="font-weight-normal text-muted">Détails du contrat de travail</h3>
+        <h3 class="h2 font-weight-normal text-muted">Détails du contrat de travail</h3>
         <p>
         <ul>
             <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
@@ -164,7 +164,7 @@
         {% if job_application.can_be_cancelled %}
             <hr>
 
-            <h3 class="font-weight-normal text-muted">Rétractation</h3>
+            <h3 class="h2 font-weight-normal text-muted">Rétractation</h3>
 
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
                 <p>
