@@ -20,16 +20,24 @@
 --------------------------------------------------------------------------- */
 
 .s-main > section {
-    padding: 5rem 0;
+	padding-top: 2rem;
+	padding-bottom: 1.5rem;
 }
 
-.h1,
-h1 {
-    margin-bottom: 3rem;
-    /* font-size will be removed, need to be defined on the main theme */
-    font-size: 2.5rem;
+.h1-hero {
+    margin-bottom: 1.5rem;
 }
 
+@media (min-width:992px) {
+    .s-main > section {
+        padding-top: 4rem;
+        padding-bottom: 3rem;
+    }
+
+    .h1-hero {
+        margin-bottom: 3rem;
+    }
+}
 
 /* Cards.
 --------------------------------------------------------------------------- */
@@ -40,7 +48,8 @@ h1 {
 }
 
 .card-deck-itou > .card {
-    flex: 0 0 26%;
+    /* flex: 0 0 26%; */
+    position: relative;
     padding: 1.5rem;
 }
 

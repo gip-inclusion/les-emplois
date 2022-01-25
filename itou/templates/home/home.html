@@ -5,7 +5,7 @@
 
 {% block content %}
 
-    {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Prenez contact avec un employeur solidaire" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
+    {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Prenez contact avec <br class='d-none d-md-inline'>un employeur solidaire" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
 
     {% if not user.is_authenticated %}
         <section class="bg-white text-center">
@@ -21,7 +21,7 @@
                             </h5>
                         </div>
                         <div class="card-footer">
-                            <a class="btn btn-primary" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                            <a class="btn btn-primary stretched-link" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                                 Créer un compte
                             </a>
                         </div>
@@ -34,7 +34,7 @@
                            </h5>
                         </div>
                         <div class="card-footer">
-                            <a class="btn btn-primary" href="{{ ITOU_COMMUNITY_URL }}">
+                            <a class="btn btn-primary stretched-link" href="{{ ITOU_COMMUNITY_URL }}">
                                 Accéder à La communauté
                             </a>
                         </div>
@@ -47,7 +47,7 @@
                             </h5>
                         </div>
                         <div class="card-footer">
-                            <a class="btn btn-primary" href="{{ ITOU_DOC_URL }}/" target=_blank>
+                            <a class="btn btn-primary stretched-link" href="{{ ITOU_DOC_URL }}/" target=_blank>
                                 En savoir plus
                             </a>
                         </div>
