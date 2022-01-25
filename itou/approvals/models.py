@@ -12,7 +12,7 @@ from django.db import models
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
-from django.utils.functional import cached_property, classproperty
+from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from unidecode import unidecode
 
