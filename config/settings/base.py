@@ -291,6 +291,11 @@ LOGGING = {
             "handlers": ["api_console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
+        # Huey; async tasks
+        "huey": {
+            "handlers": ["console"],
+            "level": os.getenv("HUEY_LOG_LEVEL", "WARNING"),
+        },
     },
 }
 
