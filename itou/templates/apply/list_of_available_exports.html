@@ -5,13 +5,13 @@
 
 {% block content %}
     {% if export_for == "siae" %}
-    <h1>Export des candidatures reçues chez {{ siae.display_name }}</h1>
+    <h1 class="h1-hero">Export des candidatures reçues chez {{ siae.display_name }}</h1>
     {% else %}
     <h1 class="h1-hero">Export des candidatures</h1>
     {% endif %}
 
     {% if not job_applications_by_month %}
-        <h2 class="font-weight-normal text-muted">
+        <h2 class="h1 font-weight-normal text-muted">
             Aucune candidature pour le moment.
         </h2>
     {% else %}

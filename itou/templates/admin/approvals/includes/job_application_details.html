@@ -2,7 +2,7 @@
 
 {% with job_application.job_seeker as job_seeker %}
 
-    <h2>
+    <h2 class="h1">
         <a href="{% url "admin:users_user_change" job_seeker.id %}" target="_blank">
             Candidat
         </a>
@@ -59,7 +59,7 @@
 
 {% with job_application.to_siae as siae %}
 
-    <h2>
+    <h2 class="h1">
         <a href="{% url "admin:siaes_siae_change" siae.id %}" target="_blank">
             Employeur solidaire
         </a>
@@ -86,7 +86,7 @@
 
 {% endwith %}
 
-<h2>
+<h2 class="h1">
     <a href="{% url "admin:job_applications_jobapplication_change" job_application.id %}" target="_blank">
         Candidature
     </a>

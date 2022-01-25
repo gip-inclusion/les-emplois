@@ -8,7 +8,7 @@
     <div class="card c-card  c-card--emploi p-3">
         <div class="card-body">
             <div class="pb-3">
-                <h1 class="h2 mb-2">
+                <h1 class="h1 mb-2">
                     <b><abbr title="{{ siae.get_kind_display }}">{{ siae.kind }}</abbr></b>
                     -
                     <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-structure">
