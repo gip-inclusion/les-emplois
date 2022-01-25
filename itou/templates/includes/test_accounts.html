@@ -8,7 +8,7 @@
 <div class="sticky-top shadow bg-danger text-white text-center layout" style="z-index:2;">
     <div class="layout-content py-0">
         <div class="d-flex align-items-center text-center p-1">
-            <h4 class="font-weight-bold flex-grow-1 mb-0 text-white h1">{{ ITOU_ENVIRONMENT }}</h4>
+            <h4 class="h3 font-weight-bold flex-grow-1 mb-0 text-white h1">{{ ITOU_ENVIRONMENT }}</h4>
             {% if not user.is_authenticated %}
                 <div>
                     <button class="btn btn-sm btn-light border" data-toggle="modal" data-target="#testAccountsModal">
@@ -35,14 +35,14 @@
                 </p>
 
                 <div class="pt-2 pb-5">
-                    <h4 class="text-center pb-3">Employeurs</h4>
+                    <h4 class="h3 text-center pb-3">Employeurs</h4>
                     <div class="card-deck">
                         {% employers_accounts_tag as employers_accounts %}
                         {% for account in employers_accounts %}
                             <div class="card">
                                 <div class="card-body mb-auto py-0">
                                     <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:11rem;">
-                                    <h5 class="h4 card-title font-weight-bold text-center">{{ account.title }}</h5>
+                                    <h5 class="h5 card-title font-weight-bold text-center">{{ account.title }}</h5>
                                 </div>
                                 <div class="p-3 text-center">
                                     <p class="card-text">{{ account.description }}</p>
@@ -59,14 +59,14 @@
                 </div>
 
                 <div class="pb-5">
-                    <h4 class="text-center pb-3">Prescripteurs</h4>
+                    <h4 class="h3 text-center pb-3">Prescripteurs</h4>
                     <div class="card-deck">
                         {% prescribers_accounts_tag as prescribers_accounts %}
                         {% for account in prescribers_accounts %}
                             <div class="card">
                                 <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:11rem;">
                                 <div class="card-body">
-                                    <h5 class="h4 card-title h6 font-weight-bold text-center">{{ account.title|safe }}</h5>
+                                    <h5 class="h5 card-title h6 font-weight-bold text-center">{{ account.title|safe }}</h5>
                                     <p class="card-text">{{ account.description }}</p>
                                 </div>
                                 <div class="card-footer text-center">
@@ -80,14 +80,14 @@
                 </div>
 
                 <div class="pb-5">
-                    <h4 class="text-center pb-3">Candidat</h4>
+                    <h4 class="h3 text-center pb-3">Candidat</h4>
                     <div class="card-deck w-sm-33 m-auto">
                         {% job_seekers_accounts_tag as job_seekers_accounts %}
                         {% for account in job_seekers_accounts %}
                             <div class="card">
                                 <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;">
                                 <div class="card-body">
-                                    <h5 class="h4 card-title font-weight-bold text-center mb-0">{{ account.title }}</h5>
+                                    <h5 class="h5 card-title font-weight-bold text-center mb-0">{{ account.title }}</h5>
                                     <p class="card-text">{{ account.description }}</p>
                                 </div>
                                 <div class="card-footer text-center">
