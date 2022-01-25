@@ -114,7 +114,7 @@ class SuspensionForm(forms.ModelForm):
         self.siae = kwargs.pop("siae")
         super().__init__(*args, **kwargs)
         # Show new reasons but keep old ones for history.
-        self.fields["reason"].choices = Suspension.Reason.displayed_choices
+        self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
 
         today = timezone.now().date()
         if self.instance.pk:
