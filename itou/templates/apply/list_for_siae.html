@@ -37,7 +37,7 @@
             <div class="card-footer bg-white">
                 <div class="row">
                     <div class="col-sm-3">
-                        <a class="btn btn-emploi" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">
+                        <a class="btn btn-emploi" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}">
                             Gérer la candidature
                         </a>
                     </div>
