@@ -11,7 +11,7 @@
         <small class="text-muted">Prescripteur/Orienteur</small>
     </h1>
 
-    <h2 class="h4">
+    <h2 class="h1">
         Votre organisation est-elle déjà inscrite ?
     </h2>
 
@@ -39,7 +39,7 @@
 
     {% if prescriber_orgs_with_members_same_siret %}
         <div class="mt-5">
-            <h3>Organisation(s) déjà inscrite(s) avec ce SIRET</h3>
+            <h3 class="h2">Organisation(s) déjà inscrite(s) avec ce SIRET</h3>
             <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
             {% for prescriber_org in prescriber_orgs_with_members_same_siret %}
                 {% include "signup/includes/prescriber_card.html" %}
@@ -50,10 +50,10 @@
     {% if prescriber_orgs_with_members_same_siren %}
         <div class="mt-5">
             {% if not prescriber_orgs_with_members_same_siret %}
-            <h3>Organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
+            <h3 class="h2">Organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
             <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
             {% else %}
-            <h3>Autre(s) organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
+            <h3 class="h2">Autre(s) organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
             {% endif %}
             
             {% for prescriber_org in prescriber_orgs_with_members_same_siren %}
@@ -64,7 +64,7 @@
 
     {% if prescriber_orgs_with_members_same_siret or prescriber_orgs_with_members_same_siren %}
     <div class="mt-5">
-        <h3>Ajouter mon organisation</h3>
+        <h3 class="h2">Ajouter mon organisation</h3>
 
         {% if prescriber_orgs_with_members_same_siret %}
         <div class="alert alert-warning pb-0" role="alert">

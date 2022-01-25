@@ -7,7 +7,7 @@
                 Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critère de niveau 2 par exemple
             {% endcomment %}
             <hr>
-            <h3 class="font-weight-normal text-muted">
+            <h3 class="h2 font-weight-normal text-muted">
                 Éligibilité IAE
             </h3>
             <p>
@@ -48,7 +48,7 @@
             </p>
         {% else %}
             <hr>
-            <h3 class="font-weight-normal text-muted">
+            <h3 class="h2 font-weight-normal text-muted">
                 Critères d'éligibilité
             </h3>
 
@@ -107,14 +107,14 @@
     {% elif approvals_wrapper.has_valid_pole_emploi_eligibility_diagnosis %}
 
         <hr>
-        <h3 class="font-weight-normal text-muted">Critères d'éligibilité</h3>
+        <h3 class="h2 font-weight-normal text-muted">Critères d'éligibilité</h3>
         <p>
             Validés par <b>Pôle emploi</b>.
         </p>
 
     {% elif expired_eligibility_diagnosis %}
         <hr>
-        <h3 class="font-weight-normal text-muted">Éligibilité IAE</h3>
+        <h3 class="h2 font-weight-normal text-muted">Éligibilité IAE</h3>
         <div class="alert alert-warning" role="alert">
             Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, 
             vous devez valider les critères d'éligibilité.
