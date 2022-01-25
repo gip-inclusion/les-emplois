@@ -1,5 +1,5 @@
 {% comment %} takes 2 argument siae<Siae> and jobs_descriptions <List of SiaeJobDescription> {% endcomment %}
-<h4 class="pb-2">Recrutement{{ jobs_descriptions|pluralize }} en cours</h4>
+<h4 class="h3 pb-2">Recrutement{{ jobs_descriptions|pluralize }} en cours</h4>
 {% for job in jobs_descriptions %}
     {% if job.is_active and not siae.block_job_applications %}
         <a class="matomo-event btn btn-outline-primary mb-2"

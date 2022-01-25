@@ -11,7 +11,7 @@
         <div class="card-body">
             {% comment %} SIAE Title and adress {% endcomment %}
             <div class="border-bottom">
-                <h4>
+                <h4 class="h3">
                     <b><abbr title="{{ siae.get_kind_display }}">{{ siae.kind }}</abbr></b>
                     -
                     <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-structure">
