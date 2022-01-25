@@ -28,7 +28,7 @@ def strip_sentry_sensitive_data(event, hint):
 
 sentry_logging = LoggingIntegration(
     level=logging.INFO,  # Capture info and above as breadcrumbs.
-    event_level=logging.ERROR,  # Send only errors as events.
+    event_level=logging.ERROR,  # Send errors as events.
 )
 
 
