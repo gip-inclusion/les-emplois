@@ -41,13 +41,15 @@
 
         {% if preview_mode %}
             <!-- Modal -->
-            <div class="modal" id="nir-confirmation-modal" tabindex="-1" aria-labelledby="nir-confirmation-label" aria-hidden="true">
+            <div class="modal" id="nir-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="nir-confirmation-label" aria-modal="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="nir-confirmation-label">Utilisateur trouvé</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                            <h3 class="modal-title" id="nir-confirmation-label">Utilisateur trouvé</h3>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                                    <path fill="none" d="M0 0h24v24H0z"/><path fill="currentColor" d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/>
+                                </svg>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -59,11 +61,11 @@
                         <div class="modal-footer">
                             {% buttons %}
                                 {# Reload this page with a new form. #}
-                                <button type="submit" name="cancel" value="1" class="btn btn-secondary">
+                                <button type="submit" name="cancel" value="1" class="btn btn-sm btn-secondary">
                                     Ce n'est pas mon candidat
                                 </button>
                                 {# Go to the next step. #}
-                                <button type="submit" name="confirm" value="1" class="btn btn-primary">
+                                <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">
                                     Continuer
                                 </button>
                             {% endbuttons %}
