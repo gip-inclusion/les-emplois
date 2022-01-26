@@ -1,5 +1,5 @@
 # https://registry.hub.docker.com/r/postgis/postgis
-FROM postgis/postgis:12-master
+FROM postgis/postgis:14-master
 
 COPY ./docker/dev/postgres/maintenance /usr/local/bin/maintenance
 
