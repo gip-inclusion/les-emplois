@@ -1,6 +1,6 @@
 /* L'objectif est de construire un tableau de bord pour suivre en début de chaque année 
  les structures conventionnées (avec une annexe financière valide) */
- 
+
 /* Paramètres à changer tous les ans */
 with constantes as 
 ( 
@@ -38,9 +38,9 @@ structure_af as (
         s.nom_region_structure,
         s.code_departement
 )
-select 
+select
+    distinct identifiant_structure_asp,
     constantes.*,
-    identifiant_structure_asp,
     type_siae,
     af_date_fin_effet_v2,
     structure_denomination,
