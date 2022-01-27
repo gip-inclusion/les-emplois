@@ -11,7 +11,7 @@ L'objectif est de retravailler les variables de la table fluxIAE_AnnexeFinancier
 
 with "AnnexeFinanciere_v1" as (
     select
-        /* Reformattage de la colonne type de structure par exemple on passe de ACI_DC à ACI */
+        /* Reformatage de la colonne type de structure par exemple on passe de ACI_DC à ACI */
         substring(
             af.af_mesure_dispositif_code from 1 for char_length(af.af_mesure_dispositif_code)-3
         ) as type_siae,
