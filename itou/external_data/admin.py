@@ -20,3 +20,4 @@ class JobSeekerExternalDataAdmin(admin.ModelAdmin):
 class RejectedEmailEventDataAdmin(admin.ModelAdmin):
     list_filter = ("reason",)
     list_display = ("pk", "recipient", "reason", "created_at")
+    search_fields = ("recipient",)
