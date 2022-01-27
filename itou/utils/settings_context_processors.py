@@ -9,12 +9,14 @@ def expose_settings(request):
 
     assistance_url = settings.ITOU_ASSISTANCE_URL
 
-    resolver_match = request.resolver_match
-    if resolver_match is not None:  # resolver_match is None for some routes e.g. /robots.txt
-        full_view_name = resolver_match.view_name  # e.g. "home:hp" or "stats:stats_public"
+    try:
+        full_view_name = request.resolver_match.view_name  # e.g. "home:hp" or "stats:stats_public"
         if full_view_name.startswith("stats:"):
             # On all stats pages the help button should redirect to the C2 help page instead of the C1 help page.
             assistance_url = settings.PILOTAGE_ASSISTANCE_URL
+    except AttributeError:
+        # request.resolver_match is None for any non existing route ending in a 404 error e.g. /robots.txt or /favicon.ico
+        pass
 
     return {
         "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
