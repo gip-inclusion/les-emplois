@@ -472,7 +472,7 @@ class Suspension(models.Model):
             """
             Old reasons are not showed anymore but kept to let users still see
             a nice label in their dashboard instead of just the enum stored in the DB.
-            If the given SIAE is an ACI or EI, it can use the CONTRAT_PASSERELLE suspension reason.
+            If the given SIAE is an ACI or EI, it can now use the 'CONTRAT_PASSERELLE' suspension reason.
             """
             reasons = [
                 Suspension.Reason.SUSPENDED_CONTRACT,
@@ -487,6 +487,8 @@ class Suspension(models.Model):
     REASONS_TO_UNSUSPEND = [
         Reason.BROKEN_CONTRACT.value,
         Reason.FINISHED_CONTRACT.value,
+        Reason.APPROVAL_BETWEEN_CTA_MEMBERS.value,
+        Reason.CONTRAT_PASSERELLE.value,
     ]
 
     approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
