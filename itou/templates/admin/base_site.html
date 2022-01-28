@@ -3,13 +3,80 @@
 {% block title %}{{ title }} | Les emplois de l'inclusion{% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">Admin Itou</a></h1>
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">Admin Itou</a>
+</h1>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
 
 {% block extrahead %}
     <style>
-      {# TODO David #}
+        input[type=radio] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            -ms-appearance: none;
+            height: 15px;
+            width: 15px;
+            background: #fff;
+            border-radius: 50%;
+            border: 3px solid var(--body-quiet-color);
+        }
+
+        input[type="radio"]:checked {
+            position: relative;
+            margin:0px;
+            background: white;
+            border: 3px solid #007aff;
+        }
+
+        input[type="radio"]:checked:before {
+            position: absolute;
+            content: '';
+            display: block;
+            height: 5px;
+            width: 5px;
+            border-radius: 50%;
+            background-color: #007aff;
+            font-size: 13px;
+            line-height: 1;
+            font-weight: 300;
+            top: 2px;
+            left: 2px;
+        }
+
+        input[type=checkbox] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            -ms-appearance: none;
+            height: 15px;
+            width: 15px;
+            background: #fff;
+            border: 3px solid var(--body-quiet-color);
+        }
+
+        input[type="checkbox"]:checked {
+            position: relative;
+            margin:0px;
+            background: #007aff;
+            border: 3px solid #007aff;
+        }
+
+        input[type="checkbox"]:checked:before {
+            position: absolute;
+            content: '✓';
+            display: block;
+            color: white;
+            font-size: 13px;
+            line-height: 1;
+            font-weight: 300;
+            top: -1px;
+            left: 0;
+        }
+
+        input[type="radio"]:focus-visible,
+        input[type="checkbox"]:focus-visible {
+            outline-style: auto;
+        }
     </style>
 {% endblock %}
