@@ -1086,6 +1086,11 @@ class PoleEmploiApproval(CommonApprovalMixin):
     last_name = models.CharField("Nom", max_length=150)
     birth_name = models.CharField("Nom de naissance", max_length=150)
     birthdate = models.DateField(verbose_name="Date de naissance", default=timezone.localdate)
+    nir = models.CharField(verbose_name="NIR", max_length=15, null=True, blank=True)
+    # Some people have no NIR. They can have a temporary NIA or NTT instead:
+    # https://www.net-entreprises.fr/astuces/identification-des-salaries%E2%80%AF-nir-nia-et-ntt/
+    # NTT max length = 40 chars, max duration = 3 months
+    ntt_nia = models.CharField(verbose_name="NTT ou NIA", max_length=40, null=True, blank=True)
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 
