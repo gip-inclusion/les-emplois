@@ -1117,6 +1117,20 @@ class SuspensionModelTest(TestCase):
         suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
         self.assertFalse(suspension2.get_overlapping_suspensions().exists())
 
+    def test_displayed_choices_for_siae(self):
+        # EI and ACI kind have one more choice
+        for kind in [Siae.KIND_EI, Siae.KIND_ACI]:
+            siae = SiaeFactory(kind=kind)
+            result = Suspension.Reason.displayed_choices_for_siae(siae)
+            self.assertEqual(len(result), 5)
+            self.assertEqual(result[-1][0], Suspension.Reason.CONTRAT_PASSERELLE.value)
+
+        # Some other cases
+        for kind in [Siae.KIND_ETTI, Siae.KIND_AI]:
+            siae = SiaeFactory(kind=kind)
+            result = Suspension.Reason.displayed_choices_for_siae(siae)
+            self.assertEqual(len(result), 4)
+
 
 class SuspensionModelTestTrigger(TestCase):
     """
