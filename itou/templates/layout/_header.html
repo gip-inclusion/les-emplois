@@ -36,39 +36,47 @@
     </div>
   </section>
 </header>
-<section class="s-postheader mb-1">
-  <div class="container s-postheader__container">
-    <div class="row">
-      <div class="col-12 s-postheader__col s-postheader__col--nav d-flex align-items-center">
-        <nav role="navigation">
-          <ul>
-            {% if user.is_authenticated %}
-              <li>
-                  <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">Tableau de bord</a>
-              </li>
-            {% endif %}
-            <li>
-              <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">Rechercher des employeurs</a>
-            </li>
-
-            <li>
-              <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs</a>
-            </li>
-
-            <li>
-              <a class="nav-link" href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" aria-label="Accéder à La communauté de l'inclusion (nouvel onglet)">Communauté 
-                  {% include "includes/icon.html" with icon="external-link" %}
-              </a>
-            </li>
-
-            <li>
-              <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Documentation 
-                  {% include "includes/icon.html" with icon="external-link" %}
-              </a>
-            </li>
-          </ul>
-        </nav>
+<section class="s-postheader">
+    <div class="container s-postheader__container">
+      <div class="row">
+        <div class="col-12 s-postheader__col s-postheader__col--nav d-flex align-items-center">
+          <nav role="navigation">
+            <ul>
+                {% if user.is_authenticated %}
+                <li>
+                    <a class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}" href="{% url 'dashboard:index' %}">
+                        <span>Tableau de bord</span>
+                        <i class="ri-arrow-right-line ri-lg"></i>
+                    </a>
+                </li>
+                {% endif %}
+                <li>
+                    <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="/">
+                        <span>Rechercher des employeurs</span>
+                        <i class="ri-arrow-right-line ri-lg"></i>
+                    </a>
+                </li>                
+                <li>
+                    <a class="{% if '/search/prescribers' in request.path %}font-weight-bold{% endif %}" href="{% url 'search:prescribers_home' %}">
+                        <span>Rechercher des prescripteurs</span>
+                        <i class="ri-arrow-right-line ri-lg"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" aria-label="Accéder à La communauté de l'inclusion (nouvel onglet)">
+                        <span>Communauté</span>
+                        <i class="ri-arrow-right-up-line ri-lg"></i>
+                    </a>
+                </li>                  
+                <li>
+                    <a href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">
+                        <span>Documentation</span>
+                        <i class="ri-arrow-right-up-line ri-lg"></i>
+                    </a>
+                </li>                  
+            </ul>
+          </nav>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
