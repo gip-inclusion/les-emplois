@@ -115,6 +115,12 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
         to_siae.display_name,
     )
 
+    dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
+    logger.info("| Job applications sent: %s", dest_siae_job_applications_sent.count())
+
+    dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=to_id)
+    logger.info("| Job applications received: %s", dest_siae_job_applications_received.count())
+
     if dry_run:
         logger.info("Nothing to do in dry run mode.")
         return
@@ -154,6 +160,27 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
                 geocoding_score=None,
             )
 
+    logger.info(
+        "MOVE %s OF siae.id=%s FINISHED",
+        "DATA" if move_all_data else "JOB APPLICATIONS",
+        from_siae.pk
+    )
+    orig_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=from_id)
+    logger.info("| Job applications sent: %s", orig_job_applications_sent.count())
+
+    orig_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=from_id)
+    logger.info("| Job applications received: %s", orig_job_applications_received.count())
+
+    logger.info(
+        "INTO siae.id=%s",
+        to_siae.pk
+    )
+
+    dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
+    logger.info("| Job applications sent: %s", dest_siae_job_applications_sent.count())
+
+    dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=to_id)
+    logger.info("| Job applications received: %s", dest_siae_job_applications_received.count())
 
 class Command(BaseCommand):
     help = HELP_TEXT
