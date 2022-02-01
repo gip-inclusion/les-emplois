@@ -4,19 +4,24 @@
 
 ### Ajouté
 
-- Modification de l'admin Django pour ajouter plus de visibilité pour les élément `checkbox` et `radio`.
 - Ajout de deux nouveaux motifs de suspension d'un PASS IAE dont un uniquement pour les ACI et EI (Contrat Passerelle). 
 - Ajout de documentation dans le fichier `Makefile`.
 - Ajout d'un second tableau de bord pour les DDETS.
+- Ajout de la date de naissance dans l'affichage en liste des PASS IAE et des utilisateurs (admin).
+- L'affichage des recrutements est en 2 parties, avec une option pour montrer la totalité des éléments (recherche de SIAE).
 
 ### Modifié
 
+- Modification de l'admin Django pour ajouter plus de visibilité pour les élément `checkbox` et `radio`.
 - Le bouton "Besoin d'aide" envoie dorénavant vers une page d'aide du pilotage et non des emplois depuis une page stats. 
 - Modification du niveau de log de Sentry.
 - Réduction du niveau de log pour l'envoi d'e-mails. 
 - Modification de la date de mise en production des fiches salarié.
 - Modification de l'indexation Google pour les emplois (route `/robots.txt`).
 - Modification du `Makefile` concernant le déploiement en production (script `deploy.sh`).
+- Modification des marges pour les boutons de connexion.
+- Modification des horaires de transfert des fiches salarié.
+- Corrections mineures (typos).
 
 ## [34] - 2022-01-14
 
