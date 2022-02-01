@@ -1,4 +1,7 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import DateRangeField
+from django.db import models
 from django.db.models import Func
 
 
@@ -13,3 +16,15 @@ class DateRange(Func):
 
     function = "daterange"
     output_field = DateRangeField()
+
+
+class SupportRemark(models.Model):
+    class Meta:
+        verbose_name = "Commentaire du support"
+
+    remark = models.TextField(verbose_name="Commentaire", blank=True)
+
+    # Attachment to different model types
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
