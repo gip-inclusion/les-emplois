@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.template.defaultfilters import date as date_filter
 
 from itou.eligibility import models
+from itou.utils.admin import SupportRemarkInline
 
 
 class AdministrativeCriteriaInline(admin.TabularInline):
@@ -66,7 +67,10 @@ class EligibilityDiagnosisAdmin(admin.ModelAdmin):
         "is_considered_valid",
     )
     search_fields = ("pk", "job_seeker__email", "author__email")
-    inlines = (AdministrativeCriteriaInline,)
+    inlines = (
+        AdministrativeCriteriaInline,
+        SupportRemarkInline,
+    )
 
     def is_valid(self, obj):
         return obj.is_valid
