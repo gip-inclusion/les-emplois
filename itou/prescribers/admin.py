@@ -7,6 +7,7 @@ from django.utils.timezone import now
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.prescribers import models
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
+from itou.utils.admin import SupportRemarkInline
 
 
 class TmpMissingSiretFilter(admin.SimpleListFilter):
@@ -127,7 +128,10 @@ class PrescriberOrganizationAdmin(OrganizationAdmin):
             },
         ),
     )
-    inlines = (PrescriberOrganizationMembersInline,)
+    inlines = (
+        PrescriberOrganizationMembersInline,
+        SupportRemarkInline,
+    )
     list_display = ("pk", "siret", "name", "kind", "post_code", "city", "department", "is_authorized", "member_count")
     list_display_links = ("pk", "name")
     list_filter = (
