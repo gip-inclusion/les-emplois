@@ -176,11 +176,11 @@ postgres_dump_cities:
 # Itou theme
 # =============================================================================
 
-update_itou_theme: scripts/upload_itou_theme.sh
+update_itou_theme:
 	docker exec itou_django /bin/sh -c "./scripts/upload_itou_theme.sh"
 
 # Deployment
 # =============================================================================
 
-deploy_prod: scripts/deploy_prod.sh
+deploy_prod:
 	./scripts/deploy_prod.sh
