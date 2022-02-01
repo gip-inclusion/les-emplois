@@ -8,6 +8,7 @@ from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
+from itou.utils.admin import SupportRemarkInline
 
 
 class JobApplicationInline(admin.StackedInline):
@@ -136,6 +137,7 @@ class ApprovalAdmin(admin.ModelAdmin):
         SuspensionInline,
         ProlongationInline,
         JobApplicationInline,
+        SupportRemarkInline,
     )
 
     def save_model(self, request, obj, form, change):
@@ -229,6 +231,7 @@ class SuspensionAdmin(admin.ModelAdmin):
         "pk",
         "approval__number",
     )
+    inlines = (SupportRemarkInline,)
 
     def is_in_progress(self, obj):
         return obj.is_in_progress
@@ -274,6 +277,7 @@ class ProlongationAdmin(admin.ModelAdmin):
         "updated_at",
         "updated_by",
     )
+    inlines = (SupportRemarkInline,)
 
     def is_in_progress(self, obj):
         return obj.is_in_progress
