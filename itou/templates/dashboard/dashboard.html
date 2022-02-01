@@ -5,12 +5,6 @@
 {% block messages %}
     {{ block.super }}
 
-    {% if current_siae and current_siae.is_subject_to_eligibility_rules %}
-        <div class="alert alert-danger" role="alert">
-            Le téléchargement des PASS IAE en PDF est momentanément indisponible. Nous nous excusons pour la gêne occasionnée.
-        </div>
-    {% endif %}
-
     {# Alerte pour gérer les cas d'exception lors de l'importation des AI. #}
     {% if current_siae and current_siae.kind == current_siae.KIND_AI %}
         <div class="alert alert-warning" role="alert">
