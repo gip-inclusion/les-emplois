@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## [35] - 2022-02-01
+
+### Ajouté
+
+- Modification de l'admin Django pour ajouter plus de visibilité pour les élément `checkbox` et `radio`.
+- Ajout de deux nouveaux motifs de suspension d'un PASS IAE dont un uniquement pour les ACI et EI (Contrat Passerelle). 
+- Ajout de documentation dans le fichier Makefile.
+- Ajout d'un second tableau de bord pour les DDETS.
+
+### Modifié
+
+- Le bouton "Besoin d'aide" envoie dorénavant vers une page d'aide du pilotage et non des emplois depuis une page stats. 
+- Modification du niveau de log de Sentry.
+- Réduction du niveau de log pour l'envoi d'e-mails. 
+- Modification de la date de mise en production des fiches salarié.
+- Modification de l'indexation Google pour les emplois (route `/robots.txt`).
+
 ## [34] - 2022-01-14
 
 ### Ajouté
