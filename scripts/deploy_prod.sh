@@ -11,10 +11,15 @@ fi
 # Merge master into master_clever, then push master_clever
 # Deployment to Clever Cloud is actually triggered via a hook
 # on a push on this branch
+
+# synchronize master  and master_clever by replaying the local branches on top of remote ones
+git fetch origin
 git checkout master
-git pull origin master
-git checkout master_clever 
-git pull origin master_clever 
+git rebase origin/master master
+git checkout master_clever
+git rebase origin/master_clever master_clever
+
+# merge master into master_clever
 git merge master --no-edit --no-ff
 git push origin master_clever 
 
