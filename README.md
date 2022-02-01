@@ -89,16 +89,14 @@ le Makefile. Elles sont suffixées par `_venv`.
 
 ### Créer un compte admin
 
+A noter qu'il existe déjà (juste après le `populate_db`) un compte super-utilisateur: `admin@test.com / password`
+
     $ make shell_on_django_container
     $ django-admin createsuperuser
 
 ### Avant un commit
 
-    $ make style  # Will run black and isort.
-
-Ou utilisez un *pre-commit git hook* que vous pouvez mettre en place de cette manière :
-
-    $ make setup_git_pre_commit_hook
+    $ make quality  # Will run black, isort, and flake8
 
 ## Données de test
 
