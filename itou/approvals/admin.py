@@ -47,12 +47,35 @@ class JobApplicationInline(admin.StackedInline):
     # (YET...)
     @admin.display(description="Statut de la fiche salarié")
     def employee_record_status(self, obj):
+        print(type(obj),obj)
         if employee_record := obj.employee_record.first():
             url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
             display = employee_record.get_status_display()
             return format_html(f"<a href='{url}'><b>{display} (ID : {employee_record.id})</b></a>")
+        
+        # WIP
+        # afficher "Fiche salarié en attente de creation" si les trois conditions suivants
+        # sont remplies
+        # [x] embauche validée avec contrat après 27.09.21
+        # [_] demande obtention pass IAE
+        # [x] aucune fiche meme salarie, meme siret, meme passIAE
+        elif not obj.state.is_accepted:
+             return "Pas de fiche salarié créée - candidature non acceptée"
 
-        return "Pas de fiche salarié crée pour cette candidature"
+        elif not obj.hiring_start_at <= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE:
+             return f"Pas de fiche salarié créée - candidature acceptée avant le {EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.strftime('%d-%m-%Y')}"
+
+        elif not obj.employee_record.filter(approval_number=obj.approval.number, 
+                                            siret=obj.to_siae.siret,
+                                            job_application__job_seeker=obj.job_seeker)
+                                            .exists():
+             return f"Pas de fiche salarié créée - fiche similaire existante"
+
+        elif true:
+            # tester la demande d'obtention d'un pass IAE
+            return "Pas de fiche salarié crée - pas de demande d'obtention d'un pass IAE"
+
+        return "Fiche salarié en attente de creation"
 
 
 class SuspensionInline(admin.TabularInline):
