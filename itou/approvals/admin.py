@@ -63,7 +63,7 @@ class JobApplicationInline(admin.StackedInline):
         elif not obj.state.is_accepted:
              return "Pas de fiche salarié créée - candidature non acceptée"
 
-        elif not obj.hiring_start_at <= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
+        elif not obj.hiring_start_at > settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
              return f"Pas de fiche salarié créée - candidature acceptée avant le \
                      {settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.strftime('%d-%m-%Y')}"
 
