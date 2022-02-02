@@ -606,6 +606,39 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 kind = "Prescripteur habilité"
         return kind
 
+    @property
+    def is_waiting_for_FS(self):
+        """
+        Returns FS creation status if EmployeeRecord does not exit.
+        Used in admin page, dynamic read-only field "employee_record_status"
+
+        Rules on Job Applications
+        x job application must be accepted
+        x job starts after settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
+        x approval must not be refused : approval_manually_refused_at date is None
+        x hiring with approval : hiring_without_approval is False
+
+        Rule on Employee Record
+        x you can only create *one* employee record for a given asp_id / approval pair
+        """
+        job_application_qs = JobApplication.objects.filter(
+            pk=self.pk,
+            hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+            approval_manually_refused_at__isnull=True,
+            hiring_without_approval=False,
+        ).accepted()
+
+        employee_record_qs = self.employee_record.filter(
+            approval_number=self.approval.number,
+            asp_id=self.to_siae.asp_id,
+            job_application__job_seeker=self.job_seeker,
+        )
+
+        if job_application_qs and not employee_record_qs:
+            return True
+
+        return False
+
     def get_eligibility_diagnosis(self):
         """
         Returns the eligibility diagnosis linked to this job application or None.
