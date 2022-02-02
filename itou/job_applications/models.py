@@ -606,6 +606,20 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 kind = "Prescripteur habilité"
         return kind
 
+    @property
+    def can_have_employee_record(self):
+        """
+        Check if EmployeeRecord does not exit and can be created for this JobApplication
+        """
+        is_application_valid = (
+            self.hiring_start_at >= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
+            and not self.hiring_without_approval
+            and self.state == JobApplicationWorkflow.STATE_ACCEPTED
+            and self.approval.is_valid()
+        )
+
+        return is_application_valid and not self.employee_record.first() and self.to_siae.can_use_employee_record
+
     def get_eligibility_diagnosis(self):
         """
         Returns the eligibility diagnosis linked to this job application or None.
