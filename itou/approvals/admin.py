@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from django.contrib import admin, messages
 from django.urls import path
 from django.urls.base import reverse
@@ -61,13 +63,13 @@ class JobApplicationInline(admin.StackedInline):
         elif not obj.state.is_accepted:
              return "Pas de fiche salarié créée - candidature non acceptée"
 
-        elif not obj.hiring_start_at <= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE:
-             return f"Pas de fiche salarié créée - candidature acceptée avant le {EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.strftime('%d-%m-%Y')}"
+        elif not obj.hiring_start_at <= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
+             return f"Pas de fiche salarié créée - candidature acceptée avant le \
+                     {settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.strftime('%d-%m-%Y')}"
 
         elif not obj.employee_record.filter(approval_number=obj.approval.number, 
                                             siret=obj.to_siae.siret,
-                                            job_application__job_seeker=obj.job_seeker)
-                                            .exists():
+                                            job_application__job_seeker=obj.job_seeker).exists():
              return f"Pas de fiche salarié créée - fiche similaire existante"
 
         elif True:
