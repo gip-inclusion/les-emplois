@@ -57,7 +57,7 @@ class JobApplicationInline(admin.StackedInline):
         # afficher "Fiche salarié en attente de creation" si les trois conditions suivants
         # sont remplies
         # [x] embauche validée avec contrat après 27.09.21
-        # [_] demande obtention pass IAE
+        # [x] demande obtention pass IAE
         # [x] aucune fiche meme salarie, meme siret, meme passIAE
         elif not obj.state.is_accepted:
             return "Pas de fiche salarié créée - candidature non acceptée"
@@ -72,10 +72,9 @@ class JobApplicationInline(admin.StackedInline):
             return f"Pas de fiche salarié créée - fiche similaire existante"
 
         elif obj.approval_manually_refused_at is not None or obj.hiring_without_approval:
-            # tester la demande d'obtention d'un pass IAE
-            # 1. case L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche
-            # PASS IAE refusé manuellement par : none
-            # Date de refus manuel du PASS IAE : none
+            # tester l'absence de demande d'obtention d'un pass IAE
+            # L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche
+            # Date de refus manuel du PASS IAE existante
             return "Pas de fiche salarié crée - pas de demande d'obtention d'un pass IAE"
 
         return "Fiche salarié en attente de creation"
