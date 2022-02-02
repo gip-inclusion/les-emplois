@@ -47,7 +47,6 @@ class JobApplicationInline(admin.StackedInline):
     # (YET...)
     @admin.display(description="Statut de la fiche salarié")
     def employee_record_status(self, obj):
-        print(type(obj),obj)
         if employee_record := obj.employee_record.first():
             url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
             display = employee_record.get_status_display()
