@@ -71,7 +71,7 @@ class JobApplicationInline(admin.StackedInline):
                                             .exists():
              return f"Pas de fiche salarié créée - fiche similaire existante"
 
-        elif true:
+        elif True:
             # tester la demande d'obtention d'un pass IAE
             return "Pas de fiche salarié crée - pas de demande d'obtention d'un pass IAE"
 
