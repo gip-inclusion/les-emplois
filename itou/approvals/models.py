@@ -558,9 +558,12 @@ class Suspension(models.Model):
         super().save(*args, **kwargs)
 
     def clean(self):
-
         if self.reason == self.Reason.FORCE_MAJEURE and not self.reason_explanation:
             raise ValidationError({"reason_explanation": "En cas de force majeure, veuillez préciser le motif."})
+
+        # This can happen in forms when no default/end date is entered
+        if not self.end_at:
+            raise ValidationError({"end_at": "La date de fin de la suspension est obligatoire."})
 
         # No min duration: a suspension may last only 1 day.
         if self.end_at < self.start_at:
