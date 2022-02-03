@@ -103,11 +103,11 @@ def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
 
 
 @login_required
-def stats_ddets_overview(request, template_name=_STATS_HTML_TEMPLATE):
+def stats_ddets_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
     They can only view data for their own departement.
-    This dashboard shows an overview of their data.
+    This dashboard shows data about IAE in general.
     """
     current_institution = get_current_institution_or_404(request)
     if not request.user.can_view_stats_ddets(current_org=current_institution):
@@ -129,7 +129,7 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
     They can only view data for their own departement.
-    This dashboard shows data about diagnosis control.
+    This dashboard shows data about diagnosis control ("Contrôle a posteriori").
     """
     current_institution = get_current_institution_or_404(request)
     if not request.user.can_view_stats_ddets(current_org=current_institution):
@@ -141,17 +141,18 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
     }
     context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
-        "page_title": "Données 2021 (version beta) du contrôle a posteriori",
+        "page_title": "Données 2021 (version bêta) du contrôle a posteriori",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
 
 
 @login_required
-def stats_dreets(request, template_name=_STATS_HTML_TEMPLATE):
+def stats_dreets_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DREETS ("Directions régionales de l’économie, de l’emploi, du travail et des solidarités") stats shown to
     relevant members. They can only view data for their own region and can filter by department.
+    This dashboard shows data about IAE in general.
     """
     current_institution = get_current_institution_or_404(request)
     if not request.user.can_view_stats_dreets(current_org=current_institution):
@@ -171,10 +172,11 @@ def stats_dreets(request, template_name=_STATS_HTML_TEMPLATE):
 
 
 @login_required
-def stats_dgefp(request, template_name=_STATS_HTML_TEMPLATE):
+def stats_dgefp_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
     They can view all data and filter by region and/or department.
+    This dashboard shows data about IAE in general.
     """
     current_institution = get_current_institution_or_404(request)
     if not request.user.can_view_stats_dgefp(current_org=current_institution):
@@ -186,6 +188,45 @@ def stats_dgefp(request, template_name=_STATS_HTML_TEMPLATE):
     context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": "Données des régions",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+def stats_dgefp_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
+    They can view all data and filter by region and/or department.
+    This dashboard shows data about diagnosis control ("Contrôle a posteriori").
+    """
+    current_institution = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_dgefp(current_org=current_institution):
+        raise PermissionDenied
+    params = {
+        DEPARTMENT_FILTER_KEY: list(DEPARTMENTS.values()),
+        REGION_FILTER_KEY: list(REGIONS.keys()),
+    }
+    context = {
+        "iframeurl": metabase_embedded_url(request=request, params=params),
+        "page_title": "Données 2021 (version bêta) du contrôle a posteriori",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def stats_dgefp_af(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
+    They can view all data and filter by region and/or department.
+    This dashboard shows data about financial annexes ("af").
+    """
+    current_institution = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_dgefp(current_org=current_institution):
+        raise PermissionDenied
+    context = {
+        "iframeurl": metabase_embedded_url(request=request),
+        "page_title": "Annexes financières actives",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
