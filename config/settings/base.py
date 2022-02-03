@@ -542,6 +542,7 @@ METABASE_DASHBOARD_IDS = {
     "stats_ddets_iae": 117,
     "stats_ddets_diagnosis_control": 144,
     "stats_dgefp_iae": 117,
+    "stats_dgefp_diagnosis_control": 144,
     "stats_dgefp_af": 142,
     "stats_dreets_iae": 117,
     "stats_public": 119,
