@@ -464,6 +464,11 @@
                         </p>
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
+                            <a href="{% url 'stats:stats_dgefp_diagnosis_control' %}">Voir les données 2021 du contrôle a posteriori (Version beta)</a>
+                            <span class="badge badge-info">Nouveau</span>
+                        </p>
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="activity" %}
                             <a href="{% url 'stats:stats_dgefp_af' %}">Annexes financières actives</a>
                             <span class="badge badge-info">Nouveau</span>
                         </p>

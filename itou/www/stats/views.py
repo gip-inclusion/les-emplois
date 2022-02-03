@@ -129,7 +129,7 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
     They can only view data for their own departement.
-    This dashboard shows data about diagnosis control.
+    This dashboard shows data about diagnosis control ("Contrôle a posteriori").
     """
     current_institution = get_current_institution_or_404(request)
     if not request.user.can_view_stats_ddets(current_org=current_institution):
@@ -188,6 +188,27 @@ def stats_dgefp_iae(request, template_name=_STATS_HTML_TEMPLATE):
     context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": "Données des régions",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+def stats_dgefp_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
+    They can view all data and filter by region and/or department.
+    This dashboard shows data about diagnosis control ("Contrôle a posteriori").
+    """
+    current_institution = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_dgefp(current_org=current_institution):
+        raise PermissionDenied
+    params = {
+        DEPARTMENT_FILTER_KEY: list(DEPARTMENTS.values()),
+        REGION_FILTER_KEY: list(REGIONS.keys()),
+    }
+    context = {
+        "iframeurl": metabase_embedded_url(request=request, params=params),
+        "page_title": "Données 2021 (version beta) du contrôle a posteriori",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
