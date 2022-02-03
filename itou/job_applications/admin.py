@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from itou.job_applications import models
+from itou.job_applications.admin_forms import JobApplicationAdminForm
 
 
 class TransitionLogInline(admin.TabularInline):
@@ -38,6 +39,7 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
 
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
+    form = JobApplicationAdminForm
     date_hierarchy = "created_at"
     list_display = ("pk", "state", "sender_kind", "created_at")
     raw_id_fields = (
