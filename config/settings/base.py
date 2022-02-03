@@ -283,7 +283,7 @@ LOGGING = {
         },
         "itou": {
             "handlers": ["console"],
-            "level": os.getenv("DJANGO_LOG_LEVEL", "DEBUG"),
+            "level": os.getenv("ITOU_LOG_LEVEL", "INFO"),
         },
         # Logger for DRF API application
         # Will be "log-drained": may need to adjust format
