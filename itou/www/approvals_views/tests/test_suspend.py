@@ -12,6 +12,7 @@ from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.approvals_views.forms import SuspensionForm
 
 
 class ApprovalSuspendViewTest(TestCase):
@@ -73,6 +74,44 @@ class ApprovalSuspendViewTest(TestCase):
         self.assertEqual(1, approval.suspension_set.count())
         suspension = approval.suspension_set.first()
         self.assertEqual(suspension.created_by, siae_user)
+
+    def test_create_suspension_without_end_date(self):
+        # Only test form validation (faster)
+
+        today = timezone.localdate()
+
+        job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            hiring_start_at=today - relativedelta(days=1),
+        )
+
+        # Ensure that the job_application cannot be canceled.
+        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.PROCESSED)
+
+        start_at = today
+
+        # Fill all form data:
+        # do not forget to fill `end_at` field with None (or model init will override with a default value)
+        post_data = {
+            "start_at": start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "end_at": None,
+            "set_default_end_date": False,
+            "reason": Suspension.Reason.SUSPENDED_CONTRACT,
+            "reason_explanation": "",
+            "preview": "1",
+        }
+
+        form = SuspensionForm(approval=job_application.approval, siae=job_application.to_siae, data=post_data)
+
+        self.assertFalse(form.is_valid())
+        self.assertIsNotNone(form.errors["end_at"][0])
+
+        # Check 'set_default_end_date' and expect a default end date to be set
+        post_data["set_default_end_date"] = True
+        form = SuspensionForm(approval=job_application.approval, siae=job_application.to_siae, data=post_data)
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["end_at"], Suspension.get_max_end_at(today))
 
     def test_update_suspension(self):
         """
