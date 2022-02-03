@@ -1,3 +1,4 @@
+from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.models import SocialAccount
 from django.contrib import admin
@@ -352,3 +353,11 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
 
     username.short_description = "Nom complet"
     pole_emploi_id.short_description = "Identifiant Pôle emploi"
+
+
+class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
+    inlines = (SupportRemarkInline,)
+
+
+admin.site.unregister(EmailAddress)
+admin.site.register(EmailAddress, EmailAddressWithRemarkAdmin)
