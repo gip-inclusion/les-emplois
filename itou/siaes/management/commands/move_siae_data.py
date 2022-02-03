@@ -3,6 +3,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models import Exists, OuterRef, Subquery
 from django.utils import timezone
 
 from itou.approvals import models as approvals_models
@@ -82,7 +83,14 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
     logger.info("| Job applications received: %s", job_applications_received.count())
 
     if move_all_data:
-        job_descriptions = siaes_models.SiaeJobDescription.objects.filter(siae_id=from_id)
+        # Move Job Description not already present in siae destination, Job Applications related will be attached to
+        # Job Description present in siae destination
+        appellation_subquery = Subquery(
+            siaes_models.SiaeJobDescription.objects.filter(siae_id=to_id, appellation_id=OuterRef("appellation_id"))
+        )
+        job_descriptions = siaes_models.SiaeJobDescription.objects.filter(siae_id=from_id).exclude(
+            Exists(appellation_subquery)
+        )
         logger.info("| Job descriptions: %s", job_descriptions.count())
 
         # Move users not already present in siae destination
@@ -121,6 +129,13 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
     dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=to_id)
     logger.info("| Job applications received: %s", dest_siae_job_applications_received.count())
 
+    if move_all_data:
+        logger.info(f"| Brand '{to_siae.brand}' will be updated with '{from_siae.display_name}'")
+        logger.info(f"| Description \n{to_siae.description}\nwill be updated with\n{from_siae.description}")
+        logger.info(f"| Phone '{to_siae.phone}' will be updated with '{from_siae.phone}'")
+        logger.info(f"| Coords '{to_siae.coords}' will be updated with '{from_siae.coords}'")
+        logger.info(f"| Geoscore '{to_siae.geocoding_score}' will be updated with '{from_siae.geocoding_score}'")
+
     if dry_run:
         logger.info("Nothing to do in dry run mode.")
         return
@@ -135,11 +150,34 @@ def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
             for job_application in job_applications_received:
                 job_application.selected_jobs.clear()
 
+        # If we move job_description, we have to take care of existant job_description linked to siae B (destination),
+        # because we can't have 2 job_applications with the same Appellation for one siae. Job applications linked to
+        # these kind of job_description have to be unlinked to be transfered. Job_description can be different enough
+        # to be irrelevant.
+        if move_all_data:
+            # find Appellation linked to job_description siae B
+            to_siae_appellation_id = siaes_models.SiaeJobDescription.objects.filter(siae_id=to_id).values_list(
+                "appellation_id", flat=True
+            )
+
+            # find job_applications in siae A, linked with job_description which Appellation is found in siae B
+            job_applications_to_clear = job_applications_models.JobApplication.objects.filter(
+                to_siae_id=from_id,
+                selected_jobs__in=siaes_models.SiaeJobDescription.objects.filter(
+                    siae_id=from_id, appellation_id__in=to_siae_appellation_id
+                ),
+            )
+
+            # clean job_applications to let them be transfered in siae B
+            for job_application in job_applications_to_clear:
+                job_application.selected_jobs.clear()
+
         job_applications_sent.update(sender_siae_id=to_id)
         job_applications_received.update(to_siae_id=to_id)
 
         if move_all_data:
-            job_descriptions.update(siae_id=to_id)
+            # do not move duplicated job_descriptions
+            job_descriptions.exclude(appellation_id__in=to_siae_appellation_id).update(siae_id=to_id)
             members.update(siae_id=to_id)
             diagnoses.update(author_siae_id=to_id)
             prolongations.update(declared_by_siae_id=to_id)
