@@ -171,7 +171,7 @@ def stats_dreets(request, template_name=_STATS_HTML_TEMPLATE):
 
 
 @login_required
-def stats_dgefp(request, template_name=_STATS_HTML_TEMPLATE):
+def stats_dgefp_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
     They can view all data and filter by region and/or department.
