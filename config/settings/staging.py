@@ -20,7 +20,7 @@ DATABASES = {
 ITOU_ENVIRONMENT = "STAGING"
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = "staging.emplois.inclusion.beta.gouv.fr"
-ITOU_EMAIL_CONTACT = "contact+staging@inclusion.beta.gouv.fr"
+ITOU_EMAIL_CONTACT = "assistance+staging@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+staging@inclusion.beta.gouv.fr"
 
 sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
