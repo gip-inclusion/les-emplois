@@ -11,7 +11,7 @@ L'objectif est de suivre par année l'évolution du nombre d'ETP conventionnés 
 with constantes as 
 ( 
     select 
-        max(date_part('year',af_date_debut_effet_v2)) as annee_en_cours
+        max(date_part('year', af_date_debut_effet_v2)) as annee_en_cours
     from 
         "fluxIAE_AnnexeFinanciere_v2"
 )
@@ -36,6 +36,6 @@ from
         on af.af_id_structure = s.structure_id_siae  
  where          
     af.af_etat_annexe_financiere_code in ('VALIDE', 'PROVISOIRE')
-    and date_part('year',af.af_date_debut_effet_v2) >= annee_en_cours-2
+    and date_part('year', af.af_date_debut_effet_v2) >= annee_en_cours - 2
     and af_mesure_dispositif_code not like '%MP%' 
     and af_mesure_dispositif_code not like '%FDI%'
