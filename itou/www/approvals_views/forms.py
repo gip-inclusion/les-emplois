@@ -109,12 +109,22 @@ class SuspensionForm(forms.ModelForm):
     Suspension.clean() will handle the validation.
     """
 
+    set_default_end_date = forms.BooleanField(
+        required=False,
+        label="Je ne connais pas la date de fin de la suspension.",
+        help_text=f"La Plateforme indiquera {Suspension.MAX_DURATION_MONTHS} mois par défaut.",
+    )
+
     def __init__(self, *args, **kwargs):
         self.approval = kwargs.pop("approval")
         self.siae = kwargs.pop("siae")
         super().__init__(*args, **kwargs)
         # Show new reasons but keep old ones for history.
         self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
+
+        # End date is not strictly required because it can be set
+        # with `set_default_end_date` input
+        self.fields["end_at"].required = False
 
         today = timezone.now().date()
         if self.instance.pk:
@@ -140,6 +150,7 @@ class SuspensionForm(forms.ModelForm):
             # Order is important for the template.
             "start_at",
             "end_at",
+            "set_default_end_date",
             "reason",
             "reason_explanation",
         ]
@@ -186,6 +197,16 @@ class SuspensionForm(forms.ModelForm):
             )
 
         return start_at
+
+    def clean(self):
+        set_default_end_date = self.cleaned_data["set_default_end_date"]
+
+        # If the end date of the suspension is not known,
+        # it is set to `start_date` + 12 months.
+        # If `set_default_end_date` is not checked, `end_at` field is required.
+        # See Suspension model clean/validation.
+        if set_default_end_date:
+            self.cleaned_data["end_at"] = Suspension.get_max_end_at(self.cleaned_data["start_at"])
 
 
 class PoleEmploiApprovalSearchForm(forms.Form):
