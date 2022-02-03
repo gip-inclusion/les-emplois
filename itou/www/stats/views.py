@@ -107,7 +107,7 @@ def stats_ddets_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
     They can only view data for their own departement.
-    This dashboard shows an overview of their data.
+    This dashboard shows data about IAE in general.
     """
     current_institution = get_current_institution_or_404(request)
     if not request.user.can_view_stats_ddets(current_org=current_institution):
@@ -152,6 +152,7 @@ def stats_dreets_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DREETS ("Directions régionales de l’économie, de l’emploi, du travail et des solidarités") stats shown to
     relevant members. They can only view data for their own region and can filter by department.
+    This dashboard shows data about IAE in general.
     """
     current_institution = get_current_institution_or_404(request)
     if not request.user.can_view_stats_dreets(current_org=current_institution):
@@ -175,6 +176,7 @@ def stats_dgefp_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
     They can view all data and filter by region and/or department.
+    This dashboard shows data about IAE in general.
     """
     current_institution = get_current_institution_or_404(request)
     if not request.user.can_view_stats_dgefp(current_org=current_institution):
@@ -186,6 +188,24 @@ def stats_dgefp_iae(request, template_name=_STATS_HTML_TEMPLATE):
     context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": "Données des régions",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def stats_dgefp_af(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
+    They can view all data and filter by region and/or department.
+    This dashboard shows data about financial annexes ("af").
+    """
+    current_institution = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_dgefp(current_org=current_institution):
+        raise PermissionDenied
+    context = {
+        "iframeurl": metabase_embedded_url(request=request),
+        "page_title": "Annexes financières actives",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)

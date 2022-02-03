@@ -455,13 +455,16 @@
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
                             <a href="{% url 'stats:stats_dreets_iae' %}">Données IAE</a>
-                            <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
                     {% if can_view_stats_dgefp %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
                             <a href="{% url 'stats:stats_dgefp_iae' %}">Données IAE</a>
+                        </p>
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="activity" %}
+                            <a href="{% url 'stats:stats_dgefp_af' %}">Annexes financières actives</a>
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
