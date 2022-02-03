@@ -20,7 +20,7 @@ DATABASES = {
 ITOU_ENVIRONMENT = "DEMO"
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = "demo.emplois.inclusion.beta.gouv.fr"
-ITOU_EMAIL_CONTACT = "contact+demo@inclusion.beta.gouv.fr"
+ITOU_EMAIL_CONTACT = "assistance+demo@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+demo@inclusion.beta.gouv.fr"
 
 sentry_init(dsn=os.environ["SENTRY_DSN_DEMO"])
