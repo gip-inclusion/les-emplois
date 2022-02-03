@@ -148,7 +148,7 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
 
 
 @login_required
-def stats_dreets(request, template_name=_STATS_HTML_TEMPLATE):
+def stats_dreets_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DREETS ("Directions régionales de l’économie, de l’emploi, du travail et des solidarités") stats shown to
     relevant members. They can only view data for their own region and can filter by department.
