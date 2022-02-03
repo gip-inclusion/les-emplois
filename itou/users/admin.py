@@ -11,6 +11,7 @@ from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
 from itou.users.admin_forms import UserAdminForm
+from itou.utils.admin import SupportRemarkInline
 
 
 class SiaeMembershipInline(admin.TabularInline):
@@ -155,6 +156,7 @@ class ItouUserAdmin(UserAdmin):
         SiaeMembershipInline,
         PrescriberMembershipInline,
         InstitutionMembershipInline,
+        SupportRemarkInline,
     ]
     list_display = (
         "pk",
@@ -339,6 +341,8 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+    inlines = (SupportRemarkInline,)
 
     def username(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
