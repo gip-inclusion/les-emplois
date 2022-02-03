@@ -453,7 +453,7 @@ MIGRATION_MODULES = {
 ITOU_ENVIRONMENT = "PROD"
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = "emplois.inclusion.beta.gouv.fr"
-ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
+ITOU_EMAIL_CONTACT = "assistance@inclusion.beta.gouv.fr"
 ITOU_EMAIL_PROLONGATION = "prolongation@inclusion.beta.gouv.fr"
 ITOU_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/emplois"
 
