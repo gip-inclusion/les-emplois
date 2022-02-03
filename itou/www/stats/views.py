@@ -103,7 +103,7 @@ def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
 
 
 @login_required
-def stats_ddets_overview(request, template_name=_STATS_HTML_TEMPLATE):
+def stats_ddets_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
     They can only view data for their own departement.
