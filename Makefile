@@ -2,7 +2,7 @@
 # =============================================================================
 PYTHON_VERSION := python3.9
 
-.PHONY: run clean cdsitepackages quality style
+.PHONY: run clean cdsitepackages quality
 
 # Run Docker images
 run:
