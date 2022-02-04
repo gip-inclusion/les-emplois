@@ -30,10 +30,10 @@
         {% elif not siae.block_job_applications %}
             <div class="text-with-btn">
                 <span>Cette structure vous intéresse ?</span>
-                <div class="btn-group btn-group-sm float-right" role="group" aria-label="Postuler">
+                <div class="btn-group btn-group-sm float-right" role="group">
                     <a class="btn btn-primary"
                         href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                        aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                        title="Proposer votre candidature auprès de l'employeur solidaire {{ siae.display_name }}">
                         Proposer votre candidature
                     </a>
                 </div>

@@ -11,11 +11,11 @@
 {% if approval.is_pass_iae %}
     <p class="text-center">
         {% if approval.is_pass_iae and approval.is_suspended %}
-            <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" alt="Logo PASS IAE">
+            <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" alt="Logo du PASS IAE">
             <br>
             <span class="badge badge-warning">PASS IAE suspendu</span>
         {% else %}
-            <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo PASS IAE">
+            <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo du PASS IAE">
         {% endif %}
     </p>
 {% endif %}
