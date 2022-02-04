@@ -43,7 +43,7 @@
                     {% if siae.website %}
                         <p>
                             {% include "includes/icon.html" with icon="external-link" title="Site Internet" %}
-                            <a href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
+                            <a href="{{ siae.website }}" rel="noopener" target="_blank" title="{{ siae.website }} (ouverture dans un nouvel onglet)">{{ siae.website }}</a>
                         </p>
                     {% endif %}
 

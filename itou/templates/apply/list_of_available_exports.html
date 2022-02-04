@@ -39,6 +39,7 @@
                                 data-matomo-category="candidatures"
                                 data-matomo-action="exports"
                                 data-matomo-option="export-siae"
+                                title="Télécharger cet export SIAE"
                                 href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                 {% include "includes/icon.html" with icon="download" %} Télécharger
                             </a>
@@ -48,6 +49,7 @@
                                 data-matomo-category="candidatures"
                                 data-matomo-action="exports"
                                 data-matomo-option="export-prescripteur"
+                                title="Télécharger cet export prescriteur"
                                 href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                 {% include "includes/icon.html" with icon="download" %} Télécharger
                             </a>

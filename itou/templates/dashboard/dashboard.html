@@ -11,7 +11,7 @@
             <p>Tous les salariés déclarés auprès de l'ASP avant le 1er décembre ont été ajoutés au tableau de bord de la SIAE porteuse de l’annexe financière. Nous travaillons à vous permettre de les transférer dans le tableau de bord d’une structure fille.</p>
             <p>Pour les salariés qui ne seraient plus en poste, il vous est demandé de procéder à une suspension d’un an au motif « contrat de travail terminé ». Dans la mesure où ces salariés sont connus dans l’Extranet IAE 2.0 de l'ASP, ces PASS IAE ne peuvent pas être annulés.</p>
             <p>Pour les salariés entrés en parcours avant le 1er décembre 2021 qui n’auraient pas été déclarés dans l’Extranet avant le 1er décembre 2021, vous devez procéder à une déclaration d’éligibilité sur la plateforme de l’inclusion.</p>
-            <p>Pour toute question liée à un cas individuel, <a href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/#support" rel="noopener" target="_blank" class="is-external" aria-label="Ouverture dans un nouvel onglet">une assistance est disponible ici {% include "includes/icon.html" with icon="external-link" %}</a>.</p>
+            <p>Pour toute question liée à un cas individuel, <a href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/#support" rel="noopener" target="_blank" class="is-external" title="Une assistance est disponible ici (ouverture dans un nouvel onglet)">une assistance est disponible ici {% include "includes/icon.html" with icon="external-link" %}</a>.</p>
         </div>
     {% endif %}
 
@@ -33,7 +33,7 @@
                     Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name|title }} {{ admin.last_name|title }}) pour qu'il ou elle indique une autre adresse
                 {% endwith %}
             {% endif %}
-            ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">contactez-nous</a> en cas de problème.
+            ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
         </div>
     {% endif %}
 
@@ -50,7 +50,7 @@
                     Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name|title }} {{ admin.last_name|title }}) pour qu'il ou elle indique une autre adresse
                 {% endwith %}
             {% endif %}
-            ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">contactez-nous</a> en cas de problème.
+            ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
         </div>
     {% endif %}
 
@@ -79,7 +79,7 @@
             {% if current_prescriber_organization.has_pending_authorization_proof %}
                 <p>
                     Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
-                    <a href="{{ TYPEFORM_URL }}/to/mk0GyI67#idprescriber={{ current_prescriber_organization.pk }}&iduser={{ user.pk }}&source={{ ITOU_ENVIRONMENT }}" rel="noopener" target="_blank">
+                    <a href="{{ TYPEFORM_URL }}/to/mk0GyI67#idprescriber={{ current_prescriber_organization.pk }}&iduser={{ user.pk }}&source={{ ITOU_ENVIRONMENT }}" rel="noopener" target="_blank" title="Cliquez ici pour l'envoyer (ouverture dans un nouvel onglet)">
                         cliquez ici pour l'envoyer
                         {% include "includes/icon.html" with icon="external-link" %}
                     </a>
@@ -113,7 +113,7 @@
                     Bénéficiez des bonnes pratiques et actualités de la 1ère communauté des professionnels de l'inclusion !
                 </p>
                 <p class="mb-0">
-                    <a href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" class="btn btn-primary">
+                    <a href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" class="btn btn-primary" title="Partagez et découvrez les outils qui facilitent votre quotidien (ouverture dans un nouvel onglet)">
                         Partagez et découvrez les outils qui facilitent votre quotidien
                         {% include "includes/icon.html" with icon="external-link" %}
                     </a>
@@ -253,7 +253,7 @@
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="award" %}
                                 <span>
-                                    {{ current_prescriber_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
+                                    {{ current_prescriber_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank" title="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
                                 </span>
                             </p>
                         {% endif %}
@@ -383,7 +383,7 @@
                             {% include "includes/icon.html" with icon="book-open" %}
                             <a
                                 href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
-                                target="_blank">
+                                target="_blank" title="Liste des critères d'éligibilité (ouverture dans un nouvel onglet)">
                                     Liste des critères d'éligibilité
                             </a>
                         </p>
@@ -423,7 +423,7 @@
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="activity" %}
-                        <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                        <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" title="Accéder au Pilotage de l'inclusion (ouverture dans un nouvel onglet)">
                             Accéder au Pilotage de l'inclusion
                         </a>
                     </p>

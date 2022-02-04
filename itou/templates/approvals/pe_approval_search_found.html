@@ -53,10 +53,10 @@
             </p>
         </div>
         <p>
-            S'il s'agit d'un nouveau contrat, vous pouvez solliciter <a href="{% url 'search:prescribers_home' %}">un prescripteur habilité</a> pour qu'il puisse vous orienter le candidat.
+            S'il s'agit d'un nouveau contrat, vous pouvez solliciter <a href="{% url 'search:prescribers_home' %}" title="Solliciter un prescripteur habilité">un prescripteur habilité</a> pour qu'il puisse vous orienter le candidat.
         </p>
         <p>
-            Si le salarié travaille actuellement dans votre structure, <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">contactez-nous {% include "includes/icon.html" with icon="external-link" %}</a>.
+            Si le salarié travaille actuellement dans votre structure, <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" title="Contactez-nous (ouverture dans un nouvel onglet)">contactez-nous {% include "includes/icon.html" with icon="external-link" %}</a>.
         </p>
         <a class="btn btn-primary" href="{{ back_url }}">Nouvelle recherche</a>
     {% endif %}
