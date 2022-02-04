@@ -22,6 +22,6 @@
     style="vertical-align: text-top;"
     aria-hidden="true"
 >
-    {% if title %}<title>{{ title }}</title>{% endif %}
     <use xlink:href="{% static 'icons/feather-sprite.svg' %}#{{ icon }}"></use>
 </svg>
+{% if title %}<span class="sr-only">{{ title }}</span>{% endif %}
