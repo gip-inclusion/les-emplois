@@ -12,15 +12,16 @@
 {% block script %}
     {{ block.super }}
     <script>
-    $("#search-filter-form :input").change(function() {
-        $("#search-form").submit();
-    });
-    // If the Filtres button is present, the associated card shoud be collapsed on display.
-    if ($("#js-search-filter-button").is(":visible")) {
-        // The button should be always visible now (on windows resize)
-        $("#js-search-filter-button").removeClass("d-md-none");
-        $('#search-filter-form').collapse();
-    }
+        $("#search-filter-form :input").change(function() {
+            $("#search-form").submit();
+        });
+        // If the Filtres button is present, the associated card shoud be collapsed on display.
+        if ($("#js-search-filter-button").is(":visible")) {
+            // The button should be always visible now (on windows resize)
+            $("#js-search-filter-button").removeClass("d-md-none");
+            $('#search-filter-form').collapse();
+        }
+        $("#siae-number-results").focus();
     </script>
 {% endblock %}
 
@@ -32,7 +33,7 @@
 
         {% if form.is_valid %}
             <h3 class="h2">
-                Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
+                Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
             </h3>
         {% endif %}
 
@@ -42,7 +43,7 @@
             </small>
         </p>
 
-        <p class="font-weight-bold text-muted mb-0">
+        <p class="font-weight-bold text-muted mb-0 h3" id="siae-number-results">
             {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages and siaes_page.paginator.count as counter %}
                 <b>{{ counter }}</b> résultat{% if counter > 1 %}s{% endif %}
                 {% if siaes_page.paginator.num_pages > 1 %}
