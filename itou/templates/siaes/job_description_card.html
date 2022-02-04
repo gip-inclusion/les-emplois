@@ -61,7 +61,7 @@
                         {% if job.is_active and not siae.block_job_applications %}
                             <a class="btn btn-primary"
                                 href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}&{% if back_url %}back_url={{ back_url }}{% endif %}"
-                                aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                title="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                 Postuler
                             </a>
                         {% endif %}
