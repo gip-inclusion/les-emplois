@@ -611,12 +611,16 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         """
         Returns True if EmployeeRecord does not exit and can be created
         """
-        is_application_valid = JobApplication.objects.filter(
-            pk=self.pk,
-            hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
-            approval_manually_refused_at__isnull=True,
-            hiring_without_approval=False,
-        ).accepted()
+        # is_application_valid = JobApplication.objects.filter(
+        #    pk=self.pk,
+        # return self.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
+
+        is_application_valid = (
+            self.hiring_start_at >= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
+            and self.approval_manually_refused_at is None
+            and not self.hiring_without_approval
+            and self.state == JobApplicationWorkflow.STATE_ACCEPTED
+        )
 
         has_employee_record = self.employee_record.filter(
             approval_number=self.approval.number,
@@ -624,10 +628,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             job_application__job_seeker=self.job_seeker,
         )
 
-        if is_application_valid and not has_employee_record:
-            return True
-
-        return False
+        return is_application_valid and not has_employee_record
 
     def get_eligibility_diagnosis(self):
         """
