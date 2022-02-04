@@ -7,15 +7,14 @@
 {% endcomment %}
 {% if page.display_pager %}
     {% with request.get_full_path as url %}
-        <nav aria-label="Pagination">
+        <nav role="navigation" aria-label="Pagination">
             {# Pagination is not responsive by default https://github.com/twbs/bootstrap/issues/23504 #}
             <ul class="pagination flex-wrap justify-content-center">
-
                 {# First page. #}
                 {% if page.number == 1 %}
                     <li class="page-item disabled">
-                        <span class="page-link">Premier</span>
-                    </li>
+                        <a class="page-link" aria-disabled="true" tabindex="-1" href="{% url_add_query url page=1 %}">Premier</a>
+                    </li>                    
                 {% else %}
                     <li class="page-item">
                         <a class="page-link" href="{% url_add_query url page=1 %}">Premier</a>
@@ -25,15 +24,12 @@
                 {# Pages. #}
                 {% for i in page.pages_to_display %}
                     {% if page.number == i %}
-                        <li class="page-item active" aria-current="page">
-                            <span class="page-link">
-                                {{ page.number }}
-                                <span class="sr-only">(actuel)</span>
-                            </span>
-                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" aria-label="Page {{ i }}" aria-current="page" href="{% url_add_query url page=i %}">{{ i }}</a>
+                        </li>                        
                     {% else %}
                         <li class="page-item">
-                            <a class="page-link" href="{% url_add_query url page=i %}">{{ i }}</a>
+                            <a class="page-link" aria-label="Page {{ i }}" href="{% url_add_query url page=i %}">{{ i }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}
@@ -41,15 +37,14 @@
                 {# Last page. #}
                 {% if page.number == page.paginator.num_pages %}
                     <li class="page-item disabled">
-                        <span class="page-link">Dernier</span>
+                        <a class="page-link" aria-disabled="true" tabindex="-1" href="{% url_add_query url page=page.paginator.num_pages %}">Dernier</a>
                     </li>
                 {% else %}
                     <li class="page-item">
                         <a class="page-link" href="{% url_add_query url page=page.paginator.num_pages %}">Dernier</a>
                     </li>
                 {% endif %}
-
             </ul>
-        </nav>
+        </nav>     
     {% endwith %}
 {% endif %}
