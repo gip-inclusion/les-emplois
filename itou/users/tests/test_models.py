@@ -2,6 +2,7 @@ import datetime
 import uuid
 from unittest import mock
 
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
@@ -203,6 +204,30 @@ class ModelTest(TestCase):
         self.assertTrue(user.last_hire_was_made_by_siae(siae))
         siae2 = SiaeFactory()
         self.assertFalse(user.last_hire_was_made_by_siae(siae2))
+
+    def test_last_accepted_job_application(self):
+        # Set 2 job applications with:
+        # - different hiring date
+        # - same creation date
+        # `last_accepted_job_application` is the one with the greater `hiring_start_at`
+        now = timezone.now()
+        job_application_1 = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            created_at=now,
+            hiring_start_at=now + relativedelta(days=1),
+        )
+
+        user = job_application_1.job_seeker
+
+        job_application_2 = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            created_at=now,
+            job_seeker=user,
+            hiring_start_at=now,
+        )
+
+        self.assertEqual(job_application_1, user.last_accepted_job_application)
+        self.assertNotEqual(job_application_2, user.last_accepted_job_application)
 
     def test_valid_birth_place_and_country(self):
         """
