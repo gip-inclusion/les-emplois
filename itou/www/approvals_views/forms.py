@@ -201,14 +201,15 @@ class SuspensionForm(forms.ModelForm):
     def clean(self):
         super().clean()
 
-        set_default_end_date = self.cleaned_data["set_default_end_date"]
+        set_default_end_date = self.cleaned_data.get("set_default_end_date")
+        start_at = self.cleaned_data.get("start_at")
 
         # If the end date of the suspension is not known,
         # it is set to `start_date` + 12 months.
         # If `set_default_end_date` is not checked, `end_at` field is required.
         # See Suspension model clean/validation.
-        if set_default_end_date:
-            self.cleaned_data["end_at"] = Suspension.get_max_end_at(self.cleaned_data["start_at"])
+        if set_default_end_date and start_at:
+            self.cleaned_data["end_at"] = Suspension.get_max_end_at(start_at)
 
 
 class PoleEmploiApprovalSearchForm(forms.Form):
