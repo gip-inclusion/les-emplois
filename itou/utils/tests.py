@@ -17,6 +17,7 @@ from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import escape
 from factory import Faker
 from faker import Faker as fk
 
@@ -979,3 +980,7 @@ class SupportRemarkAdminViewsTest(TestCase):
         # Is the remark created ?
         remark = SupportRemark.objects.filter(content_type=suspension_content_type, object_id=suspension.pk).first()
         self.assertEqual(remark.remark, fake_remark)
+
+        # Is the remark displayed in admin change form ?
+        response = self.client.get(url)
+        self.assertContains(response, escape(fake_remark))
