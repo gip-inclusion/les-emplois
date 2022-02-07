@@ -948,6 +948,8 @@ class SupportRemarkAdminViewsTest(TestCase):
         permission = Permission.objects.get(content_type=suspension_content_type, codename="change_suspension")
         user.user_permissions.add(permission)
         remark_content_type = ContentType.objects.get_for_model(SupportRemark)
+        permission = Permission.objects.get(content_type=remark_content_type, codename="view_supportremark")
+        user.user_permissions.add(permission)
         permission = Permission.objects.get(content_type=remark_content_type, codename="add_supportremark")
         user.user_permissions.add(permission)
 
