@@ -1,7 +1,6 @@
 from unittest.mock import PropertyMock, patch
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
 
@@ -108,5 +107,5 @@ class TestDownloadApprovalAsPDF(TestCase):
         siae_member = job_application.to_siae.members.first()
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
-        with self.assertRaises(ObjectDoesNotExist):
+        with self.assertRaisesRegex(Exception, "had no eligibility diagnosis and also was not mass-imported"):
             self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))

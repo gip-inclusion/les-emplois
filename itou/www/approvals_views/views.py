@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import FileResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -47,13 +47,19 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     if not diagnosis and job_application.approval and job_application.approval.originates_from_itou:
         # On November 30th, 2021, AI were delivered a PASS IAE
         # without a diagnosis for all of their employees.
+        # We want to raise an error if the approval of the pass originates from our side, but
+        # is not from the AI stock, as it should not happen.
+        # We may have to add conditions there in case of new mass imports.
         if not job_application.approval.is_from_ai_stock:
             # Keep track of job applications without a proper eligibility diagnosis because
             # it shouldn't happen.
             # If this occurs too much we may have to change `can_download_approval_as_pdf()`
             # and investigate a lot more about what's going on.
             # See also migration `0035_link_diagnoses.py`.
-            raise ObjectDoesNotExist("Job application %s has no eligibility diagnosis." % job_application.pk)
+            raise Exception(
+                f"Job application={job_application.pk} comes from itou, "
+                "had no eligibility diagnosis and also was not mass-imported."
+            )
 
     # The PDFShift API can load styles only if it has the full URL.
     base_url = request.build_absolute_uri("/")[:-1]
