@@ -111,15 +111,20 @@ def get_creatable_conventions():
 
         is_active = does_siae_have_an_active_convention(siae)
 
-        assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
+        # assert makes script fail for all conventions if one siae already got its own convention
+        # log it instead
+        # assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
+        if not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists():
+            convention = SiaeConvention(
+                siret_signature=siret_signature,
+                kind=siae.kind,
+                is_active=is_active,
+                asp_id=asp_id,
+            )
+            creatable_conventions.append((convention, siae))
+        else:
+            print(f"get_creatable_conventions: SIAE {asp_id} (kind {siae.kind}) already have a convention")
 
-        convention = SiaeConvention(
-            siret_signature=siret_signature,
-            kind=siae.kind,
-            is_active=is_active,
-            asp_id=asp_id,
-        )
-        creatable_conventions.append((convention, siae))
     return creatable_conventions
 
 
