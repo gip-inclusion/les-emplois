@@ -71,7 +71,7 @@ ALLOW_POPULATING_METABASE = True
 # https://www.neilwithdata.com/django-sql-logging
 LOGGING.setdefault("filters", {}).setdefault("require_debug_true", {})["()"] = "django.utils.log.RequireDebugTrue"
 LOGGING.setdefault("loggers", {})["django.db.backends"] = {
-    "level": "DEBUG",
+    "level": os.getenv("SQL_LOG_LEVEL", "DEBUG"),
     "handlers": ["console"],
 }
 
