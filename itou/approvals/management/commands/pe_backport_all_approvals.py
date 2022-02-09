@@ -20,10 +20,6 @@ class Command(BaseCommand):
         )
 
     def backport_approvals_to_pole_emploi(self, dry_run: bool):
-        """
-        Pole emploi wants to be notified everyday of the valid approvals that start on this day
-        that they did not already receive
-        """
         # We want to send to pole emploi the valid approvals that have already been created
         today = timezone.now()
         approvals = Approval.objects.filter(start_at__lt=today).valid()
@@ -31,11 +27,15 @@ class Command(BaseCommand):
             self.stdout.write("DRY-RUN. NO NOTIFICATION WILL BE PERFORMED")
             self.stdout.write(f"{approvals.count()} valid approvals")
         else:
+            ##########################################################################################################
+            #
+            # The exact mechanism for this is not set. The goal is to notify PE of all the existing agrements we have.
+            #
+            ##########################################################################################################
+
             start_date_fr = timezone.now()
             self.stdout.write(f"Notifying Pole Emploi for {approvals.count()} valid approvals for day {start_date_fr}")
             print(approvals.count())
-            # for approval in approvals:
-            #     print(approval.id)
 
     def handle(self, dry_run=False, **options):
         self.backport_approvals_to_pole_emploi(dry_run)
