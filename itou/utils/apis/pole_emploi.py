@@ -1,9 +1,11 @@
 import logging
+import re
 from dataclasses import dataclass
 from typing import Optional
 
 import httpx
 from django.conf import settings
+from unidecode import unidecode
 
 from itou.siaes.models import Siae
 
@@ -92,10 +94,46 @@ class PoleEmploiMiseAJourPassIAEException(Exception):
         self.response_code = message
 
 
+def ensure_compatible_last_name(last_name):
+    """
+    D’après les specs de l’API PE non documentése concernant la recherche individu
+    simplifié, le NOM doit:
+     - être en majuscule
+     - sans accents (ils doivent être remplacés par l’équivalent non accentué)
+     - le tiret, l’espace et l’apostrophe sont acceptés dans les noms
+     - sa longueur est max 25 caractères
+    Ainsi, "Nôm^' Exémple{}$" devient "NOM EXEMPLE"
+    """
+    # remove accents, convert to uppercase
+    last_name = unidecode(last_name).upper()
+    # We get rid of all the incompatible characters
+    replaced = re.sub("[^A-Z-' ]", "", last_name)
+    # We finally keep a limited amount of letters
+    return replaced[:25]
+
+
+def ensure_compatible_first_name(first_name):
+    """
+    D’après les specs de l’API PE non documentése concernant la recherche individu
+    simplifié, le PRÉNOM  doit:
+     - être en majuscule
+     - sans accents (ils doivent être remplacés par l’équivalent non accentué)
+     - le tiret remplace les espaces. Apostrophe et espace sont interdits.
+     - sa longueur est max 13 caractères
+    Ainsi, "Nôm^' Exémple{}$" devient "NOM EXEMPLE"
+    """
+    # remove accents, convert to uppercase, replace spaces with dash
+    first_name = unidecode(first_name).upper().replace(" ", "-")
+    # We get rid of all the incompatible characters (including spaces)
+    replaced = re.sub("[^A-Z-]", "", first_name)
+    # We finally keep a limited amount of letters
+    return replaced[:13]
+
+
 class PoleEmploiIndividu:
     def __init__(self, first_name: str, last_name: str, birthdate, nir: str):
-        self.first_name = first_name.upper()
-        self.last_name = last_name.upper()
+        self.first_name = ensure_compatible_first_name(first_name)
+        self.last_name = ensure_compatible_last_name(last_name)
         self.birthdate = birthdate.strftime("%Y-%m-%d") if birthdate else ""
         self.nir = nir
 

@@ -720,6 +720,36 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertTrue(etablissement.is_head_office)
 
 
+class PoleEmploiIndividuTest(TestCase):
+    def test_name_conversion_for_special_characters(self):
+        individual = PoleEmploiIndividu(
+            "marie christine", "Bind n'qici ", datetime.date(1979, 6, 3), "152062441001270"
+        )
+        individual2 = PoleEmploiIndividu(
+            "marié%{-christine}", "Bind-n'qici ", datetime.date(1979, 6, 3), "152062441001270"
+        )
+        # After clarification from PE, names should be truncated, so here we are
+        self.assertEqual(individual.first_name, "MARIE-CHRISTI")
+        self.assertEqual(individual2.first_name, "MARIE-CHRISTI")
+        self.assertEqual(individual.last_name, "BIND N'QICI ")
+        self.assertEqual(individual2.last_name, "BIND-N'QICI ")
+
+    def test_name_conversion_for_accents(self):
+        """first name and last name should not have accents, because Pole Emploi'S API cannot handle them"""
+        individual = PoleEmploiIndividu("aéïèêë", "gh'îkñ", datetime.date(1979, 6, 3), "152062441001270")
+
+        self.assertEqual(individual.first_name, "AEIEEE")
+        self.assertEqual(individual.last_name, "GH'IKN")
+
+    def test_name_length(self):
+        """first name and last name have a maximum length (from PE’s API point of view)
+        and should be truncated if its not the case"""
+        individual = PoleEmploiIndividu("a" * 50, "b" * 50, datetime.date(1979, 6, 3), "152062441001270")
+
+        self.assertEqual(len(individual.first_name), 13)
+        self.assertEqual(len(individual.last_name), 25)
+
+
 class PoleEmploiTest(TestCase):
     """All the test cases around function recherche_individu_certifie_api and mise_a_jour_pass_iae"""
 
