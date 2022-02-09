@@ -235,10 +235,8 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
 
 
 @login_required
+@transaction.atomic
 def create_siae(request, template_name="siaes/create_siae.html"):
-    """
-    Create a new SIAE (Antenne in French).
-    """
     current_siae = get_current_siae_or_404(request)
     if not request.user.can_create_siae_antenna(parent_siae=current_siae):
         raise PermissionDenied
@@ -251,10 +249,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     )
 
     if request.method == "POST" and form.is_valid():
-        with transaction.atomic():
-            # The form creates multiple objects
-            siae = form.save(request)
-
+        siae = form.save()
         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
         return HttpResponseRedirect(reverse("dashboard:index"))
 
@@ -284,19 +279,16 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
 
 @login_required
 def members(request, template_name="siaes/members.html"):
-    """
-    List members of an SIAE.
-    """
     siae = get_current_siae_or_404(request)
     if not siae.is_active:
         raise PermissionDenied
 
-    members = siae.siaemembership_set.active().select_related("user").all().order_by("joined_at")
+    active_siae_members = siae.siaemembership_set.active().select_related("user").all().order_by("joined_at")
     pending_invitations = siae.invitations.pending()
 
     context = {
         "siae": siae,
-        "members": members,
+        "members": active_siae_members,
         "pending_invitations": pending_invitations,
     }
     return render(request, template_name, context)

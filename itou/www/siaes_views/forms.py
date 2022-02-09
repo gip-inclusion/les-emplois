@@ -9,10 +9,6 @@ from itou.utils.urls import get_external_link_markup
 
 
 class CreateSiaeForm(forms.ModelForm):
-    """
-    Create a new SIAE (Agence / Etablissement in French).
-    """
-
     def __init__(self, current_siae, current_user, *args, **kwargs):
         self.current_siae = current_siae
         self.current_user = current_user
@@ -82,15 +78,15 @@ class CreateSiaeForm(forms.ModelForm):
 
         return self.cleaned_data
 
-    def save(self, request):
+    def save(self, commit=False):
         siae = super().save(commit=False)
         siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
-        siae.created_by = request.user
+        siae.created_by = self.current_user
         siae.source = Siae.SOURCE_USER_CREATED
         siae.convention = self.current_siae.convention
         siae.save()
 
-        SiaeMembership.objects.create(siae=siae, is_admin=True, user=request.user)
+        SiaeMembership.objects.create(siae=siae, is_admin=True, user=self.current_user)
 
         return siae
 
@@ -194,13 +190,13 @@ class FinancialAnnexSelectForm(forms.Form):
         self.fields["financial_annexes"].label_from_instance = self.label_from_instance
 
     @staticmethod
-    def label_from_instance(self):
+    def label_from_instance(siae):
         """
         Display a custom value for the AF in the dropdown instead of the default af.__str__.
 
         From https://stackoverflow.com/questions/41969899/display-field-other-than-str
         """
-        return self.number_prefix_with_spaces
+        return siae.number_prefix_with_spaces
 
     financial_annexes = forms.ModelChoiceField(
         label="Numéro d'annexe financière sans son suffixe de type 'A1M1'",

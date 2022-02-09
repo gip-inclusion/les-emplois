@@ -1,3 +1,5 @@
+# pylint: disable=too-many-lines
+
 from unittest import mock
 
 from django.conf import settings
@@ -585,7 +587,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_cannot_create_siae_with_same_siret_and_different_kind(self, mock_call_ban_geocoding_api):
+    def test_cannot_create_siae_with_same_siret_and_different_kind(self, _mock_call_ban_geocoding_api):
         siae = SiaeWithMembershipFactory()
         siae.kind = Siae.KIND_ETTI
         siae.save()
@@ -617,7 +619,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_cannot_create_siae_with_same_siren_and_different_kind(self, mock_call_ban_geocoding_api):
+    def test_cannot_create_siae_with_same_siren_and_different_kind(self, _mock_call_ban_geocoding_api):
         siae = SiaeWithMembershipFactory()
         siae.kind = Siae.KIND_ETTI
         siae.save()
@@ -715,7 +717,7 @@ class CreateSiaeViewTest(TestCase):
 
 class EditSiaeViewTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_edit(self, mock_call_ban_geocoding_api):
+    def test_edit(self, _unused_mock):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
