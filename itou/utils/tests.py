@@ -51,7 +51,7 @@ from itou.utils.mocks.pole_emploi import (
     POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK,
     POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK,
 )
-from itou.utils.models import SupportRemark
+from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
@@ -947,10 +947,10 @@ class SupportRemarkAdminViewsTest(TestCase):
         suspension_content_type = ContentType.objects.get_for_model(Suspension)
         permission = Permission.objects.get(content_type=suspension_content_type, codename="change_suspension")
         user.user_permissions.add(permission)
-        remark_content_type = ContentType.objects.get_for_model(SupportRemark)
-        permission = Permission.objects.get(content_type=remark_content_type, codename="view_supportremark")
+        remark_content_type = ContentType.objects.get_for_model(PkSupportRemark)
+        permission = Permission.objects.get(content_type=remark_content_type, codename="view_pksupportremark")
         user.user_permissions.add(permission)
-        permission = Permission.objects.get(content_type=remark_content_type, codename="add_supportremark")
+        permission = Permission.objects.get(content_type=remark_content_type, codename="add_pksupportremark")
         user.user_permissions.add(permission)
 
         # With good perms.
@@ -966,21 +966,21 @@ class SupportRemarkAdminViewsTest(TestCase):
         # Compose manually dict for remark inlines fields because context doesn't provide it easily
         post_data.update(
             {
-                "utils-supportremark-content_type-object_id-TOTAL_FORMS": "1",
-                "utils-supportremark-content_type-object_id-INITIAL_FORMS": "0",
-                "utils-supportremark-content_type-object_id-MIN_NUM_FORMS": "0",
-                "utils-supportremark-content_type-object_id-MAX_NUM_FORMS": "1",
-                "utils-supportremark-content_type-object_id-0-remark": fake_remark,
-                "utils-supportremark-content_type-object_id-0-id": "",
-                "utils-supportremark-content_type-object_id-__prefix__-remark": "",
-                "utils-supportremark-content_type-object_id-__prefix__-id": "",
+                "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+                "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+                "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+                "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+                "utils-pksupportremark-content_type-object_id-0-remark": fake_remark,
+                "utils-pksupportremark-content_type-object_id-0-id": "",
+                "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+                "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
                 "_save": "Enregistrer",
             }
         )
         self.client.post(url, data=post_data)
 
         # Is the remark created ?
-        remark = SupportRemark.objects.filter(content_type=suspension_content_type, object_id=suspension.pk).first()
+        remark = PkSupportRemark.objects.filter(content_type=suspension_content_type, object_id=suspension.pk).first()
         self.assertEqual(remark.remark, fake_remark)
 
         # Is the remark displayed in admin change form ?

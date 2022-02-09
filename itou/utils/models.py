@@ -18,13 +18,22 @@ class DateRange(Func):
     output_field = DateRangeField()
 
 
-class SupportRemark(models.Model):
+class AbstractSupportRemark(models.Model):
     class Meta:
         verbose_name = "Commentaire du support"
+        abstract = True
 
     remark = models.TextField(verbose_name="Commentaire", blank=True)
 
     # Attachment to different model types
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    object_id = models.UUIDField()
     content_object = GenericForeignKey("content_type", "object_id")
+
+
+class PkSupportRemark(AbstractSupportRemark):
+    object_id = models.PositiveIntegerField()
+
+
+class UUIDSupportRemark(AbstractSupportRemark):
+    object_id = models.UUIDField()

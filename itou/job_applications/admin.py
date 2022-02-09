@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 
 from itou.job_applications import models
 from itou.job_applications.admin_forms import JobApplicationAdminForm
+from itou.utils.admin import UUIDSupportRemarkInline
 
 
 class TransitionLogInline(admin.TabularInline):
@@ -70,7 +71,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "approval_manually_refused_by",
         "approval_manually_refused_at",
     )
-    inlines = (JobsInline, TransitionLogInline)
+    inlines = (JobsInline, TransitionLogInline, UUIDSupportRemarkInline)
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
 
     def get_form(self, request, obj=None, **kwargs):

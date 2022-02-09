@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.siaes import models
 from itou.siaes.admin_forms import SiaeAdminForm
-from itou.utils.admin import SupportRemarkInline
+from itou.utils.admin import PkSupportRemarkInline
 
 
 class SiaeMembersInline(MembersInline):
@@ -122,7 +122,7 @@ class SiaeAdmin(OrganizationAdmin):
         ),
     )
     search_fields = ("pk", "siret", "name", "city", "department", "post_code", "address_line_1")
-    inlines = (SiaeMembersInline, JobsInline, SupportRemarkInline)
+    inlines = (SiaeMembersInline, JobsInline, PkSupportRemarkInline)
     formfield_overrides = {
         # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/forms-api/#widget-classes
         gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
@@ -213,7 +213,7 @@ class SiaeConvention(admin.ModelAdmin):
         ),
     )
     search_fields = ("pk", "siret_signature")
-    inlines = (FinancialAnnexesInline, SiaesInline, SupportRemarkInline)
+    inlines = (FinancialAnnexesInline, SiaesInline, PkSupportRemarkInline)
 
     def save_model(self, request, obj, form, change):
         if change:

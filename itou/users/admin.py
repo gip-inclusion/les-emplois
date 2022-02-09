@@ -12,7 +12,7 @@ from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
 from itou.users.admin_forms import UserAdminForm
-from itou.utils.admin import SupportRemarkInline
+from itou.utils.admin import PkSupportRemarkInline
 
 
 class SiaeMembershipInline(admin.TabularInline):
@@ -157,7 +157,7 @@ class ItouUserAdmin(UserAdmin):
         SiaeMembershipInline,
         PrescriberMembershipInline,
         InstitutionMembershipInline,
-        SupportRemarkInline,
+        PkSupportRemarkInline,
     ]
     list_display = (
         "pk",
@@ -343,7 +343,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
         ),
     )
 
-    inlines = (SupportRemarkInline,)
+    inlines = (PkSupportRemarkInline,)
 
     def username(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
@@ -356,7 +356,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
 
 
 class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
-    inlines = (SupportRemarkInline,)
+    inlines = (PkSupportRemarkInline,)
 
 
 admin.site.unregister(EmailAddress)
