@@ -199,6 +199,8 @@ class SuspensionForm(forms.ModelForm):
         return start_at
 
     def clean(self):
+        super().clean()
+
         set_default_end_date = self.cleaned_data["set_default_end_date"]
 
         # If the end date of the suspension is not known,
