@@ -1,11 +1,17 @@
 from allauth.account.views import LoginView
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.core.exceptions import PermissionDenied
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from itou.utils.urls import get_safe_url
 from itou.www.login.forms import ItouLoginForm
+
+
+def permission_denied(request):
+    # AllAuth default login page should never be accessed alone.
+    raise PermissionDenied
 
 
 class ItouLoginView(LoginView):
@@ -58,6 +64,3 @@ class ItouLoginView(LoginView):
         response = super(ItouLoginView, self).post(*args, **kwargs)
         response = self.inject_context_into_response(response, params=self.request.POST)
         return response
-
-
-login = ItouLoginView.as_view()
