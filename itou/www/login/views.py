@@ -2,6 +2,7 @@ from allauth.account.views import LoginView
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponsePermanentRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 
@@ -9,8 +10,18 @@ from itou.utils.urls import get_safe_url
 from itou.www.login.forms import ItouLoginForm
 
 
-def permission_denied(request):
-    # AllAuth default login page should never be accessed alone.
+def redirect_to_login_type(request):
+    """Historically, a generic login view was used to authenticate users.
+    The "account_type" URL parameter mapped to the correct user type.
+    We split them into multiple classes but we should handle old urls.
+    """
+    account_type = request.GET.get("account_type") or request.POST.get("account_type")
+    if account_type:
+        if account_type == "siae":
+            account_type = "siae_staff"
+        if account_type not in ["siae_staff", "prescriber", "job_seeker", "labor_inspector"]:
+            raise PermissionDenied
+        return HttpResponsePermanentRedirect(reverse(f"login:{account_type}"))
     raise PermissionDenied
 
 
