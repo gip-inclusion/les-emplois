@@ -609,7 +609,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def can_have_employee_record(self):
         """
-        Returns Boolean on EmployeeRecord does not exit and can be created
+        Check if EmployeeRecord does not exit and can be created for this JobApplication
         """
         is_application_valid = (
             self.hiring_start_at >= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
