@@ -53,6 +53,9 @@ class JobApplicationInline(admin.StackedInline):
             display = employee_record.get_status_display()
             return format_html(f"<a href='{url}'><b>{display} (ID : {employee_record.id})</b></a>")
 
+        elif obj.is_waiting_for_employee_record_creation and obj.to_siae.can_use_employee_record:
+            return "Fiche salarié en attente de creation"
+
         return "Pas de fiche salarié crée pour cette candidature"
 
 
