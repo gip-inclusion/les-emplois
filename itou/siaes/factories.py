@@ -3,7 +3,7 @@ import string
 import factory.fuzzy
 from django.utils import timezone
 
-from itou.common_apps.address.departments import DEPARTMENTS
+from itou.common_apps.address.departments import department_from_postcode
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
@@ -59,12 +59,12 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
     auth_email = factory.Faker("email", locale="fr_FR")
-    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     post_code = factory.Faker("postalcode")
     city = factory.Faker("city", locale="fr_FR")
     source = models.Siae.SOURCE_ASP
     convention = factory.SubFactory(SiaeConventionFactory)
+    department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
 
 
 class SiaeMembershipFactory(factory.django.DjangoModelFactory):
