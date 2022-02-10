@@ -261,7 +261,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
             email=user.email,
         )
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertIn(reverse("account_login"), response.wsgi_request.get_full_path())
+        self.assertIn(reverse("login:prescriber"), response.wsgi_request.get_full_path())
         self.assertFalse(invitation.accepted)
 
         response = self.client.post(

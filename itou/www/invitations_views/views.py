@@ -44,10 +44,10 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
     if invitation.can_be_accepted:
         user = User.objects.filter(email__iexact=invitation.email)
         if user:
-            # The user exists but he should log in first
-            next_step_url = "{url}?account_type={account_type}&next={redirect_to}".format(
-                url=reverse("account_login"),
-                account_type=invitation.SIGNIN_ACCOUNT_TYPE,
+            # The user exists but he should log in first.
+            login_url = reverse(f"login:{invitation.SIGNIN_ACCOUNT_TYPE}")
+            next_step_url = "{url}?next={redirect_to}".format(
+                url=login_url,
                 redirect_to=get_safe_url(request, "redirect_to"),
             )
             next_step = redirect(next_step_url)

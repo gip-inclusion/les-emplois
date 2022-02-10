@@ -35,7 +35,7 @@ class InvitationQuerySet(models.QuerySet):
 
 class InvitationAbstract(models.Model):
     # String representing the account type to use when logging in.
-    # f"reverse("account_login")?account_type={account_type}"
+    # reverse(f"login:{account_type}")
     SIGNIN_ACCOUNT_TYPE = ""
     EXPIRATION_DAYS = 14
     GUEST_TYPE_JOB_SEEKER = KIND_JOB_SEEKER
@@ -221,7 +221,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
 
 class SiaeStaffInvitation(InvitationAbstract):
-    SIGNIN_ACCOUNT_TYPE = "siae"
+    SIGNIN_ACCOUNT_TYPE = "siae_staff"
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Parrain ou marraine",
