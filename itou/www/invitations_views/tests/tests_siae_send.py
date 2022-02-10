@@ -79,7 +79,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         self.assertEqual(invitation.email, guest.email)
         self.assertEqual(invitation.sender, self.sender)
         self.assertEqual(invitation.siae, self.siae)
-        self.assertEqual(invitation.SIGNIN_ACCOUNT_TYPE, "siae")
+        self.assertEqual(invitation.SIGNIN_ACCOUNT_TYPE, "siae_staff")
 
     def test_send_invitation_to_not_employer(self):
         UserFactory(
