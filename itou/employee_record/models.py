@@ -127,6 +127,12 @@ class EmployeeRecord(models.Model):
         Self-explanatory on the meaning, however:
         - an E.R. can be modified until it is in the PROCESSED state
         - after that, the FS is "archived" and can't be used for further interaction
+
+        The new INCOHERENT status allows to track former valid employee records
+        that now have some disfunctional properties such as:
+        - non-existing approval (deletion in admin),
+        - deleted linked job_application.
+        An employee record marked as incoherent must not be used in any further processing.
         """
 
         NEW = "NEW", "Nouvelle"
@@ -134,7 +140,11 @@ class EmployeeRecord(models.Model):
         SENT = "SENT", "Envoyée"
         REJECTED = "REJECTED", "En erreur"
         PROCESSED = "PROCESSED", "Intégrée"
-        ARCHIVED = "ARCHIVED", "Archivée"
+        ARCHIVED = (
+            "ARCHIVED",
+            "Archivée",
+        )
+        INCOHERENT = "INCOHERENT", "Incohérente"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
