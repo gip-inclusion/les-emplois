@@ -13,6 +13,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.approvals.models import (
@@ -25,7 +26,13 @@ from itou.approvals.models import (
 )
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
-from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
+from itou.employee_record.factories import EmployeeRecordFactory
+from itou.employee_record.models import EmployeeRecord
+from itou.job_applications.factories import (
+    JobApplicationSentByJobSeekerFactory,
+    JobApplicationWithApprovalFactory,
+    JobApplicationWithoutApprovalFactory,
+)
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory, PrescriberOrganizationFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
@@ -983,6 +990,43 @@ class CustomApprovalAdminViewsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn(approval.number_with_spaces, email.body)
+
+    def test_employee_record_status(self):
+        # test employee record exists
+        job_application = JobApplicationWithApprovalFactory()
+        EmployeeRecordFactory(job_application=job_application)
+        employee_record_id = EmployeeRecord.objects.get(job_application_id=job_application.id).id
+        msg = JobApplicationInline.employee_record_status(self, job_application)
+        self.assertIn(f"<a href='/admin/employee_record/employeerecord/{employee_record_id}/change/'>", msg)
+
+        # test employee record creation is pending
+        today = datetime.date.today()
+        for siae_kind in Siae.ASP_EMPLOYEE_RECORD_KINDS:
+            eligible_siae = SiaeFactory(kind=siae_kind)
+            job_application = JobApplicationWithApprovalFactory(to_siae=eligible_siae, hiring_start_at=today)
+            self.assertIn(
+                "Fiche salarié en attente de creation",
+                JobApplicationInline.employee_record_status(self, job_application),
+            )
+
+        # test no employee record for this application
+        ## cannot have employee record
+        job_application = JobApplicationWithoutApprovalFactory()
+        self.assertIn(
+            "Pas de fiche salarié crée pour cette candidature",
+            JobApplicationInline.employee_record_status(self, job_application),
+        )
+
+        ## can_use_employee_record
+        for siae_kind in [
+            siae_kind for siae_kind, _ in Siae.KIND_CHOICES if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS
+        ]:
+            not_eligible_siae = SiaeFactory(kind=siae_kind)
+            job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
+            self.assertIn(
+                "Pas de fiche salarié crée pour cette candidature",
+                JobApplicationInline.employee_record_status(self, job_application),
+            )
 
 
 class SuspensionQuerySetTest(TestCase):
