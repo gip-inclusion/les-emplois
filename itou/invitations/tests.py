@@ -1,5 +1,5 @@
 from django.template.defaultfilters import capfirst
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import timezone
 
 from itou.invitations.factories import (
@@ -33,32 +33,32 @@ class SiaeStaffInvitationQuerySetTest(TestCase):
         self.assertNotIn(invitation4.pk, pending_invitations.values_list("pk", flat=True))
 
 
-class InvitationModelTest(TestCase):
+class InvitationModelTest(SimpleTestCase):
     def test_acceptance_link(self):
-        invitation = SentSiaeStaffInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory.build()
         self.assertIn(str(invitation.pk), invitation.acceptance_link)
 
         # Must be an absolute URL
         self.assertTrue(invitation.acceptance_link.startswith("http"))
 
     def has_expired(self):
-        invitation = ExpiredSiaeStaffInvitationFactory()
+        invitation = ExpiredSiaeStaffInvitationFactory.build()
         self.assertTrue(invitation.has_expired)
 
-        invitation = SentSiaeStaffInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory.build()
         self.assertFalse(invitation.has_expired)
 
     def test_can_be_accepted(self):
-        invitation = ExpiredSiaeStaffInvitationFactory()
+        invitation = ExpiredSiaeStaffInvitationFactory.build()
         self.assertFalse(invitation.can_be_accepted)
 
-        invitation = SiaeStaffInvitationFactory(sent_at=timezone.now())
+        invitation = SiaeStaffInvitationFactory.build(sent_at=timezone.now())
         self.assertFalse(invitation.can_be_accepted)
 
-        invitation = SentSiaeStaffInvitationFactory(accepted=True)
+        invitation = SentSiaeStaffInvitationFactory.build(accepted=True)
         self.assertFalse(invitation.can_be_accepted)
 
-        invitation = SentSiaeStaffInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory.build()
         self.assertTrue(invitation.can_be_accepted)
 
     def test_get_model_from_string(self):
@@ -72,9 +72,9 @@ class InvitationModelTest(TestCase):
             InvitationAbstract.get_model_from_string(12)
 
 
-class InvitationEmailsTest(TestCase):
+class InvitationEmailsTest(SimpleTestCase):
     def test_send_invitation(self):
-        invitation = SentSiaeStaffInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory.build()
         email = invitation.email_invitation
 
         # Subject
@@ -106,9 +106,9 @@ class TestPrescriberWithOrgInvitation(TestCase):
         self.assertEqual(org_members + 1, org_members_after)
 
 
-class TestPrescriberWithOrgInvitationEmails(TestCase):
+class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
     def test_accepted_notif_sender(self):
-        invitation = PrescriberWithOrgSentInvitationFactory()
+        invitation = PrescriberWithOrgSentInvitationFactory.build()
         email = invitation.email_accepted_notif_sender
 
         # Subject
@@ -125,7 +125,7 @@ class TestPrescriberWithOrgInvitationEmails(TestCase):
         self.assertIn(invitation.sender.email, email.to)
 
     def test_email_invitation(self):
-        invitation = PrescriberWithOrgSentInvitationFactory()
+        invitation = PrescriberWithOrgSentInvitationFactory.build()
         email = invitation.email_invitation
 
         # Subject
@@ -151,9 +151,9 @@ class TestSiaeInvitation(TestCase):
         self.assertEqual(siae_members + 1, siae_members_after)
 
 
-class TestSiaeInvitationEmails(TestCase):
+class TestSiaeInvitationEmails(SimpleTestCase):
     def test_accepted_notif_sender(self):
-        invitation = SentSiaeStaffInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory.build()
         email = invitation.email_accepted_notif_sender
 
         # Subject
@@ -170,7 +170,7 @@ class TestSiaeInvitationEmails(TestCase):
         self.assertIn(invitation.sender.email, email.to)
 
     def test_email_invitation(self):
-        invitation = SentSiaeStaffInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory.build()
         email = invitation.email_invitation
 
         # Subject
