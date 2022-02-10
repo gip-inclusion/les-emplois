@@ -618,7 +618,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             and self.approval.is_valid()
         )
 
-        return is_application_valid and not self.employee_record.get() and self.to_siae.can_use_employee_record
+        return is_application_valid and not self.employee_record.first() and self.to_siae.can_use_employee_record
 
     def get_eligibility_diagnosis(self):
         """
