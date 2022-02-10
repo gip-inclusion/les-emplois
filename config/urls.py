@@ -24,10 +24,8 @@ urlpatterns = [
     # --------------------------------------------------------------------------------------
     # Override allauth `account_login` URL.
     # /accounts/login/ <=> account_login
-    # We override this view because the login page should look slightly differently
-    # for job seekers, prescribers and employers.
-    # Also, PEAMU is only available for job seekers.
-    re_path(r"^accounts/login/$", login_views.login),
+    # Customized login pages per user type are handled by login.urls.
+    re_path(r"^accounts/login/$", login_views.permission_denied),
     # --------------------------------------------------------------------------------------
     # Override allauth `account_change_password` URL.
     # /accounts/password/change/ <=> account_change_password
