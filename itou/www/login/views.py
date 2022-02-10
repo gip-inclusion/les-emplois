@@ -64,3 +64,19 @@ class ItouLoginView(LoginView):
         response = super(ItouLoginView, self).post(*args, **kwargs)
         response = self.inject_context_into_response(response, params=self.request.POST)
         return response
+
+
+class PrescriberLoginView(ItouLoginView):
+    pass
+
+
+class SiaeStaffLoginView(ItouLoginView):
+    pass
+
+
+class LaborInspectorLoginView(ItouLoginView):
+    pass
+
+
+class JobSeekerLoginView(ItouLoginView):
+    pass
