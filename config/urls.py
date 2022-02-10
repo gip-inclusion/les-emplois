@@ -25,7 +25,7 @@ urlpatterns = [
     # Override allauth `account_login` URL.
     # /accounts/login/ <=> account_login
     # Customized login pages per user type are handled by login.urls.
-    re_path(r"^accounts/login/$", login_views.permission_denied),
+    re_path(r"^accounts/login/$", login_views.redirect_to_login_type),
     # --------------------------------------------------------------------------------------
     # Override allauth `account_change_password` URL.
     # /accounts/password/change/ <=> account_change_password
