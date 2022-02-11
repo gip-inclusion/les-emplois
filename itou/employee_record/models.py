@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 from itou.asp.models import EmployerType, PrescriberType, SiaeKind
@@ -81,6 +82,12 @@ class EmployeeRecordQuerySet(models.QuerySet):
     def processed_for_siae(self, siae):
         return self.processed().filter(job_application__to_siae=siae).select_related("job_application")
 
+    def incoherent(self):
+        return self.filter(status=EmployeeRecord.Status.INCOHERENT)
+
+    def incoherent_for_siae(self, siae):
+        return self.incoherent().filter(job_application__to_siae=siae).select_related("job_application")
+
     # Search queries
 
     def find_by_batch(self, filename, line_number):
@@ -94,6 +101,19 @@ class EmployeeRecordQuerySet(models.QuerySet):
         Fetch employee records in PROCESSED state for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
         """
         return self.processed().filter(processed_at__lte=timezone.now() - ARCHIVING_DELTA)
+
+    def find_incoherent(self):
+        """
+        Fetch incoherent employee records:
+        - must be in `PROCESSED` state.
+        - have at least one of job application, approval, job seeker profile missing.
+        Add more filter at convenience...
+        """
+        return self.processed().filter(
+            Q(job_application__isnull=True)
+            | Q(job_application__approval__isnull=True)
+            | Q(job_application__job_seeker__jobseeker_profile__isnull=True)
+        )
 
 
 class EmployeeRecord(models.Model):

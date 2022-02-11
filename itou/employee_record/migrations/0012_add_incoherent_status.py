@@ -6,13 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('employee_record', '0011_alter_employeerecord_asp_processing_label'),
+        ("employee_record", "0011_alter_employeerecord_asp_processing_label"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='employeerecord',
-            name='status',
-            field=models.CharField(choices=[('NEW', 'Nouvelle'), ('READY', 'Complétée'), ('SENT', 'Envoyée'), ('REJECTED', 'En erreur'), ('PROCESSED', 'Intégrée'), ('ARCHIVED', 'Archivée'), ('INCOHERENT', 'Incohérente')], default='NEW', max_length=10, verbose_name='Statut'),
+            model_name="employeerecord",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("NEW", "Nouvelle"),
+                    ("READY", "Complétée"),
+                    ("SENT", "Envoyée"),
+                    ("REJECTED", "En erreur"),
+                    ("PROCESSED", "Intégrée"),
+                    ("ARCHIVED", "Archivée"),
+                    ("INCOHERENT", "Incohérente"),
+                ],
+                default="NEW",
+                max_length=10,
+                verbose_name="Statut",
+            ),
         ),
     ]
