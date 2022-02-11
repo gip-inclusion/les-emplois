@@ -204,6 +204,10 @@ class SuspensionAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("created_at", "created_by", "updated_at", "updated_by")
     date_hierarchy = "start_at"
+    search_fields = (
+        "pk",
+        "approval__number",
+    )
 
     def is_in_progress(self, obj):
         return obj.is_in_progress
