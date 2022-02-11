@@ -677,8 +677,6 @@ class Suspension(models.Model):
         # Start at overrides to handle edge cases.
         if approval.last_old_suspension(pk_suspension):
             start_at = approval.last_old_suspension(pk_suspension).end_at + relativedelta(days=1)
-        elif approval.user.last_accepted_job_application.created_from_pe_approval:
-            start_at = referent_date
 
         if with_retroactivity_limitation:
             start_at_threshold = referent_date - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
