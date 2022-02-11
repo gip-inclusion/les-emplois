@@ -1131,6 +1131,23 @@ class SuspensionModelTest(TestCase):
             result = Suspension.Reason.displayed_choices_for_siae(siae)
             self.assertEqual(len(result), 4)
 
+    def test_next_min_start_date(self):
+        today = timezone.now()
+        start_at = today - relativedelta(days=10)
+
+        job_application_1 = JobApplicationWithApprovalFactory(hiring_start_at=today)
+        job_application_2 = JobApplicationWithApprovalFactory(hiring_start_at=start_at)
+        job_application_3 = JobApplicationWithApprovalFactory(hiring_start_at=start_at, created_from_pe_approval=True)
+
+        min_start_at = Suspension.next_min_start_at(job_application_1.approval)
+        self.assertEqual(min_start_at, today.date())
+
+        # Same rules apply for PE approval and PASS IAE
+        min_start_at = Suspension.next_min_start_at(job_application_2.approval)
+        self.assertEqual(min_start_at, start_at.date())
+        min_start_at = Suspension.next_min_start_at(job_application_3.approval)
+        self.assertEqual(min_start_at, start_at.date())
+
 
 class SuspensionModelTestTrigger(TestCase):
     """
