@@ -41,7 +41,7 @@ RUN set -ex; \
     rm -rf "$GNUPGHOME"; \
     apt-key list;
 
-ENV PG_MAJOR="12"
+ENV PG_MAJOR="14"
 
 # Add PostgreSQL's repository. It contains the most recent stable release.
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main $PG_MAJOR" > /etc/apt/sources.list.d/pgdg.list
