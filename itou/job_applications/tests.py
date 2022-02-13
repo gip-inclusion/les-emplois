@@ -38,7 +38,7 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
-from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.apis.pole_emploi import (
     POLE_EMPLOI_PASS_APPROVED,
@@ -1394,4 +1394,61 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
         self.assertEqual(
             notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
+        )
+
+
+class JobApplicationAdminFormTest(TestCase):
+    """
+    should it be moved to specific admin test file ?
+    should we mock SuperUser ?
+    """
+
+    def setUp(self):
+        self.user = JobSeekerFactory()
+        self.user.is_superuser = True
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+    def test_JobApplicationSentByJobSeeker(self):
+        """
+        Job Application sent by a JobSeeker
+        """
+        job_application = JobApplicationSentByJobSeekerFactory()
+        response = self.client.get(
+            reverse("admin:job_applications_jobapplication_change", kwargs={"object_id": str(job_application.id)})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_applications_sent_by_siae(self):
+        """
+        Job Application sent by a SIAE
+        """
+        job_application = JobApplicationSentBySiaeFactory()
+        self.display_job_application(job_application)
+        self.assertEqual(True, True)
+
+    def test_applications_sent_by_prescriber_without_organization(self):
+        """
+        Job Application sent by a prescriber not linked to an organization
+        """
+        job_application = JobApplicationSentByPrescriberFactory()
+        self.display_job_application(job_application)
+        self.assertEqual(True, True)
+
+    def test_applications_sent_by_prescriber_with_organization(self):
+        """
+        Job Application sent by a prescriber linked to an organization
+        """
+        job_application = JobApplicationSentByPrescriberOrganizationFactory()
+        self.display_job_application(job_application)
+        self.assertEqual(True, True)
+
+    def display_job_application(self, obj):
+        print(
+            f"id: {obj.id}\n\
+            state: {obj.state}\n\
+            to_siae: {obj.to_siae}\n\
+            sender_kind: {obj.sender_kind}\n\
+            sender.email: {obj.sender.email}\n\
+            sender_siae: {obj.sender_siae}\n\
+            sender_prescriber_organization: {obj.sender_prescriber_organization}"
         )
