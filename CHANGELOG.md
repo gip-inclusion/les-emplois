@@ -1,5 +1,37 @@
 # Journal des modifications
 
+## [36] - 2022-02-13
+
+### Ajouté
+
+- Ajout de la possibilité d’effectuer une recherche par email dans les logs d’erreurs
+- Ajout de contrôle dans le formulaire de suspension sur la date de départ des suspensions
+- Ajout d'une date de suspension de PASS IAE par défaut
+- Ajout de nouvelles stats pour la DGEFP : stats annexes financières, stats contrôle a posteriori.
+- Ajout du NIR, NIA ou NTT dans les agréments Pole Emploi
+- Ajout de contrôles de cohérence sur la reprise de candidatures via l'interface admin
+
+### Modifié 
+
+- Modification de la cohérence de la date de départ des suspensions
+- Modification du contrôle de la dernière embauche pour les suspensions
+- Modification du niveau de logs par défaut de l'application
+- Permettre le téléchargement des pass IAE dans les environnement de validation et de démonstration
+- Mise à jour de l'adresse email de contact
+- Montée de version du framework Django suite à une mise à jour de sécurité
+- Petites améliorations de la documentation, du script de déploiement, et du `Makefile`
+- Réactivation du téléchargement des PASS IAE
+- Enrichissement des logs du traitement de migration des données d'une SIAE
+- Montée de version du moteur de base de données
+- Mise à jour du script des annexes financières pour 2022
+- Mise à jour du script qui alimente le suivi de la consommation des ETP
+- Mise à jour du lien retour dans la fiche candidature pour conserver les filtres de recherche
+- Mise à jour du thème de l'application pour préparer les corrections liées à l'audit d'accessibilité 
+
+### Supprimé 
+
+- Suppression d'un message d'information en double dans le tableau de bord
+
 ## [35] - 2022-02-01
 
 ### Ajouté
