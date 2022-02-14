@@ -11,11 +11,9 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
 
         handler = logging.StreamHandler(self.stdout)
-
         self.logger = logging.getLogger(__name__)
         self.logger.propagate = False
         self.logger.addHandler(handler)
-
         self.logger.setLevel(logging.INFO)
 
     def add_arguments(self, parser):
@@ -61,7 +59,7 @@ class Command(BaseCommand):
         self.logger.info(f"Updated {nb_flagged} incoherent employee record(s).")
         self.logger.info("Done!")
 
-    def handle(self, *args, **options):
+    def handle(self, *_, **options):
         self.update = bool(options.get("update"))
 
         # Always display info

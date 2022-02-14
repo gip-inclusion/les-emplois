@@ -1,6 +1,7 @@
 import json
+import os
 from datetime import date, timedelta
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.conf import settings
 from django.core import management
@@ -9,6 +10,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from itou.employee_record.factories import EmployeeRecordFactory
+from itou.employee_record.management.commands import check_employee_records_coherence
 from itou.employee_record.mocks.transfer_employee_records import (
     SFTPBadConnectionMock,
     SFTPConnectionMock,
@@ -536,3 +538,42 @@ class JobApplicationConstraintsTest(TestCase):
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         self.employee_record.update_as_accepted(process_code, process_message, "{}")
         self.assertFalse(self.job_application.can_be_cancelled)
+
+
+@skipIf(os.getenv("CI"), "Log issue to be fixed on Github actions.")
+class CheckCoherenceManagementCommandTest(TestCase):
+    """
+    Check execution of `check_employee_records_coherence` management command.
+    """
+
+    def test_info_without_incoherence(self):
+        self.assertEqual(0, EmployeeRecord.objects.incoherent().count())
+
+        with self.assertLogs(check_employee_records_coherence.__name__) as log:
+            management.call_command("check_employee_records_coherence")
+            self.assertIn("### Processed employee records summary ###", log.output[0])
+            self.assertIn("Did not find any new incoherent employee record. Good job, James!", log.output[-1])
+
+    def test_info_with_incoherence(self):
+        # Create incoherent employee record
+        EmployeeRecordFactory(job_application=None, status=EmployeeRecord.Status.PROCESSED)
+
+        self.assertEqual(0, EmployeeRecord.objects.incoherent().count())
+        self.assertNotEqual(0, EmployeeRecord.objects.find_incoherent().count())
+
+        with self.assertLogs(check_employee_records_coherence.__name__) as log:
+            management.call_command("check_employee_records_coherence")
+            self.assertIn("### Processed employee records summary ###", log.output[0])
+            self.assertIn("Update them as incoherent with `--update` option.", log.output[4])
+
+    def test_update_option(self):
+        # Create incoherent employee record
+        EmployeeRecordFactory(job_application=None, status=EmployeeRecord.Status.PROCESSED)
+        self.assertEqual(0, EmployeeRecord.objects.incoherent().count())
+
+        with self.assertLogs(check_employee_records_coherence.__name__) as log:
+            management.call_command("check_employee_records_coherence", update=True)
+            self.assertIn("### Processed employee records summary ###", log.output[0])
+            self.assertIn("### Updating incoherent employee records status ###", log.output[4])
+
+        self.assertNotEqual(0, EmployeeRecord.objects.incoherent().count())
