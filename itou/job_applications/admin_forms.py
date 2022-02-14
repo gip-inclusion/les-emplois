@@ -43,6 +43,9 @@ class JobApplicationAdminForm(forms.ModelForm):
                 # to be checked with support team
                 raise ValidationError("Emetteur prescripteur manquant.")
         elif sender_prescriber_organization is not None:
+            # this part cannot be executed. catched by previous test on sender_kind
+            # as long as sender_kind can only be SENDER_KIND_JOB_SEEKER,
+            # SENDER_KIND_SIAE_STAFF or SENDER_KIND_PRESCRIBER (see models.py)
             raise ValidationError("Organisation du prescripteur émettrice inattendue.")
 
         return
