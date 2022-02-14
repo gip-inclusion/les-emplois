@@ -1408,11 +1408,14 @@ class JobApplicationAdminFormTest(TestCase):
     def setUp(self):
         self.job_seeker = JobSeekerFactory()
         self.siae = SiaeFactory()
-
-    #    self.user = UserFactory()
-    #    self.user.is_superuser = True
-    #    self.client.force_login(self.user)
-    #    self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.job_application_sent_by_seeker = model_to_dict(JobApplicationSentByJobSeekerFactory())
+        self.job_application_sent_by_siae = model_to_dict(JobApplicationSentBySiaeFactory())
+        self.job_applications_sent_by_prescriber_with_organization = model_to_dict(
+            JobApplicationSentByPrescriberOrganizationFactory()
+        )
+        self.job_applications_sent_by_prescriber_without_organization = model_to_dict(
+            JobApplicationSentByPrescriberFactory()
+        )
 
     def test_JobApplicationAdminForm(self):
         """
@@ -1427,48 +1430,121 @@ class JobApplicationAdminFormTest(TestCase):
         self.assertIn("state", form.fields)
         self.assertIn("created_at", form.fields)
 
-    # def test_loggin_to_JobApplicationAdminForm(self):
-    #    """
-    #    Log into Job Application Admin Form
-    #    """
-    #    url = reverse("admin:job_applications_jobapplication_add")
-    #    response = self.client.get(url)
-    #    self.assertEqual(response.status_code, 200)
+        # tester job_seeker obligatioir
+        # tester SIAE destinataire obligatoire
 
     def test_JobApplicationSentByJobSeeker(self):
         """
         Job Application sent by a JobSeeker
         """
 
-        data = model_to_dict(JobApplicationSentByJobSeekerFactory())
-        form = JobApplicationAdminForm(data)
-        self.assertTrue(form.is_valid())
-
+        data = self.job_application_sent_by_seeker.copy()
         data["sender"] = None
         form = JobApplicationAdminForm(data)
         self.assertFalse(form.is_valid())
         self.assertIn("Emetteur candidat manquant.", form.errors["__all__"])
 
-        data = model_to_dict(JobApplicationSentByJobSeekerFactory())
+        data = self.job_application_sent_by_seeker.copy()
         data["sender_kind"] = JobApplication.SENDER_KIND_PRESCRIBER
         form = JobApplicationAdminForm(data)
         self.assertFalse(form.is_valid())
         self.assertIn("Emetteur du mauvais type.", form.errors["__all__"])
 
+        data = self.job_application_sent_by_seeker.copy()
+        form = JobApplicationAdminForm(data)
+        self.assertTrue(form.is_valid())
+
     def test_applications_sent_by_siae(self):
         """
         Job Application sent by a SIAE
         """
-        self.assertEqual(True, True)
+        data = self.job_application_sent_by_siae.copy()
+        data["sender_siae"] = None
+        form = JobApplicationAdminForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("SIAE émettrice manquante.", form.errors["__all__"])
 
-    def test_applications_sent_by_prescriber_without_organization(self):
-        """
-        Job Application sent by a prescriber not linked to an organization
-        """
-        self.assertEqual(True, True)
+        data = self.job_application_sent_by_siae.copy()
+        data["sender"] = self.job_application_sent_by_seeker["sender"]
+        form = JobApplicationAdminForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Emetteur du mauvais type.", form.errors["__all__"])
+
+        data = self.job_application_sent_by_siae.copy()
+        data["sender_kind"] = JobApplication.SENDER_KIND_PRESCRIBER
+        form = JobApplicationAdminForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("SIAE émettrice inattendue.", form.errors["__all__"])
+
+        data = self.job_application_sent_by_siae.copy()
+        data["sender"] = None
+        form = JobApplicationAdminForm(data)
+        self.assertTrue(form.is_valid())
+
+        data = self.job_application_sent_by_siae.copy()
+        form = JobApplicationAdminForm(data)
+        self.assertTrue(form.is_valid())
 
     def test_applications_sent_by_prescriber_with_organization(self):
         """
         Job Application sent by a prescriber linked to an organization
         """
-        self.assertEqual(True, True)
+        data = self.job_applications_sent_by_prescriber_with_organization.copy()
+        data["sender"] = self.job_application_sent_by_seeker["sender"]
+        form = JobApplicationAdminForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Emetteur du mauvais type.", form.errors["__all__"])
+
+        data = self.job_applications_sent_by_prescriber_with_organization.copy()
+        data["sender_prescriber_organization"] = None
+        form = JobApplicationAdminForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Organisation du prescripteur émettrice manquante.", form.errors["__all__"])
+
+        # test on new part of code, which have to be checked with support
+        data = self.job_applications_sent_by_prescriber_with_organization.copy()
+        data["sender"] = None
+        form = JobApplicationAdminForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Emetteur prescripteur manquant.", form.errors["__all__"])
+
+        """
+        `elif sender_prescriber_organization is not None` can't be executed
+        edge cas catched by previous test on sender_kind
+        """
+        # data = self.job_applications_sent_by_prescriber_with_organization.copy()
+        # data["sender_kind"] = JobApplication.SENDER_KIND_JOB_SEEKER
+        # form = JobApplicationAdminForm(data)
+        # self.assertFalse(form.is_valid())
+        # self.assertIn("Organisation du prescripteur émettrice inattendue.", form.errors["__all__"])
+
+        data = self.job_applications_sent_by_prescriber_with_organization.copy()
+        form = JobApplicationAdminForm(data)
+        self.assertTrue(form.is_valid())
+
+    def test_applications_sent_by_prescriber_without_organization(self):
+        """
+        Job Application sent by a prescriber not linked to an organization
+        """
+
+        data = self.job_applications_sent_by_prescriber_without_organization.copy()
+        data["sender"] = self.job_application_sent_by_seeker["sender"]
+        form = JobApplicationAdminForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Emetteur du mauvais type.", form.errors["__all__"])
+
+        data = self.job_applications_sent_by_prescriber_without_organization.copy()
+        data["sender"] = None
+        form = JobApplicationAdminForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Emetteur prescripteur manquant.", form.errors["__all__"])
+
+        data = self.job_applications_sent_by_prescriber_without_organization.copy()
+        form = JobApplicationAdminForm(data)
+        self.assertTrue(form.is_valid())
+
+        # explicit redundant test
+        data = self.job_applications_sent_by_prescriber_without_organization.copy()
+        data["sender_prescriber_organization"] = None
+        form = JobApplicationAdminForm(data)
+        self.assertTrue(form.is_valid())
