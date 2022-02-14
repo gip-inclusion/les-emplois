@@ -39,6 +39,9 @@ class JobApplicationAdminForm(forms.ModelForm):
                 # Request organization only if prescriber is linked to organization
                 if sender.is_prescriber_with_org and sender_prescriber_organization is None:
                     raise ValidationError("Organisation du prescripteur émettrice manquante.")
+            else:
+                # to be checked with support team
+                raise ValidationError("Emetteur prescripteur manquant.")
         elif sender_prescriber_organization is not None:
             raise ValidationError("Organisation du prescripteur émettrice inattendue.")
 
