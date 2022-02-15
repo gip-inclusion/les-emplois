@@ -14,14 +14,17 @@
     {% endfor %}
     {% if user.is_prescriber or user.is_siae_staff %}
         <li class="list-group-item border-0 ml-md-auto p-0">
-            <span class="btn btn-outline-primary">
-                {% include "includes/icon.html" with icon="download" %}
-                {% if user.is_prescriber %}
-                    <a href="{% url 'apply:list_for_prescriber_exports' %}" class="text-decoration-none">Exporter</a>
+            {% if user.is_prescriber %}
+            <a href="{% url 'apply:list_for_prescriber_exports' %}" class="btn btn-ico btn-outline-primary">
+                    {% include "includes/icon.html" with icon="download" %}
+                    <span>Exporter</span>
+                </a>
                 {% elif user.is_siae_staff %}
-                    <a href="{% url 'apply:list_for_siae_exports' %}" class="text-decoration-none">Exporter</a>
-                {% endif %}
-            </span>
+                <a href="{% url 'apply:list_for_siae_exports' %}" class="btn btn-ico btn-outline-primary">
+                    {% include "includes/icon.html" with icon="download" %}
+                    <span>Exporter</span>
+                </a>
+            {% endif %}
         </li>
     {% endif %}
 </ul>
