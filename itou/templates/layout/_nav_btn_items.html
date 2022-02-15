@@ -6,10 +6,11 @@
             class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle"
             data-toggle="dropdown"
             aria-haspopup="true"
-            aria-expanded="false" >
+            aria-controls="dashboardUserDropdown"
+            aria-expanded="false">
             Mon espace
         </button>
-        <div class="dropdown-menu dropdown-menu-left">
+        <div class="dropdown-menu dropdown-menu-left" id="dashboardUserDropdown">
             <div class="dropdown-item media">
                 {% include "includes/icon.html" with icon="user" size="40" class="mr-3 icon align-self-center" %}
                 <div class="media-body align-self-center text-wrap">
@@ -56,11 +57,11 @@
     </li>
 
     {% if user.is_siae_staff and user_siaes|length > 1 %}
-        <li  class="dropdown">
-            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+        <li class="dropdown">
+            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false" data-display="static">
                 Changer de structure
             </button>
-            <div class="dropdown-menu dropdown-menu-left">
+            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
                 <form action="{% url 'dashboard:switch_siae' %}" method="post">
                     {% csrf_token %}
                     {% for s in user_siaes %}
@@ -77,11 +78,11 @@
     {% endif %}
 
     {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
-        <li  class="dropdown">
-            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <li class="dropdown">
+            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
                 Changer de structure
             </button>
-            <div class="dropdown-menu dropdown-menu-left">
+            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
                 <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
                     {% csrf_token %}
                     {% for po in user_prescriberorganizations %}
@@ -99,10 +100,10 @@
 
     {% if user.is_labor_inspector and user_institutions|length > 1 %}
         <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchDropdown" aria-expanded="false">
+            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
                 Changer de structure
             </button>
-            <div class="dropdown-menu dropdown-menu-left" id="switchDropdown">
+            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
                 <form action="{% url 'dashboard:switch_institution' %}" method="post">
                     {% csrf_token %}
                     {% for i in user_institutions %}
@@ -120,10 +121,10 @@
 
 {% else %}
     <li class="dropdown mr-2">
-        <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginDropdown" aria-expanded="false">
+        <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
             S'inscrire | Se connecter
         </button>
-        <div class="dropdown-menu" id="loginDropdown">
+        <div class="dropdown-menu" id="loginUserDropdown">
             <a class="dropdown-item" href="{% url 'account_login' %}?account_type=job_seeker{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                 Candidat
             </a>
