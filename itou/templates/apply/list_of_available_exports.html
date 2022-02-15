@@ -20,6 +20,7 @@
 
         <div class="table-responsive">
             <table class="table table-striped table-bordered">
+                <caption>Liste de candidatures reçues</caption>
                 <thead>
                     <tr>
                         <th scope="col">Mois</th>
@@ -35,7 +36,7 @@
                         <td>
                         {% if export_for == "siae" %}
                             <a
-                                class="matomo-event"
+                                class="matomo-event text-decoration-none"
                                 data-matomo-category="candidatures"
                                 data-matomo-action="exports"
                                 data-matomo-option="export-siae"
@@ -45,7 +46,7 @@
                             </a>
                         {% else %}
                             <a
-                                class="matomo-event"
+                                class="matomo-event text-decoration-none"
                                 data-matomo-category="candidatures"
                                 data-matomo-action="exports"
                                 data-matomo-option="export-prescripteur"
