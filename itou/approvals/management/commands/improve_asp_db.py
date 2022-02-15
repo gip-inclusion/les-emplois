@@ -19,9 +19,57 @@ def get_worksheet_height(worksheet):
     return count
 
 
+def all_nirs_from_worksheet(worksheet, total):
+    return [worksheet[f"E{row}"].value for row in range(2, total)]
+
+
+def find_our_nirs(cursor, table_name="merged_approvals_poleemploiapproval"):
+    """Returns a set of all the nirs we have"""
+    # First we want to extract the NIRs for the pole emploi table
+    # This table separates NIR and NTT/NIA, we’ll merge them
+    search_sql = f"""select nir, ntt_nia from {table_name}"""
+
+    cursor.execute(search_sql)
+    res = cursor.fetchall()
+
+    nirs = [r[0] for r in res if r[0] is not None]
+    ntt_nia = [r[1] for r in res if r[1] is not None]
+    set_nirs = set(nirs)
+    set_ntt_nia = set(ntt_nia)
+    all_nirs_and_ntt_nia = set_ntt_nia | set_nirs
+
+    # We also include the NIRs from the user table
+    search_sql = "select nir from users_user"
+    cursor.execute(search_sql)
+    res = cursor.fetchall()
+
+    user_nirs = [r[0] for r in res if r[0] is not None]
+    all_nirs_and_ntt_nia |= set(user_nirs)
+
+    return all_nirs_and_ntt_nia
+
+
+def display_debug_count(worksheet, cursor):
+    """
+    Answers the question "how many NIRs from the excel sheet do we have in our database"
+    (the answer is 62%)
+    """
+    total = get_worksheet_height(worksheet)
+    nirs = all_nirs_from_worksheet(worksheet, total)
+
+    print("nombre de nirs distincts dans la feuille Excel:")
+
+    print(len(nirs))
+
+    table = "merged_approvals_poleemploiapproval"
+    print(f"Nombre de ces nirs trouvés chez nous via {table}:")
+    our_nirs = find_our_nirs(cursor, table)
+    print(len(set(nirs) & set(our_nirs)))
+
+
 class Command(BaseCommand):
     """
-    ./manage.py improve_asp_db --reset
+    ./manage.py improve_asp_db --debug --filename "exports/20220120_sans_doublons-small.xlsx"
     Complète le fichier de l'ASP (20220120_sans_doublons)
     avec les bonnes infos qui sont désormais chez nous.
     on re-remplit les colonnes de ce fichier :
@@ -33,8 +81,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--dry-run", dest="dry_run", action="store_true", help="Only print possible errors and stats"
+            "--filename",
+            dest="filename",
+            required=True,
+            action="store",
+            help="Absolute path of the XLSX file to import",
         )
+        parser.add_argument("--debug", dest="debug", action="store_true", help="Only print the NIR counts")
 
     def find_agrement_data_by_nir(self, nir):
         """
@@ -68,38 +121,41 @@ class Command(BaseCommand):
             except User.DoesNotExist:
                 raise ValueError("Nir non trouve")
 
-    def handle(self, dry_run=False, reset=False, **options):
-        self.dry_run = dry_run
+    def handle(self, filename, debug=False, **options):
+        self.debug = debug
         self.stdout.write("Merging approvals / PASS IAE")
         self.cursor = connection.cursor()
-        filename = "exports/20220120_sans_doublons.xlsx"
-        # filename = "exports/20220120_sans_doublons-small.xlsx"
+
         out = "exports/20220120_enrichi.xlsx"
 
         workbook = load_workbook(filename=filename)
         worksheet = workbook.active
-        total = get_worksheet_height(worksheet)
-        progressbar = tqdm(total=total)
-        for row in range(2, total):
-            numero_agrement_index = f"Y{row}"
-            date_debut_index = f"Z{row}"
-            date_fin_index = f"AA{row}"
 
-            try:
-                nir_index = f"E{row}"
-                nir = worksheet[nir_index].value
-                number, start_at, end_at = self.find_agrement_data_by_nir(nir)
+        if debug:
+            display_debug_count(worksheet, self.cursor)
+        else:
+            total = get_worksheet_height(worksheet)
+            progressbar = tqdm(total=total)
+            for row in range(2, total):
+                numero_agrement_index = f"Y{row}"
+                date_debut_index = f"Z{row}"
+                date_fin_index = f"AA{row}"
 
-                worksheet[numero_agrement_index] = number
-                worksheet[date_debut_index] = start_at
-                worksheet[date_fin_index] = end_at
+                try:
+                    nir_index = f"E{row}"
+                    nir = worksheet[nir_index].value
+                    number, start_at, end_at = self.find_agrement_data_by_nir(nir)
 
-            except ValueError:
-                worksheet[numero_agrement_index] = ""
-                worksheet[date_debut_index] = ""
-                worksheet[date_fin_index] = ""
+                    worksheet[numero_agrement_index] = number
+                    worksheet[date_debut_index] = start_at
+                    worksheet[date_fin_index] = end_at
 
-            progressbar.update(1)
+                except ValueError:
+                    worksheet[numero_agrement_index] = ""
+                    worksheet[date_debut_index] = ""
+                    worksheet[date_fin_index] = ""
 
-        workbook.save(out)
-        progressbar.close()
+                progressbar.update(1)
+
+            workbook.save(out)
+            progressbar.close()
