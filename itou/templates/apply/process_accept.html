@@ -50,9 +50,21 @@
                     <button type="submit" class="btn btn-success btn-block">
                         Oui, j'ai besoin d'une aide au poste
                     </button>
+                    {% comment %}
+## Contexte :
+les AI et les ETTI sont tenues de recruter des personnes dans le cadre de l’IAE,
+elles n’ont pas le droit de recruter des personnes en dehors du conventionnement.
+Aussi, il ne faudrait pas permettre aux AI et ETTI de recruter « sans PASS IAE ».
+## Solution boost
+**On retire le bouton “je n’ai pas besoin d’une aide au poste” pour toutes les SIAE .**
+On laisse le mécanisme au cas où il soit nécessaire e le remettre en
+place (notamment du fait de demande arrivant au support)
+                    {% endcomment%}
+                    {% comment%}
                     <button type="submit" name="without_approval" class="btn btn-outline-success btn-block">
                         Non, je n'ai pas besoin d'aide au poste
                     </button>
+                    {% endcomment %}
                 </div>
                 <div class="my-4 mx-5 justify-content-center">
                     <p class="text-center">
