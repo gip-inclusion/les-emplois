@@ -13,13 +13,13 @@
 
     {% if join_authorized_org and kind_label and not kind_is_other %}
         {# Display kind's full name if known. #}
-        <div class="alert alert-emploi pb-0" role="alert">
+        <div class="alert alert-emploi pb-0" role="status">
             <p class="lead">{{ kind_label }}</p>
         </div>
     {% endif %}
 
     {% if prescriber_org_data %}
-        <div class="alert alert-emploi pb-0" role="alert">
+        <div class="alert alert-emploi pb-0" role="status">
             <p>
                 <b>{{ prescriber_org_data.name }}</b> - {{ prescriber_org_data.siret|format_siret }}<br>
                 {% if prescriber_org_data.address_line_1 %}{{ prescriber_org_data.address_line_1 }}<br>{% endif %}

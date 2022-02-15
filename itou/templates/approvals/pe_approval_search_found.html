@@ -8,7 +8,7 @@
 
     {% if approval.is_valid %}
         {% if approval.originates_from_itou %}
-            <div class="alert alert-danger pb-0" role="alert">
+            <div class="alert alert-danger pb-0" role="status">
                 <p>Le numéro <strong>{{ approval.number|slice:12 }}</strong> correspond à un PASS IAE.</p>
             </div>
             <p>
@@ -23,7 +23,7 @@
                     A redirection is made upstream if the current SIAE can prolong or suspend it.
                     It means another SIAE is using it right now.
                 {% endcomment %}
-                <div class="alert alert-danger pb-0" role="alert">
+                <div class="alert alert-danger pb-0" role="status">
                     <p>L'agrément <strong>{{ approval.number|slice:12 }}</strong> a déjà été converti en PASS IAE.</p>
                 </div>
                 <p>
@@ -48,7 +48,7 @@
         {% endif %}
 
     {% else %}
-        <div class="alert alert-danger pb-0" role="alert">
+        <div class="alert alert-danger pb-0" role="status">
             <p>L'agrément <strong>{{ approval.number|slice:12 }}</strong> est expiré depuis le {{ approval.end_at|date:"d/m/Y" }}. Vous ne pouvez pas le prolonger ou le suspendre.
             </p>
         </div>
