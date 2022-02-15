@@ -6,6 +6,7 @@ SiaeConvention object logic used by the import_siae.py script is gathered here.
 from django.utils import timezone
 
 from itou.siaes.management.commands._import_siae.siae import does_siae_have_an_active_convention
+from itou.siaes.management.commands._import_siae.vue_af import INACTIVE_SIAE_LIST
 from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIRET_SIGNATURE, SIRET_TO_ASP_ID
 from itou.siaes.models import Siae, SiaeConvention
 
@@ -113,11 +114,25 @@ def get_creatable_conventions():
 
         assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
 
+        if is_active:
+            deactivated_at = None
+        else:
+            siae_key = (asp_id, siae.kind)
+            convention_end_date_list = list(filter(lambda x: siae_key in x, INACTIVE_SIAE_LIST))
+            if convention_end_date_list:
+                _, convention_end_date = convention_end_date_list[0]
+            else:
+                raise ValueError(
+                    f"SIAE: {siae_key} is not active, but no convention_end_date found in INACTIVE_SIAE_LIST"
+                )
+            deactivated_at = convention_end_date
+
         convention = SiaeConvention(
             siret_signature=siret_signature,
             kind=siae.kind,
             is_active=is_active,
             asp_id=asp_id,
+            deactivated_at=deactivated_at,
         )
         creatable_conventions.append((convention, siae))
     return creatable_conventions

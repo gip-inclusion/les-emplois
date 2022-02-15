@@ -168,3 +168,9 @@ ACTIVE_SIAE_KEYS = [
     for siae_key, convention_end_date in get_siae_key_to_convention_end_date().items()
     if timezone.now() < timezone.make_aware(convention_end_date)
 ]
+
+INACTIVE_SIAE_LIST = [
+    (siae_key, convention_end_date)
+    for siae_key, convention_end_date in get_siae_key_to_convention_end_date().items()
+    if siae_key not in ACTIVE_SIAE_KEYS
+]
