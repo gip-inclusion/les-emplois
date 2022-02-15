@@ -115,7 +115,7 @@
     {% elif expired_eligibility_diagnosis %}
         <hr>
         <h3 class="h2 font-weight-normal text-muted">Éligibilité IAE</h3>
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning" role="status">
             Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, 
             vous devez valider les critères d'éligibilité.
         </div>

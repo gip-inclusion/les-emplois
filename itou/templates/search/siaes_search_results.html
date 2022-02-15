@@ -43,7 +43,7 @@
             </small>
         </p>
 
-        <p class="font-weight-bold text-muted mb-0 h3" id="siae-number-results">
+        <p class="font-weight-bold text-muted mb-0 h3" id="siae-number-results" role="status">
             {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages and siaes_page.paginator.count as counter %}
                 <b>{{ counter }}</b> résultat{% if counter > 1 %}s{% endif %}
                 {% if siaes_page.paginator.num_pages > 1 %}

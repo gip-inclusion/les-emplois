@@ -99,10 +99,10 @@
 
     {% if user.is_labor_inspector and user_institutions|length > 1 %}
         <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchDropdown" aria-expanded="false">
                 Changer de structure
             </button>
-            <div class="dropdown-menu dropdown-menu-left">
+            <div class="dropdown-menu dropdown-menu-left" id="switchDropdown">
                 <form action="{% url 'dashboard:switch_institution' %}" method="post">
                     {% csrf_token %}
                     {% for i in user_institutions %}
@@ -120,10 +120,10 @@
 
 {% else %}
     <li class="dropdown mr-2">
-        <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginDropdown" aria-expanded="false">
             S'inscrire | Se connecter
         </button>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu" id="loginDropdown">
             <a class="dropdown-item" href="{% url 'account_login' %}?account_type=job_seeker{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                 Candidat
             </a>

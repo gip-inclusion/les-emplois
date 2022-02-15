@@ -7,7 +7,7 @@
 
     {# Alerte pour gérer les cas d'exception lors de l'importation des AI. #}
     {% if current_siae and current_siae.kind == current_siae.KIND_AI %}
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning">
             <p>Tous les salariés déclarés auprès de l'ASP avant le 1er décembre ont été ajoutés au tableau de bord de la SIAE porteuse de l’annexe financière. Nous travaillons à vous permettre de les transférer dans le tableau de bord d’une structure fille.</p>
             <p>Pour les salariés qui ne seraient plus en poste, il vous est demandé de procéder à une suspension d’un an au motif « contrat de travail terminé ». Dans la mesure où ces salariés sont connus dans l’Extranet IAE 2.0 de l'ASP, ces PASS IAE ne peuvent pas être annulés.</p>
             <p>Pour les salariés entrés en parcours avant le 1er décembre 2021 qui n’auraient pas été déclarés dans l’Extranet avant le 1er décembre 2021, vous devez procéder à une déclaration d’éligibilité sur la plateforme de l’inclusion.</p>
@@ -16,14 +16,14 @@
     {% endif %}
 
     {% if current_siae and not current_siae.jobs.exists %}
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning">
             Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
         </div>
     {% endif %}
 
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
     {% if current_siae and not current_siae.has_reliable_coords %}
-        <div class="alert alert-warning mb-0" role="alert">
+        <div class="alert alert-warning mb-0" role="status">
             Nous n'avons pas pu géolocaliser votre établissement.<br>
             Cela peut affecter sa position dans les résultats de recherche.<br>
             {% if user_is_siae_admin %}
@@ -40,7 +40,7 @@
     {# Alerte pour les prescripteurs en cas d'absence ou de mauvais score de geocoding. #}
     {# Seuls les prescripteurs habilités apparaissent dans le moteur de recherche. #}
     {% if current_prescriber_organization and current_prescriber_organization.is_authorized and not current_prescriber_organization.has_reliable_coords %}
-        <div class="alert alert-warning mb-0" role="alert">
+        <div class="alert alert-warning mb-0" role="status">
             Nous n'avons pas pu géolocaliser votre établissement.<br>
             Cela peut affecter sa position dans les résultats de recherche.<br>
             {% if user_is_prescriber_org_admin %}
@@ -55,7 +55,7 @@
     {% endif %}
 
     {% if current_siae and not current_siae.is_active %}
-        <div class="alert alert-warning mb-0" role="alert">
+        <div class="alert alert-warning mb-0" role="status">
             La DGEFP nous indique que votre structure {% if current_siae.siret %}(inscrite avec le numéro SIRET : {{ current_siae.siret }}) {% endif %}n'est plus conventionnée.<br>
             Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.<br>
             À compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.<br>
@@ -72,7 +72,7 @@
     {% endif %}
 
     {% if current_prescriber_organization and current_prescriber_organization.has_pending_authorization %}
-        <div class="alert alert-warning pb-0" role="alert">
+        <div class="alert alert-warning pb-0" role="status">
             <p>
                 Votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique est en cours de vérification par nos équipes. Vous ne pouvez pas encore réaliser le diagnostic d'éligibilité des candidats.
             </p>

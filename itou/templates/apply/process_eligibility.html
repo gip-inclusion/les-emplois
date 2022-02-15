@@ -32,7 +32,7 @@
         Si le candidat ne remplit pas les conditions administratives, <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite/derogation-criteres" target="_blank" rel="noreferrer noopener">orientez-le vers un prescripteur habilité</a>.
     </p>
 
-    <div class="alert alert-warning" role="alert">
+    <div class="alert alert-warning">
         <i>Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge.</i>
     </div>
 
@@ -43,7 +43,7 @@
     {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
     {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
 
-    <div class="alert alert-emploi" role="alert">
+    <div class="alert alert-emploi">
         <p>
             Si le candidat n'est pas éligible à l'insertion par l'activité économique, vous pouvez décliner sa candidature :
         </p>
