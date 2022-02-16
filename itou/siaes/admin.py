@@ -95,6 +95,7 @@ class SiaeAdmin(OrganizationAdmin):
                     "auth_email",
                     "website",
                     "description",
+                    "provided_support",
                     "source",
                     "convention",
                     "created_by",

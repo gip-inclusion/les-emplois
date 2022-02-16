@@ -244,6 +244,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     auth_email = models.EmailField(verbose_name="E-mail d'authentification", blank=True)
     website = models.URLField(verbose_name="Site web", blank=True)
     description = models.TextField(verbose_name="Description", blank=True)
+    provided_support = models.TextField(verbose_name="Type d'accompagnement", blank=True)
 
     source = models.CharField(
         verbose_name="Source de données", max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
@@ -308,6 +309,10 @@ class Siae(AddressMixin, OrganizationAbstract):
         if self.brand:
             return self.brand
         return self.name.capitalize()
+
+    @property
+    def display_kind(self):
+        return dict(self.KIND_CHOICES)[self.kind]
 
     @property
     def is_active(self):

@@ -1,42 +1,72 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
+{% load static %}
+{% load theme_inclusion %}
 
 {% block title %}Modifier les coordonnées de votre structure{{ block.super }}{% endblock %}
 
+{% block breadcrumbs %}
+    {% include 'siaes/edit_siae_breadcrumb.html' %}
+{% endblock %}
+
 {% block content %}
 
-    <h1 class="h1-hero-c1">Modifier les coordonnées de votre structure</h1>
 
-    <h2 class="h1 text-muted">
-        {{ siae.display_name }}
-    </h2>
-    <p class="text-muted">
-        {% if siae.siret %}
-            SIRET : {{ siae.siret }}
-        {% endif %}
-    </p>
+    <div class="c-stepper my-3 my-lg-6">
+        <div class="progress progress--emploi">
+            <div class="progress-bar" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <p><strong>Étape 1</strong>/3 : Informations générales</p>
+    </div>
 
-    <form method="post" action="" class="js-prevent-multiple-submit">
-
-        <div class="alert alert-emploi">
-            <i>Laisser les champs vides pour ne rien afficher.</i>
+    <div class="bg-white d-block rounded-lg shadow-lg p-3 p-lg-5">
+        <div class="text-center">
+            <h1 class="h1-hero">
+                <img src="{% static 'img/edit_siae_header.svg' %}" alt="En-tête édition SIAE" style="width: 100px;">
+            </h1>
+            <h2 class="h1">Informations générales <br class="d-none d-lg-inline">de ma structure</h2>
         </div>
 
-        {% csrf_token %}
-        {% bootstrap_form_errors form type="all" %}
-        {% bootstrap_label "Nom à afficher" label_title="a" label_for=form.brand.id  %}
-        {% bootstrap_field form.brand show_label=False %}
+        <div class="card c-card c-card--emploi my-3 my-lg-5">
+            <div class="card-body">
+                <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.display_kind }} </p>
+                <hr>
+                <h2 class="h2">
+                    {{ siae.display_name }}
+                </h2>
+                <p class="text-muted">
+                    SIRET : {{ siae.siret | default:"-" }}
+                </p>
+            </div>
+        </div>
 
-        {% bootstrap_form form exclude="brand" %}
+        <form method="post" action="" class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            {% bootstrap_form_errors form type="all" %}
 
-        <p>
-            En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
-        </p>
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-        {% endbuttons %}
+            {% bootstrap_field form.brand %}
+            <hr>
+            {% bootstrap_field form.address_line_1 %}
+            {% bootstrap_field form.address_line_2 %}
+            <div class="form-row">
+                {% bootstrap_field form.post_code form_group_class='form-group col-md-3' %}
+                {% bootstrap_field form.city form_group_class='form-group col-md-9' %}
+            </div>
+            <hr>
+            {% bootstrap_field form.phone %}
+            {% bootstrap_field form.email %}
+            {% bootstrap_field form.website %}
 
-    </form>
+            <hr class="my-3 my-lg-5">
 
+            <div class="row mt-3 mt-lg-5 justify-content-end">
+                <div class="col-6 col-lg-auto">
+                    <a class="btn btn-link" title="Retourner au tableau de bord" href="{% url 'dashboard:index' %}">Retour</a>
+                </div>
+                <div class="col-6 col-lg-auto">
+                    <button type="submit" aria-label="Vers l'étape suivante du formulaire" class="btn float-right btn-primary">Suivant</button>
+                </div>
+            </div>
+        </form>
+    </div>
 {% endblock %}
