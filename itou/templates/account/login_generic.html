@@ -31,7 +31,6 @@
             </div>
         {% endif %}
 
-        {# TODO: update action URL #}
         <form method="post" action="{% url 'account_login' %}" class="js-prevent-multiple-submit">
 
             {% csrf_token %}
@@ -46,7 +45,7 @@
 
             {% bootstrap_field form.password form_group_class="form-group mb-1" %}
             <p class="text-right small font-italic">
-                <a href="{% url 'account_reset_password' %}">Mot de passe oublié ?</a>
+                <a href="{% url 'account_reset_password' %}">Mot de passe oublié ?</a>
             </p>
 
             <input type="hidden" id="account_type" name="account_type" value="{{ account_type }}">
@@ -79,6 +78,6 @@
     <!-- Hide left column on small devices. -->
     <div class="mt-5 d-none d-sm-block">
         <h2 class="h1 ff-extra-01 text-center">Bienvenue !</h2>
-        <img class="img-fluid mt-5" src="{% static 'img/login.svg' %}">
+        <img class="img-fluid mt-5" src="{% static 'img/login.svg' %}" alt="">
     </div>
 {% endblock %}
