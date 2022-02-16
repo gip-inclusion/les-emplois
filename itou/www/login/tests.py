@@ -11,16 +11,22 @@ from itou.users.factories import (
 
 
 class ItouLoginTest(TestCase):
-    def test_unauthorized_default_view(self):
-        # ItouLogin overrides AllAuth default login view.
-        # This parent class should be never be accessed directly.
-        # Each child represents a login type (one per user kind).
+    def test_generic_view(self):
+        # If a user type cannot be determined, don't prevent login.
+        # Just show a generic login form.
+        user = JobSeekerFactory()
         url = reverse("account_login")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)  # Forbidden
+        self.assertEqual(response.status_code, 200)
 
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)  # Forbidden
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = self.client.post(url, data=form_data)
+
+        # Redirect to email confirmation.
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
 
     def test_redirect_to_new_login_views(self):
         # If an "account_type" URL parameter is present,
@@ -44,7 +50,7 @@ class ItouLoginTest(TestCase):
         # Wrong kind.
         url = reverse("account_login") + "?account_type=hater"
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)  # Forbidden
+        self.assertEqual(response.status_code, 403)  # PermissionDenied
 
 
 class PrescriberLoginTest(TestCase):

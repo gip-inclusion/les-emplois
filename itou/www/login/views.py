@@ -10,22 +10,12 @@ from itou.utils.urls import get_safe_url
 from itou.www.login.forms import ItouLoginForm
 
 
-def redirect_to_login_type(request):
-    """Historically, a generic login view was used to authenticate users.
-    The "account_type" URL parameter mapped to the correct user type.
-    We split them into multiple classes but we should handle old urls.
-    """
-    account_type = request.GET.get("account_type") or request.POST.get("account_type")
-    if account_type:
-        if account_type == "siae":
-            account_type = "siae_staff"
-        if account_type not in ["siae_staff", "prescriber", "job_seeker", "labor_inspector"]:
-            raise PermissionDenied
-        return HttpResponsePermanentRedirect(reverse(f"login:{account_type}"))
-    raise PermissionDenied
-
-
 class ItouLoginView(LoginView):
+    """
+    Generic authentication entry point.
+    It redirects to a more precise login view when a user type can be determined.
+    """
+
     ACCOUNT_TYPE_TO_DISPLAY_NAME = {
         "job_seeker": "Candidat",
         "prescriber": "Prescripteur",
@@ -42,7 +32,7 @@ class ItouLoginView(LoginView):
     }
 
     form_class = ItouLoginForm
-    template_name = "account/login.html"
+    template_name = "account/login_generic.html"
 
     def inject_context_into_response(self, response, params):
         if isinstance(response, TemplateResponse):
@@ -66,12 +56,44 @@ class ItouLoginView(LoginView):
 
         return response
 
+    def redirect_to_login_type(self):
+        """
+        Historically, a generic login view was used to authenticate users.
+        The "account_type" URL parameter mapped to the correct user type.
+        We've split them into multiple classes but we should handle old urls.
+        """
+        account_type = self.request.GET.get("account_type") or self.request.POST.get("account_type")
+        if account_type:
+            if account_type == "siae":
+                account_type = "siae_staff"
+            if account_type not in ["siae_staff", "prescriber", "job_seeker", "labor_inspector"]:
+                raise PermissionDenied
+            return HttpResponsePermanentRedirect(reverse(f"login:{account_type}"))
+
     def get(self, *args, **kwargs):
+        """
+        If a user type cannot be found, display a generic form.
+        This should never happen except in one case:
+        when a user confirms its email after updating it.
+        Allauth magic is complicated to debug.
+        """
+        redirection = self.redirect_to_login_type()
+        if redirection:
+            return redirection
         response = super(ItouLoginView, self).get(*args, **kwargs)
         response = self.inject_context_into_response(response, params=self.request.GET)
         return response
 
     def post(self, *args, **kwargs):
+        """
+        If a user type cannot be found, display a generic form.
+        This should never happen except in one case:
+        when a user confirms its email after updating it.
+        Allauth magic is complicated to debug.
+        """
+        redirection = self.redirect_to_login_type()
+        if redirection:
+            return redirection
         response = super(ItouLoginView, self).post(*args, **kwargs)
         response = self.inject_context_into_response(response, params=self.request.POST)
         return response
