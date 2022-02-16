@@ -78,6 +78,62 @@
                                         </a>
                                     </div>
                                 </div>
+                                <div class="p-3 text-center">
+                                    <p class="card-text">{{ account.description }}</p>
+                                    <p class="m-auto card-text">{% include "includes/icon.html" with icon="map" title=title class="mr-1"%}{{ account.location }}</p>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="#" class="postLogin btn btn-link" data-email="{{ account.email }}" data-type="siae_staff" data-action-url="{{ account.action_url }}">
+                                        Utiliser ce compte
+                                    </a>
+                                </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="pb-5">
+                            <h4 class="h3 text-center pb-3">Candidat</h4>
+                            <div class="card-deck w-sm-33 m-auto">
+                                {% job_seekers_accounts_tag as job_seekers_accounts %}
+                                {% for account in job_seekers_accounts %}
+                                    <div class="card">
+                                        <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;" alt="">
+                                        <div class="card-body">
+                                            <h5 class="h5 card-title font-weight-bold text-center mb-0">{{ account.title }}</h5>
+                                            <p class="card-text">{{ account.description }}</p>
+                                        </div>
+                                        <div class="card-footer text-center">
+                                            <a href="#" class="postLogin btn btn-link" data-email="{{ account.email }}" data-type="job_seeker">
+                                                Utiliser ce compte
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-primary" data-dismiss="modal">Fermer</button>
+                    </div>
+
+                    <div class="pb-5">
+                        <h4 class="h3 text-center pb-3">Prescripteurs</h4>
+                        <div class="card-deck">
+                            {% prescribers_accounts_tag as prescribers_accounts %}
+                            {% for account in prescribers_accounts %}
+                                <div class="card">
+                                    <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:11rem;" alt="">
+                                    <div class="card-body">
+                                        <h5 class="h5 card-title h6 font-weight-bold text-center">{{ account.title|safe }}</h5>
+                                        <p class="card-text">{{ account.description }}</p>
+                                    </div>
+                                    <div class="card-footer text-center">
+                                        <a href="#" class="postLogin btn btn-link" data-email="{{ account.email }}" data-type="prescriber" data-action-url="{{ account.action_url }}">
+                                            Utiliser ce compte
+                                        </a>
+                                    </div>
+                                </div>
                             {% endfor %}
                         </div>
                     </div>
@@ -94,7 +150,7 @@
                                         <p class="card-text">{{ account.description }}</p>
                                     </div>
                                     <div class="card-footer text-center">
-                                        <a href="#" class="postLogin btn btn-link" data-email="{{ account.email }}" data-type="job_seeker">
+                                        <a href="#" class="postLogin btn btn-link" data-email="{{ account.email }}" data-type="job_seeker" data-action-url="{{ account.action_url }}">
                                             Utiliser ce compte
                                         </a>
                                     </div>
@@ -109,16 +165,15 @@
                 </div>
 
                 <div class="d-none">
-                    <form id="testAccountsForm" method="post" action="{% url 'account_login' %}">
+                    <!-- `action` is set by test_accounts.js based on clicked link's "data-action-url" attribute. -->
+                    <form id="testAccountsForm" method="post">
                         {% csrf_token %}
                         <input type="email" name="login">
                         <input type="password" name="password">
-                        <input type="hidden" name="account_type">
                     </form>
                 </div>
             </div>
         </div>
-    </div>
 
 
 {% endif %}
