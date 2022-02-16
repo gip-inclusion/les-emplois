@@ -1138,6 +1138,12 @@ class SuspensionModelTest(TestCase):
         job_application_1 = JobApplicationWithApprovalFactory(hiring_start_at=today)
         job_application_2 = JobApplicationWithApprovalFactory(hiring_start_at=start_at)
         job_application_3 = JobApplicationWithApprovalFactory(hiring_start_at=start_at, created_from_pe_approval=True)
+        job_application_4 = JobApplicationWithApprovalFactory(hiring_start_at=None, created_from_pe_approval=True)
+
+        # TODO: must be checked with PO
+        # - empty hiring start date
+        # - `with_retroactivity_limitation` set to `False`
+        # What should be the expected suspension mimimum start date ?
 
         min_start_at = Suspension.next_min_start_at(job_application_1.approval)
         self.assertEqual(min_start_at, today.date())
@@ -1147,6 +1153,12 @@ class SuspensionModelTest(TestCase):
         self.assertEqual(min_start_at, start_at.date())
         min_start_at = Suspension.next_min_start_at(job_application_3.approval)
         self.assertEqual(min_start_at, start_at.date())
+
+        # Fix a type error when creating a suspension:
+        min_start_at = Suspension.next_min_start_at(job_application_4.approval)
+        self.assertEqual(
+            min_start_at, today.date() - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
+        )
 
 
 class SuspensionModelTestTrigger(TestCase):
