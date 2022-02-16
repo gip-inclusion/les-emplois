@@ -219,7 +219,7 @@ class JobSeekerSignupTest(TestCase):
 
         # User cannot log in until confirmation.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
-        url = reverse("account_login")
+        url = reverse("login:job_seeker")
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("account_email_verification_sent"))

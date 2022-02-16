@@ -155,16 +155,24 @@
         <div class="dropdown-menu" id="loginUserDropdown">
             <ul class="list-unstyled">
                 <li>
-                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=job_seeker{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">Candidat</a>
+                    <a class="dropdown-item" href="{% url 'login:job_seeker' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                        Candidat
+                    </a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=prescriber{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">Prescripteur</a>
+                    <a class="dropdown-item" href="{% url 'login:prescriber' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                        Prescripteur
+                    </a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=siae{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">Employeur solidaire</a>
+                    <a class="dropdown-item" href="{% url 'login:siae_staff' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                        Employeur solidaire
+                    </a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=institution{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">Institution partenaire</a>
+                    <a class="dropdown-item" href="{% url 'login:labor_inspector' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                        Institution partenaire
+                    </a>
                 </li>
             </ul>
         </div>

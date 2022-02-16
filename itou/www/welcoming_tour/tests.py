@@ -23,24 +23,15 @@ class WelcomingTourTest(TestCase):
     def setUp(self):
         self.email = None
 
-    def tearDown(self):
-        self.client.logout()
-        response = self.client.post(
-            reverse("account_login"), follow=True, data={"login": self.email, "password": PASSWORD}
-        )
-        self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
-        self.assertContains(response, "Revoir le message")
-
-    def verify_email(self, request):
+    def verify_email(self, request, email):
         # User verifies its email clicking on the email he received
-        confirm_email_url = get_confirm_email_url(request, self.email)
+        confirm_email_url = get_confirm_email_url(request, email)
         response = self.client.post(confirm_email_url, follow=True)
         self.assertEqual(response.status_code, 200)
         return response
 
     def test_new_job_seeker_sees_welcoming_tour_test(self):
         job_seeker = JobSeekerFactory.build()
-        self.email = job_seeker.email
 
         # First signup step: job seeker NIR.
         url = reverse("signup:job_seeker_nir")
@@ -56,18 +47,24 @@ class WelcomingTourTest(TestCase):
             "password2": PASSWORD,
         }
         response = self.client.post(url, data=post_data)
-        response = self.verify_email(response.wsgi_request)
+        response = self.verify_email(response.wsgi_request, email=job_seeker.email)
 
         # User should be redirected to the welcoming tour as he just signed up
         self.assertEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertTemplateUsed(response, "welcoming_tour/job_seeker.html")
+
+        self.client.logout()
+        response = self.client.post(
+            reverse("login:job_seeker"), follow=True, data={"login": job_seeker.email, "password": PASSWORD}
+        )
+        self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        self.assertContains(response, "Revoir le message")
 
     def test_new_prescriber_sees_welcoming_tour_test(self):
         session = self.client.session
         session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
         session.save()
         prescriber = PrescriberFactory.build()
-        self.email = prescriber.email
         url = reverse("signup:prescriber_user")
         post_data = {
             "first_name": prescriber.first_name,
@@ -77,15 +74,21 @@ class WelcomingTourTest(TestCase):
             "password2": PASSWORD,
         }
         response = self.client.post(url, data=post_data)
-        response = self.verify_email(response.wsgi_request)
+        response = self.verify_email(response.wsgi_request, email=prescriber.email)
 
         # User should be redirected to the welcoming tour as he just signed up
         self.assertEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
+        self.client.logout()
+        response = self.client.post(
+            reverse("login:prescriber"), follow=True, data={"login": prescriber.email, "password": PASSWORD}
+        )
+        self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        self.assertContains(response, "Revoir le message")
+
     def test_new_employer_sees_welcoming_tour(self):
         employer = SiaeStaffFactory.build()
-        self.email = employer.email
         siae = SiaeWithMembershipFactory()
 
         url = reverse("signup:siae", kwargs={"encoded_siae_id": siae.get_encoded_siae_id(), "token": siae.get_token()})
@@ -102,11 +105,18 @@ class WelcomingTourTest(TestCase):
             "password2": PASSWORD,
         }
         response = self.client.post(url, data=post_data)
-        response = self.verify_email(response.wsgi_request)
+        response = self.verify_email(response.wsgi_request, email=employer.email)
 
         # User should be redirected to the welcoming tour as he just signed up
         self.assertEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertTemplateUsed(response, "welcoming_tour/siae_staff.html")
+
+        self.client.logout()
+        response = self.client.post(
+            reverse("login:siae_staff"), follow=True, data={"login": employer.email, "password": PASSWORD}
+        )
+        self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        self.assertContains(response, "Revoir le message")
 
 
 class WelcomingTourExceptions(TestCase):
