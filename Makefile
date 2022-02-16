@@ -2,7 +2,7 @@
 # =============================================================================
 PYTHON_VERSION := python3.9
 
-.PHONY: run clean cdsitepackages quality
+.PHONY: run clean cdsitepackages quality quality_venv fix fix_venv pylint pylint_venv
 
 # Run Docker images
 run:
@@ -15,17 +15,32 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality:
-	docker exec -ti itou_django black itou
-	docker exec -ti itou_django isort itou
-	docker exec -ti itou_django flake8 itou
+	docker exec -ti itou_django black --check itou
+	docker exec -ti itou_django isort --check itou
+	docker exec -ti itou_django djhtml --check $(shell find itou/templates -name "*.html")
+	docker exec -ti itou_django flake8 itou --count --show-source --statistics
 
 quality_venv:
+	black --check itou
+	isort --check itou
+	djhtml --check $(shell find itou/templates -name "*.html")
+	flake8 itou --count --show-source --statistics
+
+fix:
+	docker exec -ti itou_django black itou
+	docker exec -ti itou_django isort itou
+	docker exec -ti itou_django djhtml --in-place $(shell find itou/templates -name "*.html")
+
+fix_venv:
 	black itou
 	isort itou
-	flake8 itou
+	djhtml --in-place $(shell find itou/templates -name "*.html")
 
 pylint:
 	docker exec -ti itou_django pylint itou
+
+pylint_venv:
+	pylint itou
 
 coverage:
 	docker exec -ti itou_django coverage run ./manage.py test itou --settings=config.settings.test
