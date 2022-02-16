@@ -87,7 +87,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         messages.error(
             request, "France Connect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
         )
-        return HttpResponseRedirect(reverse("account_login"))
+        return HttpResponseRedirect(reverse("login:job_seeker"))
 
     state = request.GET.get("state")
     if not state_is_valid(state):
@@ -95,7 +95,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
             "Le paramètre « state » fourni par France Connect et nécessaire à votre authentification n’est pas valide."
         )
         messages.error(request, message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return HttpResponseRedirect(reverse("login:job_seeker"))
 
     redirect_uri = get_callback_redirect_uri(request)
 
@@ -115,7 +115,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         message = "Impossible d'obtenir le jeton de FranceConnect."
         logger.error("%s : %s", message, response.content)
         messages.error(request, message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return HttpResponseRedirect(reverse("login:job_seeker"))
 
     # Contains access_token, token_type, expires_in, id_token
     token_data = response.json()
@@ -125,7 +125,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         message = "Aucun champ « access_token » dans la réponse FranceConnect, impossible de vous authentifier"
         messages.error(request, message)
         logger.error(message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return HttpResponseRedirect(reverse("login:job_seeker"))
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
@@ -139,20 +139,20 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     if response.status_code != 200:
         message = "Impossible d'obtenir les informations utilisateur de FranceConnect."
         logger.error(message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return HttpResponseRedirect(reverse("login:job_seeker"))
 
     try:
         user_data = json.loads(response.content.decode("utf-8"))
     except json.decoder.JSONDecodeError:
         message = "Impossible de décoder les informations utilisateur."
         logger.error(message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return HttpResponseRedirect(reverse("login:job_seeker"))
 
     if "sub" not in user_data:
         # 'sub' is the unique identifier from France Connect, we need that to match a user later on
         message = "Le paramètre « sub » n'a pas été retourné par FranceConnect. Il est nécessaire pour identifier un utilisateur."  # noqa E501
         logger.error(message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return HttpResponseRedirect(reverse("login:job_seeker"))
 
     fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
 

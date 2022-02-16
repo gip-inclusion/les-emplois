@@ -54,7 +54,7 @@ Vous et votre candidat serez tous les deux informés de l'avancement de cette ca
 {% endif %}
 
 ---
-Pour vous connecter avec votre adresse e-mail, cliquez ici : {{ base_url }}{% url 'account_login' %}?account_type=job_seeker
+Pour vous connecter avec votre adresse e-mail, cliquez ici : {{ base_url }}{% url 'login:job_seeker' %}
 Mot de passe oublié ? Cliquez ici : {{ base_url }}{% url 'account_reset_password' %}
 
 {% endblock body %}

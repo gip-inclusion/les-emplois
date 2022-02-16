@@ -476,7 +476,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
-        self.assertIn(reverse("account_login"), email.body)
+        self.assertIn(reverse("login:job_seeker"), email.body)
         self.assertIn(reverse("account_reset_password"), email.body)
         self.assertIn(job_application.resume_link, email.body)
 
