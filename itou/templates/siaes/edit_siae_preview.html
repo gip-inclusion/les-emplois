@@ -1,0 +1,98 @@
+{% extends "layout/content_small.html" %}
+{% load format_filters %}
+{% load bootstrap4 %}
+{% load static %}
+{% load theme_inclusion %}
+
+{% block title %}Modifier les coordonnées de votre structure{{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+    {% include 'siaes/edit_siae_breadcrumb.html' %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="card mt-6 p-2 bg-white">
+        <div class="card-body">
+            <p class="mb-0"><b>Étape  3</b>/3 : Aperçu</p>
+        </div>
+    </div>
+
+    <div class="card mt-6 p-2 bg-white">
+        <div class="card-body">
+            <div class="text-center">
+                <h1 class="h1-hero">
+                    <img src="{% static 'img/edit_siae_header.svg' %}" alt="En-tête édition SIAE" style="width: 100px;">
+                </h1>
+                <h1 class="h1">Aperçu de la fiche de ma structure</h1>
+            </div>
+
+            <div class="c-card shadow my-4 p-2 bg-white">
+                <div class="card-body">
+                    <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.display_kind }} </p>
+                    <hr>
+                    <h2 class="h1">
+                        {{ siae.display_name }}
+                    </h2>
+                    <p> {{ siae.address_on_one_line }} </p>
+                </div>
+            </div>
+
+            <form method="post" action="" class="js-prevent-multiple-submit">
+                {% csrf_token %}
+
+                <h3>Son activité</h3>
+                <p>{{ form_data.description | linebreaks }}</p>
+
+                <h3>L'accompagnement proposé</h3>
+                <p>{{ form_data.provided_support | linebreaks }}</p>
+
+                <hr>
+
+                {% if siae.email %}
+                    <p>
+                        <i class="ri-mail-line"></i>
+                        <a title="Contact par mail" href="mailto:{{ siae.email }}">{{ siae.email }}</a>
+                    </p>
+                {% endif %}
+
+                {% if siae.phone %}
+                    <p>
+                        <i class="ri-phone-line"></i>
+                        <a title="Contact téléphonique" href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
+                    </p>
+                {% endif %}
+
+                {% if siae.website %}
+                    <p>
+                        <i class="ri-global-line"></i>
+                        <a title="Site web" href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
+                    </p>
+                {% endif %}
+
+
+                <hr>
+
+                <div class="c-card shadow my-4 p-2 bg-warning">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <i class="ri-information-line ri-xl col-1"></i>
+                            <span class="col">En cliquant sur le bouton <b>« Publier »</b>, vous acceptez que
+                                vos informations et coordonnées soient rendues publiques.</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% buttons %}
+                    <div class="float-right mt-4">
+                        <a class="btn btn-link" title="Retourner à l'édition de la description" href="{{ prev_url }}">Retour</a>
+                        <button type="submit" title="Publier" class="btn btn-primary">Publier</button>
+                    </div>
+                {% endbuttons %}
+
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}

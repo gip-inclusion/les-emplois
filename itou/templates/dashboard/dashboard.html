@@ -27,7 +27,7 @@
             Nous n'avons pas pu géolocaliser votre établissement.<br>
             Cela peut affecter sa position dans les résultats de recherche.<br>
             {% if user_is_siae_admin %}
-                <a href="{% url 'siaes_views:edit_siae' %}">Indiquez une autre adresse</a>
+                <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}">Indiquez une autre adresse</a>
             {% else %}
                 {% with current_siae.active_admin_members.first as admin %}
                     Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name|title }} {{ admin.last_name|title }}) pour qu'il ou elle indique une autre adresse
@@ -294,7 +294,7 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
                         {% if user_is_siae_admin %}
-                            <a href="{% url 'siaes_views:edit_siae' %}">
+                            <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}">
                                 Modifier les informations de l'établissement
                             </a>
                             /

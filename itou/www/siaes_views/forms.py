@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
-from itou.common_apps.address.departments import DEPARTMENTS
+from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.utils.urls import get_external_link_markup
 
@@ -92,61 +92,67 @@ class CreateSiaeForm(forms.ModelForm):
 
 
 class EditSiaeForm(forms.ModelForm):
-    """
-    Edit an SIAE's card (or "Fiche" in French).
-    """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["department"].choices = [("", "---")] + list(DEPARTMENTS.items())
 
-        required_fields = ["address_line_1", "post_code", "city", "department"]
+        required_fields = ["brand", "address_line_1", "post_code", "city", "phone", "email"]
         for required_field in required_fields:
             self.fields[required_field].required = True
 
-        # COVID-19 "Operation ETTI".
-        # The "description" field is made required for ETTIs during this time.
-        if self.instance and (self.instance.kind == self.instance.KIND_ETTI):
-            desc_example = (
-                "<p><b>Exemple de description :</b></p>"
-                "<p>L'ETTi XXXXX, intervient sur le territoire XXXXX et met à disposition "
-                "des intérimaires et notamment pour 5 missions récurrentes :</p>"
-                "<ul>"
-                "<li>Mission 1</li>"
-                "<li>Mission 2</li>"
-                "<li>Mission 3</li>"
-                "<li>Mission 4</li>"
-                "<li>Mission 5</li>"
-                "</ul>"
-                "<p>Nous sommes disponibles pour étudier avec les entreprises utilisatrices "
-                "toutes les missions de premier niveau de qualification."
-            )
-            self.fields["description"].help_text = mark_safe(desc_example)
-            if not self.instance.description:
-                self.fields["description"].required = True
+        self.fields["address_line_1"].widget.attrs["placeholder"] = ""
+        self.fields["address_line_2"].widget.attrs["placeholder"] = ""
 
     class Meta:
         model = Siae
         fields = [
             "brand",
-            "description",
-            "phone",
-            "email",
-            "website",
             "address_line_1",
             "address_line_2",
             "post_code",
+            "department",  # will not be displayed in the template but filled with clean_department
             "city",
-            "department",
+            "phone",
+            "email",
+            "website",
         ]
+        labels = {
+            "brand": "Nom à afficher",
+            "post_code": "Code postal",
+            "city": "Ville",
+            "email": "Email",
+        }
         help_texts = {
-            "brand": (
-                "Si ce champ est renseigné, il sera utilisé en tant que nom "
-                "sur la fiche et dans les résultats de recherche."
-            ),
+            "brand": "Nom présent sur la fiche et dans les résultats de recherche.",
             "description": "Texte de présentation de votre structure.",
-            "phone": "Par exemple 0610203040",
+            "address_line_1": "Appartement, suite, bloc, bâtiment, boite postale, etc.",
+            "address_line_2": "",
             "website": "Votre site web doit commencer par http:// ou https://",
+        }
+
+    def clean_department(self):
+        post_code = self.cleaned_data.get("post_code")
+        return department_from_postcode(post_code)
+
+
+class EditSiaeDescriptionForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["description"].widget.attrs[
+            "placeholder"
+        ] = "Présentez votre entreprise, votre secteur d’activité, domaines d’intervention, etc."
+        self.fields["provided_support"].widget.attrs[
+            "placeholder"
+        ] = "Indiquez les modalités d’accompagnement, par qui, comment, à quelle fréquence, etc."
+
+    class Meta:
+        model = Siae
+        fields = [
+            "description",
+            "provided_support",
+        ]
+        labels = {
+            "description": "Description générale de l'activité",
+            "provided_support": "Type d'accompagnement proposé",
         }
 
     def save(self):
