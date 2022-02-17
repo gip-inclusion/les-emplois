@@ -94,7 +94,7 @@ class PoleEmploiMiseAJourPassIAEException(Exception):
         self.response_code = message
 
 
-def ensure_compatible_last_name(last_name):
+def pole_emploi_last_name(last_name: str) -> str:
     """
     (ces règles sont proches mais un peu différentes de celles pour le prénom)
 
@@ -106,19 +106,16 @@ def ensure_compatible_last_name(last_name):
      - sa longueur est max 25 caractères
     Ainsi, "Nôm^' Exémple{}$" devient "NOM EXEMPLE"
     """
-    # remove accents, convert to uppercase
     last_name = unidecode(last_name).upper()
-    # We get rid of all the incompatible characters
     replaced = re.sub("[^A-Z-' ]", "", last_name)
-    # We finally keep a limited amount of letters
     return replaced[:25]
 
 
-def ensure_compatible_first_name(first_name):
+def pole_emploi_first_name(first_name: str) -> str:
     """
     (ces règles sont proches mais un peu différentes de celles pour le nom)
 
-    D’après les specs de l’API PE non documentése concernant la recherche individu
+    D’après les specs de l’API PE non documentées concernant la recherche individu
     simplifié, le PRÉNOM  doit:
      - être en majuscule
      - sans accents (ils doivent être remplacés par l’équivalent non accentué)
@@ -126,18 +123,15 @@ def ensure_compatible_first_name(first_name):
      - sa longueur est max 13 caractères
     Ainsi, "Prénôm^' {}$Exémple" devient "PRENOM-EXEMPL"
     """
-    # remove accents, convert to uppercase, replace spaces with dash
     first_name = unidecode(first_name).upper().replace(" ", "-")
-    # We get rid of all the incompatible characters (including spaces)
     replaced = re.sub("[^A-Z-]", "", first_name)
-    # We finally keep a limited amount of letters
     return replaced[:13]
 
 
 class PoleEmploiIndividu:
     def __init__(self, first_name: str, last_name: str, birthdate, nir: str):
-        self.first_name = ensure_compatible_first_name(first_name)
-        self.last_name = ensure_compatible_last_name(last_name)
+        self.first_name = pole_emploi_first_name(first_name)
+        self.last_name = pole_emploi_last_name(last_name)
         self.birthdate = birthdate.strftime("%Y-%m-%d") if birthdate else ""
         self.nir = nir
 
