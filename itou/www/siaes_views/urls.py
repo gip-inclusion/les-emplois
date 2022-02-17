@@ -14,9 +14,7 @@ urlpatterns = [
     path("show_financial_annexes", views.show_financial_annexes, name="show_financial_annexes"),
     path("select_financial_annex", views.select_financial_annex, name="select_financial_annex"),
     path("create_siae", views.create_siae, name="create_siae"),
-    path("edit_siae", views.edit_siae_step_contact_infos, name="edit_siae_step_contact_infos"),
-    path("edit_siae_description", views.edit_siae_step_description, name="edit_siae_step_description"),
-    path("edit_siae_preview", views.edit_siae_step_preview, name="edit_siae_step_preview"),
+    path("edit_siae", views.edit_siae, name="edit_siae"),
     path("colleagues", views.members, name="members"),
     path("deactivate_member/<int:user_id>", views.deactivate_member, name="deactivate_member"),
     # Tricky: when using `re_path` you CAN'T mix re parts with non re ones

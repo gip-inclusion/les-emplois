@@ -459,20 +459,12 @@ ITOU_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/emplois"
 
 DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
-# FIXME(vperron): Those following lines are *not* settings. They are code constants that have
-# no reason to change or be modified through the environment. They should be moved in a constants.py
-# file in an app or in the module that uses them if it's a single Python module.
-# This gives the fake impression that we have many settings when we don't, and forces code
-# to import the whole Django settings (a full Django setup) when it may not be necessary.
-# The same could be said about any non-environment dependant variable here.
 ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
 ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_CURRENT_INSTITUTION_KEY = "current_institution"
 ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
 ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
 ITOU_SESSION_NIR_KEY = "job_seeker_nir"
-ITOU_SESSION_EDIT_SIAE_KEY = "edit_siae_session_key"
-
 
 # Some external libraries, as PDF Shift, need access to static files
 # but they can't access them when working locally.

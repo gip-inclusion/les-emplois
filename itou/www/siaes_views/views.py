@@ -9,19 +9,12 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views.forms import (
-    BlockJobApplicationsForm,
-    CreateSiaeForm,
-    EditSiaeDescriptionForm,
-    EditSiaeForm,
-    FinancialAnnexSelectForm,
-)
+from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm, FinancialAnnexSelectForm
 from itou.www.siaes_views.utils import refresh_card_list
 
 
@@ -265,76 +258,22 @@ def create_siae(request, template_name="siaes/create_siae.html"):
 
 
 @login_required
-def edit_siae_step_contact_infos(request, template_name="siaes/edit_siae.html"):
-    if settings.ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
-        request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY] = {}
-
+def edit_siae(request, template_name="siaes/edit_siae.html"):
+    """
+    Edit an SIAE.
+    """
     siae = get_current_siae_or_404(request)
     if not siae.has_admin(request.user):
         raise PermissionDenied
 
-    form = EditSiaeForm(
-        instance=siae, data=request.POST or None, initial=request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
-    )
-    if request.method == "POST" and form.is_valid():
-        request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY].update(form.cleaned_data)
-        request.session.modified = True
-        return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_description"))
-
-    context = {"form": form, "siae": siae}
-    return render(request, template_name, context)
-
-
-@login_required
-def edit_siae_step_description(request, template_name="siaes/edit_siae_description.html"):
-    if settings.ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
-        return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_contact_infos"))
-
-    siae = get_current_siae_or_404(request)
-    if not siae.has_admin(request.user):
-        raise PermissionDenied
-
-    form = EditSiaeDescriptionForm(
-        instance=siae, data=request.POST or None, initial=request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
-    )
+    form = EditSiaeForm(instance=siae, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY].update(form.cleaned_data)
-        request.session.modified = True
-        return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_preview"))
-
-    context = {"form": form, "siae": siae, "prev_url": reverse("siaes_views:edit_siae_step_contact_infos")}
-    return render(request, template_name, context)
-
-
-@login_required
-@transaction.atomic
-def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"):
-    if settings.ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
-        return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_contact_infos"))
-
-    siae = get_current_siae_or_404(request)
-    if not siae.has_admin(request.user):
-        raise PermissionDenied
-
-    form_data = request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
-    if request.method == "POST":
-        # NOTE(vperron): This is quite "ugly" but it's probably acceptable here since it:
-        # - only takes in pre-validated and cleand data (the ModelForms do call full_clean()
-        #   on the underlying models)
-        # - enables us to perform a single save() in the whole block instead of at least 2 (custom
-        #   form) or 3 (existing forms)
-        siae.__dict__.update(**form_data)
-        siae.department = department_from_postcode(siae.post_code)
-        siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
-        siae.save()
-        # Clear the session now, so that we start fresh if we edit again.
-        del request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
-        request.session.modified = True
+        form.save()
         messages.success(request, "Mise à jour effectuée !")
         return HttpResponseRedirect(reverse("dashboard:index"))
 
-    context = {"siae": siae, "form_data": form_data, "prev_url": reverse("siaes_views:edit_siae_step_description")}
+    context = {"form": form, "siae": siae}
     return render(request, template_name, context)
 
 

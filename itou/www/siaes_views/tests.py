@@ -724,13 +724,13 @@ class EditSiaeViewTest(TestCase):
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse("siaes_views:edit_siae_step_contact_infos")
+        url = reverse("siaes_views:edit_siae")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Informations générales de ma structure")
 
         post_data = {
             "brand": "NEW FAMOUS SIAE BRAND NAME",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "phone": "0610203050",
             "email": "",
             "website": "https://famous-siae.com",
@@ -738,80 +738,24 @@ class EditSiaeViewTest(TestCase):
             "address_line_2": "",
             "post_code": "62000",
             "city": "Arras",
+            "department": "62",
         }
         response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
 
-        # Ensure form validation is done
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Ce champ est obligatoire")
-
-        # Go to next step: description
-        post_data["email"] = "toto@titi.fr"
-        response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("siaes_views:edit_siae_step_description"))
-
-        response = self.client.post(url, data=post_data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Présentation de l'activité de ma structure")
-
-        # Go to next step: summary
-        url = response.redirect_chain[-1][0]
-        post_data = {
-            "description": "Le meilleur des SIAEs !",
-            "provided_support": "On est très très forts pour tout",
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("siaes_views:edit_siae_step_preview"))
-
-        response = self.client.post(url, data=post_data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Aperçu de la fiche de ma structure")
-
-        # Go back, should not be an issue
-        step_2_url = reverse("siaes_views:edit_siae_step_description")
-        response = self.client.get(step_2_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Présentation de l'activité de ma structure")
-        self.assertEqual(
-            self.client.session["edit_siae_session_key"],
-            {
-                "address_line_1": "1 Rue Jeanne d'Arc",
-                "address_line_2": "",
-                "brand": "NEW FAMOUS SIAE BRAND NAME",
-                "city": "Arras",
-                "department": "62",
-                "description": "Le meilleur des SIAEs !",
-                "email": "toto@titi.fr",
-                "phone": "0610203050",
-                "post_code": "62000",
-                "provided_support": "On est très très forts pour tout",
-                "website": "https://famous-siae.com",
-            },
-        )
-
-        # Go forward again
-        response = self.client.post(step_2_url, data=post_data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Aperçu de la fiche de ma structure")
-
-        # Save the object for real
-        response = self.client.post(response.redirect_chain[-1][0])
-        self.assertRedirects(response, reverse("dashboard:index"))
-
-        # refresh Siae, but using the siret to be sure we didn't mess with the PK
         siae = Siae.objects.get(siret=siae.siret)
 
-        self.assertEqual(siae.brand, "NEW FAMOUS SIAE BRAND NAME")
-        self.assertEqual(siae.description, "Le meilleur des SIAEs !")
-        self.assertEqual(siae.email, "toto@titi.fr")
-        self.assertEqual(siae.phone, "0610203050")
-        self.assertEqual(siae.website, "https://famous-siae.com")
+        self.assertEqual(siae.brand, post_data["brand"])
+        self.assertEqual(siae.description, post_data["description"])
+        self.assertEqual(siae.email, post_data["email"])
+        self.assertEqual(siae.phone, post_data["phone"])
+        self.assertEqual(siae.website, post_data["website"])
 
-        self.assertEqual(siae.address_line_1, "1 Rue Jeanne d'Arc")
-        self.assertEqual(siae.address_line_2, "")
-        self.assertEqual(siae.post_code, "62000")
-        self.assertEqual(siae.city, "Arras")
-        self.assertEqual(siae.department, "62")
+        self.assertEqual(siae.address_line_1, post_data["address_line_1"])
+        self.assertEqual(siae.address_line_2, post_data["address_line_2"])
+        self.assertEqual(siae.post_code, post_data["post_code"])
+        self.assertEqual(siae.city, post_data["city"])
+        self.assertEqual(siae.department, post_data["department"])
 
         # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
         self.assertEqual(siae.coords, "SRID=4326;POINT (2.316754 48.838411)")
@@ -819,17 +763,11 @@ class EditSiaeViewTest(TestCase):
         self.assertEqual(siae.longitude, 2.316754)
         self.assertEqual(siae.geocoding_score, 0.587663373207207)
 
-    def test_permission(self):
-        siae = SiaeWithMembershipFactory()
-        user = siae.members.first()
-
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-
         # Only admin members should be allowed to edit SIAE's details
         membership = user.siaemembership_set.first()
         membership.is_admin = False
         membership.save()
-        url = reverse("siaes_views:edit_siae_step_contact_infos")
+        url = reverse("siaes_views:edit_siae")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
