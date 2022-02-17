@@ -96,6 +96,8 @@ class PoleEmploiMiseAJourPassIAEException(Exception):
 
 def ensure_compatible_last_name(last_name):
     """
+    (ces règles sont proches mais un peu différentes de celles pour le prénom)
+
     D’après les specs de l’API PE non documentése concernant la recherche individu
     simplifié, le NOM doit:
      - être en majuscule
@@ -114,13 +116,15 @@ def ensure_compatible_last_name(last_name):
 
 def ensure_compatible_first_name(first_name):
     """
+    (ces règles sont proches mais un peu différentes de celles pour le nom)
+
     D’après les specs de l’API PE non documentése concernant la recherche individu
     simplifié, le PRÉNOM  doit:
      - être en majuscule
      - sans accents (ils doivent être remplacés par l’équivalent non accentué)
      - le tiret remplace les espaces. Apostrophe et espace sont interdits.
      - sa longueur est max 13 caractères
-    Ainsi, "Nôm^' Exémple{}$" devient "NOM EXEMPLE"
+    Ainsi, "Prénôm^' {}$Exémple" devient "PRENOM-EXEMPL"
     """
     # remove accents, convert to uppercase, replace spaces with dash
     first_name = unidecode(first_name).upper().replace(" ", "-")
