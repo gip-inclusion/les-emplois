@@ -135,7 +135,7 @@
                         if (document.body.clientWidth > tablet_width) {
                             height = "365px";
                         }
-                        return '<iframe title="' + frame_title + '" src="' + url + '" width="' + width + '" height="' + height + '" frameborder="0" scrolling="no" allowtransparency allowfullscreen></iframe>';
+                        return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + ';" allowtransparency allowfullscreen></iframe>';
                     });
                 },
                 "fallback": function () {

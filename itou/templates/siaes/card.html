@@ -15,9 +15,9 @@
                     <p class="h2">
                         {{ siae.display_name }}
                     </p>
-                    {% if siae.address_on_one_line %}
-                        <p> {{ siae.address_on_one_line }} </p>
-                    {% endif %}
+                    {# Display non-user-edited name too. #}
+                    {% comment %} {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %} {% endcomment %}
+                    <adresse class="card-subtitle fs-lg font-weight-bold text-secondary">{{ siae.address_on_one_line }}</adresse>
                 </div>
             </div>
 
