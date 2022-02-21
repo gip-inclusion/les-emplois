@@ -16,14 +16,7 @@ class ItouLoginView(LoginView):
     """
 
     ACCOUNT_TYPE_TO_DISPLAY_NAME = {
-        "siae": "Employeur solidaire",
         "institution": "Institution partenaire",
-    }
-
-    # The reverse() method cannot be used here as it causes
-    # a cryptic loop import error in config/urls.py
-    ACCOUNT_TYPE_TO_SIGNUP_URL = {
-        "siae": "signup:siae_select",
     }
 
     form_class = ItouLoginForm
@@ -93,7 +86,15 @@ class PrescriberLoginView(ItouLoginView):
 
 
 class SiaeStaffLoginView(ItouLoginView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        extra_context = {
+            "account_type_display_name": "employeur solidaire",
+            "login_url": reverse("login:siae_staff"),
+            "signup_url": reverse("signup:siae_select"),
+            "signup_allowed": True,
+        }
+        return context | extra_context
 
 
 class LaborInspectorLoginView(ItouLoginView):
