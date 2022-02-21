@@ -915,10 +915,6 @@ class ResumeFormMixinTest(TestCase):
 
 
 class SupportRemarkAdminViewsTest(TestCase):
-    """
-    Test Support Remark admin views.
-    """
-
     def test_add_support_remark_to_suspension(self):
         user = UserFactory()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
