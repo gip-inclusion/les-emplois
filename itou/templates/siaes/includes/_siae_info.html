@@ -1,0 +1,12 @@
+
+<div class="card c-card c-card--emploi mb-3 mb-lg-5">
+    <div class="card-body">
+        <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.display_kind }} </p>
+        <hr>
+        <p class="h2">
+            {{ siae.display_name }}
+        </p>
+        {# Display non-user-edited name too. #}
+        <adresse class="card-subtitle fs-lg font-weight-bold text-secondary">{{ siae.address_on_one_line }}</adresse>
+    </div>
+</div>

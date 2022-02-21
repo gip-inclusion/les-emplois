@@ -1,0 +1,187 @@
+{% extends "layout/content.html" %}
+{% load bootstrap4 %}
+
+{% block title %}Vos fiches de postes{{ block.super }}{% endblock %}
+
+{% block content_container_css_classes %}pt-0{% endblock %}
+
+{% block breadcrumbs %}
+    {% include "siaes/includes/_job_description_breadcrumbs.html" %}
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="mb-0">{{siae.kind }} {{ siae.display_name }}</h1>
+    <h2 class="text-muted">Gérer les métiers et recrutements</h2>
+
+    <div class="shadow rounded p-4">
+        <div class="row">
+            <div class="col">
+                <h6>Le(s) métier(s) exercé(s) dans votre structure</h6>
+            </div>
+            <div class="col text-right">
+                <a class="btn btn-primary btn-sm" href="{% url "siaes_views:edit_job_description" %}?page={{ page|default:1 }}" title="Créer une nouvelle fiche de poste">Créer une nouvelle fiche de poste</a>
+            </div>
+        </div>
+
+        <hr>
+
+        <form method="post" action="?page={{ page|default:1 }}" id="block_job_applications_form">
+            {% csrf_token %}
+            <div class="custom-control custom-switch is-rtl">
+                <input name="block_job_applications"
+                    type="checkbox" id="block_job_applications"
+                    class="custom-control-input"
+                    {% if siae.block_job_applications %}checked{% endif %}/>
+                <label class="custom-control-label" for="block_job_applications">
+                    Bloquer temporairement la réception de candidatures (candidatures spontanées, recrutements).
+                </label>
+            </div>
+            {% if siae.job_applications_blocked_at %}
+                <p class="text-muted">
+                    <small>
+                        Vous avez modifié cette option la dernière fois le {{ siae.job_applications_blocked_at|date }}
+                    </small>
+                </p>
+            {% endif %}
+        </form>
+
+        <table class="table fs-sm mt-4 table-hover">
+            <thead>
+                <tr>
+                    <th scope="col" class="align-top">Rome</th>
+                    <th scope="col" class="align-top">Métiers exercés dans ma structure</th>
+                    <th scope="col" class="align-top">Localisation du poste</th>
+                    <th scope="col" class="align-top">Nombre de postes ouverts</th>
+                    <th scope="col" class="align-top">Statut du recrutement</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job_description in job_pager %}
+                    <tr>
+                        <th>{{ job_description.appellation.rome.code }}</th>
+                        <th>
+                            <a href="{% url "siaes_views:job_description_card" job_description_id=job_description.id %}" title="Lien vers fiche de poste : '{{ job_description.display_name }}'">
+                                {{ job_description.display_name }}
+                            </a>
+                        </th>
+                        <td><i class="ri-map-pin-line"></i> {{ job_description.display_location }}</td>
+                        <td class="text-center">
+                            <span class="badge badge-sm badge-pill badge-primary">{{ job_description.open_positions }}</span>
+                        </td>
+                        <td>
+                            {# Change job description status form #}
+                            <form method="post" action="?action=toggle_active" id="toggle_job_description_form_{{ job_description.id}}" class="d-block js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                <input type="hidden" name="job_description_id" value="{{ job_description.id}}"/>
+                                <div class="custom-control custom-switch is-rtl">
+                                    <input name="job_description_is_active"
+                                        type="checkbox"
+                                        id="job_description_is_active_{{ job_description.id}}"
+                                        class="custom-control-input"
+                                        {% if job_description.is_active %}checked{% endif %}/>
+                                    <label class="custom-control-label" for="job_description_is_active_{{ job_description.id}}">
+                                        {% if job_description.is_active %}Ouvert{% else %}Fermé{% endif %}
+                                    </label>
+                                </div>
+                            </form>
+                        </td>
+                        <td>
+                            <button class="btn p-0" data-toggle="modal" data-target="#_delete_modal_{{ job_description.id }}">
+                                <i class="ri-delete-bin-line ri-lg text-danger"></i>
+                            </button>
+                            {# Modal for job description deletion #}
+                            <div id="_delete_modal_{{ job_description.id }}" class="modal fade" tabindex="-1" aria-labelledby="Suppression de la fiche de poste" style="display:none;" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3>Supprimer</h3>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                                <i class="ri-close-line"></i>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body home-content-body">
+                                            <div class="row alert alert-danger">
+                                                <div class="col-auto pl-0">
+                                                    <i class="ri-information-fill ri-lg text-danger"></i>
+                                                </div>
+                                                <div class="col">
+                                                    <p>
+                                                        Êtes-vous de vouloir supprimer la fiche de poste <strong>{{ job_description.display_name}}</strong> ?
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {# Job description deletion form #}
+                                            <form method="post" action="?action=delete&page={{ page|default:1}}" class="d-block js-prevent-multiple-submit">
+                                                {% csrf_token %}
+                                                <div class="text-right">
+                                                    <input type="hidden" name="job_description_id" value="{{ job_description.id }}"/>
+                                                    <button class="btn btn-outline-primary btn-sm" data-dismiss="modal" aria-label="Annuler">Annuler</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm" aria-label="Supprimer">Supprimer</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="mt-4 text-center">
+            {% if job_pager %}
+                <div class="row">
+                    <div class="col-auto text-center">
+                        {% include "includes/pagination.html" with page=job_pager %}
+                    </div>
+                    <div class="col text-right">
+                        <button type="button"
+                            id="js-preview-card"
+                            class="btn btn-primary btn-sm"
+                            aria-label="Aperçu dans les résultats de recherche"
+                            data-url-preview="{% url 'siaes_views:card_search_preview' %}">
+                            Aperçu dans les résultats de recherche
+                        </button>
+                    </div>
+                </div>
+            {% else %}
+                <p>
+                    Aucun poste actuellement pour cette structure
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Preview search results modal #}
+    <div id="preview"></div>
+    <div class="modal modal-md fade" id="js-modal-preview" tabindex="-1" role="dialog" aria-labelledby="modalPrevisualisationTitle" aria-modal="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalPrevisualisationTitle" class="modal-title">Vu de votre structure depuis la liste de résultats</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div id="js-modal-preview-body" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-sm btn-primary" href="#" data-dismiss="modal" title="Fermer la fenêtre">Fermer la fenêtre</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {# For auto-submit forms #}
+    <script>
+        $("#block_job_applications_form").change(function() { this.submit(); })
+        $("form[id^= 'toggle_job_description_form_']").change(function() { this.submit(); })
+    </script>
+{% endblock %}

@@ -10,7 +10,13 @@ urlpatterns = [
     path("<int:siae_id>/card", views.card, name="card"),
     path("card_search_preview", views.card_search_preview, name="card_search_preview"),
     path("job_description/<int:job_description_id>/card", views.job_description_card, name="job_description_card"),
-    path("configure_jobs", views.configure_jobs, name="configure_jobs"),
+    path("job_description_list", views.job_description_list, name="job_description_list"),
+    path("edit_job_description", views.edit_job_description, name="edit_job_description"),
+    path("edit_job_description_details", views.edit_job_description_details, name="edit_job_description_details"),
+    path("edit_job_description_preview", views.edit_job_description_preview, name="edit_job_description_preview"),
+    path(
+        "update_job_description/<int:job_description_id>", views.update_job_description, name="update_job_description"
+    ),
     path("show_financial_annexes", views.show_financial_annexes, name="show_financial_annexes"),
     path("select_financial_annex", views.select_financial_annex, name="select_financial_annex"),
     path("create_siae", views.create_siae, name="create_siae"),

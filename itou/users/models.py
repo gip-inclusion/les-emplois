@@ -900,7 +900,7 @@ class JobSeekerProfile(models.Model):
     #  However, building forms with ModelForm objects and a *subset* of
     #  the model fields is really troublesome when using a global validator.
     #  (forms are calling model.clean() at every validation).
-    #  This method as to be triggered manually from now on.
+    #  This method is triggered manually.
     def clean_model(self):
         """
         Global model validation. Used to be the `clean` method.

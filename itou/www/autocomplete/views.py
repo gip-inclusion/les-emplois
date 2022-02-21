@@ -8,6 +8,7 @@ from django.template.defaultfilters import slugify
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.jobs.models import Appellation
+from itou.siaes.models import SiaeJobDescription
 from itou.utils.swear_words import get_city_swear_words_slugs
 
 
@@ -40,13 +41,18 @@ def jobs_autocomplete(request):
     """
 
     term = request.GET.get("term", "").strip()
+    siae_id = request.GET.get("siae_id", "").strip()
     appellations = []
 
+    # Fetch excluded codes:
+    # SIAE already have job descriptions with these codes.
+    excluded_codes = (
+        SiaeJobDescription.objects.filter(siae__id=siae_id)
+        .select_related("appellation", "siae")
+        .values_list("appellation__code", flat=True)
+    )
+
     if term:
-        codes_to_delete = request.GET.getlist("code-delete", [])
-        codes_to_create_update = request.GET.getlist("code-create", [])
-        codes_to_create_update += request.GET.getlist("code-update", [])
-        codes_to_exclude = list(set(codes_to_create_update) - set(codes_to_delete))
         appellations = [
             {
                 "value": f"{appellation.name} ({appellation.rome.code})",
@@ -54,7 +60,7 @@ def jobs_autocomplete(request):
                 "rome": appellation.rome.code,
                 "name": appellation.name,
             }
-            for appellation in Appellation.objects.autocomplete(term, codes_to_exclude, limit=10)
+            for appellation in Appellation.objects.autocomplete(term, codes_to_exclude=excluded_codes, limit=10)
         ]
 
     return JsonResponse(appellations, safe=False)
@@ -64,7 +70,7 @@ def communes_autocomplete(request):
     """
     Autocomplete endpoint for INSEE communes (ASP ref. files)
 
-    Slight variation : a `date` parameter is send with search term
+    Slight variation : a `date` parameter is sent with search term
     in order to get valid INSEE codes (with this date within a period between
     commune.start_date and commune.end_date)
 
@@ -77,7 +83,7 @@ def communes_autocomplete(request):
     try:
         dt = datetime.fromisoformat(request.GET.get("date", ""))
     except ValueError:
-        # Can't extract date in iso format, use today as fallback
+        # Can't extract date in ISO format: use today as fallback
         dt = datetime.now()
 
     if term:

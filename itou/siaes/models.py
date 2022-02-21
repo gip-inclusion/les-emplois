@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.gis.measure import D
-from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import BooleanField, Case, Count, Exists, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.functions import Cast, Coalesce
@@ -521,6 +522,34 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
         )
         return annotation
 
+    def for_siae(self, siae):
+        return self.filter(siae=siae).order_by("-created_at")
+
+    def by_siae_id(self, siae_id):
+        return (
+            self.filter(siae__id=siae_id)
+            .prefetch_related("appellation", "appellation__rome", "siae")
+            .order_by("-updated_at", "-created_at")
+        )
+
+
+class ContractType(models.TextChoices):
+    """
+    A list of possible work contract types for SIAE.
+    Not included as an intern class of SiaeJobDescription because of possible reuse cases.
+    """
+
+    PERMANENT = "PERMANENT", "CDI"
+    PERMANENT_I = "PERMANENT_I", "CDI-I"
+    FIXED_TERM = "FIXED_TERM", "CDD"
+    FIXED_TERM_I = "FIXED_TERM_I", "CDD-I"
+    FIXED_TERM_TREMPLIN = "FIXED_TERM_TREMPLIN", "CDD Tremplin"
+    APPRENTICESHIP = "APPRENTICESHIP", "Contrat d'apprentissage"
+    PROFESSIONAL_TRAINING = "PROFESSIONAL_TRAINING", "Contrat de professionalisation"
+    TEMPORARY = "TEMPORARY", "Contrat de mission intérimaire"
+    BUSINESS_CREATION = "BUSINESS_CREATION", "Accompagnement à la création d'entreprise"
+    OTHER = "OTHER", "Autre type de contrat"
+
 
 class SiaeJobDescription(models.Model):
     """
@@ -531,6 +560,7 @@ class SiaeJobDescription(models.Model):
 
     MAX_UI_RANK = 32767
     POPULAR_THRESHOLD = 20
+    MAX_WORKED_HOURS_PER_WEEK = 42
 
     appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name="job_description_through")
@@ -544,6 +574,22 @@ class SiaeJobDescription(models.Model):
     )
     # is used to order job descriptions in the UI
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
+    contract_type = models.CharField(
+        verbose_name="Type de contrat", choices=ContractType.choices, max_length=30, blank=True
+    )
+    other_contract_type = models.CharField(verbose_name="Autre type de contrat", max_length=255, blank=True, null=True)
+    location = models.ForeignKey(
+        "cities.City", on_delete=models.SET_NULL, null=True, verbose_name="Localisation du poste"
+    )
+    hours_per_week = models.PositiveSmallIntegerField(
+        verbose_name="Nombre d'heures par semaine",
+        blank=True,
+        null=True,
+        validators=[MaxValueValidator(MAX_WORKED_HOURS_PER_WEEK)],
+    )
+    open_positions = models.PositiveSmallIntegerField(verbose_name="Nombre de postes ouverts", blank=True, default=1)
+    profile_description = models.TextField(verbose_name="Profil recherché et pré-requis", blank=True)
+    is_resume_mandatory = models.BooleanField(verbose_name="CV nécessaire pour la candidature", default=False)
 
     objects = models.Manager.from_queryset(SiaeJobDescriptionQuerySet)()
 
@@ -556,9 +602,16 @@ class SiaeJobDescription(models.Model):
     def __str__(self):
         return self.display_name
 
+    def clean(self):
+        if self.contract_type == ContractType.OTHER and not self.other_contract_type:
+            raise ValidationError(
+                {
+                    "other_contract_type": "Veuillez préciser le type de contrat.",
+                }
+            )
+
     def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
+        self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
     @property
@@ -566,6 +619,12 @@ class SiaeJobDescription(models.Model):
         if self.custom_name:
             return self.custom_name
         return self.appellation.name
+
+    @property
+    def display_location(self):
+        if self.location:
+            return f"{self.location.name} ({self.location.department})"
+        return f"{self.siae.city} ({self.siae.department})"
 
     def get_absolute_url(self):
         return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})

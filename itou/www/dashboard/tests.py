@@ -484,7 +484,7 @@ class SwitchSiaeTest(TestCase):
         self.assertEqual(response.context["current_siae"], related_siae)
         self.assertEqual(response.context["siae"], related_siae)
 
-        url = reverse("siaes_views:configure_jobs")
+        url = reverse("siaes_views:job_description_list")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], related_siae)

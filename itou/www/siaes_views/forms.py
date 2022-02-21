@@ -1,10 +1,14 @@
 from django import forms
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
+from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
-from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
+from itou.jobs.models import Appellation
+from itou.siaes.models import ContractType, Siae, SiaeJobDescription, SiaeMembership
 from itou.utils.urls import get_external_link_markup
 
 
@@ -171,7 +175,10 @@ class BlockJobApplicationsForm(forms.ModelForm):
     class Meta:
         model = Siae
         fields = ["block_job_applications"]
-        labels = {"block_job_applications": "Ne plus recevoir de nouvelles candidatures"}
+        labels = {
+            "block_job_applications": "Bloquer temporairement la réception de candidatures "
+            "(candidatures spontanées, recrutements)"
+        }
 
     def save(self, commit=True):
         siae = super().save(commit=commit)
@@ -213,16 +220,149 @@ class FinancialAnnexSelectForm(forms.Form):
     )
 
 
-class ValidateSiaeJobDescriptionForm(forms.ModelForm):
-    """
-    Validate a job description.
-    """
+# SIAE job descriptions forms (2 steps and session based)
+
+
+class EditJobDescriptionForm(forms.ModelForm):
+
+    JOBS_AUTOCOMPLETE_URL = reverse_lazy("autocomplete:jobs")
+
+    # See: itou/static/js/job_autocomplete.js
+    job_appellation = forms.CharField(
+        label="Poste (code ROME)",
+        widget=forms.TextInput(
+            attrs={
+                "class": "js-job-autocomplete-input form-control",
+                "data-autosubmit-on-enter-pressed": 0,
+                "placeholder": "Ex. K2204 ou agent/agente d'entretien en crèche.",
+                "autocomplete": "off",
+            }
+        ),
+    )
+    # Hidden placeholder field for "real" job appellation.
+    job_appellation_code = forms.CharField(
+        max_length=5, widget=forms.HiddenInput(attrs={"class": "js-job-autocomplete-hidden"})
+    )
+
+    LOCATION_AUTOCOMPLETE_URL = reverse_lazy("autocomplete:cities")
+    location_label = forms.CharField(
+        label="Localisation du poste (si différent du siège)",
+        widget=forms.TextInput(
+            attrs={
+                "class": "js-city-autocomplete-input form-control",
+                "data-autosubmit-on-enter-pressed": 0,
+                "data-autocomplete-source-url": LOCATION_AUTOCOMPLETE_URL,
+                "placeholder": "Ex. Poitiers",
+                "autocomplete": "off",
+            }
+        ),
+        required=False,
+    )
+
+    location_code = forms.CharField(
+        required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"})
+    )
+
+    def __init__(self, current_siae: Siae, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.siae = current_siae
+
+        if self.instance.pk:
+            self.fields["job_appellation"].initial = self.instance.appellation.name
+            self.fields["job_appellation_code"].initial = self.instance.appellation.code
+
+            if self.instance.location:
+                # Optional field
+                self.fields["location_label"].initial = self.instance.location.name
+                self.fields["location_code"].initial = self.instance.location.slug
+
+            if self.instance.contract_type != ContractType.OTHER:
+                self.fields["other_contract_type"].widget.attrs.update({"disabled": "true"})
+
+        # Pass SIAE id in autocomplete call
+        self.fields["job_appellation"].widget.attrs.update(
+            {
+                "data-autocomplete-source-url": self.JOBS_AUTOCOMPLETE_URL + f"?siae_id={current_siae.pk}",
+            }
+        )
+
+        self.fields["custom_name"].widget.attrs.update({"placeholder": ""})
+        self.fields["hours_per_week"].widget.attrs.update({"placeholder": ""})
+        self.fields["other_contract_type"].widget.attrs.update({"placeholder": ""})
+
+        self.fields["contract_type"].required = True
+        self.fields["open_positions"].required = True
+        self.fields["job_appellation_code"].required = True
+        self.fields["job_appellation"].required = True
+
+        self.fields["contract_type"].choices = [
+            (
+                "",
+                "---------",
+            )
+        ] + ContractType.choices
 
     class Meta:
         model = SiaeJobDescription
         fields = [
             "custom_name",
-            "description",
-            "is_active",
-            "nb_open_positions",
+            "contract_type",
+            "other_contract_type",
+            "hours_per_week",
+            "open_positions",
         ]
+        labels = {
+            "custom_name": "Nom du poste à afficher",
+            "location_label": "Localisation du poste (si différent du siège)",
+            "hours_per_week": "Nombre d'heures par semaine",
+            "open_positions": "Nombre de poste(s) ouvert(s) au recrutement",
+        }
+        help_texts = {
+            "custom_name": "Si le champ est renseigné, il sera utilisé à la place du nom ci-dessus.",
+            "other_contract_type": "Veuillez préciser quel est le type de contrat.",
+        }
+
+    def clean_job_application_code(self):
+        job_appellation = self.cleaned_data.get("job_appellation_code")
+        if not job_appellation:
+            raise ValidationError({"job_appellation_code": "Le code d'appellation n'est pas renseigné."})
+        return int(job_appellation)
+
+    def clean_open_positions(self):
+        open_positions = self.cleaned_data.get("open_positions")
+        if open_positions is not None and open_positions < 1:
+            raise ValidationError({"open_positions", "Il doit y avoir au moins un poste ouvert."})
+        return open_positions
+
+    def clean(self):
+        # Bind `Appellation` and `City` objects
+        appellation_code = self.cleaned_data.get("job_appellation_code")
+        if appellation_code:
+            self.instance.appellation = Appellation.objects.get(code=appellation_code)
+
+        location_code = self.cleaned_data.get("location_code")
+        if location_code:
+            self.instance.location = City.objects.get(slug=location_code)
+
+
+class EditJobDescriptionDetailsForm(forms.ModelForm):
+    def __init__(self, current_siae: Siae, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.siae = current_siae
+
+        placeholder = "Soyez le plus concret possible"
+        self.fields["description"].widget.attrs.update({"placeholder": placeholder})
+        self.fields["profile_description"].widget.attrs.update({"placeholder": placeholder})
+
+    class Meta:
+        model = SiaeJobDescription
+        fields = [
+            "description",
+            "profile_description",
+            "is_resume_mandatory",
+        ]
+        labels = {
+            "description": "Les missions",
+            "profile_description": "Profil recherché et prérequis",
+            "is_resume_mandatory": "Le CV est nécessaire pour le traitement de la candidature",
+        }

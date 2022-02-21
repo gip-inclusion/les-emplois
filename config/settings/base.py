@@ -475,6 +475,8 @@ ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
 ITOU_SESSION_FACILITATOR_SIGNUP_KEY = "facilitator_signup"
 ITOU_SESSION_NIR_KEY = "job_seeker_nir"
 ITOU_SESSION_EDIT_SIAE_KEY = "edit_siae_session_key"
+ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
+ITOU_SESSION_CURRENT_PAGE_KEY = "current_page"
 
 
 # Some external libraries, as PDF Shift, need access to static files
