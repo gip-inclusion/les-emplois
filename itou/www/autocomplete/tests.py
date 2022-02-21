@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
 from itou.jobs.factories import create_test_romes_and_appellations
+from itou.siaes.factories import SiaeFactory
 
 
 class JobsAutocompleteTest(TestCase):
@@ -12,10 +13,20 @@ class JobsAutocompleteTest(TestCase):
     def setUpTestData(cls):
         # Set up data for the whole TestCase.
         create_test_romes_and_appellations(["N1101", "N4105"])
+        # Update:
+        # - autocomplete URL now needs a SIAE parameter (for existing ROME filtering)
+        # - this URL does not accept create / update / delete of elements (removed some some tests)
+        cls.siae = SiaeFactory()
         cls.url = reverse("autocomplete:jobs")
 
     def test_search_multi_words(self):
-        response = self.client.get(self.url, {"term": "cariste ferroviaire"})
+        response = self.client.get(
+            self.url,
+            {
+                "term": "cariste ferroviaire",
+                "siae_id": self.siae.id,
+            },
+        )
         self.assertEqual(response.status_code, 200)
         expected = [
             {
@@ -27,14 +38,14 @@ class JobsAutocompleteTest(TestCase):
         ]
         self.assertEqual(json.loads(response.content), expected)
 
-    def test_search_multi_words_with_exclusion(self):
-        response = self.client.get(self.url, {"term": "cariste ferroviaire", "code-update": "10357"})
-        self.assertEqual(response.status_code, 200)
-        expected = b"[]"
-        self.assertEqual(response.content, expected)
-
     def test_search_case_insensitive_and_explicit_rome_code(self):
-        response = self.client.get(self.url, {"term": "CHAUFFEUR livreuse n4105"})
+        response = self.client.get(
+            self.url,
+            {
+                "term": "CHAUFFEUR livreuse n4105",
+                "siae_id": self.siae.id,
+            },
+        )
         self.assertEqual(response.status_code, 200)
         expected = [
             {
@@ -46,42 +57,25 @@ class JobsAutocompleteTest(TestCase):
         ]
         self.assertEqual(json.loads(response.content), expected)
 
-    def test_update_rome_code(self):
-        response = self.client.get(self.url, {"term": "CHAUFFEUR livreuse n4105", "code-update": "11999"})
-        self.assertEqual(response.status_code, 200)
-        expected = []
-        self.assertEqual(json.loads(response.content), expected)
-
-    def test_delete_rome_code(self):
+    def test_search_empty_chars(self):
         response = self.client.get(
             self.url,
             {
-                "term": "CHAUFFEUR",
-                "code-update": ["11999", "12001", "11998"],
-                "code-create": "12000",
-                "code-delete": "11998",
+                "term": "    ",
+                "siae_id": self.siae.id,
             },
         )
-        self.assertEqual(response.status_code, 200)
-        expected = [
-            {
-                "value": "Chauffeur-jockey / Chauffeuse-jockey (N4105)",
-                "code": "11998",
-                "rome": "N4105",
-                "name": "Chauffeur-jockey / Chauffeuse-jockey",
-            }
-        ]
-        self.assertEqual(json.loads(response.content), expected)
-
-    def test_search_empty_chars(self):
-        response = self.client.get(self.url, {"term": "    "})
         self.assertEqual(response.status_code, 200)
         expected = b"[]"
         self.assertEqual(response.content, expected)
 
     def test_search_full_label(self):
         response = self.client.get(
-            self.url, {"term": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)"}
+            self.url,
+            {
+                "term": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
+                "siae_id": self.siae.id,
+            },
         )
         self.assertEqual(response.status_code, 200)
         expected = [
@@ -96,7 +90,11 @@ class JobsAutocompleteTest(TestCase):
 
     def test_search_special_chars(self):
         response = self.client.get(
-            self.url, {"term": "conducteur:* & & de:* & !chariot:* & <eleva:*>>>> & armee:* & `(((()))`):*"}
+            self.url,
+            {
+                "term": "conducteur:* & & de:* & !chariot:* & <eleva:*>>>> & armee:* & `(((()))`):*",
+                "siae_id": self.siae.id,
+            },
         )
         self.assertEqual(response.status_code, 200)
         expected = [

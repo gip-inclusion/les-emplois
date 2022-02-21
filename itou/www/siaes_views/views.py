@@ -7,46 +7,34 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.views.decorators.http import require_POST
 
+from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
+from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
+from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import (
     BlockJobApplicationsForm,
     CreateSiaeForm,
+    EditJobDescriptionDetailsForm,
+    EditJobDescriptionForm,
     EditSiaeDescriptionForm,
     EditSiaeForm,
     FinancialAnnexSelectForm,
 )
-from itou.www.siaes_views.utils import refresh_card_list
 
 
-def card(request, siae_id, template_name="siaes/card.html"):
-    """
-    SIAE's card (or "Fiche" in French).
+NB_ITEMS_PER_PAGE = 10
 
-    # COVID-19 "Operation ETTI".
-    Public view (previously private, made public during COVID-19).
-    """
-    queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
 
-    siae = get_object_or_404(queryset, pk=siae_id)
-    jobs_descriptions = siae.job_description_through.all()
-    back_url = get_safe_url(request, "back_url")
-    context = {"siae": siae, "back_url": back_url, "jobs_descriptions": jobs_descriptions}
-    return render(request, template_name, context)
+### Job description views
 
 
 def job_description_card(request, job_description_id, template_name="siaes/job_description_card.html"):
-    """
-    SIAE's job description card (or "Fiche" in French).
-
-    Public view.
-    """
     job_description = get_object_or_404(SiaeJobDescription, pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
     siae = job_description.siae
@@ -56,107 +44,237 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
         .exclude(id=job_description_id)
         .order_by("-updated_at", "-created_at")
     )
+    breadcrumbs = {
+        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+        "Détail du poste": reverse(
+            "siaes_views:job_description_card",
+            kwargs={
+                "job_description_id": job_description_id,
+            },
+        ),
+    }
     context = {
         "job": job_description,
         "siae": siae,
         "others_active_jobs": others_active_jobs,
         "back_url": back_url,
+        "breadcrumbs": breadcrumbs,
     }
     return render(request, template_name, context)
 
 
 @login_required
-def configure_jobs(request, template_name="siaes/configure_jobs.html"):
-    """
-    Configure an SIAE's jobs.
-
-    Time was limited during the prototyping phase and this view is based on
-    JavaScript to generate a dynamic form. No proper Django form is used.
-    """
+def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
     siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
     job_descriptions = (
-        siae.job_description_through.select_related("appellation__rome").all().order_by("-updated_at", "-created_at")
+        SiaeJobDescription.objects.for_siae(siae)
+        .prefetch_related("appellation", "appellation__rome", "siae")
+        .order_by("-updated_at", "-created_at")
     )
-    errors = {}
+    context = {
+        "siae": siae,
+        "jobs_descriptions": job_descriptions,
+    }
+    return HttpResponse(render_to_string(template_name, context))
+
+
+@login_required
+@transaction.atomic
+def job_description_list(request, template_name="siaes/job_description_list.html"):
+    siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
+    job_descriptions = (
+        SiaeJobDescription.objects.for_siae(siae)
+        .prefetch_related("appellation", "appellation__rome", "siae")
+        .order_by("-updated_at", "-created_at")
+    )
+    page = int(request.GET.get("page") or request.session.get(settings.ITOU_SESSION_CURRENT_PAGE_KEY) or 1)
+    request.session[settings.ITOU_SESSION_CURRENT_PAGE_KEY] = page
+
+    # Remove possible obsolete session data when coming from breakcrumbs links and back buttons
+    if request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY):
+        del request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY]
+
+    form = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
 
     if request.method == "POST":
-        # Validate data for Siae block_job_applications
-        form_siae_block_job_applications = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
+        action = request.GET.get("action")
 
-        if form_siae_block_job_applications.is_valid():
-            form_siae_block_job_applications.save()
+        if action == "delete":
+            job_description_id = request.POST.get("job_description_id")
+            SiaeJobDescription.objects.get(pk=job_description_id).delete()
+            messages.success(request, "La fiche de poste a été supprimée.")
+        elif action == "toggle_active":
+            job_description_id = request.POST.get("job_description_id")
+            is_active = bool(request.POST.get("job_description_is_active", False))
+            job_description = SiaeJobDescription.objects.get(pk=job_description_id)
+            job_description.is_active = is_active
+            job_description.save(update_fields=["is_active"])
+            messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}")
+        elif form.is_valid():
+            siae = form.save()
+            messages.success(
+                request,
+                "La réception de candidature est temporairement bloquée."
+                if siae.block_job_applications
+                else "La structure peut recevoir des candidatures.",
+            )
 
-        refreshed_cards = refresh_card_list(request=request, siae=siae)
+        return HttpResponseRedirect(reverse("siaes_views:job_description_list"))
 
-        if not refreshed_cards["errors"]:
-            with transaction.atomic():
-                if refreshed_cards["jobs"]["create"]:
-                    SiaeJobDescription.objects.bulk_create(refreshed_cards["jobs"]["create"])
+    job_pager = pager(job_descriptions, page, items_per_page=NB_ITEMS_PER_PAGE)
+    breadcrumbs = {
+        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+    }
 
-                if refreshed_cards["jobs"]["update"]:
-                    SiaeJobDescription.objects.bulk_update(
-                        refreshed_cards["jobs"]["update"],
-                        ["custom_name", "description", "is_active", "updated_at", "nb_open_positions"],
-                    )
-
-                if refreshed_cards["jobs"]["delete"]:
-                    siae.jobs.remove(*refreshed_cards["jobs"]["delete"])
-
-                messages.success(request, "Mise à jour effectuée !")
-                return HttpResponseRedirect(reverse("dashboard:index"))
-        else:
-            errors = refreshed_cards["errors"]
-
-    context = {"errors": errors, "job_descriptions": job_descriptions, "siae": siae}
+    context = {
+        "siae": siae,
+        "form": form,
+        "job_pager": job_pager,
+        "page": page,
+        "breadcrumbs": breadcrumbs,
+    }
     return render(request, template_name, context)
 
 
-@require_POST
-@login_required
-def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
-    """
-    SIAE's card (or "Fiche" in French) search preview.
-
-    Return only html of card search preview without global template (header, footer, ...)
-    Need to recount active jobs to avoid supress and updated count active jobs
-    """
-    siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
-
-    form_siae_block_job_applications = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
-    if form_siae_block_job_applications.is_valid():
-        siae = form_siae_block_job_applications.instance
-
-    refreshed_cards = refresh_card_list(request=request, siae=siae)
-
-    if not refreshed_cards["errors"]:
-        # sort all the jobs buy updated_at and created_at desc
-        list_jobs_descriptions = sorted(
-            refreshed_cards["jobs"]["create"]
-            + refreshed_cards["jobs"]["update"]
-            + refreshed_cards["jobs"]["unmodified"],
-            key=lambda x: x.updated_at if x.updated_at else x.created_at,
-            reverse=True,
+def _get_job_description(session_data):
+    if pk := session_data.get("pk"):
+        job_description = get_object_or_404(
+            SiaeJobDescription.objects.select_related(
+                "appellation",
+                "location",
+            ),
+            pk=pk,
         )
+        return job_description
+    return None
 
-        # count the number of active jobs
-        count_active_job_descriptions = 0
-        for job in list_jobs_descriptions:
-            # int(True) = 1, int(False) = 0
-            count_active_job_descriptions += int(job.is_active)
 
-        siae.count_active_job_descriptions = count_active_job_descriptions
+@login_required
+def edit_job_description(request, template_name="siaes/edit_job_description.html"):
+    siae = get_current_siae_or_404(request)
+    session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
+    job_description = _get_job_description(session_data)
 
-        context = {
-            "siae": siae,
-            "jobs_descriptions": list_jobs_descriptions,
-        }
+    form = EditJobDescriptionForm(siae, instance=job_description, data=request.POST or None, initial=session_data)
 
-        html = render_to_string(template_name, context)
+    if request.method == "POST" and form.is_valid():
+        request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
+        return HttpResponseRedirect(reverse("siaes_views:edit_job_description_details"))
+
+    breadcrumbs = {
+        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+    }
+    if job_description and job_description.pk:
+        kwargs = {"job_description_id": job_description.pk}
+        breadcrumbs.update(
+            {
+                "Détails du poste": reverse("siaes_views:job_description_card", kwargs=kwargs),
+                "Modifier une fiche de poste": reverse("siaes_views:update_job_description", kwargs=kwargs),
+            }
+        )
     else:
-        context = {"errors": refreshed_cards["errors"]}
-        template_name_errors = "siaes/includes/_alert_configure_job.html"
-        html = render_to_string(template_name_errors, context)
-    return HttpResponse(html)
+        breadcrumbs["Créer une fiche de poste"] = reverse("siaes_views:edit_job_description")
+
+    context = {
+        "form": form,
+        "breadcrumbs": breadcrumbs,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def edit_job_description_details(request, template_name="siaes/edit_job_description_details.html"):
+    siae = get_current_siae_or_404(request)
+    session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+    job_description = _get_job_description(session_data)
+
+    form = EditJobDescriptionDetailsForm(
+        siae, instance=job_description, data=request.POST or None, initial=session_data
+    )
+
+    if request.method == "POST" and form.is_valid():
+        request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
+        return HttpResponseRedirect(reverse("siaes_views:edit_job_description_preview"))
+
+    breadcrumbs = {
+        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+    }
+
+    if job_description and job_description.pk:
+        kwargs = {"job_description_id": job_description.pk}
+        breadcrumbs.update(
+            {
+                "Détails du poste": reverse("siaes_views:job_description_card", kwargs=kwargs),
+                "Modifier une fiche de poste": reverse("siaes_views:update_job_description", kwargs=kwargs),
+            }
+        )
+    else:
+        breadcrumbs["Créer une fiche de poste"] = reverse("siaes_views:edit_job_description")
+
+    context = {
+        "form": form,
+        "breadcrumbs": breadcrumbs,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+@transaction.atomic
+def edit_job_description_preview(request, template_name="siaes/edit_job_description_preview.html"):
+    siae = get_current_siae_or_404(request)
+    session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+    job_description = _get_job_description(session_data) or SiaeJobDescription()
+
+    job_description.__dict__.update(**session_data)
+
+    if location_code := session_data.get("location_code"):
+        job_description.location = City.objects.get(slug=location_code)
+    job_description.appellation = Appellation.objects.get(code=session_data.get("job_appellation_code"))
+    job_description.siae = siae
+
+    if request.method == "POST":
+        try:
+            job_description.save()
+            messages.success(request, "Enregistrement de la fiche de poste effectué.")
+        except Exception as ex:
+            messages.error(request, f"Une erreur est survenue lors de l'enregistrement de la fiche de poste. ({ ex })")
+        finally:
+            request.session.pop(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+            return HttpResponseRedirect(reverse("siaes_views:job_description_list"))
+
+    breadcrumbs = {
+        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+    }
+
+    if job_description and job_description.pk:
+        kwargs = {"job_description_id": job_description.pk}
+        breadcrumbs.update(
+            {
+                "Détails du poste": reverse("siaes_views:job_description_card", kwargs=kwargs),
+                "Modifier une fiche de poste": reverse("siaes_views:update_job_description", kwargs=kwargs),
+            }
+        )
+    else:
+        breadcrumbs["Créer une fiche de poste"] = reverse("siaes_views:edit_job_description")
+
+    context = {
+        "siae": siae,
+        "job": job_description,
+        "breadcrumbs": breadcrumbs,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def update_job_description(request, job_description_id):
+    request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {"pk": job_description_id}
+    return HttpResponseRedirect(reverse("siaes_views:edit_job_description"))
+
+
+### Financial annexes views
 
 
 @login_required
@@ -239,6 +357,19 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
         return HttpResponseRedirect(reverse("siaes_views:show_financial_annexes"))
 
     context = {"select_form": select_form}
+    return render(request, template_name, context)
+
+
+### SIAE CRUD views
+
+
+def card(request, siae_id, template_name="siaes/card.html"):
+    queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
+
+    siae = get_object_or_404(queryset, pk=siae_id)
+    jobs_descriptions = siae.job_description_through.all()
+    back_url = get_safe_url(request, "back_url")
+    context = {"siae": siae, "back_url": back_url, "jobs_descriptions": jobs_descriptions}
     return render(request, template_name, context)
 
 
@@ -344,6 +475,9 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
 
     context = {"siae": siae, "form_data": form_data, "prev_url": reverse("siaes_views:edit_siae_step_description")}
     return render(request, template_name, context)
+
+
+### SIAE memberships views
 
 
 @login_required

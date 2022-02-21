@@ -8,18 +8,7 @@
     <div class="card c-card mt-4 p-3">
         <div class="card-body">
 
-            <div class="card c-card c-card--emploi mb-3 mb-lg-5">
-                <div class="card-body">
-                    <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.display_kind }} </p>
-                    <hr>
-                    <p class="h2">
-                        {{ siae.display_name }}
-                    </p>
-                    {# Display non-user-edited name too. #}
-                    {% comment %} {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %} {% endcomment %}
-                    <div class="card-subtitle fs-lg font-weight-bold text-secondary">{{ siae.address_on_one_line }}</div>
-                </div>
-            </div>
+            {% include "siaes/includes/_siae_info.html" %}
 
             {% if siae.description %}
                 <p class="h3 mb-1">Son activité</p>
@@ -31,29 +20,8 @@
                 {{ siae.provided_support | linebreaks }}
             {% endif %}
 
-
             {% if siae.email or siae.phone or siae.website %}
-                <hr>
-                {% if siae.email %}
-                    <p>
-                        <i class="ri-mail-line ri-xl mr-2"></i>
-                        <a title="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
-                    </p>
-                {% endif %}
-
-                {% if siae.phone %}
-                    <p>
-                        <i class="ri-phone-line ri-xl mr-2"></i>
-                        <a title="Contact téléphonique" href="tel:{{ siae.phone|cut:' ' }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
-                    </p>
-                {% endif %}
-
-                {% if siae.website %}
-                    <p>
-                        <i class="ri-global-line ri-xl mr-2"></i>
-                        <a title="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
-                    </p>
-                {% endif %}
+                {% include "siaes/includes/_siae_details.html" %}
             {% endif %}
 
             {% if siae.block_job_applications and siae.count_active_job_descriptions == 0 %}
