@@ -16,7 +16,6 @@ class ItouLoginView(LoginView):
     """
 
     ACCOUNT_TYPE_TO_DISPLAY_NAME = {
-        "prescriber": "Prescripteur",
         "siae": "Employeur solidaire",
         "institution": "Institution partenaire",
     }
@@ -24,7 +23,6 @@ class ItouLoginView(LoginView):
     # The reverse() method cannot be used here as it causes
     # a cryptic loop import error in config/urls.py
     ACCOUNT_TYPE_TO_SIGNUP_URL = {
-        "prescriber": "signup:prescriber_check_already_exists",
         "siae": "signup:siae_select",
     }
 
@@ -32,20 +30,14 @@ class ItouLoginView(LoginView):
     template_name = "account/login_generic.html"
 
     def get_context_data(self, **kwargs):
-        params = self.request.GET or self.request.POST
-        account_type = params.get("account_type")
-        signup_url = reverse(ItouLoginView.ACCOUNT_TYPE_TO_SIGNUP_URL.get(account_type, "account_signup"))
-        show_france_connect = settings.FRANCE_CONNECT_ENABLED
-        signup_allowed = account_type != "institution"
-        redirect_field_value = get_safe_url(self.request, REDIRECT_FIELD_NAME)
         context = super().get_context_data(**kwargs)
+        login_url = reverse("account_login")
+        signup_url = reverse("account_signup")
         extra_context = {
-            "account_type": account_type,
+            "login_url": login_url,
             "signup_url": signup_url,
-            "show_france_connect": show_france_connect,
             "redirect_field_name": REDIRECT_FIELD_NAME,
-            "redirect_field_value": redirect_field_value,
-            "signup_allowed": signup_allowed,
+            "redirect_field_value": get_safe_url(self.request, REDIRECT_FIELD_NAME),
         }
         return context | extra_context
 
@@ -89,7 +81,15 @@ class ItouLoginView(LoginView):
 
 
 class PrescriberLoginView(ItouLoginView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        extra_context = {
+            "account_type_display_name": "prescripteur",
+            "login_url": reverse("login:prescriber"),
+            "signup_url": reverse("signup:prescriber_check_already_exists"),
+            "signup_allowed": True,
+        }
+        return context | extra_context
 
 
 class SiaeStaffLoginView(ItouLoginView):
@@ -102,3 +102,11 @@ class LaborInspectorLoginView(ItouLoginView):
 
 class JobSeekerLoginView(ItouLoginView):
     template_name = "account/login_job_seeker.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        show_france_connect = settings.FRANCE_CONNECT_ENABLED
+        extra_context = {
+            "show_france_connect": show_france_connect,
+        }
+        return context | extra_context
