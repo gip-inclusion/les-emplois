@@ -6,6 +6,8 @@ import httpx
 import respx
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
@@ -13,15 +15,22 @@ from django.core.mail.message import EmailMessage
 from django.http import HttpResponse
 from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.html import escape
 from factory import Faker
+from faker import Faker as fk
 
+from itou.approvals.factories import SuspensionFactory
+from itou.approvals.models import Suspension
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
-from itou.users.factories import JobSeekerFactory, PrescriberFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import process_geocoding_data
@@ -42,6 +51,7 @@ from itou.utils.mocks.pole_emploi import (
     POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK,
     POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK,
 )
+from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
@@ -902,3 +912,73 @@ class ResumeFormMixinTest(TestCase):
         form = ResumeFormMixin(data={"resume_link": resume_link})
         self.assertTrue(form.is_valid())
         self.assertFalse(form.has_error("resume_link"))
+
+
+class SupportRemarkAdminViewsTest(TestCase):
+    def test_add_support_remark_to_suspension(self):
+        user = UserFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        today = timezone.now().date()
+        job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        approval = job_app.approval
+
+        suspension = SuspensionFactory(
+            approval=approval,
+            start_at=today,
+            end_at=today + relativedelta(months=2),
+            reason=Suspension.Reason.BROKEN_CONTRACT.value,
+        )
+
+        url = reverse("admin:approvals_suspension_change", args=[suspension.pk])
+
+        # Not enough perms.
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        user.is_staff = True
+        user.save()
+
+        # Add needed perms
+        suspension_content_type = ContentType.objects.get_for_model(Suspension)
+        permission = Permission.objects.get(content_type=suspension_content_type, codename="change_suspension")
+        user.user_permissions.add(permission)
+        remark_content_type = ContentType.objects.get_for_model(PkSupportRemark)
+        permission = Permission.objects.get(content_type=remark_content_type, codename="view_pksupportremark")
+        user.user_permissions.add(permission)
+        permission = Permission.objects.get(content_type=remark_content_type, codename="add_pksupportremark")
+        user.user_permissions.add(permission)
+
+        # With good perms.
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        fake = fk(locale="fr_FR")
+        fake_remark = fake.sentence()
+
+        # Get initial data for suspension form
+        post_data = response.context["adminform"].form.initial
+
+        # Compose manually dict for remark inlines fields because context doesn't provide it easily
+        post_data.update(
+            {
+                "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+                "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+                "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+                "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+                "utils-pksupportremark-content_type-object_id-0-remark": fake_remark,
+                "utils-pksupportremark-content_type-object_id-0-id": "",
+                "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+                "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+                "_save": "Enregistrer",
+            }
+        )
+        self.client.post(url, data=post_data)
+
+        # Is the remark created ?
+        remark = PkSupportRemark.objects.filter(content_type=suspension_content_type, object_id=suspension.pk).first()
+        self.assertEqual(remark.remark, fake_remark)
+
+        # Is the remark displayed in admin change form ?
+        response = self.client.get(url)
+        self.assertContains(response, escape(fake_remark))

@@ -1,3 +1,4 @@
+from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.models import SocialAccount
 from django.contrib import admin
@@ -11,6 +12,7 @@ from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
 from itou.users.admin_forms import UserAdminForm
+from itou.utils.admin import PkSupportRemarkInline
 
 
 class SiaeMembershipInline(admin.TabularInline):
@@ -155,6 +157,7 @@ class ItouUserAdmin(UserAdmin):
         SiaeMembershipInline,
         PrescriberMembershipInline,
         InstitutionMembershipInline,
+        PkSupportRemarkInline,
     ]
     list_display = (
         "pk",
@@ -340,6 +343,8 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
         ),
     )
 
+    inlines = (PkSupportRemarkInline,)
+
     def username(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
 
@@ -348,3 +353,11 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
 
     username.short_description = "Nom complet"
     pole_emploi_id.short_description = "Identifiant Pôle emploi"
+
+
+class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
+    inlines = (PkSupportRemarkInline,)
+
+
+admin.site.unregister(EmailAddress)
+admin.site.register(EmailAddress, EmailAddressWithRemarkAdmin)
