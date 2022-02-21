@@ -15,10 +15,6 @@ class ItouLoginView(LoginView):
     It redirects to a more precise login view when a user type can be determined.
     """
 
-    ACCOUNT_TYPE_TO_DISPLAY_NAME = {
-        "institution": "Institution partenaire",
-    }
-
     form_class = ItouLoginForm
     template_name = "account/login_generic.html"
 
@@ -98,7 +94,14 @@ class SiaeStaffLoginView(ItouLoginView):
 
 
 class LaborInspectorLoginView(ItouLoginView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        extra_context = {
+            "account_type_display_name": "institution partenaire",
+            "login_url": reverse("login:labor_inspector"),
+            "signup_allowed": False,
+        }
+        return context | extra_context
 
 
 class JobSeekerLoginView(ItouLoginView):
