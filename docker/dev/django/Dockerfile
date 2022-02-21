@@ -1,6 +1,7 @@
 # Debian Buster slim variant.
 FROM python:3.9.2-slim-buster
 
+ENV DOCKER_DEFAULT_PLATFORM=linux/amd64
 # Inspiration
 # https://github.com/azavea/docker-django/blob/1ef366/Dockerfile-slim.template
 # https://github.com/docker-library/postgres/blob/9d8e24/11/Dockerfile
@@ -46,27 +47,25 @@ ENV PG_MAJOR="14"
 # Add PostgreSQL's repository. It contains the most recent stable release.
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main $PG_MAJOR" > /etc/apt/sources.list.d/pgdg.list
 
-RUN set -eux \
-    && buildDeps=" \
-       build-essential \
-       libpq-dev \
-    " \
-    && deps=" \
-       gdal-bin \
-       gettext \
-       git \
-       postgresql-client-$PG_MAJOR \
-    " \
-    && apt-get update && apt-get install -y $buildDeps $deps --no-install-recommends \
-    && apt-get purge -y --auto-remove $buildDeps \
-       $(! command -v gpg > /dev/null || echo 'gnupg dirmngr') \
-    && rm -rf /var/lib/apt/lists/*;
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    gdal-bin \
+    gettext \
+    git \
+    postgresql-client-$PG_MAJOR \
+    --no-install-recommends
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r /requirements/dev.txt \
+    && pip uninstall psycopg2-binary -y \
+    && pip install psycopg2-binary --no-binary psycopg2-binary \
     && rm -rf /requirements
+
+RUN apt-get purge -y --auto-remove build-essential libpq-dev $(! command -v gpg > /dev/null || echo 'gnupg dirmngr') \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=app:app . $APP_DIR
 
