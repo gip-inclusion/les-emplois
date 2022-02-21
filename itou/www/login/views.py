@@ -17,7 +17,6 @@ class ItouLoginView(LoginView):
     """
 
     ACCOUNT_TYPE_TO_DISPLAY_NAME = {
-        "job_seeker": "Candidat",
         "prescriber": "Prescripteur",
         "siae": "Employeur solidaire",
         "institution": "Institution partenaire",
@@ -26,7 +25,6 @@ class ItouLoginView(LoginView):
     # The reverse() method cannot be used here as it causes
     # a cryptic loop import error in config/urls.py
     ACCOUNT_TYPE_TO_SIGNUP_URL = {
-        "job_seeker": "signup:job_seeker_situation",
         "prescriber": "signup:prescriber_check_already_exists",
         "siae": "signup:siae_select",
     }
@@ -38,7 +36,6 @@ class ItouLoginView(LoginView):
         if isinstance(response, TemplateResponse):
             account_type = params.get("account_type")
             signup_url = reverse(ItouLoginView.ACCOUNT_TYPE_TO_SIGNUP_URL.get(account_type, "account_signup"))
-            show_sign_in_providers = account_type == "job_seeker"
             show_france_connect = settings.FRANCE_CONNECT_ENABLED
             signup_allowed = account_type != "institution"
             redirect_field_value = get_safe_url(self.request, REDIRECT_FIELD_NAME)
@@ -46,7 +43,6 @@ class ItouLoginView(LoginView):
             context = {
                 "account_type": account_type,
                 "signup_url": signup_url,
-                "show_sign_in_providers": show_sign_in_providers,
                 "show_france_connect": show_france_connect,
                 "redirect_field_name": REDIRECT_FIELD_NAME,
                 "redirect_field_value": redirect_field_value,
@@ -112,4 +108,4 @@ class LaborInspectorLoginView(ItouLoginView):
 
 
 class JobSeekerLoginView(ItouLoginView):
-    pass
+    template_name = "account/login_job_seeker.html"
