@@ -4,13 +4,13 @@
 {% block title %}Préférences personnelles{{ block.super }}{% endblock %}
 
 {% block content %}
-<h1 class="h1-hero-c1">Préférences personnelles</h1>
-<h2 class="h1"><span class="text-muted">{{ current_siae.display_name }}</span></h2>
+    <h1 class="h1-hero-c1">Préférences personnelles</h1>
+    <h2 class="h1"><span class="text-muted">{{ current_siae.display_name }}</span></h2>
 
-<div class="card-deck mt-3">
-    <div class="card">
-        <h3 class="h2 card-header font-weight-bold h3">Notifications e-mail</h3>
-        <div class="card-body">
+    <div class="card-deck mt-3">
+        <div class="card">
+            <h3 class="h2 card-header font-weight-bold h3">Notifications e-mail</h3>
+            <div class="card-body">
                 <h4 class="font-weight-bold h4">Nouvelles candidatures</h4>
                 <form method="post" action="" class="js-prevent-multiple-submit">
                     {% csrf_token %}
@@ -24,7 +24,7 @@
                     {% endbuttons %}
 
                 </form>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

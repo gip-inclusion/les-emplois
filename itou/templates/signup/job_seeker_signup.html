@@ -11,7 +11,7 @@
         </h1>
 
         <b class="mb-4">Inscrivez-vous avec un service tiers</b>
-            {% if show_france_connect %}
+        {% if show_france_connect %}
             <div>
                 {% include "signup/includes/france_connect_button.html" %}
             </div>
@@ -20,13 +20,13 @@
                     <b>Ou</b>
                 </p>
             </div>
-            {% endif %}
+        {% endif %}
 
-            <div class="row mt-3">
-                <div class="col-sm">
-                    <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
-                </div>
+        <div class="row mt-3">
+            <div class="col-sm">
+                <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
             </div>
+        </div>
         <div class="mt-4 mb-3">
             <b>Ou utilisez votre adresse e-mail</b>
         </div>
@@ -67,7 +67,7 @@
             <p>Vous avez déjà un compte ?</p>
             <p>
                 <a class="btn btn-outline-primary" href="{% url 'account_login' %}">
-                Connexion
+                    Connexion
                 </a>
             </p>
         </div>

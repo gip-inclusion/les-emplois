@@ -12,14 +12,14 @@
 
 {% block content %}
 
-<h1 class="h1-hero-c1">Erreur inattendue à la connexion</h1>
+    <h1 class="h1-hero-c1">Erreur inattendue à la connexion</h1>
 
-<p>Une erreur inattendue s'est produite. Essayez à nouveau de vous connecter.</p>
+    <p>Une erreur inattendue s'est produite. Essayez à nouveau de vous connecter.</p>
 
-<p>Code de l'erreur : {{ auth_error.code }}</p>
+    <p>Code de l'erreur : {{ auth_error.code }}</p>
 
-<p>Nature de l'erreur : {{ auth_error.exception }}</p>
+    <p>Nature de l'erreur : {{ auth_error.exception }}</p>
 
-<p>Détails : {{ auth_error }}</p>
+    <p>Détails : {{ auth_error }}</p>
 
 {% endblock %}

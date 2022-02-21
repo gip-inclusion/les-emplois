@@ -14,7 +14,7 @@
             {{ job_seeker.last_name }}
             <small>
                 (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.last_name|urlencode }}" target="_blank">
-                rechercher dans les agréments Pôle emploi
+                    rechercher dans les agréments Pôle emploi
                 </a>)
             </small>
         </li>
@@ -42,7 +42,7 @@
                 {{ job_seeker.pole_emploi_id }}
                 <small>
                     (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.pole_emploi_id|urlencode }}" target="_blank">
-                    rechercher dans les agréments Pôle emploi
+                        rechercher dans les agréments Pôle emploi
                     </a>)
                 </small>
             </li>

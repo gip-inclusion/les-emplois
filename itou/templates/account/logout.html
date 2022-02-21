@@ -6,26 +6,26 @@
 
 {% block content %}
 
-<div class="alert alert-info" role="status">
+    <div class="alert alert-info" role="status">
 
-    <h1 class="h1-hero-c1">Déconnexion</h1>
+        <h1 class="h1-hero-c1">Déconnexion</h1>
 
-    <p>Voulez-vous vraiment vous déconnecter ?</p>
+        <p>Voulez-vous vraiment vous déconnecter ?</p>
 
-    <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
+        <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
 
-        {% csrf_token %}
+            {% csrf_token %}
 
-        {% if redirect_field_value %}
-        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-        {% endif %}
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+            {% endif %}
 
-        {% buttons %}
-            <button type="submit" class="btn btn-primary">Se déconnecter</button>
-        {% endbuttons %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">Se déconnecter</button>
+            {% endbuttons %}
 
-    </form>
+        </form>
 
-</div>
+    </div>
 
 {% endblock %}

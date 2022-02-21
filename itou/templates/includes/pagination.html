@@ -14,7 +14,7 @@
                 {% if page.number == 1 %}
                     <li class="page-item disabled">
                         <a class="page-link" aria-disabled="true" tabindex="-1" href="{% url_add_query url page=1 %}">Premier</a>
-                    </li>                    
+                    </li>
                 {% else %}
                     <li class="page-item">
                         <a class="page-link" href="{% url_add_query url page=1 %}">Premier</a>
@@ -26,7 +26,7 @@
                     {% if page.number == i %}
                         <li class="page-item active">
                             <a class="page-link" aria-label="Page {{ i }}" aria-current="page" href="{% url_add_query url page=i %}">{{ i }}</a>
-                        </li>                        
+                        </li>
                     {% else %}
                         <li class="page-item">
                             <a class="page-link" aria-label="Page {{ i }}" href="{% url_add_query url page=i %}">{{ i }}</a>

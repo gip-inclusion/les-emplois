@@ -9,52 +9,52 @@
                 <th scope="col">Email</th>
                 <th scope="col">Date d'inscription</th>
                 {% if user in active_admin_members %}
-                <th scope="col">Action</th>
+                    <th scope="col">Action</th>
                 {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for member in members %}
-            <tr>
-                <th scope="row">{{ forloop.counter }}</th>
-                <td>
-                    {{ member.user.get_full_name }}
-                    {% if member.user in active_admin_members %}
-                        <small>
-                            <span class="badge badge-info" data-toggle="tooltip" title="Administrateur de la structure">
-                                admin
-                            </span>
-                        </small>
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>
+                        {{ member.user.get_full_name }}
+                        {% if member.user in active_admin_members %}
+                            <small>
+                                <span class="badge badge-info" data-toggle="tooltip" title="Administrateur de la structure">
+                                    admin
+                                </span>
+                            </small>
+                        {% endif %}
+                    </td>
+                    <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
+                    <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
+                    {% if user in active_admin_members %}
+                        <td>
+                            <div>
+                                {% if member.user != user %}
+                                    <a href="{% url base_url|add:":deactivate_member" member.user.pk %}" role="button">
+                                        Retirer de la structure
+                                    </a>
+                                    <br>
+                                    {% if not member.user in active_admin_members %}
+                                        <a href="{% url base_url|add:":update_admin_role" "add" member.user.pk %}" role="button">
+                                            Ajouter en tant qu'administrateur
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url base_url|add:":update_admin_role" "remove" member.user.pk %}" role="button">
+                                            Retirer les droits d'administrateur
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="text-center">
+                                        {% include "includes/icon.html" with icon="slash" %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </td>
                     {% endif %}
-                </td>
-                <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
-                <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
-                {% if user in active_admin_members %}
-                <td>
-                    <div>
-                        {% if member.user != user %}
-                        <a href="{% url base_url|add:":deactivate_member" member.user.pk %}" role="button">
-                            Retirer de la structure
-                        </a>
-                        <br>
-                        {% if not member.user in active_admin_members %}
-                        <a href="{% url base_url|add:":update_admin_role" "add" member.user.pk %}" role="button">
-                            Ajouter en tant qu'administrateur
-                        </a>
-                        {% else %}
-                        <a href="{% url base_url|add:":update_admin_role" "remove" member.user.pk %}" role="button">
-                            Retirer les droits d'administrateur
-                        </a>
-                        {% endif %}
-                        {% else %}
-                        <div class="text-center">
-                            {% include "includes/icon.html" with icon="slash" %}
-                        </div>
-                        {% endif %}
-                    </div>
-                </td>
-                {% endif %}
-            </tr>
+                </tr>
             {% endfor %}
         </tbody>
     </table>

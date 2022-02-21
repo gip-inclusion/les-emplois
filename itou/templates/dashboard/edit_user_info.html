@@ -4,31 +4,31 @@
 {% block title %}Modifier votre profil{{ block.super }}{% endblock %}
 
 {% block content %}
-<h1 class="h1-hero-c1">Modifier votre profil</h1>
+    <h1 class="h1-hero-c1">Modifier votre profil</h1>
 
-{% if extra_data %}
+    {% if extra_data %}
 
-<div class="alert alert-info">
+        <div class="alert alert-info">
 
-    Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte Pôle emploi
-    (récupérés lors de votre connexion du {{extra_data.created_at|date:"d F Y"}}).
+            Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte Pôle emploi
+            (récupérés lors de votre connexion du {{extra_data.created_at|date:"d F Y"}}).
 
-</div>
+        </div>
 
-{% endif %}
+    {% endif %}
 
-<form method="post" action="" class="js-prevent-multiple-submit">
+    <form method="post" action="" class="js-prevent-multiple-submit">
 
-    {% csrf_token %}
+        {% csrf_token %}
 
-    {% bootstrap_form form alert_error_type="all" %}
+        {% bootstrap_form form alert_error_type="all" %}
 
-    {% buttons %}
-        <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
-    {% endbuttons %}
+        {% buttons %}
+            <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        {% endbuttons %}
 
-</form>
+    </form>
 
 {% endblock %}
 

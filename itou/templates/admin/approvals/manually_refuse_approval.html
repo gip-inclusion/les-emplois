@@ -4,23 +4,23 @@
 
 {% block content %}
 
-<p>En confirmant le refus, cet email sera envoyé à la personne ayant accepté la candidature :</p>
+    <p>En confirmant le refus, cet email sera envoyé à la personne ayant accepté la candidature :</p>
 
-<pre>
+    <pre>
 {{ email_subject_template }}<br>
 {{ email_body_template }}
-</pre>
+    </pre>
 
-<form method="post">{% csrf_token %}
+    <form method="post">{% csrf_token %}
 
-    <div>
-        <input type="hidden" name="confirm" value="yes">
-        <input type="submit" value="Oui, je confirme le refus"">
-        <a href="{% url "admin:approvals_approval_manually_add_approval" job_application.id %}" class="button cancel-link">Non, revenir à la page précédente</a>
-    </div>
+        <div>
+            <input type="hidden" name="confirm" value="yes">
+            <input type="submit" value="Oui, je confirme le refus"">
+                <a href="{% url "admin:approvals_approval_manually_add_approval" job_application.id %}" class="button cancel-link">Non, revenir à la page précédente</a>
+            </div>
 
-</form>
+        </form>
 
-{% include "admin/approvals/includes/job_application_details.html" %}
+        {% include "admin/approvals/includes/job_application_details.html" %}
 
 {% endblock %}

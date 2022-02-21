@@ -103,10 +103,10 @@
                             <br>
                             <small>{{ p.get_reason_display }}</small>
                             {% if p.validated_by %}
-                            <br>
-                            <small>
-                                Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
-                            </small>
+                                <br>
+                                <small>
+                                    Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
+                                </small>
                             {% endif %}
                         </li>
                     {% endfor %}

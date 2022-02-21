@@ -6,149 +6,149 @@
 
 {% block content %}
 
-<h1 class="h1-hero-c1">
-    Inscription
-    <small class="text-muted">Employeur solidaire</small>
-</h1>
+    <h1 class="h1-hero-c1">
+        Inscription
+        <small class="text-muted">Employeur solidaire</small>
+    </h1>
 
-<form method="get" action="" role="form">
+    <form method="get" action="" role="form">
 
-    {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
 
-    {% bootstrap_form siren_form alert_error_type="all" %}
+        {% bootstrap_form siren_form alert_error_type="all" %}
 
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">Rechercher</button>
-    {% endbuttons %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        {% endbuttons %}
 
-</form>
-
-
-{% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
-    <div class="alert alert-emploi mt-5" role="status">
-        Aucun résultat pour <b>{{ siren_form.cleaned_data.siren }}</b>.
-    </div>
-
-    <div class="alert alert-danger mt-2" role="status">
-        <p>
-            <b>Si votre conventionnement est récent</b>, nous vous invitons à renouveler votre inscription dans une semaine.
-        </p>
-        <p>
-            <b>Si votre conventionnement a plus d’un mois</b>, prenez contact avec votre DIRECCTE en lui demandant de nous envoyer la confirmation de votre conventionnement via <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_ASSISTANCE_URL }}</a>.
-            <br>
-            La DIRECCTE doit nous indiquer si le conventionnement de votre structure est en cours en précisant le numéro de SIRET, le type de structure, l’adresse postale et l’adresse e-mail du correspondant technique ASP.<br>
-        </p>
-        <p>
-            <b>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</b>, merci d'utiliser <a href="{{ TYPEFORM_URL }}/to/RYfNLR79" target="_blank" rel="noopener" title="Merci d'utiliser ce formulaire (ouverture dans un nouvel onglet)">ce formulaire</a>.
-        </p>
-    </div>
-{% endif %}
+    </form>
 
 
-{% if siaes_without_members and siae_select_form %}
-    <div class="mt-5">
-
-        <h3 class="h2">Entreprises disponibles</h3>
-
-        <div class="alert alert-emploi" role="status">
-            <i>Les données sont fournies par l'extranet IAE 2.0 de l'ASP.</i>
+    {% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
+        <div class="alert alert-emploi mt-5" role="status">
+            Aucun résultat pour <b>{{ siren_form.cleaned_data.siren }}</b>.
         </div>
 
-        <form method="post" action="" class="js-prevent-multiple-submit">
+        <div class="alert alert-danger mt-2" role="status">
+            <p>
+                <b>Si votre conventionnement est récent</b>, nous vous invitons à renouveler votre inscription dans une semaine.
+            </p>
+            <p>
+                <b>Si votre conventionnement a plus d’un mois</b>, prenez contact avec votre DIRECCTE en lui demandant de nous envoyer la confirmation de votre conventionnement via <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_ASSISTANCE_URL }}</a>.
+                <br>
+                La DIRECCTE doit nous indiquer si le conventionnement de votre structure est en cours en précisant le numéro de SIRET, le type de structure, l’adresse postale et l’adresse e-mail du correspondant technique ASP.<br>
+            </p>
+            <p>
+                <b>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</b>, merci d'utiliser <a href="{{ TYPEFORM_URL }}/to/RYfNLR79" target="_blank" rel="noopener" title="Merci d'utiliser ce formulaire (ouverture dans un nouvel onglet)">ce formulaire</a>.
+            </p>
+        </div>
+    {% endif %}
 
-            {% csrf_token %}
 
-            {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+    {% if siaes_without_members and siae_select_form %}
+        <div class="mt-5">
 
-            {% comment %}
+            <h3 class="h2">Entreprises disponibles</h3>
+
+            <div class="alert alert-emploi" role="status">
+                <i>Les données sont fournies par l'extranet IAE 2.0 de l'ASP.</i>
+            </div>
+
+            <form method="post" action="" class="js-prevent-multiple-submit">
+
+                {% csrf_token %}
+
+                {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+
+                {% comment %}
             A ModelChoiceField's iterator only returns a tuple with (value, label).
             This means that using e.g. {% bootstrap_field form.siaes %} would only display
             a radio input and a label.
             The best solution I've yet found to display more info to the user than just a
             label is to manually render the inputs.
             {% endcomment %}
+                <ul>
+                    {% for siae in siaes_without_members %}
+                        <li>
+                            <p>
+                                <label for="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" class="align-top">
+                                    <input
+                                        type="radio"
+                                        name="{{ siae_select_form.siaes.html_name }}"
+                                        value="{{ siae.pk }}"
+                                        id="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}"
+                                        required>
+                                    <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
+                                    <br>
+                                    {{ siae.display_name }}
+                                    <br>
+                                    {{ siae.address_line_1 }},
+                                    {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+                                    {{ siae.post_code }} {{ siae.city }}
+                                </label>
+                            </p>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="alert alert-warning pb-0">
+                    <p>
+                        Pour sécuriser l'inscription, un e-mail de confirmation sera envoyé au correspondant technique référencé dans l'extranet IAE 2.0 de l'ASP. Il permettra de poursuivre la procédure.
+                    </p>
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary">Continuer l'inscription</button>
+                    {% endbuttons %}
+                </div>
+
+            </form>
+
+        </div>
+    {% endif %}
+
+
+    {% if siaes_with_members %}
+        <div class="mt-5">
+
+            <h3 class="h2">Entreprises déjà inscrites</h3>
+
+            <div class="alert alert-emploi" role="status">
+                <i>Par sécurité vous devez obtenir une invitation pour rejoindre ces structures.</i>
+            </div>
+
             <ul>
-                {% for siae in siaes_without_members %}
+                {% for siae in siaes_with_members %}
                     <li>
                         <p>
-                            <label for="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" class="align-top">
-                                <input
-                                    type="radio"
-                                    name="{{ siae_select_form.siaes.html_name }}"
-                                    value="{{ siae.pk }}"
-                                    id="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}"
-                                    required>
-                                <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
-                                <br>
-                                {{ siae.display_name }}
-                                <br>
-                                {{ siae.address_line_1 }},
-                                {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
-                                {{ siae.post_code }} {{ siae.city }}
-                            </label>
+                            <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
+                            <br>
+                            {{ siae.display_name }}
+                            <br>
+                            {{ siae.address_line_1 }},
+                            {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+                            {{ siae.post_code }} {{ siae.city }}
+                            <br>
+                            {% if siae.active_admin_members %}
+                                {% with siae.active_admin_members.first as admin %}
+                                    {# For security, display only the first char of the last name. #}
+                                    <i>Pour obtenir une invitation, contactez {{ admin.first_name|title }} {{ admin.last_name|slice:1 }}.</i>
+                                {% endwith %}
+                            {% endif %}
                         </p>
                     </li>
                 {% endfor %}
             </ul>
 
-            <div class="alert alert-warning pb-0">
-                <p>
-                    Pour sécuriser l'inscription, un e-mail de confirmation sera envoyé au correspondant technique référencé dans l'extranet IAE 2.0 de l'ASP. Il permettra de poursuivre la procédure.
-                </p>
-                {% buttons %}
-                    <button type="submit" class="btn btn-primary">Continuer l'inscription</button>
-                {% endbuttons %}
-            </div>
-
-        </form>
-
-    </div>
-{% endif %}
-
-
-{% if siaes_with_members %}
-    <div class="mt-5">
-
-        <h3 class="h2">Entreprises déjà inscrites</h3>
-
-        <div class="alert alert-emploi" role="status">
-            <i>Par sécurité vous devez obtenir une invitation pour rejoindre ces structures.</i>
         </div>
-
-        <ul>
-            {% for siae in siaes_with_members %}
-                <li>
-                    <p>
-                        <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
-                        <br>
-                        {{ siae.display_name }}
-                        <br>
-                        {{ siae.address_line_1 }},
-                        {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
-                        {{ siae.post_code }} {{ siae.city }}
-                        <br>
-                        {% if siae.active_admin_members %}
-                            {% with siae.active_admin_members.first as admin %}
-                                {# For security, display only the first char of the last name. #}
-                                <i>Pour obtenir une invitation, contactez {{ admin.first_name|title }} {{ admin.last_name|slice:1 }}.</i>
-                            {% endwith %}
-                        {% endif %}
-                    </p>
-                </li>
-            {% endfor %}
-        </ul>
-
-    </div>
-{% endif %}
+    {% endif %}
 
 
-{% if siaes_without_members or siaes_with_members %}
-    <div class="mt-5">
-        <p>
-            En cas de problème contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_ASSISTANCE_URL }}</a>
-        </p>
-    </div>
-{% endif %}
+    {% if siaes_without_members or siaes_with_members %}
+        <div class="mt-5">
+            <p>
+                En cas de problème contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_ASSISTANCE_URL }}</a>
+            </p>
+        </div>
+    {% endif %}
 
 
 {% endblock %}

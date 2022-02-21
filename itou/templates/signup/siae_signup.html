@@ -5,40 +5,40 @@
 
 
 {% block content %}
-<h1 class="h1-hero-c1">
-    Inscription
-    <small class="text-muted">Employeur solidaire</small>
-</h1>
+    <h1 class="h1-hero-c1">
+        Inscription
+        <small class="text-muted">Employeur solidaire</small>
+    </h1>
 
-<form method="post" action="" role="form" class="js-prevent-multiple-submit">
+    <form method="post" action="" role="form" class="js-prevent-multiple-submit">
 
-    {% csrf_token %}
+        {% csrf_token %}
 
-    {% bootstrap_form_errors form type="all" %}
+        {% bootstrap_form_errors form type="all" %}
 
-    {% if redirect_field_value %}
-        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-    {% endif %}
+        {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+        {% endif %}
 
-    {% bootstrap_field form.encoded_siae_id %}
-    {% bootstrap_field form.token %}
+        {% bootstrap_field form.encoded_siae_id %}
+        {% bootstrap_field form.token %}
 
-    {% bootstrap_field form.kind %}
-    {% bootstrap_field form.siret %}
-    {% bootstrap_field form.siae_name %}
-    {% bootstrap_field form.first_name %}
-    {% bootstrap_field form.last_name %}
-    {% bootstrap_field form.email %}
-    {% bootstrap_field form.password1 %}
-    {% bootstrap_field form.password2 %}
+        {% bootstrap_field form.kind %}
+        {% bootstrap_field form.siret %}
+        {% bootstrap_field form.siae_name %}
+        {% bootstrap_field form.first_name %}
+        {% bootstrap_field form.last_name %}
+        {% bootstrap_field form.email %}
+        {% bootstrap_field form.password1 %}
+        {% bootstrap_field form.password2 %}
 
-    {% include "signup/includes/submit_rgpd.html" %}
+        {% include "signup/includes/submit_rgpd.html" %}
 
-</form>
+    </form>
 
-<hr>
+    <hr>
 
-<p>
-    <a href="{% url 'account_login' %}">Vous avez déjà un compte ?</a>
-</p>
+    <p>
+        <a href="{% url 'account_login' %}">Vous avez déjà un compte ?</a>
+    </p>
 {% endblock %}

@@ -74,9 +74,9 @@
         <div class="pt-4">
             <h2 class="h1">Consulter le(s) recrutement(s) en cours dans cette structure</h2>
             {% for other_job in others_active_jobs %}
-                    <a href="{{ other_job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event btn btn-outline-primary mb-2" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
-                        {{ other_job.display_name }}
-                    </a>
+                <a href="{{ other_job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event btn btn-outline-primary mb-2" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+                    {{ other_job.display_name }}
+                </a>
                 <br >
             {% endfor %}
         </div>

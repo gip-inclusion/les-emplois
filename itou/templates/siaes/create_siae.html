@@ -5,45 +5,45 @@
 
 {% block content %}
 
-<h1 class="h1-hero-c1">Créer/rejoindre une nouvelle structure</h1>
+    <h1 class="h1-hero-c1">Créer/rejoindre une nouvelle structure</h1>
 
-<form method="post" action="" class="js-prevent-multiple-submit">
+    <form method="post" action="" class="js-prevent-multiple-submit">
 
-    <div class="alert alert-info">
-        <p>Vous souhaitez rejoindre une structure :</p>
-        <ul>
-            <li>ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b></li>
-            <li>connue dans l'extranet IAE 2.0 de l'ASP mais n’ayant pas encore de membre : <a href="{% url 'signup:siae_select' %}">utilisez ce formulaire</a></li>
-        </ul>
-        <p>Dans les autres cas, complétez le formulaire ci-dessous.</p>
-    </div>
-
-    {% csrf_token %}
-
-    {% if form.non_field_errors %}
-        <div class="alert alert-danger alert-dismissible alert-link" role="alert">
-            {% for error in form.non_field_errors %}
-                {{ error | safe }}{% if not forloop.last %}<br>{% endif %}
-            {% endfor %}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                <i class="ri-close-line"></i>
-            </button>               
+        <div class="alert alert-info">
+            <p>Vous souhaitez rejoindre une structure :</p>
+            <ul>
+                <li>ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b></li>
+                <li>connue dans l'extranet IAE 2.0 de l'ASP mais n’ayant pas encore de membre : <a href="{% url 'signup:siae_select' %}">utilisez ce formulaire</a></li>
+            </ul>
+            <p>Dans les autres cas, complétez le formulaire ci-dessous.</p>
         </div>
-    {% endif %}
 
-    {% for field in form %}
-        {% bootstrap_field field %}
-    {% endfor %}
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissible alert-link" role="alert">
+                {% for error in form.non_field_errors %}
+                    {{ error | safe }}{% if not forloop.last %}<br>{% endif %}
+                {% endfor %}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            {% bootstrap_field field %}
+        {% endfor %}
 
 
-    <p>
-        En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
-    </p>
-    {% buttons %}
-        <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
-    {% endbuttons %}
+        <p>
+            En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+        </p>
+        {% buttons %}
+            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        {% endbuttons %}
 
-</form>
+    </form>
 
 {% endblock %}

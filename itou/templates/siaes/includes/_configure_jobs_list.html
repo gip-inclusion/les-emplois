@@ -11,60 +11,60 @@
     </thead>
     <tbody class="js-jobs-tbody">
         {% for job in job_descriptions %}
-        {# Important: keep the JavaScript template in sync if you edit the row markup. #}
-        <tr>
-            <td class="font-weight-bold">{{ job.appellation.rome.code }}</td>
-            <td class="text-left">
-                <p class="job-appellation-name">
-                    <i>{{ job.appellation.name }}</i>
-                </p>
-                <input type="hidden" name="code-update" value="{{ job.appellation.code }}">
-                <div class="form-group">
-                    <label for="custom-name-{{ job.appellation.code }}">
-                        <small>Nom personnalisé</small>
-                    </label>
-                    <input
-                        type="text"
-                        class="form-control form-control-sm"
-                        id="custom-name-{{ job.appellation.code }}"
-                        name="custom-name-{{ job.appellation.code }}"
-                        value="{{ job.custom_name }}">
-                    <small class="form-text text-muted">
-                        Si ce champ est renseigné, il sera utilisé à la place du nom ci-dessus.
-                    </small>
-                </div>
-                <div class="form-group">
-                    <label for="description-{{ job.appellation.code }}">
-                        <small>Description</small>
-                    </label>
-                    <textarea
-                        class="form-control form-control-sm"
-                        id="description-{{ job.appellation.code }}"
-                        name="description-{{ job.appellation.code }}"
-                        rows="3">{{ job.description }}</textarea>
-                    <small class="form-text text-muted">
-                        Renseignez ici le détail des missions, les compétences/habilitations nécessaires, les conditions de travail, les éventuelles adaptations ou restrictions du poste.
-                    </small>
-                </div>
-            </td>
-            <td class="text-center align-middle" scope="row">
-                <div class="custom-control custom-switch is-rtl">
-                    <input name="is_active-{{ job.appellation.code }}"
-                        type="checkbox" class="custom-control-input"
-                        id="is_active-{{ job.appellation.code }}"
-                        {% if job.is_active %}checked{% endif %}>
-                    <label class="custom-control-label font-weight-bold"
-                        for="is_active-{{ job.appellation.code }}">Ouvrir au recrutement</label>
-                </div>
-            </td>
-            <td class="align-middle">
-                <a href="#" role="button" class="js-job-delete">
-                    {% include "includes/icon.html" with icon="trash-2" %}
-                </a>
-                {# will be enable with JavaScript if user click to delete it #}
-                <input type="hidden" name="code-delete"  value="{{ job.appellation.code }}" disabled>
-            </td>
-        </tr>
+            {# Important: keep the JavaScript template in sync if you edit the row markup. #}
+            <tr>
+                <td class="font-weight-bold">{{ job.appellation.rome.code }}</td>
+                <td class="text-left">
+                    <p class="job-appellation-name">
+                        <i>{{ job.appellation.name }}</i>
+                    </p>
+                    <input type="hidden" name="code-update" value="{{ job.appellation.code }}">
+                    <div class="form-group">
+                        <label for="custom-name-{{ job.appellation.code }}">
+                            <small>Nom personnalisé</small>
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control form-control-sm"
+                            id="custom-name-{{ job.appellation.code }}"
+                            name="custom-name-{{ job.appellation.code }}"
+                            value="{{ job.custom_name }}">
+                        <small class="form-text text-muted">
+                            Si ce champ est renseigné, il sera utilisé à la place du nom ci-dessus.
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="description-{{ job.appellation.code }}">
+                            <small>Description</small>
+                        </label>
+                        <textarea
+                            class="form-control form-control-sm"
+                            id="description-{{ job.appellation.code }}"
+                            name="description-{{ job.appellation.code }}"
+                            rows="3">{{ job.description }}</textarea>
+                        <small class="form-text text-muted">
+                            Renseignez ici le détail des missions, les compétences/habilitations nécessaires, les conditions de travail, les éventuelles adaptations ou restrictions du poste.
+                        </small>
+                    </div>
+                </td>
+                <td class="text-center align-middle" scope="row">
+                    <div class="custom-control custom-switch is-rtl">
+                        <input name="is_active-{{ job.appellation.code }}"
+                            type="checkbox" class="custom-control-input"
+                            id="is_active-{{ job.appellation.code }}"
+                            {% if job.is_active %}checked{% endif %}>
+                        <label class="custom-control-label font-weight-bold"
+                            for="is_active-{{ job.appellation.code }}">Ouvrir au recrutement</label>
+                    </div>
+                </td>
+                <td class="align-middle">
+                    <a href="#" role="button" class="js-job-delete">
+                        {% include "includes/icon.html" with icon="trash-2" %}
+                    </a>
+                    {# will be enable with JavaScript if user click to delete it #}
+                    <input type="hidden" name="code-delete"  value="{{ job.appellation.code }}" disabled>
+                </td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>

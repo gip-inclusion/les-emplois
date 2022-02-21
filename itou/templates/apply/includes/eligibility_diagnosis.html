@@ -42,7 +42,7 @@
 
             <p>
                 <i>
-                    Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au 
+                    Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au
                     {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
                 </i>
             </p>
@@ -95,7 +95,7 @@
 
                 <p>
                     <i>
-                        Ce diagnostic expire le 
+                        Ce diagnostic expire le
                         {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
                     </i>
                 </p>
@@ -116,7 +116,7 @@
         <hr>
         <h3 class="h2 font-weight-normal text-muted">Éligibilité IAE</h3>
         <div class="alert alert-warning" role="status">
-            Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, 
+            Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }},
             vous devez valider les critères d'éligibilité.
         </div>
     {% endif %}

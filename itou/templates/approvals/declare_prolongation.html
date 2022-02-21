@@ -30,11 +30,11 @@
             {% bootstrap_form_errors form type="all" %}
 
             {% bootstrap_field form.reason %}
-    
+
             {% bootstrap_field form.end_at %}
-    
+
             {% bootstrap_field form.reason_explanation %}
-    
+
             <div id="js-field-email">
                 {% bootstrap_field form.email %}
 
@@ -91,11 +91,11 @@
                         <span class="badge badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
                     </p>
                     {% if form.instance.validated_by.email %}
-                    <p class="card-text">
-                        Un e-mail sera envoyé au prescripteur habilité ayant autorisé la prolongation :
-                        <b>{{ form.instance.validated_by.get_full_name|title }}</b>
-                        ({{ form.instance.validated_by.email }})
-                    </p>
+                        <p class="card-text">
+                            Un e-mail sera envoyé au prescripteur habilité ayant autorisé la prolongation :
+                            <b>{{ form.instance.validated_by.get_full_name|title }}</b>
+                            ({{ form.instance.validated_by.email }})
+                        </p>
                     {% endif %}
                 </div>
             </div>
@@ -133,7 +133,7 @@
             var reasons_max_durations = {{ form.reasons_max_duration_labels|js }};
             var reasons_not_need_prescriber_opinion = {{ form.reasons_not_need_prescriber_opinion|js }};
             $('#js-field-email').css("display", "none");
-            
+
             function ajust_form_according_reason() {
                 const value = $('input[name="reason"]:checked').val();
                 if (reasons_not_need_prescriber_opinion.includes(value)) {

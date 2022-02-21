@@ -4,14 +4,14 @@
 <h4 class="h3">Situation du salarié</h4>
 
 <form method="post" action="{% url "employee_record_views:create_step_3" job_application.id %}" class="js-prevent-multiple-submit">
-        
+
     {% bootstrap_form_errors form type="all" %}
 
     {% csrf_token %}
 
     {% bootstrap_field form.education_level %}
-    
-    {% if not is_registered_to_pole_emploi %} 
+
+    {% if not is_registered_to_pole_emploi %}
         <div role="button" data-toggle="collapse" data-target="#collapse_pole_emploi" aria-controls="#collapse_pole_emploi">
             {% bootstrap_field form.pole_emploi %}
         </div>
@@ -58,11 +58,11 @@
     <div id="collapse_ass_allocation" class="ml-1 pl-4 border-left border-primary collapse{% if form.ass_allocation.value %} show{% endif %}">
         {% bootstrap_field form.ass_allocation_since %}
     </div>
-    
+
     <div role="button" data-toggle="collapse" data-target="#collapse_aah_allocation" aria-controls="#collapse_aah_allocation">
         {% bootstrap_field form.aah_allocation %}
     </div>
-    
+
     <div id="collapse_aah_allocation" class="ml-1 pl-4 border-left border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
         {% bootstrap_field form.aah_allocation_since %}
     </div>

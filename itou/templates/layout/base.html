@@ -3,218 +3,218 @@
 {% load bootstrap4 %}
 <!DOCTYPE HTML>
 <html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <title>{% block title %} - Les emplois de l'inclusion{% endblock %}</title>
-    {% block meta_description %}<meta name="description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">{% endblock %}
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %} - Les emplois de l'inclusion{% endblock %}</title>
+        {% block meta_description %}<meta name="description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">{% endblock %}
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    {# https://metatags.io #}
-    <meta name="title" content="Les emplois de l'inclusion">
-    {# https://metatags.io Open Graph / Facebook #}
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
-    <meta property="og:title" content="Les emplois de l'inclusion">
-    <meta property="og:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
-    <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
-    {# https://metatags.io Twitter #}
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}/">
-    <meta property="twitter:title" content="Les emplois de l'inclusion">
-    <meta property="twitter:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
-    <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
+        {# https://metatags.io #}
+        <meta name="title" content="Les emplois de l'inclusion">
+        {# https://metatags.io Open Graph / Facebook #}
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
+        <meta property="og:title" content="Les emplois de l'inclusion">
+        <meta property="og:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+        <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
+        {# https://metatags.io Twitter #}
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}/">
+        <meta property="twitter:title" content="Les emplois de l'inclusion">
+        <meta property="twitter:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+        <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
 
-    {# Use this to get the value of the CSRF token in JavaScript. #}
-    <meta name="csrf-token" content="{{ csrf_token }}">
-    <link rel="shortcut icon" href="{% static_theme_images "favico.ico" %}" type="image/ico">
-    {% import_static_CSS_theme_inclusion %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.css" integrity="sha256-NRYg+xSNb5bHzrFEddJ0wL3YDp6YNt2dGNI+T5rOb2c=" crossorigin="anonymous" type="text/css">
-    <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
-    {% block extra_head %}{% endblock %}
-</head>
-<body>
-    <nav role="navigation" aria-label="Accès rapide" tabindex="1" class="sr-only">
-        <ul>
-            <li><a href="#nav-primary">Aller au menu principal</a></li>
-            <li><a href="#main">Aller au contenu principal</a></li>
-        </ul>
-    </nav>
+        {# Use this to get the value of the CSRF token in JavaScript. #}
+        <meta name="csrf-token" content="{{ csrf_token }}">
+        <link rel="shortcut icon" href="{% static_theme_images "favico.ico" %}" type="image/ico">
+        {% import_static_CSS_theme_inclusion %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.css" integrity="sha256-NRYg+xSNb5bHzrFEddJ0wL3YDp6YNt2dGNI+T5rOb2c=" crossorigin="anonymous" type="text/css">
+        <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
+        {% block extra_head %}{% endblock %}
+    </head>
+    <body>
+        <nav role="navigation" aria-label="Accès rapide" tabindex="1" class="sr-only">
+            <ul>
+                <li><a href="#nav-primary">Aller au menu principal</a></li>
+                <li><a href="#main">Aller au contenu principal</a></li>
+            </ul>
+        </nav>
 
-    {% include "includes/test_accounts.html" %}
-    {% include "layout/_header.html" %}
+        {% include "includes/test_accounts.html" %}
+        {% include "layout/_header.html" %}
 
-    <main id="main" role="main" class="s-main bg-gray-400">
+        <main id="main" role="main" class="s-main bg-gray-400">
 
-        <div class="container container-messages">
-            {% block messages %}
+            <div class="container container-messages">
+                {% block messages %}
 
-                {% bootstrap_messages %}
+                    {% bootstrap_messages %}
 
-                {# Display an alert for old browsers #}
-                <div class="alert alert-secondary alert-old-browser" role="status">
-                    La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
-                </div>
+                    {# Display an alert for old browsers #}
+                    <div class="alert alert-secondary alert-old-browser" role="status">
+                        La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
+                    </div>
 
-            {% endblock %}
+                {% endblock %}
+            </div>
+
+            {% block content_full_viewport %}{% endblock %}
+
+        </main>
+
+        {% include "layout/_footer.html" %}
+
+        <div class="sr-only">
+            <a href="#header">Retour au début de la page</a>
         </div>
 
-        {% block content_full_viewport %}{% endblock %}
+        {% import_static_JS_theme_inclusion %}
+        <script src="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+        <script>
 
-    </main>
+            // Tarteaucitron's language is set according to the browser configuration
+            // but a lot of users don't know how to change it.
+            // This can be forced only by using a global `var` statement.
+            // https://github.com/AmauriC/tarteaucitron.js/blob/98b02b0bdda670bd953752d85443c3fd77dde724/tarteaucitron.js#L5
+            var tarteaucitronForceLanguage = "fr";
 
-    {% include "layout/_footer.html" %}
+            tarteaucitron.init({
+                "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
+                "cookieName": "tarteaucitron", /* Cookie name */
+                "orientation": "top", /* Banner position (top - bottom) */
+                "groupServices": false, /* Group services by category */
+                "showAlertSmall": false, /* Show the small banner on bottom right */
+                "cookieslist": false, /* Show the cookie list */
+                "closePopup": false, /* Show a close X on the banner */
+                "showIcon": true, /* Show cookie icon to manage cookies */
+                //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
+                "iconPosition": "BottomLeft", /* BottomRight, BottomLeft, TopRight and TopLeft */
+                "adblocker": false, /* Show a Warning if an adblocker is detected */
+                "DenyAllCta" : true, /* Show the deny all button */
+                "AcceptAllCta" : true, /* Show the accept all button when highPrivacy on */
+                "highPrivacy": true, /* HIGHLY RECOMMANDED Disable auto consent */
+                "handleBrowserDNTRequest": false, /* If Do Not Track == 1, disallow all */
+                "removeCredit": true, /* Remove credit link */
+                "moreInfoLink": true, /* Show more info link */
+                "useExternalCss": true, /* If false, the tarteaucitron.css file will be loaded */
+                "useExternalJs": false, /* If false, the tarteaucitron.js file will be loaded */
+                //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
+                "readmoreLink": "{{ ITOU_DOC_URL }}/mentions/protection-des-donnees", /* Change the default readmore link */
+                "mandatory": true, /* Show a message about mandatory cookies */
+            });
 
-    <div class="sr-only">
-        <a href="#header">Retour au début de la page</a>
-    </div>
+            // Hotjar.
+            (tarteaucitron.job = tarteaucitron.job || []).push('hotjar');
+            {% if ITOU_ENVIRONMENT == "PROD" %}tarteaucitron.user.hotjarId = 2360441;{% endif %}
+            {% if ITOU_ENVIRONMENT == "DEMO" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
+            tarteaucitron.user.HotjarSv = 6;
 
-    {% import_static_JS_theme_inclusion %}
-    <script src="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
-    <script>
+            // Matomo :
+            tarteaucitron.user.matomoId = 117;
+            tarteaucitron.user.matomoHost = "https://stats.data.gouv.fr/";
+            (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
 
-        // Tarteaucitron's language is set according to the browser configuration
-        // but a lot of users don't know how to change it.
-        // This can be forced only by using a global `var` statement.
-        // https://github.com/AmauriC/tarteaucitron.js/blob/98b02b0bdda670bd953752d85443c3fd77dde724/tarteaucitron.js#L5
-        var tarteaucitronForceLanguage = "fr";
-
-        tarteaucitron.init({
-            "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
-            "cookieName": "tarteaucitron", /* Cookie name */
-            "orientation": "top", /* Banner position (top - bottom) */
-            "groupServices": false, /* Group services by category */
-            "showAlertSmall": false, /* Show the small banner on bottom right */
-            "cookieslist": false, /* Show the cookie list */
-            "closePopup": false, /* Show a close X on the banner */
-            "showIcon": true, /* Show cookie icon to manage cookies */
-            //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
-            "iconPosition": "BottomLeft", /* BottomRight, BottomLeft, TopRight and TopLeft */
-            "adblocker": false, /* Show a Warning if an adblocker is detected */
-            "DenyAllCta" : true, /* Show the deny all button */
-            "AcceptAllCta" : true, /* Show the accept all button when highPrivacy on */
-            "highPrivacy": true, /* HIGHLY RECOMMANDED Disable auto consent */
-            "handleBrowserDNTRequest": false, /* If Do Not Track == 1, disallow all */
-            "removeCredit": true, /* Remove credit link */
-            "moreInfoLink": true, /* Show more info link */
-            "useExternalCss": true, /* If false, the tarteaucitron.css file will be loaded */
-            "useExternalJs": false, /* If false, the tarteaucitron.js file will be loaded */
-            //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
-            "readmoreLink": "{{ ITOU_DOC_URL }}/mentions/protection-des-donnees", /* Change the default readmore link */
-            "mandatory": true, /* Show a message about mandatory cookies */
-        });
-
-        // Hotjar.
-        (tarteaucitron.job = tarteaucitron.job || []).push('hotjar');
-        {% if ITOU_ENVIRONMENT == "PROD" %}tarteaucitron.user.hotjarId = 2360441;{% endif %}
-        {% if ITOU_ENVIRONMENT == "DEMO" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
-        tarteaucitron.user.HotjarSv = 6;
-
-        // Matomo :
-        tarteaucitron.user.matomoId = 117;
-        tarteaucitron.user.matomoHost = "https://stats.data.gouv.fr/";
-        (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
-
-        // livestorm
-        const tablet_width = 750;
-        tarteaucitron.services.livestorm = {
-            "key": "livestorm",
-            "type": "video",
-            "name": "Livestorm",
-            "uri": "https://livestorm.co/fr/politique-confidentialite",
-            "needConsent": true,
-            "cookies": [],
-            "js": function () {
-                "use strict";
-                tarteaucitron.fallback(['js-tac-livestorm'], function (x) {
-                    var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'livestorm iframe'),
+            // livestorm
+            const tablet_width = 750;
+            tarteaucitron.services.livestorm = {
+                "key": "livestorm",
+                "type": "video",
+                "name": "Livestorm",
+                "uri": "https://livestorm.co/fr/politique-confidentialite",
+                "needConsent": true,
+                "cookies": [],
+                "js": function () {
+                    "use strict";
+                    tarteaucitron.fallback(['js-tac-livestorm'], function (x) {
+                        var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'livestorm iframe'),
                         width = x.getAttribute("width"),
                         height = x.getAttribute("height"),
                         url = x.getAttribute("data-url");
 
-                    // Poor attempt to make the Livestorm iframe responsive.
-                    if (document.body.clientWidth > tablet_width) {
-                        height = "365px";
-                    }
-                    return '<iframe title="' + frame_title + '" src="' + url + '" width="' + width + '" height="' + height + '" frameborder="0" scrolling="no" allowtransparency allowfullscreen></iframe>';
-                });
-            },
-            "fallback": function () {
-                "use strict";
-                var id = 'livestorm';
-                tarteaucitron.fallback(['js-tac-livestorm'], function (elem) {
-                    elem.style.width = elem.getAttribute('width');
-                    if (document.body.clientWidth > tablet_width) {
-                        elem.style.height = "310px";
-                    } else {
-                        elem.style.height = elem.getAttribute('height');
-                    }
-                    return tarteaucitron.engage(id);
-                });
-            }
-        };
-        (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
+                        // Poor attempt to make the Livestorm iframe responsive.
+                        if (document.body.clientWidth > tablet_width) {
+                            height = "365px";
+                        }
+                        return '<iframe title="' + frame_title + '" src="' + url + '" width="' + width + '" height="' + height + '" frameborder="0" scrolling="no" allowtransparency allowfullscreen></iframe>';
+                    });
+                },
+                "fallback": function () {
+                    "use strict";
+                    var id = 'livestorm';
+                    tarteaucitron.fallback(['js-tac-livestorm'], function (elem) {
+                        elem.style.width = elem.getAttribute('width');
+                        if (document.body.clientWidth > tablet_width) {
+                            elem.style.height = "310px";
+                        } else {
+                            elem.style.height = elem.getAttribute('height');
+                        }
+                        return tarteaucitron.engage(id);
+                    });
+                }
+            };
+            (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
 
-    </script>
-
-    {% block script %}
-        <script src="{% static "js/logout.js" %}"></script>
-        <script src="{% static "js/city_autocomplete_field.js" %}"></script>
-        <script src="{% static "js/commune_autocomplete_field.js" %}"></script>
-        <script src="{% static "js/configure_jobs.js" %}"></script>
-        <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
-        <script src="{% static 'js/utils.js'%}"></script>
-        {% if SHOW_TEST_ACCOUNTS_BANNER %}
-        <script src="{% static 'js/test_accounts.js'%}"></script>
-        {% endif %}
-    {% endblock %}
-
-    {% if ITOU_FQDN in ALLOWED_HOSTS %}
-        {# Matomo/Piwik open source web analytics #}
-        <script>
-            var _paq = window._paq || [];
-            /* Custom variables: https://matomo.org/docs/custom-variables/ */
-            /* Fields are, in order: index, name, value, scope. */
-            {% for key, value in  matomo_custom_variables.items %}
-              _paq.push(['setCustomVariable', {{ forloop.counter }}, '{{ key }}', '{{ value }}', 'page']);
-            {% endfor %}
-            /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-            _paq.push(['trackPageView']);
-            _paq.push(['enableLinkTracking']);
-            (function() {
-              var u = "//stats.data.gouv.fr/";
-              _paq.push(['setTrackerUrl', u + 'piwik.php']);
-              _paq.push(['setSiteId', '117']);
-              var d = document,
-                g = d.createElement('script'),
-                s = d.getElementsByTagName('script')[0];
-              g.type = 'text/javascript';
-              g.async = true;
-              g.defer = true;
-              g.src = u + 'piwik.js';
-              s.parentNode.insertBefore(g, s);
-            })();
         </script>
-        <script src="{% static "js/matomo.js" %}"></script>
-    {% endif %}
 
-    {# Display "Je donne mon avis" only on HP. #}
-    {# The rationale behind it: "Je donne mon avis" is imposed by DINUM but is redundant with Hotjar. #}
-    {# Hotjar is way more powerful. Compromise: display "Je donne mon avis" only on HP. #}
-    {% if request.path == "/" %}
-        <div class="fixed-sm-bottom text-center text-sm-right p-3 pr-sm-2 pb-sm-2">
-            <a href="https://voxusagers.numerique.gouv.fr/Demarches/2436?&view-mode=formulaire-avis&nd_mode=en-ligne-enti%C3%A8rement&nd_source=button&key=ca117c905602fb63fda68b31ee0f5bdd" target="_blank">
-              <img src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis sur cette démarche" style="width: 150px;">
-            </a>
-        </div>
-    {% else %}
-        {# Sticky FAQ link is not displayed on HP and on small devices #}
-        <div class="rounded-pill bg-white shadow fixed-sm-bottom d-none d-sm-inline-block m-4 py-2 px-3 text-center text-md-right">
-            <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" class="text-decoration-none" title="Besoin d'aide ? (ouverture dans un nouvel onglet)">
-                Besoin d'aide ?
-                {% include "includes/icon.html" with icon="external-link" %}
-            </a>
-        </div>
-    {% endif %}
+        {% block script %}
+            <script src="{% static "js/logout.js" %}"></script>
+            <script src="{% static "js/city_autocomplete_field.js" %}"></script>
+            <script src="{% static "js/commune_autocomplete_field.js" %}"></script>
+            <script src="{% static "js/configure_jobs.js" %}"></script>
+            <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
+            <script src="{% static 'js/utils.js'%}"></script>
+            {% if SHOW_TEST_ACCOUNTS_BANNER %}
+                <script src="{% static 'js/test_accounts.js'%}"></script>
+            {% endif %}
+        {% endblock %}
 
-</body>
+        {% if ITOU_FQDN in ALLOWED_HOSTS %}
+            {# Matomo/Piwik open source web analytics #}
+            <script>
+                var _paq = window._paq || [];
+                /* Custom variables: https://matomo.org/docs/custom-variables/ */
+                /* Fields are, in order: index, name, value, scope. */
+                {% for key, value in  matomo_custom_variables.items %}
+                    _paq.push(['setCustomVariable', {{ forloop.counter }}, '{{ key }}', '{{ value }}', 'page']);
+                {% endfor %}
+                /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+                _paq.push(['trackPageView']);
+                _paq.push(['enableLinkTracking']);
+                (function() {
+                    var u = "//stats.data.gouv.fr/";
+                    _paq.push(['setTrackerUrl', u + 'piwik.php']);
+                    _paq.push(['setSiteId', '117']);
+                    var d = document,
+                    g = d.createElement('script'),
+                    s = d.getElementsByTagName('script')[0];
+                    g.type = 'text/javascript';
+                    g.async = true;
+                    g.defer = true;
+                    g.src = u + 'piwik.js';
+                    s.parentNode.insertBefore(g, s);
+                })();
+            </script>
+            <script src="{% static "js/matomo.js" %}"></script>
+        {% endif %}
+
+        {# Display "Je donne mon avis" only on HP. #}
+        {# The rationale behind it: "Je donne mon avis" is imposed by DINUM but is redundant with Hotjar. #}
+        {# Hotjar is way more powerful. Compromise: display "Je donne mon avis" only on HP. #}
+        {% if request.path == "/" %}
+            <div class="fixed-sm-bottom text-center text-sm-right p-3 pr-sm-2 pb-sm-2">
+                <a href="https://voxusagers.numerique.gouv.fr/Demarches/2436?&view-mode=formulaire-avis&nd_mode=en-ligne-enti%C3%A8rement&nd_source=button&key=ca117c905602fb63fda68b31ee0f5bdd" target="_blank">
+                    <img src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis sur cette démarche" style="width: 150px;">
+                </a>
+            </div>
+        {% else %}
+            {# Sticky FAQ link is not displayed on HP and on small devices #}
+            <div class="rounded-pill bg-white shadow fixed-sm-bottom d-none d-sm-inline-block m-4 py-2 px-3 text-center text-md-right">
+                <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" class="text-decoration-none" title="Besoin d'aide ? (ouverture dans un nouvel onglet)">
+                    Besoin d'aide ?
+                    {% include "includes/icon.html" with icon="external-link" %}
+                </a>
+            </div>
+        {% endif %}
+
+    </body>
 </html>

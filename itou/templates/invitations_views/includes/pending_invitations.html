@@ -14,34 +14,34 @@
                 </tr>
             </thead>
             <tbody>
-            {% for invitation in pending_invitations %}
-                <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ invitation.first_name }} {{ invitation.last_name }}</td>
-                    <td><a href="mailto:{{ invitation.email }}">{{ invitation.email }}</a></td>
-                    <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
-                    <td>
-                        <p>
-                            <a data-toggle="collapse" href="#share-invitation-link-{{ forloop.counter }}" role="button" aria-expanded="false">
-                                Afficher le lien
-                            </a>
-                        </p>
-                        <div class="collapse form-group" id="share-invitation-link-{{ forloop.counter }}">
+                {% for invitation in pending_invitations %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ invitation.first_name }} {{ invitation.last_name }}</td>
+                        <td><a href="mailto:{{ invitation.email }}">{{ invitation.email }}</a></td>
+                        <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
+                        <td>
                             <p>
-                                Copiez-collez le lien ci-dessous :
+                                <a data-toggle="collapse" href="#share-invitation-link-{{ forloop.counter }}" role="button" aria-expanded="false">
+                                    Afficher le lien
+                                </a>
                             </p>
-                            {# Poor man's copy and paste with onClick #}
-                            <input type="text" class="form-control" readonly="readonly" value="{{ invitation.acceptance_link }}" onClick="this.select()">
-                        </div>
-                    </td>
-                </tr>
-            {% endfor %}
+                            <div class="collapse form-group" id="share-invitation-link-{{ forloop.counter }}">
+                                <p>
+                                    Copiez-collez le lien ci-dessous :
+                                </p>
+                                {# Poor man's copy and paste with onClick #}
+                                <input type="text" class="form-control" readonly="readonly" value="{{ invitation.acceptance_link }}" onClick="this.select()">
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
     <div class="alert alert-warning">
         Chaque collaborateur invité reçoit son propre lien d'invitation, ce lien est valable 15 jours
-        (lorsque le lien expire, l'invitation n'est plus affichée ci-dessus). 
+        (lorsque le lien expire, l'invitation n'est plus affichée ci-dessus).
         Ce lien d'invitation est transmis automatiquement par e-mail.
         En cas de besoin, vous pouvez également le copier depuis la colonne « Lien d'invitation ».
     </div>

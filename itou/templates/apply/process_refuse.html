@@ -48,7 +48,7 @@
         // Clicking on the "other" radio button displays a hidden field.
         $('#js-field-answer-to-prescriber').css("display", "none");
         $('.js-refusal-reasons input')
-          .on('change', function () {
+            .on('change', function () {
             $('#js-field-answer-to-prescriber').hide("slide");
             $('#js-refusal-reason-poorly').hide("up", function(){
                 $(this).remove();
@@ -61,6 +61,6 @@
                     $(this).parent().after('<p id="js-refusal-reason-poorly"><i>En cas de besoin, n\'hésitez pas à contacter le prescripteur pour avoir plus d\'informations</i></p>');
                     break;
             }
-          });
+        });
     </script>
 {% endblock %}

@@ -5,23 +5,23 @@
 
 {% block content %}
 
-<h1 class="h1-hero-c1">Sélectionner une annexe financière</h1>
-<h2 class="h1 text-muted">{{ current_siae.display_name }}</h2>
+    <h1 class="h1-hero-c1">Sélectionner une annexe financière</h1>
+    <h2 class="h1 text-muted">{{ current_siae.display_name }}</h2>
 
-<form method="post" action="" role="form" class="js-prevent-multiple-submit">
+    <form method="post" action="" role="form" class="js-prevent-multiple-submit">
 
-    {% csrf_token %}
+        {% csrf_token %}
 
-    {% bootstrap_form_errors select_form type="all" %}
+        {% bootstrap_form_errors select_form type="all" %}
 
-    {% bootstrap_field select_form.financial_annexes %}
+        {% bootstrap_field select_form.financial_annexes %}
 
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">Continuer</button>
-    {% endbuttons %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">Continuer</button>
+        {% endbuttons %}
 
-</form>
+    </form>
 
-Si votre annexe financière correspond à un SIREN différent de {{ current_siae.siren }} ou à un type de structure différent de {{ current_siae.kind }}, ou bien si elle n'apparait pas dans la liste ci-dessus, contactez nous via la rubrique votre structure sur <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_ASSISTANCE_URL }}</a>
+    Si votre annexe financière correspond à un SIREN différent de {{ current_siae.siren }} ou à un type de structure différent de {{ current_siae.kind }}, ou bien si elle n'apparait pas dans la liste ci-dessus, contactez nous via la rubrique votre structure sur <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_ASSISTANCE_URL }}</a>
 
 {% endblock %}

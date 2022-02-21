@@ -18,19 +18,19 @@
 
 {% block content %}
 
-<h1 class="h1-hero-c1">Votre compte Pôle emploi doit être validé</h1>
+    <h1 class="h1-hero-c1">Votre compte Pôle emploi doit être validé</h1>
 
-<p>
-    Vous devez valider votre compte Pôle emploi pour vous connecter.
-</p>
-<p>
-    Cliquez sur le lien « <i>Je confirme mon adresse électronique</i> » dans le courriel
-    « <i>Confirmation de votre adresse électronique</i> » que Pôle emploi vous a envoyé.
-</p>
-<p>
-    <a href="{% url 'account_login' %}?account_type=job_seeker">
-        <span class="btn btn-secondary">Retour</span>
-    </a>
-</p>
+    <p>
+        Vous devez valider votre compte Pôle emploi pour vous connecter.
+    </p>
+    <p>
+        Cliquez sur le lien « <i>Je confirme mon adresse électronique</i> » dans le courriel
+        « <i>Confirmation de votre adresse électronique</i> » que Pôle emploi vous a envoyé.
+    </p>
+    <p>
+        <a href="{% url 'account_login' %}?account_type=job_seeker">
+            <span class="btn btn-secondary">Retour</span>
+        </a>
+    </p>
 
 {% endblock %}

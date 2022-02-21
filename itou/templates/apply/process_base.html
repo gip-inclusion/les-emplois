@@ -41,14 +41,14 @@
                             <a
                                 href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                 class="btn btn btn-link">
-                                    Suspendre
+                                Suspendre
                             </a>
                         {% endif %}
                         {% if approval_can_be_prolonged_by_siae %}
                             <a
                                 href="{% url 'approvals:declare_prolongation' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                 class="btn btn btn-link">
-                                    Prolonger
+                                Prolonger
                             </a>
                         {% endif %}
                         {% if job_application.can_download_approval_as_pdf %}
@@ -58,7 +58,7 @@
                                 data-matomo-category="agrement"
                                 data-matomo-action="telechargement-pdf"
                                 data-matomo-option="details-candidature">
-                                    Télécharger le PASS IAE
+                                Télécharger le PASS IAE
                             </a>
                         {% endif %}
                     {% endif %}

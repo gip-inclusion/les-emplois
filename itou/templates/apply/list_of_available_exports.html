@@ -5,9 +5,9 @@
 
 {% block content %}
     {% if export_for == "siae" %}
-    <h1 class="h1-hero-c1">Export des candidatures reçues chez {{ siae.display_name }}</h1>
+        <h1 class="h1-hero-c1">Export des candidatures reçues chez {{ siae.display_name }}</h1>
     {% else %}
-    <h1 class="h1-hero-c1">Export des candidatures</h1>
+        <h1 class="h1-hero-c1">Export des candidatures</h1>
     {% endif %}
 
     {% if not job_applications_by_month %}
@@ -30,33 +30,33 @@
                 </thead>
                 <tbody>
                     {% for month in job_applications_by_month %}
-                    <tr>
-                        <td>{{ month.month|date:"F Y"|capfirst }}</td>
-                        <td>{{ month.c }}</td>
-                        <td>
-                        {% if export_for == "siae" %}
-                            <a
-                                class="matomo-event text-decoration-none"
-                                data-matomo-category="candidatures"
-                                data-matomo-action="exports"
-                                data-matomo-option="export-siae"
-                                title="Télécharger cet export SIAE"
-                                href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                {% include "includes/icon.html" with icon="download" %} Télécharger
-                            </a>
-                        {% else %}
-                            <a
-                                class="matomo-event text-decoration-none"
-                                data-matomo-category="candidatures"
-                                data-matomo-action="exports"
-                                data-matomo-option="export-prescripteur"
-                                title="Télécharger cet export prescriteur"
-                                href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                {% include "includes/icon.html" with icon="download" %} Télécharger
-                            </a>
-                        {% endif %}
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>{{ month.month|date:"F Y"|capfirst }}</td>
+                            <td>{{ month.c }}</td>
+                            <td>
+                                {% if export_for == "siae" %}
+                                    <a
+                                        class="matomo-event text-decoration-none"
+                                        data-matomo-category="candidatures"
+                                        data-matomo-action="exports"
+                                        data-matomo-option="export-siae"
+                                        title="Télécharger cet export SIAE"
+                                        href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
+                                        {% include "includes/icon.html" with icon="download" %} Télécharger
+                                    </a>
+                                {% else %}
+                                    <a
+                                        class="matomo-event text-decoration-none"
+                                        data-matomo-category="candidatures"
+                                        data-matomo-action="exports"
+                                        data-matomo-option="export-prescripteur"
+                                        title="Télécharger cet export prescriteur"
+                                        href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
+                                        {% include "includes/icon.html" with icon="download" %} Télécharger
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

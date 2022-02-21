@@ -5,38 +5,38 @@
 
 {% block content %}
 
-<h1 class="h1-hero-c1">Modifier les coordonnées de votre structure</h1>
+    <h1 class="h1-hero-c1">Modifier les coordonnées de votre structure</h1>
 
-<h2 class="h1 text-muted">
-    {{ siae.display_name }}
-</h2>
-<p class="text-muted">
-    {% if siae.siret %}
-        SIRET : {{ siae.siret }}
-    {% endif %}
-</p>
-
-<form method="post" action="" class="js-prevent-multiple-submit">
-
-    <div class="alert alert-emploi">
-        <i>Laisser les champs vides pour ne rien afficher.</i>
-    </div>
-
-    {% csrf_token %}
-    {% bootstrap_form_errors form type="all" %}
-    {% bootstrap_label "Nom à afficher" label_title="a" label_for=form.brand.id  %}
-    {% bootstrap_field form.brand show_label=False %}
-
-    {% bootstrap_form form exclude="brand" %}
-
-    <p>
-        En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+    <h2 class="h1 text-muted">
+        {{ siae.display_name }}
+    </h2>
+    <p class="text-muted">
+        {% if siae.siret %}
+            SIRET : {{ siae.siret }}
+        {% endif %}
     </p>
-    {% buttons %}
-        <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
-    {% endbuttons %}
 
-</form>
+    <form method="post" action="" class="js-prevent-multiple-submit">
+
+        <div class="alert alert-emploi">
+            <i>Laisser les champs vides pour ne rien afficher.</i>
+        </div>
+
+        {% csrf_token %}
+        {% bootstrap_form_errors form type="all" %}
+        {% bootstrap_label "Nom à afficher" label_title="a" label_for=form.brand.id  %}
+        {% bootstrap_field form.brand show_label=False %}
+
+        {% bootstrap_form form exclude="brand" %}
+
+        <p>
+            En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+        </p>
+        {% buttons %}
+            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        {% endbuttons %}
+
+    </form>
 
 {% endblock %}

@@ -40,25 +40,25 @@
         <h1 class="h1-hero-c1 mt-5">Invitations en attente</h1>
         <div class="table-responsive">
             <table class="table table-striped">
-              <caption>Liste des invitations en attente</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Prénom</th>
-                  <th scope="col">Nom</th>
-                  <th scope="col">E-mail</th>
-                  <th scope="col">Envoyée le</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for invitation in pending_invitations %}
+                <caption>Liste des invitations en attente</caption>
+                <thead>
                     <tr>
-                      <td>{{ invitation.first_name }}</td>
-                      <td>{{ invitation.last_name }}</td>
-                      <td>{{ invitation.email }}</td>
-                      <td>{{ invitation.sent_at|date }}</td>
+                        <th scope="col">Prénom</th>
+                        <th scope="col">Nom</th>
+                        <th scope="col">E-mail</th>
+                        <th scope="col">Envoyée le</th>
                     </tr>
-                {% endfor %}
-              </tbody>
+                </thead>
+                <tbody>
+                    {% for invitation in pending_invitations %}
+                        <tr>
+                            <td>{{ invitation.first_name }}</td>
+                            <td>{{ invitation.last_name }}</td>
+                            <td>{{ invitation.email }}</td>
+                            <td>{{ invitation.sent_at|date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     {% endif %}

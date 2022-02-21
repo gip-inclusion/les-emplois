@@ -11,14 +11,14 @@
         {% if show_sign_in_providers %}
             <b class="mb-4">Connectez-vous avec un service tiers</b>
             {% if show_france_connect %}
-            <div class="mt-4">
-                {% include "signup/includes/france_connect_button.html" %}
-            </div>
-            <div class="mt-4 mb-3">
-                <p class="text-center">
-                    <b>Ou</b>
-                </p>
-            </div>
+                <div class="mt-4">
+                    {% include "signup/includes/france_connect_button.html" %}
+                </div>
+                <div class="mt-4 mb-3">
+                    <p class="text-center">
+                        <b>Ou</b>
+                    </p>
+                </div>
             {% endif %}
 
             <div class="row mt-3">
@@ -38,7 +38,7 @@
             {% bootstrap_form_errors form type="all" %}
 
             {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
             {% endif %}
 
             {% bootstrap_field form.login form_group_class="form-group" %}
@@ -63,10 +63,10 @@
 
                 <p>
                     <a class="btn btn-outline-primary" href="{{ signup_url }}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                    Inscription 
-                    {% if account_type_display_name %}
-                        {{ account_type_display_name|lower }}
-                    {% endif %}
+                        Inscription
+                        {% if account_type_display_name %}
+                            {{ account_type_display_name|lower }}
+                        {% endif %}
                     </a>
                 </p>
             </div>

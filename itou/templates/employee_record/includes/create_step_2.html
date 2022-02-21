@@ -10,13 +10,13 @@
     {% endif %}
     <p>{{ job_seeker.post_code}} {{ job_seeker.city}}</p>
 
-    <h5 class="h4"><b>Adresse 
+    <h5 class="h4"><b>Adresse
         {% if address_updated_by_user %}
             modifiée manuellement
         {% else %}
             vérifiée automatiquement
         {% endif %}
-    :</b></h5>
+        :</b></h5>
     {% if profile.hexa_address_filled %}
         <div class="row">
             <div class="col-md-3">Numéro</div>
@@ -53,14 +53,14 @@
         </ul>
         <p>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</p>
     {% else %}
-            <p><b>L'adresse du salarié n'a pu être vérifiée automatiquement.</b></p>
-            <p>Ceci peut-être du à:
+        <p><b>L'adresse du salarié n'a pu être vérifiée automatiquement.</b></p>
+        <p>Ceci peut-être du à:
             <ul>
                 <li>une erreur temporaire de géolocalisation,</li>
                 <li>une adresse introuvable (code postal ou voie erronée).
-            </ul>
-        <p>
-        <p>Merci de bien vouloir ressaisir l'adresse du salarié dans le formulaire ci-dessous.</p>
+                </ul>
+                <p>
+                    <p>Merci de bien vouloir ressaisir l'adresse du salarié dans le formulaire ci-dessous.</p>
     {% endif %}
 </div>
 
@@ -98,17 +98,17 @@
                 {% bootstrap_field form.insee_commune_code %}
             </div>
 
-        <div class="mt-4">
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">Modifier l'adresse du salarié</button>
-            {% endbuttons %}
+            <div class="mt-4">
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary">Modifier l'adresse du salarié</button>
+                {% endbuttons %}
+            </div>
         </div>
-    </div>
-</form>
+    </form>
 
-<div class="mb-3">
-    <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create" job_application.id %}">Précédent</a>
-    {% if profile.hexa_address_filled %}
-        <a class="btn btn btn-outline-primary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Continuer</a>
-    {% endif %}
-</div>
+    <div class="mb-3">
+        <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create" job_application.id %}">Précédent</a>
+        {% if profile.hexa_address_filled %}
+            <a class="btn btn btn-outline-primary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Continuer</a>
+        {% endif %}
+    </div>

@@ -40,10 +40,10 @@
                 <p>
                     Mais avant, nous avons besoin de connaître l'adresse e-mail de votre salarié(e).
                 </p>
-                    <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
-                    <a class="btn btn-primary" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">
-                        Continuer
-                    </a>
+                <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
+                <a class="btn btn-primary" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">
+                    Continuer
+                </a>
             {% endif %}
         {% endif %}
 

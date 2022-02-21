@@ -4,26 +4,26 @@
 
 {% block content %}
 
-<h1 class="h1-hero-c1">Collaborateurs</h1>
+    <h1 class="h1-hero-c1">Collaborateurs</h1>
 
-<h2 class="h1 text-muted">
-    {{ institution.display_name }}
-</h2>
+    <h2 class="h1 text-muted">
+        {{ institution.display_name }}
+    </h2>
 
-<div class="alert alert-info">
-    Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
-</div>
+    <div class="alert alert-info">
+        Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
+    </div>
 
-{% with active_admin_members=institution.active_admin_members base_url="institutions_views" %}
-    {% include "includes/members.html" %}
-{% endwith %}
+    {% with active_admin_members=institution.active_admin_members base_url="institutions_views" %}
+        {% include "includes/members.html" %}
+    {% endwith %}
 
-<a href="{% url 'invitations_views:invite_labor_inspector' %}" class="align-self-center">
-    <span class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">Inviter des collaborateurs</span>
-</a>
+    <a href="{% url 'invitations_views:invite_labor_inspector' %}" class="align-self-center">
+        <span class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">Inviter des collaborateurs</span>
+    </a>
 
-{% if pending_invitations %}
-    {% include "invitations_views/includes/pending_invitations.html" %}
-{% endif %}
+    {% if pending_invitations %}
+        {% include "invitations_views/includes/pending_invitations.html" %}
+    {% endif %}
 
 {% endblock %}

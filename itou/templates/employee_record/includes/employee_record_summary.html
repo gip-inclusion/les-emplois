@@ -5,7 +5,7 @@
 
         <div class="py-2">
             <div>
-                {{ employee.get_title_display }} {{ employee.get_full_name }} 
+                {{ employee.get_title_display }} {{ employee.get_full_name }}
             </div>
             <div>
                 Né(e) le : {{ employee.birthdate }}
@@ -16,7 +16,7 @@
                 {% endif %}
             </div>
             <div>
-                Pays de naissance : {{ employee.birth_country }} 
+                Pays de naissance : {{ employee.birth_country }}
             </div>
         </div>
 
@@ -39,16 +39,16 @@
 
             {% if profile.resourceless %}
                 <div>Le salarié ne dispose d'aucune ressource</div>
-            {% endif %} 
+            {% endif %}
 
             {% if profile.unemployed_since %}
-            <div>Salarié sans emploi depuis {{ profile.get_unemployed_since_display|lower }}</div>
-            {% endif %} 
+                <div>Salarié sans emploi depuis {{ profile.get_unemployed_since_display|lower }}</div>
+            {% endif %}
 
             {% if profile.oeth_employee %}
                 <div>Employé OETH</div>
             {% endif %}
-            
+
             {% if profile.rqth_employee %}
                 <div>Employé RQTH</div>
             {% endif %}
@@ -58,7 +58,7 @@
                     {{ profile.get_has_rsa_allocation_display }} (depuis {{ profile.get_rsa_allocation_since_display|lower }})
                 </div>
             {% endif %}
-            
+
             {% if profile.ass_allocation_since %}
                 <div>
                     Bénéficiaire de l'ASS depuis (depuis {{ profile.get_ass_allocation_since_display|lower }})
@@ -75,11 +75,11 @@
 
         <h5 class="h4">Annexe financière </h5>
 
-        <div>    
+        <div>
             {% if employee_record.financial_annex %}
-              {{ employee_record.financial_annex.number }} ({{ employee_record.financial_annex.get_state_display|lower }})
+                {{ employee_record.financial_annex.number }} ({{ employee_record.financial_annex.get_state_display|lower }})
             {% else %}
-              Aucune annexe financière n'a été selectionnée.
+                Aucune annexe financière n'a été selectionnée.
             {% endif %}
         </div>
 
