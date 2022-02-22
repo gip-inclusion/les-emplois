@@ -39,10 +39,10 @@
 
                 <p>
                     <a class="btn btn-outline-primary" href="{{ signup_url }}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                    Inscription 
-                    {% if account_type_display_name %}
-                        {{ account_type_display_name|lower }}
-                    {% endif %}
+                        Inscription
+                        {% if account_type_display_name %}
+                            {{ account_type_display_name|lower }}
+                        {% endif %}
                     </a>
                 </p>
             </div>
