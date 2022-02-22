@@ -25,6 +25,7 @@ def refresh_card_list(request, siae):
                 "custom_name": request.POST.get(f"custom-name-{code}", ""),
                 "description": request.POST.get(f"description-{code}", ""),
                 "is_active": bool(request.POST.get(f"is_active-{code}")),
+                "nb_open_positions": int(request.POST.get(f"nb_open_positions-{code}", "1")),
                 "siae": siae.id,
             }
             # We use a single ModelForm instance to validate each submitted group of data.
@@ -60,14 +61,17 @@ def refresh_card_list(request, siae):
                 new_custom_name = request.POST.get(f"custom-name-{code}", "")
                 new_description = request.POST.get(f"description-{code}", "")
                 new_is_active = bool(request.POST.get(f"is_active-{code}"))
+                new_nb_open_positions = int(request.POST.get(f"nb_open_positions-{code}", "1"))
                 if (
                     job_through.custom_name != new_custom_name
                     or job_through.description != new_description
                     or job_through.is_active != new_is_active
+                    or job_through.nb_open_positions != new_nb_open_positions
                 ):
                     job_through.custom_name = new_custom_name
                     job_through.description = new_description
                     job_through.is_active = new_is_active
+                    job_through.nb_open_positions = new_nb_open_positions
                     job_through.updated_at = timezone.now()
                     jobs["update"].append(job_through)
                 else:

@@ -95,7 +95,8 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
 
                 if refreshed_cards["jobs"]["update"]:
                     SiaeJobDescription.objects.bulk_update(
-                        refreshed_cards["jobs"]["update"], ["custom_name", "description", "is_active", "updated_at"]
+                        refreshed_cards["jobs"]["update"],
+                        ["custom_name", "description", "is_active", "updated_at", "nb_open_positions"],
                     )
 
                 if refreshed_cards["jobs"]["delete"]:

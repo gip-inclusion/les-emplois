@@ -5,6 +5,7 @@
         <tr>
             <th scope="col">ROME</th>
             <th scope="col" class="text-left">Le(s) métiers(s) exercé(s) dans votre structure</th>
+            <th class="w-25" scope="col">Nombre de postes</th>
             <th class="w-25" scope="col">Actions</th>
             <th scope="col">Supprimer</th>
         </tr>
@@ -45,6 +46,20 @@
                         <small class="form-text text-muted">
                             Renseignez ici le détail des missions, les compétences/habilitations nécessaires, les conditions de travail, les éventuelles adaptations ou restrictions du poste.
                         </small>
+                    </div>
+                </td>
+                <td class="text-center align-middle" scope="row">
+                    <div class="custom-control custom-switch is-rtl">
+                        <label for="nb_open_positions-{{ job.appellation.code }}">
+                            <small>Nombre de postes ouverts</small>
+                        </label>
+                        <input
+                            type="number"
+                            class="form-control form-control-sm"
+                            id="nb_open_positions-{{ job.appellation.code }}"
+                            name="nb_open_positions-{{ job.appellation.code }}"
+                            value="{{ job.nb_open_positions }}"
+                            min="1" step="1" />
                     </div>
                 </td>
                 <td class="text-center align-middle" scope="row">
