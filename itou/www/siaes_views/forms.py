@@ -224,4 +224,5 @@ class ValidateSiaeJobDescriptionForm(forms.ModelForm):
             "custom_name",
             "description",
             "is_active",
+            "nb_open_positions",
         ]
