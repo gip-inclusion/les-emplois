@@ -605,7 +605,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         Check if EmployeeRecord does not exist and can be created for this JobApplication.
         """
         is_application_valid = (
-            self.hiring_start_at >= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
+            self.hiring_start_at is not None
+            and self.hiring_start_at >= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
             and not self.hiring_without_approval
             and self.state == JobApplicationWorkflow.STATE_ACCEPTED
             and self.approval.is_valid()
