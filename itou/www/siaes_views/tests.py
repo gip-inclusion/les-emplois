@@ -120,6 +120,7 @@ class ConfigureJobsViewTest(TestCase):
             "is_active-10357": "on",  # "on" is set when the checkbox is checked.
             # Update "Agent / Agente de quai manutentionnaire"
             "custom-name-10579": "Agent de quai",
+            "nb_open_positions-10579": "12",
             "description-10579": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "is_active-10579": "",
             # Update "Agent magasinier / Agente magasinière gestionnaire de stocks"
@@ -146,6 +147,7 @@ class ConfigureJobsViewTest(TestCase):
                 is_active=False,
                 custom_name=post_data["custom-name-10579"],
                 description=post_data["description-10579"],
+                nb_open_positions=post_data["nb_open_positions-10579"],
             )
         )
         self.assertTrue(
@@ -337,7 +339,7 @@ class ConfigureJobsViewTest(TestCase):
         response_content = str(response.content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["job"], job_description)
-        self.assertIn("Recrutement en cours", response_content)
+        self.assertIn(f"{job_description.nb_open_positions} poste(s) ouvert(s) au recrutement", response_content)
 
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
