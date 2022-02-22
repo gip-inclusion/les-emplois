@@ -175,12 +175,12 @@ class Command(BaseCommand):
             employee_record = EmployeeRecord.objects.find_by_batch(batch_filename, line_number).first()
 
             if not employee_record:
-                self.logger.error(
+                self.logger.warning(
                     "Could not get existing employee record data: BATCH_FILE=%s, LINE_NUMBER=%s",
                     batch_filename,
                     line_number,
                 )
-                record_errors += 1
+                # Do not count as an error
                 continue
 
             # Employee record succesfully processed by ASP :
