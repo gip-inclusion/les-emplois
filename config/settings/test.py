@@ -43,3 +43,10 @@ AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = "colette@ratatouille.com"
 # We enable the notifications in the test environment so that can ensure the correct API calls are performed,
 # but those calls are mocked so that no real data is sent to Pole Emploi
 API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS = True
+
+
+# Leave any uploaded files appear legit as soon as they are hosted on "server.com"
+# The developer then does not need to worry about any resume link using this domain,
+# or computed from the factories (which also use it)
+# Override it in the tests only when you explicitly want to test a failure.
+S3_STORAGE_ENDPOINT_DOMAIN = "server.com"

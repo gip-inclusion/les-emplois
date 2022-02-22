@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail.message import EmailMessage
 from django.http import HttpResponse
 from django.template import Context, Template
-from django.test import RequestFactory, SimpleTestCase, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
@@ -901,17 +901,14 @@ class UtilsEmailsSplitRecipientTest(TestCase):
 
 
 class ResumeFormMixinTest(TestCase):
-    def test_pole_emploi_internal_resume_link(self):
-        resume_link = "http://ds000-xxxx-00xx000.xxx00.pole-emploi.intra/docnums/portfolio-usager/XXXXXXXXXXX/CV.pdf?Expires=1590485264&Signature=XXXXXXXXXXXXXXXX"  # noqa E501
-        form = ResumeFormMixin(data={"resume_link": resume_link})
+    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
+    def test_ensure_link_safe_hosting(self):
+        form = ResumeFormMixin(data={"resume_link": "https://www.evil.com/virus.pdf"})
         self.assertFalse(form.is_valid())
-        self.assertTrue(form.has_error("resume_link"))
+        self.assertEqual(form.errors["resume_link"][0], "Le CV proposé ne provient pas d'une source de confiance.")
 
-    def test_valid_resume_link(self):
-        resume_link = "https://www.moncv.fr/vive_moi.pdf"
-        form = ResumeFormMixin(data={"resume_link": resume_link})
+        form = ResumeFormMixin(data={"resume_link": "https://foobar.com/safe.pdf"})
         self.assertTrue(form.is_valid())
-        self.assertFalse(form.has_error("resume_link"))
 
 
 class SupportRemarkAdminViewsTest(TestCase):

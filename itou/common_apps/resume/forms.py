@@ -1,13 +1,8 @@
-import re
-
 import django.forms as forms
+from django.conf import settings
 
 
 class ResumeFormMixin(forms.Form):
-    """
-    Handles resume field for job applications
-    """
-
     resume_link = forms.URLField(
         label="CV (optionnel)",
         required=False,
@@ -19,21 +14,10 @@ class ResumeFormMixin(forms.Form):
         ]
 
     def clean_resume_link(self):
-        """
-        PE developed a platform to host job seeker's documents such as resumes.
-        It looks like a Cloud drive and offers the possibility to share
-        documents with their own link. PE prescribers often use it.
-        Unfortunately, documents are not public but limited to connected PE prescribers!
-        """
         resume_link = self.cleaned_data["resume_link"]
-        pole_emploi_pattern = r"^https?://.*\.pole-emploi\.intra/.*\.{0,7}"
-        match = re.search(pole_emploi_pattern, resume_link)
-        if match:
-            error = forms.ValidationError(
-                (
-                    "Les CV hébergés par l'intranet de Pôle emploi ne sont pas publics. "
-                    "Indiquez une autre adresse ou laissez ce champ vide pour continuer."
-                )
+        # ensure the CV has been uploaded via our S3 platform and is not a link to a 3rd party website
+        if settings.S3_STORAGE_ENDPOINT_DOMAIN not in resume_link:
+            self.add_error(
+                "resume_link", forms.ValidationError("Le CV proposé ne provient pas d'une source de confiance.")
             )
-            self.add_error("resume_link", error)
         return resume_link
