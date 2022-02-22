@@ -398,7 +398,8 @@ SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountA
 
 # France Connect
 # https://partenaires.franceconnect.gouv.fr/
-# France Connect is enabled by default, but a feature flag allows to deactivate it
+# France Connect is enabled by default, but a feature flag allows to deactivate it.
+# Disabled in the DEMO environment.
 FRANCE_CONNECT_ENABLED = os.environ.get("FRANCE_CONNECT_ENABLED", "True") == "True"
 FRANCE_CONNECT_BASE_URL = "https://app.franceconnect.gouv.fr/api/v1/"
 FRANCE_CONNECT_SCOPES = "openid gender given_name family_name email birthdate birthplace birthcountry"
