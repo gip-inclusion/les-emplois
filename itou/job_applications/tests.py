@@ -223,6 +223,10 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationWithApprovalFactory()
         to_siae = job_application.to_siae
 
+        # test application with missing hiring_start_at (it’s an optional)
+        job_application.hiring_start_at = None
+        self.assertFalse(job_application.is_waiting_for_employee_record_creation)
+
         # test application before EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
         day_in_the_past = settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date() - relativedelta(months=2)
         job_application.hiring_start_at = day_in_the_past
