@@ -65,3 +65,28 @@ class ListEmployeeRecordsTest(TestCase):
         for status in [EmployeeRecord.Status.SENT, EmployeeRecord.Status.REJECTED, EmployeeRecord.Status.PROCESSED]:
             response = self.client.get(self.url + f"?status={status.value}")
             self.assertNotContains(response, job_seeker_name)
+
+    def test_employee_records_with_hiring_end_at(self):
+        """
+        Check if "hiring_end_at" of job_application is displayed
+        """
+        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        hiring_end_at = self.job_application.hiring_end_at
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f"Fin de contrat : <b>{hiring_end_at.strftime('%d')}")
+
+    def test_employee_records_without_hiring_end_at(self):
+        """
+        Check if "hiring_end_at" of job_application is replaced by "non renseigné"
+        """
+        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.job_application.hiring_end_at = None
+        self.job_application.save()
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Fin de contrat : <b>Non renseigné")

@@ -265,8 +265,9 @@ class AcceptForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["hiring_without_approval"].widget = forms.HiddenInput()
-        for field in ["hiring_start_at", "hiring_end_at"]:
+        for field in ["hiring_start_at"]:
             self.fields[field].required = True
+        for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].widget = DuetDatePickerWidget()
         # Job applications can be accepted twice if they have been cancelled.
         # They also can be accepted after a refusal.
@@ -283,14 +284,14 @@ class AcceptForm(forms.ModelForm):
             # "parcours IAE" and the payment of the "aide au poste".
             "hiring_start_at": (
                 "Au format JJ/MM/AAAA, par exemple  %(date)s. Il n'est pas possible d'antidater un contrat. "
-                "La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
+                "La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
                 "la personne, cette date déclenche le début de son parcours."
             )
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
             "hiring_end_at": (
                 "Au format JJ/MM/AAAA, par exemple  %(date)s. "
                 "Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
-                "à faire dans l'extranet 2.0 de l'ASP."
+                "à faire dans l'extranet 2.0 de l'ASP. <b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
             )
             % {
                 "date": (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime(
@@ -317,7 +318,7 @@ class AcceptForm(forms.ModelForm):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
         hiring_end_at = self.cleaned_data["hiring_end_at"]
 
-        if hiring_end_at < hiring_start_at:
+        if hiring_end_at and hiring_end_at < hiring_start_at:
             raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
 
         return cleaned_data
@@ -330,8 +331,9 @@ class EditHiringDateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in ["hiring_start_at", "hiring_end_at"]:
+        for field in ["hiring_start_at"]:
             self.fields[field].required = True
+        for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].widget = DuetDatePickerWidget()
 
     class Meta:
@@ -346,7 +348,7 @@ class EditHiringDateForm(forms.ModelForm):
             ),
             "hiring_end_at": (
                 "Cette date sert uniquement à des fins d'informations et est sans conséquence"
-                " sur les déclarations à faire dans l'extranet 2.0 de l'ASP."
+                " sur les déclarations à faire dans l'extranet 2.0 de l'ASP. <b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
             ),
         }
 
@@ -370,7 +372,7 @@ class EditHiringDateForm(forms.ModelForm):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
         hiring_end_at = self.cleaned_data["hiring_end_at"]
 
-        if hiring_end_at < hiring_start_at:
+        if hiring_end_at and hiring_end_at < hiring_start_at:
             raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
 
         # Check if hiring date is before end of a possible "old" approval

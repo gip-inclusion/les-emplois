@@ -78,6 +78,58 @@ class EditContractTest(TestCase):
         self.assertEqual(self.job_application_1.hiring_start_at, future_start_date)
         self.assertEqual(self.job_application_1.hiring_end_at, future_end_date)
 
+        # test how hiring_end_date is displayed
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f"Fin : {future_end_date.strftime('%d')}")
+
+    def test_future_contract_date_without_hiring_end_at(self):
+        """
+        Checks possibility of changing hiring start date to a future date, with no hiring_end_at date.
+        """
+        self.client.login(username=self.user1.username, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+
+        future_start_date = (timezone.now() + relativedelta(days=11)).date()
+        future_end_date = None
+
+        # empty "hiring_end_at"
+        post_data = {
+            "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+        }
+
+        response = self.client.post(self.url, data=post_data)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application_1.id})
+        self.assertRedirects(response, next_url)
+
+        self.job_application_1.refresh_from_db()
+
+        self.assertEqual(self.job_application_1.hiring_start_at, future_start_date)
+        self.assertEqual(self.job_application_1.hiring_end_at, future_end_date)
+
+        # no "hiring_end_at"
+        post_data = {
+            "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        }
+
+        response = self.client.post(self.url, data=post_data)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application_1.id})
+        self.assertRedirects(response, next_url)
+
+        self.job_application_1.refresh_from_db()
+
+        self.assertEqual(self.job_application_1.hiring_start_at, future_start_date)
+        self.assertEqual(self.job_application_1.hiring_end_at, future_end_date)
+
+        # test how hiring_end_date is displayed
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Fin : Non renseigné")
+
     def test_past_contract_date(self):
         """
         Past contract start date are not allowed
