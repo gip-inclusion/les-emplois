@@ -16,6 +16,8 @@
 
         {% csrf_token %}
 
+        {% bootstrap_form_errors form alert_error_type="all" %}
+
         {% if siae.jobs.exists %}
             {% bootstrap_field form.selected_jobs %}
         {% endif %}
