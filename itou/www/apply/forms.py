@@ -290,7 +290,8 @@ class AcceptForm(forms.ModelForm):
             "hiring_end_at": (
                 "Au format JJ/MM/AAAA, par exemple  %(date)s. "
                 "Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
-                "à faire dans l'extranet 2.0 de l'ASP. <b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
+                "à faire dans l'extranet 2.0 de l'ASP. "
+                "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
             )
             % {
                 "date": (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime(
@@ -346,7 +347,8 @@ class EditHiringDateForm(forms.ModelForm):
             ),
             "hiring_end_at": (
                 "Cette date sert uniquement à des fins d'informations et est sans conséquence"
-                " sur les déclarations à faire dans l'extranet 2.0 de l'ASP. <b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
+                " sur les déclarations à faire dans l'extranet 2.0 de l'ASP. "
+                "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
             ),
         }
 
