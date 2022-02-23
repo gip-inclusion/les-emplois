@@ -16,7 +16,7 @@ class ResumeFormMixin(forms.Form):
     def clean_resume_link(self):
         resume_link = self.cleaned_data["resume_link"]
         # ensure the CV has been uploaded via our S3 platform and is not a link to a 3rd party website
-        if settings.S3_STORAGE_ENDPOINT_DOMAIN not in resume_link:
+        if resume_link and settings.S3_STORAGE_ENDPOINT_DOMAIN not in resume_link:
             self.add_error(
                 "resume_link", forms.ValidationError("Le CV proposé ne provient pas d'une source de confiance.")
             )
