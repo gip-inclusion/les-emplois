@@ -910,6 +910,16 @@ class ResumeFormMixinTest(TestCase):
         form = ResumeFormMixin(data={"resume_link": "https://foobar.com/safe.pdf"})
         self.assertTrue(form.is_valid())
 
+    def test_resume_is_optional(self):
+        form = ResumeFormMixin(data={})
+        self.assertTrue(form.is_valid())
+
+        form = ResumeFormMixin(data={"resume_link": None})
+        self.assertTrue(form.is_valid())
+
+        form = ResumeFormMixin(data={"resume_link": ""})
+        self.assertTrue(form.is_valid())
+
 
 class SupportRemarkAdminViewsTest(TestCase):
     def test_add_support_remark_to_suspension(self):
