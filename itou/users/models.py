@@ -533,6 +533,9 @@ class User(AbstractUser, AddressMixin):
          - to display the data source in the UI, or
          - to check if we have a more recent data from an external data source
         """
+        # TODO: (celine-m-s) Create a de-serializer to load datetime objects.
+        # Because external_data_source_history is a JSONField,
+        # dates are actually stored as strings in the database.
         now = timezone.now()
         has_performed_update = False
         # If we never wrote any value, initialize the dict

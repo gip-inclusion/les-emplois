@@ -66,6 +66,7 @@ def load_user_data(user_data: dict) -> dict:
 
 def get_field_provider_info(value, source):
     """Fills the provider info line"""
+    # FIXME: (celine-m-s) This seems to be ghost code. Delete me.
     now = timezone.now()
     return {"source": source, "created_at": now, "value": value}
 

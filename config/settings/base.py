@@ -417,8 +417,15 @@ FRANCE_CONNECT_STATE_EXPIRATION = datetime.timedelta(hours=1)
 FRANCE_CONNECT_SESSION_TOKEN = "FC_ID_TOKEN"
 FRANCE_CONNECT_SESSION_STATE = "FC_STATE"
 
+# Inclusion Connect
+INCLUSION_CONNECT_BASE_URL = os.environ.get("INCLUSION_CONNECT_BASE_URL")
+INCLUSION_CONNECT_REALM = os.environ.get("INCLUSION_CONNECT_REALM")
+INCLUSION_CONNECT_CLIENT_ID = os.environ.get("INCLUSION_CONNECT_CLIENT_ID")
+INCLUSION_CONNECT_CLIENT_SECRET = os.environ.get("INCLUSION_CONNECT_CLIENT_SECRET")
+
 PROVIDER_PE_CONNECT = "poleemploi_connect"
 PROVIDER_FRANCE_CONNECT = "franceconnect"
+PROVIDER_INCLUSION_CONNECT = "inclusion_connect"
 
 # Typeform
 # ------------------------------------------------------------------------------
