@@ -13,7 +13,7 @@ Date de naissance : {{ job_application.approval.user.birthdate|date:"d/m/Y" }}
 
 Pour un contrat d'insertion :
 Débutant le : {{ job_application.hiring_start_at|date:"d/m/Y" }}
-Se terminant le : {{ job_application.hiring_end_at|date:"d/m/Y" }}
+Se terminant le : {{ job_application.hiring_end_at|date:"d/m/Y"|default:"Non renseigné" }}
 
 Au sein de la structure :
 {{ job_application.to_siae.display_name }}

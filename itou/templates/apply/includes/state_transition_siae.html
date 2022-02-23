@@ -147,7 +147,7 @@
     <p>
         <ul>
             <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
-            <li>Fin : {{ job_application.hiring_end_at|date:"d F Y" }}</li>
+            <li>Fin : {{ job_application.hiring_end_at|date:"d F Y"|default:"Non renseigné" }}</li>
         </ul>
     </p>
 

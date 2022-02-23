@@ -18,7 +18,7 @@ Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candida
 - Type : {{ job_application.to_siae.kind }} ({{ job_application.to_siae.get_kind_display }})
 - Département : {{ job_application.to_siae.get_department_display }}
 - Date de début du contrat : {{ job_application.hiring_start_at|date:"d/m/Y" }}
-- Date de fin du contrat : {{ job_application.hiring_end_at|date:"d/m/Y" }}{% if accepted_by %}
+- Date de fin du contrat : {{ job_application.hiring_end_at|date:"d/m/Y"|default:"Non renseigné" }}{% if accepted_by %}
 - Accepté par : {{ accepted_by.get_full_name }} - {{ accepted_by.email }}{% endif %}
 
 Délivrer un PASS IAE dans l'admin :
