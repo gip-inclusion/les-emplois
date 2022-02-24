@@ -339,7 +339,7 @@ class ConfigureJobsViewTest(TestCase):
         response_content = str(response.content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["job"], job_description)
-        self.assertIn(f"{job_description.nb_open_positions} poste(s) ouvert(s) au recrutement", response_content)
+        self.assertIn(f"{job_description.nb_open_positions} poste ouvert au recrutement", response_content)
 
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
