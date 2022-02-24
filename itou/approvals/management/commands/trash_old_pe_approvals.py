@@ -30,5 +30,3 @@ class Command(BaseCommand):
         )
 
         connection.commit()
-        cursor.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(table_name))))
-        connection.commit()
