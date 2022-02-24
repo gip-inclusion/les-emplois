@@ -59,13 +59,16 @@
                             id="nb_open_positions-{{ job.appellation.code }}"
                             name="nb_open_positions-{{ job.appellation.code }}"
                             value="{{ job.nb_open_positions }}"
+                            {% if not job.is_active %}
+                                disabled="disabled"
+                            {% endif %}
                             min="1" step="1" />
                     </div>
                 </td>
                 <td class="text-center align-middle" scope="row">
                     <div class="custom-control custom-switch is-rtl">
                         <input name="is_active-{{ job.appellation.code }}"
-                            type="checkbox" class="custom-control-input"
+                            type="checkbox" class="custom-control-input js-toggle-is_active"
                             id="is_active-{{ job.appellation.code }}"
                             {% if job.is_active %}checked{% endif %}>
                         <label class="custom-control-label font-weight-bold"

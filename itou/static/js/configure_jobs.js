@@ -34,6 +34,15 @@ $(document).ready(() => {
     }
   })
 
+  $(jobsTableSelector).on('click', '.js-toggle-is_active', e => {
+    // When the 'is-active' checkbox is disabled
+    // the 'nombre de postes' should be disabled too
+    var checkbox = $(e.currentTarget)
+    var tr = checkbox.parents('tr').first()
+    var nb_postes = tr.find('[name^="nb_open_positions-"]')
+    nb_postes.prop('disabled', !checkbox.is(":checked"));
+  })
+
 
   // Autocomplete.
 
