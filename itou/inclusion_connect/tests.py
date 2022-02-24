@@ -1,24 +1,30 @@
 import dataclasses
 import datetime
 
-# import httpx
-# import respx
+import httpx
 from django.test import TestCase
-
-# from django.urls import reverse
+from django.urls import reverse
 from django.utils import timezone
 
 from ..users.factories import UserFactory
 from ..users.models import User
-from .constants import INCLUSION_CONNECT_STATE_EXPIRATION, PROVIDER_INCLUSION_CONNECT
+from .constants import (
+    INCLUSION_CONNECT_ENDPOINT_AUTHORIZE,
+    INCLUSION_CONNECT_ENDPOINT_LOGOUT,
+    INCLUSION_CONNECT_ENDPOINT_TOKEN,
+    INCLUSION_CONNECT_ENDPOINT_USERINFO,
+    INCLUSION_CONNECT_STATE_EXPIRATION,
+    PROVIDER_INCLUSION_CONNECT,
+)
 from .models import InclusionConnectState, InclusionConnectUserData, create_or_update_user, userinfo_to_user_model_dict
+from .views import state_is_valid, state_new
 
 
 INCLUSION_CONNECT_USERINFO = {
     "given_name": "Michel",
     "family_name": "AUDIARD",
     "email": "michel@lestontons.fr",
-    "sub": "b6048e95bb134ec5b1d1e1fa69f287172e91722b9354d637a1bcf2ebb0fd2ef5v1",
+    "sub": "af6b26f9-85cd-484e-beb9-bea5be13e30f",  # username
 }
 
 
@@ -136,3 +142,104 @@ class InclusionConnectModelTest(TestCase):
             if isinstance(created_at, str):
                 created_at = datetime.datetime.fromisoformat(created_at[:19])  # Remove milliseconds
             self.assertEqual(created_at.date(), datetime.date.today())
+
+
+class InclusionConnectViewTest(TestCase):
+    def test_state_verification(self):
+        csrf_signed = state_new()
+        self.assertTrue(state_is_valid(csrf_signed))
+
+    def test_callback_no_code(self):
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_callback_no_state(self):
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url, data={"code": "123"})
+        self.assertEqual(response.status_code, 302)
+
+    def test_callback_invalid_state(self):
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url, data={"code": "123", "state": "000"})
+        self.assertEqual(response.status_code, 302)
+
+    def test_authorize_endpoint(self):
+        url = reverse("inclusion_connect:authorize")
+        response = self.client.get(url, follow=False)
+        # Don't use assertRedirects to avoid fetch
+        self.assertTrue(response.url.startswith(INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
+
+    @respx.mock
+    def test_logout(self):
+        url = reverse("inclusion_connect:logout")
+
+        respx.post(url=INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
+        response = self.client.get(url, data={"id_token": "123"})
+        self.assertEqual(response.status_code, 302)
+
+    def test_logout_no_id_token(self):
+        url = reverse("inclusion_connect:logout")
+        response = self.client.get(url + "?")
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "Le paramètre « id_token » est manquant.")
+
+    ####################################
+    ######### Callback tests ###########
+    ####################################
+    @respx.mock
+    def _callback_dance(self):
+        token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+        respx.post(INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+
+        respx.get(INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(
+            return_value=httpx.Response(200, json=INCLUSION_CONNECT_USERINFO)
+        )
+
+        csrf_signed = state_new()
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url, data={"code": "123", "state": csrf_signed})
+        self.assertRedirects(response, reverse("dashboard:index"))
+        return response
+
+    def test_callback_user_created(self):
+        ### User does not exist.
+        self._callback_dance()
+        self.assertEqual(User.objects.count(), 1)
+        user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
+        self.assertEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
+        self.assertEqual(user.last_name, INCLUSION_CONNECT_USERINFO["family_name"])
+        self.assertEqual(user.username, INCLUSION_CONNECT_USERINFO["sub"])
+
+    def test_callback_user_no_change(self):
+        ### User already exists on Itou with exactly the same data
+        # as in Inclusion Connect. No change should have been made.
+        user_info = {
+            "first_name": INCLUSION_CONNECT_USERINFO["given_name"],
+            "last_name": INCLUSION_CONNECT_USERINFO["family_name"],
+            "username": INCLUSION_CONNECT_USERINFO["sub"],
+            "email": INCLUSION_CONNECT_USERINFO["email"],
+        }
+        UserFactory(**user_info)
+        self._callback_dance()
+        self.assertEqual(User.objects.count(), 1)
+        user = User.objects.get(email=user_info["email"])
+        self.assertEqual(user.first_name, user_info["first_name"])
+        self.assertEqual(user.last_name, user_info["last_name"])
+        self.assertEqual(user.username, user_info["username"])
+
+    def test_callback_user_updated(self):
+        # User already exists on Itou but some attributes differs.
+        # An update should be made.
+        UserFactory(
+            first_name="Bernard",
+            last_name="Blier",
+            username=INCLUSION_CONNECT_USERINFO["sub"],
+            email=INCLUSION_CONNECT_USERINFO["email"],
+        )
+        self._callback_dance()
+        self.assertEqual(User.objects.count(), 1)
+        user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
+        self.assertEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
+        self.assertEqual(user.last_name, INCLUSION_CONNECT_USERINFO["family_name"])
+        self.assertEqual(user.username, INCLUSION_CONNECT_USERINFO["sub"])

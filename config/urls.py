@@ -48,6 +48,8 @@ urlpatterns = [
     path("accounts/", include("itou.allauth_adapters.peamu.urls")),
     # FranceConnect URLs.
     path("franceconnect/", include("itou.france_connect.urls")),
+    # Inclusion Connect URLs.
+    path("inclusion_connect/", include("itou.inclusion_connect.urls")),
     # --------------------------------------------------------------------------------------
     # API.
     path("api/v1/", include("itou.api.urls", namespace="v1")),

@@ -3,13 +3,13 @@ import datetime
 from django.conf import settings
 
 
-INCLUSION_CONNECT_SCOPES = "openid given_name family_name email"
+INCLUSION_CONNECT_SCOPES = "openid profile email"
 # "openid","offline_access","address","microprofile-jwt","phone","profile","email","web-origins","roles"
 
 INCLUSION_CONNECT_CLIENT_ID = settings.INCLUSION_CONNECT_CLIENT_ID
 INCLUSION_CONNECT_CLIENT_SECRET = settings.INCLUSION_CONNECT_CLIENT_SECRET
 
-INCLUSION_CONNECT_REALM_ENDPOINT = "{base_url}/realms/{realm}/protocol/openid-connect".format(
+INCLUSION_CONNECT_REALM_ENDPOINT = "{base_url}/auth/realms/{realm}/protocol/openid-connect".format(
     base_url=settings.INCLUSION_CONNECT_BASE_URL, realm=settings.INCLUSION_CONNECT_REALM
 )
 INCLUSION_CONNECT_ENDPOINT_AUTHORIZE = f"{INCLUSION_CONNECT_REALM_ENDPOINT}/auth"
