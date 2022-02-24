@@ -284,6 +284,11 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
             return True
         except Exception:
             raise PoleEmploiMiseAJourPassIAEException(r.status_code, r.content)
+    except httpx.ConnectTimeout:  # noqa
+        # We need to deal with this special case because
+        # ConnectTimeout do not carry a response
+        HTTP_CODE_REQUEST_TIMEOUT = 408
+        raise PoleEmploiMiseAJourPassIAEException(HTTP_CODE_REQUEST_TIMEOUT)
     except httpx.HTTPError as e:
         raise PoleEmploiMiseAJourPassIAEException(e.response.status_code)
 

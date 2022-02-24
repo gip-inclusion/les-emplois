@@ -844,6 +844,22 @@ class PoleEmploiTest(TestCase):
 
     @mock.patch(
         "httpx.post",
+        raises=httpx.ConnectTimeout,
+    )
+    def test_mise_a_jour_pass_iae_timeout(self, mock_post):
+        """
+        If the API answers with a non-S001 codeSortie (this is something in the json output)
+        mise_a_jour_pass_iae will return false
+        """
+        job_application = JobApplicationWithApprovalFactory()
+        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+            mise_a_jour_pass_iae(
+                job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
+            )
+            mock_post.assert_called()
+
+    @mock.patch(
+        "httpx.post",
         return_value=httpx.Response(401, json=""),
     )
     def test_mise_a_jour_pass_iae_invalid_token(self, mock_post):
