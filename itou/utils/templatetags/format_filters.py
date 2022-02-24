@@ -45,7 +45,12 @@ def format_siret(siret):
 @register.filter
 @stringfilter
 def format_nir(nir):
-    nir = nir.replace(" ", "")
+    nir_without_spaces = nir.replace(" ", "")
     nir_regex = r"^([12])([0-9]{2})([0-9]{2})(2[AB]|[0-9]{2})([0-9]{3})([0-9]{3})([0-9]{2})$"
-    match = re.match(nir_regex, nir)
-    return " ".join(match.groups())
+    match = re.match(nir_regex, nir_without_spaces)
+    if match is not None:
+        return " ".join(match.groups())
+    else:
+        # Some NIRs do not match the pattern (they can be NTT/NIA) so we can’t format them
+        # When this happen, we should not crash but return the initial value
+        return nir
