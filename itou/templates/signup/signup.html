@@ -8,10 +8,10 @@
     <div class="card-deck card-deck-itou">
         <div class="card">
             <div class="card-body">
-                <h5 class="h4 card-title font-weight-light">
+                <h3 class="h4 card-title font-weight-light">
                     <span class="d-block">Vous êtes un employeur solidaire</span>
                     <span class="d-block">(SIAE, GEIQ, EA, ...)</span>
-                </h5>
+                </h3>
             </div>
             <div class="card-footer">
                 <a class="btn btn-primary" href="{% url 'signup:siae_select' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
@@ -22,9 +22,9 @@
 
         <div class="card">
             <div class="card-body">
-                <h5 class="h4 card-title font-weight-light">
+                <h3 class="h4 card-title font-weight-light">
                     Vous êtes prescripteur ou orienteur
-                </h5>
+                </h3>
             </div>
             <div class="card-footer">
                 <a class="btn btn-primary" href="{% url 'signup:prescriber_check_already_exists' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
@@ -35,9 +35,9 @@
 
         <div class="card">
             <div class="card-body">
-                <h5 class="h4 card-title font-weight-light">
+                <h3 class="h4 card-title font-weight-light">
                     Vous êtes en recherche d'un emploi et souhaitez postuler
-                </h5>
+                </h3>
             </div>
             <div class="card-footer">
                 <a class="btn btn-primary" href="{% url 'signup:job_seeker_situation' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">

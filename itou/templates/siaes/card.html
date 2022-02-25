@@ -12,9 +12,9 @@
                 <div class="card-body">
                     <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.display_kind }} </p>
                     <hr>
-                    <h2 class="h2">
+                    <p class="h2">
                         {{ siae.display_name }}
-                    </h2>
+                    </p>
                     {% if siae.address_on_one_line %}
                         <p> {{ siae.address_on_one_line }} </p>
                     {% endif %}
@@ -22,12 +22,12 @@
             </div>
 
             {% if siae.description %}
-                <h3 class="h3 mb-1">Son activité</h3>
+                <p class="h3 mb-1">Son activité</p>
                 {{ siae.description | linebreaks }}
             {% endif %}
 
             {% if siae.provided_support %}
-                <h3 class="h3 mb-1">L'accompagnement proposé</h3>
+                <p class="h3 mb-1">L'accompagnement proposé</p>
                 {{ siae.provided_support | linebreaks }}
             {% endif %}
 

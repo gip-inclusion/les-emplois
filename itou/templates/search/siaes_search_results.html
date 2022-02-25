@@ -26,15 +26,15 @@
 {% endblock %}
 
 {% block content %}
-    <h2 class="h1">Rechercher des employeurs solidaires</h2>
+    <h1 class="h1">Rechercher des employeurs solidaires</h1>
 
     <form id="search-form" method="get" action="" class="d-block mb-5">
         {% include "search/includes/siaes_search_form.html" with form=form %}
 
         {% if form.is_valid %}
-            <h3 class="h2">
+            <h2 class="h2">
                 Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
-            </h3>
+            </h2>
         {% endif %}
 
         <p>

@@ -154,7 +154,7 @@
             <div class="card">
                 <h5 class="card-header">Admin</h5>
                 <div class="card-body">
-                    <p class="card-text">
+                    <p class="card-text mb-3">
                         {% include "includes/icon.html" with icon="key" %}
                         <a href="{% url 'admin:index' %}">
                             Admin
@@ -167,39 +167,43 @@
         {% if user.is_job_seeker %}
 
             <div class="card">
-                <h5 class="h4 card-header">Candidatures</h5>
+                <p class="h4 card-header">Candidatures</p>
                 <div class="card-body">
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_job_seeker' %}">Vos candidatures</a>
-                    </p>
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="briefcase" %}
-                        <a href="/">Rechercher une entreprise</a>
-                    </p>
+                    <ul class="list-unstyled">
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="message-square" %}
+                            <a href="{% url 'apply:list_for_job_seeker' %}">Vos candidatures</a>
+                        </li>
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="briefcase" %}
+                            <a href="/">Rechercher une entreprise</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
             {% with user.approvals_wrapper as approvals_wrapper %}
                 {% if approvals_wrapper.latest_approval %}
                     <div class="card">
-                        <h5 class="h4 card-header">Numéro d'agrément</h5>
+                        <p class="h4 card-header">Numéro d'agrément</p>
                         <div class="card-body">
-                            {# Approval status. #}
-                            <div class="card-text">
-                                {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
-                            </div>
-                            {% if approvals_wrapper.has_in_waiting_period %}
-                                <p class="card-text">
-                                    {% if user.has_valid_diagnosis %}
-                                        <p>Un prescripteur habilité a réalisé un diagnostic d'éligibilité. <b>Vous pouvez commencer un nouveau parcours.</b></p>
-                                    {% else %}
-                                        <small>
-                                            {{ user.approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER }}
-                                        </small>
-                                    {% endif %}
-                                </p>
-                            {% endif %}
+                            <ul class="list-unstyled">
+                                {# Approval status. #}
+                                <li class="card-text mb-3">
+                                    {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+                                </li>
+                                {% if approvals_wrapper.has_in_waiting_period %}
+                                    <li class="card-text mb-3">
+                                        {% if user.has_valid_diagnosis %}
+                                            <p>Un prescripteur habilité a réalisé un diagnostic d'éligibilité. <b>Vous pouvez commencer un nouveau parcours.</b></p>
+                                        {% else %}
+                                            <small>
+                                                {{ user.approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER }}
+                                            </small>
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            </ul>
                         </div>
                     </div>
                 {% endif %}
@@ -211,73 +215,79 @@
 
             {% if current_prescriber_organization %}
                 <div class="card">
-                    <h5 class="h4 card-header">
+                    <p class="h4 card-header">
                         Organisation <span class="ml-1 badge badge-secondary">{{ current_prescriber_organization.kind }} - ID {{ current_prescriber_organization.id }}</span>
-                    </h5>
+                    </p>
                     <div class="card-body">
-                        <p class="card-text">
-                            {% with card_url=current_prescriber_organization.get_card_url %}
-                                {% if user_is_prescriber_org_admin or card_url %}
-                                    {% include "includes/icon.html" with icon="bookmark" %}
-                                    {% if user_is_prescriber_org_admin %}
-                                        <a href="{% url 'prescribers_views:edit_organization' %}">
-                                            Modifier les informations
-                                        </a>
-                                        {% if card_url %} / {% endif %}
+                        <ul class="list-unstyled">
+                            <li class="card-text mb-3">
+                                {% with card_url=current_prescriber_organization.get_card_url %}
+                                    {% if user_is_prescriber_org_admin or card_url %}
+                                        {% include "includes/icon.html" with icon="bookmark" %}
+                                        {% if user_is_prescriber_org_admin %}
+                                            <a href="{% url 'prescribers_views:edit_organization' %}">
+                                                Modifier les informations
+                                            </a>
+                                            {% if card_url %} / {% endif %}
+                                        {% endif %}
+                                        {% if card_url %}
+                                            <a href="{{ card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                                Voir la fiche
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
-                                    {% if card_url %}
-                                        <a href="{{ card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                                            Voir la fiche
-                                        </a>
-                                    {% endif %}
-                                {% endif %}
-                            {% endwith %}
-                        </p>
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="users" %}
-                            <a href="{% url 'prescribers_views:members' %}">
-                                Gérer vos collaborateurs
-                            </a>
-                        </p>
-                        {% if current_prescriber_organization.kind == current_prescriber_organization.Kind.DEPT and user_is_prescriber_org_admin %}
-                            <p class="card-text">
-                                {% include "includes/icon.html" with icon="list" %}
-                                <a href="{% url 'prescribers_views:list_accredited_organizations' %}">
-                                    Voir la liste des organisations conventionnées
+                                {% endwith %}
+                            </li>
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="users" %}
+                                <a href="{% url 'prescribers_views:members' %}">
+                                    Gérer vos collaborateurs
                                 </a>
-                                <span class="badge badge-info">Nouveau</span>
-                            </p>
-                        {% endif %}
-                        {% if current_prescriber_organization.is_authorized %}
-                            <hr>
-                            <p class="card-text">
-                                {% include "includes/icon.html" with icon="award" %}
-                                <span>
-                                    {{ current_prescriber_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank" title="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
-                                </span>
-                            </p>
-                        {% endif %}
+                            </li>
+                            {% if current_prescriber_organization.kind == current_prescriber_organization.Kind.DEPT and user_is_prescriber_org_admin %}
+                                <li class="card-text mb-3">
+                                    {% include "includes/icon.html" with icon="list" %}
+                                    <a href="{% url 'prescribers_views:list_accredited_organizations' %}">
+                                        Voir la liste des organisations conventionnées
+                                    </a>
+                                    <span class="badge badge-info">Nouveau</span>
+                                </li>
+                            {% endif %}
+                            {% if current_prescriber_organization.is_authorized %}
+                                <li>
+                                    <hr>
+                                </li>
+                                <li class="card-text mb-3">
+                                    {% include "includes/icon.html" with icon="award" %}
+                                    <span>
+                                        {{ current_prescriber_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank" title="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
+                                    </span>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
             {% endif %}
 
             <div class="card">
-                <h5 class="h4 card-header">Candidatures</h5>
+                <p class="h4 card-header">Candidatures</p>
                 <div class="card-body">
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_prescriber' %}">Suivi des candidatures</a>
-                    </p>
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="user-check" %}
-                        <a href="/">Postuler pour un candidat</a>
-                    </p>
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="download" %}
-                        <a href="{% url 'apply:list_for_prescriber_exports' %}">
-                            Export des candidatures
-                        </a>
-                    </p>
+                    <ul class="list-unstyled">
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="message-square" %}
+                            <a href="{% url 'apply:list_for_prescriber' %}">Suivi des candidatures</a>
+                        </li>
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="user-check" %}
+                            <a href="/">Postuler pour un candidat</a>
+                        </li>
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="download" %}
+                            <a href="{% url 'apply:list_for_prescriber_exports' %}">
+                                Export des candidatures
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
@@ -286,114 +296,114 @@
         {% if user.is_siae_staff %}
 
             <div class="card">
-                <h5 class="h4 card-header">
+                <p class="h4 card-header">
                     Ma structure
                     <span class="ml-1 badge badge-secondary">{{ current_siae.kind }} - ID {{ current_siae.id }}</span>
-                </h5>
+                </p>
                 <div class="card-body">
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="box" %}
-                        {% if user_is_siae_admin %}
-                            <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}">
-                                Modifier les informations de l'établissement
-                            </a>
-                            /
-                        {% endif %}
-                        <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                            Voir la fiche publique
-                        </a>
-                    </p>
-                    {% if current_siae.is_active %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="users" %}
-                            <a href="{% url 'siaes_views:members' %}">
-                                Gérer des collaborateurs
-                            </a>
-                        </p>
-                    {% endif %}
-
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="briefcase" %}
-                        <a class="title-with-badge" href="{% url 'siaes_views:configure_jobs' %}">Gérer les métiers et recrutements
-                            <span class="badge badge-info" data-toggle="tooltip" data-placement="right"
-                                title="À partir de maintenant, vous allez pouvoir informer les prescripteurs et les candidats des métiers qui recrutent en ce moment, avec la fonctionnalité «recrutement en cours»">Nouveau</span>
-                        </a>
-                    </p>
-
-                    {% if can_show_financial_annexes %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="check-circle" %}
-                            <a href="{% url 'siaes_views:show_financial_annexes' %}">
-                                Mes annexes financières
-                            </a>
-                            {% if not current_siae.is_active %}
-                                <span class="badge badge-danger">
-                                    Action requise
-                                </span>
+                    <ul class="list-unstyled">
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="box" %}
+                            {% if user_is_siae_admin %}
+                                <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}">
+                                    Modifier les informations de l'établissement
+                                </a>
+                                /
                             {% endif %}
-                        </p>
-                    {% endif %}
-                    {% if can_create_siae_antenna %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="plus-square" %}
-                            <a href="{% url 'siaes_views:create_siae' %}">Créer/rejoindre une autre structure</a>
-                        </p>
-                    {% endif %}
+                            <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                Voir la fiche publique
+                            </a>
+                        </li>
+                        {% if current_siae.is_active %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="users" %}
+                                <a href="{% url 'siaes_views:members' %}">
+                                    Gérer des collaborateurs
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="briefcase" %}
+                            <a class="title-with-badge" href="{% url 'siaes_views:configure_jobs' %}">Gérer les métiers et recrutements
+                                <span class="badge badge-info" data-toggle="tooltip" data-placement="right"
+                                    title="À partir de maintenant, vous allez pouvoir informer les prescripteurs et les candidats des métiers qui recrutent en ce moment, avec la fonctionnalité «recrutement en cours»">Nouveau</span>
+                            </a>
+                        </li>
+                        {% if can_show_financial_annexes %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="check-circle" %}
+                                <a href="{% url 'siaes_views:show_financial_annexes' %}">
+                                    Mes annexes financières
+                                </a>
+                                {% if not current_siae.is_active %}
+                                    <span class="badge badge-danger">
+                                        Action requise
+                                    </span>
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                        {% if can_create_siae_antenna %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="plus-square" %}
+                                <a href="{% url 'siaes_views:create_siae' %}">Créer/rejoindre une autre structure</a>
+                            </li>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
 
             <div class="card">
-                <h5 class="h4 card-header">Mes candidatures</h5>
+                <p class="h4 card-header">Mes candidatures</p>
                 <div class="card-body">
-                    {% for category in job_applications_categories %}
-                        {% if category.counter %}
-                            <p class="card-text">
-                                {% include "includes/icon.html" with icon=category.icon %}
-                                <a href="{{ category.url }}">{{ category.name }}</a>
-                                <span class="badge {{ category.badge }}">{{ category.counter }}</span>
-                            </p>
-                        {% endif %}
-                    {% endfor %}
-
-                    {% if can_show_employee_records %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="file" %}
-                            <a href="{% url 'employee_record_views:list' %}?status=NEW">Gérer mes fiches salarié (ASP)</a>
-                        </p>
-                    {% endif %}
-
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="log-in" %}
-                        <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
-                            {% if current_siae.is_subject_to_eligibility_rules %}
-                                Déclarer une embauche
-                            {% else %}
-                                Candidature spontanée
+                    <ul class="list-unstyled">
+                        {% for category in job_applications_categories %}
+                            {% if category.counter %}
+                                <li class="card-text mb-3">
+                                    {% include "includes/icon.html" with icon=category.icon %}
+                                    <a href="{{ category.url }}">{{ category.name }}</a>
+                                    <span class="badge {{ category.badge }}">{{ category.counter }}</span>
+                                </li>
                             {% endif %}
-                        </a>
-                    </p>
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="search" %}
-                        <a href="{% url 'approvals:pe_approval_search' %}">
-                            Prolonger ou suspendre un agrément émis par Pôle emploi
-                        </a>
-                    </p>
-                    {% if current_siae.is_subject_to_eligibility_rules %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="book-open" %}
-                            <a
-                                href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
-                                target="_blank" title="Liste des critères d'éligibilité (ouverture dans un nouvel onglet)">
-                                Liste des critères d'éligibilité
+                        {% endfor %}
+                        {% if can_show_employee_records %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="file" %}
+                                <a href="{% url 'employee_record_views:list' %}?status=NEW">Gérer mes fiches salarié (ASP)</a>
+                            </li>
+                        {% endif %}
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="log-in" %}
+                            <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
+                                {% if current_siae.is_subject_to_eligibility_rules %}
+                                    Déclarer une embauche
+                                {% else %}
+                                    Candidature spontanée
+                                {% endif %}
                             </a>
-                        </p>
-                    {% endif %}
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="download" %}
-                        <a href="{% url 'apply:list_for_siae_exports' %}">
-                            Export des candidatures
-                        </a>
-                    </p>
+                        </li>
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="search" %}
+                            <a href="{% url 'approvals:pe_approval_search' %}">
+                                Prolonger ou suspendre un agrément émis par Pôle emploi
+                            </a>
+                        </li>
+                        {% if current_siae.is_subject_to_eligibility_rules %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="book-open" %}
+                                <a
+                                    href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
+                                    target="_blank" title="Liste des critères d'éligibilité (ouverture dans un nouvel onglet)">
+                                    Liste des critères d'éligibilité
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="card-text mb-3">
+                            {% include "includes/icon.html" with icon="download" %}
+                            <a href="{% url 'apply:list_for_siae_exports' %}">
+                                Export des candidatures
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
@@ -401,9 +411,9 @@
 
         {% if user.is_labor_inspector %}
             <div class="card">
-                <h5 class="h4 card-header">
+                <p class="h4 card-header">
                     Organisation <span class="ml-1 badge badge-secondary">{{ current_institution.kind }} - ID {{ current_institution.id }}</span>
-                </h5>
+                </p>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="users" %}
@@ -419,60 +429,62 @@
         {% if can_view_stats_dashboard_widget %}
 
             <div class="card">
-                <h5 class="h4 card-header">Statistiques et pilotage</h5>
+                <p class="h4 card-header">Statistiques et pilotage</p>
                 <div class="card-body">
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="activity" %}
-                        <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" title="Accéder au Pilotage de l'inclusion (ouverture dans un nouvel onglet)">
-                            Accéder au Pilotage de l'inclusion
-                        </a>
-                    </p>
-                    {% if can_view_stats_siae %}
-                        <p class="card-text">
+                    <ul class="list-unstyled">
+                        <li class="card-text mb-3">
                             {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_siae' %}">Voir les données de ma structure</a>
-                            <span class="badge badge-info">Nouveau</span>
-                        </p>
-                    {% endif %}
-                    {% if can_view_stats_cd %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_cd' %}">Données IAE</a>
-                        </p>
-                    {% endif %}
-                    {% if can_view_stats_ddets %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_ddets_iae' %}">Données IAE</a>
-                        </p>
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_ddets_diagnosis_control' %}">Voir mes données 2021 du contrôle a posteriori (version bêta)</a>
-                            <span class="badge badge-info">Nouveau</span>
-                        </p>
-                    {% endif %}
-                    {% if can_view_stats_dreets %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_dreets_iae' %}">Données IAE</a>
-                        </p>
-                    {% endif %}
-                    {% if can_view_stats_dgefp %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_dgefp_iae' %}">Données IAE</a>
-                        </p>
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_dgefp_diagnosis_control' %}">Voir les données 2021 du contrôle a posteriori (version bêta)</a>
-                            <span class="badge badge-info">Nouveau</span>
-                        </p>
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_dgefp_af' %}">Annexes financières actives</a>
-                            <span class="badge badge-info">Nouveau</span>
-                        </p>
-                    {% endif %}
+                            <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" title="Accéder au Pilotage de l'inclusion (ouverture dans un nouvel onglet)">
+                                Accéder au Pilotage de l'inclusion
+                            </a>
+                        </li>
+                        {% if can_view_stats_siae %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="activity" %}
+                                <a href="{% url 'stats:stats_siae' %}">Voir les données de ma structure</a>
+                                <span class="badge badge-info">Nouveau</span>
+                            </li>
+                        {% endif %}
+                        {% if can_view_stats_cd %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="activity" %}
+                                <a href="{% url 'stats:stats_cd' %}">Données IAE</a>
+                            </li>
+                        {% endif %}
+                        {% if can_view_stats_ddets %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="activity" %}
+                                <a href="{% url 'stats:stats_ddets_iae' %}">Données IAE</a>
+                            </li>
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="activity" %}
+                                <a href="{% url 'stats:stats_ddets_diagnosis_control' %}">Voir mes données 2021 du contrôle a posteriori (version bêta)</a>
+                                <span class="badge badge-info">Nouveau</span>
+                            </li>
+                        {% endif %}
+                        {% if can_view_stats_dreets %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="activity" %}
+                                <a href="{% url 'stats:stats_dreets_iae' %}">Données IAE</a>
+                            </li>
+                        {% endif %}
+                        {% if can_view_stats_dgefp %}
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="activity" %}
+                                <a href="{% url 'stats:stats_dgefp_iae' %}">Données IAE</a>
+                            </li>
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="activity" %}
+                                <a href="{% url 'stats:stats_dgefp_diagnosis_control' %}">Voir les données 2021 du contrôle a posteriori (version bêta)</a>
+                                <span class="badge badge-info">Nouveau</span>
+                            </li>
+                            <li class="card-text mb-3">
+                                {% include "includes/icon.html" with icon="activity" %}
+                                <a href="{% url 'stats:stats_dgefp_af' %}">Annexes financières actives</a>
+                                <span class="badge badge-info">Nouveau</span>
+                            </li>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
 

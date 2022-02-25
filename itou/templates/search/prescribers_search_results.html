@@ -57,14 +57,14 @@
                                     {{ prescriber_org.name }}
                                 </a>
                             </h3>
-                            <h6 class="h5 card-subtitle mb-2 text-muted">
+                            <h4 class="h5 card-subtitle mb-2 text-muted">
                                 {{ prescriber_org.get_kind_display }}
                                 {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
-                            </h6>
+                            </h4>
                             <hr>
-                            <h6 class="h5 card-subtitle mb-2 text-muted">
+                            <h4 class="h5 card-subtitle mb-2 text-muted">
                                 {{ prescriber_org.address_on_one_line }}
-                            </h6>
+                            </h4>
                             <small class="card-text">
                                 <span class="badge badge-info">{{ prescriber_org.distance.km|floatformat:"-1" }} km</span>
                                 de votre lieu de recherche

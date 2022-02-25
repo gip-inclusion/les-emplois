@@ -10,7 +10,7 @@
             {# Display non-user-edited name too. #}
             {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
         </h3>
-        <h6 class="h5 card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
+        <h4 class="h5 card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h4>
         {% if siae.kind in ea_eatt_kinds %}
             <small>
                 <span class="badge badge-info my-3">Priorité aux bénéficiaires de RQTH</span>
