@@ -85,7 +85,7 @@
    "model": "users.user",
    "pk": 3,
    "fields": {
-      "password": "pbkdf2_sha256$260000$nJ6aneEH1U2VM3SG1TCqdz$UhrAYCZt1ky+WtJ6uLt1kHrjqwxc20IhZdx9KD7QL1c=",
+      "password": "pbkdf2_sha256$260000$9sCvZqLhQq9dUViPGTkCeu$vQQjUuhIoc6OIdAGAbWZqM+/ESPWNygQ2XfVcoiT9CA=",
       "last_login": "2021-05-12T09:07:37.709Z",
       "is_superuser": false,
       "username": "test+prescripteur@inclusion.beta.gouv.fr",
