@@ -26,7 +26,9 @@
 
     {% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
         <div class="alert alert-emploi mt-5" role="status">
-            Aucun résultat pour <b>{{ siren_form.cleaned_data.siren }}</b>.
+            <p class="mb-0">
+                Aucun résultat pour <b>{{ siren_form.cleaned_data.siren }}</b>.
+            </p>
         </div>
 
         <div class="alert alert-danger mt-2" role="status">
@@ -38,7 +40,7 @@
                 <br>
                 La DIRECCTE doit nous indiquer si le conventionnement de votre structure est en cours en précisant le numéro de SIRET, le type de structure, l’adresse postale et l’adresse e-mail du correspondant technique ASP.<br>
             </p>
-            <p>
+            <p class="mb-0">
                 <b>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</b>, merci d'utiliser <a href="{{ TYPEFORM_URL }}/to/RYfNLR79" target="_blank" rel="noopener" title="Merci d'utiliser ce formulaire (ouverture dans un nouvel onglet)">ce formulaire</a>.
             </p>
         </div>
@@ -51,7 +53,9 @@
             <h3 class="h2">Entreprises disponibles</h3>
 
             <div class="alert alert-emploi" role="status">
-                <i>Les données sont fournies par l'extranet IAE 2.0 de l'ASP.</i>
+                <p class="mb-0">
+                    <i>Les données sont fournies par l'extranet IAE 2.0 de l'ASP.</i>
+                </p>
             </div>
 
             <form method="post" action="" class="js-prevent-multiple-submit">
@@ -112,7 +116,9 @@
             <h3 class="h2">Entreprises déjà inscrites</h3>
 
             <div class="alert alert-emploi" role="status">
-                <i>Par sécurité vous devez obtenir une invitation pour rejoindre ces structures.</i>
+                <p class="mb-0">
+                    <i>Par sécurité vous devez obtenir une invitation pour rejoindre ces structures.</i>
+                </p>
             </div>
 
             <ul>

@@ -6,16 +6,16 @@
 {% block content %}
     <h1 class="h1-hero-c1">Prolonger ou suspendre un agrément émis par Pôle emploi</h1>
 
-    <div class="alert alert-info pb-0">
-        <p>
+    <div class="alert alert-info">
+        <p class="mb-0">
             Cette fonction est destinée à prolonger ou suspendre un agrément émis par Pôle emploi pour un salarié déjà présent dans vos effectifs (donc déjà déclaré dans l’ASP)
         </p>
     </div>
 
     {% if number %}
 
-        <div class="alert alert-danger pb-0" role="status">
-            <p>
+        <div class="alert alert-danger" role="status">
+            <p class="mb-0">
                 Nous n'avons pas trouvé d'agrément en cours de validité avec le numéro <strong>{{ number }}</strong>.
             </p>
         </div>

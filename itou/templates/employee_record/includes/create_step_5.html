@@ -12,7 +12,7 @@
             Le traitement est effectué à intervalle régulier et vous serez notifié du changement d'état
             de la fiche salarié sur la liste récapitulative accessible depuis le tableau de bord.
         </p>
-        <p>
+        <p class="mb-0">
             Après validation de la fiche salarié, <b>la modification de la date de début du PASS IAE n'est plus possible</b>.
         </p>
     </div>
@@ -28,7 +28,7 @@
 {% else %}
     <div class="alert alert-success">
         <p><b>La création de cette fiche salariée est terminée.</b></p>
-        <p>Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.</p>
+        <p class="mb-0">Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.</p>
     </div>
     <div class="mb-3">
         <a href="{% url "employee_record_views:list" %}?status=NEW" class="btn btn-primary">

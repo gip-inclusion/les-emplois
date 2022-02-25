@@ -67,18 +67,16 @@
             <h3 class="h2">Ajouter mon organisation</h3>
 
             {% if prescriber_orgs_with_members_same_siret %}
-                <div class="alert alert-warning pb-0" role="status">
-                    <p>
-                        <small>
-                            Attention une ou plusieurs organisations existent déjà avec ce SIRET.<br>
-                            Si vous ne trouvez pas votre organisation dans la liste ci-dessus ou si
-                            vous souhaitez créer un compte avec ce SIRET pour un autre type
-                            d'organisation, vous avez la possibilité de l'inscrire.
-                        </small>
+                <div class="alert alert-warning" role="status">
+                    <p class="small mb-0">
+                        Attention une ou plusieurs organisations existent déjà avec ce SIRET.<br>
+                        Si vous ne trouvez pas votre organisation dans la liste ci-dessus ou si
+                        vous souhaitez créer un compte avec ce SIRET pour un autre type
+                        d'organisation, vous avez la possibilité de l'inscrire.
                     </p>
                 </div>
             {% else %}
-                <p>
+                <p class="mb-0">
                     <small>
                         Si vous ne trouvez pas votre organisation dans la liste ci-dessus, vous avez la possibilité de l'inscrire.
                     </small>

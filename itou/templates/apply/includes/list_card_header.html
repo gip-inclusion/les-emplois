@@ -1,31 +1,32 @@
 <div class="card-header">
+    <p>
+        <b>{{ job_application.job_seeker.get_full_name }}</b>
 
-    <b>{{ job_application.job_seeker.get_full_name }}</b>
+        <small>chez</small>
 
-    <small>chez</small>
+        <b>
+            <a href="{{ job_application.to_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                {{ job_application.to_siae.display_name }}
+            </a>
+        </b>
 
-    <b>
-        <a href="{{ job_application.to_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-            {{ job_application.to_siae.display_name }}
-        </a>
-    </b>
+        {% if job_application.to_siae.grace_period_has_expired %}
+            <span class="badge badge-danger">
+                Structure déconventionnée depuis le
+                {{ job_application.to_siae.grace_period_end_date|date:"d F Y" }}
+            </span>
+        {% endif %}
+    </p>
 
-    {% if job_application.to_siae.grace_period_has_expired %}
-        <span class="badge badge-danger">
-            Structure déconventionnée depuis le
-            {{ job_application.to_siae.grace_period_end_date|date:"d F Y" }}
-        </span>
-    {% endif %}
+    <p>
+        <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
 
-    <br>
-
-    <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
-
-    {% if job_application.is_pending_for_too_long and not request.user_is_job_seeker %}
-        <br>
-        <small class="text-danger font-weight-bold">
-            En attente de réponse depuis plus de {{ job_application.WEEKS_BEFORE_CONSIDERED_OLD }} semaines.
-        </small>
-    {% endif %}
+        {% if job_application.is_pending_for_too_long and not request.user_is_job_seeker %}
+            <br>
+            <small class="text-danger font-weight-bold">
+                En attente de réponse depuis plus de {{ job_application.WEEKS_BEFORE_CONSIDERED_OLD }} semaines.
+            </small>
+        {% endif %}
+    </p>
 
 </div>
