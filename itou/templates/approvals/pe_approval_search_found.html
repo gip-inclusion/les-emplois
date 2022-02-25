@@ -8,8 +8,8 @@
 
     {% if approval.is_valid %}
         {% if approval.originates_from_itou %}
-            <div class="alert alert-danger pb-0" role="status">
-                <p>Le numéro <strong>{{ approval.number|slice:12 }}</strong> correspond à un PASS IAE.</p>
+            <div class="alert alert-danger" role="status">
+                <p class="mb-0">Le numéro <strong>{{ approval.number|slice:12 }}</strong> correspond à un PASS IAE.</p>
             </div>
             <p>
                 Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>. Il sera automatiquement importé dans votre compte.
@@ -23,8 +23,8 @@
                     A redirection is made upstream if the current SIAE can prolong or suspend it.
                     It means another SIAE is using it right now.
                 {% endcomment %}
-                <div class="alert alert-danger pb-0" role="status">
-                    <p>L'agrément <strong>{{ approval.number|slice:12 }}</strong> a déjà été converti en PASS IAE.</p>
+                <div class="alert alert-danger" role="status">
+                    <p class="mb-0">L'agrément <strong>{{ approval.number|slice:12 }}</strong> a déjà été converti en PASS IAE.</p>
                 </div>
                 <p>
                     Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>.
@@ -48,9 +48,8 @@
         {% endif %}
 
     {% else %}
-        <div class="alert alert-danger pb-0" role="status">
-            <p>L'agrément <strong>{{ approval.number|slice:12 }}</strong> est expiré depuis le {{ approval.end_at|date:"d/m/Y" }}. Vous ne pouvez pas le prolonger ou le suspendre.
-            </p>
+        <div class="alert alert-danger" role="status">
+            <p class="mb-0">L'agrément <strong>{{ approval.number|slice:12 }}</strong> est expiré depuis le {{ approval.end_at|date:"d/m/Y" }}. Vous ne pouvez pas le prolonger ou le suspendre.</p>
         </div>
         <p>
             S'il s'agit d'un nouveau contrat, vous pouvez solliciter <a href="{% url 'search:prescribers_home' %}" title="Solliciter un prescripteur habilité">un prescripteur habilité</a> pour qu'il puisse vous orienter le candidat.

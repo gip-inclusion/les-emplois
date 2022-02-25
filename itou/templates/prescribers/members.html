@@ -11,7 +11,9 @@
     </h2>
 
     <div class="alert alert-info">
-        Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
+        <p class="mb-0">
+            Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
+        </p>
     </div>
 
     {% with active_admin_members=organization.active_admin_members base_url="prescribers_views" %}

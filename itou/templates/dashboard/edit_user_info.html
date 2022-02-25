@@ -9,10 +9,9 @@
     {% if extra_data %}
 
         <div class="alert alert-info">
-
-            Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte Pôle emploi
-            (récupérés lors de votre connexion du {{extra_data.created_at|date:"d F Y"}}).
-
+            <p class="mb-0">
+                Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte Pôle emploi (récupérés lors de votre connexion du {{extra_data.created_at|date:"d F Y"}}).
+            </p>
         </div>
 
     {% endif %}

@@ -14,7 +14,7 @@
 
             {# Statuses #}
             <div class="col-md-5 text-right">
-                <small>
+                <p class="small mb-0">
                     {% if form.status.value == "SENT" %}
                         <p class="badge badge-warning">Transmise à l'ASP le <b>{{ employee_record.updated_at }}</b></p>
                     {% elif form.status.value == "REJECTED" %}
@@ -24,7 +24,7 @@
                     {% elif form.status.value == "READY" %}
                         <p class="badge badge-secondary">Complétée le <b>{{ employee_record.updated_at }}</b></p>
                     {% endif %}
-                </small>
+                </p>
             </div>
         </div>
 
