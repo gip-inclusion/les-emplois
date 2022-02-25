@@ -1,5 +1,49 @@
 # Journal des modifications
 
+## [37] - 2022-02-25
+
+### Ajouté
+
+ - Demander et afficher le nombre de postes sur les fiches de postes
+ - Ajout d'un champ de texte libre dans certains objets de l'admin
+ - Préparation de l’envoi quotidien des PASS à Pole Emploi
+ - Création de fiches structure en plusieurs étapes
+
+### Modifié
+
+Métier:
+
+ - Retirer le bouton "je n'ai pas besoin d'aide au poste"
+ - Admin: Gestion du status "fiche salarié en attente" dans la page "Pass IAE"
+ - Admin: Demander l'organisation prescriptrice seulement si le prescripteur est lié à une organisation
+ - Admin: mise à jour de l’email utilisateur, message d'erreur si l'email est déjà utilisé
+
+Front:
+
+ - Correction des erreurs a11y sur les tableaux
+ - Correction des erreurs a11y sur les scripts
+ - Mise a jour du theme itou vers la v0.2.7
+ - Petits changements dans l’écran "Description de SIAE"
+
+Bugfixes:
+
+ - Correctif pour permettre de nouveau l'envoi de candidature
+ - Niveau de log de certaines erreurs lors du transfert de fiches salarié
+ - Un bug empechait de créer une suspension pour les agrément PE qui ont été migrés en PASS IAE lorsque la date de départ manquait
+ - Utilisation des noms au format prévu par l’API Pole Emploi
+ - La date d’embauche est optionnelle et ne doit pas faire planter l’admin
+ - ResumeFormMixin: ensure the resume_link will stay optional
+
+Sécurité:
+
+ - Forcer les CV à être hébergés dans notre Cloud
+ - Ajout de la directive HSTS (sur 1H pour commencer)
+
+Technique:
+
+ - Montée de version du client Postgres dans le container django
+ - Appliquer djhtml systématiquement
+
 ## [36] - 2022-02-13
 
 ### Ajouté
