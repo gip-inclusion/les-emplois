@@ -250,12 +250,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         }
 
 
-# Prescribers signup.
-# ------------------------------------------------------------------------------------------
-
-
-class PrescriberCheckAlreadyExistsForm(forms.Form):
-
+class APIEntrepriseSearchForm(forms.Form):
     siret = forms.CharField(
         label="Numéro de SIRET de votre organisation",
         min_length=14,
@@ -265,10 +260,9 @@ class PrescriberCheckAlreadyExistsForm(forms.Form):
         ),
     )
 
-    department = forms.ChoiceField(
-        label="Département",
-        choices=DEPARTMENTS.items(),
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.org_data = None
 
     def clean_siret(self):
         # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
@@ -311,6 +305,15 @@ class PrescriberCheckAlreadyExistsForm(forms.Form):
         return siret
 
 
+class APIEntrepriseSearchWithDepartmentForm(APIEntrepriseSearchForm):
+    department = forms.ChoiceField(
+        label="Département",
+        choices=DEPARTMENTS.items(),
+    )
+
+
+# Prescribers signup.
+# ------------------------------------------------------------------------------------------
 class PrescriberRequestInvitationForm(FullnameFormMixin):
     email = forms.EmailField(
         label="E-mail",

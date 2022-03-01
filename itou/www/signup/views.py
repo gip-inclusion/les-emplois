@@ -269,7 +269,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
     prescriber_orgs_with_members_same_siret = None
     prescriber_orgs_with_members_same_siren = None
 
-    form = forms.PrescriberCheckAlreadyExistsForm(data=request.POST or None)
+    form = forms.APIEntrepriseSearchWithDepartmentForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
