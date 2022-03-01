@@ -265,8 +265,7 @@ class AcceptForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["hiring_without_approval"].widget = forms.HiddenInput()
-        for field in ["hiring_start_at"]:
-            self.fields[field].required = True
+        self.fields["hiring_start_at"].required = True
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].widget = DuetDatePickerWidget()
         # Job applications can be accepted twice if they have been cancelled.
@@ -331,8 +330,7 @@ class EditHiringDateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in ["hiring_start_at"]:
-            self.fields[field].required = True
+        self.fields["hiring_start_at"].required = True
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].widget = DuetDatePickerWidget()
 
