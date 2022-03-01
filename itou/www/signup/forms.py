@@ -1,13 +1,13 @@
 from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
-from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
@@ -491,10 +491,9 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
             prescriber_org.post_code = self.prescriber_org_data["post_code"]
             prescriber_org.city = self.prescriber_org_data["city"]
             prescriber_org.department = self.prescriber_org_data["department"]
-            longitude = self.prescriber_org_data["longitude"]
-            latitude = self.prescriber_org_data["latitude"]
-            if longitude and latitude:
-                prescriber_org.coords = GEOSGeometry(f"POINT({longitude} {latitude})")
+            prescriber_org.coords = lat_lon_to_coords(
+                self.prescriber_org_data["latitude"], self.prescriber_org_data["longitude"]
+            )
             prescriber_org.geocoding_score = self.prescriber_org_data["geocoding_score"]
             prescriber_org.kind = self.kind
             prescriber_org.authorization_status = self.authorization_status

@@ -1,12 +1,14 @@
 from unittest import mock
 
 from django import forms
+from django.contrib.gis.geos import Point
 from django.test import TestCase
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin, OptionalAddressFormMixin
+from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
@@ -229,3 +231,11 @@ class UtilsMandatoryAddressFormMixinTest(TestCase):
         self.assertEqual(form.errors["address_line_1"][0], "Ce champ est obligatoire.")
         self.assertEqual(form.errors["post_code"][0], "Ce champ est obligatoire.")
         self.assertEqual(form.errors["city"][0], "Ce champ est obligatoire.")
+
+
+class UtilsMiscTestCase(TestCase):
+    def test_lat_lon_to_coords(self):
+        self.assertEqual(lat_lon_to_coords(None, None), None)
+        self.assertEqual(lat_lon_to_coords(1, None), None)
+        self.assertEqual(lat_lon_to_coords(None, 1), None)
+        self.assertEqual(lat_lon_to_coords(13, 42), Point(42, 13))

@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -10,6 +11,12 @@ from itou.utils.validators import validate_post_code
 
 
 logger = logging.getLogger(__name__)
+
+
+def lat_lon_to_coords(lat, lon):
+    if lat is not None and lon is not None:
+        return GEOSGeometry(f"POINT({lon} {lat})")
+    return None
 
 
 class AddressMixin(models.Model):
