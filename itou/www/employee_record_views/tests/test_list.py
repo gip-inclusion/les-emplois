@@ -68,7 +68,7 @@ class ListEmployeeRecordsTest(TestCase):
 
     def test_employee_records_with_hiring_end_at(self):
         """
-        Check if "hiring_end_at" of job_application is displayed
+        Check "hiring_end_at" display
         """
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
         hiring_end_at = self.job_application.hiring_end_at
@@ -80,7 +80,7 @@ class ListEmployeeRecordsTest(TestCase):
 
     def test_employee_records_without_hiring_end_at(self):
         """
-        Check if "hiring_end_at" of job_application is replaced by "non renseigné"
+        Check "hiring_end_at" display when None
         """
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
         self.job_application.hiring_end_at = None

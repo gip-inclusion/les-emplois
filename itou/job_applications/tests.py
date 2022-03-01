@@ -517,21 +517,7 @@ class JobApplicationNotificationsTest(TestCase):
     def test_accept_for_proxy_without_hiring_end_at(self, *args, **kwargs):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(hiring_end_at=None)
         email = job_application.email_accept_for_proxy
-        # To.
-        self.assertIn(job_application.sender.email, email.to)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(len(email.bcc), 0)
-        # Subject.
-        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", email.subject)
-        # Body.
-        self.assertIn(title(job_application.job_seeker.get_full_name()), email.body)
-        self.assertIn(title(job_application.sender.get_full_name()), email.body)
-        self.assertIn(job_application.to_siae.display_name, email.body)
-        self.assertIn(job_application.answer, email.body)
-        self.assertIn("Date de début du contrat", email.body)
-        self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
         self.assertIn("Date de fin du contrat : Non renseigné", email.body)
-        self.assertIn(job_application.sender_prescriber_organization.accept_survey_url, email.body)
 
     def test_accept_trigger_manual_approval(self, *args, **kwargs):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -564,24 +550,7 @@ class JobApplicationNotificationsTest(TestCase):
         )
         accepted_by = job_application.to_siae.members.first()
         email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
-        # To.
-        self.assertIn(settings.ITOU_EMAIL_CONTACT, email.to)
-        self.assertEqual(len(email.to), 1)
-        # Body.
-        self.assertIn(job_application.job_seeker.first_name, email.body)
-        self.assertIn(job_application.job_seeker.last_name, email.body)
-        self.assertIn(job_application.job_seeker.email, email.body)
-        self.assertIn(job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body)
-        self.assertIn(job_application.to_siae.siret, email.body)
-        self.assertIn(job_application.to_siae.kind, email.body)
-        self.assertIn(job_application.to_siae.get_kind_display(), email.body)
-        self.assertIn(job_application.to_siae.get_department_display(), email.body)
-        self.assertIn(job_application.to_siae.display_name, email.body)
-        self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
         self.assertIn("Date de fin du contrat : Non renseigné", email.body)
-        self.assertIn(accepted_by.get_full_name(), email.body)
-        self.assertIn(accepted_by.email, email.body)
-        self.assertIn(reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk]), email.body)
 
     def test_refuse(self, *args, **kwargs):
 
@@ -656,27 +625,7 @@ class JobApplicationNotificationsTest(TestCase):
         )
         accepted_by = job_application.to_siae.members.first()
         email = job_application.email_deliver_approval(accepted_by)
-        # To.
-        self.assertIn(accepted_by.email, email.to)
-        self.assertEqual(len(email.to), 1)
-        # Body.
-        self.assertIn(approval.user.get_full_name(), email.subject)
-        self.assertIn(approval.number_with_spaces, email.body)
-        self.assertIn(approval.start_at.strftime("%d/%m/%Y"), email.body)
-        self.assertIn(approval.end_at.strftime("%d/%m/%Y"), email.body)
-        self.assertIn(approval.user.last_name, email.body)
-        self.assertIn(approval.user.first_name, email.body)
-        self.assertIn(approval.user.birthdate.strftime("%d/%m/%Y"), email.body)
-        self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
         self.assertIn("Se terminant le : Non renseigné", email.body)
-        self.assertIn(job_application.to_siae.display_name, email.body)
-        self.assertIn(job_application.to_siae.get_kind_display(), email.body)
-        self.assertIn(job_application.to_siae.address_line_1, email.body)
-        self.assertIn(job_application.to_siae.address_line_2, email.body)
-        self.assertIn(job_application.to_siae.post_code, email.body)
-        self.assertIn(job_application.to_siae.city, email.body)
-        self.assertIn(settings.ITOU_ASSISTANCE_URL, email.body)
-        self.assertIn(job_application.to_siae.accept_survey_url, email.body)
 
     def test_manually_deliver_approval(self, *args, **kwargs):
         staff_member = UserFactory(is_staff=True)

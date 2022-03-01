@@ -1,3 +1,4 @@
+from itertools import product
 from unittest.mock import patch
 
 from dateutil.relativedelta import relativedelta
@@ -30,6 +31,8 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 @patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class ProcessViewsTest(TestCase):
+    """Application process"""
+
     def test_details_for_siae(self, *args, **kwargs):
         """Display the details of a job application."""
 
@@ -199,39 +202,54 @@ class ProcessViewsTest(TestCase):
         siae = SiaeWithMembershipFactory()
         siae_user = siae.members.first()
 
-        for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
-            job_application = JobApplicationSentByJobSeekerFactory(state=state, job_seeker=job_seeker, to_siae=siae)
-            self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+        hiring_end_dates = [
+            Approval.get_default_end_date(today),
+            None,
+        ]
+        cases = list(product(hiring_end_dates, JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES))
 
-            url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+        for hiring_end_at, state in cases:
+            with self.subTest(hiring_end_at=hiring_end_at, state=state):
 
-            # Good duration.
-            hiring_start_at = today
-            hiring_end_at = Approval.get_default_end_date(hiring_start_at)
-            post_data = {
-                # Data for `JobSeekerPoleEmploiStatusForm`.
-                "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-                # Data for `AcceptForm`.
-                "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "answer": "",
-                **address,
-            }
-            response = self.client.post(url, data=post_data)
-            next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-            self.assertRedirects(response, next_url)
+                job_application = JobApplicationSentByJobSeekerFactory(
+                    state=state, job_seeker=job_seeker, to_siae=siae
+                )
+                self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-            job_application = JobApplication.objects.get(pk=job_application.pk)
-            self.assertEqual(job_application.hiring_start_at, hiring_start_at)
-            self.assertEqual(job_application.hiring_end_at, hiring_end_at)
-            self.assertTrue(job_application.state.is_accepted)
+                url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
 
-            # test how hiring_end_date is displayed
-            response = self.client.get(next_url)
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, f"Fin : {hiring_end_at.strftime('%d')}")
+                # Good duration.
+                hiring_start_at = today
+                post_data = {
+                    # Data for `JobSeekerPoleEmploiStatusForm`.
+                    "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+                    # Data for `AcceptForm`.
+                    "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "answer": "",
+                    **address,
+                }
+                if hiring_end_at:
+                    post_data["hiring_end_at"] = hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
+
+                response = self.client.post(url, data=post_data)
+                next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+                self.assertRedirects(response, next_url)
+
+                job_application = JobApplication.objects.get(pk=job_application.pk)
+                self.assertEqual(job_application.hiring_start_at, hiring_start_at)
+                self.assertEqual(job_application.hiring_end_at, hiring_end_at)
+                self.assertTrue(job_application.state.is_accepted)
+
+                # test how hiring_end_date is displayed
+                response = self.client.get(next_url)
+                self.assertEqual(response.status_code, 200)
+                # test case hiring_end_at
+                if hiring_end_at:
+                    self.assertContains(response, f"Fin : {hiring_end_at.strftime('%d')}")
+                else:
+                    self.assertContains(response, "Fin : Non renseigné")
 
         ##############
         # Exceptions #
@@ -285,62 +303,6 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response, "form_user_address", "address_line_1", "Ce champ est obligatoire.")
         self.assertFormError(response, "form_user_address", "city", "Ce champ est obligatoire.")
         self.assertFormError(response, "form_user_address", "post_code", "Ce champ est obligatoire.")
-
-    def test_accept_without_hiring_end_at(self, *args, **kwargs):
-        """Test the `accept` transition."""
-        create_test_cities(["54", "57"], num_per_department=2)
-        city = City.objects.first()
-        today = timezone.localdate()
-
-        job_seeker = JobSeekerWithAddressFactory(city=city.name)
-        address = {
-            "address_line_1": job_seeker.address_line_1,
-            "post_code": job_seeker.post_code,
-            "city": city.name,
-            "city_slug": city.slug,
-        }
-        siae = SiaeWithMembershipFactory()
-        siae_user = siae.members.first()
-
-        for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
-            job_application = JobApplicationSentByJobSeekerFactory(state=state, job_seeker=job_seeker, to_siae=siae)
-            self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
-
-            url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-
-            job_application = JobApplicationSentByJobSeekerFactory(state=state, job_seeker=job_seeker, to_siae=siae)
-            self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
-
-            url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-
-            hiring_start_at = today
-            hiring_end_at = None
-            post_data = {
-                # Data for `JobSeekerPoleEmploiStatusForm`.
-                "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-                # Data for `AcceptForm`.
-                "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "answer": "",
-                **address,
-            }
-            response = self.client.post(url, data=post_data)
-            next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-            self.assertRedirects(response, next_url)
-
-            job_application = JobApplication.objects.get(pk=job_application.pk)
-            self.assertEqual(job_application.hiring_start_at, hiring_start_at)
-            self.assertEqual(job_application.hiring_end_at, hiring_end_at)
-            self.assertTrue(job_application.state.is_accepted)
-
-            # test how hiring_end_date is displayed
-            response = self.client.get(next_url)
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, "Fin : Non renseigné")
-
 
     def test_accept_with_active_suspension(self, *args, **kwargs):
         """Test the `accept` transition with active suspension for active user"""
