@@ -50,15 +50,13 @@
                 </td>
                 <td class="text-center align-middle" scope="row">
                     <div class="custom-control custom-switch is-rtl">
-                        <label for="nb_open_positions-{{ job.appellation.code }}">
-                            <small>Nombre de postes ouverts</small>
-                        </label>
                         <input
                             type="number"
                             class="form-control form-control-sm"
                             id="nb_open_positions-{{ job.appellation.code }}"
                             name="nb_open_positions-{{ job.appellation.code }}"
                             value="{{ job.nb_open_positions }}"
+                            aria-label="Nombre de postes ouverts pour {{ job.appellation.name }}"
                             {% if not job.is_active %}
                                 disabled="disabled"
                             {% endif %}
