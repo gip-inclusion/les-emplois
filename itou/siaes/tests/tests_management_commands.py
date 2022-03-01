@@ -1,6 +1,8 @@
 import datetime
 import importlib
+import os
 import shutil
+import unittest
 from pathlib import Path
 
 from django.conf import settings
@@ -16,6 +18,7 @@ from itou.siaes.models import Siae
 """
 
 
+@unittest.skipUnless(os.getenv("CI", False), "It is a long management command and normally not subject to change!")
 class ImportSiaeManagementCommandsTest(TestCase):
 
     path_dest = "./siaes/management/commands/data"
