@@ -49,19 +49,17 @@
                     </div>
                 </td>
                 <td class="text-center align-middle" scope="row">
-                    <div class="custom-control custom-switch is-rtl">
-                        <input
-                            type="number"
-                            class="form-control form-control-sm"
-                            id="nb_open_positions-{{ job.appellation.code }}"
-                            name="nb_open_positions-{{ job.appellation.code }}"
-                            value="{{ job.nb_open_positions }}"
-                            aria-label="Nombre de postes ouverts pour {{ job.appellation.name }}"
-                            {% if not job.is_active %}
-                                disabled="disabled"
-                            {% endif %}
-                            min="1" step="1" />
-                    </div>
+                    <input
+                        type="number"
+                        class="form-control form-control-sm job-appellation-nb_open_positions"
+                        id="nb_open_positions-{{ job.appellation.code }}"
+                        name="nb_open_positions-{{ job.appellation.code }}"
+                        value="{{ job.nb_open_positions }}"
+                        aria-label="Nombre de postes ouverts pour {{ job.appellation.name }}"
+                        {% if not job.is_active %}
+                            disabled="disabled"
+                        {% endif %}
+                        min="1" step="1" />
                 </td>
                 <td class="text-center align-middle" scope="row">
                     <div class="custom-control custom-switch is-rtl">
