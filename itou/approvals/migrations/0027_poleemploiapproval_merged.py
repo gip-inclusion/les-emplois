@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="poleemploiapproval",
             name="merged",
-            field=models.BooleanField(default=False, verbose_name="Agrément fusionné avec les doublons?"),
+            field=models.BooleanField(default=False, verbose_name="Agrément fusionné avec les doublons ?"),
         ),
     ]

@@ -72,10 +72,10 @@ class Command(BaseCommand):
     ./manage.py improve_asp_db --debug --filename "exports/20220120_sans_doublons-small.xlsx"
     Complète le fichier de l'ASP (20220120_sans_doublons)
     avec les bonnes infos qui sont désormais chez nous.
-    on re-remplit les colonnes de ce fichier :
+    On re-remplit les colonnes de ce fichier :
         - Y (PASS IAE)
         - Z (Date de début PASS IAE)
-        - AA (Date de fin PASS IAE) , en utilisant
+        - AA (Date de fin PASS IAE)
     On utilise la colonne E (ppn_numero_inscription) qui contient le NIR pour croiser
     """
 
@@ -91,12 +91,13 @@ class Command(BaseCommand):
 
     def find_agrement_data_by_nir(self, nir):
         """
-        We’ve got the NIR (or possibly NTT/NIA) of a condidate,
-        we want to return the agrement number, as well as it start and end date
+        We’ve got the NIR (or possibly NTT/NIA) of a candidate,
+        we want to return the agrement number, as well as its start and end date
 
         In order to do this, we first try to  use the (not yet deployed, hence the raw SQL)
         merged_approvals_poleemploiapproval table.
-        If we do not find the candidate there, we run through the User model directly, and go through the approvals
+        If we do not find the candidate in PoleEmploiMergedApproval, we fall back
+        on the User model directly, and go through the approvals
         """
         search_sql = """select
                 left(number, 12),
@@ -116,14 +117,13 @@ class Command(BaseCommand):
                 if approval is not None:
                     return approval.number, approval.start_at, approval.end_at
                 else:
-                    raise ValueError("Approval non trouvee")
-
+                    raise ValueError("Approval non trouvé")
             except User.DoesNotExist:
                 raise ValueError("Nir non trouve")
 
     def handle(self, filename, debug=False, **options):
         self.debug = debug
-        self.stdout.write("Merging approvals / PASS IAE")
+        self.stdout.write("Filling ASP file with Itou data")
         self.cursor = connection.cursor()
 
         out = "exports/20220120_enrichi.xlsx"
