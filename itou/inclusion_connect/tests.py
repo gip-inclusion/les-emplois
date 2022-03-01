@@ -2,6 +2,7 @@ import dataclasses
 import datetime
 
 import httpx
+import respx
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -10,9 +11,9 @@ from ..users.factories import UserFactory
 from ..users.models import User
 from .constants import (
     INCLUSION_CONNECT_ENDPOINT_AUTHORIZE,
-    INCLUSION_CONNECT_ENDPOINT_LOGOUT,
     INCLUSION_CONNECT_ENDPOINT_TOKEN,
     INCLUSION_CONNECT_ENDPOINT_USERINFO,
+    INCLUSION_CONNECT_ENDPOINT_LOGOUT,
     INCLUSION_CONNECT_STATE_EXPIRATION,
     PROVIDER_INCLUSION_CONNECT,
 )

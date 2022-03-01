@@ -6,7 +6,7 @@ import httpx
 from django.contrib import messages
 from django.contrib.auth import login
 from django.core import signing
-from django.http import HttpResponseRedirect  # , JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.utils import crypto
 from django.utils.http import urlencode
@@ -17,6 +17,7 @@ from .constants import (  # INCLUSION_CONNECT_SCOPES,
     INCLUSION_CONNECT_CLIENT_ID,
     INCLUSION_CONNECT_CLIENT_SECRET,
     INCLUSION_CONNECT_ENDPOINT_AUTHORIZE,
+    INCLUSION_CONNECT_ENDPOINT_LOGOUT,
     INCLUSION_CONNECT_ENDPOINT_TOKEN,
     INCLUSION_CONNECT_ENDPOINT_USERINFO,
     INCLUSION_CONNECT_SESSION_STATE,
@@ -182,3 +183,15 @@ def inclusion_connect_logout(request):
     # The user can be authenticated on IC w/o a session on itou.
     id_token = request.GET.get("id_token")
     state = request.GET.get("state", "")
+
+    if not id_token:
+        return JsonResponse({"message": "Le paramètre « id_token » est manquant."}, status=400)
+
+    params = {
+        "id_token_hint": id_token,
+        "state": state,
+        "post_logout_redirect_uri": get_absolute_url(reverse("home:hp")),
+    }
+    url = INCLUSION_CONNECT_ENDPOINT_LOGOUT
+    complete_url = f"{url}?{urlencode(params)}"
+    return HttpResponseRedirect(complete_url)
