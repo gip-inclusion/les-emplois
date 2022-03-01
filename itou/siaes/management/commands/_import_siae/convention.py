@@ -112,6 +112,7 @@ def get_creatable_conventions():
 
         is_active = does_siae_have_an_active_convention(siae)
 
+        # convention is to be unique for an asp_id and a SIAE kind
         assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
 
         if is_active:
