@@ -536,7 +536,7 @@ class SiaeJobDescription(models.Model):
     nb_open_positions = models.PositiveIntegerField(
         verbose_name="Nombre de postes ouverts", default=1, validators=[MinValueValidator(1)]
     )
-    # TODO: this will be used to order job description in UI.
+    # is used to order job descriptions in the UI
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
 
     objects = models.Manager.from_queryset(SiaeJobDescriptionQuerySet)()

@@ -114,7 +114,7 @@ class SiaeSignupTest(TestCase):
             self.assertEqual(redirect_url, next_url)
             self.assertEqual(response.status_code, 200)
             expected_message = (
-                "Ce lien d'inscription est invalide ou a expiré. " "Veuillez procéder à une nouvelle inscription."
+                "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription."
             )
             self.assertContains(response, escape(expected_message))
 

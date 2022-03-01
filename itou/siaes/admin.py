@@ -129,10 +129,6 @@ class SiaeAdmin(OrganizationAdmin):
         gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
     }
 
-    def get_queryset(self, request):
-        # OrganizationAdmin adds some useful annotations.
-        return super().get_queryset(request)
-
     def save_model(self, request, obj, form, change):
         if not change:
             obj.created_by = request.user

@@ -15,7 +15,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
 class UtilsAddressMixinTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_set_coords(self, mock_call_ban_geocoding_api):
+    def test_set_coords(self, _mock_call_ban_geocoding_api):
         """
         Test `AddressMixin.set_coords()`.
         Use `PrescriberOrganization` which inherits from abstract `AddressMixin`.
@@ -46,7 +46,7 @@ class UtilsAddressMixinTest(TestCase):
         self.assertEqual(prescriber.longitude, expected_longitude)
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_set_coords_and_address(self, mock_call_ban_geocoding_api):
+    def test_set_coords_and_address(self, _mock_call_ban_geocoding_api):
         """
         Test `AddressMixin.set_coords_and_address()`.
         Use `PrescriberOrganization` which inherits from abstract `AddressMixin`.

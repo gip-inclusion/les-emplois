@@ -322,7 +322,7 @@ def get_fluxiae_df(
     with gzip.open(filename) as f:
         # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
         nrows = -3
-        for line in f:
+        for _line in f:
             nrows += 1
             if dry_run and nrows == 100:
                 break
