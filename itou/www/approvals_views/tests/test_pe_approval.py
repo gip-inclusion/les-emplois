@@ -146,7 +146,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
-        # TODO: redirect to prescriber's connection page with a flash message instead.
+        # TODO: (cms) redirect to prescriber's connection page with a flash message instead.
         # AssertionError: '/login/job_seeker' not found in '/accounts/login/?next=/approvals/pe-approval/search'
         next_url = reverse("account_login")
         self.assertIn(next_url, response.url)
