@@ -1,0 +1,16 @@
+{% extends "layout/content.html" %}
+
+{% block title %}Liste des auto-prescriptions à justifier{{ block.super }}{% endblock %}
+
+{% block content %}
+    Liste des auto-prescriptions à justifier pour {{ siae.name }}
+    {% for approval_id in approval_list %}
+        <div><a href="{% url "controls:self_approvals" approval_id %}">{{approval_id}}</a></div>
+
+    {% endfor %}
+
+    navigation_pages
+    <a class="btn btn-outline-primary" href="{{ back_url }}">
+        Retour
+    </a>
+{% endblock %}

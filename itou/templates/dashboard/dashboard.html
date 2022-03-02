@@ -315,8 +315,7 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
                         <a class="title-with-badge" href="{% url 'siaes_views:configure_jobs' %}">Gérer les métiers et recrutements
-                            <span class="badge badge-info" data-toggle="tooltip" data-placement="right"
-                                title="À partir de maintenant, vous allez pouvoir informer les prescripteurs et les candidats des métiers qui recrutent en ce moment, avec la fonctionnalité «recrutement en cours»">Nouveau</span>
+                            <span class="badge badge-info" data-toggle="tooltip" data-placement="right" title="À partir de maintenant, vous allez pouvoir informer les prescripteurs et les candidats des métiers qui recrutent en ce moment, avec la fonctionnalité «recrutement en cours»">Nouveau</span>
                         </a>
                     </p>
 
@@ -381,9 +380,7 @@
                     {% if current_siae.is_subject_to_eligibility_rules %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="book-open" %}
-                            <a
-                                href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
-                                target="_blank" title="Liste des critères d'éligibilité (ouverture dans un nouvel onglet)">
+                            <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1" target="_blank" title="Liste des critères d'éligibilité (ouverture dans un nouvel onglet)">
                                 Liste des critères d'éligibilité
                             </a>
                         </p>
@@ -393,6 +390,15 @@
                         <a href="{% url 'apply:list_for_siae_exports' %}">
                             Export des candidatures
                         </a>
+                    </p>
+                </div>
+            </div>
+            <div class="card">
+                <h5 class="h4 card-header">Contrôle à postériori <span class="badge badge-info">Nouveau</span></h5>
+                <div class="card-body">
+                    <p class="card-text">
+                        <i class="ri-file-copy-2-line ri-lg"></i>
+                        <a href="{% url 'controls:self_approvals_list' %}">Justifier mes auto-prescriptions</a>
                     </p>
                 </div>
             </div>
@@ -445,11 +451,6 @@
                             {% include "includes/icon.html" with icon="activity" %}
                             <a href="{% url 'stats:stats_ddets_iae' %}">Données IAE</a>
                         </p>
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="activity" %}
-                            <a href="{% url 'stats:stats_ddets_diagnosis_control' %}">Voir mes données 2021 du contrôle a posteriori (version bêta)</a>
-                            <span class="badge badge-info">Nouveau</span>
-                        </p>
                     {% endif %}
                     {% if can_view_stats_dreets %}
                         <p class="card-text">
@@ -475,6 +476,22 @@
                     {% endif %}
                 </div>
             </div>
+
+            {% if can_view_stats_ddets %}
+                <div class="card">
+                    <h5 class="h4 card-header">Contrôle à postériori <span class="badge badge-info">Nouveau</span></h5>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <i class="ri-pulse-line ri-lg"></i>
+                            <a href="{% url 'stats:stats_ddets_diagnosis_control' %}">Sélectionner l'échantilonnage</a>
+                        </p>
+                        <p class="card-text">
+                            <i class="ri-file-copy-2-line ri-lg"></i>
+                            <a href="{% url 'controls:review_self_approvals' %}">Contrôler les pièces justificatives</a>
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
 
         {% endif %}
 

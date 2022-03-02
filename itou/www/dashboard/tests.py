@@ -3,6 +3,8 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.institutions.factories import InstitutionWithMembershipFactory
+from itou.institutions.models import Institution
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByPrescriberFactory,
@@ -20,7 +22,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipFactory,
 )
 from itou.siaes.models import Siae
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.www.dashboard.forms import EditUserEmailForm
 
@@ -586,3 +588,57 @@ class EditUserPreferencesExceptionsTest(TestCase):
         url = reverse("dashboard:edit_user_preferences")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
+
+
+class DisplayControlsCardTest(TestCase):
+    def test_links_if_user_can_view_stats_ddets(self):
+        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DDETS, department="14")
+        user = institution.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["can_view_stats_ddets"])
+        self.assertContains(response, reverse("stats:stats_ddets_diagnosis_control"))
+        self.assertContains(response, reverse("controls:review_self_approvals"))
+
+    def test_links_if_user_cannot_view_stats_ddets(self):
+        user = UserFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["can_view_stats_ddets"])
+        self.assertNotContains(response, reverse("stats:stats_ddets_diagnosis_control"))
+        self.assertNotContains(response, reverse("controls:review_self_approvals"))
+
+    def test_links_if_user_is_siae_staff_with_self_approval_control(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("controls:self_approvals_list"))
+
+    def test_links_if_user_is_siae_staff_without_self_approval_control(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, reverse("controls:self_approvals_list"))
+
+    def test_links_if_user_is_not_siae_staff(self):
+        user = UserFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, reverse("controls:self_approvals_list"))

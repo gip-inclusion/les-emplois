@@ -1,0 +1,8 @@
+{% extends "layout/content.html" %}
+
+{% block title %}Auto-prescription à justifier{{ block.super }}{% endblock %}
+
+{% block content %}
+    Auto-prescription {{ job_application.approval.number}} à justifier pour {{ siae.name }}
+    <a href="{% url "controls:self_approvals_list" %}" class="btn btn-primary">Retour à la liste</a>
+{% endblock %}
