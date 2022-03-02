@@ -40,13 +40,13 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             {
                 "name": "Candidatures à traiter",
                 "states": [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING],
-                "icon": "user-plus",
+                "icon": "ri-user-add-line",
                 "badge": "badge-danger",
             },
             {
                 "name": "Candidatures acceptées ou mises en liste d'attente",
                 "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_POSTPONED],
-                "icon": "user-check",
+                "icon": "ri-user-follow-line",
                 "badge": "badge-secondary",
             },
             {
@@ -56,7 +56,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     JobApplicationWorkflow.STATE_CANCELLED,
                     JobApplicationWorkflow.STATE_OBSOLETE,
                 ],
-                "icon": "user-x",
+                "icon": "ri-user-follow-line",
                 "badge": "badge-secondary",
             },
         ]
