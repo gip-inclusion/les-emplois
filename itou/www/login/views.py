@@ -25,12 +25,13 @@ class ItouLoginView(LoginView):
         extra_context = {
             "login_url": login_url,
             "signup_url": signup_url,
+            "signup_allowed": True,
             "redirect_field_name": REDIRECT_FIELD_NAME,
             "redirect_field_value": get_safe_url(self.request, REDIRECT_FIELD_NAME),
         }
         return context | extra_context
 
-    def redirect_to_login_type(self):
+    def _redirect_to_login_type(self):
         """
         Historically, a generic login view was used to authenticate users.
         The "account_type" URL parameter mapped to the correct user type.
@@ -43,6 +44,7 @@ class ItouLoginView(LoginView):
             if account_type not in ["siae_staff", "prescriber", "job_seeker", "labor_inspector"]:
                 raise PermissionDenied
             return HttpResponsePermanentRedirect(reverse(f"login:{account_type}"))
+        return None
 
     def get(self, *args, **kwargs):
         """
@@ -51,10 +53,7 @@ class ItouLoginView(LoginView):
         when a user confirms its email after updating it.
         Allauth magic is complicated to debug.
         """
-        redirection = self.redirect_to_login_type()
-        if redirection:
-            return redirection
-        return super(ItouLoginView, self).get(*args, **kwargs)
+        return self._redirect_to_login_type() or super(ItouLoginView, self).get(*args, **kwargs)
 
     def post(self, *args, **kwargs):
         """
@@ -63,10 +62,7 @@ class ItouLoginView(LoginView):
         when a user confirms its email after updating it.
         Allauth magic is complicated to debug.
         """
-        redirection = self.redirect_to_login_type()
-        if redirection:
-            return redirection
-        return super(ItouLoginView, self).post(*args, **kwargs)
+        return self._redirect_to_login_type() or super(ItouLoginView, self).post(*args, **kwargs)
 
 
 class PrescriberLoginView(ItouLoginView):
