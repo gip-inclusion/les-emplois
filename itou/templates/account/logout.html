@@ -1,6 +1,7 @@
 {# django-allauth template override. #}
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
+{% load redirection_fields %}
 
 {% block title %}Déconnexion{{ block.super }}{% endblock %}
 
@@ -16,9 +17,7 @@
 
             {% csrf_token %}
 
-            {% if redirect_field_value %}
-                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-            {% endif %}
+            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
 
             {% buttons %}
                 <button type="submit" class="btn btn-primary">Se déconnecter</button>

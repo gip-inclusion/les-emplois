@@ -428,6 +428,60 @@ class UtilsTemplateTagsTestCase(TestCase):
         expected = "?page=1"
         self.assertEqual(out, expected)
 
+    def test_redirection_url(self):
+        base_url = reverse("dashboard:index")
+        redirect_field_value = reverse("home:hp")
+
+        # Redirection value.
+        context = {"redirect_field_name": "next", "redirect_field_value": redirect_field_value}
+        template = Template(
+            """
+            {% load redirection_fields %}
+            {% url "dashboard:index" %}{% redirection_url name=redirect_field_name value=redirect_field_value %}
+        """
+        )
+        out = template.render(Context(context)).strip()
+        expected = base_url + f"?next={redirect_field_value}"
+        self.assertEqual(out, expected)
+
+        # No redirection value.
+        template = Template(
+            """
+            {% load redirection_fields %}
+            {% url "dashboard:index" %}{% redirection_url name=redirect_field_name value=redirect_field_value %}
+        """
+        )
+        out = template.render(Context()).strip()
+        expected = base_url
+        self.assertEqual(out, expected)
+
+    def test_redirection_input_field(self):
+        name = "next"
+        value = reverse("home:hp")
+
+        # Redirection value.
+        context = {"redirect_field_name": name, "redirect_field_value": value}
+        template = Template(
+            """
+            {% load redirection_fields %}
+            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
+        """
+        )
+        out = template.render(Context(context)).strip()
+        expected = f'<input type="hidden" name="{name}" value="{value}">'
+        self.assertEqual(out, expected)
+
+        # No redirection expected.
+        template = Template(
+            """
+            {% load redirection_fields %}
+            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
+        """
+        )
+        out = template.render(Context()).strip()
+        expected = ""
+        self.assertEqual(out, expected)
+
     def test_call_method(self):
         """Test `call_method` template tag."""
         siae = SiaeWithMembershipFactory()

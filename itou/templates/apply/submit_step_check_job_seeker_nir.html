@@ -1,7 +1,8 @@
 {% extends "apply/submit_base_two_columns.html" %}
 {% load bootstrap4 %}
-{% load static %}
 {% load format_filters %}
+{% load redirection_fields %}
+{% load static %}
 
 {% block title %}{{ block.super }}{% endblock %}
 
@@ -14,9 +15,7 @@
 
         {% bootstrap_form form %}
 
-        {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-        {% endif %}
+        {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
 
         {% if form.errors %}
             <div class="alert alert-info">

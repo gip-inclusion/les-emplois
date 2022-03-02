@@ -1,4 +1,5 @@
 {% extends "layout/content_full_viewport.html" %}
+{% load redirection_fields %}
 {% load static %}
 
 {% block title %}Les emplois de l'inclusion{% endblock %}
@@ -21,7 +22,7 @@
                             </h3>
                         </div>
                         <div class="card-footer">
-                            <a class="btn btn-primary stretched-link" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                            <a class="btn btn-primary stretched-link" href="{% url 'account_signup' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
                                 Créer un compte
                             </a>
                         </div>
