@@ -7,9 +7,6 @@ from django.utils import safestring
 from itou.www.login import urls as login_urls
 
 
-LOGIN_ROUTES = [reverse(f"login:{url.name}") for url in login_urls.urlpatterns] + [reverse("account_login")]
-
-
 class ItouCurrentOrganizationMiddleware:
     """
     Store the ID of the current prescriber organization or employer structure in session.
@@ -30,7 +27,8 @@ class ItouCurrentOrganizationMiddleware:
         # In view two, the user is authenticated and has a flag (is_siae_staff, is_prescriber, ...)
         # but he does not belong to any group.
         # This raises an error so we skip the middleware only in this case.
-        skip_middleware = request.path in [reverse("account_logout"), *LOGIN_ROUTES] or (
+        login_routes = [reverse(f"login:{url.name}") for url in login_urls.urlpatterns] + [reverse("account_login")]
+        skip_middleware = request.path in [reverse("account_logout"), *login_routes] or (
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite")
         )
         if skip_middleware:
