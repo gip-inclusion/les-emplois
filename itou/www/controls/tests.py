@@ -1,12 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.approvals.models import Approval
 from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.institutions.models import Institution
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siaes.factories import SiaeWithMembershipFactory
-from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, UserFactory
 from itou.www.stats.views import _STATS_HTML_TEMPLATE
 
