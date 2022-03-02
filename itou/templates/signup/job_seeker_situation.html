@@ -1,5 +1,6 @@
 {% extends "layout/content_two_columns.html" %}
 {% load bootstrap4 %}
+{% load redirection_fields %}
 {% load static %}
 
 {% block title %}Inscription candidat{{ block.super }}{% endblock %}
@@ -13,9 +14,7 @@
 
             {% csrf_token %}
 
-            {% if redirect_field_value %}
-                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-            {% endif %}
+            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
 
             {% bootstrap_form form alert_error_type="all" %}
 

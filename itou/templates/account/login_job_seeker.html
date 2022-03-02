@@ -1,6 +1,7 @@
 {# django-allauth template override. #}
 {% extends "layout/content_two_columns.html" %}
 {% load bootstrap4 %}
+{% load redirection_fields %}
 {% load static %}
 
 {% block title %}Connexion candidat{{ block.super }}{% endblock %}
@@ -35,9 +36,7 @@
 
             {% bootstrap_form_errors form type="all" %}
 
-            {% if redirect_field_value %}
-                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-            {% endif %}
+            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
 
             {% bootstrap_field form.login form_group_class="form-group" %}
 
@@ -56,7 +55,7 @@
             <p>Vous n'avez pas de compte ?</p>
 
             <p>
-                <a class="btn btn-outline-primary" href="{% url 'signup:job_seeker_situation' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                <a class="btn btn-outline-primary" href="{% url 'signup:job_seeker_situation' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
                     Inscription candidat
                 </a>
             </p>

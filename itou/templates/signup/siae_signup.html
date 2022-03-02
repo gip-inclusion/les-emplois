@@ -1,5 +1,6 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
+{% load redirection_fields %}
 
 {% block title %}Employeur solidaire - Inscription{{ block.super }}{% endblock %}
 
@@ -16,9 +17,7 @@
 
         {% bootstrap_form_errors form type="all" %}
 
-        {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-        {% endif %}
+        {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
 
         {% bootstrap_field form.encoded_siae_id %}
         {% bootstrap_field form.token %}
