@@ -289,6 +289,7 @@ class Command(BaseCommand):
                 "siae",
                 "appellation__rome",
             )
+            .filter(siae__pk__in=self.active_siae_pks)
             .with_job_applications_count()
             .all()
         )
@@ -321,7 +322,7 @@ class Command(BaseCommand):
         queryset = (
             JobApplication.objects.select_related("to_siae", "sender_siae", "sender_prescriber_organization")
             .prefetch_related("logs")
-            .filter(created_from_pe_approval=False)
+            .filter(created_from_pe_approval=False, to_siae__pk__in=self.active_siae_pks)
             .all()
         )
 
@@ -339,7 +340,12 @@ class Command(BaseCommand):
 
         # Iterating directly on this very large queryset results in psycopg2.errors.DiskFull error.
         # We use pagination to mitigate this issue.
-        queryset = JobApplication.objects.prefetch_related("selected_jobs").all()
+        queryset = (
+            JobApplication.objects.select_related("to_siae")
+            .prefetch_related("selected_jobs")
+            .filter(created_from_pe_approval=False, to_siae__pk__in=self.active_siae_pks)
+            .all()
+        )
         paginator = Paginator(queryset, chunk_size)
 
         rows = []
@@ -466,6 +472,13 @@ class Command(BaseCommand):
         send_slack_message(
             ":rocket: Début de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"
         )
+
+        # Load once and for all the list of all active siae pks in memory and reuse them multiple times in various
+        # queries to avoid additional joins of the SiaeConvention model and the non trivial use of the
+        # `Siae.objects.active()` queryset on a related model of a queryset on another model. This is a list of less
+        # than 10k integers thus should not use much memory. The end result being both simpler code
+        # and better performance.
+        self.active_siae_pks = [siae_pk for siae_pk in Siae.objects.active().values_list("pk", flat=True)]
 
         updates = [
             self.populate_siaes,
