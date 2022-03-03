@@ -129,6 +129,14 @@ class SearchSiaeTest(TestCase):
         for i, siae in enumerate(siaes_results):
             self.assertEqual(siae.pk, created_siaes[i].pk)
 
+    def test_opcs_displays_card_differently(self):
+        city = create_city_saint_andre()
+        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=Siae.KIND_OPCS)
+
+        response = self.client.get(self.url, {"city": city.slug})
+        self.assertContains(response, "<b>1</b> résultat")
+        self.assertContains(response, "Offres clauses sociales")
+
 
 class SearchPrescriberTest(TestCase):
     def test_home(self):

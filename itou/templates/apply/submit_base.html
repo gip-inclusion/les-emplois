@@ -6,7 +6,7 @@
 
     <h1 class="h1-hero-c1">
         {% if request.user.is_siae_staff %}
-            Candidature spontanée
+            Déclarer une embauche
         {% else %}
             Postuler
             {% if request.user.is_prescriber and job_seeker %}pour <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>{% endif %}

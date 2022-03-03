@@ -13,7 +13,7 @@
         <!-- instead of the tiny layout/content_small.html. -->
         <h1 class="h1-hero-c1">
             {% if request.user.is_siae_staff %}
-                Candidature spontanée
+                Déclarer une embauche
             {% else %}
                 Postuler chez <span class="text-muted">{{ siae.display_name }}</span>
             {% endif %}

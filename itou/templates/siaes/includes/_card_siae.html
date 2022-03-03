@@ -2,7 +2,11 @@
 <div class="card my-4">
     <div class="bg-gray-400 p-3">
         <h3 class="card-title">
-            <b><abbr title="{{ siae.get_kind_display }}">{{ siae.kind }}</abbr></b>
+            {% if siae.is_opcs %}
+                <b>Offres clauses sociales</b>
+            {% else %}
+                <b><abbr title="{{ siae.get_kind_display }}">{{ siae.kind }}</abbr></b>
+            {% endif %}
             -
             <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-structure">
                 {{ siae.display_name }}

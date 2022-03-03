@@ -337,6 +337,10 @@ class Siae(AddressMixin, OrganizationAbstract):
         return None
 
     @property
+    def is_opcs(self):
+        return self.kind == Siae.KIND_OPCS
+
+    @property
     def obfuscated_auth_email(self):
         """
         Used during the SIAE secure signup process to avoid

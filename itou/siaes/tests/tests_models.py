@@ -216,6 +216,12 @@ class SiaeModelTest(TestCase):
         self.assertEqual(siae2.members.count(), 3)
         self.assertEqual(siae2.active_members.count(), 3)
 
+    def test_is_opcs(self):
+        siae = SiaeFactory(kind=Siae.KIND_ACI)
+        self.assertFalse(siae.is_opcs)
+        siae.kind = Siae.KIND_OPCS
+        self.assertTrue(siae.is_opcs)
+
 
 class SiaeQuerySetTest(TestCase):
     def test_prefetch_job_description_through(self):

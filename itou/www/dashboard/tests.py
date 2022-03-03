@@ -94,6 +94,43 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, "badge-danger")
         self.assertEqual(response.context["num_rejected_employee_records"], 2)
 
+    def test_dashboard_agreements_and_job_postings(self):
+        for kind in [Siae.KIND_AI, Siae.KIND_EI, Siae.KIND_EITI, Siae.KIND_ACI, Siae.KIND_EITI, Siae.KIND_ACIPHC]:
+            with self.subTest(f"should display when siae_kind={kind}"):
+                siae = SiaeWithMembershipFactory(kind=kind)
+                user = siae.members.first()
+                self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+                response = self.client.get(reverse("dashboard:index"))
+                self.assertContains(response, "Prolonger ou suspendre un agrément émis par Pôle emploi")
+                self.assertContains(response, "Déclarer une embauche")
+
+        for kind in [Siae.KIND_EA, Siae.KIND_EATT, Siae.KIND_GEIQ, Siae.KIND_OPCS]:
+            with self.subTest(f"should not display when siae_kind={kind}"):
+                siae = SiaeWithMembershipFactory(kind=kind)
+                user = siae.members.first()
+                self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+                response = self.client.get(reverse("dashboard:index"))
+                self.assertNotContains(response, "Prolonger ou suspendre un agrément émis par Pôle emploi")
+                self.assertNotContains(response, "Déclarer une embauche")
+
+    def test_dashboard_can_create_siae_antenna(self):
+        for kind in [Siae.KIND_EA, Siae.KIND_EATT, Siae.KIND_GEIQ]:
+            with self.subTest(f"antennas freely created without a convention siae_kind={kind}"):
+                siae = SiaeWithMembershipFactory(kind=kind, convention=None)
+                user = siae.members.first()
+                self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+                response = self.client.get(reverse("dashboard:index"))
+                self.assertContains(response, "Créer/rejoindre une autre structure")
+
+        # but disabled specifically for OPCS
+        siae = SiaeWithMembershipFactory(kind=Siae.KIND_OPCS)
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Créer/rejoindre une autre structure")
+
 
 class EditUserInfoViewTest(TestCase):
     def test_edit(self):
