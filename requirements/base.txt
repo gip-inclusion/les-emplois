@@ -90,3 +90,6 @@ boto3==1.20.21  # https://github.com/boto/boto3
 # For automatic OpenAPI schema generation
 uritemplate==4.1.1  # https://github.com/python-hyper/uritemplate
 pyyaml==6.0  # https://github.com/yaml/pyyaml
+
+# For automatic export/import of models in the admin
+django-import-export==2.7.1

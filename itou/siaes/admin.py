@@ -5,6 +5,10 @@ from django.contrib.gis import forms as gis_forms
 from django.contrib.gis.db import models as gis_models
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.timezone import now
+from import_export import resources
+from import_export.admin import ExportActionMixin
+from import_export.fields import Field
 
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.siaes import models
@@ -64,8 +68,52 @@ class SiaesInline(admin.TabularInline):
         return mark_safe(f'<a href="{url}">{obj.id}</a>')
 
 
+class SiaeResource(resources.ModelResource):
+    siret = Field(attribute="siret", column_name="SIRET")
+    name = Field(attribute="name", column_name="Nom")
+    address_line_1 = Field(attribute="address_line_1", column_name="Adresse")
+    address_line_2 = Field(attribute="address_line_2", column_name="Adresse (extra)")
+    post_code = Field(attribute="post_code", column_name="Code postal")
+    city = Field(attribute="city", column_name="Ville")
+    last_name = Field(attribute="created_by__last_name", column_name="Nom")
+    first_name = Field(attribute="created_by__first_name", column_name="Prénom")
+    phone = Field(attribute="created_by__phone", column_name="Téléphone")
+    email = Field(attribute="created_by__email", column_name="E-mail")
+    created_at = Field(attribute="created_at", column_name="Date de création")
+
+    class Meta:
+        model = models.Siae
+        fields = (
+            "siret",
+            "name",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "last_name",
+            "first_name",
+            "phone",
+            "email",
+            "created_at",
+        )
+        export_order = (
+            "siret",
+            "name",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "last_name",
+            "first_name",
+            "phone",
+            "email",
+            "created_at",
+        )
+
+
 @admin.register(models.Siae)
-class SiaeAdmin(OrganizationAdmin):
+class SiaeAdmin(ExportActionMixin, OrganizationAdmin):
+    resource_class = SiaeResource
     form = SiaeAdminForm
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
     list_filter = (HasMembersFilter, "kind", "block_job_applications", "source", "department")
@@ -128,6 +176,9 @@ class SiaeAdmin(OrganizationAdmin):
         # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/forms-api/#widget-classes
         gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
     }
+
+    def get_export_filename(self, request, queryset, file_format):
+        return f"Entreprises-{now().strftime('%Y-%m-%d')}.{file_format.get_extension()}"
 
     def save_model(self, request, obj, form, change):
         if not change:
