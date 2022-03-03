@@ -4,6 +4,7 @@ from operator import attrgetter
 
 from django.utils import timezone
 
+from itou.approvals.models import Approval
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
@@ -249,3 +250,15 @@ for criteria in AdministrativeCriteria.objects.order_by("id").all():
             "fn": partial(get_latest_diagnosis_criteria, criteria_id=criteria.id),
         }
     ]
+
+
+TABLE_COLUMNS += [
+    {
+        "name": "injection_ai",
+        "type": "boolean",
+        "comment": "Provient des injections AI",
+        "fn": lambda o: o.approvals_wrapper.latest_approval.is_from_ai_stock
+        if isinstance(o.approvals_wrapper.latest_approval, Approval)
+        else False,
+    },
+]
