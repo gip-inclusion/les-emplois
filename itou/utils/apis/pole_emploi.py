@@ -280,10 +280,12 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
             # The only way the process can be entirely realized is with
             # code HTTP 200 + a specific code sortie
             if code_sortie != CODE_SORTIE_PASS_IAE_PRESCRIT:
-                raise PoleEmploiMiseAJourPassIAEException(r.status_code, code_sortie)
+                details = f"{code_sortie} {token} {settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
+                raise PoleEmploiMiseAJourPassIAEException(r.status_code, details)
             return True
         except Exception:
-            raise PoleEmploiMiseAJourPassIAEException(r.status_code, r.content)
+            details = f"{r.content} {token} {settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
+            raise PoleEmploiMiseAJourPassIAEException(r.status_code, details)
     except httpx.ConnectTimeout:  # noqa
         # We need to deal with this special case because
         # ConnectTimeout do not carry a response
