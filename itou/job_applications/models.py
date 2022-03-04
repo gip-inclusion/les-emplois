@@ -16,7 +16,12 @@ from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.tasks import huey_notify_pole_employ
 from itou.utils.apis.esd import get_access_token
-from itou.utils.apis.pole_emploi import POLE_EMPLOI_PASS_APPROVED, PoleEmploiIndividu, recherche_individu_certifie_api
+from itou.utils.apis.pole_emploi import (
+    POLE_EMPLOI_PASS_APPROVED,
+    PoleEmploiIndividu,
+    PoleEmploiMiseAJourPassIAEException,
+    recherche_individu_certifie_api,
+)
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
@@ -956,7 +961,12 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
     @staticmethod
     def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
         individual_pole_emploi_result = recherche_individu_certifie_api(individual, api_token)
-        if individual is not None and individual_pole_emploi_result.is_valid:
-            return individual_pole_emploi_result.id_national_demandeur
+        if individual is not None:
+            if individual_pole_emploi_result.is_valid:
+                return individual_pole_emploi_result.id_national_demandeur
+            else:
+                raise PoleEmploiMiseAJourPassIAEException(
+                    http_code=200, message=individual_pole_emploi_result.code_sortie
+                )
         else:
-            return ""
+            raise PoleEmploiMiseAJourPassIAEException(http_code=200, message="pas d'individu")
