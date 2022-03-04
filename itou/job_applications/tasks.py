@@ -1,5 +1,6 @@
 from time import sleep
 
+from django.conf import settings
 from django.utils import timezone
 from huey.contrib.djhuey import db_task
 
@@ -62,7 +63,7 @@ def notify_pole_emploi_pass(job_application, job_seeker, mode=POLE_EMPLOI_PASS_A
         log = JobApplicationPoleEmploiNotificationLog(
             job_application=job_application,
             status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
-            details=f"{e.http_code} {e.response_code} {token}",
+            details=f"{e.http_code} {e.response_code} {token} {settings.API_ESD_MISE_A_JOUR_PASS_MODE}",
         )
         log.save()
         return False
@@ -72,10 +73,10 @@ def notify_pole_emploi_pass(job_application, job_seeker, mode=POLE_EMPLOI_PASS_A
         sleep(1)
     except PoleEmploiMiseAJourPassIAEException as e:
         log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
-        log.details = f"{e.http_code} {e.response_code} {token}"
+        log.details = f"{e.http_code} {e.response_code} {token}  {settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
         log.save()
         return False
-    log.details += token
+    log.details += f" {token} {settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
     log.save()
     return True
 
