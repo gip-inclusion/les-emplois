@@ -1175,6 +1175,35 @@ class PoleEmploiApproval(CommonApprovalMixin):
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
 
+class MergedPoleEmploiApproval(CommonApprovalMixin):
+    """
+    This is a temporary model, bound to replicate the PoleEmploiApproval model, with a twist.
+    It exists to materialize that at some point:
+     - Pole emploi provided us with a large dump of all the "PoleEmploiApproval" that they delivered
+     - in order to simplify, we merged those approvals
+
+    The **merge_pe_approvals** management command implements the merge behavior we decided
+    """
+
+    # All those fields are copied from PoleEmploiApproval
+    pe_structure_code = models.CharField("Code structure Pôle emploi", max_length=5)
+    number = models.CharField(verbose_name="Numéro", max_length=15, unique=True)
+    pole_emploi_id = models.CharField("Identifiant Pôle emploi", max_length=8)
+    first_name = models.CharField("Prénom", max_length=150)
+    last_name = models.CharField("Nom", max_length=150)
+    birth_name = models.CharField("Nom de naissance", max_length=150)
+    birthdate = models.DateField(verbose_name="Date de naissance", default=timezone.localdate)
+    nir = models.CharField(verbose_name="NIR", max_length=15, null=True, blank=True)
+    ntt_nia = models.CharField(verbose_name="NTT ou NIA", max_length=40, null=True, blank=True)
+
+    class Meta:
+        db_table = "merged_approvals_poleemploiapproval"
+        verbose_name = "Agrément Pôle emploi fusionnés"
+        verbose_name_plural = "Agréments Pôle emploi fusionnés"
+        ordering = ["-start_at"]
+        indexes = [models.Index(fields=["pole_emploi_id", "birthdate"], name="merged_pe_id_and_birthdate_idx")]
+
+
 class ApprovalsWrapper:
     """
     Wrapper that manipulates both `Approval` and `PoleEmploiApproval` models.
