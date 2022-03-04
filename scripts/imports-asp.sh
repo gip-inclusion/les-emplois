@@ -22,9 +22,13 @@ unzip -P $ASP_UNZIP_PASSWORD asp_shared_bucket/fluxIAE_*.zip -d itou/siaes/manag
 unzip -P $ASP_UNZIP_PASSWORD asp_shared_bucket/Liste_Contact_EA*.zip -d itou/siaes/management/commands/data/
 
 # Perform the necessary data imports
-time ./manage.py populate_metabase_fluxiae --verbosity 2
-time ./manage.py import_siae --verbosity=2
-time ./manage.py import_ea_eatt --verbosity=2
+OUTPUT_PATH=shared_bucket/import_siae
+mkdir -p $OUTPUT_PATH/populate_metabase_fluxiae
+mkdir $OUTPUT_PATH/import_siae
+mkdir $OUTPUT_PATH/import_ea_eatt
+time ./manage.py populate_metabase_fluxiae --verbosity 2 |& tee -a "$OUTPUT_PATH/populate_metabase_fluxiae/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+time ./manage.py import_siae --verbosity=2 |& tee -a "$OUTPUT_PATH/import_siae/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+time ./manage.py import_ea_eatt --verbosity=2 |& tee -a "$OUTPUT_PATH/import_ea_eatt/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
 
 # Destroy the cleartext ASP data
 rm -rf itou/siaes/management/commands/data/
