@@ -173,7 +173,7 @@ class PoleEmploiIndividuResult:
     def is_valid(self):
         # This specific value is provided by Pole Emploi as part of their API spec
         CODE_SORTIE_INDIVIDU_TROUVE = "S001"
-        return self.code_sortie == CODE_SORTIE_INDIVIDU_TROUVE
+        return self.code_sortie == CODE_SORTIE_INDIVIDU_TROUVE and self.id_national_demandeur != ""
 
     @staticmethod
     def from_data(data):
@@ -254,9 +254,9 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
 
     # The production URL
     url = f"{settings.API_ESD_BASE_URL}/maj-pass-iae/v1/passIAE/miseAjour"
-    if settings.API_ESD_MISE_A_JOUR_PASS_MODE != "production":
-        # The test URL in recette, sandboxed mode
-        url = f"{settings.API_ESD_BASE_URL}/testmaj-pass-iae/v1/passIAE/miseAjour"  # noqa
+    # if settings.API_ESD_MISE_A_JOUR_PASS_MODE != "production":
+    #     # The test URL in recette, sandboxed mode
+    #     url = f"{settings.API_ESD_BASE_URL}/testmaj-pass-iae/v1/passIAE/miseAjour"  # noqa
 
     headers = {"Authorization": token, "Content-Type": "application/json"}  # noqa
 
