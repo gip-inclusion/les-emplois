@@ -237,8 +237,10 @@ class Command(BaseCommand):
 
             existing_siae_query = Siae.objects.filter(siret=siret, kind=kind)
             if existing_siae_query.exists():
-                # Siae with this siret+kind already exists but with wrong source.
                 existing_siae = existing_siae_query.get()
+                if existing_siae.source == Siae.SOURCE_ASP:
+                    continue
+                # Siae with this siret+kind already exists but with wrong source.
                 assert existing_siae.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]
                 assert existing_siae.is_asp_managed
                 self.log(
