@@ -19,7 +19,7 @@ from itou.utils.apis.geocoding import get_geocoding_data
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-SHOW_IMPORT_SIAE_METHOD_TIMER = False
+SHOW_IMPORT_SIAE_METHOD_TIMER = True
 
 
 def timeit(f):
