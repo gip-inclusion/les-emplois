@@ -156,7 +156,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, f"Fin du contrat : <b>{hiring_end_at.strftime('%d')}")
+        self.assertContains(response, f"Fin du contrat : <b>{hiring_end_at.strftime('%e').lstrip()}")
 
     def test_no_hiring_end_at_in_header(self):
         self.job_application.hiring_end_at = None
