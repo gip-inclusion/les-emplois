@@ -213,7 +213,7 @@ class SiaeConvention(admin.ModelAdmin):
             },
         ),
     )
-    search_fields = ("pk", "siret_signature")
+    search_fields = ("pk", "siret_signature", "asp_id")
     inlines = (FinancialAnnexesInline, SiaesInline, PkSupportRemarkInline)
 
     def save_model(self, request, obj, form, change):
