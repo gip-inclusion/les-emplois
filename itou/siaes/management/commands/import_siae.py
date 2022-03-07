@@ -73,7 +73,9 @@ class Command(BaseCommand):
         Those siaes cannot be joined by any way and thus are useless.
         Let's clean them up when possible.
         """
-        for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED):
+        for siae in Siae.objects.prefetch_related("memberships").filter(
+            members__isnull=True, source=Siae.SOURCE_USER_CREATED
+        ):
             if not siae.has_members:
                 if could_siae_be_deleted(siae):
                     self.log(f"siae.id={siae.id} is user created and has no member thus will be deleted")
