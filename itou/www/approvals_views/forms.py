@@ -164,7 +164,8 @@ class SuspensionForm(forms.ModelForm):
                 (
                     "Au format JJ/MM/AAAA, par exemple 20/12/1978."
                     "<br>"
-                    "La suspension ne peut pas commencer dans le futur."
+                    "La suspension ne doit pas chevaucher une suspension déjà existante."
+                    " Elle ne peut pas commencer dans le futur."
                 )
             ),
             "end_at": mark_safe(
@@ -190,10 +191,8 @@ class SuspensionForm(forms.ModelForm):
         next_min_start_at = Suspension.next_min_start_at(self.approval, suspension_pk, referent_date, True)
         if start_at < next_min_start_at:
             raise ValidationError(
-                f"Pour la date de début de suspension, vous pouvez remonter "
-                f"{Suspension.MAX_RETROACTIVITY_DURATION_DAYS} jours avant la date de saisie "
-                f"et elle ne doit pas chevaucher une suspension déjà existante. "
-                f"Date de début minimum : {next_min_start_at.strftime('%d/%m/%Y')}."
+                f"Vous ne pouvez pas saisir une date de début de suspension "
+                f"qui précède le {next_min_start_at.strftime('%d/%m/%Y')}."
             )
 
         return start_at
