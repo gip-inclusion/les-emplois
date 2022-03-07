@@ -83,7 +83,7 @@ class Command(BaseCommand):
 
     def reset_tables(self):
         reset_queries = [
-            f"TRUNCATE {self.merge_table};",  # noqa
+            f"TRUNCATE {MergedPoleEmploiApproval._meta.db_table};",
             f"UPDATE {PoleEmploiApproval._meta.db_table} set merged=false where merged=true;",
         ]
         for query in reset_queries:
@@ -96,7 +96,7 @@ class Command(BaseCommand):
         self.cursor = connection.cursor()
 
         if reset:
-            self.reset_tables(reset)
+            self.reset_tables()
 
         progress_bar = tqdm(total=self.get_count_non_merged_approvals())
         print("Merge all the approvals \\o/")
