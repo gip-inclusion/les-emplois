@@ -273,7 +273,7 @@ class Command(BaseCommand):
 
     @timeit
     def check_whether_signup_is_possible_for_all_siaes(self):
-        for siae in Siae.objects.all():
+        for siae in Siae.objects.prefetch_related("memberships").filter(members__isnull=True):
             if not siae.has_members and not siae.auth_email:
                 self.log(
                     f"FATAL ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
