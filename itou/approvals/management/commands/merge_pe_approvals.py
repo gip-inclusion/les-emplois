@@ -8,6 +8,10 @@ from itou.approvals.models import MergedPoleEmploiApproval, PoleEmploiApproval
 
 class Command(BaseCommand):
     """
+    This command merges Pole Emploi approvals for a given PoleEmploiApproval number:
+     - For every Pole Emploi appraval number:
+        - it searches all the approvals that have the same number
+        - it creates a new entry in MergedPoleEmploiApproval using those duplicate data. See create_new_merged_approval
     ./manage.py merge_pe_approvals --reset
     """
 
