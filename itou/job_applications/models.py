@@ -948,11 +948,8 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
     @staticmethod
     def get_token() -> str:
         """returns the necessary token for Updating PoleEmploi, or raise exceptions"""
+        # Sandbox token value: "passIAE api_testmaj-pass-iaev1"
         maj_pass_iae_api_scope = "passIAE api_maj-pass-iaev1"
-        # The sandbox mode involves a slightly different scope
-        # if settings.API_ESD_MISE_A_JOUR_PASS_MODE != "production":
-        #     maj_pass_iae_api_scope = "passIAE api_testmaj-pass-iaev1"
-        # It is not obvious but we can ask for one token only with all the necessary rights
         token_recherche_et_maj = get_access_token(
             f"api_rechercheindividucertifiev1 rechercherIndividuCertifie {maj_pass_iae_api_scope}"
         )

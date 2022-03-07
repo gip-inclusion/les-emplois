@@ -63,7 +63,7 @@ def notify_pole_emploi_pass(job_application, job_seeker, mode=POLE_EMPLOI_PASS_A
         log = JobApplicationPoleEmploiNotificationLog(
             job_application=job_application,
             status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
-            details=f"{e.http_code} {e.response_code} {token} {settings.API_ESD_MISE_A_JOUR_PASS_MODE}",
+            details=f"http_code={e.http_code} response_code={e.response_code} token={token} mode={settings.API_ESD_MISE_A_JOUR_PASS_MODE}",  # noqa
         )
         log.save()
         return False
@@ -73,10 +73,10 @@ def notify_pole_emploi_pass(job_application, job_seeker, mode=POLE_EMPLOI_PASS_A
         sleep(1)
     except PoleEmploiMiseAJourPassIAEException as e:
         log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
-        log.details = f"{e.http_code} {e.response_code} Token: {token} Mode: {settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
+        log.details = f"http_code={e.http_code} response_code={e.response_code} token={token} mode={settings.API_ESD_MISE_A_JOUR_PASS_MODE}"  # noqa
         log.save()
         return False
-    log.details += f" {token} {settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
+    log.details += f" token={token} mode={settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
     log.save()
     return True
 
