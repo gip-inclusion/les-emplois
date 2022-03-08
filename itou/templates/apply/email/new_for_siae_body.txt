@@ -53,6 +53,6 @@ Candidature envoyée à l'entreprise {{ job_application.to_siae.display_name }},
 
 Toute demande de PASS IAE doit être effectuée au plus tard le jour de l'embauche. Les demandes rétroactives ne sont pas autorisées.
 
-Vous pouvez désactiver les notifications depuis votre espace utilisateur (rubrique "Mon espace" > "Préférences" ).
+Vous pouvez désactiver les notifications depuis votre espace utilisateur (rubrique "Mon espace" > "Mes notifications" ).
 
 {% endblock body %}

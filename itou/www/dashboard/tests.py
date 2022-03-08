@@ -463,7 +463,7 @@ class EditUserPreferencesTest(TestCase):
         # Recipient's notifications are empty for the moment.
         self.assertFalse(recipient.notifications)
 
-        url = reverse("dashboard:edit_user_preferences")
+        url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -491,7 +491,7 @@ class EditUserPreferencesTest(TestCase):
         # Recipient's notifications are empty for the moment.
         self.assertFalse(recipient.notifications)
 
-        url = reverse("dashboard:edit_user_preferences")
+        url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -521,7 +521,7 @@ class EditUserPreferencesTest(TestCase):
         # Recipient's notifications are empty for the moment.
         self.assertFalse(recipient.notifications)
 
-        url = reverse("dashboard:edit_user_preferences")
+        url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -549,7 +549,7 @@ class EditUserPreferencesTest(TestCase):
         # Recipient's notifications are empty for the moment.
         self.assertFalse(recipient.notifications)
 
-        url = reverse("dashboard:edit_user_preferences")
+        url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -577,12 +577,12 @@ class EditUserPreferencesExceptionsTest(TestCase):
 
         prescriber = PrescriberFactory()
         self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
-        url = reverse("dashboard:edit_user_preferences")
+        url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
         job_seeker = JobSeekerFactory()
         self.client.login(username=job_seeker.email, password=DEFAULT_PASSWORD)
-        url = reverse("dashboard:edit_user_preferences")
+        url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)

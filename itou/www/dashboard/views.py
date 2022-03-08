@@ -288,7 +288,7 @@ def switch_institution(request):
 
 
 @login_required
-def edit_user_preferences(request, template_name="dashboard/edit_user_preferences.html"):
+def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
     if not request.user.is_siae_staff:
         raise PermissionDenied
 
