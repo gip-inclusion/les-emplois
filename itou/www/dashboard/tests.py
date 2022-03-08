@@ -565,7 +565,7 @@ class EditUserPreferencesTest(TestCase):
         recipient.refresh_from_db()
         self.assertTrue(recipient.notifications)
 
-        for i, pk in enumerate(job_descriptions_pks):
+        for _i, pk in enumerate(job_descriptions_pks):
             self.assertFalse(
                 NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
             )

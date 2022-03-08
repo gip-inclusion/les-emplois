@@ -52,10 +52,7 @@ STEPS = [
 
 
 @login_required
-def list(request, template_name="employee_record/list.html"):
-    """
-    Displays a list of employee records for the SIAE
-    """
+def list_employee_records(request, template_name="employee_record/list.html"):
     siae = get_current_siae_or_404(request)
 
     if not siae.can_use_employee_record:

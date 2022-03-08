@@ -1,3 +1,5 @@
+# pylint: disable=too-many-lines
+
 import datetime
 import io
 import json
@@ -712,7 +714,9 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
 
         # Receiver is now subscribed to one kind of notification
         self.assertEqual(
-            len(NewQualifiedJobAppEmployersNotification._get_recipient_subscribed_pks(recipient=membership)), 1
+            # pylint: disable=protected-access
+            len(NewQualifiedJobAppEmployersNotification._get_recipient_subscribed_pks(recipient=membership)),
+            1,
         )
 
         # A job application is sent concerning another job_description.
@@ -726,7 +730,9 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         )
 
         self.assertEqual(
-            len(NewQualifiedJobAppEmployersNotification._get_recipient_subscribed_pks(recipient=membership)), 2
+            # pylint: disable=protected-access
+            len(NewQualifiedJobAppEmployersNotification._get_recipient_subscribed_pks(recipient=membership)),
+            2,
         )
         self.assertEqual(len(membership.notifications), 1)
 
@@ -1354,7 +1360,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
     sample_pole_emploi_individual = PoleEmploiIndividu("john", "doe", datetime.date(1987, 5, 8), "1870275051055")
 
     @patch("itou.job_applications.models.get_access_token", return_value=token)
-    def test_invalid_job_seeker_for_pole_emploi(self, access_token_mock, sleep_mock):
+    def test_invalid_job_seeker_for_pole_emploi(self, access_token_mock, _sleep_mock):
         """
         Error case: our job seeker is not valid (from PoleEmploi’s point of view: here, the NIR is missing)
          - We do not even call the APIs
@@ -1378,7 +1384,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         return_value=encrypted_nir,
     )
     @patch("itou.job_applications.models.get_access_token", return_value=token)
-    def test_notification_accepted_nominal(self, access_token_mock, nir_mock, maj_mock, sleep_mock):
+    def test_notification_accepted_nominal(self, access_token_mock, nir_mock, maj_mock, _sleep_mock):
         """
         Nominal scenario: we sent a notification for acceptation and everything worked
          - All the APIs should be called
@@ -1402,7 +1408,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
     @patch("itou.job_applications.tasks.mise_a_jour_pass_iae")
     @patch("itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual")
     @patch("itou.job_applications.models.get_access_token")
-    def test_notification_accepted_but_in_the_future(self, access_token_mock, nir_mock, maj_mock, sleep_mock):
+    def test_notification_accepted_but_in_the_future(self, access_token_mock, nir_mock, maj_mock, _sleep_mock):
         """
         Nominal scenario: an approval is created, but its start date is in the future.
          - we do not send it: no API call is performed
@@ -1430,7 +1436,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         return_value=encrypted_nir,
     )
     @patch("itou.job_applications.models.get_access_token", side_effect=PoleEmploiMiseAJourPassIAEException("401"))
-    def test_notification_authentication_failure(self, access_token_mock, nir_mock, maj_mock, sleep_mock):
+    def test_notification_authentication_failure(self, access_token_mock, nir_mock, maj_mock, _sleep_mock):
         """
         Authentication failed: only the get_token call should be made, and an entry with the failure should be added
         """
@@ -1451,7 +1457,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         side_effect=PoleEmploiMiseAJourPassIAEException("200", "R010"),
     )
     @patch("itou.job_applications.models.get_access_token", return_value=token)
-    def test_notification_recherche_individu_not_found(self, access_token_mock, nir_mock, maj_mock, sleep_mock):
+    def test_notification_recherche_individu_not_found(self, access_token_mock, nir_mock, maj_mock, _sleep_mock):
         """
         Error case: we have a valid authentification token, but the job seeker is not found on Pole Emploi’s end:
          - the mise a jour is not done
@@ -1476,7 +1482,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         return_value=encrypted_nir,
     )
     @patch("itou.job_applications.models.get_access_token", return_value=token)
-    def test_notification_mise_a_jour_crashed(self, access_token_mock, nir_mock, maj_mock, sleep_mock):
+    def test_notification_mise_a_jour_crashed(self, access_token_mock, nir_mock, maj_mock, _sleep_mock):
         """
         Error case: valid authentification token and PoleEmploi provided us with a valid encrypted nir, but
         the mise_a_jour_pass_iae API call crashed
