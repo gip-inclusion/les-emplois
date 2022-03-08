@@ -45,20 +45,22 @@
                     {% bootstrap_field filters_form.end_date form_group_class="form-group" %}
 
                     <h5 class="h4 mt-4">Statut</h5>
-                    {% for choice in filters_form.states %}
-                        <div class="form-check form-check-inline dropdown-item">
-                            <input
-                                id="{{ choice.id_for_label }}"
-                                class="form-check-input"
-                                name="{{ choice.data.name }}"
-                                type="checkbox"
-                                value="{{ choice.data.value }}"
-                                {% if choice.data.selected %}checked=""{% endif %}>
-                            <label for="{{ choice.id_for_label }}" class="form-check-label">
-                                {{ choice.choice_label }}
-                            </label>
-                        </div>
-                    {% endfor %}
+                    <ul class="list-unstyled">
+                        {% for choice in filters_form.states %}
+                            <li class="form-check">
+                                <input
+                                    id="{{ choice.id_for_label }}"
+                                    class="form-check-input"
+                                    name="{{ choice.data.name }}"
+                                    type="checkbox"
+                                    value="{{ choice.data.value }}"
+                                    {% if choice.data.selected %}checked=""{% endif %}>
+                                <label for="{{ choice.id_for_label }}" class="form-check-label">
+                                    {{ choice.choice_label }}
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
 
                     {% if filters_form.pass_iae_suspended %}
                         <h5 class="h4 mt-4">PASS IAE</h5>
