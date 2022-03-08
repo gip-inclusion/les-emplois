@@ -263,6 +263,7 @@ class APIEntrepriseSearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.org_data = None
+        self.fields["siret"].widget.attrs["placeholder"] = "Numéro à 14 chiffres"
 
     def clean_siret(self):
         # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
