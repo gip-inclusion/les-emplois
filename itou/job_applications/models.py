@@ -607,6 +607,21 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return kind
 
     @property
+    def candidate_has_employee_record(self):
+
+        if not self.approval:
+            return False
+
+        if self.employee_record.exists():
+            return True
+
+        # check if employee_record for the same approval in the same siae exists
+        return self.approval.jobapplication_set.filter(
+            employee_record__asp_id=self.to_siae.convention.asp_id,
+            employee_record__approval_number=self.approval.number,
+        ).exists()
+
+    @property
     def is_waiting_for_employee_record_creation(self):
         """
         Check if EmployeeRecord does not exist and can be created for this JobApplication.
@@ -619,7 +634,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             and self.approval.is_valid()
         )
 
-        return is_application_valid and not self.employee_record.all() and self.to_siae.can_use_employee_record
+        return is_application_valid and not self.candidate_has_employee_record and self.to_siae.can_use_employee_record
 
     def get_eligibility_diagnosis(self):
         """
