@@ -220,7 +220,51 @@ class JobApplicationModelTest(TestCase):
         )
         self.assertTrue(job_application.is_from_ai_stock)
 
+    def test_candidate_has_employee_record(self, *args, **kwargs):
+
+        # test job_application has no Approval
+        job_application = JobApplicationWithoutApprovalFactory()
+        self.assertFalse(job_application.candidate_has_employee_record)
+
+        # test job_application has one Approval and no EmployeeRecord
+        job_application = JobApplicationWithApprovalFactory()
+        self.assertFalse(job_application.candidate_has_employee_record)
+
+        # test job_application has one Approval and one EmployeeRecord
+        job_application = JobApplicationWithApprovalFactory()
+        EmployeeRecordFactory(job_application=job_application)
+        self.assertTrue(job_application.candidate_has_employee_record)
+
+        # test job_application has one Approval and no EmployeeRecord
+        # but an EmployeeRecord already exists for the same approval.number
+        # and the same Siae
+        job_application1 = JobApplicationWithApprovalFactory()
+        EmployeeRecordFactory(
+            job_application=job_application1,
+            asp_id=job_application1.to_siae.convention.asp_id,
+            approval_number=job_application1.approval.number,
+        )
+        job_application2 = JobApplicationWithApprovalFactory(
+            approval=job_application1.approval, to_siae=job_application1.to_siae
+        )
+        self.assertTrue(job_application1.candidate_has_employee_record)
+        self.assertTrue(job_application2.candidate_has_employee_record)
+
+        # test job_application has one Approval and no EmployeeRecord
+        # but an EmployeeRecord already exists for the same approval.number
+        # in an other Siae
+        job_application1 = JobApplicationWithApprovalFactory()
+        EmployeeRecordFactory(
+            job_application=job_application1,
+            asp_id=job_application1.to_siae.convention.asp_id,
+            approval_number=job_application1.approval.number,
+        )
+        job_application2 = JobApplicationWithApprovalFactory(approval=job_application1.approval)
+        self.assertTrue(job_application1.candidate_has_employee_record)
+        self.assertFalse(job_application2.candidate_has_employee_record)
+
     def test_is_waiting_for_employee_record_creation(self, *args, **kwargs):
+
         today = datetime.date.today()
         job_application = JobApplicationWithApprovalFactory()
         to_siae = job_application.to_siae
@@ -282,6 +326,20 @@ class JobApplicationModelTest(TestCase):
         job_application.to_siae = to_siae
         EmployeeRecordFactory(job_application=job_application)
         self.assertFalse(job_application.is_waiting_for_employee_record_creation)
+
+        # test Employee_Record doesn't exists,
+        # but an other EmployeeRecord exists for the same Approval and the same Siae
+        job_application1 = JobApplicationWithApprovalFactory()
+        EmployeeRecordFactory(
+            job_application=job_application1,
+            asp_id=job_application1.to_siae.convention.asp_id,
+            approval_number=job_application1.approval.number,
+        )
+        job_application2 = JobApplicationWithApprovalFactory(
+            approval=job_application1.approval, to_siae=job_application1.to_siae
+        )
+        self.assertFalse(job_application1.is_waiting_for_employee_record_creation)
+        self.assertFalse(job_application2.is_waiting_for_employee_record_creation)
 
 
 class JobApplicationQuerySetTest(TestCase):
