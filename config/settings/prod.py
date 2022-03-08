@@ -51,9 +51,6 @@ ELASTIC_APM = {
     "TRANSACTION_SAMPLE_RATE": 0.1,
 }
 
-# Overrides base settings, only PROD should be allowed to do this
-EMPLOYEE_RECORD_TRANSFER_ENABLED = True
-
 # Enable HTTP Strict Transport Security
 # see https://docs.djangoproject.com/en/4.0/ref/middleware/#http-strict-transport-security
 SECURE_HSTS_SECONDS = 3600  # We set this to a small value initially
