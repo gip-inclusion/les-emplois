@@ -10,6 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
+from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
@@ -27,6 +28,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     can_show_financial_annexes = False
     can_show_employee_records = False
     job_applications_categories = []
+    num_rejected_employee_records = 0
 
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
@@ -67,6 +69,11 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "url"
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
+        num_rejected_employee_records = EmployeeRecord.objects.filter(
+            status=EmployeeRecord.Status.REJECTED,
+            job_application__to_siae__in=request.user.siae_set.all(),
+        ).count()
+
     if request.user.is_prescriber:
         try:
             current_org = get_current_org_or_404(request)
@@ -88,6 +95,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_ddets": request.user.can_view_stats_ddets(current_org=current_org),
         "can_view_stats_dreets": request.user.can_view_stats_dreets(current_org=current_org),
         "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
+        "num_rejected_employee_records": num_rejected_employee_records,
     }
 
     return render(request, template_name, context)

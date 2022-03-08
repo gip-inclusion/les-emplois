@@ -3,9 +3,12 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.employee_record.factories import EmployeeRecordFactory
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByPrescriberFactory,
+    JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
@@ -68,6 +71,28 @@ class DashboardViewTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_dashboard_displays_asp_badge(self):
+        siae = SiaeWithMembershipFactory(kind=Siae.KIND_EI)
+        user = siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Gérer mes fiches salarié")
+        self.assertNotContains(response, "badge-danger")
+        self.assertEqual(response.context["num_rejected_employee_records"], 0)
+
+        # create rejected job applications
+        job_application = JobApplicationWithApprovalFactory(to_siae=siae)
+        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.REJECTED)
+        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.REJECTED)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "badge-danger")
+        self.assertEqual(response.context["num_rejected_employee_records"], 2)
 
 
 class EditUserInfoViewTest(TestCase):

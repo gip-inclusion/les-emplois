@@ -374,6 +374,9 @@
                             <li class="card-text mb-3">
                                 <i class="ri-file-3-line ri-lg mr-1"></i>
                                 <a href="{% url 'employee_record_views:list' %}?status=NEW">Gérer mes fiches salarié (ASP)</a>
+                                {% if num_rejected_employee_records %}
+                                    <span class="badge badge-danger zorglub">{{ num_rejected_employee_records }}</span>
+                                {% endif %}
                             </li>
                         {% endif %}
                         <li class="card-text mb-3">
