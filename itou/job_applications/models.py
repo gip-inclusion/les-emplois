@@ -1,5 +1,7 @@
 import datetime
 import logging
+import os
+import socket
 import uuid
 
 from dateutil.relativedelta import relativedelta
@@ -928,6 +930,9 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
     status = models.CharField(verbose_name="Motifs d’erreurs", max_length=30, choices=STATUS_CHOICES, blank=True)
     details = models.TextField(verbose_name="Précisions concernant le comportement obtenu", blank=True)
 
+    env = models.JSONField(verbose_name="L’état de l’environnement", null=True)
+    hostname = models.CharField(verbose_name="La machine qui a effectué la requête", null=True, max_length=40)
+
     job_application = models.ForeignKey(
         "job_applications.JobApplication", verbose_name="Candidature", null=True, blank=True, on_delete=models.SET_NULL
     )
@@ -942,6 +947,14 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    def save(self, *args, **kwargs):
+        self.clean()
+
+        self.hostname = socket.gethostname()
+        self.env = dict(os.environ)
+
+        super().save(*args, **kwargs)
 
     API_DATE_FORMAT = "%Y-%m-%d"
 
