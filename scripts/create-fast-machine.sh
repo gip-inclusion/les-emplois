@@ -47,6 +47,13 @@ clever service link-addon c1-fast-machine-config --alias $IMPORT_APP_NAME
 clever service link-addon c1-prod-database-encrypted  --alias $IMPORT_APP_NAME
 clever service link-addon c1-itou-redis --alias $IMPORT_APP_NAME
 
+# We never want huey to be run in such a machine so CC_WORKER_COMMAND must be empty.
+#
+# This value being incorrectly set to "django_admin run_huey" led to the epic issue of march 2022
+# where an import machine unexpectedly ran huey tasks with invalid settings.
+# You never want to face this kind of hard-to-debug issue ever again
+clever env set CC_WORKER_COMMAND "" --alias $IMPORT_APP_NAME
+
 clever deploy --alias $IMPORT_APP_NAME --branch $DEPLOY_BRANCH --force
 
 cat << EOF
