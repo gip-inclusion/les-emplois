@@ -17,6 +17,16 @@ urlpatterns = [
         TemplateView.as_view(template_name="signup/job_seeker_situation_not_eligible.html"),
         name="job_seeker_situation_not_eligible",
     ),
+    path(
+        "facilitator/search",
+        views.facilitator_search,
+        name="facilitator_search",
+    ),
+    path(
+        "facilitator/signup",
+        views.FacilitatorSignupView.as_view(),
+        name="facilitator_signup",
+    ),
     # Prescriber.
     path(
         "prescriber/check_already_exists",

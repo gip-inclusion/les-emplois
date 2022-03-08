@@ -1,9 +1,12 @@
 import uuid
 from unittest import mock
 
+import httpx
+import respx
 from allauth.account.models import EmailConfirmationHMAC
+from django.conf import settings
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.html import escape
 
@@ -11,6 +14,8 @@ from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
+from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
+from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
 
 class SiaeSignupTest(TestCase):
@@ -133,3 +138,99 @@ class SiaeSignupTest(TestCase):
             self.assertEqual(response.url, reverse("welcoming_tour:index"))
             user_email = user.emailaddress_set.first()
             self.assertTrue(user_email.verified)
+
+    @respx.mock
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_create_facilitator(self, mock_call_ban_geocoding_api):
+        FAKE_SIRET = "26570134200148"  # matches the one from ETABLISSEMENT_API_RESULT_MOCK for consistency
+
+        url = reverse("signup:facilitator_search")
+        post_data = {
+            "siret": FAKE_SIRET,
+        }
+
+        # Mocks an invalid answer from the server
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{FAKE_SIRET}").mock(
+            return_value=httpx.Response(422, json={})
+        )
+        response = self.client.post(url, data=post_data)
+        mock_call_ban_geocoding_api.assert_not_called()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f"SIRET « {FAKE_SIRET} » non reconnu.")
+
+        # Mock a valid answer from the server
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{FAKE_SIRET}").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
+        response = self.client.post(url, data=post_data)
+        mock_call_ban_geocoding_api.assert_called_once()
+        self.assertRedirects(response, reverse("signup:facilitator_signup"))
+
+        # Checks that the SIRET and  the enterprise name are present in the second step
+        response = self.client.post(url, data=post_data, follow=True)
+        self.assertContains(response, "Centre communal")
+        self.assertContains(response, "26570134200148")
+
+        # Now, we're on the second page.
+        url = reverse("signup:facilitator_signup")
+        post_data = {
+            "first_name": "The",
+            "last_name": "Joker",
+            "email": "batman@robin.fr",
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
+        }
+
+        # Assert the correct redirection
+        response = self.client.post(url, data=post_data)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        # Try creating the user again
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "Un autre utilisateur utilise déjà cette adresse e-mail.")
+
+        # Check `User` state.
+        user = User.objects.get(email=post_data["email"])
+        self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
+        self.assertFalse(user.is_job_seeker)
+        self.assertFalse(user.is_prescriber)
+        self.assertTrue(user.is_siae_staff)
+
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
+
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Confirmez votre adresse e-mail", email.subject)
+        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], user.email)
+
+        # User cannot log in until confirmation.
+        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
+        url = reverse("account_login")
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_email_verification_sent"))
+
+        # Confirm email + auto login.
+        confirmation_token = EmailConfirmationHMAC(user_email).key
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
+        response = self.client.post(confirm_email_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("welcoming_tour:index"))
+        user_email = user.emailaddress_set.first()
+        self.assertTrue(user_email.verified)
+
+    def test_facilitator_base_signup_process(self):
+        url = reverse("signup:siae_select")
+        response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
+        self.assertNotContains(response, "Si votre organisation est porteuse de la clause sociale")
+        with override_settings(FEATURE_ENABLE_FACILITATORS=True):
+            response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
+            self.assertContains(response, "Si votre organisation est porteuse de la clause sociale")

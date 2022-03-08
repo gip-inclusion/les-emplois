@@ -1,0 +1,39 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load static %}
+{% load format_filters %}
+
+{% block title %}Facilitateur de clauses sociales - Inscription{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1 class="h1-hero-c1">
+        Inscription
+        <small class="text-muted">Facilitateur de clauses sociales</small>
+    </h1>
+
+    <h2 class="h1">
+        Inscrire mon organisation porteuse de la clause sociale d’insertion
+    </h2>
+
+    <!-- this prevents the user from clicking on the "back" button of the browser -->
+    <form method="post" action="" class="js-prevent-multiple-submit">
+
+        {% csrf_token %}
+
+        {% bootstrap_form form alert_error_type="all" %}
+
+        <hr class="my-3 my-lg-5">
+
+        <div class="row mt-3 mt-lg-5 justify-content-end">
+            <div class="col-6 col-lg-auto">
+                <a class="btn btn-link" title="Retourner à l'édition des coordonnées" href="{{ prev_url }}">Retour</a>
+            </div>
+            <div class="col-6 col-lg-auto">
+                <button type="submit"  aria-label="Rechercher une entreprise par SIRET"  class="btn float-right btn-primary">Suivant</button>
+            </div>
+        </div>
+
+    </form>
+
+{% endblock %}

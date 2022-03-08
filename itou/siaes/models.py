@@ -188,6 +188,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     KIND_GEIQ = "GEIQ"
     KIND_EA = "EA"
     KIND_EATT = "EATT"
+    KIND_OPCS = "OPCS"
 
     KIND_CHOICES = (
         (KIND_EI, "Entreprise d'insertion"),  # Regroupées au sein de la fédération des entreprises d'insertion.
@@ -199,6 +200,7 @@ class Siae(AddressMixin, OrganizationAbstract):
         (KIND_GEIQ, "Groupement d'employeurs pour l'insertion et la qualification"),
         (KIND_EA, "Entreprise adaptée"),
         (KIND_EATT, "Entreprise adaptée de travail temporaire"),
+        (KIND_OPCS, "Organisation porteuse de la clause sociale"),
     )
 
     SOURCE_ASP = "ASP"
@@ -318,7 +320,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     @property
     def is_active(self):
         if not self.is_asp_managed:
-            # GEIQ, EA, EATT, ACIPHC... have no convention logic and thus are always active.
+            # GEIQ, EA, EATT, OPCS, ACIPHC... have no convention logic and thus are always active.
             return True
         if self.source == Siae.SOURCE_STAFF_CREATED:
             # Staff created siaes are always active until eventually

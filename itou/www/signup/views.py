@@ -17,6 +17,7 @@ from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.views.decorators.http import require_GET
 
+from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
@@ -179,6 +180,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
 
     context = {
         "next_url": next_url,
+        "facilitators_enabled": settings.FEATURE_ENABLE_FACILITATORS,
         "siaes_without_members": siaes_without_members,
         "siaes_with_members": siaes_with_members,
         "siae_select_form": siae_select_form,
@@ -303,6 +305,65 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
         "form": form,
     }
     return render(request, template_name, context)
+
+
+def facilitator_search(request, template_name="signup/facilitator_search.html"):
+    form = forms.APIEntrepriseSearchForm(data=request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        request.session[settings.ITOU_SESSION_FACILITATOR_SIGNUP_KEY] = form.org_data
+        return HttpResponseRedirect(reverse("signup:facilitator_signup"))
+
+    context = {
+        "form": form,
+        "prev_url": reverse("signup:siae_select"),
+    }
+    return render(request, template_name, context)
+
+
+class FacilitatorSignupView(SignupView):
+
+    form_class = forms.FacilitatorSignupForm
+    template_name = "signup/facilitator_signup.html"
+
+    def _get_session_siae(self):
+        if not hasattr(self, "siae"):
+            org_data = self.request.session[settings.ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
+            self.siae = Siae(
+                kind=Siae.KIND_OPCS,
+                source=Siae.SOURCE_USER_CREATED,
+                siret=org_data["siret"],
+                name=org_data["name"],
+                address_line_1=org_data["address_line_1"] or "",
+                address_line_2=org_data["address_line_2"] or "",
+                post_code=org_data["post_code"],
+                city=org_data["city"],
+                department=org_data["department"],
+                email="",  # not public
+                auth_email="",  # filled in the form
+                phone="",
+                geocoding_score=org_data["geocoding_score"],
+                coords=lat_lon_to_coords(org_data.get("latitude"), org_data.get("longitude")),
+                created_by=None,
+            )
+        return self.siae
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["prev_url"] = reverse("signup:facilitator_search")
+        context["siae"] = self._get_session_siae()
+        return context
+
+    def get_form(self, form_class=None):
+        return self.form_class(data=self.request.POST or None, siae=self._get_session_siae())
+
+    def get(self, request, *args, **kwargs):
+        if settings.ITOU_SESSION_FACILITATOR_SIGNUP_KEY not in request.session:
+            return HttpResponseRedirect(reverse("signup:facilitator_search"))
+        return super().get(request, *args, **kwargs)
+
+    @transaction.atomic  # important
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 @valid_prescriber_signup_session_required

@@ -472,6 +472,7 @@ ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_CURRENT_INSTITUTION_KEY = "current_institution"
 ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
 ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
+ITOU_SESSION_FACILITATOR_SIGNUP_KEY = "facilitator_signup"
 ITOU_SESSION_NIR_KEY = "job_seeker_nir"
 ITOU_SESSION_EDIT_SIAE_KEY = "edit_siae_session_key"
 
@@ -714,3 +715,7 @@ EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 9, 27, tzinf
 # This is disabled by default, overidden in prod settings, and can be set
 # via local dev settings or env vars for a temporary environment.
 EMPLOYEE_RECORD_TRANSFER_ENABLED = bool(os.environ.get("EMPLOYEE_RECORD_TRANSFER_ENABLED", False))
+
+# FIXME(vperron): Selectively enable the facilitators feature for staging purposes. Remove any mention
+# of it after the "recette".
+FEATURE_ENABLE_FACILITATORS = bool(os.environ.get("FEATURE_ENABLE_FACILITATORS", False))
