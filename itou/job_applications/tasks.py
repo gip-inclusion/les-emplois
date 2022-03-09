@@ -69,7 +69,7 @@ def notify_pole_emploi_pass(job_application, job_seeker, mode=POLE_EMPLOI_PASS_A
         return False
 
     # despite some earlier checks, we keep having invalid encrypted indentifier errors
-    if encrypted_nir == "":
+    if not encrypted_nir:
         log = JobApplicationPoleEmploiNotificationLog(
             job_application=job_application,
             status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
