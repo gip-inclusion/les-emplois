@@ -67,13 +67,26 @@ def notify_pole_emploi_pass(job_application, job_seeker, mode=POLE_EMPLOI_PASS_A
         )
         log.save()
         return False
+
+    # despite some earlier checks, we keep having invalid encrypted indentifier errors
+    if encrypted_nir == "":
+        log = JobApplicationPoleEmploiNotificationLog(
+            job_application=job_application,
+            status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
+            details="empty encrypted nir",
+        )
+        log.save()
+        return False
     # Step 3: we finally notify Pole Emploi that something happened for this user
     try:
         mise_a_jour_pass_iae(job_application, mode, encrypted_nir, token)
         sleep(1)
     except PoleEmploiMiseAJourPassIAEException as e:
         log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
-        log.details = f"http_code={e.http_code} response_code={e.response_code} token={token} mode={settings.API_ESD_MISE_A_JOUR_PASS_MODE}"  # noqa
+        # We log the encrypted nir in case its not empty but
+        # it leads to an E_ERR_EX042_PROBLEME_DECHIFFREMEMENT anyway
+        # This error should be fixed earlier but for some unknown reason yet, it keeps happening
+        log.details = f"http_code={e.http_code} response_code={e.response_code} token={token} mode={settings.API_ESD_MISE_A_JOUR_PASS_MODE} encrypted_nir={encrypted_nir}"  # noqa
         log.save()
         return False
     log.details += f" token={token} mode={settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
