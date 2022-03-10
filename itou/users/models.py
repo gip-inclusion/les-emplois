@@ -542,10 +542,15 @@ class User(AbstractUser, AddressMixin):
     def last_accepted_job_application(self):
         if not self.is_job_seeker:
             return None
+        # Some candidates may not have accepted job applications
+        # Assuming its the case can lead to issues downstream
+        accepted_job_applications = self.job_applications.accepted()
+        if accepted_job_applications.count() == 0:
+            return None
         # Last accepted job application is based on creation and hiring dates.
         # There were cases of identical job application creation dates in production,
         # leading to bad ordering (listed in DB natural "insertion" order).
-        return self.job_applications.accepted().latest("created_at", "hiring_start_at")
+        return accepted_job_applications.latest("created_at", "hiring_start_at")
 
     @cached_property
     def jobseeker_hash_id(self):

@@ -7,7 +7,7 @@ from django.utils import timezone
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeMembershipFactory, SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
@@ -119,8 +119,9 @@ class PoleEmploiApprovalSearchTest(TestCase):
         ja.save()
 
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-        with self.assertRaises(JobApplication.DoesNotExist):
-            response = self.client.get(self.url, {"number": self.approval.number})  # noqa
+        # Our approval should not be usable without a job application
+        response = self.client.get(self.url, {"number": self.approval.number})
+        self.assertNotContains(response, "Continuer")
 
     def test_has_matching_pass_iae_that_belongs_to_another_siae(self):
         """
