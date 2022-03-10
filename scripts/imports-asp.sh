@@ -22,7 +22,7 @@ unzip -P $ASP_UNZIP_PASSWORD asp_shared_bucket/fluxIAE_*.zip -d itou/siaes/manag
 unzip -P $ASP_UNZIP_PASSWORD asp_shared_bucket/Liste_Contact_EA*.zip -d itou/siaes/management/commands/data/
 
 # Perform the necessary data imports
-OUTPUT_PATH=shared_bucket/import_siae
+OUTPUT_PATH=shared_bucket/imports-asp
 mkdir -p $OUTPUT_PATH/populate_metabase_fluxiae
 mkdir $OUTPUT_PATH/import_siae
 mkdir $OUTPUT_PATH/import_ea_eatt
