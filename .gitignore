@@ -102,3 +102,6 @@ Pipfile*
 
 # Clever Cloud
 .clever.json
+
+# Debugger files
+.pdbhistory
