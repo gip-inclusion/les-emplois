@@ -5,9 +5,7 @@ from django.db import migrations, models
 
 def migrate_data_forward(apps, _schema_editor):
     User = apps.get_model("users", "User")
-    User.objects.filter(external_data_source_history__email__source="franceconnect").update(
-        identity_provider=User.IdentityProvider.FRANCE_CONNECT
-    )
+    User.objects.filter(external_data_source_history__email__source="franceconnect").update(identity_provider="FC")
 
 
 def migrate_data_backward(apps, _schema_editor):
