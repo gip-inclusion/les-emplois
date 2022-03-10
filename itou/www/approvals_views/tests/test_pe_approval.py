@@ -7,7 +7,7 @@ from django.utils import timezone
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.factories import SiaeMembershipFactory, SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
@@ -108,6 +108,19 @@ class PoleEmploiApprovalSearchTest(TestCase):
 
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application.id})
         self.assertEqual(response.url, next_url)
+
+    def test_has_no_last_accepted_job_application(self):
+        """
+        In some cases, there is an approval but no matching accepted job application
+        """
+        self.set_up_pe_approval(with_job_application=True)
+        ja = self.job_seeker.job_applications.first()
+        ja.state = JobApplicationWorkflow.STATE_CANCELLED
+        ja.save()
+
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        with self.assertRaises(JobApplication.DoesNotExist):
+            response = self.client.get(self.url, {"number": self.approval.number})  # noqa
 
     def test_has_matching_pass_iae_that_belongs_to_another_siae(self):
         """
