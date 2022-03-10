@@ -3,17 +3,22 @@ import datetime
 
 import httpx
 import respx
+from django.conf import settings
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from ..users.factories import UserFactory
+from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberPoleEmploiFactory
+from itou.prescribers.models import PrescriberOrganization
+
+from ..users.factories import PrescriberFactory, SiaeStaffFactory, UserFactory
 from ..users.models import User
 from .constants import (
     INCLUSION_CONNECT_ENDPOINT_AUTHORIZE,
+    INCLUSION_CONNECT_ENDPOINT_LOGOUT,
     INCLUSION_CONNECT_ENDPOINT_TOKEN,
     INCLUSION_CONNECT_ENDPOINT_USERINFO,
-    INCLUSION_CONNECT_ENDPOINT_LOGOUT,
     INCLUSION_CONNECT_STATE_EXPIRATION,
     PROVIDER_INCLUSION_CONNECT,
 )
@@ -27,6 +32,26 @@ INCLUSION_CONNECT_USERINFO = {
     "email": "michel@lestontons.fr",
     "sub": "af6b26f9-85cd-484e-beb9-bea5be13e30f",  # username
 }
+
+
+@respx.mock
+def _oauth_dance(test_class, email=None, assert_redirects=True):
+    user_info = INCLUSION_CONNECT_USERINFO.copy()
+    token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+    respx.post(INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+
+    if email:
+        user_info["email"] = email
+
+    respx.get(INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
+
+    csrf_signed = state_new()
+    url = reverse("inclusion_connect:callback")
+    response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
+    if assert_redirects:
+        test_class.assertRedirects(response, reverse("dashboard:index"))
+
+    return response
 
 
 class InclusionConnectModelTest(TestCase):
@@ -188,29 +213,18 @@ class InclusionConnectViewTest(TestCase):
     ####################################
     ######### Callback tests ###########
     ####################################
-    @respx.mock
-    def _callback_dance(self):
-        token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
-        respx.post(INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
-
-        respx.get(INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(
-            return_value=httpx.Response(200, json=INCLUSION_CONNECT_USERINFO)
-        )
-
-        csrf_signed = state_new()
-        url = reverse("inclusion_connect:callback")
-        response = self.client.get(url, data={"code": "123", "state": csrf_signed})
-        self.assertRedirects(response, reverse("dashboard:index"))
-        return response
 
     def test_callback_user_created(self):
         ### User does not exist.
-        self._callback_dance()
+        _oauth_dance(self)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
         self.assertEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
         self.assertEqual(user.last_name, INCLUSION_CONNECT_USERINFO["family_name"])
         self.assertEqual(user.username, INCLUSION_CONNECT_USERINFO["sub"])
+        # TODO: later.
+        # self.assertTrue(user.has_sso_provider)
+        # self.assertEqual(user.identiy_provider, users_enums.INCLUSION_CONNECT)
 
     def test_callback_user_no_change(self):
         ### User already exists on Itou with exactly the same data
@@ -222,7 +236,7 @@ class InclusionConnectViewTest(TestCase):
             "email": INCLUSION_CONNECT_USERINFO["email"],
         }
         UserFactory(**user_info)
-        self._callback_dance()
+        _oauth_dance(self)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(email=user_info["email"])
         self.assertEqual(user.first_name, user_info["first_name"])
@@ -238,9 +252,336 @@ class InclusionConnectViewTest(TestCase):
             username=INCLUSION_CONNECT_USERINFO["sub"],
             email=INCLUSION_CONNECT_USERINFO["email"],
         )
-        self._callback_dance()
+        _oauth_dance(self)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
         self.assertEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
         self.assertEqual(user.last_name, INCLUSION_CONNECT_USERINFO["family_name"])
         self.assertEqual(user.username, INCLUSION_CONNECT_USERINFO["sub"])
+        # TODO: later.
+        # self.assertTrue(user.has_sso_provider)
+        # self.assertEqual(user.identiy_provider, users_enums.INCLUSION_CONNECT)
+
+
+class InclusionConnectPrescribersViewsTest(TestCase):
+    """
+    Test prescribers' signup and login paths.
+    """
+
+    @respx.mock
+    def test_prescriber_signup__no_organization(self):
+        """
+        A user creates a prescriber account on Itou with Inclusion Connect.
+        This is a simple prescriber account ("orienteur"): no organization.
+        """
+        # Go through each step to ensure session data is recorded properly.
+        # Step 1: choose organization kind or go to the "no organization" page.
+        self.client.get(reverse("signup:prescriber_check_already_exists"))
+
+        # Step 2: register as a simple prescriber (orienteur).
+        response = self.client.get(reverse("signup:prescriber_user"))
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        # Connect with Inclusion Connect.
+        response = _oauth_dance(self)
+        # Follow the redirection.
+        response = self.client.get(response.url)
+        # Response should contain links available only to prescribers.
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
+
+        user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_job_seeker)
+        self.assertFalse(user.is_siae_staff)
+        self.assertFalse(user.is_labor_inspector)
+        self.assertEqual(user.prescribermembership_set.count(), 0)
+        self.assertEqual(user.siae_set.count(), 0)
+
+    @respx.mock
+    def test_prescriber_signup__pe_organization(self):
+        """
+        A user creates a prescriber account on Itou with Inclusion Connect.
+        He wants to join a Pôle emploi organization (as first admin).
+        """
+        pe_org = PrescriberPoleEmploiFactory()
+        email = "maxime@pole-emploi.fr"
+
+        # Go through each step to ensure session data is recorded properly.
+        # Step 1: choose organization kind or go to the "no organization" page.
+        self.client.get(reverse("signup:prescriber_check_already_exists"))
+
+        # Step 2: find PE organization by SAFIR code.
+        safir_step_url = reverse("signup:prescriber_pole_emploi_safir_code")
+        response = self.client.get(safir_step_url)
+        post_data = {"safir_code": pe_org.code_safir_pole_emploi}
+        response = self.client.post(safir_step_url, data=post_data, follow=True)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        # Connect with Inclusion Connect.
+        response = _oauth_dance(self, email=email)
+        # Follow the redirection.
+        response = self.client.get(response.url)
+        # Response should contain links available only to prescribers.
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
+
+        # Organization
+        self.assertEqual(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY), pe_org.pk)
+        self.assertContains(response, f"Code SAFIR {pe_org.code_safir_pole_emploi}")
+
+        user = User.objects.get(email=email)
+        self.assertEqual(user.prescribermembership_set.count(), 1)
+        self.assertEqual(user.prescribermembership_set.first().organization_id, pe_org.pk)
+        self.assertEqual(user.siae_set.count(), 0)
+
+    @respx.mock
+    def test_prescriber_signup__unauthorized_organization(self):
+        """
+        A user creates a prescriber account on Itou with Inclusion Connect.
+        He wants to create an unauthorized organization and join it (as first admin).
+        """
+        org = PrescriberOrganizationFactory.build(kind=PrescriberOrganization.Kind.OTHER)
+
+        # Go through each step to ensure session data is recorded properly.
+        # Step 1: find organization to join or go to the "no organization" page.
+        find_org_url = reverse("signup:prescriber_check_already_exists")
+        self.client.get(find_org_url)
+
+        session_signup_data = self.client.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+
+        # Jump over the last step to avoid double-testing each one:
+        # as they are already tested on prescriber's signup views.
+        # Prescriber's signup process heavily relies on session data.
+        # Override only what's needed for our test.
+        # PrescriberOrganizationFactoy does not contain any address field
+        # so we can't use it.
+        prescriber_org_data = {
+            "siret": org.siret,
+            "is_head_office": True,
+            "name": org.name,
+            "address_line_1": "17 RUE JEAN DE LA FONTAINE",
+            "address_line_2": "",
+            "post_code": "13150",
+            "city": "TARASCON",
+            "department": "13",
+            "longitude": 4.660572,
+            "latitude": 43.805661,
+            "geocoding_score": 0.8178357293868921,
+        }
+        session_signup_data = session_signup_data | {
+            "authorization_status": "NOT_SET",
+            "kind": org.kind,
+            "prescriber_org_data": prescriber_org_data,
+        }
+        """
+        # authorization_status': 'NOT_SET', 'kind': 'CAP_EMPLOI',
+        'prescriber_org_data': {'siret': '83137196800023', 'is_head_office': True,
+        'name': 'HELLO BIRDS', 'address_line_1': '17 RUE JEAN DE LA FONTAINE',
+        'address_line_2': None, 'post_code': '13150', 'city': 'TARASCON',
+        'department': '13', 'longitude': 4.660572, 'latitude': 43.805661,
+        'geocoding_score': 0.8178357293868921'safir_code': None,
+        'url_history': ['/signup/prescriber/check_already_exists',
+        '/signup/prescriber/choose_org', '/signup/prescriber/user'],
+        'next': None  }, 'pole_emploi_org_pk': None
+        """
+        client_session = self.client.session
+        client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
+        client_session.save()
+
+        response = self.client.get(reverse("signup:prescriber_user"))
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        # Connect with Inclusion Connect.
+        response = _oauth_dance(self)
+        # Follow the redirection.
+        response = self.client.get(response.url)
+        # Response should contain links available only to prescribers.
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
+
+        org = PrescriberOrganization.objects.get(siret=org.siret)
+
+        # Dashboard
+        self.assertEqual(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY), org.pk)
+        self.assertContains(response, org.display_name)
+
+        # Created organization attributes
+        self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
+        # self.assertTrue(org.is_head_office)
+        self.assertFalse(org.is_authorized)
+
+        # Interestingly enough, this attribute is ignored when
+        # creating the organization.
+        prescriber_org_data.pop("is_head_office")
+        for key, value in prescriber_org_data.items():
+            with self.subTest(key=key, value=value):
+                self.assertEqual(getattr(org, key), value)
+
+        # Membership
+        user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
+        self.assertEqual(user.prescribermembership_set.count(), 1)
+        self.assertEqual(user.prescribermembership_set.first().organization_id, org.pk)
+        self.assertEqual(user.siae_set.count(), 0)
+
+
+class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
+    """
+    Prescribers' signup and login exceptions: user already exists, ...
+    """
+
+    @respx.mock
+    def test_prescriber_already_exists__simple_signup(self):
+        """
+        He does not want to join an organization, only create an account.
+        He likely forgot he had an account.
+        """
+        #### User is a prescriber. Update it and connect. ####
+        PrescriberFactory(email=INCLUSION_CONNECT_USERINFO["email"])
+        self.client.get(reverse("signup:prescriber_check_already_exists"))
+
+        # Step 2: register as a simple prescriber (orienteur).
+        response = self.client.get(reverse("signup:prescriber_user"))
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        # Connect with Inclusion Connect.
+        response = _oauth_dance(self)
+        # Follow the redirection.
+        response = self.client.get(response.url)
+        # Response should contain links available only to prescribers.
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
+
+        User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
+        # self.assertTrue(user.has_sso_provider)
+
+    @respx.mock
+    def test_prescriber_already_exists__create_organization(self):
+        """
+        User is already a prescriber.
+        We should update his account and make him join this new organization.
+        But as long as the code uses PrescriberSignupForms, this is complicated.
+        At the same time, this is quite unlikely to happen (confirmed by Zohra).
+        Propose to ask the support team.
+        """
+        org = PrescriberOrganizationFactory.build(kind=PrescriberOrganization.Kind.OTHER)
+        user = PrescriberFactory(email=INCLUSION_CONNECT_USERINFO["email"])
+
+        self.client.get(reverse("signup:prescriber_check_already_exists"))
+
+        session_signup_data = self.client.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        # Jump over the last step to avoid double-testing each one:
+        # as they are already tested on prescriber's signup views.
+        # Prescriber's signup process heavily relies on session data.
+        # Override only what's needed for our test.
+        # PrescriberOrganizationFactoy does not contain any address field
+        # so we can't use it.
+        prescriber_org_data = {
+            "siret": org.siret,
+            "is_head_office": True,
+            "name": org.name,
+            "address_line_1": "17 RUE JEAN DE LA FONTAINE",
+            "address_line_2": "",
+            "post_code": "13150",
+            "city": "TARASCON",
+            "department": "13",
+            "longitude": 4.660572,
+            "latitude": 43.805661,
+            "geocoding_score": 0.8178357293868921,
+        }
+        session_signup_data = session_signup_data | {
+            "authorization_status": "NOT_SET",
+            "kind": org.kind,
+            "prescriber_org_data": prescriber_org_data,
+        }
+
+        client_session = self.client.session
+        client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
+        client_session.save()
+        signup_url = reverse("signup:prescriber_user")
+
+        response = self.client.get(signup_url)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        # Connect with Inclusion Connect.
+        response = _oauth_dance(self, assert_redirects=False)
+        # Follow the redirection.
+        response = self.client.get(response.url)
+
+        # Show an error and don't create an organization.
+        self.assertEqual(response.wsgi_request.path, signup_url)
+        self.assertNotContains(response, reverse("apply:list_for_prescriber"))
+        self.assertContains(response, "inclusion_connect_button.svg")
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertIn("email", str(messages[0]))
+
+        user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
+        self.assertNotEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
+        organization_exists = PrescriberOrganization.objects.filter(siret=org.siret).exists()
+        self.assertFalse(organization_exists)
+        self.assertFalse(user.prescriberorganization_set.exists())
+
+    @respx.mock
+    def test_employer_already_exists(self):
+        """
+        User is already a member of an SIAE.
+        Raise an exception.
+        """
+        org = PrescriberOrganizationFactory.build(kind=PrescriberOrganization.Kind.OTHER)
+        user = SiaeStaffFactory(email=INCLUSION_CONNECT_USERINFO["email"])
+        self.client.get(reverse("signup:prescriber_check_already_exists"))
+
+        session_signup_data = self.client.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        # Jump over the last step to avoid double-testing each one:
+        # as they are already tested on prescriber's signup views.
+        # Prescriber's signup process heavily relies on session data.
+        # Override only what's needed for our test.
+        # PrescriberOrganizationFactoy does not contain any address field
+        # so we can't use it.
+        prescriber_org_data = {
+            "siret": org.siret,
+            "is_head_office": True,
+            "name": org.name,
+            "address_line_1": "17 RUE JEAN DE LA FONTAINE",
+            "address_line_2": "",
+            "post_code": "13150",
+            "city": "TARASCON",
+            "department": "13",
+            "longitude": 4.660572,
+            "latitude": 43.805661,
+            "geocoding_score": 0.8178357293868921,
+        }
+        session_signup_data = session_signup_data | {
+            "authorization_status": "NOT_SET",
+            "kind": org.kind,
+            "prescriber_org_data": prescriber_org_data,
+        }
+
+        client_session = self.client.session
+        client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
+        client_session.save()
+        signup_url = reverse("signup:prescriber_user")
+
+        response = self.client.get(signup_url)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        # Connect with Inclusion Connect.
+        response = _oauth_dance(self, assert_redirects=False)
+        # Follow the redirection.
+        response = self.client.get(response.url)
+
+        # Show an error and don't create an organization.
+        self.assertEqual(response.wsgi_request.path, signup_url)
+        self.assertNotContains(response, reverse("apply:list_for_prescriber"))
+        self.assertContains(response, "inclusion_connect_button.svg")
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertIn("email", str(messages[0]))
+
+        user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
+        self.assertNotEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
+        organization_exists = PrescriberOrganization.objects.filter(siret=org.siret).exists()
+        self.assertFalse(organization_exists)
+        self.assertFalse(user.prescriberorganization_set.exists())
+
+
+class InclusionConnectLoginTest(TestCase):
+    # TODO: test login
+    pass
