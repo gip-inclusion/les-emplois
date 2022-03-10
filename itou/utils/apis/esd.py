@@ -27,13 +27,13 @@ def get_access_token(scope):
             return token.value
 
     auth_request = httpx.post(
-        f"{settings.API_ESD_AUTH_BASE_URL}/connexion/oauth2/access_token",
+        f"{settings.API_ESD['AUTH_BASE_URL']}/connexion/oauth2/access_token",
         params={"realm": "/partenaire"},
         data={
             "grant_type": "client_credentials",
-            "client_id": settings.API_ESD_KEY,
-            "client_secret": settings.API_ESD_SECRET,
-            "scope": f"application_{settings.API_ESD_KEY} {scope}",
+            "client_id": settings.API_ESD["KEY"],
+            "client_secret": settings.API_ESD["SECRET"],
+            "scope": f"application_{settings.API_ESD['KEY']} {scope}",
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )

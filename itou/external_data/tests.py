@@ -1,7 +1,8 @@
 import json
 
 import requests_mock
-from django.test import TestCase
+from django.conf import settings
+from django.test import TestCase, override_settings
 
 import itou.external_data.apis.pe_connect as pec
 from itou.users.factories import JobSeekerFactory
@@ -58,7 +59,7 @@ _RESP_COMPENSATION = {"beneficiairePrestationSolidarite": False, "beneficiaireAs
 
 
 def _url_for_key(k):
-    return f"{pec.API_ESD_BASE_URL}/{k}"
+    return f"{settings.API_ESD['BASE_URL']}/{k}"
 
 
 _API_KEYS = [
@@ -89,8 +90,11 @@ def _status_failed(m):
         m.get(_url_for_key(api_k), text="", status_code=500)
 
 
+@requests_mock.Mocker()
+@override_settings(
+    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
+)
 class ExternalDataImportTest(TestCase):
-    @requests_mock.Mocker()
     def test_status_ok(self, m):
         user = JobSeekerFactory()
 
@@ -108,7 +112,6 @@ class ExternalDataImportTest(TestCase):
         self.assertEqual(6 + 1, len(report.get("fields_updated")))  # all the fields + history
         self.assertEqual(12, len(report.get("fields_fetched")))
 
-    @requests_mock.Mocker()
     def test_status_partial(self, m):
         user = JobSeekerFactory()
         _status_partial(m)
@@ -126,7 +129,6 @@ class ExternalDataImportTest(TestCase):
         self.assertEqual(9, len(report.get("fields_fetched")))
         self.assertEqual(2, len(report.get("fields_failed")))
 
-    @requests_mock.Mocker()
     def test_status_failed(self, m):
         user = JobSeekerFactory()
         _status_failed(m)
@@ -140,8 +142,11 @@ class ExternalDataImportTest(TestCase):
         self.assertEqual(0, len(report.get("fields_failed")))
 
 
+@requests_mock.Mocker()
+@override_settings(
+    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
+)
 class JobSeekerExternalDataTest(TestCase):
-    @requests_mock.Mocker()
     def test_import_ok(self, m):
         _status_ok(m)
 
@@ -180,7 +185,6 @@ class JobSeekerExternalDataTest(TestCase):
         self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
         self.assertEqual(birthdate, user.birthdate)
 
-    @requests_mock.Mocker()
     def test_import_partial(self, m):
         _status_partial(m)
 
@@ -198,7 +202,6 @@ class JobSeekerExternalDataTest(TestCase):
         self.assertEqual(user.address_line_2, "The cupboard under the stairs")
         self.assertNotEqual(str(user.birthdate), "1970-01-01")
 
-    @requests_mock.Mocker()
     def test_import_failed(self, m):
         _status_failed(m)
 
@@ -211,7 +214,6 @@ class JobSeekerExternalDataTest(TestCase):
         self.assertIsNone(data.is_pe_jobseeker)
         self.assertIsNone(data.has_minimal_social_allowance)
 
-    @requests_mock.Mocker()
     def test_has_external_data(self, m):
         _status_ok(m)
 

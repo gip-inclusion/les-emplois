@@ -19,7 +19,6 @@ from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrative
 from itou.job_applications.tasks import huey_notify_pole_employ
 from itou.utils.apis.esd import get_access_token
 from itou.utils.apis.pole_emploi import (
-    POLE_EMPLOI_PASS_APPROVED,
     PoleEmploiIndividu,
     PoleEmploiMiseAJourPassIAEException,
     recherche_individu_certifie_api,
@@ -949,8 +948,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
 
     def notify_pole_emploi_accepted(self) -> bool:
-        if settings.API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS:
-            return huey_notify_pole_employ(self, POLE_EMPLOI_PASS_APPROVED)
+        if settings.API_ESD["MISE_A_JOUR_PASS_MODE"] == "production":
+            return huey_notify_pole_employ(self)
         return False
 
 

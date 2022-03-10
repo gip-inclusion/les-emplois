@@ -372,10 +372,14 @@ API_ENTREPRISE_TOKEN = os.environ.get("API_ENTREPRISE_TOKEN")
 # Production settings:
 ## API_ESD_AUTH_BASE_URL="https://entreprise.pole-emploi.fr"
 ## API_ESD_BASE_URL="https://api.emploi-store.fr/partenaire"
-API_ESD_KEY = os.environ.get("API_ESD_KEY", "")
-API_ESD_SECRET = os.environ.get("API_ESD_SECRET", "")
-API_ESD_AUTH_BASE_URL = os.environ.get("API_ESD_AUTH_BASE_URL", "https://entreprise.pole-emploi.fr")
-API_ESD_BASE_URL = os.environ.get("API_ESD_BASE_URL", "https://api.emploi-store.fr/partenaire")
+API_ESD = {
+    "AUTH_BASE_URL": os.environ.get("API_ESD_AUTH_BASE_URL"),
+    "KEY": os.environ.get("API_ESD_KEY", ""),
+    "SECRET": os.environ.get("API_ESD_SECRET", ""),
+    "BASE_URL": os.environ.get("API_ESD_BASE_URL"),
+    "MISE_A_JOUR_PASS_MODE": "production",
+}
+
 # Pole emploi mise à jour API can be run in sandboxed mode (updates are not saved to the database,
 # but the API confirms everything was alright), or in production mode (updates ARE saved)
 # the values can be: sandbox|production
@@ -383,8 +387,7 @@ API_ESD_BASE_URL = os.environ.get("API_ESD_BASE_URL", "https://api.emploi-store.
 # In order to ensure we do no send dummy data to PE (from the review apps, demo, automated tests… anything)
 # We force the value to sandbox so that, in the worst case, if the API is enabled on a service that it should not,
 # it does not pollute PE’s services
-API_ESD_MISE_A_JOUR_PASS_MODE = os.environ.get("API_ESD_MISE_A_JOUR_PASS_MODE", "sandbox")
-API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS = os.environ.get("API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS", "False") == "True"
+# API_ESD_MISE_A_JOUR_PASS_MODE = os.environ.get("API_ESD_MISE_A_JOUR_PASS_MODE", "sandbox")
 
 
 # PE Connect aka PEAMU - technically one of ESD's APIs.
@@ -397,7 +400,7 @@ API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS = os.environ.get("API_ESD_SHOULD_PERFORM
 PEAMU_AUTH_BASE_URL = "https://authentification-candidat.pole-emploi.fr"
 SOCIALACCOUNT_PROVIDERS = {
     "peamu": {
-        "APP": {"key": "peamu", "client_id": API_ESD_KEY, "secret": API_ESD_SECRET},
+        "APP": {"key": "peamu", "client_id": API_ESD["KEY"], "secret": API_ESD["SECRET"]},
     },
 }
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"

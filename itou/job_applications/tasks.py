@@ -1,18 +1,12 @@
 from time import sleep
 
-from django.conf import settings
 from django.utils import timezone
 from huey.contrib.djhuey import db_task
 
-from itou.utils.apis.pole_emploi import (
-    POLE_EMPLOI_PASS_APPROVED,
-    PoleEmploiIndividu,
-    PoleEmploiMiseAJourPassIAEException,
-    mise_a_jour_pass_iae,
-)
+from itou.utils.apis.pole_emploi import PoleEmploiIndividu, PoleEmploiMiseAJourPassIAEException, mise_a_jour_pass_iae
 
 
-def notify_pole_emploi_pass(job_application, job_seeker, mode=POLE_EMPLOI_PASS_APPROVED):
+def notify_pole_emploi_pass(job_application, job_seeker):
     """
     The entire logic for notifying Pole Emploi when a job_application is accepted:
         - first, we authenticate to pole-emploi.io with the proper credentials, scopes, environment and
@@ -63,7 +57,7 @@ def notify_pole_emploi_pass(job_application, job_seeker, mode=POLE_EMPLOI_PASS_A
         log = JobApplicationPoleEmploiNotificationLog(
             job_application=job_application,
             status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
-            details=f"http_code={e.http_code} response_code={e.response_code} token={token} mode={settings.API_ESD_MISE_A_JOUR_PASS_MODE}",  # noqa
+            details=f"http_code={e.http_code} response_code={e.response_code} token={token}",  # noqa
         )
         log.save()
         return False
@@ -79,21 +73,21 @@ def notify_pole_emploi_pass(job_application, job_seeker, mode=POLE_EMPLOI_PASS_A
         return False
     # Step 3: we finally notify Pole Emploi that something happened for this user
     try:
-        mise_a_jour_pass_iae(job_application, mode, encrypted_nir, token)
+        mise_a_jour_pass_iae(job_application, encrypted_nir, token)
         sleep(1)
     except PoleEmploiMiseAJourPassIAEException as e:
         log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
         # We log the encrypted nir in case its not empty but
         # it leads to an E_ERR_EX042_PROBLEME_DECHIFFREMEMENT anyway
         # This error should be fixed earlier but for some unknown reason yet, it keeps happening
-        log.details = f"http_code={e.http_code} response_code={e.response_code} token={token} mode={settings.API_ESD_MISE_A_JOUR_PASS_MODE} encrypted_nir={encrypted_nir}"  # noqa
+        log.details = f"http_code={e.http_code} response_code={e.response_code} token={token} encrypted_nir={encrypted_nir}"  # noqa
         log.save()
         return False
-    log.details += f" token={token} mode={settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
+    log.details += f" token={token}"
     log.save()
     return True
 
 
 @db_task()
-def huey_notify_pole_employ(job_application, mode: str):
-    return notify_pole_emploi_pass(job_application, job_application.job_seeker, mode)
+def huey_notify_pole_employ(job_application):
+    return notify_pole_emploi_pass(job_application, job_application.job_seeker)

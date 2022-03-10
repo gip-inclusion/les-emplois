@@ -10,9 +10,6 @@ from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
 
 
 # PE Connect API data retrieval tools
-
-API_ESD_BASE_URL = settings.API_ESD_BASE_URL
-
 ESD_USERINFO_API = "peconnect-individu/v1/userinfo"
 ESD_COORDS_API = "peconnect-coordonnees/v1/coordonnees"
 ESD_STATUS_API = "peconnect-statut/v1/statut"
@@ -36,7 +33,7 @@ def _call_api(api_path, token):
     Make a sync call to an API
     For further processing, returning something else than `None` is considered a success
     """
-    url = f"{API_ESD_BASE_URL}/{api_path}"
+    url = f"{settings.API_ESD['BASE_URL']}/{api_path}"
     response = requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=settings.REQUESTS_TIMEOUT)
     if response.status_code == 200:
         result = response.json()

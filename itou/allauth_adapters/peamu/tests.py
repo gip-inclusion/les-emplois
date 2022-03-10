@@ -8,11 +8,15 @@ from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.tests import OAuth2TestsMixin
 from allauth.tests import MockedResponse, TestCase
 from django.core import mail
+from django.test import override_settings
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
 from itou.users.models import User
 
 
+@override_settings(
+    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
+)  # noqa
 class PEAMUTests(OAuth2TestsMixin, TestCase):
     provider_id = PEAMUProvider.id
 

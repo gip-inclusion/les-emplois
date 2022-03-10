@@ -12,9 +12,13 @@ from itou.siaes.models import Siae
 
 logger = logging.getLogger(__name__)
 
-# The values for the pass status in the mise à jour API
+# The value for the approvel PASS status in the mise à jour API.
+# They are not interested in the refused PASSes
 POLE_EMPLOI_PASS_APPROVED = "A"
-POLE_EMPLOI_PASS_REFUSED = "R"
+
+RECHERCHE_INDIVIDU_URL = f"{settings.API_ESD['BASE_URL']}/rechercheindividucertifie/v1/rechercheIndividuCertifie"
+MISE_A_JOUR_PASS_PRODUCTION_URL = f"{settings.API_ESD['BASE_URL']}/maj-pass-iae/v1/passIAE/miseAjour"
+MISE_A_JOUR_PASS_SANDBOX_URL = f"{settings.API_ESD['BASE_URL']}/testmaj-pass-iae/v1/passIAE/miseAjour"
 
 DATE_FORMAT = "%Y-%m-%d"
 CODE_SORTIE_MAPPING_RECHERCHE_INDIVIDU_CERTIFIE = {
@@ -215,11 +219,10 @@ def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) ->
         "certifDE":false
     }
     """
-    url = f"{settings.API_ESD_BASE_URL}/rechercheindividucertifie/v1/rechercheIndividuCertifie"
     headers = {"Authorization": token}
 
     try:
-        r = httpx.post(url, json=individu.as_api_params(), headers=headers)
+        r = httpx.post(RECHERCHE_INDIVIDU_URL, json=individu.as_api_params(), headers=headers)
         data = r.json()
         # we can’t use `raise_for_error` since actual data are stored with status code 4xx
         # if r.status_code not in [200, 400, 401, 404, 429]
@@ -236,7 +239,7 @@ def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) ->
     raise PoleEmploiMiseAJourPassIAEException("no response code")
 
 
-def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifier, token):
+def mise_a_jour_pass_iae(job_application, encrypted_identifier, token):
     """
     We post some data (see _mise_a_jour_parameters), and as an output we get a JSON response:
     {'codeSortie': 'S000', 'idNational': 'some identifier', 'message': 'Pass IAE prescrit'}
@@ -252,16 +255,11 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
     """
     CODE_SORTIE_PASS_IAE_PRESCRIT = "S000"  # noqa constant that comes from Pole Emploi’s documentation
 
-    # The production URL
-    url = f"{settings.API_ESD_BASE_URL}/maj-pass-iae/v1/passIAE/miseAjour"
-    # Sandbox URL, should it be used again:
-    # f"{settings.API_ESD_BASE_URL}/testmaj-pass-iae/v1/passIAE/miseAjour"
-
     headers = {"Authorization": token, "Content-Type": "application/json"}  # noqa
 
     try:
-        params = _mise_a_jour_parameters(encrypted_identifier, job_application, pass_approved_code)
-        r = httpx.post(url, json=params, headers=headers)
+        params = _mise_a_jour_parameters(encrypted_identifier, job_application)
+        r = httpx.post(MISE_A_JOUR_PASS_PRODUCTION_URL, json=params, headers=headers)
         # The status code are 200, 401, 500.
         # Visibly non-200 HTTP codes do not return parsable json but I do not have samples
         if r.status_code != 200:
@@ -279,11 +277,11 @@ def mise_a_jour_pass_iae(job_application, pass_approved_code, encrypted_identifi
             # The only way the process can be entirely realized is with
             # code HTTP 200 + a specific code sortie
             if code_sortie != CODE_SORTIE_PASS_IAE_PRESCRIT:
-                details = f"{code_sortie} {token} {settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
+                details = f"{code_sortie} {token}"
                 raise PoleEmploiMiseAJourPassIAEException(r.status_code, details)
             return True
         except Exception:
-            details = f"{r.content} {token} {settings.API_ESD_MISE_A_JOUR_PASS_MODE}"
+            details = f"{r.content} {token}"
             raise PoleEmploiMiseAJourPassIAEException(r.status_code, details)
     except httpx.ConnectTimeout:  # noqa
         # We need to deal with this special case because
@@ -340,28 +338,19 @@ def _mise_a_jour_sender_kind_param(sender_kind):
     return sender_kind_mapping[JobApplication.SENDER_KIND_JOB_SEEKER]
 
 
-def _mise_a_jour_parameters(encrypted_identifier: str, job_application, pass_approved_code: str):
+def _mise_a_jour_parameters(encrypted_identifier: str, job_application):
     """
     The necessary parameters to notify Pole Emploi that a Pass has been granted
     """
     siae = job_application.to_siae
     approval = job_application.approval
 
-    if pass_approved_code == POLE_EMPLOI_PASS_REFUSED:
-        # The necessary parameters to notify Pole Emploi of a refusal
-        return {
-            "idNational": encrypted_identifier,
-            "typeSIAE": _mise_a_jour_siae_kind_param(siae),
-            "numSIRETsiae": siae.siret,
-            "statutReponsePassIAE": POLE_EMPLOI_PASS_REFUSED,
-            "origineCandidature": _mise_a_jour_sender_kind_param(job_application.sender_kind),
-        }
     # The necessary parameters to notify Pole Emploi that a Pass has been granted
     date_debut_pass = approval.start_at.strftime(DATE_FORMAT) if approval.start_at else ""
     date_fin_pass = approval.end_at.strftime(DATE_FORMAT) if approval.start_at else ""
     return {
         "idNational": encrypted_identifier,
-        "statutReponsePassIAE": POLE_EMPLOI_PASS_APPROVED,
+        "statutReponsePassIAE": POLE_EMPLOI_PASS_APPROVED,  # We used to send refused PASSes too, but they don’t care
         "typeSIAE": _mise_a_jour_siae_kind_param(siae),
         "dateDebutPassIAE": date_debut_pass,
         "dateFinPassIAE": date_fin_pass,

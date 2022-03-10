@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core import mail
 from django.forms.models import model_to_dict
 from django.template.defaultfilters import title
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -47,7 +47,6 @@ from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.apis.pole_emploi import (
-    POLE_EMPLOI_PASS_APPROVED,
     PoleEmploiIndividu,
     PoleEmploiIndividuResult,
     PoleEmploiMiseAJourPassIAEException,
@@ -55,6 +54,9 @@ from itou.utils.apis.pole_emploi import (
 from itou.utils.templatetags import format_filters
 
 
+@override_settings(
+    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
+)
 @patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self, *args, **kwargs):
@@ -86,9 +88,9 @@ class JobApplicationModelTest(TestCase):
         notification_mock.assert_called()
 
     def test_is_sent_by_authorized_prescriber(self, *args, **kwargs):
+
         job_application = JobApplicationSentByJobSeekerFactory()
         self.assertFalse(job_application.is_sent_by_authorized_prescriber)
-
         job_application = JobApplicationSentByPrescriberFactory()
         self.assertFalse(job_application.is_sent_by_authorized_prescriber)
 
@@ -941,6 +943,9 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         self.assertEqual(len(notification.recipients_emails), 0)
 
 
+@override_settings(
+    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
+)
 @patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationWorkflowTest(TestCase):
     """Test JobApplication workflow."""
@@ -1508,7 +1513,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(job_seeker=job_seeker)
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertFalse(pe_individual.is_valid())
-        notif_result = notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
+        notif_result = notify_pole_emploi_pass(job_application, job_application.job_seeker)
         self.assertFalse(notif_result)
         access_token_mock.assert_not_called()
         self.assertFalse(
@@ -1532,13 +1537,11 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         # our job seeker is valid
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertTrue(pe_individual.is_valid())
-        self.assertTrue(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertTrue(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
-        maj_mock.assert_called_with(job_application, ANY, self.encrypted_nir, self.token)
+        maj_mock.assert_called_with(job_application, self.encrypted_nir, self.token)
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
         self.assertEqual(notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_OK)
 
@@ -1558,9 +1561,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         # our job seeker is valid
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertTrue(pe_individual.is_valid())
-        self.assertFalse(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertFalse(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_not_called()
         nir_mock.assert_not_called()
@@ -1579,9 +1580,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         Authentication failed: only the get_token call should be made, and an entry with the failure should be added
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertFalse(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertFalse(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_not_called()
@@ -1602,9 +1601,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
          - an entry should be created, showing the problem came from recherche individu
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertFalse(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertFalse(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
@@ -1628,13 +1625,11 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
          - an entry should be created, showing the problem came from mise_a_jour_pass_iae
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertFalse(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertFalse(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
-        maj_mock.assert_called_with(job_application, ANY, self.encrypted_nir, self.token)
+        maj_mock.assert_called_with(job_application, self.encrypted_nir, self.token)
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
         self.assertEqual(
             notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI

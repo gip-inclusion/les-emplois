@@ -25,7 +25,7 @@ from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
@@ -35,8 +35,6 @@ from itou.users.models import User
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.pole_emploi import (
-    POLE_EMPLOI_PASS_APPROVED,
-    POLE_EMPLOI_PASS_REFUSED,
     PoleEmploiIndividu,
     PoleEmploiMiseAJourPassIAEException,
     mise_a_jour_pass_iae,
@@ -827,6 +825,9 @@ class PoleEmploiIndividuTest(TestCase):
         self.assertEqual(len(individual.last_name), 25)
 
 
+@override_settings(
+    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
+)  # noqa
 class PoleEmploiTest(TestCase):
     """All the test cases around function recherche_individu_certifie_api and mise_a_jour_pass_iae"""
 
@@ -872,24 +873,7 @@ class PoleEmploiTest(TestCase):
         Nominal scenario: an approval is **accepted**
         HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae will return True"""
         job_application = JobApplicationWithApprovalFactory()
-        result = mise_a_jour_pass_iae(
-            job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
-        )
-        mock_post.assert_called()
-        self.assertTrue(result)
-
-    @mock.patch(
-        "httpx.post",
-        return_value=httpx.Response(200, json=POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_OK_MOCK),
-    )
-    def test_mise_a_jour_pass_iae_success_with_approval_refused(self, mock_post):
-        """
-        Nominal scenario: an approval is **refused**
-        HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae will return True"""
-        job_application = JobApplicationFactory()
-        result = mise_a_jour_pass_iae(
-            job_application, POLE_EMPLOI_PASS_REFUSED, "some_valid_encrypted_identifier", "some_valid_token"
-        )
+        result = mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
         mock_post.assert_called()
         self.assertTrue(result)
 
@@ -904,9 +888,7 @@ class PoleEmploiTest(TestCase):
         """
         job_application = JobApplicationWithApprovalFactory()
         with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
-            mise_a_jour_pass_iae(
-                job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
-            )
+            mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
             mock_post.assert_called()
 
     @mock.patch(
@@ -920,9 +902,7 @@ class PoleEmploiTest(TestCase):
         """
         job_application = JobApplicationWithApprovalFactory()
         with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
-            mise_a_jour_pass_iae(
-                job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
-            )
+            mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
             mock_post.assert_called()
 
     @mock.patch(
@@ -933,9 +913,7 @@ class PoleEmploiTest(TestCase):
         """If the API answers with a non-200 http code, mise_a_jour_pass_iae will return false"""
         job_application = JobApplicationWithApprovalFactory()
         with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
-            mise_a_jour_pass_iae(
-                job_application, POLE_EMPLOI_PASS_APPROVED, "some_valid_encrypted_identifier", "some_valid_token"
-            )
+            mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
             mock_post.assert_called()
 
 
