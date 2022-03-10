@@ -35,6 +35,7 @@ class FranceConnectUserData:  # pylint: disable=too-many-instance-attributes
     post_code: str
     city: str
     country: Optional[str] = None
+    identity_provider: str = User.IdentityProvider.FRANCE_CONNECT
 
 
 def load_user_data(user_data: dict) -> dict:
@@ -70,7 +71,7 @@ def get_field_provider_info(value, source):
 
 def create_user_from_fc_user_data(fc_user_data: FranceConnectUserData):
     user = User(is_job_seeker=True)
-    for field in ["username", "first_name", "last_name", "birthdate", "email", "phone"]:
+    for field in ["username", "first_name", "last_name", "birthdate", "email", "phone", "identity_provider"]:
         value = getattr(fc_user_data, field)
         if user.update_external_data_source_history_field(settings.PROVIDER_FRANCE_CONNECT, field, value):
             setattr(user, field, value)

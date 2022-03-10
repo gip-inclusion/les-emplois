@@ -74,12 +74,14 @@ class FranceConnectTest(TestCase):
         self.assertEqual(user.last_name, user_data["family_name"])
         self.assertEqual(user.first_name, user_data["given_name"])
         self.assertEqual(user.external_data_source_history["last_name"]["source"], "franceconnect")
+        self.assertEqual(user.identity_provider, User.IdentityProvider.FRANCE_CONNECT)
 
         # Update user
         fc_user_data.last_name = "DUPUIS"
         user, created = france_connect_models.create_or_update_user(fc_user_data)
         self.assertFalse(created)
         self.assertEqual(user.last_name, "DUPUIS")
+        self.assertEqual(user.identity_provider, User.IdentityProvider.FRANCE_CONNECT)
 
     def test_create_user_from_user_data_with_already_existing_fc_id(self):
         """
@@ -94,6 +96,7 @@ class FranceConnectTest(TestCase):
         self.assertEqual(user.last_name, user_data["family_name"])
         self.assertEqual(user.first_name, user_data["given_name"])
         self.assertEqual(user.external_data_source_history["last_name"]["source"], "franceconnect")
+        self.assertEqual(user.identity_provider, User.IdentityProvider.FRANCE_CONNECT)
 
     def test_create_user_from_user_data_with_already_existing_fc_email(self):
         """
@@ -109,6 +112,7 @@ class FranceConnectTest(TestCase):
         self.assertNotEqual(user.first_name, user_data["given_name"])
         # We did not fill this data using external data, so it is not set
         self.assertIsNone(user.external_data_source_history)
+        self.assertNotEqual(user.identity_provider, User.IdentityProvider.FRANCE_CONNECT)
 
     def test_callback_no_code(self):
         url = reverse("france_connect:callback")
