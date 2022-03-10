@@ -167,6 +167,9 @@ class User(AbstractUser, AddressMixin):
         M = "M", "Monsieur"
         MME = "MME", "Madame"
 
+    class IdentityProvider(models.TextChoices):
+        FRANCE_CONNECT = "FC", "FranceConnect"
+
     title = models.CharField(
         max_length=3,
         verbose_name="Civilité",
@@ -250,6 +253,15 @@ class User(AbstractUser, AddressMixin):
         blank=True,
     )
     resume_link = models.URLField(max_length=500, verbose_name="Lien vers un CV", blank=True)
+
+    identity_provider = models.CharField(
+        max_length=2,
+        verbose_name="Fournisseur d'identité (SSO)",
+        blank=True,
+        default="",
+        choices=IdentityProvider.choices,
+    )
+
     has_completed_welcoming_tour = models.BooleanField(verbose_name="Parcours de bienvenue effectué", default=False)
 
     created_by = models.ForeignKey(
