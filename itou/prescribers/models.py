@@ -231,7 +231,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
             if not self.siret:
                 raise ValidationError({"siret": "Le SIRET est obligatoire."})
             if self._meta.model.objects.exclude(pk=self.pk).filter(siret=self.siret, kind=self.kind).exists():
-                raise ValidationError({"siret": "Ce SIRET est déjà utilisé."})
+                raise ValidationError({"siret": f"Ce SIRET est déjà utilisé avec le type '{self.kind}'."})
 
     @property
     def accept_survey_url(self):

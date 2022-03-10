@@ -203,10 +203,11 @@ class PrescriberOrganizationAdmin(OrganizationAdmin):
                 obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.REFUSED
                 obj.authorization_updated_at = now()
                 obj.authorization_updated_by = request.user
+                obj.kind = models.PrescriberOrganization.Kind.OTHER
                 obj.save()
                 obj.refused_prescriber_organization_email().send()
             else:
-                return PermissionDenied()
+                raise PermissionDenied()
 
         if "_authorization_action_validate" in request.POST:
             # Same checks as change_form template to display the button
