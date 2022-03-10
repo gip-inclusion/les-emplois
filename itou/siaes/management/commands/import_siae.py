@@ -239,6 +239,8 @@ class Command(BaseCommand):
             if existing_siae_query.exists():
                 existing_siae = existing_siae_query.get()
                 if existing_siae.source == Siae.SOURCE_ASP:
+                    # Sometimes the siae already exists but was not detected in the first queryset above because it
+                    # has the wrong asp_id. Such an edge case is fixed in another method `update_existing_conventions`.
                     continue
                 # Siae with this siret+kind already exists but with wrong source.
                 assert existing_siae.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]
