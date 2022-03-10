@@ -1236,7 +1236,7 @@ class ApprovalsWrapper:
 
     # Error messages.
     WAITING_PERIOD_DOC_LINK = get_external_link_markup(
-        url=f"{settings.ITOU_DOC_URL}/qui-est-eligible-iae-criteres-eligibilite/derogation-au-delai-de-carence",
+        url=f"{settings.ITOU_COMMUNITY_URL }/doc/emplois/derogation-au-delai-de-carence/",
         text="En savoir plus sur la dérogation du délai de carence",
     )
     ERROR_CANNOT_OBTAIN_NEW_FOR_USER = mark_safe(
