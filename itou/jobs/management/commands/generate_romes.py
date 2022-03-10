@@ -24,7 +24,7 @@ class Command(BaseCommand):
     def handle(self, **options):
 
         token = get_access_token("api_romev1 nomenclatureRome")
-        url = f"{settings.API_ESD_BASE_URL}/rome/v1/metier"
+        url = f"{settings.API_ESD['BASE_URL']}/rome/v1/metier"
         r = httpx.get(url, headers={"Authorization": token})
         r.raise_for_status()
 

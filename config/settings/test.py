@@ -11,10 +11,6 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 # Prevent calls to external APIs but keep a valid scheme
 API_BAN_BASE_URL = None
 API_ENTREPRISE_BASE_URL = "http://example.com"
-API_ESD_KEY = None
-API_ESD_SECRET = None
-API_ENTREPRISE_RECIPIENT = 12345
-API_ENTREPRISE_TOKEN = 12345
 
 # Disable logging and traceback in unit tests for readability.
 # https://docs.python.org/3/library/logging.html#logging.disable
@@ -42,8 +38,11 @@ AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = "colette@ratatouille.com"
 
 # We enable the notifications in the test environment so that can ensure the correct API calls are performed,
 # but those calls are mocked so that no real data is sent to Pole Emploi
-API_ESD_SHOULD_PERFORM_MISE_A_JOUR_PASS = True
-
+API_ESD["MISE_A_JOUR_PASS_MODE"] = "production"  # noqa F405
+# We override those urls in test in order to ensure that, should everything go wrong, we do not send stuff to
+# PE’s production databases
+API_ESD["AUTH_BASE_URL"] = "https://some-authentication-domain.fr"  # noqa F405
+API_ESD["BASE_URL"] = "https://some-base-domain.fr/partenaire"  # noqa F405
 
 # Leave any uploaded files appear legit as soon as they are hosted on "server.com"
 # The developer then does not need to worry about any resume link using this domain,

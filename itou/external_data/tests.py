@@ -1,6 +1,7 @@
 import json
 
 import requests_mock
+from django.conf import settings
 from django.test import TestCase
 
 import itou.external_data.apis.pe_connect as pec
@@ -58,7 +59,7 @@ _RESP_COMPENSATION = {"beneficiairePrestationSolidarite": False, "beneficiaireAs
 
 
 def _url_for_key(k):
-    return f"{pec.API_ESD_BASE_URL}/{k}"
+    return f"{settings.API_ESD['BASE_URL']}/{k}"
 
 
 _API_KEYS = [

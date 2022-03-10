@@ -47,7 +47,6 @@ from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.apis.pole_emploi import (
-    POLE_EMPLOI_PASS_APPROVED,
     PoleEmploiIndividu,
     PoleEmploiIndividuResult,
     PoleEmploiMiseAJourPassIAEException,
@@ -1428,7 +1427,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(job_seeker=job_seeker)
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertFalse(pe_individual.is_valid())
-        notif_result = notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
+        notif_result = notify_pole_emploi_pass(job_application, job_application.job_seeker)
         self.assertFalse(notif_result)
         access_token_mock.assert_not_called()
         self.assertFalse(
@@ -1452,13 +1451,11 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         # our job seeker is valid
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertTrue(pe_individual.is_valid())
-        self.assertTrue(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertTrue(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
-        maj_mock.assert_called_with(job_application, ANY, self.encrypted_nir, self.token)
+        maj_mock.assert_called_with(job_application, self.encrypted_nir, self.token)
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
         self.assertEqual(notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_OK)
 
@@ -1478,9 +1475,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         # our job seeker is valid
         pe_individual = PoleEmploiIndividu.from_job_seeker(job_application.job_seeker)
         self.assertTrue(pe_individual.is_valid())
-        self.assertFalse(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertFalse(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_not_called()
         nir_mock.assert_not_called()
@@ -1499,9 +1494,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         Authentication failed: only the get_token call should be made, and an entry with the failure should be added
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertFalse(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertFalse(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_not_called()
@@ -1522,9 +1515,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
          - an entry should be created, showing the problem came from recherche individu
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertFalse(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertFalse(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
@@ -1548,13 +1539,11 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
          - an entry should be created, showing the problem came from mise_a_jour_pass_iae
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertFalse(
-            notify_pole_emploi_pass(job_application, job_application.job_seeker, POLE_EMPLOI_PASS_APPROVED)
-        )
+        self.assertFalse(notify_pole_emploi_pass(job_application, job_application.job_seeker))
 
         access_token_mock.assert_called_with(ANY)
         nir_mock.assert_called_with(ANY, self.token)
-        maj_mock.assert_called_with(job_application, ANY, self.encrypted_nir, self.token)
+        maj_mock.assert_called_with(job_application, self.encrypted_nir, self.token)
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
         self.assertEqual(
             notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
