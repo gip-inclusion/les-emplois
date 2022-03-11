@@ -209,8 +209,26 @@ class SiaeAdmin(ExportActionMixin, OrganizationAdmin):
 
 @admin.register(models.SiaeJobDescription)
 class SiaeJobDescription(admin.ModelAdmin):
-    list_display = ("appellation", "siae", "created_at", "updated_at", "is_active", "custom_name")
+    list_display = (
+        "display_name",
+        "siae",
+        "contract_type",
+        "created_at",
+        "updated_at",
+        "is_active",
+        "nb_open_positions",
+    )
     raw_id_fields = ("appellation", "siae")
+    search_fields = (
+        "pk",
+        "siae__siret",
+        "siae__name",
+        "custom_name",
+        "appellation__name",
+    )
+
+    def get_display_name(self, obj):
+        return obj.custom_name if obj.custom_name else obj.appellation
 
 
 @admin.register(models.SiaeConvention)
