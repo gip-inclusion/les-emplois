@@ -320,7 +320,9 @@ class Command(BaseCommand):
         Populate job applications table with various statistics.
         """
         queryset = (
-            JobApplication.objects.select_related("to_siae", "sender_siae", "sender_prescriber_organization")
+            JobApplication.objects.select_related(
+                "to_siae", "sender_siae", "sender_prescriber_organization", "approval", "approval__created_by"
+            )
             .prefetch_related("logs")
             .filter(created_from_pe_approval=False, to_siae__pk__in=self.active_siae_pks)
             .all()
@@ -376,7 +378,7 @@ class Command(BaseCommand):
         the SAFIR code.
         """
         queryset1 = Approval.objects.prefetch_related(
-            "user", "user__job_applications", "user__job_applications__to_siae"
+            "user", "user__job_applications", "user__job_applications__to_siae", "created_by"
         ).all()
         queryset2 = PoleEmploiApproval.objects.filter(
             start_at__gte=_approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
@@ -397,6 +399,8 @@ class Command(BaseCommand):
         queryset = (
             User.objects.filter(is_job_seeker=True)
             .prefetch_related(
+                "approvals",
+                "approvals__created_by",
                 "eligibility_diagnoses",
                 "eligibility_diagnoses__administrative_criteria",
                 "eligibility_diagnoses__author_prescriber_organization",
