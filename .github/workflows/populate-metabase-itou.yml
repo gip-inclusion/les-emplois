@@ -34,6 +34,15 @@ jobs:
   populate_metabase:
     runs-on: ubuntu-latest
 
+    # Default github action workflow timeout is 6 hours (360 minutes). If the script lasts longer than this for any reason,
+    # the github action will be killed but the clever instance will keep running forever as the last job supposed to
+    # delete it was never runned. This is why we set a very large timer here (24 hours == 1440 minutes) because
+    # clever instances are expensive but github actions are not. Cutting financial costs is the reponsibility of the
+    # last job, not of github.
+    # Unfortunately this does not work, the new timeout value is silently ignored and github keeps killing the job
+    # after the default 6 hours. This will need to be investigated further.
+    timeout-minutes: 1440
+
     steps:
     - name: 📥 Checkout to the latest version on $DEPLOY_BRANCH
       uses: actions/checkout@v2.3.4
@@ -87,8 +96,12 @@ jobs:
     - name: 🚀 Deploy app to Clever Cloud
       run: $CLEVER_CLI deploy --alias $CRON_TASK_APP_NAME --branch $DEPLOY_BRANCH --force
 
+    # This script was taking less than 3h (10800s) until https://github.com/betagouv/itou/pull/1154 introduced
+    # significant performance degradation due to several additional joins. The script now takes 5h instead of 3h
+    # even after some optimization. We set the timeout at 5h45 (20700s), just below 6h, because there is
+    # an unresolved issue with a different timeout system, see `timeout-minutes` above.
     - name: 🕒 Wait a reasonable amount of time for the script to complete
-      run: sleep 10800
+      run: sleep 20700
 
     - name: 🔪 Delete the app once the work is done
       run:
