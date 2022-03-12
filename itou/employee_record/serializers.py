@@ -3,7 +3,7 @@ import re
 from rest_framework import serializers
 from unidecode import unidecode
 
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.users.enums import Title
 from itou.users.models import User
 
@@ -306,9 +306,41 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
 
 class EmployeeRecordBatchSerializer(serializers.Serializer):
     """
-    This serializer is a wrapper for a list of employee records
+    This serializer is a wrapper for a list of employee records.
     """
 
     msgInformatif = serializers.CharField(source="message")
     telId = serializers.CharField(source="id", allow_blank=True)
-    lignesTelechargement = EmployeeRecordSerializer(many=True, source="employee_records")
+    lignesTelechargement = EmployeeRecordSerializer(many=True, source="elements")
+
+
+### Notifications
+
+
+class _ApprovalUpdatesSerializer(serializers.Serializer):
+    passIae = serializers.CharField(source="employee_record.approval_number")
+    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="start_at")
+    passDateFin = serializers.DateField(format="%d/%m/%Y", source="end_at")
+
+
+class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
+    numLigne = serializers.IntegerField(source="asp_batch_line_number")
+    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
+    siret = serializers.CharField(source="employee_record.siret")
+    mesure = serializers.CharField(source="employee_record.asp_siae_type")
+
+    personnePhysique = serializers.SerializerMethodField()
+
+    def get_personnePhysique(self, obj):
+        return _ApprovalUpdatesSerializer(obj).data
+
+    class Meta:
+        model = EmployeeRecordUpdateNotification
+
+
+class EmployeeRecordUpdateNotificationBatchSerializer(EmployeeRecordBatchSerializer):
+    """
+    This serializer is a wrapper for a list of employee records / approvals update notifications.
+    """
+
+    lignesTelechargement = EmployeeRecordUpdateNotificationSerializer(many=True, source="elements")
