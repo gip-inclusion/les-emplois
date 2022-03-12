@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.query import QuerySet
 from django.utils import timezone
 
+from itou.approvals.models import ApprovalPeriodUpdateEvent
 from itou.asp.models import EmployerType, PrescriberType, SiaeKind
 from itou.job_applications.models import JobApplication
 from itou.siaes.models import Siae, SiaeFinancialAnnex
@@ -570,28 +572,26 @@ class EmployeeRecordBatch:
     # Feedback file names end with this string
     FEEDBACK_FILE_SUFFIX = "_FichierRetour"
 
-    def __init__(self, employee_records):
-        if employee_records and len(employee_records) > self.MAX_EMPLOYEE_RECORDS:
-            raise ValidationError(
-                f"An upload batch can have no more than {self.MAX_EMPLOYEE_RECORDS} employee records"
-            )
+    def __init__(self, elements):
+        if elements and len(elements) > self.MAX_EMPLOYEE_RECORDS:
+            raise ValidationError(f"An upload batch can have no more than {self.MAX_EMPLOYEE_RECORDS} elements")
 
         # id and message fields must be null for upload
         # they may have a value after download
         self.id = None
         self.message = None
 
-        self.employee_records = employee_records
+        self.elements = elements
         self.upload_filename = self.REMOTE_PATH_FORMAT.format(timezone.now().strftime("%Y%m%d%H%M%S"))
 
         # add a line number to each FS for JSON serialization
-        for idx, er in enumerate(self.employee_records, start=1):
+        for idx, er in enumerate(self.elements, start=1):
             er.asp_batch_line_number = idx
             er.asp_processing_code = None
             er.asp_processing_label = None
 
     def __str__(self):
-        return f"FIL£NAME:{self.upload_filename} NB_RECORDS:{len(self.employee_records)}"
+        return f"FIL£NAME:{self.upload_filename} NB_RECORDS:{len(self.elements)}"
 
     @staticmethod
     def feedback_filename(filename):
@@ -618,3 +618,109 @@ class EmployeeRecordBatch:
 
         # .removesuffix is Python 3.9
         return separator.join([path.removesuffix(EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX), ext])
+
+
+class EmployeeRecordUpdateNotificationQuerySet(QuerySet):
+    def new(self):
+        return self.filter(status=EmployeeRecordUpdateNotification.Status.NEW)
+
+    def sent(self):
+        return self.filter(status=EmployeeRecordUpdateNotification.Status.SEND)
+
+    def processed(self):
+        return self.filter(status=EmployeeRecordUpdateNotification.Status.PROCESSED)
+
+    def rejected(self):
+        return self.filter(status=EmployeeRecordUpdateNotification.Status.REJECTED)
+
+
+class EmployeeRecordUpdateNotification(models.Model):
+    """
+    TODO: comments
+    """
+
+    ASP_MOVEMENT_TYPE = "M"
+
+    class Status(models.TextChoices):
+        NEW = "NEW", "Nouvelle"
+        SEND = "SENT", "Envoyée"
+        PROCESSED = "PROCESSED", "Traitée"
+        REJECTED = "REJECTED", "En erreur"
+
+    employee_record = models.ForeignKey(
+        EmployeeRecord,
+        related_name="approval_update_events",
+        verbose_name="Fiche salarié",
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(
+        verbose_name="Date de création",
+        default=timezone.now,
+    )
+    updated_at = models.DateTimeField(
+        verbose_name=("Date de modification"),
+        default=timezone.now,
+    )
+    status = models.CharField(
+        verbose_name="Statut",
+        max_length=10,
+        choices=Status.choices,
+        default=Status.NEW,
+    )
+
+    # Approval period update
+    start_at = models.DateField(verbose_name="Date de début du PASS IAE")
+    end_at = models.DateField(verbose_name="Date de fin du PASS IAE")
+
+    # ASP processing part
+    asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
+    asp_processing_label = models.CharField(max_length=200, verbose_name="Libellé de traitement ASP", null=True)
+
+    # Employee records are sent to ASP in a JSON file,
+    # We keep track of the name for processing feedback
+    # The format of the file name is EXACTLY: RIAE_FS_ AAAAMMJJHHMMSS (27 chars)
+    asp_batch_file = models.CharField(
+        max_length=27,
+        verbose_name="Fichier de batch ASP",
+        null=True,
+        validators=[validate_asp_batch_filename],
+    )
+
+    # Line number of the employee record in the batch file
+    # Unique pair with `asp_batch_file`
+    asp_batch_line_number = models.IntegerField(
+        verbose_name="Ligne correspondante dans le fichier batch ASP",
+        null=True,
+    )
+
+    objects = models.Manager.from_queryset(EmployeeRecordUpdateNotificationQuerySet)()
+
+    def clean(self):
+        pass
+
+    @classmethod
+    def from_approval_period_update_event(
+        cls,
+        event: ApprovalPeriodUpdateEvent,
+        employee_record: EmployeeRecord = None,
+    ):
+        # Check if updated PASS IAE has an employee record
+        employee_record = employee_record or (
+            EmployeeRecord.objects.processed()
+            .filter(job_application__approval__id=event.pk)
+            .select_related("job_application__approval")
+            .first()
+        )
+
+        if not employee_record:
+            return None
+
+        if employee_record.job_application.approval.pk != event.pk:
+            return None
+
+        return cls(
+            status=cls.Status.NEW,
+            employee_record=employee_record,
+            start_at=event.start_at,
+            end_at=event.end_at,
+        )
