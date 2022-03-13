@@ -1,5 +1,55 @@
 # Journal des modifications
 
+## [38] - 2022-03-11
+
+### Ajouté
+
+- Commande de fusion des agréments Pôle Emploi
+- Dans l’administration, il est désormais possible :
+  - De trouver une convention via son ID ASP
+  - D’exporter des SIAEs
+  - De visualiser le statut de la fiche salarié sur les PASS IAE (gestion du cas d’une fiche existante pour un même PASS IAE dans la même SIAE)
+- Affichage du nombre de fiches salarié à traiter sur le tableau de bord
+- Gestion des candidatures liées à des fiches de poste en doublon dans la migration de toutes les données d’une SIAE
+- Ajout du parcours d’inscription pour les facilitateurs, affichage et export (sous paramètre, donc désactivé en production)
+
+### Modifié
+
+- Import ASP :
+  - Redirection de la sortie dans un fichier pour conserver les informations d’exécution
+  - Ajout de la date de désactivation des conventions non actives
+  - Améliorations mineures (performance et gestion d’un cas particulier)
+- La date de fin de contrat est désormais optionnelle (dans le formulaire d’embauche et celui d’édition des dates de contrat) 
+- Mise à jour du thème ITOU vers la v3.0.1
+- Mise à jour Django vers la 4.0.3
+- Correction de quelques erreurs de formatage ou de structure du DOM (arborescence du code HTML)
+- Correction des erreurs d’accessibilité sur :
+  - Le contraste de couleurs, la présentation et consultation de l’information
+  - La structuration de documents et des titres
+  - Les formulaires  
+  - Les éléments obligatoires
+- Remplacement des icônes SVG du tableau de bord par les icônes `remixicon`
+- API Pôle Emploi :
+  - Ajout de logs et de vérifications concernant les erreurs de déchiffrement
+  - Ajout de logs d’infos d’environnement dans l’API Pôle Emploi
+  - Correctif pour les appels à l’API
+  - Correction de l’erreur de déchiffrement lors des appels à l’API
+  - Log des jetons lors des appels à l’API
+- Correction des tests sur les dates de fin de contrats optionnelles
+- Correction des erreurs occasionnelles sur la recherche d’agréments
+- Evolutions Metabase :
+  - Les fiches de poste des SIAE inactives ne sont plus envoyées.
+  - Les candidatures avec une SIAE destinatrice inactive ne sont plus envoyées
+  - Les liaisons fiche de poste / candidature portant sur une candidature avec une SIAE destinatrice inactive ne sont plus envoyées
+  - Note : les SIAE inactives n’étaient déjà pas envoyées
+- Séparation des routes d’authentification en fonction du type de l’utilisateur
+- Le titre "Candidature spontanée" a été remplacé par "Déclarer une embauche" sur les pages concernées
+- Le lien "Préférences" devient "Mes notifications"
+
+### Supprimé
+
+- Les liens vers "Prolonger/suspendre un agrément Pôle Emploi" et "Candidature spontanée" sont retirés du tableau de bord pour les EA/EATT/GEIQ/Facilitateurs
+
 ## [37] - 2022-02-25
 
 ### Ajouté
