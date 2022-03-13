@@ -543,6 +543,8 @@ class ContractType(models.TextChoices):
     PERMANENT_I = "PERMANENT_I", "CDI-I"
     FIXED_TERM = "FIXED_TERM", "CDD"
     FIXED_TERM_I = "FIXED_TERM_I", "CDD-I"
+    FIXED_TERM_I_PHC = "FIXED_TERM_I_PHC", "CDD-I Premières heures en Chantier"
+    FIXED_TERM_I_CVG = "FIXED_TERM_I_CVG", "CDD-I Convergence"
     FIXED_TERM_TREMPLIN = "FIXED_TERM_TREMPLIN", "CDD Tremplin"
     APPRENTICESHIP = "APPRENTICESHIP", "Contrat d'apprentissage"
     PROFESSIONAL_TRAINING = "PROFESSIONAL_TRAINING", "Contrat de professionalisation"
