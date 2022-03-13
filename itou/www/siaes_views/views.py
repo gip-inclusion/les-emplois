@@ -189,6 +189,10 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
     session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
     job_description = _get_job_description(session_data)
 
+    rome = get_object_or_404(
+        Appellation.objects.select_related("rome"), code=session_data.get("job_appellation_code")
+    ).rome.code
+
     form = EditJobDescriptionDetailsForm(
         siae, instance=job_description, data=request.POST or None, initial=session_data
     )
@@ -214,6 +218,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
 
     context = {
         "form": form,
+        "rome": rome,
         "breadcrumbs": breadcrumbs,
     }
 

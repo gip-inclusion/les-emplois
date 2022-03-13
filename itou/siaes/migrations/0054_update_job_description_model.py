@@ -23,6 +23,8 @@ class Migration(migrations.Migration):
                     ("PERMANENT_I", "CDI-I"),
                     ("FIXED_TERM", "CDD"),
                     ("FIXED_TERM_I", "CDD-I"),
+                    ("FIXED_TERM_I_PHC", "CDD-I Premières heures en Chantier"),
+                    ("FIXED_TERM_I_CVG", "CDD-I Convergence"),
                     ("FIXED_TERM_TREMPLIN", "CDD Tremplin"),
                     ("APPRENTICESHIP", "Contrat d'apprentissage"),
                     ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
