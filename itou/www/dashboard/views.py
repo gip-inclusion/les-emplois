@@ -71,7 +71,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
         num_rejected_employee_records = EmployeeRecord.objects.filter(
             status=EmployeeRecord.Status.REJECTED,
-            job_application__to_siae__in=request.user.siae_set.all(),
+            job_application__to_siae=current_org,
         ).count()
 
     if request.user.is_prescriber:

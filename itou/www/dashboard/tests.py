@@ -1,4 +1,5 @@
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
+from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -74,7 +75,12 @@ class DashboardViewTest(TestCase):
 
     def test_dashboard_displays_asp_badge(self):
         siae = SiaeWithMembershipFactory(kind=Siae.KIND_EI)
+        other_siae = SiaeWithMembershipFactory(kind=Siae.KIND_ETTI)
+        last_siae = SiaeWithMembershipFactory(kind=Siae.KIND_ETTI)
+
         user = siae.members.first()
+        user.siae_set.add(other_siae)
+        user.siae_set.add(last_siae)
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -89,10 +95,34 @@ class DashboardViewTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(to_siae=siae)
         EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.REJECTED)
         EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.REJECTED)
+
+        other_job_application = JobApplicationWithApprovalFactory(to_siae=other_siae)
+        EmployeeRecordFactory(job_application=other_job_application, status=EmployeeRecord.Status.REJECTED)
+
+        session = self.client.session
+
+        # select the first SIAE's in the session
+        session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+        session.save()
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "badge-danger")
         self.assertEqual(response.context["num_rejected_employee_records"], 2)
+
+        # select the second SIAE's in the session
+        session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = other_siae.pk
+        session.save()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "badge-danger")
+        self.assertEqual(response.context["num_rejected_employee_records"], 1)
+
+        # select the third SIAE's in the session
+        session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = last_siae.pk
+        session.save()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["num_rejected_employee_records"], 0)
 
     def test_dashboard_agreements_and_job_postings(self):
         for kind in [Siae.KIND_AI, Siae.KIND_EI, Siae.KIND_EITI, Siae.KIND_ACI, Siae.KIND_EITI, Siae.KIND_ACIPHC]:
