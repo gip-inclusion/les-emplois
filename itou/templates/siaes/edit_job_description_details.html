@@ -5,7 +5,7 @@
 {% block title %}Modifier les détails de la fiche de poste{{ block.super }}{% endblock %}
 
 {% block breadcrumbs %}
-    {% include "siaes/includes/_job_description_breadcrumbs.html" %}
+    {% include "layout/breadcrumbs_from_dashboard.html" %}
 {% endblock %}
 
 {% block content %}
@@ -18,12 +18,12 @@
 
     <div class="d-block rounded-lg shadow-lg p-3 p-lg-5">
         <div class="text-center mb-3">
-            <img src="{% static 'img/edit_job_description_header.svg' %}" alt="En-tête édition fiche de poste" style="width: 100px;">
+            <img src="{% static 'img/edit_job_description_header.svg' %}" alt="">
         </div>
         <form method="post" action="" class="js-prevent-multiple-submit">
             {% bootstrap_form_errors form type="all" %}
             {% csrf_token %}
-            <h1 class="text-center mb-5">Description<br> de ma fiche de poste</h1>
+            <h1 class="text-center mb-5">Description de ma fiche de poste</h1>
             <hr>
             {% bootstrap_field form.description %}
             <div class="alert alert-emploi">
@@ -46,14 +46,26 @@
                         <i class="ri-information-line ri-xl text-emplois"></i>
                     </div>
                     <div class="col">
-                        <p><b>Exemple</b></p>
-                        <p>
-                            "Poste ouvert aux candidats ne maîtrisant pas la langue francaise."
-                        </p>
+                        {% if siae.is_opcs %}
+                            <p><b>Conseil</b></p>
+                            <p>
+                                Ajoutez la liste des publics éligibles à ce marché spécifique afin d’augmenter vos chances de recevoir des candidatures qualifiées.
+                            </p>
+                        {% else %}
+                            <p><b>Exemple</b></p>
+                            <p>
+                                « Poste ouvert aux candidats ne maîtrisant pas la langue française. »
+                            </p>
+
+                        {% endif %}
                     </div>
                 </div>
             </div>
+
             {% bootstrap_field form.is_resume_mandatory %}
+            {% if form.is_qpv_mandatory %}
+                {% bootstrap_field form.is_qpv_mandatory %}
+            {% endif %}
 
             {% buttons %}
                 <div align="right" class="pt-3">
@@ -67,7 +79,6 @@
 
 {% block script %}
     {{ block.super }}
-    <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
     <script src="{% static "js/job_autocomplete.js" %}"></script>
 {% endblock %}

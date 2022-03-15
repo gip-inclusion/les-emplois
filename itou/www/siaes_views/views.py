@@ -17,17 +17,11 @@ from itou.users.models import User
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views.forms import (
-    BlockJobApplicationsForm,
-    CreateSiaeForm,
-    EditJobDescriptionDetailsForm,
-    EditJobDescriptionForm,
-    EditSiaeDescriptionForm,
-    EditSiaeForm,
-    FinancialAnnexSelectForm,
-)
+from itou.www.siaes_views import forms as siaes_forms
 
 
+# This is a "magic" value for the number of items for paginator objects.
+# Set to 10 because we're humans, but can / must be discussed and pulled-up to settings if an agreement is reached.
 NB_ITEMS_PER_PAGE = 10
 
 
@@ -67,9 +61,9 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
     siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
     job_descriptions = (
-        SiaeJobDescription.objects.for_siae(siae)
+        SiaeJobDescription.objects.filter(siae__pk=siae.pk)
         .prefetch_related("appellation", "appellation__rome", "siae")
-        .order_by("-updated_at", "-created_at")
+        .order_by_most_recent()
     )
     context = {
         "siae": siae,
@@ -83,9 +77,9 @@ def card_search_preview(request, template_name="siaes/includes/_card_siae.html")
 def job_description_list(request, template_name="siaes/job_description_list.html"):
     siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
     job_descriptions = (
-        SiaeJobDescription.objects.for_siae(siae)
+        SiaeJobDescription.objects.filter(siae__pk=siae.pk)
         .prefetch_related("appellation", "appellation__rome", "siae")
-        .order_by("-updated_at", "-created_at")
+        .order_by_most_recent()
     )
     page = int(request.GET.get("page") or request.session.get(settings.ITOU_SESSION_CURRENT_PAGE_KEY) or 1)
     request.session[settings.ITOU_SESSION_CURRENT_PAGE_KEY] = page
@@ -94,7 +88,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
     if request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY):
         del request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY]
 
-    form = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
+    form = siaes_forms.BlockJobApplicationsForm(instance=siae, data=request.POST or None)
 
     if request.method == "POST":
         action = request.GET.get("action")
@@ -109,7 +103,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
             job_description = SiaeJobDescription.objects.get(pk=job_description_id)
             job_description.is_active = is_active
             job_description.save(update_fields=["is_active"])
-            messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}")
+            messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}.")
         elif form.is_valid():
             siae = form.save()
             messages.success(
@@ -155,7 +149,11 @@ def edit_job_description(request, template_name="siaes/edit_job_description.html
     session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
     job_description = _get_job_description(session_data)
 
-    form = EditJobDescriptionForm(siae, instance=job_description, data=request.POST or None, initial=session_data)
+    form = siaes_forms.EditJobDescriptionForm(
+        siae, instance=job_description, data=request.POST or None, initial=session_data
+    )
+
+    print(form.errors)
 
     if request.method == "POST" and form.is_valid():
         request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
@@ -193,13 +191,15 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
         Appellation.objects.select_related("rome"), code=session_data.get("job_appellation_code")
     ).rome.code
 
-    form = EditJobDescriptionDetailsForm(
+    form = siaes_forms.EditJobDescriptionDetailsForm(
         siae, instance=job_description, data=request.POST or None, initial=session_data
     )
 
     if request.method == "POST" and form.is_valid():
         # Checkboxes don't emit a value when `False`
         session_data["is_resume_mandatory"] = request.POST.get("is_resume_mandatory", False)
+        session_data["is_qpv_mandatory"] = request.POST.get("is_qpv_mandatory", False)
+
         request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
         return HttpResponseRedirect(reverse("siaes_views:edit_job_description_preview"))
 
@@ -245,8 +245,6 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
         try:
             job_description.save()
             messages.success(request, "Enregistrement de la fiche de poste effectué.")
-        except Exception as ex:
-            messages.error(request, f"Une erreur est survenue lors de l'enregistrement de la fiche de poste. ({ ex })")
         finally:
             request.session.pop(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
             return HttpResponseRedirect(reverse("siaes_views:job_description_list"))
@@ -350,7 +348,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
     # The form expects a queryset and not a list.
     financial_annexes = financial_annexes.filter(pk__in=[af.pk for af in prefix_to_af.values()])
 
-    select_form = FinancialAnnexSelectForm(data=request.POST or None, financial_annexes=financial_annexes)
+    select_form = siaes_forms.FinancialAnnexSelectForm(data=request.POST or None, financial_annexes=financial_annexes)
 
     if request.method == "POST" and select_form.is_valid():
         financial_annex = select_form.cleaned_data["financial_annexes"]
@@ -387,7 +385,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     if not request.user.can_create_siae_antenna(parent_siae=current_siae):
         raise PermissionDenied
 
-    form = CreateSiaeForm(
+    form = siaes_forms.CreateSiaeForm(
         current_siae=current_siae,
         current_user=request.user,
         data=request.POST or None,
@@ -416,7 +414,7 @@ def edit_siae_step_contact_infos(request, template_name="siaes/edit_siae.html"):
     # This ensures the filed will be filled with a correct value as default.
     siae.brand = siae.display_name
 
-    form = EditSiaeForm(
+    form = siaes_forms.EditSiaeForm(
         instance=siae, data=request.POST or None, initial=request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
     )
     if request.method == "POST" and form.is_valid():
@@ -437,7 +435,7 @@ def edit_siae_step_description(request, template_name="siaes/edit_siae_descripti
     if not siae.has_admin(request.user):
         raise PermissionDenied
 
-    form = EditSiaeDescriptionForm(
+    form = siaes_forms.EditSiaeDescriptionForm(
         instance=siae, data=request.POST or None, initial=request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
     )
 

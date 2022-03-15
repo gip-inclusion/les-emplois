@@ -2,8 +2,9 @@ from django.test import TestCase
 
 from itou.cities.factories import create_city_guerande
 from itou.jobs.factories import create_test_romes_and_appellations
+from itou.siaes.enums import ContractType
 from itou.siaes.factories import SiaeFactory
-from itou.siaes.models import ContractType
+from itou.siaes.models import Siae
 from itou.www.siaes_views.forms import EditJobDescriptionDetailsForm, EditJobDescriptionForm
 
 
@@ -38,9 +39,9 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         siae = SiaeFactory()
         post_data = {
             "job_appellation_code": "10357",
-            "job_appellation": "Whatever",
+            "job_appellation": "Whatever appellation",
             "contract_type": ContractType.OTHER.value,
-            "other_contract_type": "Whatever",
+            "other_contract_type": "Whatever contract type",
             "open_positions": None,
         }
 
@@ -55,7 +56,50 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
         self.assertTrue(form.is_valid())
 
-    def test_non_required_fields(self):
+    def test_siae_errors(self):
+        siae = SiaeFactory()
+        post_data = {}
+
+        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        self.assertIsNotNone(form.errors)
+        self.assertIn("job_appellation_code", form.errors.keys())
+        self.assertIn("job_appellation", form.errors.keys())
+
+        post_data.update(
+            {
+                "job_appellation_code": "10357",
+                "job_appellation": "Whatever",
+            }
+        )
+
+        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        self.assertIsNotNone(form.errors)
+        self.assertIn("contract_type", form.errors.keys())
+
+        post_data.update(
+            {
+                "job_appellation_code": "10357",
+                "job_appellation": "Whatever",
+                "contract_type": ContractType.OTHER.value,
+                "other_contract_type": "Whatever contract type",
+                "open_positions": None,
+            }
+        )
+
+        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        self.assertIsNotNone(form.errors)
+        self.assertIn("open_positions", form.errors.keys())
+
+        post_data.update(
+            {
+                "open_positions": 3,
+            }
+        )
+
+        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        self.assertTrue(form.is_valid())
+
+    def test_siae_fields(self):
         siae = SiaeFactory()
         post_data = {
             "job_appellation_code": "10357",
@@ -72,6 +116,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         }
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+
         self.assertTrue(form.is_valid())
 
         cleaned_data = form.cleaned_data
@@ -81,18 +126,115 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         self.assertEqual(35, cleaned_data.get("hours_per_week"))
         self.assertEqual(5, cleaned_data.get("open_positions"))
 
-
-class EditJobDescriptionDetailsFormTest(TestCase):
-    def test_non_required_fields(self):
-        siae = SiaeFactory()
-
-        post_data = {
-            "description": "description",
-            "profile_description": "profile_description",
-        }
         form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
 
         self.assertTrue(form.is_valid())
+
+        cleaned_data = form.cleaned_data
+
+        self.assertEqual("description", cleaned_data.get("description"))
+        self.assertEqual("profile_description", cleaned_data.get("profile_description"))
+
+        # Checkboxes status
+        self.assertTrue(cleaned_data.get("is_resume_mandatory"))
+
+        del post_data["is_resume_mandatory"]
+
+        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+
+        self.assertTrue(form.is_valid())
+
+        cleaned_data = form.cleaned_data
+        self.assertFalse(cleaned_data.get("is_resume_mandatory"))
+
+    def test_opcs_errors(self):
+        opcs = SiaeFactory(kind=Siae.KIND_OPCS)
+        post_data = {
+            "job_appellation_code": "10357",
+            "job_appellation": "Whatever",
+            "custom_name": "custom_name",
+            "location_code": "guerande-44",
+            "hours_per_week": 35,
+            "contract_type": ContractType.OTHER.value,
+            "other_contract_type": "other_contract_type",
+            "open_positions": 5,
+            "description": "description",
+            "profile_description": "profile_description",
+            "is_resume_mandatory": "on",
+            "is_qpv_mandatory": "on",
+        }
+
+        form = EditJobDescriptionForm(current_siae=opcs, data=post_data)
+        self.assertIsNotNone(form.errors)
+        self.assertIn("market_context_description", form.errors.keys())
+
+        post_data.update(
+            {
+                "market_context_description": "market_context_description",
+            }
+        )
+
+        form = EditJobDescriptionForm(current_siae=opcs, data=post_data)
+        self.assertTrue(form.is_valid())
+
+    def test_opcs_fields(self):
+        siae = SiaeFactory(kind=Siae.KIND_OPCS)
+        post_data = {
+            "job_appellation_code": "10357",
+            "job_appellation": "Whatever",
+            "custom_name": "custom_name",
+            "location_code": "guerande-44",
+            "market_context_description": "market_context_description",
+            "hours_per_week": 35,
+            "contract_type": ContractType.OTHER.value,
+            "other_contract_type": "other_contract_type",
+            "open_positions": 5,
+            "description": "description",
+            "profile_description": "profile_description",
+            "is_resume_mandatory": "on",
+            "is_qpv_mandatory": "on",
+        }
+
+        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+
+        self.assertTrue(form.is_valid())
+
+        cleaned_data = form.cleaned_data
+
+        self.assertEqual("custom_name", cleaned_data.get("custom_name"))
+        self.assertEqual("guerande-44", cleaned_data.get("location_code"))
+        self.assertEqual(35, cleaned_data.get("hours_per_week"))
+        self.assertEqual(5, cleaned_data.get("open_positions"))
+        self.assertEqual("market_context_description", cleaned_data.get("market_context_description"))
+
+        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+
+        self.assertTrue(form.is_valid())
+
+        cleaned_data = form.cleaned_data
+
+        self.assertEqual("description", cleaned_data.get("description"))
+        self.assertEqual("profile_description", cleaned_data.get("profile_description"))
+
+        # Checkboxes status
+        self.assertTrue(cleaned_data.get("is_resume_mandatory"))
+        self.assertTrue(cleaned_data.get("is_qpv_mandatory"))
+
+        del post_data["is_resume_mandatory"]
+        del post_data["is_qpv_mandatory"]
+
+        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+
+        self.assertTrue(form.is_valid())
+
+        cleaned_data = form.cleaned_data
+        self.assertFalse(cleaned_data.get("is_resume_mandatory"))
+        self.assertFalse(cleaned_data.get("is_qpv_mandatory"))
+
+
+class EditJobDescriptionDetailsFormTest(TestCase):
+    def test_siae_fields(self):
+        siae = SiaeFactory()
 
         post_data = {
             "description": "description",
@@ -108,4 +250,49 @@ class EditJobDescriptionDetailsFormTest(TestCase):
 
         self.assertEqual("description", cleaned_data.get("description"))
         self.assertEqual("profile_description", cleaned_data.get("profile_description"))
-        self.assertEqual(True, cleaned_data.get("is_resume_mandatory"))
+
+        # Checkboxes status
+        self.assertTrue(cleaned_data.get("is_resume_mandatory"))
+
+        del post_data["is_resume_mandatory"]
+
+        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+
+        self.assertTrue(form.is_valid())
+
+        cleaned_data = form.cleaned_data
+        self.assertFalse(cleaned_data.get("is_resume_mandatory"))
+
+    def test_opcs_fields(self):
+        siae = SiaeFactory(kind=Siae.KIND_OPCS)
+
+        post_data = {
+            "description": "description",
+            "profile_description": "profile_description",
+            "is_resume_mandatory": "on",
+            "is_qpv_mandatory": "on",
+        }
+
+        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+
+        self.assertTrue(form.is_valid())
+
+        cleaned_data = form.cleaned_data
+
+        self.assertEqual("description", cleaned_data.get("description"))
+        self.assertEqual("profile_description", cleaned_data.get("profile_description"))
+
+        # Checkboxes status
+        self.assertTrue(cleaned_data.get("is_resume_mandatory"))
+        self.assertTrue(cleaned_data.get("is_qpv_mandatory"))
+
+        del post_data["is_resume_mandatory"]
+        del post_data["is_qpv_mandatory"]
+
+        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+
+        self.assertTrue(form.is_valid())
+
+        cleaned_data = form.cleaned_data
+        self.assertFalse(cleaned_data.get("is_resume_mandatory"))
+        self.assertFalse(cleaned_data.get("is_qpv_mandatory"))
