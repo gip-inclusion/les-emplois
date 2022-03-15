@@ -948,7 +948,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
 
     def notify_pole_emploi_accepted(self) -> bool:
-        if settings.API_ESD["MISE_A_JOUR_PASS_MODE"] == "production":
+        if settings.API_ESD["BASE_URL"]:
             return huey_notify_pole_employ(self)
         return False
 

@@ -38,9 +38,6 @@ FRANCE_CONNECT_CLIENT_SECRET = "FC_CLIENT_SECRET_123"
 # Approvals
 AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = "colette@ratatouille.com"
 
-# We enable the notifications in the test environment so that can ensure the correct API calls are performed,
-# but those calls are mocked so that no real data is sent to Pole Emploi
-API_ESD["MISE_A_JOUR_PASS_MODE"] = "production"  # noqa F405
 # We override those urls in test in order to ensure that, should everything go wrong, we do not send stuff to
 # PE’s production databases
 # API_ESD["AUTH_BASE_URL"] = "https://some-authentication-domain.fr"  # noqa F405
