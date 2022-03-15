@@ -375,17 +375,7 @@ API_ESD = {
     "KEY": os.environ.get("API_ESD_KEY"),
     "SECRET": os.environ.get("API_ESD_SECRET"),
     "BASE_URL": os.environ.get("API_ESD_BASE_URL"),
-    "MISE_A_JOUR_PASS_MODE": "production",
 }
-
-# Pole emploi mise à jour API can be run in sandboxed mode (updates are not saved to the database,
-# but the API confirms everything was alright), or in production mode (updates ARE saved)
-# the values can be: sandbox|production
-#
-# In order to ensure we do no send dummy data to PE (from the review apps, demo, automated tests… anything)
-# We force the value to sandbox so that, in the worst case, if the API is enabled on a service that it should not,
-# it does not pollute PE’s services
-# API_ESD_MISE_A_JOUR_PASS_MODE = os.environ.get("API_ESD_MISE_A_JOUR_PASS_MODE", "sandbox")
 
 
 # PE Connect aka PEAMU - technically one of ESD's APIs.
