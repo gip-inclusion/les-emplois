@@ -304,6 +304,10 @@ class User(AbstractUser, AddressMixin):
         return bool(self.created_by_id and self.created_by_id == user.pk)
 
     @property
+    def has_sso_provider(self):
+        return self.identity_provider == IdentityProvider.FRANCE_CONNECT or self.is_peamu
+
+    @property
     def has_verified_email(self):
         return self.emailaddress_set.filter(email=self.email, verified=True).exists()
 
