@@ -250,10 +250,9 @@ class User(AbstractUser, AddressMixin):
     resume_link = models.URLField(max_length=500, verbose_name="Lien vers un CV", blank=True)
 
     identity_provider = models.CharField(
-        max_length=2,
+        max_length=20,
         verbose_name="Fournisseur d'identité (SSO)",
-        blank=True,
-        default="",
+        default=IdentityProvider.DJANGO,
         choices=IdentityProvider.choices,
     )
 
