@@ -13,13 +13,13 @@ from itou.prescribers.factories import (
 )
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import SiaeJobDescription
+from itou.users.enums import Title
 from itou.users.factories import (
     JobSeekerFactory,
     JobSeekerProfileFactory,
     JobSeekerWithMockedAddressFactory,
     PrescriberFactory,
 )
-from itou.users.models import User
 
 
 class JobApplicationFactory(factory.django.DjangoModelFactory):
@@ -158,6 +158,6 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
         if not create:
             # Simple build, do nothing.
             return
-        self.job_seeker.title = User.Title.M
+        self.job_seeker.title = Title.M
 
         JobSeekerProfileFactory(user=self.job_seeker).save()

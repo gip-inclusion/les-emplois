@@ -21,6 +21,7 @@ from itou.prescribers.factories import (
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
+from itou.users.enums import Title
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
@@ -519,7 +520,7 @@ class JobSeekerProfileModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self.profile.clean_model()
 
-        self.profile.user.title = User.Title.M
+        self.profile.user.title = Title.M
 
         # Won't raise exception
         self.profile.clean_model()
@@ -532,7 +533,7 @@ class JobSeekerProfileModelTest(TestCase):
         """
         Check creation of an HEXA address from job seeker address
         """
-        self.profile.user.title = User.Title.M
+        self.profile.user.title = Title.M
         self.profile.update_hexa_address()
         self.profile.clean_model()
 
@@ -589,7 +590,7 @@ class JobSeekerProfileModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self.profile._clean_job_seeker_details()
 
-        self.profile.user.title = User.Title.M
+        self.profile.user.title = Title.M
 
         # No education level provided
         self.profile.education_level = None
@@ -607,7 +608,7 @@ class JobSeekerProfileModelTest(TestCase):
         and a fix about unchecked / badly checkedfield on ASP process side (`salarieEnEmploi`)
         """
         # Needed for model validation
-        self.profile.user.title = User.Title.M
+        self.profile.user.title = Title.M
         self.profile.education_level = "00"
 
         self.profile.unemployed_since = AllocationDuration.MORE_THAN_24_MONTHS

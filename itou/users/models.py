@@ -33,6 +33,8 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
+from .enums import IdentityProvider, Title
+
 
 class ItouUserManager(UserManager):
     def get_duplicated_pole_emploi_ids(self):
@@ -162,13 +164,6 @@ class User(AbstractUser, AddressMixin):
     ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY = (
         "Il n'est pas possible de saisir une commune de naissance hors de France"
     )
-
-    class Title(models.TextChoices):
-        M = "M", "Monsieur"
-        MME = "MME", "Madame"
-
-    class IdentityProvider(models.TextChoices):
-        FRANCE_CONNECT = "FC", "FranceConnect"
 
     title = models.CharField(
         max_length=3,
