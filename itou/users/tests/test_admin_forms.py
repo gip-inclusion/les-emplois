@@ -2,6 +2,7 @@ from django.forms.models import model_to_dict
 from django.test import TestCase
 
 from itou.users.admin_forms import UserAdminForm
+from itou.users.enums import IdentityProvider
 from itou.users.factories import JobSeekerFactory
 
 
@@ -27,6 +28,7 @@ class UserAdminFormTest(TestCase):
             "email": "john@wayne.com",
             "is_job_seeker": True,
             "date_joined": "2022-02-02",
+            "identity_provider": IdentityProvider.DJANGO,
         }
 
         # new user - email doesn't exist
