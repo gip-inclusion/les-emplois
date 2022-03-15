@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+from itou.users.enums import IdentityProvider
 from itou.users.models import User
 
 
@@ -35,7 +36,7 @@ class FranceConnectUserData:  # pylint: disable=too-many-instance-attributes
     post_code: str
     city: str
     country: Optional[str] = None
-    identity_provider: str = User.IdentityProvider.FRANCE_CONNECT
+    identity_provider: str = IdentityProvider.FRANCE_CONNECT
 
 
 def load_user_data(user_data: dict) -> dict:

@@ -4,6 +4,7 @@ from rest_framework import serializers
 from unidecode import unidecode
 
 from itou.employee_record.models import EmployeeRecord
+from itou.users.enums import Title
 from itou.users.models import User
 
 
@@ -12,7 +13,7 @@ class _EmployeeSerializer(serializers.ModelSerializer):
     idItou = serializers.CharField(source="jobseeker_hash_id")
     sufPassIae = serializers.CharField(required=False)
 
-    civilite = serializers.ChoiceField(choices=User.Title.choices, source="title")
+    civilite = serializers.ChoiceField(choices=Title.choices, source="title")
     nomUsage = serializers.SerializerMethodField()
     prenom = serializers.SerializerMethodField()
 

@@ -9,6 +9,7 @@ from itou.asp.mocks.providers import INSEECommuneProvider, INSEECountryProvider
 from itou.asp.models import AllocationDuration, EducationLevel
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.users import models
+from itou.users.enums import Title
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK
 from itou.utils.validators import validate_nir
 
@@ -64,7 +65,7 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 
 class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
     birth_country = factory.Faker("asp_country")
-    title = random.choice(models.User.Title.values)
+    title = random.choice(Title.values)
 
     @factory.post_generation
     def set_approval_user(self, create, extracted, **kwargs):
