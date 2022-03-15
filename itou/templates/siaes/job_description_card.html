@@ -6,7 +6,7 @@
 {% block nb_columns %}8{% endblock %}
 
 {% block breadcrumbs %}
-    {% include "siaes/includes/_job_description_breadcrumbs.html" %}
+    {% include "layout/breadcrumbs_from_dashboard.html" %}
 {% endblock %}
 
 {% block content %}
@@ -14,13 +14,15 @@
         {% include "siaes/includes/_job_description_details.html" %}
         <hr>
         <div class="text-right">
-            <a href="{% url "siaes_views:job_description_list" %}"
+            <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}"
                 class="btn btn-sm btn-outline-primary"
-                title="Retour vers la liste des postes">
-                Retour vers la liste des postes
+                arial-label="Modifier la fiche de poste">
+                Modifier
             </a>
-            <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-primary" arial-label="Modifier la fiche de poste">
-                Modifier la fiche de poste
+            <a href="{% url "siaes_views:job_description_list" %}"
+                class="btn btn-sm btn-primary"
+                title="Retour vers la liste des postes">
+                Fermer
             </a>
         </div>
     </div>

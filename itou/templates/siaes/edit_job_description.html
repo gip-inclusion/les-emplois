@@ -5,7 +5,7 @@
 {% block title %}Enregistrer une fiche de poste{{ block.super }}{% endblock %}
 
 {% block breadcrumbs %}
-    {% include "siaes/includes/_job_description_breadcrumbs.html" %}
+    {% include "layout/breadcrumbs_from_dashboard.html" %}
 {% endblock %}
 
 {% block content %}
@@ -18,29 +18,24 @@
 
     <div class="d-block rounded-lg shadow-lg p-3 p-lg-5">
         <div class="text-center mb-3">
-            <img src="{% static 'img/edit_job_description_header.svg' %}" alt="En-tête édition fiche de poste" style="width: 100px;">
+            <img src="{% static 'img/edit_job_description_header.svg' %}" alt="">
         </div>
+        <h1 class="text-center mb-5">Informations générales de ma fiche de poste</h1>
+        <hr>
+
         <form method="post" action="?step={{ step }}" class="js-prevent-multiple-submit">
-            {% bootstrap_form_errors form type="all" %}
+            {% bootstrap_form_errors form alert_error_type="all" %}
+
+            {# Bug or feature, django_bootstrap4 does not render errors raised from hidden fields validation #}
+            {% if form.errors.job_appellation_code %}
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <button class="close" type="button" data-dismiss="alert" aria-label="Fermer">&#215;</button>
+                    {{ form.errors.job_appellation_code }}
+                </div>
+            {% endif %}
+
             {% csrf_token %}
-
-            <h1 class="text-center mb-5">Informations générales<br> de ma fiche de poste</h1>
-            <hr>
-
-            {# autocomplete fields #}
-            {% bootstrap_field form.job_appellation %}
-            {% bootstrap_field form.job_appellation_code %}
-
-            {% bootstrap_field form.custom_name %}
-
-            {# autocomplete fields #}
-            {% bootstrap_field form.location_label %}
-            {% bootstrap_field form.location_code %}
-
-            {% bootstrap_field form.hours_per_week %}
-            {% bootstrap_field form.contract_type %}
-            {% bootstrap_field form.other_contract_type %}
-            {% bootstrap_field form.open_positions %}
+            {% bootstrap_form form %}
 
             {% buttons %}
                 <div align="right" class="pt-3">
@@ -56,10 +51,9 @@
     <script src="{% static "js/job_autocomplete.js" %}"></script>
     <script>
         $("#id_contract_type").change(function() {
-            var disabled = $("#id_contract_type").val() != "OTHER"
-            console.log(disabled)
-            $("#id_other_contract_type").attr("disabled", disabled)
-            if (disabled) {
+            var isDisabled = $("#id_contract_type").val() !== "OTHER"
+            $("#id_other_contract_type").attr("disabled", isDisabled)
+            if (isDisabled) {
                 $("#id_other_contract_type").val("")
             }
         })

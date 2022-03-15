@@ -7,25 +7,28 @@ from django.urls import reverse
 from itou.cities.models import City
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
+from itou.siaes.enums import ContractType
 from itou.siaes.factories import SiaeWithMembershipFactory
-from itou.siaes.models import ContractType, SiaeJobDescription
+from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.factories import DEFAULT_PASSWORD
 
 
 class JobDescriptionAbstractTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        # Set up data for the whole TestCase.
+    def setUp(self):
         city_slug = "paris-75"
-        paris_city = City.objects.create(
+        self.paris_city = City.objects.create(
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
         )
 
-        siae = SiaeWithMembershipFactory(department="75", coords=paris_city.coords, post_code="75001")
+        siae = SiaeWithMembershipFactory(
+            department="75",
+            coords=self.paris_city.coords,
+            post_code="75001",
+        )
         user = siae.members.first()
 
         create_test_romes_and_appellations(["N1101", "N1105", "N1103", "N4105", "K2401"])
-        appellations = Appellation.objects.filter(
+        self.appellations = Appellation.objects.filter(
             name__in=[
                 "Agent / Agente cariste de livraison ferroviaire",
                 "Agent / Agente de quai manutentionnaire",
@@ -33,32 +36,34 @@ class JobDescriptionAbstractTest(TestCase):
                 "Chauffeur-livreur / Chauffeuse-livreuse",
             ]
         )
-        siae.jobs.add(*appellations)
-        siae.save()
-        cls.siae = siae
-        cls.user = user
+        siae.jobs.add(*self.appellations)
 
-        cls.list_url = reverse("siaes_views:job_description_list")
-        cls.edit_url = reverse("siaes_views:edit_job_description")
-        cls.edit_details_url = reverse("siaes_views:edit_job_description_details")
-        cls.edit_preview_url = reverse("siaes_views:edit_job_description_preview")
+        self.siae = siae
+        self.user = user
 
-    def _login(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.list_url = reverse("siaes_views:job_description_list")
+        self.edit_url = reverse("siaes_views:edit_job_description")
+        self.edit_details_url = reverse("siaes_views:edit_job_description_details")
+        self.edit_preview_url = reverse("siaes_views:edit_job_description_preview")
+
+    def _login(self, user):
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
         response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, 200)
 
         return response
 
 
 class JobDescriptionListViewTest(JobDescriptionAbstractTest):
     def setUp(self):
+        super().setUp()
+
         self.url = self.list_url
 
     def test_job_application_list_response_content(self):
-        response = self._login()
+        response = self._login(self.user)
 
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(self.siae.job_description_through.count(), 4)
         self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
         self.assertIn(settings.ITOU_SESSION_CURRENT_PAGE_KEY, self.client.session)
@@ -71,7 +76,10 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
                 self.assertContains(response, f"#_delete_modal_{job.pk}")
 
     def test_block_job_applications(self):
-        self._login()
+        response = self._login(self.user)
+
+        self.assertEqual(response.status_code, 200)
+
         response = self.client.post(self.url, data={"block_job_applications": "on"})
 
         self.assertRedirects(response, self.url)
@@ -84,7 +92,9 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         self.assertTrue(self.siae.block_job_applications)
 
     def test_toggle_job_description_activity(self):
-        self._login()
+        response = self._login(self.user)
+
+        self.assertEqual(response.status_code, 200)
 
         job_description = self.siae.job_description_through.first()
         post_data = {
@@ -107,7 +117,9 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         self.assertTrue(job_description.is_active)
 
     def test_delete_job_descriptions(self):
-        self._login()
+        response = self._login(self.user)
+
+        self.assertEqual(response.status_code, 200)
 
         job_description = self.siae.job_description_through.first()
         post_data = {
@@ -122,10 +134,14 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
 class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
     def setUp(self):
+        super().setUp()
+
         self.url = self.edit_url
 
-    def test_edit_job_description(self):
-        self._login()
+    def test_edit_job_description_siae(self):
+        response = self._login(self.user)
+
+        self.assertEqual(response.status_code, 200)
 
         # Step 1: edit job description
         response = self.client.get(self.edit_url)
@@ -175,6 +191,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         self.assertContains(response, "custom_name")
         self.assertContains(response, "description")
         self.assertContains(response, "profile_description")
+        self.assertContains(response, "Curriculum Vitae")
 
         response = self.client.post(self.edit_preview_url)
 
@@ -182,9 +199,87 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
         self.assertEqual(self.siae.job_description_through.count(), 5)
 
+    def test_edit_job_description_opcs(self):
+        opcs = SiaeWithMembershipFactory(
+            department="75",
+            coords=self.paris_city.coords,
+            post_code="75001",
+            kind=Siae.KIND_OPCS,
+        )
+        user_opcs = opcs.members.first()
+        opcs.jobs.add(*self.appellations)
+
+        response = self._login(user_opcs)
+
+        self.assertEqual(response.status_code, 200)
+
+        # Step 1: edit job description
+        response = self.client.get(self.edit_url)
+
+        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+
+        post_data = {
+            "job_appellation_code": "11076",  # Must be a non existing one for the SIAE
+            "job_appellation": "Whatever",
+            "market_context_description": "Whatever market description",
+            "custom_name": "custom_name",
+            "location_code": "paris-75",
+            "hours_per_week": 35,
+            "contract_type": ContractType.OTHER.value,
+            "other_contract_type": "other_contract_type",
+            "open_positions": 5,
+        }
+        response = self.client.post(self.edit_url, data=post_data)
+
+        self.assertRedirects(response, self.edit_details_url)
+        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+
+        session_data = self.client.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        for k, v in post_data.items():
+            with self.subTest(k):
+                self.assertEqual(v, session_data.get(k))
+
+        # Step 2: edit job description details
+        post_data = {
+            "description": "description",
+            "profile_description": "profile_description",
+            "is_resume_mandatory": True,
+            "is_qpv_mandatory": True,
+        }
+
+        response = self.client.post(self.edit_details_url, data=post_data)
+
+        self.assertRedirects(response, self.edit_preview_url)
+        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+
+        session_data = self.client.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        for k, v in post_data.items():
+            with self.subTest(k):
+                self.assertEqual(v, session_data.get(k))
+
+        # Step 3: preview and validation
+        response = self.client.get(self.edit_preview_url)
+
+        self.assertContains(response, "custom_name")
+        self.assertContains(response, "description")
+        self.assertContains(response, "profile_description")
+        self.assertContains(response, "Whatever market description")
+        self.assertContains(response, "Curriculum Vitae")
+        # Rendering of `is_qpv_mandatory`
+        self.assertContains(response, "typologies de public particulières")
+
+        response = self.client.post(self.edit_preview_url)
+
+        self.assertRedirects(response, self.list_url)
+        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertEqual(opcs.job_description_through.count(), 5)
+
 
 class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
     def setUp(self):
+
+        super().setUp()
+
         self.job_description = self.siae.job_description_through.first()
         self.update_url = reverse(
             "siaes_views:update_job_description",
@@ -196,7 +291,9 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
         self.url = self.list_url
 
     def test_update_job_description(self):
-        self._login()
+        response = self._login(self.user)
+
+        self.assertEqual(response.status_code, 200)
 
         self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 

@@ -12,6 +12,7 @@ from django.utils.http import urlencode, urlsafe_base64_encode
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
+from itou.siaes.enums import ContractType
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
@@ -522,35 +523,8 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
         )
         return annotation
 
-    def for_siae(self, siae):
-        return self.filter(siae=siae).order_by("-created_at")
-
-    def by_siae_id(self, siae_id):
-        return (
-            self.filter(siae__id=siae_id)
-            .prefetch_related("appellation", "appellation__rome", "siae")
-            .order_by("-updated_at", "-created_at")
-        )
-
-
-class ContractType(models.TextChoices):
-    """
-    A list of possible work contract types for SIAE.
-    Not included as an intern class of SiaeJobDescription because of possible reuse cases.
-    """
-
-    PERMANENT = "PERMANENT", "CDI"
-    PERMANENT_I = "PERMANENT_I", "CDI-I"
-    FIXED_TERM = "FIXED_TERM", "CDD"
-    FIXED_TERM_I = "FIXED_TERM_I", "CDD-I"
-    FIXED_TERM_I_PHC = "FIXED_TERM_I_PHC", "CDD-I Premières heures en Chantier"
-    FIXED_TERM_I_CVG = "FIXED_TERM_I_CVG", "CDD-I Convergence"
-    FIXED_TERM_TREMPLIN = "FIXED_TERM_TREMPLIN", "CDD Tremplin"
-    APPRENTICESHIP = "APPRENTICESHIP", "Contrat d'apprentissage"
-    PROFESSIONAL_TRAINING = "PROFESSIONAL_TRAINING", "Contrat de professionalisation"
-    TEMPORARY = "TEMPORARY", "Contrat de mission intérimaire"
-    BUSINESS_CREATION = "BUSINESS_CREATION", "Accompagnement à la création d'entreprise"
-    OTHER = "OTHER", "Autre type de contrat"
+    def order_by_most_recent(self):
+        return self.order_by("-updated_at", "-created_at")
 
 
 class SiaeJobDescription(models.Model):
@@ -562,7 +536,8 @@ class SiaeJobDescription(models.Model):
 
     MAX_UI_RANK = 32767
     POPULAR_THRESHOLD = 20
-    MAX_WORKED_HOURS_PER_WEEK = 42
+    # Max number or workable hours per week in France (Code du Travail)
+    MAX_WORKED_HOURS_PER_WEEK = 48
 
     appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name="job_description_through")
@@ -593,6 +568,9 @@ class SiaeJobDescription(models.Model):
     profile_description = models.TextField(verbose_name="Profil recherché et pré-requis", blank=True)
     is_resume_mandatory = models.BooleanField(verbose_name="CV nécessaire pour la candidature", default=False)
 
+    is_qpv_mandatory = models.BooleanField(verbose_name="Une clause QPV est nécessaire pour ce poste", default=False)
+    market_context_description = models.TextField(verbose_name="Contexte du marché", blank=True)
+
     objects = models.Manager.from_queryset(SiaeJobDescriptionQuerySet)()
 
     class Meta:
@@ -613,7 +591,8 @@ class SiaeJobDescription(models.Model):
             )
 
     def save(self, *args, **kwargs):
-        self.updated_at = timezone.now()
+        if self.pk:
+            self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
     @property
@@ -627,6 +606,10 @@ class SiaeJobDescription(models.Model):
         if self.location:
             return f"{self.location.name} ({self.location.department})"
         return f"{self.siae.city} ({self.siae.department})"
+
+    @property
+    def display_contract_type(self):
+        return self.other_contract_type or self.get_contract_type_display
 
     def get_absolute_url(self):
         return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})

@@ -1,6 +1,5 @@
 from django import forms
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -8,7 +7,8 @@ from django.utils.safestring import mark_safe
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.jobs.models import Appellation
-from itou.siaes.models import ContractType, Siae, SiaeJobDescription, SiaeMembership
+from itou.siaes.enums import ContractType
+from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.utils.urls import get_external_link_markup
 
 
@@ -241,7 +241,7 @@ class EditJobDescriptionForm(forms.ModelForm):
     )
     # Hidden placeholder field for "real" job appellation.
     job_appellation_code = forms.CharField(
-        max_length=5, widget=forms.HiddenInput(attrs={"class": "js-job-autocomplete-hidden"})
+        max_length=6, widget=forms.HiddenInput(attrs={"class": "js-job-autocomplete-hidden form-control"})
     )
 
     LOCATION_AUTOCOMPLETE_URL = reverse_lazy("autocomplete:cities")
@@ -289,11 +289,19 @@ class EditJobDescriptionForm(forms.ModelForm):
         self.fields["custom_name"].widget.attrs.update({"placeholder": ""})
         self.fields["hours_per_week"].widget.attrs.update({"placeholder": ""})
         self.fields["other_contract_type"].widget.attrs.update({"placeholder": ""})
+        self.fields["market_context_description"].widget.attrs.update(
+            {"placeholder": "Décrire en quelques mots l'objet du marché."}
+        )
 
         self.fields["contract_type"].required = True
         self.fields["open_positions"].required = True
-        self.fields["job_appellation_code"].required = True
+        self.fields["job_appellation_code"].required = False
         self.fields["job_appellation"].required = True
+
+        if current_siae.is_opcs:
+            self.fields["market_context_description"].required = True
+        else:
+            del self.fields["market_context_description"]
 
         self.fields["contract_type"].choices = [
             (
@@ -305,7 +313,12 @@ class EditJobDescriptionForm(forms.ModelForm):
     class Meta:
         model = SiaeJobDescription
         fields = [
+            "job_appellation",
+            "job_appellation_code",
             "custom_name",
+            "location_label",
+            "location_code",
+            "market_context_description",
             "contract_type",
             "other_contract_type",
             "hours_per_week",
@@ -313,7 +326,7 @@ class EditJobDescriptionForm(forms.ModelForm):
         ]
         labels = {
             "custom_name": "Nom du poste à afficher",
-            "location_label": "Localisation du poste (si différent du siège)",
+            "location_label": "Localisation du poste (si différente du siège)",
             "hours_per_week": "Nombre d'heures par semaine",
             "open_positions": "Nombre de poste(s) ouvert(s) au recrutement",
         }
@@ -322,16 +335,16 @@ class EditJobDescriptionForm(forms.ModelForm):
             "other_contract_type": "Veuillez préciser quel est le type de contrat.",
         }
 
-    def clean_job_application_code(self):
-        job_appellation = self.cleaned_data.get("job_appellation_code")
-        if not job_appellation:
-            raise ValidationError({"job_appellation_code": "Le code d'appellation n'est pas renseigné."})
-        return int(job_appellation)
+    def clean_job_appellation_code(self):
+        job_appellation_code = self.cleaned_data.get("job_appellation_code")
+        if not job_appellation_code:
+            raise forms.ValidationError("Le poste n'est pas correctement renseigné.")
+        return int(job_appellation_code)
 
     def clean_open_positions(self):
         open_positions = self.cleaned_data.get("open_positions")
         if open_positions is not None and open_positions < 1:
-            raise ValidationError({"open_positions", "Il doit y avoir au moins un poste ouvert."})
+            raise forms.ValidationError("Il doit y avoir au moins un poste ouvert.")
         return open_positions
 
     def clean(self):
@@ -354,15 +367,21 @@ class EditJobDescriptionDetailsForm(forms.ModelForm):
         self.fields["description"].widget.attrs.update({"placeholder": placeholder})
         self.fields["profile_description"].widget.attrs.update({"placeholder": placeholder})
 
+        if not current_siae.is_opcs:
+            del self.fields["is_qpv_mandatory"]
+
     class Meta:
         model = SiaeJobDescription
         fields = [
             "description",
             "profile_description",
             "is_resume_mandatory",
+            "is_qpv_mandatory",
         ]
         labels = {
             "description": "Les missions",
             "profile_description": "Profil recherché et prérequis",
             "is_resume_mandatory": "Le CV est nécessaire pour le traitement de la candidature",
+            "is_qpv_mandatory": "Le marché s’inscrit dans le cadre du NPNRU et ces clauses sociales doivent "
+            "bénéficier en priorité aux publics résidant en Quartier Prioritaire de la Ville.",
         }
