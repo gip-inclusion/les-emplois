@@ -198,6 +198,8 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
     )
 
     if request.method == "POST" and form.is_valid():
+        # Checkboxes don't emit a value when `False`
+        session_data["is_resume_mandatory"] = request.POST.get("is_resume_mandatory", False)
         request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
         return HttpResponseRedirect(reverse("siaes_views:edit_job_description_preview"))
 
