@@ -21,7 +21,7 @@ from itou.prescribers.factories import (
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
-from itou.users.enums import Title
+from itou.users.enums import IdentityProvider, Title
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
@@ -197,6 +197,17 @@ class ModelTest(TestCase):
         # Job seeker activates his account. He is in control now!
         job_seeker.last_login = timezone.now()
         self.assertFalse(job_seeker.is_handled_by_proxy)
+
+    def test_has_sso_provider(self):
+        job_seeker = JobSeekerFactory.build()
+        self.assertFalse(job_seeker.has_sso_provider)
+
+        job_seeker = JobSeekerFactory.build(identity_provider=IdentityProvider.FRANCE_CONNECT)
+        self.assertTrue(job_seeker.has_sso_provider)
+
+        job_seeker = JobSeekerFactory()
+        job_seeker.socialaccount_set.create(provider="peamu")
+        self.assertTrue(job_seeker.has_sso_provider)
 
     def test_last_hire_was_made_by_siae(self):
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
