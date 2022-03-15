@@ -172,7 +172,7 @@ class ItouUserAdmin(UserAdmin):
         "last_login",
     )
     list_display_links = ("pk", "email")
-    list_filter = UserAdmin.list_filter + (KindFilter, CreatedByProxyFilter)
+    list_filter = UserAdmin.list_filter + (KindFilter, CreatedByProxyFilter, "identity_provider")
     ordering = ("-id",)
     raw_id_fields = (
         "created_by",
@@ -210,6 +210,7 @@ class ItouUserAdmin(UserAdmin):
                     "pole_emploi_id",
                     "lack_of_pole_emploi_id_reason",
                     "created_by",
+                    "identity_provider",
                 )
             },
         ),
