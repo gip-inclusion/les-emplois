@@ -7,8 +7,17 @@
 {% block title %}Connexion{{ block.super }}{% endblock %}
 
 {% block right_content %}
-    <div class="mt-5">
+    <div class="mt-5 px-sm-5">
         <h1 class="h1-hero-c1 text-center">Se connecter</h1>
+
+        {% if show_inclusion_connect %}
+            <p class="text-center mb-1">
+                Se connecter avec
+            </p>
+            {% include "signup/includes/inclusion_connect_button.html" with authentication_type=account_type_display_name %}
+
+            <hr class="my-5" data-text="ou">
+        {% endif %}
 
         <form method="post" action="{{ login_url }}" class="js-prevent-multiple-submit">
 
@@ -50,6 +59,6 @@
         {% endif %}
 
         <h2 class="h1 ff-extra-01 text-center">Bienvenue !</h2>
-        <img class="img-fluid mt-5" src="{% static 'img/login.svg' %}" alt="">
+        <img class="img-fluid mt-2" src="{% static 'img/login.svg' %}" alt="">
     </div>
 {% endblock %}

@@ -26,6 +26,7 @@ class ItouLoginView(LoginView):
             "login_url": login_url,
             "signup_url": signup_url,
             "signup_allowed": True,
+            "show_inclusion_connect": False,
             "redirect_field_name": REDIRECT_FIELD_NAME,
             "redirect_field_value": get_safe_url(self.request, REDIRECT_FIELD_NAME),
         }
@@ -73,6 +74,7 @@ class PrescriberLoginView(ItouLoginView):
             "login_url": reverse("login:prescriber"),
             "signup_url": reverse("signup:prescriber_check_already_exists"),
             "signup_allowed": True,
+            "show_inclusion_connect": True,
         }
         return context | extra_context
 
