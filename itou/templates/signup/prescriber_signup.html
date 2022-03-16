@@ -33,6 +33,17 @@
         {% include "signup/includes/authorization_proof.html" %}
     {% endif %}
 
+    <p class="text-center mb-1">
+        Se créer un compte avec
+    </p>
+    {% include "signup/includes/inclusion_connect_button.html" with authentication_type=account_type_display_name %}
+
+    <p class="mt-5">
+        Inclusion Connect est une solution de connexion unique à plusieurs services publics réservée aux professionnels de l’inclusion.
+    </p>
+
+    <hr class="my-5" data-text="ou">
+
     <form method="post" action="" class="js-prevent-multiple-submit">
 
         {% csrf_token %}
