@@ -8,7 +8,7 @@
 
 {% block right_content %}
     <div class="mt-5">
-        <h1 class="h1-hero-c1">Connexion</h1>
+        <h1 class="h1-hero-c1 text-center">Se connecter</h1>
 
         <form method="post" action="{{ login_url }}" class="js-prevent-multiple-submit">
 
@@ -21,24 +21,26 @@
             {% bootstrap_field form.login form_group_class="form-group" %}
 
             {% bootstrap_field form.password form_group_class="form-group mb-1" %}
-            <p class="text-right small font-italic">
-                <a href="{% url 'account_reset_password' %}">Mot de passe oublié ?</a>
+            <p>
+                <a href="{% url 'account_reset_password' %}" class="font-weight-bold">Mot de passe oublié ?</a>
             </p>
 
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">Connexion</button>
-            {% endbuttons %}
+            <p class="text-center">
+                {% bootstrap_button "Se connecter" button_type="submit" button_class="btn-primary btn" %}
+            </p>
 
         </form>
+    </div>
+{% endblock %}
 
-
+{% block left_content %}
+    <div class="mt-5 d-sm-block">
         {% if signup_allowed %}
-            <div class="mt-5 mb-5">
-                <p>Vous n'avez pas de compte ?</p>
-
+            <div class="mt-5 mb-5 pb-5 text-center">
+                <h2 class="h1-hero-c1">S'inscrire</h2>
                 <p>
                     <a class="btn btn-outline-primary" href="{{ signup_url }}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
-                        Inscription
+                        Créer un compte
                         {% if account_type_display_name %}
                             {{ account_type_display_name|lower }}
                         {% endif %}
@@ -46,12 +48,7 @@
                 </p>
             </div>
         {% endif %}
-    </div>
-{% endblock %}
 
-{% block left_content %}
-    <!-- Hide left column on small devices. -->
-    <div class="mt-5 d-none d-sm-block">
         <h2 class="h1 ff-extra-01 text-center">Bienvenue !</h2>
         <img class="img-fluid mt-5" src="{% static 'img/login.svg' %}" alt="">
     </div>
