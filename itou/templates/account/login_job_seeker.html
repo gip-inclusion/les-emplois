@@ -7,16 +7,15 @@
 {% block title %}Connexion candidat{{ block.super }}{% endblock %}
 
 {% block right_content %}
-    <div class="mt-5">
-        <h1 class="h1-hero-c1">Connexion</h1>
-        <b class="mb-4">Connectez-vous avec un service tiers</b>
+    <div class="m-5">
+        <h1 class="h1-hero-c1 text-center">Se connecter</h1>
         {% if show_france_connect %}
             <div class="mt-4">
                 {% include "signup/includes/france_connect_button.html" %}
             </div>
             <div class="mt-4 mb-3">
                 <p class="text-center">
-                    <b>Ou</b>
+                    <hr class="my-5" data-text="ou">
                 </p>
             </div>
         {% endif %}
@@ -26,9 +25,7 @@
                 <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
             </div>
         </div>
-        <div class="mt-4 mb-3">
-            <b>Ou utilisez votre adresse e-mail</b>
-        </div>
+        <hr class="my-5" data-text="ou">
 
         <form method="post" action="{% url 'login:job_seeker' %}" class="js-prevent-multiple-submit">
 
@@ -41,32 +38,31 @@
             {% bootstrap_field form.login form_group_class="form-group" %}
 
             {% bootstrap_field form.password form_group_class="form-group mb-1" %}
-            <p class="text-right small font-italic">
-                <a href="{% url 'account_reset_password' %}">Mot de passe oublié ?</a>
+            <p>
+                <a href="{% url 'account_reset_password' %}" class="font-weight-bold">Mot de passe oublié ?</a>
             </p>
 
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">Connexion</button>
-            {% endbuttons %}
+            <p class="text-center">
+                {% bootstrap_button "Se connecter" button_type="submit" button_class="btn-primary btn" %}
+            </p>
 
         </form>
 
-        <div class="mt-5 mb-5">
-            <p>Vous n'avez pas de compte ?</p>
-
-            <p>
-                <a class="btn btn-outline-primary" href="{% url 'signup:job_seeker_situation' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
-                    Inscription candidat
-                </a>
-            </p>
-        </div>
     </div>
 {% endblock %}
 
 {% block left_content %}
-    <!-- Hide left column on small devices. -->
-    <div class="mt-5 d-none d-sm-block">
+    <div class="mt-5 d-sm-block">
+        <div class="mt-5 mb-5 pb-5 text-center">
+            <h2 class="h1-hero-c1">S'inscrire</h2>
+
+            <p>
+                <a class="btn btn-outline-primary" href="{% url 'signup:job_seeker_situation' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                    Créer un compte candidat
+                </a>
+            </p>
+        </div>
         <h2 class="h1 ff-extra-01 text-center">Bienvenue !</h2>
-        <img class="img-fluid mt-5" src="{% static 'img/login.svg' %}" alt="">
+        <img class="img-fluid mt-2" src="{% static 'img/login.svg' %}" alt="">
     </div>
 {% endblock %}
