@@ -32,7 +32,7 @@
         <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
         {% block extra_head %}{% endblock %}
     </head>
-    <body>
+    <body class="{% block body_class %}{% if body_classname %}{{ body_classname }}{% else %}bg-gray-400{% endif %}{% endblock %}">
         <nav role="navigation" aria-label="Accès rapide" tabindex="1" class="sr-only">
             <ul>
                 <li><a href="#nav-primary">Aller au menu principal</a></li>
@@ -43,7 +43,7 @@
         {% include "includes/test_accounts.html" %}
         {% include "layout/_header.html" %}
 
-        <main id="main" role="main" class="s-main bg-gray-400">
+        <main id="main" role="main" class="s-main">
 
             <div class="container container-messages">
                 {% block messages %}
@@ -83,7 +83,7 @@
             tarteaucitron.init({
                 "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
                 "cookieName": "tarteaucitron", /* Cookie name */
-                "orientation": "top", /* Banner position (top - bottom) */
+                "orientation": "bottom", /* Banner position (top - bottom) */
                 "groupServices": false, /* Group services by category */
                 "showAlertSmall": false, /* Show the small banner on bottom right */
                 "cookieslist": false, /* Show the cookie list */
@@ -220,6 +220,5 @@
                 </a>
             </div>
         {% endif %}
-
     </body>
 </html>

@@ -1,28 +1,28 @@
 {% load bootstrap4 %}
+{% load theme_inclusion %}
 
 {% bootstrap_form_errors form type="all" %}
-<div class="row no-gutters my-3 itou-banner-blue{% if align == 'center' %} justify-content-sm-center{% endif %}">
-    <div class="col col-12 col-sm-8 col-md-6 mb-1">
+
+<div class="row my-3">
+    <div class="col-12 col-md-8">
         {{ form.city }}
+        <label for="{{ form.city_name.id_for_label }}" class="sr-only">{{ form.city_name.label }}</label>
         <div class="input-group">
-            <div class="input-group-prepend bg-white">
+            {{ form.city_name }}
+            <div class="input-group-append">
+                {# No loading #}
+                <span class="input-group-text js-city-autocomplete-no-loading rounded-right py-0">
+                    <img src="{% static_theme_images 'ico-bicro-emploi-geo.svg' %}" alt="" height="24">
+                </span>
                 {# Loading #}
                 <span class="input-group-text js-city-autocomplete-loading d-none">
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                     <span class="sr-only">Chargement...</span>
                 </span>
-                {# No loading #}
-                <span class="input-group-text js-city-autocomplete-no-loading rounded-left">
-                    {% include "includes/icon.html" with icon="map-pin" title="Logo du moteur de recherche" %}
-                </span>
             </div>
-            <label for="{{ form.city_name.id_for_label }}" class="sr-only">{{ form.city_name.label }}</label>
-            {{ form.city_name }}
         </div>
     </div>
-    <div class="col col-12 col-sm-8 ml-0 mt-2 col-md-2 ml-md-2 mt-md-0">
-        <button type="submit" class="btn btn-primary form-control js-search-button" title="Rechercher">
-            Rechercher
-        </button>
+    <div class="col-12 col-md-3 pt-3 pt-md-0 pl-md-0">
+        <button type="submit" class="btn-block btn btn-primary js-search-button" title="Rechercher">Rechercher</button>
     </div>
 </div>

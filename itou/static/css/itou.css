@@ -335,14 +335,13 @@ Usage:
     font-size: 1.25rem;
 }
 
-.title-with-badge .badge{
+.title-with-badge .badge {
     font-size: 1rem;
 }
 
-/* To be discussed.
+/* To be discussed
 --------------------------------------------------------------------------- */
-
-.collapse-caret, .collapse-caret:hover{
+.collapse-caret, .collapse-caret:hover {
     text-decoration: unset;
 }
 .collapse-caret>h6::after {
@@ -395,9 +394,73 @@ Usage:
 
 .s-postheader {
     z-index: 10;
+    background-color: #fff;
 }
 
 .job-appellation-nb_open_positions {
     width:80px;
     margin:0 auto;
 }
+
+
+/* START: Custom C1 styles to override or complete the global itou theme
+--------------------------------------------------------------------------- */
+/* Home */
+.l-hp .container-max-md {
+  max-width: 800px !important;
+}
+
+.l-hp .s-main::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 390px;
+  height: 300px;
+  background-repeat: no-repeat;
+  background-size: 776px;
+  background-position: bottom right;
+  background-image: url('../img/home/hp-picto-rond.svg');
+}
+
+@media (min-width:1200px) {
+    .l-hp .s-main::after {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        top: -50px;
+        right: 0;
+        width: 328px;
+        height: 538px;
+        background-repeat: no-repeat;
+        background-size: 100%;
+        background-position: top left;
+        background-image: url('../img/home/hp-visuel-02.png');
+    }
+}
+
+.s-hero-title-01__extra-01 {
+    position: relative;
+    display: inline-block;
+    font-size: 1.5rem;
+    transform: rotate(-4deg);
+}
+.s-hero-title-01__extra-01::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    width: 30px;
+    height: 24px;
+    left: -40px;
+    top: 16px;
+    background-image: url('../img/home/hp-ico-hand-arrow-down.svg');
+}
+
+.has-ratio-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+
+/* END: Custom C1 styles to override or complete the global itou theme
+--------------------------------------------------------------------------- */

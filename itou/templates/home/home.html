@@ -1,68 +1,404 @@
 {% extends "layout/content_full_viewport.html" %}
 {% load redirection_fields %}
 {% load static %}
+{% load theme_inclusion %}
 
 {% block title %}Les emplois de l'inclusion{% endblock %}
 
+{% block body_class %}
+    {% with body_classname="l-hp bg-white" %}
+        {{ block.super }}
+    {% endwith%}
+{% endblock %}
+
 {% block content %}
 
-    {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Prenez contact avec un employeur solidaire" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
-
-    {% if not user.is_authenticated %}
-        <section class="bg-white text-center">
-            <div class="container">
-                <h2 class="h1">Nos missions</h2>
-                <p class="lead">Ce service facilite la mise en relation des personnes les plus éloignées de l'emploi avec les employeurs solidaires (SIAE, GEIQ, EA et EATT) et les accompagnants (orienteurs et prescripteurs habilités).<br>Il offre aux utilisateurs un outil mutualisé pour simplifier les procédures, fluidifier les parcours d'insertion entre professionnels et renforcer la qualité de l'accompagnement des personnes.</p>
-
-                <div class="card-deck card-deck-itou mt-5">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="h4 card-title font-weight-light">
-                                Inscrivez-vous pour commencer à utiliser la plateforme
-                            </h3>
-                        </div>
-                        <div class="card-footer">
-                            <a class="btn btn-primary stretched-link" href="{% url 'account_signup' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
-                                Créer un compte
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="h4 card-title font-weight-light">
-                                Discutez entre professionnels sur La communauté de l'inclusion
-                            </h3>
-                        </div>
-                        <div class="card-footer">
-                            <a class="btn btn-primary stretched-link" href="{{ ITOU_COMMUNITY_URL }}">
-                                Accéder à La communauté
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="h4 card-title font-weight-light">
-                                Découvrez l'espace de documentation pour tout comprendre
-                            </h3>
-                        </div>
-                        <div class="card-footer">
-                            <a class="btn btn-primary stretched-link" href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/" target="_blank" title="En savoir plus (ouverture dans un nouvel onglet)">
-                                En savoir plus
-                            </a>
+    <section class="s-hero-title-01 s-hero-title-01--emploi pt-6 pt-lg-7 pb-5 pb-lg-5">
+        <div class="s-hero-title-01__container container">
+            <div class="s-hero-title-01__row row">
+                <div class="s-hero-title-01__col s-hero-title-01__col--article col-12 col-md-6">
+                    <article>
+                        <h1 class="s-hero-title-01__col--article__title h1-hero"><strong>Pour l’inclusion par l’emploi</strong></h1>
+                        <h2 class="h2">Faciliter la mise en relation des personnes les plus éloignées de l'emploi avec les employeurs solidaires (SIAE, GEIQ, EA et EATT) et les accompagnants (orienteurs et prescripteurs habilités).</h2>
+                    </article>
+                </div>
+                <div class="s-hero-title-01__col s-hero-title-01__col--search col-12 col-md-6">
+                    <p class="text-center my-5">
+                        <span class="s-hero-title-01__extra-01 ff-extra-01">Que cherchez-vous ?</span>
+                    </p>
+                    <div class="card c-card c-card--emploi">
+                        <ul class="nav nav-tabs nav-tabs--emploi justify-content-center px-3 mb-0" id="homeSearchTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" id="employeurs-search-tab" data-toggle="tab" href="#employeurs-search" role="tab" aria-controls="employeurs-search" aria-selected="true">Rechercher des employeurs</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="prescripteurs-search-tab" data-toggle="tab" href="#prescripteurs-search" role="tab" aria-controls="prescripteurs-search" aria-selected="false">Rechercher des prescripteurs</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content py-5 pt-lg-5 pb-lg-6 px-5 px-lg-7" id="homeSearchTabContent">
+                            <div class="tab-pane show active" id="employeurs-search" role="tabpanel" aria-labelledby="employeurs-search-tab">
+                                {% include "search/includes/generic_search_home.html" with form=siae_search_form url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form_home.html" %}
+                            </div>
+                            <div class="tab-pane" id="prescripteurs-search" role="tabpanel" aria-labelledby="prescripteurs-search-tab">
+                                {% include "search/includes/generic_search_home.html" with form=prescribers_search_form url_search="search:prescribers_results" template_form_name="search/includes/prescribers_search_form_home.html" %}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-
-    {% endif %}
-
-    <section class="bg-gray-400 text-center">
-        <div class="container">
-            <div class="js-tac-livestorm w-100" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm"></div>
         </div>
     </section>
 
+    <section class="pt-5 pt-lg-6 pb-6 pb-lg-7">
+        <div class="container container-max-md">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h2 class="h1 mb-2">Les dernières offres d'emploi</h2>
+                            <p class="h3">16 224 Recrutements en cours</p>
+                        </div>
+                        <span><img src="{% static 'img/home/hp-illu-01.svg' %}" alt="" width="75"></span>
+                    </div>
+                    <ul class="list-group c-list-group">
+                        <li class="list-group-item c-list-group-item list-group-item-action">
+                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
+                                <span class="d-flex align-items-center">
+                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
+                                    <strong class="font-weight-bold text-decoration-underline">Préparateur/préparatrice de commande </strong>
+                                </span>
+                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Le Bouscat - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
+                            </a>
+                        </li>
+                        <li class="list-group-item c-list-group-item list-group-item-action">
+                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
+                                <span class="d-flex align-items-center">
+                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
+                                    <strong class="font-weight-bold text-decoration-underline">Chargé(e) d'affaires commerciales et marketing opérationnel</strong>
+                                </span>
+                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Beychac-et-Caillau - 72<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
+                            </a>
+                        </li>
+                        <li class="list-group-item c-list-group-item list-group-item-action">
+                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
+                                <span class="d-flex align-items-center">
+                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
+                                    <strong class="font-weight-bold text-decoration-underline">Préparateur/préparatrice de commande</strong>
+                                </span>
+                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Belvès-de-Castillon - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
+                            </a>
+                        </li>
+                        <li class="list-group-item c-list-group-item list-group-item-action">
+                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
+                                <span class="d-flex align-items-center">
+                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
+                                    <strong class="font-weight-bold text-decoration-underline">Ouvrier en pépinère horticole</strong>
+                                </span>
+                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Belvès-de-Castillon - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
+                            </a>
+                        </li>
+                        <li class="list-group-item c-list-group-item list-group-item-action">
+                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
+                                <span class="d-flex align-items-center">
+                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
+                                    <strong class="font-weight-bold text-decoration-underline">Ouvrier paysagiste création des espaces verts </strong>
+                                </span>
+                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Belvès-de-Castillon - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
+                            </a>
+                        </li>
+                        <li class="list-group-item c-list-group-item list-group-item-action">
+                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
+                                <span class="d-flex align-items-center">
+                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
+                                    <strong class="font-weight-bold text-decoration-underline">Ouvrier en pépinère horticole</strong>
+                                </span>
+                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Bordeaux - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="text-center mt-3 mt-md-6">
+                        <a href="" class="btn btn-primary d-block d-md-inline-block">Toutes les offres</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-emploi-lightest py-5 py-lg-6">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12 col-md">
+                    <div>
+                        <h2 class="h1 mb-2">Inscrivez-vous pour commencer à utiliser la plateforme</h2>
+                        <h3 class="h3">Candidats, Employeurs, orienteurs et prescripteurs</h3>
+                        <p>La plateforme « Les emplois de l’inclusion » permet, tant pour les candidats que pour les employeurs, de faciliter les démarches administratives liées aux parcours d’insertion et de mieux faire se rencontrer les offres d’emploi et les différents profils éligibles</p>
+                        <div class="row no-gutters">
+                            <div class="col-6 col-md-auto pt-3 pr-2">
+                                <a href="" class="btn btn-sm btn-outline-primary btn-block" target="_blank" title="Je découvre l'IAE (ouverture dans un nouvel onglet)">Je découvre l'IAE</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-none d-md-inline-flex col-md-4 pl-md-5">
+                    <div>
+                        <img src="{% static 'img/home/hp-illu-04.svg' %}" alt="" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-0 pb-0">
+        <ul class="nav nav-tabs nav-tabs--emploi justify-content-center px-3" id="homeTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="candidats-tab" data-toggle="tab" href="#candidats" role="tab" aria-controls="candidats" aria-selected="true">Candidats</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="prescripteurs-tab" data-toggle="tab" href="#prescripteurs" role="tab" aria-controls="prescripteurs" aria-selected="false">Prescripteurs habilités</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="employeurs-tab" data-toggle="tab" href="#employeurs" role="tab" aria-controls="employeurs" aria-selected="false">Employeurs</a>
+            </li>
+        </ul>
+        <div class="tab-content container container-max-md py-3 py-lg-6" id="homeTabContent">
+            <div class="tab-pane show active" id="candidats" role="tabpanel" aria-labelledby="candidats-tab">
+                <h2 class="h1 mb-3 mb-lg-4 d-flex justify-content-between">
+                    <span>Vous avez des difficultés pour <br class="d-none d-lg-inline">trouver un emploi ?</span>
+                    <span><img src="{% static 'img/home/hp-illu-03.svg' %}" alt="" width="90"></span>
+                </h2>
+                <p>La plateforme des emplois de l’inclusion vous permettra d’identifier les employeurs solidaires près de chez vous.</p>
+                <p>Ce service facilite la mise en relation des personnes les plus éloignées de l'emploi.</p>
+                <p>Les employeurs solidaires accompagnent  les personnes éloignées de l’emploi afin de trouver les meilleures solutions adaptées à leurs difficultés afin de faciliter leur accès à un emploi durable.</p>
+                <p>Vous pouvez postuler en toute autonomie et/ou être accompagné(e) par un prescripteur (conseiller à l’emploi, conseiller en insertion professionnelle, assistance sociale…).</p>
+                <div class="row no-gutters">
+                    <div class="col-6 col-md-auto pt-3 pr-2">
+                        <a href="https://communaute.inclusion.beta.gouv.fr/aide/emplois/mode-demploi-candidat" class="btn btn-sm btn-link btn-block btn-ico pl-0" target="_blank" title="En savoir plus (ouverture dans un nouvel onglet)">
+                            <span class="ml-0">En savoir plus</span>
+                            <i class="ri-arrow-right-line ri-lg"></i>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-auto pt-3 pl-2">
+                        <a href="{% url 'login:job_seeker' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}" class="btn btn-sm btn-primary btn-block" title="Je m'inscris">Je m'inscris</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="prescripteurs" role="tabpanel" aria-labelledby="prescripteurs-tab">
+                <h2 class="h1 mb-3 mb-lg-4 d-flex justify-content-between">
+                    <span>Vous accompagnez des publics en difficulté qui ont difficilement accès au marché du travail ?</span>
+                    <span><img src="{% static 'img/home/hp-illu-03.svg' %}" alt="" width="90"></span>
+                </h2>
+                <p>En tant que prescripteur vous pouvez proposer les candidatures des personnes que vous accompagnez à des employeurs solidaires (Structures d’insertion, Entreprises adaptées, GEIQ).</p>
+                <div class="row no-gutters">
+                    <div class="col-6 col-md-auto pt-3 pr-2">
+                        <a href="https://communaute.inclusion.beta.gouv.fr/aide/emplois/mode-demploi-prescripteur-orienteur/" class="btn btn-sm btn-link btn-block btn-ico pl-0" target="_blank" title="En savoir plus (ouverture dans un nouvel onglet)">
+                            <span class="ml-0">En savoir plus</span>
+                            <i class="ri-arrow-right-line ri-lg"></i>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-auto pt-3 pl-2">
+                        <a href="{% url 'login:prescriber' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}" class="btn btn-sm btn-primary btn-block" title="Je m'inscris">Je m'inscris</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="employeurs" role="tabpanel" aria-labelledby="employeurs-tab">
+                <h2 class="h1 mb-3 mb-lg-4 d-flex justify-content-between">
+                    <span>Vous souhaitez recruter de nouveaux salariés au sein de votre entreprise solidaire (structure d’insertion par l’activité économique, entreprise adaptée, GEIQ) ?</span>
+                    <span><img src="{% static 'img/home/hp-illu-03.svg' %}" alt="" width="90"></span>
+                </h2>
+                <p>Les emplois de l’inclusion est le premier site national dédié aux recrutements 100% inclusifs. Vous bénéficierez d’une plus grande visibilité  afin de recruter plus rapidement,</p>
+                <div class="row no-gutters">
+                    <div class="col-6 col-md-auto pt-3 pr-2">
+                        <a href="https://communaute.inclusion.beta.gouv.fr/aide/emplois/mode-demploi-employeur-solidaire/" class="btn btn-sm btn-link btn-block btn-ico pl-0" target="_blank" title="En savoir plus (ouverture dans un nouvel onglet)">
+                            <span class="ml-0">En savoir plus</span>
+                            <i class="ri-arrow-right-line ri-lg"></i>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-auto pt-3 pl-2">
+                        <a href="{% url 'login:siae_staff' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}" class="btn btn-sm btn-primary btn-block" title="Je m'inscris">Je m'inscris</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-5 pt-lg-3 pb-3 pb-lg-6">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="bg-emploi-light p-3 py-lg-5 px-lg-6 rounded-xl">
+                        <div class="row align-items-center">
+                            <div class="col-12 col-md">
+                                <div>
+                                    <h2 class="h1 mb-3 mb-lg-4">C'est quoi l'inclusion par l'emploi ?</h2>
+                                    <p>L’inclusion par l'emploi est un projet de société gouvernemental qui permet aux personnes les plus fragiles de bénéficier de l’accès à l’emploi et à la formation pour s’insérer dans la société par le travail (Insertion par l'Activité Économique - IAE).</p>
+                                    <p>C’est un enjeu majeur porté par le Pacte de l’IAE pour lutter contre le chômage longue durée, l'exclusion et la pauvreté.</p>
+                                    <a href="https://communaute.inclusion.beta.gouv.fr/doc/emplois/cest-quoi-linclusion-par-lemploi" class="font-weight-bold" target="_blank" title="En savoir plus sur l’inclusion par l’emploi (ouverture dans un nouvel onglet)">En savoir plus sur l’inclusion par l’emploi</a><i class="ri-arrow-right-up-line ri-xl ml-2 font-weight-bold"></i>
+                                </div>
+                            </div>
+                            <div class="d-none d-md-inline-flex col-md-4 pl-md-5">
+                                <div>
+                                    <img src="{% static 'img/home/hp-illu-02.svg' %}" alt="" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-5 pt-lg-6 pb-0">
+        <div class="container">
+            <div class="row align-items-center mb-3 mb-md-4">
+                <div class="col-12 col-md">
+                    <h2 class="h1 mb-2 mb-md-0">Évènements à venir</h2>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <a href="https://communaute.inclusion.beta.gouv.fr/evenements" class="font-weight-bold" target="_blank" title="Voir tout le calendrier des évènements à venir (ouverture dans un nouvel onglet)">Voir tout le calendrier</a><i class="ri-arrow-right-up-line ri-xl ml-1 font-weight-bold"></i>
+                </div>
+            </div>
+            <div id="rest-events">
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-5 pb-5 pb-lg-6">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-emploi pl-md-5 pr-md-6 py-md-4 m-0">
+                        <div class="row">
+                            <div class="col-auto">
+                                <img src="{% static 'img/home/hp-illu-01.svg' %}" alt="" height="90">
+                            </div>
+                            <div class="col">
+                                <p class="mb-2"><strong>Améliorez la visibilité de votre structure</strong></p>
+                                <p class="mb-0">Juste une minute pour nous en dire plus sur les secteurs d'activités <br class="d-none d-md-inline"> de ETTI Une nouvelle chance, votre ETTI située à Beaucaire</p>
+                            </div>
+                            <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                                <a href="" class="btn btn-ico btn-primary btn-block" target="_blank" title="Je réponds au questionnaire sur la visibilité de votre structure (ouverture dans un nouvel onglet)">
+                                    <span>Je réponds au questionnaire</span>
+                                    <i class="ri-external-link-line ri-lg ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% comment %}
+    <section class="pt-5 pt-lg-6 pb-0">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="h1 mb-3 mb-lg-4">Nos démarches et nos actions</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-lg-4">
+                    <article class="pb-5 pb-lg-7">
+                        <figure aria-label="Évènement de la communauté de l'inclusion">
+                            <img src="{% static 'img/home/hp-action-visuel-01.png' %}" class="img-fluid img-fitcover rounded" alt="" />
+                            <figcaption class="my-3 d-flex align-items-center justify-content-between">
+                                <img src="{% static_theme_images 'logo-communaute-inclusion.svg' %}" alt="La communauté de l'inclusion" height="37" loading="lazy">
+                                <span class="text-uppercase text-communaute font-weight-bold">Communauté</span>
+                            </figcaption>
+                        </figure>
+                        <h3 class="h2 mt-2">5 bonnes raisons d’utiliser ce premier réseau social des professionnels de l’inclusion</h3>
+                        <p>Bonjour La communauté de l’inclusion 👋, Connaissez-vous les 5 bonnes raisons d’utiliser ce premier réseau social des professionnels de l’inclusion ?</p>
+                        <a href="" class="font-weight-bold" target="_blank" title="En savoir plus: 5 bonnes raisons d’utiliser ce premier réseau social des professionnels de l’inclusion (ouverture dans un nouvel onglet)">En savoir plus</a><i class="ri-external-link-line ri-lg ml-1"></i>
+                    </article>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <article class="pb-5 pb-lg-7">
+                        <figure aria-label="Évènement de la communauté de l'inclusion">
+                            <img src="{% static 'img/home/hp-action-visuel-02.png' %}" class="img-fluid img-fitcover rounded" alt="" />
+                            <figcaption class="my-3 d-flex align-items-center justify-content-between">
+                                <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" alt="La pilotage de l'inclusion" height="37" loading="lazy">
+                                <span class="text-uppercase text-pilotage font-weight-bold">Pilotage</span>
+                            </figcaption>
+                        </figure>
+                        <h3 class="h2 mt-2">Quelle est la typologie des employeurs inclusifs sur mon territoire ?</h3>
+                        <p>Le site de la plateforme de l'inclusion dédiée au pilotage, Découvrez ci-dessous les autres tableaux de bord sur lesquels nous travaillons et donnez-nous votre avis sur leur pertinence.</p>
+                        <a href="" class="font-weight-bold" target="_blank" title="En savoir plus: Quelle est la typologie des employeurs inclusifs sur mon territoire ? (ouverture dans un nouvel onglet)">En savoir plus</a><i class="ri-external-link-line ri-lg ml-1"></i>
+                    </article>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <article class="pb-5 pb-lg-7">
+                        <figure aria-label="Évènement de la communauté de l'inclusion">
+                            <img src="{% static 'img/home/hp-action-visuel-03.png' %}" class="img-fluid img-fitcover rounded" alt="" />
+                            <figcaption class="my-3 d-flex align-items-center justify-content-between">
+                                <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" height="37" loading="lazy">
+                                <span class="text-uppercase text-emploi font-weight-bold">Action</span>
+                            </figcaption>
+                        </figure>
+                        <h3 class="h2 mt-2">Nos intrapreneurs... ont un message pour toi !</h3>
+                        <p>Éric Barthélémy et Pierre Deleforge, tu les connais peut-être déjà... C'est eux qui sont à l'origine de la Plateforme de l'inclusion. 👋</p>
+                        <a href="" class="font-weight-bold" target="_blank" title="En savoir plus: Nos intrapreneurs... ont un message pour toi ! (ouverture dans un nouvel onglet)">En savoir plus</a><i class="ri-external-link-line ri-lg ml-1"></i>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endcomment %}
+
+    <hr>
+
+    <section class="s-article-picture-01 s-article-picture-01--emploi pt-5 pt-lg-6 pb-6 pb-lg-7">
+        <div class="s-article-picture-01__container container container-max-lg">
+            <div class="s-article-picture-01__row row">
+                <div class="s-article-picture-01__col s-article-picture-01__col--figure d-none d-lg-inline-flex col-lg-5 d-lg-flex align-items-center px-lg-4">
+                    <figure>
+                        <div>
+                            <div>
+                                <span>
+                                    <strong>5&nbsp;958</strong>
+                                    organisations de prescripteurs
+                                </span>
+                            </div>
+                            <div>
+                                <span>
+                                    <strong>4&nbsp;618</strong>
+                                    employeurs
+                                </span>
+                            </div>
+                        </div>
+                        <img src="{% static 'img/home/hp-visuel-01.jpg' %}" class="img-fluid img-fitcover" alt="">
+                    </figure>
+                </div>
+                <div class="s-article-picture-01__col s-article-picture-01__col--article col-12 col-lg-7 d-flex align-items-center">
+                    <article>
+                        <h2 class="s-article-picture-01__col--article__title h2">Les emplois</h2>
+                        <h3 class="h1">Nos impacts en chiffres sur l'insertion et l'emploi </h3>
+                        <figure class="d-block d-lg-none">
+                            <div>
+                                <div>
+                                    <span>
+                                        <strong>5&nbsp;958</strong>
+                                        organisations de prescripteurs
+                                    </span>
+                                </div>
+                                <div>
+                                    <span>
+                                        <strong>4&nbsp;618</strong>
+                                        employeurs
+                                    </span>
+                                </div>
+                            </div>
+                            <img src="{% static 'img/home/hp-visuel-01.jpg' %}" class="img-fluid img-fitcover" alt="">
+                        </figure>
+                        <p>Les emplois de l'inclusion est un service numérique de délivrance des PASS IAE et de mise en relation d'employeurs solidaires avec des candidats éloignés de l'emploi par le biais de tiers (prescripteurs habilités, orienteurs) ou en autoprescription.</p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/home.js'%}"></script>
 {% endblock %}

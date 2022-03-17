@@ -3,7 +3,16 @@
 {% block title %}Rechercher des prescripteurs habilités{{ block.super }}{% endblock %}
 
 {% block pre_content %}
-    {% include "search/includes/generic_search_home.html" with form=form title="Rechercher des prescripteurs habilités" url_search="search:prescribers_results" template_form_name="search/includes/prescribers_search_form.html" %}
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="h1">Rechercher des prescripteurs habilités</h1>
+                    {% include "search/includes/generic_search_home.html" with form=form url_search="search:prescribers_results" template_form_name="search/includes/prescribers_search_form.html" %}
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 
 {# The "content" block is empty here, so we hide it to avoid a gap in UI. #}

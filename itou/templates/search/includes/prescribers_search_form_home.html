@@ -1,0 +1,24 @@
+{% load bootstrap4 %}
+{% load theme_inclusion %}
+
+{% bootstrap_form_errors form type="all" %}
+
+{{ form.city }}
+<label for="{{ form.city_name.id_for_label }}" class="font-weight-bold">Ou ça ?</label>
+<div class="input-group">
+    {{ form.city_name }}
+    <div class="input-group-append">
+        {# No loading #}
+        <span class="input-group-text js-city-autocomplete-no-loading rounded-right py-0">
+            <img src="{% static_theme_images 'ico-bicro-emploi-geo.svg' %}" alt="" height="24">
+        </span>
+        {# Loading #}
+        <span class="input-group-text js-city-autocomplete-loading d-none">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="sr-only">Chargement...</span>
+        </span>
+    </div>
+</div>
+<div class="d-flex justify-content-center mt-3 mt-md-5">
+    <button type="submit" class="flex-grow-1 flex-md-grow-0 btn btn-primary js-search-button" title="Rechercher">Rechercher</button>
+</div>

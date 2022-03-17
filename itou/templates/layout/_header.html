@@ -18,8 +18,8 @@
                 </nav>
             </div>
             <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none" data-toggle="burger" aria-controls="burgerNav" tabindex="0">
-                <span id="burger"><img src="{% static_theme_images "picto-burger.svg" %}" alt="Menu"></span>
-                <span id="close"><img src="{% static_theme_images "picto-close.svg" %}" alt="Fermer"></span>
+                <span id="burger"><img src="{% static_theme_images " picto-burger.svg" %}" alt="Menu"></span>
+                <span id="close"><img src="{% static_theme_images " picto-close.svg" %}" alt="Fermer"></span>
             </div>
             <div id="burgerNav">
                 <nav role="navigation">
@@ -44,27 +44,29 @@
                     <ul>
                         {% if user.is_authenticated %}
                             <li>
-                                <a class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}" href="{% url 'dashboard:index' %}">
-                                    <span>Tableau de bord</span>
+                                <a href="{% url 'dashboard:index' %}">
+                                    <span class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}">Tableau de bord</span>
                                     <i class="ri-arrow-right-line ri-lg"></i>
                                 </a>
                             </li>
                         {% endif %}
                         <li>
-                            <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="/">
-                                <span>Rechercher des employeurs</span>
-                                <i class="ri-arrow-right-line ri-lg"></i>
+                            <a href="/">
+                                <span class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}">Rechercher Emploi et Prescripteurs</span>
+                                <i class="ri-search-eye-line ri-lg"></i>
                             </a>
                         </li>
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a href="{% url 'dashboard:index' %}">
+                                    <span class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}">Tableau de bord</span>
+                                    <i class="ri-arrow-right-line ri-lg"></i>
+                                </a>
+                            </li>
+                        {% endif %}
                         <li>
-                            <a class="{% if '/search/prescribers' in request.path %}font-weight-bold{% endif %}" href="{% url 'search:prescribers_home' %}">
-                                <span>Rechercher des prescripteurs</span>
-                                <i class="ri-arrow-right-line ri-lg"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" aria-label="Accéder à La communauté de l'inclusion (nouvel onglet)">
-                                <span>Communauté</span>
+                            <a href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" title="Accéder à l'espace de documentation (ouverture dans un nouvel onglet)">
+                                <span>Aide et communauté</span>
                                 <i class="ri-arrow-right-up-line ri-lg"></i>
                             </a>
                         </li>

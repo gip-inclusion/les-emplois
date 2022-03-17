@@ -1,21 +1,16 @@
 $(document).ready(() => {
+  
+  $('.js-city-autocomplete-input').each(function() {
+    let citySearchInput = $(this)
+    let hiddenCityInput = citySearchInput.parents('form:first').find('.js-city-autocomplete-hidden')
+    let searchButton = citySearchInput.parents('form:first').find('.js-search-button')
+    let loading = citySearchInput.parents('form:first').find('.js-city-autocomplete-loading')
+    let noLoading = citySearchInput.parents('form:first').find('.js-city-autocomplete-no-loading')
+  
+    let autoSubmitOnEnterPressed = citySearchInput.data('autosubmit-on-enter-pressed')
 
-  let citySearchInput = $('.js-city-autocomplete-input')
-  let hiddenCityInput = $('.js-city-autocomplete-hidden')
-  let searchButton = $('.js-search-button')
-  let loading = $('.js-city-autocomplete-loading')
-  let noLoading = $('.js-city-autocomplete-no-loading')
-
-  let autoSubmitOnEnterPressed = citySearchInput.data('autosubmit-on-enter-pressed')
-
-  function clearInput() {
-    citySearchInput.val('')
-    hiddenCityInput.val('')
-    searchButton.prop("disabled", true)
-  }
-
-  citySearchInput
     // https://api.jqueryui.com/autocomplete/
+    citySearchInput
     .autocomplete({
       delay: 300,
       minLength: 1,
@@ -63,6 +58,10 @@ $(document).ready(() => {
         citySearchInput.val('')
       }
     })
-    .focus(clearInput)
-
+    .focus(e => {
+      citySearchInput.val('')
+      hiddenCityInput.val('')
+      searchButton.prop("disabled", true)
+    })  
+  })
 });

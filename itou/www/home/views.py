@@ -2,14 +2,14 @@ import logging
 
 from django.shortcuts import render
 
-from itou.www.search.forms import SiaeSearchForm
+from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
 
 
 logger = logging.getLogger(__name__)
 
 
 def home(request, template_name="home/home.html"):
-    context = {"siae_search_form": SiaeSearchForm()}
+    context = {"siae_search_form": SiaeSearchForm(), "prescribers_search_form": PrescriberSearchForm()}
     return render(request, template_name, context)
 
 
