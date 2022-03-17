@@ -6,6 +6,10 @@
 {% block content %}
     <h1 class="h1-hero-c1">{{ page_title }}</h1>
 
+    <p>
+        Le tableau ci-dessous comprend 100% des auto-prescriptions faites en 2021, vous y avez accès pour prendre connaissance de ces caractéristiques.
+    </p>
+
     {% if is_stats_public %}
         <div class="mb-4">
             {% include "includes/icon.html" with icon="arrow-right" %}
@@ -19,6 +23,7 @@
     <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
     <iframe src="{{ iframeurl }}" width="100%" onload="iFrameResize({}, this)" frameborder="0">
     </iframe>
+
 
     <div class="mt-5 mb-3 mb-lg-5">
         <h3 class="h2">Aide à la lecture et à l'utilisation de ces indicateurs/graphiques</h3>
@@ -51,6 +56,12 @@
             <img class="mt-5 img-fluid" src="{% static 'img/stats/metabase-download-icon.png' %}">
         </p>
     </div>
+
+    {% if back_url %}
+        <p class="mt-4">
+            <a href="{{ back_url }}">Retour</a>
+        </p>
+    {% endif %}
 
 
 {% endblock %}

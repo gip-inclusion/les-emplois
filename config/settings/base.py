@@ -83,6 +83,7 @@ LOCAL_APPS = [
     "itou.metabase",
     "itou.asp",
     "itou.employee_record",
+    "itou.siae_evaluations",
     # www.
     "itou.www.apply",
     "itou.www.approvals_views",
@@ -98,6 +99,7 @@ LOCAL_APPS = [
     "itou.www.stats",
     "itou.www.welcoming_tour",
     "itou.www.employee_record_views",
+    "itou.www.siae_evaluations_views",
     # API
     "itou.api",
 ]
