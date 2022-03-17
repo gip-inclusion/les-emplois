@@ -111,7 +111,21 @@ duet-date-picker.is-invalid~.invalid-feedback {
 }
 
 
-/* Missing Boostrap utilities
+/* Dropdown menus.
+--------------------------------------------------------------------------- */
+
+/*
+Make dropdown menus scrollable in case there are too many items.
+Credits go to https://stackoverflow.com/a/19229738
+*/
+
+.dropdown-menu {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+
+/* Missing Boostrap utilities.
 --------------------------------------------------------------------------- */
 
 @media (min-width: 768px) {
@@ -153,7 +167,7 @@ duet-date-picker.is-invalid~.invalid-feedback {
 }
 
 
-/* Browser-specific issues
+/* Browser-specific issues.
 --------------------------------------------------------------------------- */
 
 
@@ -188,7 +202,7 @@ _:-ms-fullscreen,
 }
 
 
-/* JavaScript disabled
+/* JavaScript disabled.
 ---------------------------------------------------------------------------- */
 
 
@@ -280,7 +294,7 @@ Usage:
 }
 
 
-/* Dropzone component used to upload files to an S3 bucket
+/* Dropzone component used to upload files to an S3 bucket.
 --------------------------------------------------------------------------- */
 
 
@@ -305,7 +319,7 @@ Usage:
     top: auto !important;
 }
 
-/* To be integrated to the global theme
+/* To be integrated to the global theme.
 --------------------------------------------------------------------------- */
 
 .list-group-item {
@@ -324,8 +338,10 @@ Usage:
 .title-with-badge .badge{
     font-size: 1rem;
 }
-/* To be discussed
+
+/* To be discussed.
 --------------------------------------------------------------------------- */
+
 .collapse-caret, .collapse-caret:hover{
     text-decoration: unset;
 }
