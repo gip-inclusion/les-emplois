@@ -85,7 +85,7 @@
             </p>
             {% if current_prescriber_organization.has_pending_authorization_proof %}
                 <p class="mb-0">
-                    Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
+                    Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
                     <a href="{{ TYPEFORM_URL }}/to/mk0GyI67#idprescriber={{ current_prescriber_organization.pk }}&iduser={{ user.pk }}&source={{ ITOU_ENVIRONMENT }}" rel="noopener" target="_blank" title="Cliquez ici pour l'envoyer (ouverture dans un nouvel onglet)">
                         cliquez ici pour l'envoyer
                         <i class="ri-external-link-line ri-lg"></i>
@@ -95,7 +95,9 @@
         </div>
     {% endif %}
 
-    {% if user.joined_recently %}
+    {# welcoming_tour desactivé spécifiquement pour les institutions partenaires #}
+    {# en attendant une carte plus globale sur le sujet #}
+    {% if user.joined_recently and not user.is_labor_inspector%}
         {% include "welcoming_tour/includes/message.html" %}
     {% endif %}
 
@@ -117,7 +119,7 @@
             <div class="card-body">
                 <p class="h4 mb-3">
                     <span class="badge badge-warning">Nouveau</span>
-                    Bénéficiez des bonnes pratiques et actualités de la 1ère communauté des professionnels de l'inclusion !
+                    Bénéficiez des bonnes pratiques et actualités de la 1ère communauté des professionnels de l'inclusion !
                 </p>
                 <p class="mb-0">
                     <a href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" class="btn btn-primary" title="Partagez et découvrez les outils qui facilitent votre quotidien (ouverture dans un nouvel onglet)">
@@ -380,11 +382,11 @@
 
                         {% if current_siae.is_subject_to_eligibility_rules %}
                             {% comment %}
-                            NOTE(vperron):
-                            We currently do not allow OPCS users to apply for an offer.
-                            We will have to discuss this matter further with AVE, but it has been
-                            decided that it probably did not make much sense initially.
-                            {% endcomment %}
+                NOTE(vperron):
+                We currently do not allow OPCS users to apply for an offer.
+                We will have to discuss this matter further with AVE, but it has been
+                decided that it probably did not make much sense initially.
+                {% endcomment %}
                             <li class="card-text mb-3">
                                 <i class="ri-login-box-line ri-lg mr-1"></i>
                                 <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
@@ -463,10 +465,6 @@
                             </li>
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
-                                <a href="{% url 'stats:stats_ddets_diagnosis_control' %}">Voir mes données 2021 du contrôle a posteriori (version bêta)</a>
-                            </li>
-                            <li class="card-text mb-3">
-                                <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_ddets_hiring' %}">Voir les données facilitation de l'embauche</a>
                                 <span class="badge badge-info">Nouveau</span>
                             </li>
@@ -503,6 +501,20 @@
                 </div>
             </div>
 
+        {% endif %}
+
+        {% if can_view_stats_ddets and has_active_campaign %}
+            <div class="card">
+                <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info">Nouveau</span></p>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="card-text mb-3">
+                            <i class="ri-pulse-line ri-lg mr-1"></i>
+                            <a href="{% url 'siae_evaluations_views:samples_selection' %}">Sélectionner l'échantillon</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         {% endif %}
     </div>
 

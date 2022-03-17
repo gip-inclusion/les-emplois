@@ -14,6 +14,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
+from itou.siae_evaluations.models import EvaluationCampaign
 from itou.siaes.models import Siae
 from itou.utils.password_validation import FRANCE_CONNECT_PASSWORD_EXPLANATION
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -29,6 +30,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     can_show_employee_records = False
     job_applications_categories = []
     num_rejected_employee_records = 0
+    has_active_campaign = False
 
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
@@ -82,6 +84,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     if request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
+        has_active_campaign = EvaluationCampaign.objects.has_active_campaign(current_org)
 
     context = {
         "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
@@ -96,6 +99,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_dreets": request.user.can_view_stats_dreets(current_org=current_org),
         "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
         "num_rejected_employee_records": num_rejected_employee_records,
+        "has_active_campaign": has_active_campaign,
     }
 
     return render(request, template_name, context)

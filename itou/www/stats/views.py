@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, REGIONS
@@ -142,8 +143,9 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
     }
     context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
-        "page_title": "Données 2021 (version bêta) du contrôle a posteriori",
+        "page_title": "Données 2021 du contrôle a posteriori",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "back_url": reverse("siae_evaluations_views:samples_selection"),
     }
     return render(request, template_name, context)
 

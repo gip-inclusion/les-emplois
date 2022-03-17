@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord
+from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByPrescriberFactory,
@@ -16,6 +17,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.prescribers import factories as prescribers_factories
+from itou.siae_evaluations.factories import EvaluationCampaignFactory
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
@@ -160,6 +162,28 @@ class DashboardViewTest(TestCase):
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Créer/rejoindre une autre structure")
+
+    def test_dashboard_siae_evaluations_institution_access(self):
+        membershipfactory = InstitutionMembershipFactory()
+        user = membershipfactory.user
+        institution = membershipfactory.institution
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Contrôle a posteriori")
+
+        EvaluationCampaignFactory(institution=institution)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Contrôle a posteriori")
+
+    def test_dashboard_siae_evaluations_siae_access(self):
+        # preset for incoming new pages
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Contrôle a posteriori")
 
 
 class EditUserInfoViewTest(TestCase):
