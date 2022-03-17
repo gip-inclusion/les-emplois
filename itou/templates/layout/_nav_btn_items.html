@@ -89,7 +89,9 @@
                                     class="dropdown-item text-primary {% if s.pk == current_siae.pk %} font-weight-bold disabled{% endif %}"
                                     type="submit"
                                     name="siae_id"
-                                    value="{{ s.pk }}"><span class="badge badge-primary">{{ s.kind }}</span> {{ s.display_name }}
+                                    value="{{ s.pk }}">
+                                    <span class="badge badge-primary">{{ s.kind }}</span>
+                                    {{ s.display_name }}
                                 </button>
                             </li>
                         {% endfor %}
@@ -114,7 +116,9 @@
                                     class="dropdown-item text-primary {% if po.pk == current_prescriber_organization.pk %} font-weight-bold disabled{% endif %}"
                                     type="submit"
                                     name="prescriber_organization_id"
-                                    value="{{ po.pk }}">{{ po.display_name }} <span class="badge badge-primary">{{ s.kind }}</span>
+                                    value="{{ po.pk }}">
+                                    <span class="badge badge-primary">{{ po.kind }}</span>
+                                    {{ po.display_name }}
                                 </button>
                             </li>
                         {% endfor %}
@@ -139,7 +143,9 @@
                                     class="dropdown-item text-primary {% if i.pk == current_institution.pk %} font-weight-bold disabled{% endif %}"
                                     type="submit"
                                     name="institution_id"
-                                    value="{{ i.pk }}">{{ i.display_name }} <span class="badge badge-primary">{{ i.kind }}</span>
+                                    value="{{ i.pk }}">
+                                    <span class="badge badge-primary">{{ i.kind }}</span>
+                                    {{ i.display_name }}
                                 </button>
                             </li>
                         {% endfor %}
