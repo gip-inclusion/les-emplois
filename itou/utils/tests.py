@@ -135,12 +135,12 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             self.assertDictEqual(expected, result)
 
     def test_siae_multiple_memberships(self):
-
-        siae1 = SiaeWithMembershipFactory()
+        # Specify name to ensure alphabetical sorting order.
+        siae1 = SiaeWithMembershipFactory(name="1")
         user = siae1.members.first()
         self.assertTrue(siae1.has_admin(user))
 
-        siae2 = SiaeFactory()
+        siae2 = SiaeFactory(name="2")
         siae2.members.add(user)
         self.assertFalse(siae2.has_admin(user))
 
@@ -193,12 +193,12 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             self.assertDictEqual(expected, result)
 
     def test_prescriber_organization_multiple_membership(self):
-
-        organization1 = PrescriberOrganizationWithMembershipFactory()
+        # Specify name to ensure alphabetical sorting order.
+        organization1 = PrescriberOrganizationWithMembershipFactory(name="1")
         user = organization1.members.first()
         self.assertTrue(user.prescribermembership_set.get(organization=organization1).is_admin)
 
-        organization2 = PrescriberOrganizationWithMembershipFactory()
+        organization2 = PrescriberOrganizationWithMembershipFactory(name="2")
         organization2.members.add(user)
 
         request = self.go_to_dashboard(
@@ -251,10 +251,11 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             self.assertDictEqual(expected, result)
 
     def test_labor_inspector_multiple_institutions(self):
-        institution1 = InstitutionWithMembershipFactory()
+        # Specify name to ensure alphabetical sorting order.
+        institution1 = InstitutionWithMembershipFactory(name="1")
         user = institution1.members.first()
         self.assertTrue(user.institutionmembership_set.get(institution=institution1).is_admin)
-        institution2 = InstitutionFactory()
+        institution2 = InstitutionFactory(name="2")
         institution2.members.add(user)
         self.assertFalse(institution2.has_admin(user))
 
