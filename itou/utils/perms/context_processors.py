@@ -38,6 +38,7 @@ def get_current_organization_and_perms(request):
                 .all()
             )
             user_siaes = [membership.siae for membership in memberships]
+
             for membership in memberships:
                 if membership.siae_id == siae_pk:
                     siae = membership.siae
@@ -87,6 +88,11 @@ def get_current_organization_and_perms(request):
                 if membership.institution.pk == institution_pk:
                     current_institution = membership.institution
                     user_is_institution_admin = membership.is_admin
+
+    # Sort items nicely for dropdown menu.
+    user_siaes.sort(key=lambda o: (o.kind, o.display_name))
+    user_prescriberorganizations.sort(key=lambda o: (o.kind, o.display_name))
+    user_institutions.sort(key=lambda o: (o.kind, o.display_name))
 
     context = {
         "current_prescriber_organization": prescriber_organization,
