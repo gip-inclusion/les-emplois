@@ -1116,6 +1116,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 
     class Meta:
+        db_table = "merged_approvals_poleemploiapproval"
         verbose_name = "Agrément Pôle emploi"
         verbose_name_plural = "Agréments Pôle emploi"
         ordering = ["-start_at"]
