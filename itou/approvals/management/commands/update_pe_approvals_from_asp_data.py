@@ -154,7 +154,7 @@ class Command(BaseCommand):
 
     def handle(self, file_path, dry_run=False, **options):
         self.dry_run = dry_run
-        self.stdout.write("Exporting approvals / PASS IAE")
+        self.stdout.write("Importing NIR from ASP data.")
         # The fastest way I’ve found to parse this file is to use a CsvDictReader with a CSV file
         # akin to what I do in update_nir_from_pe_data
         # See https://pandas.pydata.org/pandas-docs/version/1.0.0/user_guide/io.html#io-xlsb
