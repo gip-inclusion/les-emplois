@@ -32,24 +32,36 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
     job_description = get_object_or_404(SiaeJobDescription, pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
     siae = job_description.siae
+    can_update_job_description = request.session.get("current_siae") == siae.pk
+
     others_active_jobs = (
         SiaeJobDescription.objects.select_related("appellation")
         .filter(is_active=True, siae=siae)
         .exclude(id=job_description_id)
         .order_by("-updated_at", "-created_at")
     )
-    breadcrumbs = {
-        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
-        "Détail du poste": reverse(
-            "siaes_views:job_description_card",
-            kwargs={
-                "job_description_id": job_description_id,
-            },
-        ),
-    }
+
+    breadcrumbs = {}
+    if can_update_job_description:
+        breadcrumbs = {
+            "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+        }
+
+    breadcrumbs.update(
+        {
+            "Détail du poste": reverse(
+                "siaes_views:job_description_card",
+                kwargs={
+                    "job_description_id": job_description_id,
+                },
+            ),
+        }
+    )
+
     context = {
         "job": job_description,
         "siae": siae,
+        "can_update_job_description": can_update_job_description,
         "others_active_jobs": others_active_jobs,
         "back_url": back_url,
         "breadcrumbs": breadcrumbs,
@@ -61,7 +73,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
     siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
     job_descriptions = (
-        SiaeJobDescription.objects.filter(siae__pk=siae.pk)
+        SiaeJobDescription.objects.filter(siae__pk=siae.pk, is_active=True)
         .prefetch_related("appellation", "appellation__rome", "siae")
         .order_by_most_recent()
     )
@@ -153,8 +165,6 @@ def edit_job_description(request, template_name="siaes/edit_job_description.html
         siae, instance=job_description, data=request.POST or None, initial=session_data
     )
 
-    print(form.errors)
-
     if request.method == "POST" and form.is_valid():
         request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
         return HttpResponseRedirect(reverse("siaes_views:edit_job_description_details"))
@@ -221,6 +231,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
     context = {
         "form": form,
         "rome": rome,
+        "is_opcs": siae.is_opcs,
         "breadcrumbs": breadcrumbs,
     }
 

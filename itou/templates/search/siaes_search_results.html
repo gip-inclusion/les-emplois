@@ -58,7 +58,7 @@
             </div>
             <div class="col-12 col-md-8">
                 {% for siae in siaes_page %}
-                    {% with siae.job_description_through.all as jobs_descriptions %}
+                    {% with siae.job_description_through.active as jobs_descriptions %}
                         {% include "siaes/includes/_card_siae.html" with siae=siae jobs_descriptions=jobs_descriptions %}
                     {% endwith %}
                 {% empty %}

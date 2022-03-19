@@ -7,6 +7,7 @@ from django.urls import reverse
 from itou.cities.models import City
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import ContractType
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeJobDescription
@@ -149,7 +150,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         post_data = {
-            "job_appellation_code": "11076",  # Must be a non existing one for the SIAE
+            "job_appellation_code": 11076,  # Must be a non existing one for the SIAE
             "job_appellation": "Whatever",
             "custom_name": "custom_name",
             "location_code": "paris-75",
@@ -219,7 +220,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         post_data = {
-            "job_appellation_code": "11076",  # Must be a non existing one for the SIAE
+            "job_appellation_code": 11076,  # Must be a non existing one for the SIAE
             "job_appellation": "Whatever",
             "market_context_description": "Whatever market description",
             "custom_name": "custom_name",
@@ -294,7 +295,6 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self._login(self.user)
 
         self.assertEqual(response.status_code, 200)
-
         self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         response = self.client.get(self.update_url, follow=True)
@@ -308,3 +308,36 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
         self.assertContains(response, self.job_description.appellation.name)
 
         # At this point, we're redirected to 'edit_job_description'
+
+
+class JobDescriptionCardTest(JobDescriptionAbstractTest):
+    def setUp(self):
+        super().setUp()
+        self.job_description = self.siae.job_description_through.first()
+        self.url = reverse(
+            "siaes_views:job_description_card",
+            kwargs={
+                "job_description_id": self.job_description.pk,
+            },
+        )
+
+    def test_siae_card_actions(self):
+        # Checks if SIAE can update their job descriptions
+        response = self._login(self.user)
+
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "Modifier")
+
+    def test_non_siae_card_actions(self):
+        # Checks if non-SIAE can apply to opened job descriptions
+        user = PrescriberOrganizationWithMembershipFactory().members.first()
+        response = self._login(user)
+
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "Postuler")

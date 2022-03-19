@@ -526,6 +526,9 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
     def order_by_most_recent(self):
         return self.order_by("-updated_at", "-created_at")
 
+    def active(self):
+        return self.filter(is_active=True)
+
 
 class SiaeJobDescription(models.Model):
     """
