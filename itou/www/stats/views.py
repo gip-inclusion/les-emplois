@@ -149,6 +149,28 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
 
 
 @login_required
+def stats_ddets_hiring(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
+    They can only view data for their own departement.
+    This dashboard shows data about hiring ("Facilitation de l'embauche").
+    """
+    current_institution = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_ddets(current_org=current_institution):
+        raise PermissionDenied
+    department = request.user.get_stats_ddets_department(current_org=current_institution)
+    params = {
+        DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
+    }
+    context = {
+        "iframeurl": metabase_embedded_url(request=request, params=params),
+        "page_title": f"Données facilitation de l'embauche de mon département : {DEPARTMENTS[department]}",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
 def stats_dreets_iae(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DREETS ("Directions régionales de l’économie, de l’emploi, du travail et des solidarités") stats shown to
