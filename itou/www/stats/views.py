@@ -230,3 +230,11 @@ def stats_dgefp_af(request, template_name=_STATS_HTML_TEMPLATE):
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
+
+
+def poc_matomo_custom_url(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    Simple public route to test Matomo custom URL feature.
+    """
+    context = {"matomo_custom_url": "/matomo-custom-urls-actually-do-work.html"}
+    return render(request, template_name, context)
