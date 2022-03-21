@@ -459,13 +459,13 @@
                         {% if can_view_stats_cd %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
-                                <a href="{% url 'stats:stats_cd' %}">Données IAE</a>
+                                <a href="{% url 'stats:stats_cd' %}">Voir mes données IAE</a>
                             </li>
                         {% endif %}
                         {% if can_view_stats_ddets %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
-                                <a href="{% url 'stats:stats_ddets_iae' %}">Données IAE</a>
+                                <a href="{% url 'stats:stats_ddets_iae' %}">Voir les données IAE de mon département</a>
                             </li>
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
@@ -473,20 +473,20 @@
                             </li>
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
-                                <a href="{% url 'stats:stats_ddets_hiring' %}">Données facilitation de l'embauche</a>
+                                <a href="{% url 'stats:stats_ddets_hiring' %}">Voir les données facilitation de l'embauche</a>
                                 <span class="badge badge-info">Nouveau</span>
                             </li>
                         {% endif %}
                         {% if can_view_stats_dreets %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
-                                <a href="{% url 'stats:stats_dreets_iae' %}">Données IAE</a>
+                                <a href="{% url 'stats:stats_dreets_iae' %}">Voir les données IAE de ma région</a>
                             </li>
                         {% endif %}
                         {% if can_view_stats_dgefp %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
-                                <a href="{% url 'stats:stats_dgefp_iae' %}">Données IAE</a>
+                                <a href="{% url 'stats:stats_dgefp_iae' %}">Voir les données IAE France entière</a>
                             </li>
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
@@ -495,7 +495,7 @@
                             </li>
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
-                                <a href="{% url 'stats:stats_dgefp_af' %}">Annexes financières actives</a>
+                                <a href="{% url 'stats:stats_dgefp_af' %}">Voir les données des annexes financières actives</a>
                                 <span class="badge badge-info">Nouveau</span>
                             </li>
                         {% endif %}
