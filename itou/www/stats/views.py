@@ -125,6 +125,7 @@ def stats_ddets_iae(request, template_name=_STATS_HTML_TEMPLATE):
     return render(request, template_name, context)
 
 
+@login_required
 def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
@@ -193,6 +194,7 @@ def stats_dgefp_iae(request, template_name=_STATS_HTML_TEMPLATE):
     return render(request, template_name, context)
 
 
+@login_required
 def stats_dgefp_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
     """
     DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
