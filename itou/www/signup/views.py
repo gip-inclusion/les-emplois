@@ -180,7 +180,6 @@ def siae_select(request, template_name="signup/siae_select.html"):
 
     context = {
         "next_url": next_url,
-        "facilitators_enabled": settings.FEATURE_ENABLE_FACILITATORS,
         "siaes_without_members": siaes_without_members,
         "siaes_with_members": siaes_with_members,
         "siae_select_form": siae_select_form,

@@ -6,7 +6,7 @@ import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.core import mail
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
 
@@ -230,7 +230,4 @@ class SiaeSignupTest(TestCase):
     def test_facilitator_base_signup_process(self):
         url = reverse("signup:siae_select")
         response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
-        self.assertNotContains(response, "Si votre organisation est porteuse de la clause sociale")
-        with override_settings(FEATURE_ENABLE_FACILITATORS=True):
-            response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
-            self.assertContains(response, "Si votre organisation est porteuse de la clause sociale")
+        self.assertContains(response, "Si votre organisation est porteuse de la clause sociale")
