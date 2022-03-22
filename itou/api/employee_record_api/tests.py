@@ -3,6 +3,7 @@ from unittest import mock
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
+from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithCompleteJobSeekerProfileFactory
@@ -58,7 +59,7 @@ class EmployeeRecordAPIPermissionsTest(APITestCase):
         # We only care about status filtering: no coherence check on ASP return values
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         self.employee_record_ready = EmployeeRecordWithProfileFactory(
-            job_application=job_application, status=EmployeeRecord.Status.READY
+            job_application=job_application, status=Status.READY
         )
 
         self.user = self.employee_record_ready.job_application.to_siae.members.first()

@@ -13,10 +13,10 @@ from itou.prescribers.factories import (
 )
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import SiaeJobDescription
-from itou.users.enums import Title
 from itou.users.factories import (
     JobSeekerFactory,
     JobSeekerProfileFactory,
+    JobSeekerProfileWithHexaAddressFactory,
     JobSeekerWithMockedAddressFactory,
     PrescriberFactory,
 )
@@ -158,6 +158,5 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
         if not create:
             # Simple build, do nothing.
             return
-        self.job_seeker.title = Title.M
-
-        JobSeekerProfileFactory(user=self.job_seeker).save()
+        # Create a profile for current user
+        JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker).save()

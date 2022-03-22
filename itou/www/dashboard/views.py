@@ -10,6 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -72,7 +73,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
         num_rejected_employee_records = EmployeeRecord.objects.filter(
-            status=EmployeeRecord.Status.REJECTED,
+            status=Status.REJECTED,
             job_application__to_siae=current_org,
         ).count()
 

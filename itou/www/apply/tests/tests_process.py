@@ -13,8 +13,8 @@ from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -641,7 +641,7 @@ class ProcessViewsTest(TestCase):
         )
         siae_user = job_application.to_siae.members.first()
         # Add a blocking employee record
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.PROCESSED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})

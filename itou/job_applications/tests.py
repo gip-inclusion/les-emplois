@@ -18,8 +18,8 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.csv_export import generate_csv_export
 from itou.job_applications.factories import (
@@ -155,21 +155,21 @@ class JobApplicationModelTest(TestCase):
         self.assertTrue(job_application_ok.can_be_cancelled)
 
         # Can be cancelled with a related employee record in NEW, READY, REJECTED status
-        EmployeeRecordFactory(job_application=job_application_ok, status=EmployeeRecord.Status.NEW)
+        EmployeeRecordFactory(job_application=job_application_ok, status=Status.NEW)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
-        EmployeeRecordFactory(job_application=job_application_ok, status=EmployeeRecord.Status.READY)
+        EmployeeRecordFactory(job_application=job_application_ok, status=Status.READY)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
-        EmployeeRecordFactory(job_application=job_application_ok, status=EmployeeRecord.Status.REJECTED)
+        EmployeeRecordFactory(job_application=job_application_ok, status=Status.REJECTED)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
         # Can't be cancelled with a related employee record in PROCESSED or SENT status
         job_application_not_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
-        EmployeeRecordFactory(job_application=job_application_not_ok, status=EmployeeRecord.Status.SENT)
+        EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.SENT)
         self.assertFalse(job_application_not_ok.can_be_cancelled)
 
-        EmployeeRecordFactory(job_application=job_application_not_ok, status=EmployeeRecord.Status.PROCESSED)
+        EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.PROCESSED)
         self.assertFalse(job_application_not_ok.can_be_cancelled)
 
         # Comes from AI stock.
@@ -1363,7 +1363,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Linked employee record with blocking status
         job_application = JobApplicationWithApprovalFactory(hiring_start_at=(today - relativedelta(days=365)))
         cancellation_user = job_application.to_siae.active_members.first()
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.PROCESSED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
         # xworkflows.base.AbortTransition
         with self.assertRaises(xwf_models.AbortTransition):

@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 
 from itou.asp.models import Commune, RSAAllocation
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.enums import Status
 from itou.siaes.models import SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
@@ -21,18 +21,18 @@ class SelectEmployeeRecordStatusForm(forms.Form):
     # employee record statuses.
     # The other ones are internal only.
     STATUSES = [
-        EmployeeRecord.Status.NEW,
-        EmployeeRecord.Status.READY,
-        EmployeeRecord.Status.SENT,
-        EmployeeRecord.Status.REJECTED,
-        EmployeeRecord.Status.PROCESSED,
+        Status.NEW,
+        Status.READY,
+        Status.SENT,
+        Status.REJECTED,
+        Status.PROCESSED,
     ]
 
     STATUS_CHOICES = [(choice.name, choice.label) for choice in STATUSES]
     status = forms.ChoiceField(
         widget=forms.RadioSelect(),
         choices=STATUS_CHOICES,
-        initial=EmployeeRecord.Status.NEW,
+        initial=Status.NEW,
     )
 
 

@@ -5,8 +5,9 @@ import string
 import factory
 import factory.fuzzy
 
+from itou.asp.factories import CommuneFactory, CountryFranceFactory
 from itou.asp.mocks.providers import INSEECommuneProvider, INSEECountryProvider
-from itou.asp.models import AllocationDuration, EducationLevel
+from itou.asp.models import AllocationDuration, EducationLevel, LaneType
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.users import models
 from itou.users.enums import Title
@@ -37,8 +38,11 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 
 class JobSeekerFactory(UserFactory):
+    title = random.choice(Title.values)
     is_job_seeker = True
     pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
+    birth_country = factory.SubFactory(CountryFranceFactory)
+    birth_place = factory.SubFactory(CommuneFactory)
 
     @factory.lazy_attribute
     def nir(self):
@@ -64,9 +68,6 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 
 
 class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
-    birth_country = factory.Faker("asp_country")
-    title = random.choice(Title.values)
-
     @factory.post_generation
     def set_approval_user(self, create, extracted, **kwargs):
         if not create:
@@ -88,6 +89,15 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     education_level = random.choice(EducationLevel.values)
     # JobSeeker are created with a Pôle emploi ID
     pole_emploi_since = AllocationDuration.MORE_THAN_24_MONTHS
+
+
+class JobSeekerProfileWithHexaAddressFactory(JobSeekerProfileFactory):
+    # Adding a minimum profile with all mandatory fields
+    # will avoid many mocks and convolutions during testing.
+    hexa_lane_type = random.choice(LaneType.values)
+    hexa_lane_name = factory.Faker("street_address", locale="fr_FR")
+    hexa_commune = factory.SubFactory(CommuneFactory)
+    hexa_post_code = factory.Faker("postalcode")
 
 
 class PrescriberFactory(UserFactory):

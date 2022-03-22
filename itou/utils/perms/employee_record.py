@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.enums import Status
 from itou.job_applications.models import JobApplication
 from itou.utils.perms.siae import get_current_siae_or_404
 
@@ -20,9 +20,9 @@ def tunnel_step_is_allowed(job_application):
     employee_record = job_application.employee_record.first()
 
     return employee_record.status in [
-        EmployeeRecord.Status.NEW,
-        EmployeeRecord.Status.READY,
-        EmployeeRecord.Status.REJECTED,
+        Status.NEW,
+        Status.READY,
+        Status.REJECTED,
     ]
 
 

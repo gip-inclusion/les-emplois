@@ -1,9 +1,8 @@
 import string
-from datetime import timedelta
 
 import factory
-from django.utils import timezone
 
+from itou.employee_record.enums import NotificationStatus, NotificationType
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
@@ -22,9 +21,7 @@ class EmployeeRecordFactory(factory.django.DjangoModelFactory):
         model = EmployeeRecord
 
     job_application = factory.SubFactory(JobApplicationWithApprovalNotCancellableFactory)
-
     asp_id = factory.fuzzy.FuzzyText(length=7, chars=string.digits)
-    approval_number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix="99999")
 
     @factory.post_generation
     def set_job_seeker_profile(self, create, extracted, **kwargs):
@@ -33,6 +30,7 @@ class EmployeeRecordFactory(factory.django.DjangoModelFactory):
             return
 
         self.siret = self.job_application.to_siae.siret
+        self.approval_number = self.job_application.approval.number
 
 
 class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
@@ -45,5 +43,5 @@ class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
 
 class EmployeeRecordUpdateNotificationFactory(factory.django.DjangoModelFactory):
     employee_record = factory.SubFactory(EmployeeRecordFactory)
-    start_at = timezone.now().date()
-    end_at = timezone.now().date() + timedelta(weeks=52)
+    notification_type = NotificationType.APPROVAL
+    status = NotificationStatus.NEW
