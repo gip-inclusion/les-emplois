@@ -6,8 +6,8 @@ from django.utils.http import urlencode
 
 from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
+from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.factories import DEFAULT_PASSWORD
@@ -29,7 +29,7 @@ class ApprovalSuspendViewTest(TestCase):
         )
 
         # Ensure that the job_application cannot be canceled.
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.PROCESSED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
         approval = job_application.approval
         self.assertEqual(0, approval.suspension_set.count())
@@ -86,7 +86,7 @@ class ApprovalSuspendViewTest(TestCase):
         )
 
         # Ensure that the job_application cannot be canceled.
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.PROCESSED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
         # Fill all form data:
         # do not forget to fill `end_at` field with None (or model init will override with a default value)

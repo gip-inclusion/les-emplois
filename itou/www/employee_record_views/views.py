@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.encoding import escape_uri_path
 
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.users.models import JobSeekerProfile
@@ -59,7 +60,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         raise PermissionDenied
 
     form = SelectEmployeeRecordStatusForm(data=request.GET or None)
-    status = EmployeeRecord.Status.NEW
+    status = Status.NEW
 
     # Employee records are created with a job application object
     # At this stage, new job applications / hirings do not have
@@ -89,10 +90,10 @@ def list_employee_records(request, template_name="employee_record/list.html"):
             JobApplication.objects.eligible_as_employee_record(siae).count(),
             "info",
         ),
-        (employee_record_badges.get(EmployeeRecord.Status.READY, 0), "secondary"),
-        (employee_record_badges.get(EmployeeRecord.Status.SENT, 0), "warning"),
-        (employee_record_badges.get(EmployeeRecord.Status.REJECTED, 0), "danger"),
-        (employee_record_badges.get(EmployeeRecord.Status.PROCESSED, 0), "success"),
+        (employee_record_badges.get(Status.READY, 0), "secondary"),
+        (employee_record_badges.get(Status.SENT, 0), "warning"),
+        (employee_record_badges.get(Status.REJECTED, 0), "danger"),
+        (employee_record_badges.get(Status.PROCESSED, 0), "success"),
     ]
 
     # Override defaut value (NEW status)
@@ -103,16 +104,16 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     # Not needed every time (not pulled-up), and DRY here
     base_query = EmployeeRecord.objects.full_fetch()
 
-    if status == EmployeeRecord.Status.NEW:
+    if status == Status.NEW:
         data = JobApplication.objects.eligible_as_employee_record(siae)
         employee_records_list = False
-    elif status == EmployeeRecord.Status.READY:
+    elif status == Status.READY:
         data = base_query.ready_for_siae(siae)
-    elif status == EmployeeRecord.Status.SENT:
+    elif status == Status.SENT:
         data = base_query.sent_for_siae(siae)
-    elif status == EmployeeRecord.Status.REJECTED:
+    elif status == Status.REJECTED:
         data = EmployeeRecord.objects.rejected_for_siae(siae)
-    elif status == EmployeeRecord.Status.PROCESSED:
+    elif status == Status.PROCESSED:
         data = base_query.processed_for_siae(siae)
 
     if data:
@@ -322,7 +323,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     employee_record = get_object_or_404(EmployeeRecord.objects.full_fetch(), job_application=job_application)
 
     if request.method == "POST":
-        if employee_record.status in [EmployeeRecord.Status.NEW, EmployeeRecord.Status.REJECTED]:
+        if employee_record.status in [Status.NEW, Status.REJECTED]:
             employee_record.update_as_ready()
         return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.id,)))
 

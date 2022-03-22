@@ -4,6 +4,7 @@ import os.path as os_path
 from django.core.management.base import BaseCommand
 from rest_framework.renderers import JSONRenderer
 
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordSerializer
 from itou.utils.management_commands import DeprecatedLoggerMixin
@@ -58,7 +59,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                     continue
 
                 # If and only if SENT :
-                if employee_record.status == EmployeeRecord.Status.SENT:
+                if employee_record.status == Status.SENT:
                     serializer = EmployeeRecordSerializer(employee_record)
 
                     self.logger.info("Processing employee record: %s", employee_record)

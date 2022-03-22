@@ -3,7 +3,8 @@ import logging
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.employee_record.serializers import EmployeeRecordUpdateNotificationSerializer
 from itou.job_applications.models import JobApplication
 
 from .perms import EmployeeRecordAPIPermission
@@ -37,7 +38,19 @@ class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         return JobApplication.objects.order_by("pk")[:25]
 
 
-class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
+class AbstractEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
+
+    # Possible authentication frameworks:
+    # - token auth: for external access / real world use case
+    # - session auth: for dev context and browseable API
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    # Additional / custom permission classes:
+    # Enforce the default one (IsAuthenticated)
+    permission_classes = [EmployeeRecordAPIPermission]
+
+
+class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
     """
     # API fiches salarié
 
@@ -88,15 +101,6 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = EmployeeRecordAPISerializer
 
-    # Possible authentication frameworks:
-    # - token auth: for external access / real world use case
-    # - session auth: for dev context and browseable API
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-
-    # Additional / custom permission classes:
-    # Enforce the default one (IsAuthenticated)
-    permission_classes = [EmployeeRecordAPIPermission]
-
     def get_queryset(self):
         # We only get to this point if permissions are OK
         queryset = EmployeeRecord.objects.full_fetch()
@@ -139,3 +143,8 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
         # Default queryset without params
         return queryset.processed()
+
+
+class EmployeeRecordUpdateNotificationViewSet(AbstractEmployeeRecordViewSet):
+    queryset = EmployeeRecordUpdateNotification.objects.all()
+    serializer_class = EmployeeRecordUpdateNotificationSerializer

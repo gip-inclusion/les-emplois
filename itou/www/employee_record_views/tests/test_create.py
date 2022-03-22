@@ -4,8 +4,13 @@ from django.test import TestCase
 from django.urls import reverse
 
 from itou.asp.models import Commune, Country
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
+from itou.job_applications.factories import (
+    JobApplicationWithApprovalNotCancellableFactory,
+    JobApplicationWithCompleteJobSeekerProfileFactory,
+    JobApplicationWithJobSeekerProfileFactory,
+)
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithMockedAddressFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
@@ -113,13 +118,14 @@ class AbstractCreateEmployeeRecordTest(TestCase):
     def test_access_denied_bad_permissions(self):
         # Must not have access
         self.client.login(username=self.user_without_perms.username, password=DEFAULT_PASSWORD)
-        response = self.client.get(self.url)
 
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
     def test_access_denied_bad_siae_kind(self):
         # SIAE can't use employee record (not the correct kind)
         self.client.login(username=self.user_siae_bad_kind.username, password=DEFAULT_PASSWORD)
+
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 403)
@@ -127,15 +133,8 @@ class AbstractCreateEmployeeRecordTest(TestCase):
 
 class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
     """
-    Create employee record step 1:
-
     Employee details form: title and birth place
     """
-
-    fixtures = [
-        "test_INSEE_communes.json",
-        "test_INSEE_country.json",
-    ]
 
     def setUp(self):
         super().setUp()
@@ -231,24 +230,15 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
 class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
     """
-    Create employee record step 2:
-
     Test employee (HEXA) address
     """
-
-    fixtures = [
-        "test_INSEE_communes.json",
-        "test_INSEE_country.json",
-    ]
 
     def setUp(self):
         super().setUp()
 
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae, job_seeker=JobSeekerWithMockedAddressFactory()
-        )
+        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
         self.job_seeker = self.job_application.job_seeker
-        self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
+        self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
 
     def test_access_granted(self):
         # Pass step 1
@@ -270,12 +260,14 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         self.pass_step_1()
 
         # Accept address provided by mock and pass to step 3
-        url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
+        url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_invalid_address(self):
-        # No mock here, address must be invalid
+        # Was using a mock (or not using it actually), but a proper factory will do
+        self.job_application = JobApplicationWithJobSeekerProfileFactory(to_siae=self.siae)
+        self.job_seeker = self.job_application.job_seeker
 
         # Pass step 1
         self.pass_step_1()
@@ -285,18 +277,16 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
         self.assertEqual(response.status_code, 200)
 
-        # No option to continue to next step
-        self.assertNotContains(response, "Continuer")
-        self.assertFalse(self.job_seeker.jobseeker_profile.hexa_address_filled)
-
         # Try to force the way
-        url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
+        url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
     def test_update_with_bad_address(self):
         # If HEXA address is valid, user can still change it
-        # but it must be a valid one, otherwise the previus address is discarded
+        # but it must be a valid one, otherwise the previous address is discarded
+        self.job_application = JobApplicationWithJobSeekerProfileFactory(to_siae=self.siae)
+        self.job_seeker = self.job_application.job_seeker
 
         # Pass step 1
         self.pass_step_1()
@@ -403,15 +393,8 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
 class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
     """
-    Create employee record step 2:
-
     Employee situation and social allowances
     """
-
-    fixtures = [
-        "test_INSEE_communes.json",
-        "test_INSEE_country.json",
-    ]
 
     def setUp(self):
         super().setUp()
@@ -560,7 +543,8 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         dup_job_application.job_seeker.jobseeker_profile.education_level = "00"
         dup_job_application.job_seeker.jobseeker_profile.commune = commune
         dup_job_application.job_seeker.birth_place = commune
-        dup_job_application.job_seeker.birth_country = Country.objects.get(code=Country._CODE_FRANCE)
+
+        dup_job_application.job_seeker.birth_country = Country.objects.filter(code=Country._CODE_FRANCE).first()
         dup_job_application.save()
 
         employee_record = EmployeeRecord.from_job_application(dup_job_application)
@@ -576,8 +560,6 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
 
 class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
     """
-    Create employee record step 4:
-
     Selection of a financial annex
     """
 
@@ -596,8 +578,6 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
 
 class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
     """
-    Create employee record step 5:
-
     Check summary of employee record and validation
     """
 
@@ -615,13 +595,13 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         # Employee record should now be ready to send (READY)
 
         employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
-        self.assertEqual(employee_record.status, EmployeeRecord.Status.NEW)
+        self.assertEqual(employee_record.status, Status.NEW)
 
         # Validation of create process
         self.client.post(self.url)
 
         employee_record.refresh_from_db()
-        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
+        self.assertEqual(employee_record.status, Status.READY)
 
 
 class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
@@ -646,11 +626,11 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
 
         # Must change status twice (contrained lifecycle)
         employee_record.update_as_sent("fooFileName.json", 1)
-        self.assertEqual(employee_record.status, EmployeeRecord.Status.SENT)
+        self.assertEqual(employee_record.status, Status.SENT)
 
         employee_record.update_as_rejected("0001", "Error message")
 
-        self.assertEqual(employee_record.status, EmployeeRecord.Status.REJECTED)
+        self.assertEqual(employee_record.status, Status.REJECTED)
 
         self.employee_record = employee_record
 
@@ -661,7 +641,7 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
         self.client.post(self.url)
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, EmployeeRecord.Status.READY)
+        self.assertEqual(self.employee_record.status, Status.READY)
 
     # Simpler to test summary access from here
 

@@ -3,7 +3,11 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView
 from rest_framework import routers
 from rest_framework.authtoken import views as auth_views
 
-from .employee_record_api.viewsets import DummyEmployeeRecordViewSet, EmployeeRecordViewSet
+from .employee_record_api.viewsets import (
+    DummyEmployeeRecordViewSet,
+    EmployeeRecordUpdateNotificationViewSet,
+    EmployeeRecordViewSet,
+)
 from .siae_api.viewsets import SiaeViewSet
 
 
@@ -14,6 +18,11 @@ app_name = "itou.api"
 # Using DRF router with viewsets means automatic definition of utl patterns
 router = routers.DefaultRouter()
 router.register(r"employee-records", EmployeeRecordViewSet, basename="employee-records")
+router.register(
+    r"employee-record-notifications",
+    EmployeeRecordUpdateNotificationViewSet,
+    basename="employee-record-notifications",
+)
 router.register(r"dummy-employee-records", DummyEmployeeRecordViewSet, basename="dummy-employee-records")
 router.register(r"siaes", SiaeViewSet, basename="siaes")
 

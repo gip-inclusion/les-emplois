@@ -4,8 +4,8 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord
 from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -95,11 +95,11 @@ class DashboardViewTest(TestCase):
 
         # create rejected job applications
         job_application = JobApplicationWithApprovalFactory(to_siae=siae)
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.REJECTED)
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.REJECTED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
 
         other_job_application = JobApplicationWithApprovalFactory(to_siae=other_siae)
-        EmployeeRecordFactory(job_application=other_job_application, status=EmployeeRecord.Status.REJECTED)
+        EmployeeRecordFactory(job_application=other_job_application, status=Status.REJECTED)
 
         session = self.client.session
 

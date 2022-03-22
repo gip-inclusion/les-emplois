@@ -518,6 +518,7 @@ class JobSeekerProfileModelTest(TestCase):
     def setUp(self):
         self.profile = JobSeekerProfileFactory()
         user = self.profile.user
+        user.title = None
 
         # FIXME Crap, must find a better way of creating fixture
         asp.MockedCommuneFactory()

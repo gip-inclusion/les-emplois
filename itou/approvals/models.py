@@ -1307,16 +1307,3 @@ class ApprovalsWrapper:
         return sorted(
             approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
         )
-
-
-class ApprovalPeriodUpdateEvent(models.Model):
-    approval = models.OneToOneField(
-        Approval,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        related_name="period_update_event",
-        verbose_name="PASS IAE",
-    )
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    start_at = models.DateField(verbose_name="Date de début du PASS IAE")
-    end_at = models.DateField(verbose_name="Date de fin du PASS IAE")

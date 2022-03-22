@@ -1,14 +1,20 @@
+from typing import Optional
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
+from rest_framework.authtoken.admin import User
 
-from itou.approvals.models import ApprovalPeriodUpdateEvent
+from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeKind
 from itou.job_applications.models import JobApplication
 from itou.siaes.models import Siae, SiaeFinancialAnnex
+from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
+
+from .enums import MovementType, NotificationStatus, NotificationType, Status
 
 
 # Validators
@@ -60,25 +66,25 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         These FS are ready to to be sent to ASP
         """
-        return self.filter(status=EmployeeRecord.Status.READY)
+        return self.filter(status=Status.READY)
 
     def ready_for_siae(self, siae):
         return self.ready().filter(job_application__to_siae=siae).select_related("job_application")
 
     def sent(self):
-        return self.filter(status=EmployeeRecord.Status.SENT)
+        return self.filter(status=Status.SENT)
 
     def sent_for_siae(self, siae):
         return self.sent().filter(job_application__to_siae=siae).select_related("job_application")
 
     def rejected(self):
-        return self.filter(status=EmployeeRecord.Status.REJECTED)
+        return self.filter(status=Status.REJECTED)
 
     def rejected_for_siae(self, siae):
         return self.rejected().filter(job_application__to_siae=siae).select_related("job_application")
 
     def processed(self):
-        return self.filter(status=EmployeeRecord.Status.PROCESSED)
+        return self.filter(status=Status.PROCESSED)
 
     def processed_for_siae(self, siae):
         return self.processed().filter(job_application__to_siae=siae).select_related("job_application")
@@ -121,22 +127,6 @@ class EmployeeRecord(models.Model):
 
     # 'C' stands for Creation
     ASP_MOVEMENT_TYPE = "C"
-
-    class Status(models.TextChoices):
-        """
-        Status of the employee record
-
-        Self-explanatory on the meaning, however:
-        - an E.R. can be modified until it is in the PROCESSED state
-        - after that, the FS is "archived" and can't be used for further interaction
-        """
-
-        NEW = "NEW", "Nouvelle"
-        READY = "READY", "Complétée"
-        SENT = "SENT", "Envoyée"
-        REJECTED = "REJECTED", "En erreur"
-        PROCESSED = "PROCESSED", "Intégrée"
-        ARCHIVED = "ARCHIVED", "Archivée"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
@@ -264,7 +254,7 @@ class EmployeeRecord(models.Model):
 
         Status: NEW | REJECTED => READY
         """
-        if self.status not in [EmployeeRecord.Status.NEW, EmployeeRecord.Status.REJECTED]:
+        if self.status not in [Status.NEW, Status.REJECTED]:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         profile = self.job_seeker.jobseeker_profile
@@ -277,7 +267,7 @@ class EmployeeRecord(models.Model):
 
         # If we reach this point, the employee record is ready to be serialized
         # and can be sent to ASP
-        self.status = self.Status.READY
+        self.status = Status.READY
         self.save()
 
     def update_as_sent(self, asp_filename, line_number):
@@ -287,7 +277,7 @@ class EmployeeRecord(models.Model):
 
         Status: READY => SENT
         """
-        if not self.status == EmployeeRecord.Status.READY:
+        if not self.status == Status.READY:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
@@ -305,7 +295,7 @@ class EmployeeRecord(models.Model):
 
         self.asp_batch_file = asp_filename
         self.asp_batch_line_number = line_number
-        self.status = EmployeeRecord.Status.SENT
+        self.status = Status.SENT
         self.save()
 
     def update_as_rejected(self, code, label):
@@ -314,21 +304,21 @@ class EmployeeRecord(models.Model):
 
         Status: SENT => REJECTED
         """
-        if not self.status == EmployeeRecord.Status.SENT:
+        if not self.status == Status.SENT:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
-        self.status = EmployeeRecord.Status.REJECTED
+        self.status = Status.REJECTED
         self.asp_processing_code = code
         self.asp_processing_label = label
         self.save()
 
     def update_as_accepted(self, code, label, archive):
-        if not self.status == EmployeeRecord.Status.SENT:
+        if not self.status == Status.SENT:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
-        self.status = EmployeeRecord.Status.PROCESSED
+        self.status = Status.PROCESSED
         self.processed_at = timezone.now()
         self.asp_processing_code = code
         self.asp_processing_label = label
@@ -340,7 +330,7 @@ class EmployeeRecord(models.Model):
         Can only archive employee record if already PROCESSED
         `save` parameter is for bulk updates in management command
         """
-        if self.status != EmployeeRecord.Status.PROCESSED:
+        if self.status != Status.PROCESSED:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         # Check that we are past archiving delay before ... archiving
@@ -348,7 +338,7 @@ class EmployeeRecord(models.Model):
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         # Remove proof of processing after delay
-        self.status = EmployeeRecord.Status.ARCHIVED
+        self.status = Status.ARCHIVED
         self.archived_json = None
 
         if save:
@@ -383,14 +373,14 @@ class EmployeeRecord(models.Model):
         return self.status not in [self.Status.SENT, self.Status.READY] and not self.is_archived
 
     @property
-    def job_seeker(self):
+    def job_seeker(self) -> User:
         """
         Shortcut to job application user / job seeker
         """
         return self.job_application.job_seeker if self.job_application else None
 
     @property
-    def job_seeker_profile(self):
+    def job_seeker_profile(self) -> Optional[JobSeekerProfile]:
         """
         Shortcut to job seeker profile
         """
@@ -400,7 +390,7 @@ class EmployeeRecord(models.Model):
         return None
 
     @property
-    def approval(self):
+    def approval(self) -> Optional[Approval]:
         """
         Shortcut to job application approval
         """
@@ -498,8 +488,8 @@ class EmployeeRecord(models.Model):
         is sent or already processed.
         """
         return self.status in [
-            EmployeeRecord.Status.SENT,
-            EmployeeRecord.Status.PROCESSED,
+            Status.SENT,
+            Status.PROCESSED,
         ]
 
     @staticmethod
@@ -622,37 +612,30 @@ class EmployeeRecordBatch:
 
 class EmployeeRecordUpdateNotificationQuerySet(QuerySet):
     def new(self):
-        return self.filter(status=EmployeeRecordUpdateNotification.Status.NEW)
+        return self.filter(status=NotificationStatus.NEW)
 
     def sent(self):
-        return self.filter(status=EmployeeRecordUpdateNotification.Status.SEND)
+        return self.filter(status=NotificationStatus.SENT)
 
     def processed(self):
-        return self.filter(status=EmployeeRecordUpdateNotification.Status.PROCESSED)
+        return self.filter(status=NotificationStatus.PROCESSED)
 
     def rejected(self):
-        return self.filter(status=EmployeeRecordUpdateNotification.Status.REJECTED)
+        return self.filter(status=NotificationStatus.REJECTED)
 
 
 class EmployeeRecordUpdateNotification(models.Model):
     """
-    TODO: comments
+    Notification of PROCESSED employee record updates.
+
+    `NotificationType` details the part of the employee record that is monitored.
+    At the moment, only approval updates (start and end dates) are tracked.
+
+    Monitoring of approvals is done via a Postgres trigger (defined in `Approval` app migrations).
     """
 
-    ASP_MOVEMENT_TYPE = "M"
+    ASP_MOVEMENT_TYPE = MovementType.UPDATE
 
-    class Status(models.TextChoices):
-        NEW = "NEW", "Nouvelle"
-        SEND = "SENT", "Envoyée"
-        PROCESSED = "PROCESSED", "Traitée"
-        REJECTED = "REJECTED", "En erreur"
-
-    employee_record = models.ForeignKey(
-        EmployeeRecord,
-        related_name="approval_update_events",
-        verbose_name="Fiche salarié",
-        on_delete=models.CASCADE,
-    )
     created_at = models.DateTimeField(
         verbose_name="Date de création",
         default=timezone.now,
@@ -664,13 +647,22 @@ class EmployeeRecordUpdateNotification(models.Model):
     status = models.CharField(
         verbose_name="Statut",
         max_length=10,
-        choices=Status.choices,
-        default=Status.NEW,
+        choices=NotificationStatus.choices,
+        default=NotificationStatus.NEW,
     )
 
-    # Approval period update
-    start_at = models.DateField(verbose_name="Date de début du PASS IAE")
-    end_at = models.DateField(verbose_name="Date de fin du PASS IAE")
+    notification_type = models.CharField(
+        verbose_name="Type de notification",
+        max_length=20,
+        choices=NotificationType.choices,
+    )
+
+    employee_record = models.ForeignKey(
+        EmployeeRecord,
+        related_name="update_notifications",
+        verbose_name="Fiche salarié",
+        on_delete=models.CASCADE,
+    )
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
@@ -695,32 +687,11 @@ class EmployeeRecordUpdateNotification(models.Model):
 
     objects = models.Manager.from_queryset(EmployeeRecordUpdateNotificationQuerySet)()
 
-    def clean(self):
-        pass
+    def update_as_sent(self, filename, line_number):
+        if self.status not in [NotificationStatus.NEW, NotificationStatus.REJECTED]:
+            raise ValidationError(f"Invalid status to update as SENT (currently: {self.status})")
 
-    @classmethod
-    def from_approval_period_update_event(
-        cls,
-        event: ApprovalPeriodUpdateEvent,
-        employee_record: EmployeeRecord = None,
-    ):
-        # Check if updated PASS IAE has an employee record
-        employee_record = employee_record or (
-            EmployeeRecord.objects.processed()
-            .filter(job_application__approval__id=event.pk)
-            .select_related("job_application__approval")
-            .first()
-        )
-
-        if not employee_record:
-            return None
-
-        if employee_record.job_application.approval.pk != event.pk:
-            return None
-
-        return cls(
-            status=cls.Status.NEW,
-            employee_record=employee_record,
-            start_at=event.start_at,
-            end_at=event.end_at,
-        )
+        self.status = NotificationStatus.SENT
+        self.asp_batch_file = filename
+        self.asp_batch_line_number = line_number
+        self.save(update_fields=["status", "asp_batch_file", "asp_batch_line_number", "updated_at"])

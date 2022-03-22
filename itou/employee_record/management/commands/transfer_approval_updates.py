@@ -10,11 +10,10 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record.enums import Status
-from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
+from itou.employee_record.mocks.test_serializers import TestEmployeeRecordUpdateNotificationBatchSerializer
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
-from itou.utils.management_commands import DeprecatedLoggerMixin
 
 
 # Global SFTP connection options
@@ -25,15 +24,26 @@ if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
     connection_options = pysftp.CnOpts(knownhosts=settings.ASP_FS_KNOWN_HOSTS)
 
 
-class Command(DeprecatedLoggerMixin, BaseCommand):
+class Command(BaseCommand):
     """
-    Employee record management command
+    Approval updates management command
     ---
     Allow to manually or automatically:
-    - upload ready to be processed employee records
-    - download feedback files of previous upload operations
-    - perform dry-run operations
+    - upload approval period updates to ASP servers,
+    - download feedback files of previous upload operations,
+    - perform dry-run operations.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        handler = logging.StreamHandler(self.stdout)
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.propagate = False
+        self.logger.addHandler(handler)
+
+        self.logger.setLevel(logging.INFO)
 
     def add_arguments(self, parser):
         """
@@ -47,9 +57,6 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         )
         parser.add_argument(
             "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
-        )
-        parser.add_argument(
-            "--archive", dest="archive", action="store_true", help="Archive old processed employee records"
         )
         parser.add_argument(
             "--test",
@@ -70,28 +77,22 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             cnopts=connection_options,
         )
 
-    def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_REMOTE_DOWNLOAD_DIR):
-        """
-        Store ASP processing results in a local file
-
-        Content is a string
-        """
-        with open(f"{local_path}/{remote_path}", "w") as f:
-            f.write(content)
-        self.logger.info("Wrote '%s' to local path '%s'", remote_path, local_path)
-
-    def _upload_batch_file(self, conn, employee_records, dry_run):
+    def _upload_batch_file(self, conn, notifications, dry_run):
         """
         Render a list of employee records in JSON format then send it to SFTP upload folder
         """
         # Temporary ability to use test serializers
-        raw_batch = EmployeeRecordBatch(employee_records)
+        raw_batch = EmployeeRecordBatch(notifications)
         batch = (
-            TestEmployeeRecordBatchSerializer(raw_batch) if self.asp_test else EmployeeRecordBatchSerializer(raw_batch)
+            TestEmployeeRecordUpdateNotificationBatchSerializer(raw_batch)
+            if self.asp_test
+            else EmployeeRecordBatchSerializer(raw_batch)
         )
 
         # JSONRenderer produces byte arrays
         json_bytes = JSONRenderer().render(batch.data)
+
+        print(json_bytes)
 
         # Using FileIO objects allows to use them as files
         # Cool side effect: no temporary file needed
@@ -126,8 +127,8 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
             # Now that file is transfered, update employee records status (SENT)
             # and store in which file they have been sent
-            for idx, employee_record in enumerate(employee_records, 1):
-                employee_record.update_as_sent(remote_path, idx)
+            for idx, notification in enumerate(notifications, 1):
+                notification.update_as_sent(remote_path, idx)
 
     def _parse_feedback_file(self, feedback_file, batch, dry_run):
         """
@@ -147,16 +148,6 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         if not records:
             self.logger.error("Could not get any employee record from file: %s", feedback_file)
 
-            return 1
-
-        # Check for notification records :
-        # Notifications are not mixed with employee records
-        notification_number = 0
-        for record in records:
-            if record.get("typeMouvement") == "M":
-                notification_number += 1
-        if notification_number == len(records):
-            self.logger.warning("File `%s` is a notification file, passing.", feedback_file)
             return 1
 
         for idx, employee_record in enumerate(records, 1):
@@ -298,65 +289,17 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         """
         Upload a file composed of all ready employee records
         """
-        ready_employee_records = EmployeeRecord.objects.ready()
-
-        # FIXME: temp disabled, too much impact, must be discussed
-        # As requested by ASP, we can now send employee records in bigger batches
-        # if len(ready_employee_records) < EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS:
-        #     self.logger.info(
-        #         "Not enough employee records to initiate a transfer (%s / %s)",
-        #        len(ready_employee_records),
-        #         EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS,
-        #     )
-        #     return
+        new_notifications = EmployeeRecordUpdateNotification.objects.new()
 
         self.logger.info("Starting UPLOAD")
 
-        for batch in chunks(ready_employee_records, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
+        for batch in chunks(new_notifications, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def archive(self, dry_run):
-        """
-        Archive old employee record data:
-        records are not deleted but their `archived_json` field is erased if employee record has been
-        in `PROCESSED` status for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS days
-        """
-        self.logger.info(
-            f"Archiving employee records (more than {settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS} days old)"
-        )
-        archivable = EmployeeRecord.objects.archivable()
-
-        if (cnt := archivable.count()) > 0:
-            self.logger.info(f"Found {cnt} archivable employee record(s)")
-            if dry_run:
-                return
-            archived_cnt = 0
-
-            # A bulk update will increase performance if there are a lot of employee records to update.
-            # However, if there is no performance issue, it is preferable to keep the archiving
-            # and validation logic in the model (update_as_archived).
-            # Update: let's bulk, with a batch size of 100 records
-            for er in archivable:
-                try:
-                    # Do not trigger a save() call on the object
-                    er.update_as_archived(save=False)
-                    archived_cnt += 1
-                except Exception as ex:
-                    self.logger.error(ex)
-
-            # Bulk update (100 records block):
-            EmployeeRecord.objects.bulk_update(archivable, ["status", "updated_at", "archived_json"], batch_size=100)
-
-            self.logger.info(f"Archived {archived_cnt}/{cnt} employee record(s)")
-        else:
-            self.logger.info("No archivable employee record found, exiting.")
-
-    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, archive=False, **options):
+    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, **options):
         """
         Employee Record Management Command
         """
-        self.set_logger(options.get("verbosity"))
-
         if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
             self.logger.info(
                 "This management command can't be used in this environment. Update Django settings if needed."
@@ -384,7 +327,4 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             if download:
                 self.download(sftp, dry_run)
 
-        if archive:
-            self.archive(dry_run)
-
-        self.logger.info("Employee records processing done")
+        self.logger.info("Employee record notifications processing done")

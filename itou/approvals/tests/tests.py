@@ -8,9 +8,8 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import IntegrityError
 from django.template.defaultfilters import title
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
@@ -1587,7 +1586,6 @@ class ProlongationNotificationsTest(TestCase):
         self.assertIn(settings.ITOU_EMAIL_PROLONGATION, email.body)
 
 
-<<<<<<< HEAD:itou/approvals/tests/tests.py
 class ApprovalConcurrentModelTest(TransactionTestCase):
     """
     Uses TransactionTestCase that truncates all tables after every test, instead of TestCase
@@ -1655,55 +1653,3 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
 
         self.assertEqual(approval.number, "999990000002")
         self.assertEqual(approval2.number, "999990000003")
-=======
-class ApprovalPeriodUpdateEventTest(TestCase):
-    def test_updating_approval_dates(self):
-        approval = ApprovalFactory()
-        approval.start_at += datetime.timedelta(days=1)
-        approval.save(update_fields=["start_at"])
-
-        self.assertIsNotNone(approval.period_update_event)
-        self.assertEqual(approval.period_update_event.start_at, approval.start_at)
-
-        approval.refresh_from_db()
-        approval.end_at += datetime.timedelta(days=1)
-        approval.save(update_fields=["end_at"])
-
-        self.assertIsNotNone(approval.period_update_event)
-        self.assertEqual(approval.period_update_event.end_at, approval.end_at)
-
-    def test_update_with_suspension(self):
-        approval = ApprovalFactory()
-        start_at = timezone.now().date()
-        SuspensionFactory(
-            approval=approval,
-            start_at=start_at,
-        )
-        approval.refresh_from_db()
-
-        self.assertIsNotNone(approval.period_update_event)
-        self.assertEqual(approval.period_update_event.start_at, start_at)
-
-    def test_update_with_prolongation(self):
-        approval = ApprovalFactory()
-        ProlongationFactory(
-            approval=approval,
-            start_at=approval.end_at,
-        )
-        approval.refresh_from_db()
-
-        self.assertIsNotNone(approval.period_update_event)
-        self.assertEqual(approval.period_update_event.start_at, approval.start_at)
-
-    def test_delete_approval_cascade(self):
-        approval = ApprovalFactory()
-        approval.start_at = timezone.now().date()
-        approval.save()
-
-        self.assertIsNotNone(approval.period_update_event)
-
-        Approval.objects.get(pk=approval.pk).delete()
-
-        with self.assertRaises(ObjectDoesNotExist):
-            ApprovalPeriodUpdateEvent.objects.get(pk=approval.pk)
->>>>>>> 56093d4e (Added ASP approval updates models, trigger and serializers):itou/approvals/tests.py
