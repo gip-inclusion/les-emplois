@@ -61,7 +61,7 @@ select
     z_prop_candidatures.total_candidatures,
     z_ttes_candidatures.somme_candidatures,
   /* calcul de la proportion de candidatures en % */
-    z_candidatures.nombre_de_candidatures/z_prop_candidatures.total_candidatures*100 as taux_de_candidatures,  
+    z_candidatures.nombre_de_candidatures/z_prop_candidatures.total_candidatures as taux_de_candidatures,  
     z_candidatures.nom_structure,
     z_candidatures.type_structure,
     z_candidatures.origine,
