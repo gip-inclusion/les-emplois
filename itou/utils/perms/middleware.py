@@ -18,6 +18,15 @@ class ItouCurrentOrganizationMiddleware:
 
     def __call__(self, request):
 
+        # FIXME(vperron): Temporary message
+        from django.contrib import messages
+
+        messages.add_message(
+            request,
+            messages.WARNING,
+            "Un problème avec notre gestionnaire de mails peut impacter certaines fonctionnalités du service temporairement. En particulier, les demandes au support et les inscriptions sont perturbées. Nous nous excusons pour ce désagrément et mettons tout en oeuvre pour le résoudre au plus vite.",
+        )
+
         # Before the view is called.
         user = request.user
 
