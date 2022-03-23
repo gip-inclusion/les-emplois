@@ -259,9 +259,8 @@ class PoleEmploiApprovalCreateTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Approval.objects.count(), initial_approval_count + 1)
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
         self.assertEqual(
-            str(messages[0]),
+            str(messages[-1]),
             "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
         )
 
@@ -284,8 +283,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Approval.objects.count(), initial_approval_count)
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Cet agrément a déjà été importé.")
+        self.assertEqual(str(messages[-1]), "Cet agrément a déjà été importé.")
 
     def test_from_existing_user_with_approval(self):
         """
@@ -306,5 +304,4 @@ class PoleEmploiApprovalCreateTest(TestCase):
         next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": self.pe_approval.id})
         self.assertEqual(response.url, next_url)
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide.")
+        self.assertEqual(str(messages[-1]), "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide.")
