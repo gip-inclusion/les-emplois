@@ -27,8 +27,6 @@ with candidats_p as ( /* Ici on sélectionne les colonnes pertinentes à partir 
 	public.candidats as cdd /* cdd pour CanDiDats */
     where type_auteur_diagnostic = ('Prescripteur')
 )
-
-	
 select /* On selectionne les colonnes finales qui nous intéressent */
     id_candidat_anonymise,
     actif,
