@@ -127,6 +127,7 @@ class StartDateFilter(admin.SimpleListFilter):
 class ApprovalAdmin(admin.ModelAdmin):
     form = ApprovalAdminForm
     list_display = ("pk", "number", "user", "birthdate", "start_at", "end_at", "is_valid", "created_at")
+    list_select_related = ("user",)
     search_fields = ("pk", "number", "user__first_name", "user__last_name", "user__email")
     list_filter = (
         IsValidFilter,

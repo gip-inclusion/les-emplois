@@ -19,12 +19,13 @@ from itou.utils.admin import PkSupportRemarkInline
 class SiaeMembersInline(MembersInline):
     model = models.Siae.members.through
     readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at", "notifications")
+    raw_id_fields = ("user",)
 
 
 class JobsInline(admin.TabularInline):
     model = models.Siae.jobs.through
     extra = 1
-    raw_id_fields = ("appellation",)
+    raw_id_fields = ("appellation", "siae", "location")
     readonly_fields = ("created_at", "updated_at")
 
 
@@ -218,7 +219,7 @@ class SiaeJobDescription(admin.ModelAdmin):
         "is_active",
         "nb_open_positions",
     )
-    raw_id_fields = ("appellation", "siae")
+    raw_id_fields = ("appellation", "siae", "location")
     search_fields = (
         "pk",
         "siae__siret",
