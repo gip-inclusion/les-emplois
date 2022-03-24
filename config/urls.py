@@ -12,6 +12,7 @@ from itou.www.signup import views as signup_views
 register_converter(SiretConverter, "siret")
 
 urlpatterns = [
+    path("silk/", include("silk.urls", namespace="silk")),
     path("admin/", admin.site.urls),
     # --------------------------------------------------------------------------------------
     # allauth URLs. Order is important because some URLs are overriden.

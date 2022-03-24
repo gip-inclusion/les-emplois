@@ -62,6 +62,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "django_filters",
     "import_export",
+    "silk",
 ]
 
 
@@ -122,7 +123,13 @@ ITOU_MIDDLEWARE = [
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
 ]
 
-MIDDLEWARE = DJANGO_MIDDLEWARE + ITOU_MIDDLEWARE
+MIDDLEWARE = (
+    DJANGO_MIDDLEWARE
+    + ITOU_MIDDLEWARE
+    + [
+        "silk.middleware.SilkyMiddleware",
+    ]
+)
 
 # URLs.
 # ------------------------------------------------------------------------------
@@ -718,3 +725,5 @@ EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 9, 27, tzinf
 # This is disabled by default, overidden in prod settings, and can be set
 # via local dev settings or env vars for a temporary environment.
 EMPLOYEE_RECORD_TRANSFER_ENABLED = bool(os.environ.get("EMPLOYEE_RECORD_TRANSFER_ENABLED", False))
+
+SILKY_PYTHON_PROFILER = True
