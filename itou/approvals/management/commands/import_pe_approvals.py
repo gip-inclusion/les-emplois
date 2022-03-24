@@ -1,10 +1,10 @@
 import datetime
 
 import pandas as pd
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.approvals.models import PoleEmploiApproval
+from itou.utils.management_commands import ItouBaseCommand
 
 
 FLUSH_SIZE = 5000
@@ -50,7 +50,7 @@ def load_and_sort(file_path):
     return df
 
 
-class Command(BaseCommand):
+class Command(ItouBaseCommand):
     """
     Import Pole emploi's approvals (or `agrément` in French) into the database.
 
@@ -75,6 +75,7 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
     def handle(self, file_path, wet_run=False, **options):
+        self.set_logger(options.get("verbosity"))
         now = timezone.now().date()
 
         count_before = PoleEmploiApproval.objects.count()

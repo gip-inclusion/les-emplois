@@ -1,13 +1,12 @@
 import json
-import logging
 import os
 
 from django.contrib.gis.geos import GEOSGeometry
-from django.core.management.base import BaseCommand
 from django.template.defaultfilters import slugify
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
+from itou.utils.management_commands import ItouBaseCommand
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -23,7 +22,7 @@ MISSING_COORDS = {
 }
 
 
-class Command(BaseCommand):
+class Command(ItouBaseCommand):
     """
     Import French cities data from a JSON file into the database.
 
@@ -39,20 +38,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
 
     def handle(self, dry_run=False, **options):
 

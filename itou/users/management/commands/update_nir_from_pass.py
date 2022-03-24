@@ -3,7 +3,6 @@
 
 import csv
 import datetime
-import logging
 import re
 from pathlib import Path
 
@@ -11,10 +10,10 @@ import pandas as pd
 import unidecode
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
 from itou.approvals.models import Approval
+from itou.utils.management_commands import ItouBaseCommand
 from itou.utils.validators import validate_nir
 
 
@@ -25,7 +24,7 @@ NIR_COL = "ppn_numero_inscription"
 APPROVAL_COL = "agr_numero_agrement"
 
 
-class Command(BaseCommand):
+class Command(ItouBaseCommand):
     """
     Update job seekers' account with their NIR (social security number) if an approval has been issued.
 
@@ -62,20 +61,6 @@ class Command(BaseCommand):
             action="store",
             help="Absolute path of the XLSX file to import",
         )
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity >= 1:
-            self.logger.setLevel(logging.DEBUG)
 
     def get_ratio(self, first_value, second_value):
         return round((first_value / second_value) * 100, 2)

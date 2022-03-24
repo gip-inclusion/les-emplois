@@ -4,7 +4,6 @@ from os import path
 
 import pysftp
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
@@ -13,6 +12,7 @@ from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchS
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
+from itou.utils.management_commands import ItouBaseCommand
 
 
 # Global SFTP connection options
@@ -23,7 +23,7 @@ if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
     connection_options = pysftp.CnOpts(knownhosts=settings.ASP_FS_KNOWN_HOSTS)
 
 
-class Command(BaseCommand):
+class Command(ItouBaseCommand):
     """
     Employee record management command
     ---
@@ -32,17 +32,6 @@ class Command(BaseCommand):
     - download feedback files of previous upload operations
     - perform dry-run operations
     """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
 
     def add_arguments(self, parser):
         """
@@ -354,6 +343,8 @@ class Command(BaseCommand):
         """
         Employee Record Management Command
         """
+        self.set_logger(options.get("verbosity"))
+
         if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
             self.logger.info(
                 "This management command can't be used in this environment. Update Django settings if needed."

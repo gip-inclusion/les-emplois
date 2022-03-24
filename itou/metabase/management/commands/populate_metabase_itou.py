@@ -86,10 +86,10 @@ class Command(BaseCommand):
     touching any real table, and injects only a sample of data.
 
     To populate alternate tables with sample data:
-        django-admin populate_metabase_itou --verbosity=2 --dry-run
+        django-admin populate_metabase_itou --dry-run
 
     When ready:
-        django-admin populate_metabase_itou --verbosity=2
+        django-admin populate_metabase_itou
     """
 
     help = "Populate metabase database."
@@ -98,23 +98,6 @@ class Command(BaseCommand):
         parser.add_argument(
             "--dry-run", dest="dry_run", action="store_true", help="Populate alternate tables with sample data"
         )
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
-
-    def log(self, message):
-        self.logger.debug(message)
 
     def commit(self):
         """
@@ -196,7 +179,9 @@ class Command(BaseCommand):
                     c["type"] = "integer"
                     c["fn"] = compose(convert_boolean_to_int, c["fn"])
 
-            self.log(f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:")
+            self.stdout.write(
+                f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:"
+            )
 
             # Create table.
             create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields_with_type})").format(
@@ -259,7 +244,7 @@ class Command(BaseCommand):
             )
             self.commit()
             self.cleanup_tables(table_name)
-            self.log("")
+            self.stdout.write("")
 
     def populate_siaes(self):
         """
@@ -338,7 +323,7 @@ class Command(BaseCommand):
         """
         table_name = "fiches_de_poste_par_candidature"
         chunk_size = 1000
-        self.log(f"Preparing content for {table_name} table by chunk of {chunk_size} items...")
+        self.stdout.write(f"Preparing content for {table_name} table by chunk of {chunk_size} items...")
 
         # Iterating directly on this very large queryset results in psycopg2.errors.DiskFull error.
         # We use pagination to mitigate this issue.
@@ -428,7 +413,7 @@ class Command(BaseCommand):
         Populate department codes, department names and region names.
         """
         table_name = "departements"
-        self.log(f"Preparing content for {table_name} table...")
+        self.stdout.write(f"Preparing content for {table_name} table...")
 
         rows = []
         for dpt_code, dpt_name in tqdm(DEPARTMENTS.items()):
@@ -451,11 +436,11 @@ class Command(BaseCommand):
         fatal errors after having completed its job.
         """
         fatal_errors = 0
-        self.log("Checking data for inconsistencies.")
+        self.stdout.write("Checking data for inconsistencies.")
         for approval in Approval.objects.prefetch_related("user").all():
             user = approval.user
             if not user.is_job_seeker:
-                self.log(f"FATAL ERROR: user {user.id} has an approval but is not a job seeker")
+                self.stdout.write(f"FATAL ERROR: user {user.id} has an approval but is not a job seeker")
                 fatal_errors += 1
 
         if fatal_errors >= 1:
@@ -469,7 +454,7 @@ class Command(BaseCommand):
 
     def populate_metabase_itou(self):
         if not settings.ALLOW_POPULATING_METABASE:
-            self.log("Populating metabase is not allowed in this environment.")
+            self.stdout.write("Populating metabase is not allowed in this environment.")
             return
 
         send_slack_message(
@@ -511,8 +496,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, dry_run=False, **options):
-        self.set_logger(options.get("verbosity"))
         self.dry_run = dry_run
         self.populate_metabase_itou()
-        self.log("-" * 80)
-        self.log("Done.")
+        self.stdout.write("-" * 80)
+        self.stdout.write("Done.")

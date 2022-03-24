@@ -14,8 +14,6 @@ and thus we need a proper tool to manage columns by their
 name instead of hardcoding column numbers as in `field = row[42]`.
 
 """
-import logging
-
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
@@ -38,27 +36,10 @@ class Command(BaseCommand):
     Update and sync SIAE data based on latest ASP exports.
 
     Run the following command:
-        django-admin import_siae --verbosity=2
+        django-admin import_siae
     """
 
     help = "Update and sync SIAE data based on latest ASP exports."
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
-
-    def log(self, message):
-        self.logger.debug(message)
 
     def delete_siae(self, siae):
         assert could_siae_be_deleted(siae)
@@ -78,10 +59,10 @@ class Command(BaseCommand):
         ):
             if not siae.has_members:
                 if could_siae_be_deleted(siae):
-                    self.log(f"siae.id={siae.id} is user created and has no member thus will be deleted")
+                    self.stdout.write(f"siae.id={siae.id} is user created and has no member thus will be deleted")
                     self.delete_siae(siae)
                 else:
-                    self.log(
+                    self.stdout.write(
                         f"FATAL ERROR: siae.id={siae.id} is user created and "
                         f"has no member but has job applications thus cannot be deleted"
                     )
@@ -104,7 +85,7 @@ class Command(BaseCommand):
         for siae in Siae.objects.filter(
             kind__in=Siae.ASP_MANAGED_KINDS, source=Siae.SOURCE_STAFF_CREATED, convention__isnull=False
         ):
-            self.log(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
+            self.stdout.write(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
             siae.source = Siae.SOURCE_USER_CREATED
             siae.save()
 
@@ -115,19 +96,21 @@ class Command(BaseCommand):
         )
 
         recent_unconfirmed_siaes = staff_created_siaes.filter(created_at__gte=three_months_ago)
-        self.log(
+        self.stdout.write(
             f"{recent_unconfirmed_siaes.count()} siaes created recently by staff"
             f" (still waiting for ASP data to be confirmed)"
         )
 
         old_unconfirmed_siaes = staff_created_siaes.filter(created_at__lt=three_months_ago)
-        self.log(f"{old_unconfirmed_siaes.count()} siaes created by staff should be deleted as they are unconfirmed")
+        self.stdout.write(
+            f"{old_unconfirmed_siaes.count()} siaes created by staff should be deleted as they are unconfirmed"
+        )
         for siae in old_unconfirmed_siaes:
             if could_siae_be_deleted(siae):
-                self.log(f"deleted unconfirmed siae.id={siae.id} created by staff a while ago")
+                self.stdout.write(f"deleted unconfirmed siae.id={siae.id} created by staff a while ago")
                 self.delete_siae(siae)
             else:
-                self.log(
+                self.stdout.write(
                     f"FATAL ERROR: Please fix unconfirmed staff created siae.id={siae.id}"
                     f" by either deleting it or attaching it to the correct convention"
                 )
@@ -140,7 +123,7 @@ class Command(BaseCommand):
 
     def update_siae_siret(self, siae, new_siret):
         assert siae.siret != new_siret
-        self.log(f"siae.id={siae.id} has changed siret from {siae.siret} to {new_siret} (will be updated)")
+        self.stdout.write(f"siae.id={siae.id} has changed siret from {siae.siret} to {new_siret} (will be updated)")
         siae.siret = new_siret
         siae.save()
 
@@ -179,14 +162,14 @@ class Command(BaseCommand):
                     return f"{siae.source} {siae.siret} convention=None"
                 return f"{siae.source} {siae.siret} convention.id={siae.convention.id} asp_id={siae.convention.asp_id}"
 
-            self.log(
+            self.stdout.write(
                 f"FATAL ERROR: siae.id={siae.id} ({fmt(siae)}) has changed siret from "
                 f"{siae.siret} to {new_siret} but new siret is already used by "
                 f"siae.id={existing_siae.id} ({fmt(existing_siae)}) "
             )
             self.fatal_errors += 1
 
-        self.log(f"{auth_email_updates} siae.auth_email fields will be updated")
+        self.stdout.write(f"{auth_email_updates} siae.auth_email fields will be updated")
 
     @timeit
     def cleanup_siaes_after_grace_period(self):
@@ -202,8 +185,8 @@ class Command(BaseCommand):
                 continue
             blocked_deletions += 1
 
-        self.log(f"{deletions} siaes past their grace period will be deleted")
-        self.log(f"{blocked_deletions} siaes past their grace period cannot be deleted")
+        self.stdout.write(f"{deletions} siaes past their grace period will be deleted")
+        self.stdout.write(f"{blocked_deletions} siaes past their grace period cannot be deleted")
 
     @timeit
     def create_new_siaes(self):
@@ -245,7 +228,7 @@ class Command(BaseCommand):
                 # Siae with this siret+kind already exists but with wrong source.
                 assert existing_siae.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]
                 assert existing_siae.is_asp_managed
-                self.log(
+                self.stdout.write(
                     f"siae.id={existing_siae.id} already exists "
                     f"with wrong source={existing_siae.source} "
                     f"(source will be fixed to ASP)"
@@ -263,21 +246,21 @@ class Command(BaseCommand):
                 assert siae not in creatable_siaes
                 creatable_siaes.append(siae)
 
-        self.log("--- beginning of CSV output of all creatable_siaes ---")
-        self.log("siret;kind;department;name;address")
+        self.stdout.write("--- beginning of CSV output of all creatable_siaes ---")
+        self.stdout.write("siret;kind;department;name;address")
         for siae in creatable_siaes:
-            self.log(f"{siae.siret};{siae.kind};{siae.department};{siae.name};{siae.address_on_one_line}")
+            self.stdout.write(f"{siae.siret};{siae.kind};{siae.department};{siae.name};{siae.address_on_one_line}")
             siae.save()
-        self.log("--- end of CSV output of all creatable_siaes ---")
+        self.stdout.write("--- end of CSV output of all creatable_siaes ---")
 
-        self.log(f"{len(creatable_siaes)} structures will be created")
-        self.log(f"{len([s for s in creatable_siaes if s.coords])} structures will have geolocation")
+        self.stdout.write(f"{len(creatable_siaes)} structures will be created")
+        self.stdout.write(f"{len([s for s in creatable_siaes if s.coords])} structures will have geolocation")
 
     @timeit
     def check_whether_signup_is_possible_for_all_siaes(self):
         for siae in Siae.objects.prefetch_related("memberships").filter(members__isnull=True):
             if not siae.has_members and not siae.auth_email:
-                self.log(
+                self.stdout.write(
                     f"FATAL ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
                     f"kind={siae.kind} dpt={siae.department} source={siae.source} "
                     f"created_by={siae.created_by} siae.email={siae.email}"
@@ -287,7 +270,7 @@ class Command(BaseCommand):
     @timeit
     def create_conventions(self):
         creatable_conventions = get_creatable_conventions()
-        self.log(f"will create {len(creatable_conventions)} conventions")
+        self.stdout.write(f"will create {len(creatable_conventions)} conventions")
         for (convention, siae) in creatable_conventions:
             assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists()
             convention.save()
@@ -299,7 +282,7 @@ class Command(BaseCommand):
     @timeit
     def delete_conventions(self):
         deletable_conventions = get_deletable_conventions()
-        self.log(f"will delete {len(deletable_conventions)} conventions")
+        self.stdout.write(f"will delete {len(deletable_conventions)} conventions")
         for convention in deletable_conventions:
             assert convention.siaes.count() == 0
             # This will delete the related financial annexes as well.
@@ -309,11 +292,11 @@ class Command(BaseCommand):
     def manage_financial_annexes(self):
         creatable_afs, deletable_afs = get_creatable_and_deletable_afs()
 
-        self.log(f"will create {len(creatable_afs)} financial annexes")
+        self.stdout.write(f"will create {len(creatable_afs)} financial annexes")
         for af in creatable_afs:
             af.save()
 
-        self.log(f"will delete {len(deletable_afs)} financial annexes")
+        self.stdout.write(f"will delete {len(deletable_afs)} financial annexes")
         for af in deletable_afs:
             af.delete()
 
@@ -327,12 +310,10 @@ class Command(BaseCommand):
         for siae in aciphc_query:
             assert siae.source in [Siae.SOURCE_STAFF_CREATED, Siae.SOURCE_USER_CREATED]
             assert siae.convention is None
-        self.log(f"checked {aciphc_query.count()} ACIPHC siaes")
+        self.stdout.write(f"checked {aciphc_query.count()} ACIPHC siaes")
 
     @timeit
     def handle(self, **options):
-        self.set_logger(options.get("verbosity"))
-
         self.fatal_errors = 0
 
         self.delete_user_created_siaes_without_members()

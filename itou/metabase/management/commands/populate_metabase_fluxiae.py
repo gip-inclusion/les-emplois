@@ -85,10 +85,10 @@ class Command(BaseCommand):
     touching any real table, and injects only a sample of data.
 
     To populate alternate tables with sample data:
-        django-admin populate_metabase_fluxiae --verbosity=2 --dry-run
+        django-admin populate_metabase_fluxiae --dry-run
 
     When ready:
-        django-admin populate_metabase_fluxiae --verbosity=2
+        django-admin populate_metabase_fluxiae
     """
 
     help = "Populate metabase database with fluxIAE data."
@@ -97,23 +97,6 @@ class Command(BaseCommand):
         parser.add_argument(
             "--dry-run", dest="dry_run", action="store_true", help="Populate alternate tables with sample data"
         )
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
-
-    def log(self, message):
-        self.logger.debug(message)
 
     @timeit
     def populate_fluxiae_view(self, vue_name, skip_first_row=True):
@@ -127,7 +110,7 @@ class Command(BaseCommand):
     @timeit
     def populate_metabase_fluxiae(self):
         if not settings.ALLOW_POPULATING_METABASE:
-            self.log("Populating metabase is not allowed in this environment.")
+            self.stdout.write("Populating metabase is not allowed in this environment.")
             return
 
         send_slack_message(
@@ -158,8 +141,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, dry_run=False, **options):
-        self.set_logger(options.get("verbosity"))
         self.dry_run = dry_run
         self.populate_metabase_fluxiae()
-        self.log("-" * 80)
-        self.log("Done.")
+        self.stdout.write("-" * 80)
+        self.stdout.write("Done.")

@@ -1,17 +1,16 @@
 import datetime
-import logging
 
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.utils.management_commands import ItouBaseCommand
 
 
 DATE_FORMAT = "%d/%m/%y"
 
 
-class Command(BaseCommand):
+class Command(ItouBaseCommand):
     """
     Notify
 
@@ -33,20 +32,6 @@ class Command(BaseCommand):
         parser.add_argument(
             "--dry-run", dest="dry_run", action="store_true", help="Only print the valid approvals that start today"
         )
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
 
     def parse_start_date_str(self, start_date_str):
         """Parses the user-provided start date.

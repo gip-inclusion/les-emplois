@@ -1,18 +1,17 @@
 import csv
 import datetime
-import logging
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.db.models import Case, F, Value, When
 from django.urls import reverse
 from tqdm import tqdm
 
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
+from itou.utils.management_commands import ItouBaseCommand
 
 
-class Command(BaseCommand):
+class Command(ItouBaseCommand):
     """
     Deduplicate job seekers.
 
@@ -53,20 +52,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only display data to deduplicate")
         parser.add_argument("--no-csv", dest="no_csv", action="store_true", help="Do not export results in CSV")
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity >= 1:
-            self.logger.setLevel(logging.DEBUG)
 
     def handle_easy_duplicates(self, duplicates, target, nirs):
         """

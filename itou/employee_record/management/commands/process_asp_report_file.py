@@ -1,31 +1,19 @@
 import json
-import logging
 import os.path as os_path
 
-from django.core.management.base import BaseCommand
 from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordSerializer
+from itou.utils.management_commands import ItouBaseCommand
 
 
-class Command(BaseCommand):
+class Command(ItouBaseCommand):
     """
     Manually process an employee record ASP report file
 
     *SHOULD BE TEMPORARY*
     """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
 
     def add_arguments(self, parser):
         """
@@ -40,6 +28,7 @@ class Command(BaseCommand):
         - duplicates status code and label are updated if needed
         - other error cases are processed the usual way
         """
+        self.set_logger(options.get("verbosity"))
         input_file = options.get("input_file")
         renderer = JSONRenderer()
 

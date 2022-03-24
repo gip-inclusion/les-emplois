@@ -1,6 +1,5 @@
 import csv
 import datetime
-import logging
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -26,20 +25,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--no-csv", dest="no_csv", action="store_true", help="Do not export results in CSV")
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity >= 1:
-            self.logger.setLevel(logging.DEBUG)
 
     def to_csv(self, filename, data, description):
         if self.no_csv:
@@ -71,8 +56,6 @@ class Command(BaseCommand):
         }
 
     def handle(self, no_csv=False, **options):
-
-        self.set_logger(options.get("verbosity"))
 
         self.no_csv = no_csv
 

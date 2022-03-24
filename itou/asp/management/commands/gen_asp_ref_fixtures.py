@@ -5,13 +5,13 @@ This could be a "one shot" action but we don't know for sure
 if these reference files are likely to change.
 """
 import json
-import logging
 import os
 from datetime import datetime
 
 import pandas as pd
 from django.conf import settings
-from django.core.management.base import BaseCommand
+
+from itou.utils.management_commands import ItouBaseCommand
 
 
 _FIXTURES_DIR = "itou/asp/fixtures"
@@ -26,7 +26,7 @@ def parse_asp_date(dt):
     return None
 
 
-class Command(BaseCommand):
+class Command(ItouBaseCommand):
     """
     Generation of ASP reference files fixtures
 
@@ -58,20 +58,6 @@ class Command(BaseCommand):
         parser.add_argument("--insee_departments")
         parser.add_argument("--insee_countries")
         parser.add_argument("--siae_kinds")
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
 
     def log(self, message):
         self.logger.debug(message)

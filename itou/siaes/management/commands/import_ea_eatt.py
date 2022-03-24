@@ -1,5 +1,3 @@
-import logging
-
 import numpy as np
 import pandas as pd
 from django.core.management.base import BaseCommand
@@ -147,7 +145,6 @@ class Command(BaseCommand):
 
     To debug:
         django-admin import_ea_eatt --dry-run
-        django-admin import_ea_eatt --dry-run --verbosity=2
 
     To populate the database:
         django-admin import_ea_eatt
@@ -158,28 +155,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
-
-    def log(self, message):
-        self.stdout.write(message)
-
     @timeit
     def handle(self, dry_run=False, **options):
-
-        self.set_logger(options.get("verbosity"))
-
         ea_eatt_df = get_ea_eatt_df()
         sync_structures(
             df=ea_eatt_df,
@@ -189,5 +166,5 @@ class Command(BaseCommand):
             dry_run=dry_run,
         )
 
-        self.log("-" * 80)
-        self.log("Done.")
+        self.stdout.write("-" * 80)
+        self.stdout.write("Done.")

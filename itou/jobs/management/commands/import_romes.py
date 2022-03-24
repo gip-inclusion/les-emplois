@@ -1,10 +1,8 @@
 import json
-import logging
 import os
 
-from django.core.management.base import BaseCommand
-
 from itou.jobs.models import Rome
+from itou.utils.management_commands import ItouBaseCommand
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -12,7 +10,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 JSON_FILE = f"{CURRENT_DIR}/data/romes.json"
 
 
-class Command(BaseCommand):
+class Command(ItouBaseCommand):
     """
     Import ROMEs into the database.
 
@@ -28,20 +26,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
-
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
 
     def handle(self, dry_run=False, **options):
 
