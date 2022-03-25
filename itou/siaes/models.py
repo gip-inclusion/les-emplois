@@ -63,7 +63,7 @@ class SiaeQuerySet(OrganizationQuerySet):
 
     def prefetch_job_description_through(self, **kwargs):
         qs = (
-            SiaeJobDescription.objects.filter(**kwargs)
+            SiaeJobDescription.objects.filter(is_active=True, **kwargs)
             .with_annotation_is_popular()
             .select_related("appellation__rome")
             .order_by("-updated_at", "-created_at")
