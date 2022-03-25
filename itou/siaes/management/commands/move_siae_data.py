@@ -41,7 +41,7 @@ HELP_TEXT = """
 """
 
 
-def move_siae_data(from_id, to_id, dry_run=False, only_job_applications=False):
+def move_siae_data(from_id, to_id, dry_run=True, only_job_applications=False):
     if from_id == to_id:
         logger.error("Unable to use the same siae as source and destination (ID %s)", from_id)
         return
