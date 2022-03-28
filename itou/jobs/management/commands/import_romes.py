@@ -1,8 +1,10 @@
 import json
 import os
 
+from django.core.management.base import BaseCommand
+
 from itou.jobs.models import Rome
-from itou.utils.management_commands import ItouBaseCommand
+from itou.utils.management_commands import DeprecatedLoggerMixin
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -10,7 +12,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 JSON_FILE = f"{CURRENT_DIR}/data/romes.json"
 
 
-class Command(ItouBaseCommand):
+class Command(DeprecatedLoggerMixin, BaseCommand):
     """
     Import ROMEs into the database.
 

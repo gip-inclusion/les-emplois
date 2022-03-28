@@ -10,6 +10,7 @@ from pathlib import Path
 import pandas as pd
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.management.base import BaseCommand
 from django.db import IntegrityError, transaction
 from django.db.models import F, Q
 from tqdm import tqdm
@@ -20,7 +21,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.users.models import User
-from itou.utils.management_commands import ItouBaseCommand
+from itou.utils.management_commands import DeprecatedLoggerMixin
 from itou.utils.validators import validate_nir
 
 
@@ -55,7 +56,7 @@ DATE_FORMAT = "%Y-%m-%d"
 # DATE_FORMAT = "%d/%m/%Y"
 
 
-class Command(ItouBaseCommand):
+class Command(DeprecatedLoggerMixin, BaseCommand):
     """
     On December 1st, 2021, every AI were asked to present a PASS IAE for each of their employees.
     Before that date, they were able to hire without one. To catch up with the ongoing stock,

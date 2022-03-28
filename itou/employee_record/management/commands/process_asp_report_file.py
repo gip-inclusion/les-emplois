@@ -1,14 +1,15 @@
 import json
 import os.path as os_path
 
+from django.core.management.base import BaseCommand
 from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordSerializer
-from itou.utils.management_commands import ItouBaseCommand
+from itou.utils.management_commands import DeprecatedLoggerMixin
 
 
-class Command(ItouBaseCommand):
+class Command(DeprecatedLoggerMixin, BaseCommand):
     """
     Manually process an employee record ASP report file
 

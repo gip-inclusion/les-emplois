@@ -4,6 +4,7 @@ from os import path
 
 import pysftp
 from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
@@ -12,7 +13,7 @@ from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchS
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
-from itou.utils.management_commands import ItouBaseCommand
+from itou.utils.management_commands import DeprecatedLoggerMixin
 
 
 # Global SFTP connection options
@@ -23,7 +24,7 @@ if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
     connection_options = pysftp.CnOpts(knownhosts=settings.ASP_FS_KNOWN_HOSTS)
 
 
-class Command(ItouBaseCommand):
+class Command(DeprecatedLoggerMixin, BaseCommand):
     """
     Employee record management command
     ---

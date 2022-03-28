@@ -1,10 +1,11 @@
 import datetime
 
 import pandas as pd
+from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.approvals.models import PoleEmploiApproval
-from itou.utils.management_commands import ItouBaseCommand
+from itou.utils.management_commands import DeprecatedLoggerMixin
 
 
 FLUSH_SIZE = 5000
@@ -50,7 +51,7 @@ def load_and_sort(file_path):
     return df
 
 
-class Command(ItouBaseCommand):
+class Command(DeprecatedLoggerMixin, BaseCommand):
     """
     Import Pole emploi's approvals (or `agrément` in French) into the database.
 

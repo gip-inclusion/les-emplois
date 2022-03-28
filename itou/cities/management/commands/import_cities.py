@@ -2,11 +2,12 @@ import json
 import os
 
 from django.contrib.gis.geos import GEOSGeometry
+from django.core.management.base import BaseCommand
 from django.template.defaultfilters import slugify
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
-from itou.utils.management_commands import ItouBaseCommand
+from itou.utils.management_commands import DeprecatedLoggerMixin
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -22,7 +23,7 @@ MISSING_COORDS = {
 }
 
 
-class Command(ItouBaseCommand):
+class Command(DeprecatedLoggerMixin, BaseCommand):
     """
     Import French cities data from a JSON file into the database.
 

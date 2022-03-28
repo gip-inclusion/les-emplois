@@ -10,10 +10,11 @@ import pandas as pd
 import unidecode
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
 from itou.approvals.models import Approval
-from itou.utils.management_commands import ItouBaseCommand
+from itou.utils.management_commands import DeprecatedLoggerMixin
 from itou.utils.validators import validate_nir
 
 
@@ -24,7 +25,7 @@ NIR_COL = "ppn_numero_inscription"
 APPROVAL_COL = "agr_numero_agrement"
 
 
-class Command(ItouBaseCommand):
+class Command(DeprecatedLoggerMixin, BaseCommand):
     """
     Update job seekers' account with their NIR (social security number) if an approval has been issued.
 

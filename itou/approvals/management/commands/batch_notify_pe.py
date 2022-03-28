@@ -1,16 +1,17 @@
 import datetime
 
+from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.utils.management_commands import ItouBaseCommand
+from itou.utils.management_commands import DeprecatedLoggerMixin
 
 
 DATE_FORMAT = "%d/%m/%y"
 
 
-class Command(ItouBaseCommand):
+class Command(DeprecatedLoggerMixin, BaseCommand):
     """
     Notify
 

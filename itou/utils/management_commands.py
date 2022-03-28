@@ -1,11 +1,11 @@
 import logging
 
-from django.core.management.base import BaseCommand
 
-
-class ItouBaseCommand(BaseCommand):
+class DeprecatedLoggerMixin:
     """
-    A generic class for management commands, gathering all shared stuff (loggers etc).
+    A mixin used to inject deprecated logger stuff in some of our old management commands.
+
+    Do *not* use it for new commands! Use directly `self.stdout.write()` instead.
     """
 
     def set_logger(self, verbosity):

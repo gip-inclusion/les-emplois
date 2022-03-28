@@ -10,8 +10,9 @@ from datetime import datetime
 
 import pandas as pd
 from django.conf import settings
+from django.core.management.base import BaseCommand
 
-from itou.utils.management_commands import ItouBaseCommand
+from itou.utils.management_commands import DeprecatedLoggerMixin
 
 
 _FIXTURES_DIR = "itou/asp/fixtures"
@@ -26,7 +27,7 @@ def parse_asp_date(dt):
     return None
 
 
-class Command(ItouBaseCommand):
+class Command(DeprecatedLoggerMixin, BaseCommand):
     """
     Generation of ASP reference files fixtures
 
