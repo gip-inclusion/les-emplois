@@ -43,14 +43,14 @@
   - Redirection de la sortie dans un fichier pour conserver les informations d’exécution
   - Ajout de la date de désactivation des conventions non actives
   - Améliorations mineures (performance et gestion d’un cas particulier)
-- La date de fin de contrat est désormais optionnelle (dans le formulaire d’embauche et celui d’édition des dates de contrat) 
+- La date de fin de contrat est désormais optionnelle (dans le formulaire d’embauche et celui d’édition des dates de contrat)
 - Mise à jour du thème ITOU vers la v3.0.1
 - Mise à jour Django vers la 4.0.3
 - Correction de quelques erreurs de formatage ou de structure du DOM (arborescence du code HTML)
 - Correction des erreurs d’accessibilité sur :
   - Le contraste de couleurs, la présentation et consultation de l’information
   - La structuration de documents et des titres
-  - Les formulaires  
+  - Les formulaires
   - Les éléments obligatoires
 - Remplacement des icônes SVG du tableau de bord par les icônes `remixicon`
 - API Pôle Emploi :
@@ -129,7 +129,7 @@ Technique:
 - Ajout du NIR, NIA ou NTT dans les agréments Pole Emploi
 - Ajout de contrôles de cohérence sur la reprise de candidatures via l'interface admin
 
-### Modifié 
+### Modifié
 
 - Modification de la cohérence de la date de départ des suspensions
 - Modification du contrôle de la dernière embauche pour les suspensions
@@ -144,9 +144,9 @@ Technique:
 - Mise à jour du script des annexes financières pour 2022
 - Mise à jour du script qui alimente le suivi de la consommation des ETP
 - Mise à jour du lien retour dans la fiche candidature pour conserver les filtres de recherche
-- Mise à jour du thème de l'application pour préparer les corrections liées à l'audit d'accessibilité 
+- Mise à jour du thème de l'application pour préparer les corrections liées à l'audit d'accessibilité
 
-### Supprimé 
+### Supprimé
 
 - Suppression d'un message d'information en double dans le tableau de bord
 
@@ -154,7 +154,7 @@ Technique:
 
 ### Ajouté
 
-- Ajout de deux nouveaux motifs de suspension d'un PASS IAE dont un uniquement pour les ACI et EI (Contrat Passerelle). 
+- Ajout de deux nouveaux motifs de suspension d'un PASS IAE dont un uniquement pour les ACI et EI (Contrat Passerelle).
 - Ajout de documentation dans le fichier `Makefile`.
 - Ajout d'un second tableau de bord pour les DDETS.
 - Ajout de la date de naissance dans l'affichage en liste des PASS IAE et des utilisateurs (admin).
@@ -163,9 +163,9 @@ Technique:
 ### Modifié
 
 - Modification de l'admin Django pour ajouter plus de visibilité pour les élément `checkbox` et `radio`.
-- Le bouton "Besoin d'aide" envoie dorénavant vers une page d'aide du pilotage et non des emplois depuis une page stats. 
+- Le bouton "Besoin d'aide" envoie dorénavant vers une page d'aide du pilotage et non des emplois depuis une page stats.
 - Modification du niveau de log de Sentry.
-- Réduction du niveau de log pour l'envoi d'e-mails. 
+- Réduction du niveau de log pour l'envoi d'e-mails.
 - Modification de la date de mise en production des fiches salarié.
 - Modification de l'indexation Google pour les emplois (route `/robots.txt`).
 - Modification du `Makefile` concernant le déploiement en production (script `deploy.sh`).
@@ -182,7 +182,7 @@ Technique:
 
 ### Modifié
 
-- Correction d'une erreur de calcul de dates pour les années bissextiles. 
+- Correction d'une erreur de calcul de dates pour les années bissextiles.
 - Mise à jour vers Django 4.0.1.
 - Correctif dans l'administration des invitations.
 - Correctif permettant aux EA et GEIQ de pouvoir à nouveau créer des antennes pour leurs structures.
