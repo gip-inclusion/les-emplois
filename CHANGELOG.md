@@ -1,5 +1,29 @@
 # Journal des modifications
 
+## [39] - 2022-03-25
+
+### Ajouté
+- Exports de données SQL : Ajout du nombre de candidatures par structure
+- Technique : Ajout d'une route temporaire pour tester les custom URLs Matomo
+- Ajout d'un nouveau tableau de bord "Facilitation de l'embauche" pour les DDETS
+- Ajout de l’import des NIR/NTT/NIA à partir des données ASP
+- Ajout d'un script d'extraction des utilisateurs C2 du C1
+- Mise à jour des liens vers communaute.inclusion.beta.gouv.fr
+- API Pole emploi : Ajout de journaux et de vérifications supplémentaires
+- API Pole emploi : Ajout d'un script d'export de tous les Pass IAE
+- Refonte (UI, UX) des fiches de poste avec un nouveau parcours et de nombreuses nouvelles options
+- Facilitateurs : Support des fiches de poste
+
+### Modifié
+- Tableau de bord : Rendre les menus déroulants défilants quand ils contiennent trop d'éléments
+- Tableau de bord : Affichage des fiches salarié nécessitant intervention
+- SSO: Identification des utilisateurs s'étant connecté avec FranceConnect
+- Cron quotidien Metabase : améliorations diverses (performance, fonctionnalités, lancement plus tôt)
+- API Pole emploi : Correction des erreurs occasionnelles sur la recherche d’agréments
+
+### Supprimé
+- néant
+
 ## [38] - 2022-03-11
 
 ### Ajouté
