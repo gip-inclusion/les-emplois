@@ -143,6 +143,8 @@ def job_description_list(request, template_name="siaes/job_description_list.html
 
 
 def _get_job_description(session_data):
+    if not session_data:
+        return None
     if pk := session_data.get("pk"):
         job_description = get_object_or_404(
             SiaeJobDescription.objects.select_related(
