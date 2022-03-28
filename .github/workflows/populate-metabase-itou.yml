@@ -9,7 +9,9 @@ name: 🌈 Populate metabase itou
 on:
   workflow_dispatch: # allows us to run this action manually
   schedule:
-    - cron: '12 0 * * *' # Run this workflow at 0:12am every day
+    # Run this workflow every night.
+    # 19:00 here means 22:00 or 23:00 in France depending on winter/summer time.
+    - cron: '0 19 * * *'
 
 # How to run this:
 # Locally:
