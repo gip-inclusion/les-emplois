@@ -371,14 +371,12 @@ class Approval(CommonApprovalMixin):
             - A max of 99999 approvals could be issued by year
             - We would have gone beyond, we would never have thought we could go that far
         """
+        # Lock the table's first row until the end of the transaction, effectively acting as a
+        # poor man's semaphore.
+        Approval.objects.order_by("pk").select_for_update().first()
+        # Now we can do a whole new SELECT that will take into account eventual new rows.
         last_itou_approval = (
-            Approval.objects
-            # select_for_update() returns a queryset that will lock rows until the end of the transaction.
-            # The lock is active for the duration of the transaction (see settings.ATOMIC_REQUESTS).
-            .select_for_update()
-            .filter(number__startswith=Approval.ASP_ITOU_PREFIX)
-            .order_by("number")
-            .last()
+            Approval.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX).order_by("number").last()
         )
         if last_itou_approval:
             raw_number = last_itou_approval.number.removeprefix(Approval.ASP_ITOU_PREFIX)

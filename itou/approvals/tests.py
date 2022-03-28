@@ -1,4 +1,6 @@
 import datetime
+import threading
+import time
 from unittest import mock
 
 from dateutil.relativedelta import relativedelta
@@ -7,9 +9,9 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.template.defaultfilters import title
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 
@@ -251,10 +253,6 @@ class CommonApprovalMixinTest(TestCase):
 
 
 class ApprovalModelTest(TestCase):
-    """
-    Test Approval model.
-    """
-
     def test_clean(self):
         approval = ApprovalFactory()
         approval.start_at = timezone.now().date()
@@ -1696,3 +1694,72 @@ class ProlongationNotificationsTest(TestCase):
         self.assertIn(title(prolongation.approval.user.first_name), email.body)
         self.assertIn(title(prolongation.approval.user.last_name), email.body)
         self.assertIn(settings.ITOU_EMAIL_PROLONGATION, email.body)
+
+
+class ApprovalConcurrentModelTest(TransactionTestCase):
+    """
+    Uses TransactionTestCase that truncates all tables after every test, instead of TestCase
+    that uses transaction.
+    This way we can appropriately test the select_for_update() behaviour.
+    """
+
+    def test_nominal_process(self):
+        with transaction.atomic():
+            # create a first approval out of the blue, ensure the number is correct.
+            approval_1 = ApprovalFactory.build(user=UserFactory(), number=None)
+            self.assertEqual(Approval.objects.count(), 0)
+            approval_1.save()
+            self.assertEqual(approval_1.number, "999990000001")
+            self.assertEqual(Approval.objects.count(), 1)
+
+            # if a second one is created after the save, no worries man.
+            approval_2 = ApprovalFactory.build(user=UserFactory(), number=None)
+            approval_2.save()
+            self.assertEqual(approval_2.number, "999990000002")
+
+    def test_race_condition(self):
+        """Demonstrate the issue where two concurrent requests are locking the last row of
+        the Approval table (effectively, preventing each other from modifying it at the same
+        time) but still be wrong in evaluating the next number: the selected line is the same
+        so the number also is.
+        What we can do though is selecting the FIRST line just for locking (cheap semaphore)
+        and then select the last one.
+        """
+        # create a first Approval so that the last() in get_next_number actually has something
+        # to select_for_update() and will effectively lock the last row.
+        with transaction.atomic():
+            ApprovalFactory(user=UserFactory(), number=None)
+
+        user1 = UserFactory()
+        user2 = UserFactory()
+
+        approval = None
+        approval2 = None
+
+        # We are going to simulate two concurrent requests inside two atomic transaction blocks.
+        # The goal is to simulate two concurrent Approval.accept() requests.
+        # Let's do like they do in the Django tests themselves: use threads and sleep().
+        def first_request():
+            nonlocal approval
+            with transaction.atomic():
+                approval = ApprovalFactory.build(user=user1, number=Approval.get_next_number())
+                time.sleep(0.2)  # sleep long enough for the concurrent request to start
+                approval.save()
+
+        def concurrent_request():
+            nonlocal approval2
+            with transaction.atomic():
+                time.sleep(0.1)  # ensure we are not the first to take the lock
+                approval2 = ApprovalFactory.build(user=user2, number=Approval.get_next_number())
+                time.sleep(0.2)  # sleep long enough to save() after the first request's save()
+                approval2.save()
+
+        t1 = threading.Thread(target=first_request)
+        t2 = threading.Thread(target=concurrent_request)
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()  # without the singleton we would suffer from IntegrityError here
+
+        self.assertEqual(approval.number, "999990000002")
+        self.assertEqual(approval2.number, "999990000003")
