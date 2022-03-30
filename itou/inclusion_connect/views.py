@@ -92,6 +92,7 @@ def inclusion_connect_authorize(request):
         "state": csrf_signed,
         "nonce": crypto.get_random_string(length=12),
         "acr_values": "eidas1",
+        "from": "emplois",  # Display a "Les emplois" logo on the connection page.
     }
     url = INCLUSION_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
