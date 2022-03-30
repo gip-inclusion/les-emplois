@@ -238,10 +238,8 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
 
 
 def inclusion_connect_logout(request):
-    # The user can be authenticated on IC w/o a session on itou.
-    id_token = request.GET.get("id_token")
-    state = request.GET.get("state", "")
-
+    id_token = request.GET.get(INCLUSION_CONNECT_SESSION_TOKEN)
+    state = request.GET.get(INCLUSION_CONNECT_SESSION_STATE)
     if not id_token:
         return JsonResponse({"message": "Le paramètre « id_token » est manquant."}, status=400)
 

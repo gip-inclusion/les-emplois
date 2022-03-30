@@ -1,7 +1,9 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from django.conf import settings
 from django.urls import reverse
+from django.utils.http import urlencode
 
+from itou.inclusion_connect import constants as ic_constants
 from itou.utils.urls import get_safe_url
 
 
@@ -47,3 +49,26 @@ class UserAdapter(DefaultAccountAdapter):
     def send_mail(self, template_prefix, email, context):
         context["itou_environment"] = settings.ITOU_ENVIRONMENT
         super().send_mail(template_prefix, email, context)
+
+    def get_logout_redirect_url(self, request):
+        """
+        Returns the URL to redirect to after the user logs out. Note that
+        this method is also invoked if you attempt to log out while no users
+        is logged in. Therefore, request.user is not guaranteed to be an
+        authenticated user.
+        TODO: do it too for FranceConnect.
+        TODO: add a test.
+        """
+        # Is user is from SSO, get params from session.
+        redirect_url = reverse("home:hp")
+        ic_token = request.session.get(ic_constants.INCLUSION_CONNECT_SESSION_TOKEN)
+        ic_state = request.session.get(ic_constants.INCLUSION_CONNECT_SESSION_STATE)
+
+        if ic_token:
+            params = {
+                ic_constants.INCLUSION_CONNECT_SESSION_TOKEN: ic_token,
+                ic_constants.INCLUSION_CONNECT_SESSION_STATE: ic_state,
+            }
+            redirect_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+
+        return redirect_url
