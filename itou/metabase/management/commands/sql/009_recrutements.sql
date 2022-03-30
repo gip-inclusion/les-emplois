@@ -20,7 +20,11 @@ select
     nom_departement_af,
     nom_region_af,
     af_numero_convention,
-    af_numero_annexe_financiere
+    af_numero_annexe_financiere,
+    zrr,
+    qpv,
+    tranche_age,
+    rqth
 from 
     saisies_mensuelles_IAE
 where date_part('year', date_recrutement) >= (date_part('year', current_date) - 2)
@@ -40,4 +44,8 @@ group by
     nom_departement_af,
     nom_region_af,
     af_numero_convention,
-    af_numero_annexe_financiere
+    af_numero_annexe_financiere,
+    zrr,
+    qpv,
+    tranche_age,
+    rqth
