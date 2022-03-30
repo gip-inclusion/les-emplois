@@ -1,13 +1,53 @@
 import datetime
-import logging
-import os
 
 import pandas as pd
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from tqdm import tqdm
 
 from itou.approvals.models import PoleEmploiApproval
+
+
+FLUSH_SIZE = 5000
+
+# Sometimes, there are multiple date formats in the XLS file.
+# Otherwise it would be too easy.
+DATE_FORMAT = "%m/%d/%Y"
+DATE_FORMAT2 = "%d/%m/%y"
+DATE_FORMAT3 = "%d%b%Y"
+FALLBACK_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+
+def parse_date(value):
+    value = str(value).strip()
+    try:
+        return datetime.datetime.strptime(value, DATE_FORMAT).date()
+    except ValueError:
+        pass
+    try:
+        return datetime.datetime.strptime(value, DATE_FORMAT2).date()
+    except ValueError:
+        pass
+    try:
+        return datetime.datetime.strptime(value, DATE_FORMAT3).date()
+    except ValueError:
+        pass
+    return datetime.datetime.strptime(value, FALLBACK_DATE_FORMAT).date()
+
+
+def parse_str(src, max_len):
+    if not isinstance(src, str):
+        return src, "instance"
+    s = src.strip().replace(" ", "")
+    if len(s) > max_len:
+        return s, "length"
+    return s, None
+
+
+def load_and_sort(file_path):
+    df = pd.read_excel(file_path)
+    df["DATE_DEB"] = pd.to_datetime(df.DATE_DEB, format=DATE_FORMAT)
+    df.sort_values("DATE_DEB")
+    return df
 
 
 class Command(BaseCommand):
@@ -24,11 +64,6 @@ class Command(BaseCommand):
 
     help = "Import the content of the Pole emploi's approvals xlsx file into the database."
 
-    DATE_FORMAT = "%d/%m/%y"
-    # Sometimes, there are multiple date formats in the XLS file.
-    # Otherwise it would be too easy.
-    FALLBACK_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-
     def add_arguments(self, parser):
         parser.add_argument(
             "--file-path",
@@ -37,104 +72,65 @@ class Command(BaseCommand):
             action="store",
             help="Absolute path of the XLSX file to import",
         )
-        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
+        parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
-
-    def parse_date(self, value):
-        """
-        In some of the XLS files provided, there are find two date formats.
-        """
-        value = str(value).strip()
-        try:
-            return datetime.datetime.strptime(value, self.DATE_FORMAT).date()
-        except ValueError:
-            return datetime.datetime.strptime(value, self.FALLBACK_DATE_FORMAT).date()
-
-    def handle(self, file_path, dry_run=False, **options):
-
-        self.set_logger(options.get("verbosity"))
-
+    def handle(self, file_path, wet_run=False, **options):
         now = timezone.now().date()
 
         count_before = PoleEmploiApproval.objects.count()
+        count_errors = 0
+        count_invalid_agr_dec = 0
         count_canceled_approvals = 0
+        count_success = 0
         unique_approval_suffixes = {}
 
-        file_size_in_bytes = os.path.getsize(file_path)
-        self.stdout.write(f"Opening a {file_size_in_bytes >> 20} MB file… (this will take some time)")
+        df = load_and_sort(file_path)
+        self.stdout.write(f"Ready to import up to length={len(df)} approvals from file={file_path}")
 
         bulk_create_queue = []
-        chunk_size = 5000
-
-        df = pd.read_excel(file_path)
-        df["DATE_HISTO"] = pd.to_datetime(df.DATE_HISTO, format=self.DATE_FORMAT)
-        df.sort_values("DATE_HISTO")
-        first_approval_date = df.iloc[0].DATE_HISTO.strftime(self.DATE_FORMAT)
-        last_approval_date = df.iloc[-1].DATE_HISTO.strftime(self.DATE_FORMAT)
-
-        self.stdout.write("Ready.")
-        self.stdout.write(f"Importing up to {len(df)} approvals from {first_approval_date} to {last_approval_date}")
-
-        pbar = tqdm(total=len(df))
         for idx, row in df.iterrows():
-            pbar.update(1)
-
-            if idx == 0:
-                # Skip XLSX header.
-                continue
-
             CODE_STRUCT_AFFECT_BENE = str(row["CODE_STRUCT_AFFECT_BENE"])
-            assert len(CODE_STRUCT_AFFECT_BENE) in [4, 5]
+            if len(CODE_STRUCT_AFFECT_BENE) not in [4, 5]:
+                self.stderr.write(f"! wrong CODE_STRUCT_AFFECT_BENE={CODE_STRUCT_AFFECT_BENE}, skipping...")
+                count_errors += 1
+                continue
 
             # This is known as "Identifiant Pôle emploi".
             ID_REGIONAL_BENE = str(row["ID_REGIONAL_BENE"]).strip()
             if len(ID_REGIONAL_BENE) < 8:
-                self.logger.debug("-" * 80)
-                self.logger.debug("Bad format for ID_REGIONAL_BENE (PE ID) found, skipping…")
-                self.logger.debug("%s", ID_REGIONAL_BENE)
+                self.stderr.write(f"! bad length for ID_REGIONAL_BENE={ID_REGIONAL_BENE} (PE ID) found, skipping…")
+                count_errors += 1
                 continue
+
             # Check the format of ID_REGIONAL_BENE.
-            # First 7 chars should be digits.
-            assert ID_REGIONAL_BENE[:7].isdigit()
-            # Last char should be alphanumeric.
-            assert ID_REGIONAL_BENE[7:].isalnum()
+            # First 7 chars should be digits, last char should be alphanumeric.
+            if not ID_REGIONAL_BENE[:7].isdigit() or not ID_REGIONAL_BENE[7:].isalnum():
+                self.stderr.write(f"! bad format for ID_REGIONAL_BENE={ID_REGIONAL_BENE} (PE ID) found, skipping…")
+                count_errors += 1
+                continue
 
-            NOM_USAGE_BENE = row["NOM_USAGE_BENE"].strip()
-            assert "  " not in NOM_USAGE_BENE
-            # max length 29
+            NOM_USAGE_BENE, err = parse_str(row["NOM_USAGE_BENE"], 29)
+            if err:
+                self.stderr.write(f"! unable to parse NOM_USAGE_BENE={NOM_USAGE_BENE} err={err}, skipping…")
+                count_errors += 1
+                continue
 
-            PRENOM_BENE = row["PRENOM_BENE"].strip()
-            assert "  " not in PRENOM_BENE
-            # max length 13
+            PRENOM_BENE, err = parse_str(row["PRENOM_BENE"], 13)
+            if err:
+                self.stderr.write(f"! unable to parse PRENOM_BENE={PRENOM_BENE} err={err}, skipping…")
+                count_errors += 1
+                continue
 
-            NOM_NAISS_BENE = row["NOM_NAISS_BENE"].strip()
-            assert "  " not in NOM_NAISS_BENE
-            # max length 25
+            NOM_NAISS_BENE, err = parse_str(row["NOM_NAISS_BENE"], 25)
+            if err:
+                self.stderr.write(f"! unable to parse NOM_NAISS_BENE={NOM_NAISS_BENE} err={err}, skipping…")
+                count_errors += 1
+                continue
 
-            NUM_AGR_DEC = row["NUM_AGR_DEC"].strip().replace(" ", "")
-            assert " " not in NUM_AGR_DEC
+            NUM_AGR_DEC = str(row["NUM_AGR_DEC"]).strip().replace(" ", "")
             if len(NUM_AGR_DEC) not in [12, 15]:
-                self.stderr.write("-" * 80)
-                self.stderr.write("Invalid number, skipping…")
-                self.stderr.write(CODE_STRUCT_AFFECT_BENE)
-                self.stderr.write(ID_REGIONAL_BENE)
-                self.stderr.write(NOM_USAGE_BENE)
-                self.stderr.write(PRENOM_BENE)
-                self.stderr.write(NOM_NAISS_BENE)
-                self.stderr.write(NUM_AGR_DEC)
+                self.stderr.write(f"! invalid NUM_AGR_DEC={NUM_AGR_DEC} len={len(NUM_AGR_DEC)}, skipping…")
+                count_invalid_agr_dec += 1
                 continue
 
             # Keep track of unique suffixes added by PE at the end of a 12 chars number
@@ -143,16 +139,17 @@ class Command(BaseCommand):
                 suffix = NUM_AGR_DEC[12:]
                 unique_approval_suffixes[suffix] = unique_approval_suffixes.get(suffix, 0) + 1
 
-            DATE_DEB_AGR_DEC = self.parse_date(row["DATE_DEB"])
-            DATE_FIN_AGR_DEC = self.parse_date(row["DATE_FIN"])
-            DATE_NAISS_BENE = self.parse_date(row["DATE_NAISS_BENE"])
+            DATE_DEB_AGR_DEC = parse_date(row["DATE_DEB"])
+            DATE_FIN_AGR_DEC = parse_date(row["DATE_FIN"])
+            DATE_NAISS_BENE = parse_date(row["DATE_NAISS_BENE"])
 
             # Same start and end dates means that the approval has been canceled.
             if DATE_DEB_AGR_DEC == DATE_FIN_AGR_DEC:
+                self.stderr.write(
+                    f"> canceled approval found AGR_DEC={NUM_AGR_DEC} "
+                    f"NOM={NOM_USAGE_BENE} PRENOM={PRENOM_BENE}, skipping..."
+                )
                 count_canceled_approvals += 1
-                self.logger.debug("-" * 80)
-                self.logger.debug("Canceled approval found, skipping…")
-                self.logger.debug("%s - %s - %s", NUM_AGR_DEC, NOM_USAGE_BENE, PRENOM_BENE)
                 continue
 
             # Pôle emploi sends us the year in a two-digit format ("14/03/68")
@@ -165,7 +162,8 @@ class Command(BaseCommand):
                 str_d = f"19{str_d[2:]}"
                 DATE_NAISS_BENE = datetime.datetime.strptime(str_d, "%Y-%m-%d")
 
-            if not dry_run:
+            count_success += 1
+            if wet_run:
                 pe_approval = PoleEmploiApproval()
                 pe_approval.pe_structure_code = CODE_STRUCT_AFFECT_BENE
                 pe_approval.pole_emploi_id = ID_REGIONAL_BENE
@@ -177,7 +175,7 @@ class Command(BaseCommand):
                 pe_approval.start_at = DATE_DEB_AGR_DEC
                 pe_approval.end_at = DATE_FIN_AGR_DEC
                 bulk_create_queue.append(pe_approval)
-                if len(bulk_create_queue) > chunk_size:
+                if len(bulk_create_queue) > FLUSH_SIZE:
                     # Setting the ignore_conflicts parameter to True tells the
                     # database to ignore failure to insert any rows that fail
                     # constraints such as duplicate unique values.
@@ -186,18 +184,18 @@ class Command(BaseCommand):
                     PoleEmploiApproval.objects.bulk_create(bulk_create_queue, ignore_conflicts=True)
                     bulk_create_queue = []
 
-        pbar.close()
-
         # Create any remaining objects.
-        if not dry_run and bulk_create_queue:
+        if wet_run and bulk_create_queue:
             PoleEmploiApproval.objects.bulk_create(bulk_create_queue, ignore_conflicts=True)
 
         count_after = PoleEmploiApproval.objects.count()
 
-        self.stdout.write("-" * 80)
-        self.stdout.write(f"Before: {count_before}")
-        self.stdout.write(f"After: {count_after}")
-        self.stdout.write(f"New objects: {count_after - count_before} (in case of dry run this will always be zero)")
-        self.stdout.write(f"Skipped {count_canceled_approvals} canceled approvals")
-        self.stdout.write(f"Unique suffixes: {unique_approval_suffixes}")
+        self.stdout.write("PEApprovals import summary:")
+        self.stdout.write(f"  Number of approvals, before    : {count_before}")
+        self.stdout.write(f"  Number of approvals, after     : {count_after}")
+        self.stdout.write(f"  Added approvals                : {count_after - count_before}")
+        self.stdout.write(f"  Sucessfully parsed lines       : {count_success}")
+        self.stdout.write(f"  Unexpected parsing errors      : {count_errors}")
+        self.stdout.write(f"  Invalid approval number errors : {count_invalid_agr_dec}")
+        self.stdout.write(f"  Canceled approvals             : {count_canceled_approvals}")
         self.stdout.write("Done.")
