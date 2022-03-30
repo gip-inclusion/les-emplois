@@ -10,7 +10,6 @@ L'objectif est de créer une table agrégée avec l'indicateur nombre de sorties
     - département et région de l'annexe financière
   
 Un filtre est appliqué pour récupérer un historique de 2 ans en plus de l'année en cours
-
 */    
 
 select 
@@ -31,7 +30,11 @@ select
     nom_departement_af,
     nom_region_af,
     af_numero_convention,
-    af_numero_annexe_financiere
+    af_numero_annexe_financiere,    
+    zrr,
+    qpv,
+    tranche_age,
+    rqth
 from 
     saisies_mensuelles_IAE
 where 
@@ -55,4 +58,8 @@ group by
     nom_departement_af,
     nom_region_af,
     af_numero_convention,
-    af_numero_annexe_financiere
+    af_numero_annexe_financiere,
+    zrr,
+    qpv,
+    tranche_age,
+    rqth
