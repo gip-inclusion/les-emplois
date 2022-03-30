@@ -81,7 +81,7 @@ select
     end rsa, 
     ctr_mis.contrat_id_structure as id_structure_asp,
     to_date (ctr_mis.contrat_date_embauche ,'dd/mm/yyyy') as date_recrutement,
-    ctr_mis.contrat_beneficiaire_rqth as rqth,
+    ctr_mis.contrat_salarie_rqth as rqth,
     concat(ctr_mis.contrat_code_rome, '-', code_rome.description_code_rome) as metier,
     case
         when niv_formation.rnf_libelle_niveau_form_empl = 'JAMAIS SCOLARISE' then 'a- Jamais scolarisé'
