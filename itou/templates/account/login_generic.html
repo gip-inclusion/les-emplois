@@ -7,7 +7,7 @@
 {% block title %}Connexion{{ block.super }}{% endblock %}
 
 {% block right_content %}
-    <div class="mt-5 px-sm-5">
+    <div class="m-5">
         <h1 class="h1-hero-c1 text-center">Se connecter</h1>
 
         {% if show_inclusion_connect %}
@@ -39,25 +39,27 @@
             </p>
 
         </form>
-    </div>
-{% endblock %}
-
-{% block left_content %}
-    <div class="mt-5 d-sm-block">
         {% if signup_allowed %}
-            <div class="mt-5 mb-5 pb-5 text-center">
-                <h2 class="h1-hero-c1">S'inscrire</h2>
-                <p>
-                    <a class="btn btn-outline-primary" href="{{ signup_url }}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+            <hr class="my-5">
+            <div class="d-flex justify-content-between align-items-end pb-5">
+                <div class="">
+                    <h2 class="m-0 p-0">Nouvel utilisateur ?</h2>
+                </div>
+                <div class="">
+                    <a class="font-weight-bold" href="{{ signup_url }}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
                         Créer un compte
                         {% if account_type_display_name %}
                             {{ account_type_display_name|lower }}
                         {% endif %}
                     </a>
-                </p>
+                </div>
             </div>
         {% endif %}
+    </div>
+{% endblock %}
 
+{% block left_content %}
+    <div class="mt-5 d-none d-sm-block">
         <h2 class="h1 ff-extra-01 text-center">Bienvenue !</h2>
         <img class="img-fluid mt-2" src="{% static 'img/login.svg' %}" alt="">
     </div>
