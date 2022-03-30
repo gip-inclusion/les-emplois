@@ -16,8 +16,8 @@ jedi==0.17.2
 
 # Code quality
 # ------------------------------------------------------------------------------
+black==22.3.0  # https://github.com/psf/black
 flake8==3.9.2  # https://github.com/PyCQA/flake8
-black==21.7b0  # https://github.com/psf/black
 isort==5.9.3  # https://github.com/timothycrosley/isort
 pylint==2.12.2  # https://github.com/PyCQA/pylint
 pylint-django==2.4.3  # https://github.com/PyCQA/pylint-django
