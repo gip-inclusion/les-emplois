@@ -46,7 +46,6 @@ from
         qpv,
         tranche_age,
         rqth
-    
 from 
     constantes 
     cross join 
