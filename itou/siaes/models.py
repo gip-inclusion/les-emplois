@@ -559,7 +559,11 @@ class SiaeJobDescription(models.Model):
     )
     other_contract_type = models.CharField(verbose_name="Autre type de contrat", max_length=255, blank=True, null=True)
     location = models.ForeignKey(
-        "cities.City", on_delete=models.SET_NULL, null=True, verbose_name="Localisation du poste"
+        "cities.City",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Localisation du poste",
     )
     hours_per_week = models.PositiveSmallIntegerField(
         verbose_name="Nombre d'heures par semaine",
