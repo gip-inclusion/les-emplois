@@ -25,12 +25,30 @@ class SiaeMembersInline(MembersInline):
 class JobsInline(admin.TabularInline):
     model = models.Siae.jobs.through
     extra = 1
+    fields = (
+        "jobdescription_id_link",
+        "appellation",
+        "custom_name",
+        "created_at",
+        "contract_type",
+    )
     raw_id_fields = ("appellation", "siae", "location")
-    # The location was made read-only to solve an issue detailed in https://github.com/betagouv/itou/pull/1210
-    # If one day we need the staff to be able to edit this location, the proper way to do this would be to link to
-    # the existing job description admin page. For some weird reason the current inline links to the appellation
-    # admin page instead of the job description admin page.
-    readonly_fields = ("created_at", "updated_at", "location")
+    readonly_fields = (
+        "appellation",
+        "custom_name",
+        "contract_type",
+        "created_at",
+        "updated_at",
+        "jobdescription_id_link",
+    )
+
+    def jobdescription_id_link(self, obj):
+        app_label = obj._meta.app_label
+        model_name = obj._meta.model_name
+        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.id])
+        return mark_safe(f'<a href="{url}"><strong>Fiche de poste ID: {obj.id}</strong></a>')
+
+    jobdescription_id_link.short_description = "Lien vers la fiche de poste"
 
 
 class FinancialAnnexesInline(admin.TabularInline):
