@@ -26,6 +26,10 @@ class JobsInline(admin.TabularInline):
     model = models.Siae.jobs.through
     extra = 1
     raw_id_fields = ("appellation", "siae", "location")
+    # The location was made read-only to solve an issue detailed in https://github.com/betagouv/itou/pull/1210
+    # If one day we need the staff to be able to edit this location, the proper way to do this would be to link to
+    # the existing job description admin page. For some weird reason the current inline links to the appellation
+    # admin page instead of the job description admin page.
     readonly_fields = ("created_at", "updated_at", "location")
 
 
