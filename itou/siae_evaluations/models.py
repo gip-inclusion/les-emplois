@@ -1,13 +1,31 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Count, F
 from django.urls import reverse
 from django.utils import timezone
 
 from itou.institutions.models import Institution
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
+from itou.siaes.models import Siae
 from itou.utils.emails import get_email_message, sanitize_mailjet_recipients_list
+from itou.utils.perms.user import KIND_SIAE_STAFF
+
+
+def select_min_max_job_applications(job_applications):
+    # select 20% max, within bounds
+    # minimum 10 job_applications, maximun 20 job_applications
+
+    count = job_applications.count()
+    limit = int(round(count * evaluation_enums.EvaluationJobApplicationsBoundariesNumber.SELECTION_PERCENTAGE / 100))
+
+    if count < evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN:
+        limit = 0
+    elif count > evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX:
+        limit = evaluation_enums.EvaluationJobApplicationsBoundariesNumber.SELECTED_MAX
+    return job_applications.order_by("?")[:limit]
 
 
 def validate_institution(institution_id):
@@ -21,7 +39,6 @@ def validate_institution(institution_id):
 
 
 def email_campaign_is_setup(emails, ratio_selection_end_at):
-
     return get_email_message(
         to=[settings.DEFAULT_FROM_EMAIL],
         context={
@@ -142,3 +159,142 @@ class EvaluationCampaign(models.Model):
     def clean(self):
         if self.evaluated_period_end_at <= self.evaluated_period_start_at:
             raise ValidationError("La date de début de la période contrôlée doit être antérieure à sa date de fin.")
+
+    def eligible_job_applications(self):
+        # accepted job_applications with self-approval made by hiring siae.
+        return (
+            JobApplication.objects.exclude(approval=None)
+            .select_related("approval", "to_siae", "eligibility_diagnosis", "eligibility_diagnosis__author_siae")
+            .filter(
+                to_siae__department=self.institution.department,
+                to_siae__kind__in=evaluation_enums.EvaluationSiaesKind.Evaluable,
+                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                eligibility_diagnosis__author_kind=KIND_SIAE_STAFF,
+                eligibility_diagnosis__author_siae=F("to_siae"),
+                hiring_start_at__gte=self.evaluated_period_start_at,
+                hiring_start_at__lte=self.evaluated_period_end_at,
+            )
+        )
+
+    def eligible_siaes(self):
+        return (
+            self.eligible_job_applications()
+            .values("to_siae")
+            .annotate(to_siae_count=Count("to_siae"))
+            .filter(to_siae_count__gte=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN)
+        )
+
+    def number_of_siaes_to_select(self):
+        if self.eligible_siaes().count() > 0:
+            return max(round(self.eligible_siaes().count() * self.chosen_percent / 100), 1)
+        return 0
+
+    def eligible_siaes_under_ratio(self):
+        return (
+            self.eligible_siaes().values_list("to_siae", flat=True).order_by("?")[: self.number_of_siaes_to_select()]
+        )
+
+    def eligible_job_applications_under_ratio(self, evaluated_siaes):
+        return [
+            EvaluatedJobApplication(evaluated_siae=evaluated_siae, job_application=job_application)
+            for evaluated_siae in evaluated_siaes
+            for job_application in select_min_max_job_applications(
+                self.eligible_job_applications().filter(to_siae=evaluated_siae.siae)
+            )
+        ]
+
+    def populate_campaign(self):
+
+        if self.evaluations_asked_at:
+
+            return f"La selection de l'échantillon à contrôler a déjà été réalisée pour {self.name}"
+
+        with transaction.atomic():
+            if not self.percent_set_at:
+                self.percent_set_at = timezone.now()
+            self.evaluations_asked_at = timezone.now()
+
+            self.save(update_fields=["percent_set_at", "evaluations_asked_at"])
+
+            evaluated_siaes = EvaluatedSiae.objects.bulk_create(
+                EvaluatedSiae(evaluation_campaign=self, siae=Siae.objects.get(pk=pk))
+                for pk in self.eligible_siaes_under_ratio()
+            )
+            EvaluatedJobApplication.objects.bulk_create(self.eligible_job_applications_under_ratio(evaluated_siaes))
+            return f"{len(evaluated_siaes)} SIAE(s) ont été ajoutées dans la campagne {self.name}"
+
+
+class EvaluatedSiae(models.Model):
+
+    evaluation_campaign = models.ForeignKey(
+        EvaluationCampaign,
+        verbose_name="Contrôle",
+        on_delete=models.CASCADE,
+        related_name="evaluated_siaes",
+    )
+    siae = models.ForeignKey(
+        "siaes.Siae",
+        verbose_name="SIAE",
+        on_delete=models.CASCADE,
+        related_name="evaluated_siaes",
+    )
+
+    class Meta:
+        verbose_name = "Entreprise"
+        verbose_name_plural = "Entreprises"
+        unique_together = ("evaluation_campaign", "siae")
+
+    def __str__(self):
+        return f"{self.siae}"
+
+
+class EvaluatedJobApplication(models.Model):
+
+    job_application = models.ForeignKey(
+        "job_applications.JobApplication",
+        verbose_name="Candidature",
+        on_delete=models.CASCADE,
+        related_name="evaluated_job_applications",
+    )
+
+    evaluated_siae = models.ForeignKey(
+        EvaluatedSiae,
+        verbose_name="SIAE évaluée",
+        on_delete=models.CASCADE,
+        related_name="evaluated_job_applications",
+    )
+    labor_inspector_explanation = models.TextField(verbose_name="Commentaires de l'inspecteur du travail", blank=True)
+
+    class Meta:
+        verbose_name = "Auto-prescription"
+        verbose_name_plural = "Auto-prescriptions"
+
+    def __str__(self):
+        return f"{self.job_application}"
+
+
+class EvaluatedEligibilityDiagnosis(models.Model):
+
+    administrative_criteria = models.ForeignKey(
+        "eligibility.AdministrativeCriteria",
+        verbose_name="Critère administratif",
+        on_delete=models.CASCADE,
+        related_name="evaluated_eligibility_diagnoses",
+    )
+
+    evaluated_job_application = models.ForeignKey(
+        EvaluatedJobApplication,
+        verbose_name="Candidature évaluée",
+        on_delete=models.CASCADE,
+        related_name="evaluated_eligibility_diagnoses",
+    )
+
+    proof_url = models.URLField(max_length=500, verbose_name="Lien vers le justificatif", blank=True)
+    uploaded_at = models.DateTimeField(verbose_name=("Téléversé le"), blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Critère administratif"
+        verbose_name_plural = "Critères administratifs"
+
+    def __str__(self):
+        return f"{self.evaluated_job_application} - {self.administrative_criteria}"

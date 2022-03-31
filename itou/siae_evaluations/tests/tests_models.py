@@ -4,10 +4,61 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
 from itou.institutions.models import Institution
-from itou.siae_evaluations.factories import EvaluationCampaignFactory
-from itou.siae_evaluations.models import EvaluationCampaign, create_campaigns, validate_institution
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
+from itou.siae_evaluations import enums as evaluation_enums
+from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
+from itou.siae_evaluations.models import (
+    EvaluatedJobApplication,
+    EvaluatedSiae,
+    EvaluationCampaign,
+    create_campaigns,
+    select_min_max_job_applications,
+    validate_institution,
+)
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.models import Siae
+from itou.users.factories import JobSeekerFactory
+from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
+
+
+class EvaluationCampaignMiscMethodsTest(TestCase):
+    def test_select_min_max_job_applications(self):
+        siae = SiaeFactory()
+
+        # zero job application
+        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
+        self.assertIsInstance(qs, JobApplicationQuerySet)
+        self.assertEqual(0, qs.count())
+
+        # less than mininum number of job applications made by SIAE (10)
+        JobApplicationFactory.create_batch(
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN - 1, to_siae=siae
+        )
+        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
+        self.assertEqual(0, qs.count())
+
+        # mininum number of job applications made by SIAE (10)
+        JobApplicationFactory(to_siae=siae)
+        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
+        self.assertEqual(2, qs.count())
+
+        # maximum number of selectionnable job applications made by SIAE (100)
+        JobApplicationFactory.create_batch(
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX
+            - evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+            to_siae=siae,
+        )
+        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
+        self.assertEqual(evaluation_enums.EvaluationJobApplicationsBoundariesNumber.SELECTED_MAX, qs.count())
+
+        # more than maximum number of selectionnable job applications made by SIAE (100)
+        JobApplicationFactory.create_batch(20, to_siae=siae)
+        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
+        self.assertEqual(evaluation_enums.EvaluationJobApplicationsBoundariesNumber.SELECTED_MAX, qs.count())
 
 
 class EvaluationCampaignQuerySetTest(TestCase):
@@ -176,3 +227,237 @@ class EvaluationCampaignManagerTest(TestCase):
         email = mail.outbox[2]
         self.assertEqual(len(email.to), 1)
         self.assertEqual(len(email.bcc), 48)
+
+    def test_eligible_job_applications(self):
+        evaluation_campaign = EvaluationCampaignFactory()
+        siae = SiaeFactory(department="14")
+        siae2 = SiaeFactory(department="14")
+
+        # Job Application without approval
+        JobApplicationWithApprovalFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+
+        # Job Application outside institution department
+        siae12 = SiaeFactory(department="12")
+        JobApplicationWithApprovalFactory(
+            to_siae=siae12,
+            sender_siae=siae,
+            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+            eligibility_diagnosis__author_siae=siae,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+
+        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+
+        # Job Application not eligible kind
+        for kind in [k for (k, _) in Siae.KIND_CHOICES if k not in evaluation_enums.EvaluationSiaesKind.Evaluable]:
+            with self.subTest(kind=kind):
+                siae_wrong_kind = SiaeFactory(department="14", kind=kind)
+                JobApplicationWithApprovalFactory(
+                    to_siae=siae_wrong_kind,
+                    sender_siae=siae_wrong_kind,
+                    eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+                    eligibility_diagnosis__author_siae=siae_wrong_kind,
+                    hiring_start_at=timezone.now() - relativedelta(months=2),
+                )
+                self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+
+        # Job Application not accepted
+        JobApplicationWithApprovalFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+            eligibility_diagnosis__author_siae=siae,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+            state=JobApplicationWorkflow.STATE_REFUSED,
+        )
+        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+
+        # Job Application not in period
+        JobApplicationWithApprovalFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+            eligibility_diagnosis__author_siae=siae,
+            hiring_start_at=timezone.now() - relativedelta(months=10),
+        )
+        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+
+        # Eligibility Diagnosis not made by Siae_staff
+        JobApplicationWithApprovalFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER,
+            eligibility_diagnosis__author_siae=siae,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+
+        # Eligibility Diagnosis made by an other siae (not the on of the job application)
+        JobApplicationWithApprovalFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+            eligibility_diagnosis__author_siae=siae2,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+
+        # the eligible job application
+        JobApplicationWithApprovalFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+            eligibility_diagnosis__author_siae=siae,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+        self.assertEqual(
+            JobApplication.objects.filter(
+                to_siae=siae,
+                sender_siae=siae,
+                eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+                eligibility_diagnosis__author_siae=siae,
+                hiring_start_at=timezone.now() - relativedelta(months=2),
+            )[0],
+            evaluation_campaign.eligible_job_applications()[0],
+        )
+        self.assertEqual(1, len(evaluation_campaign.eligible_job_applications()))
+
+    def test_eligible_siaes(self):
+
+        evaluation_campaign = EvaluationCampaignFactory()
+        siae1 = SiaeFactory(department="14")
+        JobApplicationWithApprovalFactory(
+            to_siae=siae1,
+            sender_siae=siae1,
+            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+            eligibility_diagnosis__author_siae=siae1,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+        siae2 = SiaeFactory(department="14")
+        JobApplicationWithApprovalFactory.create_batch(
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+            to_siae=siae2,
+            sender_siae=siae2,
+            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+            eligibility_diagnosis__author_siae=siae2,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+        eligible_siaes_res = evaluation_campaign.eligible_siaes()
+        self.assertEqual(1, eligible_siaes_res.count())
+        self.assertIn(
+            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN},
+            eligible_siaes_res,
+        )
+
+    def test_number_of_siaes_to_select(self):
+        evaluation_campaign = EvaluationCampaignFactory()
+        self.assertEqual(0, evaluation_campaign.number_of_siaes_to_select())
+
+        for i in range(3):
+            siae = SiaeFactory(department="14")
+            JobApplicationWithApprovalFactory.create_batch(
+                evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+                to_siae=siae,
+                sender_siae=siae,
+                eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+                eligibility_diagnosis__author_siae=siae,
+                hiring_start_at=timezone.now() - relativedelta(months=2),
+            )
+            self.assertEqual(1, evaluation_campaign.number_of_siaes_to_select())
+
+        for i in range(3):
+            siae = SiaeFactory(department="14")
+            JobApplicationWithApprovalFactory.create_batch(
+                evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+                to_siae=siae,
+                sender_siae=siae,
+                eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+                eligibility_diagnosis__author_siae=siae,
+                hiring_start_at=timezone.now() - relativedelta(months=2),
+            )
+        self.assertEqual(2, evaluation_campaign.number_of_siaes_to_select())
+
+    def test_eligible_siaes_under_ratio(self):
+        evaluation_campaign = EvaluationCampaignFactory()
+
+        for i in range(6):
+            siae = SiaeFactory(department="14")
+            JobApplicationWithApprovalFactory.create_batch(
+                evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+                to_siae=siae,
+                sender_siae=siae,
+                eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+                eligibility_diagnosis__author_siae=siae,
+                hiring_start_at=timezone.now() - relativedelta(months=2),
+            )
+        self.assertEqual(2, evaluation_campaign.eligible_siaes_under_ratio().count())
+
+    def test_eligible_job_applications_under_ratio(self):
+        evaluation_campaign = EvaluationCampaignFactory()
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+
+        JobApplicationWithApprovalFactory.create_batch(
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+            to_siae=evaluated_siae.siae,
+            sender_siae=evaluated_siae.siae,
+            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+            eligibility_diagnosis__author_siae=evaluated_siae.siae,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+
+        results = evaluation_campaign.eligible_job_applications_under_ratio(
+            EvaluatedSiae.objects.filter(evaluation_campaign=evaluation_campaign)
+        )
+        self.assertIsInstance(results[0], EvaluatedJobApplication)
+        self.assertEqual(2, len(results))
+
+    def test_populate_campaign(self):
+        # integration tests
+        evaluation_campaign = EvaluationCampaignFactory()
+
+        siae = SiaeWithMembershipFactory(department=evaluation_campaign.institution.department)
+
+        job_seeker = JobSeekerFactory()
+        user = siae.members.first()
+        user_info = UserInfo(
+            user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
+        )
+
+        criteria1 = AdministrativeCriteria.objects.get(
+            level=AdministrativeCriteria.Level.LEVEL_1, name="Bénéficiaire du RSA"
+        )
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker, user_info, administrative_criteria=[criteria1]
+        )
+
+        JobApplicationWithApprovalFactory.create_batch(
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+            to_siae=siae,
+            sender_siae=siae,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+
+        self.assertEqual(0, EvaluatedSiae.objects.all().count())
+        self.assertEqual(0, EvaluatedJobApplication.objects.all().count())
+
+        # first regular method exec
+        message = evaluation_campaign.populate_campaign()
+        self.assertEqual(message, f"1 SIAE(s) ont été ajoutées dans la campagne {evaluation_campaign.name}")
+
+        self.assertIsNotNone(EvaluationCampaign.objects.get(pk=evaluation_campaign.pk).percent_set_at)
+        self.assertIsNotNone(EvaluationCampaign.objects.get(pk=evaluation_campaign.pk).evaluations_asked_at)
+        self.assertEqual(1, EvaluatedSiae.objects.all().count())
+        self.assertEqual(2, EvaluatedJobApplication.objects.all().count())
+
+        # an other method exec which have to fail
+        message = evaluation_campaign.populate_campaign()
+        self.assertEqual(
+            message,
+            f"La selection de l'échantillon à contrôler a déjà été réalisée pour {evaluation_campaign.name}",
+        )
