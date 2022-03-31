@@ -146,6 +146,7 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
         "page_title": "Données 2021 du contrôle a posteriori",
         "stats_base_url": settings.METABASE_SITE_URL,
         "back_url": reverse("siae_evaluations_views:samples_selection"),
+        "show_diagnosis_control_message": True,
     }
     return render(request, template_name, context)
 
@@ -236,6 +237,7 @@ def stats_dgefp_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": "Données 2021 (version bêta) du contrôle a posteriori",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "show_diagnosis_control_message": True,
     }
     return render(request, template_name, context)
 
