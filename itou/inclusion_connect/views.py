@@ -36,6 +36,13 @@ from .models import InclusionConnectState, InclusionConnectUserData, create_or_u
 logger = logging.getLogger(__name__)
 
 
+def _redirect_to_login_page_on_error(error_msg, request=None):
+    if request:
+        messages.error(request, "Une erreur technique est survenue. Merci de recommencer.")
+    logger.error(error_msg)
+    return HttpResponseRedirect(reverse("login:job_seeker"))
+
+
 def get_callback_redirect_uri(request) -> str:
     redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
     next_url = request.GET.get("next")
@@ -101,20 +108,9 @@ def inclusion_connect_authorize(request):
 def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
     # TODO: major refactor!
     code = request.GET.get("code")
-    if code is None:
-        messages.error(
-            request, "Inclusion Connect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
-        )
-        return HttpResponseRedirect(reverse("account_login"))
-
     state = request.GET.get("state")
-    if not state_is_valid(state):
-        message = (
-            "Le paramètre « state » fourni par Inclusion Connect"
-            " et nécessaire à votre authentification n’est pas valide."
-        )
-        messages.error(request, message)
-        return HttpResponseRedirect(reverse("account_login"))
+    if code is None or not state_is_valid(state):
+        return _redirect_to_login_page_on_error(error_msg="Missing code or invalid state.", request=request)
 
     redirect_uri = get_callback_redirect_uri(request)
 
@@ -131,20 +127,14 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     response = httpx.post(url, data=data, timeout=30)
 
     if response.status_code != 200:
-        message = "Impossible d'obtenir le jeton d'Inclusion Connect."
-        logger.error("%s : %s", message, response.content)
-        messages.error(request, message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return _redirect_to_login_page_on_error(error_msg="Impossible to get IC token.", request=request)
 
     # Contains access_token, token_type, expires_in, id_token
     token_data = response.json()
 
     access_token = token_data.get("access_token")
     if not access_token:
-        message = "Aucun champ « access_token » dans la réponse Inclusion Connect, impossible de vous authentifier"
-        messages.error(request, message)
-        logger.error(message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return _redirect_to_login_page_on_error(error_msg="Access token field missing.", request=request)
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
@@ -156,22 +146,16 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         timeout=60,
     )
     if response.status_code != 200:
-        message = "Impossible d'obtenir les informations utilisateur d'Inclusion Connect."
-        logger.error(message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return _redirect_to_login_page_on_error(error_msg="Impossible to get user infos.", request=request)
 
     try:
         user_data = json.loads(response.content.decode("utf-8"))
     except json.decoder.JSONDecodeError:
-        message = "Impossible de décoder les informations utilisateur."
-        logger.error(message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return _redirect_to_login_page_on_error(error_msg="Impossible to decode user infos.", request=request)
 
     if "sub" not in user_data:
         # 'sub' is the unique identifier from Inclusion Connect, we need that to match a user later on.
-        message = "Le paramètre « sub » n'a pas été retourné par InclusionConnect. Il est nécessaire pour identifier un utilisateur."  # noqa E501
-        logger.error(message)
-        return HttpResponseRedirect(reverse("account_login"))
+        return _redirect_to_login_page_on_error(error_msg="Sub parameter missing.", request=request)
 
     # email_verified = user_data.get("email_verified")
     # TODO: error if email_verified is False
