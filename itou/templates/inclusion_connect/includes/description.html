@@ -1,0 +1,27 @@
+{% load static %}
+
+<p class="mt-5">
+    Créer un compte sur les emplois de l’inclusion avec <span class="font-weight-bold">Inclusion Connect</span>.<br>
+    Inclusion Connect est une solution de connexion unique à plusieurs services publics réservée aux professionnels de l’inclusion.
+</p>
+
+{% if show_ic_button %}
+    {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
+{% endif %}
+
+<p class="text-center font-weight-bold mt-5">
+    La plateforme de l’inclusion met en place
+</p>
+
+<div class="bg-emploi-lighter p-5 text-center">
+    <img class="img-fluid" alt="" src="{% static 'img/inclusion_connect/inclusion_connect_logo.svg' %}">
+    <p class="mt-3">
+        Bientôt, vous pourrez utiliser le même identifiant et le même mot de passe pour les services suivant :
+    </p>
+    <div class="d-flex justify-content-between">
+        <img src="{% static 'img/logos_chantiers/emplois.svg' %}" class="w-100 px-2">
+        <img src="{% static 'img/logos_chantiers/communaute.svg' %}" class="w-100 px-2">
+        <img src="{% static 'img/logos_chantiers/dora.svg' %}" class="w-100 px-2">
+    </div>
+
+</div>

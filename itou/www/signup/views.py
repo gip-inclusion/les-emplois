@@ -561,6 +561,7 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
 class PrescriberPoleEmploiUserSignupView(SignupView):
     """
     Create a user of type prescriber and make him join a pre-existing Pôle emploi organization.
+    TODO: delete this view? No signup outside Inclusion Connect is allowed anymore.
     """
 
     form_class = forms.PrescriberPoleEmploiUserSignupForm
@@ -619,6 +620,7 @@ class PrescriberUserSignupView(SignupView):
     - or without any organization ("orienteur")
 
     The "authorized" character of a new organization is still to be validated by the support.
+    TODO: delete these views? No signup is allowed outside Inclusion Connect anymore.
     """
 
     form_class = forms.PrescriberUserSignupForm
