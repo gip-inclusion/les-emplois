@@ -1,5 +1,6 @@
 import dataclasses
 import datetime
+from unittest import mock
 
 import httpx
 import respx
@@ -48,7 +49,7 @@ def _oauth_dance(test_class, email=None, assert_redirects=True):
     url = reverse("inclusion_connect:callback")
     response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
     if assert_redirects:
-        test_class.assertRedirects(response, reverse("dashboard:index"))
+        test_class.assertRedirects(response, reverse("welcoming_tour:index"))
 
     return response
 
@@ -287,9 +288,12 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
-        response = _oauth_dance(self)
-        # Follow the redirection.
-        response = self.client.get(response.url)
+        # Skip the welcoming tour to test dashboard content.
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            response = _oauth_dance(self, assert_redirects=False)
+            # Follow the redirection.
+            response = self.client.get(response.url)
         # Response should contain links available only to prescribers.
         self.assertContains(response, reverse("apply:list_for_prescriber"))
 
@@ -322,9 +326,13 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
-        response = _oauth_dance(self, email=email)
-        # Follow the redirection.
-        response = self.client.get(response.url)
+        # Skip the welcoming tour to test dashboard content.
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            response = _oauth_dance(self, email=email, assert_redirects=False)
+            # Follow the redirection.
+            response = self.client.get(response.url)
+
         # Response should contain links available only to prescribers.
         self.assertContains(response, reverse("apply:list_for_prescriber"))
 
@@ -395,9 +403,13 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
-        response = _oauth_dance(self)
-        # Follow the redirection.
-        response = self.client.get(response.url)
+        # Skip the welcoming tour to test dashboard content.
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            response = _oauth_dance(self, assert_redirects=False)
+            # Follow the redirection.
+            response = self.client.get(response.url)
+
         # Response should contain links available only to prescribers.
         self.assertContains(response, reverse("apply:list_for_prescriber"))
 
@@ -446,9 +458,13 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
-        response = _oauth_dance(self)
-        # Follow the redirection.
-        response = self.client.get(response.url)
+        # Skip the welcoming tour to test dashboard content.
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            response = _oauth_dance(self, assert_redirects=False)
+            # Follow the redirection.
+            response = self.client.get(response.url)
+
         # Response should contain links available only to prescribers.
         self.assertContains(response, reverse("apply:list_for_prescriber"))
 

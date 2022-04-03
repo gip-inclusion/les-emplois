@@ -5,6 +5,7 @@ import string
 from urllib.parse import unquote
 
 import httpx
+from allauth.account.adapter import get_adapter
 from django.conf import settings  # TODO: move to itou.prescribers.constants
 from django.contrib import messages
 from django.contrib.auth import login
@@ -210,6 +211,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         user, _ = create_or_update_user(ic_user_data)
 
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    next_url = get_adapter(request).get_login_redirect_url(request)
 
     # Keep token_data["id_token"] to logout from FC
     # At this step, we can update the user's fields in DB and create a session if required
@@ -217,7 +219,6 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     request.session[INCLUSION_CONNECT_SESSION_STATE] = state
     request.session.modified = True
 
-    next_url = reverse("dashboard:index")
     return HttpResponseRedirect(next_url)
 
 
