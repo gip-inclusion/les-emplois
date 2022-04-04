@@ -42,10 +42,10 @@ salarie as (
         end genre_salarie, 
         (annee_en_cours - salarie.salarie_annee_naissance) as age_salarie,
         case 
-           when (annee_en_cours - salarie.salarie_annee_naissance) <= 26 then '26_ou_moins'
-           when (annee_en_cours - salarie.salarie_annee_naissance) >= 27 and (annee_en_cours - salarie.salarie_annee_naissance) <= 29  then 'Entre_27_29ans'
-           when (annee_en_cours - salarie.salarie_annee_naissance) >= 30 and (annee_en_cours - salarie.salarie_annee_naissance) <= 49  then 'Entre_30_49ans'
-           when (annee_en_cours - salarie.salarie_annee_naissance) >= 50 then '50_ou_plus'
+           when (annee_en_cours - salarie.salarie_annee_naissance) <= 25 then 'a- Moins de 25 ans'
+           when (annee_en_cours - salarie.salarie_annee_naissance) >= 26 and (annee_en_cours - salarie.salarie_annee_naissance) <= 30  then 'b- Entre 26 ans et 30 ans'
+           when (annee_en_cours - salarie.salarie_annee_naissance) >= 31 and (annee_en_cours - salarie.salarie_annee_naissance) <= 50  then 'c- Entre 31 ans et 50 ans'
+           when (annee_en_cours - salarie.salarie_annee_naissance) >= 51 then 'd- 50 ans et plus'
            else 'autre'
         end tranche_age,
         departement_com_salarie.nom_departement as departement_salarie,
@@ -81,7 +81,10 @@ select
     end rsa, 
     ctr_mis.contrat_id_structure as id_structure_asp,
     to_date (ctr_mis.contrat_date_embauche ,'dd/mm/yyyy') as date_recrutement,
-    ctr_mis.contrat_salarie_rqth as rqth,
+    case 
+        when ctr_mis.contrat_salarie_rqth = 'true' then 'Oui'
+        else 'Non'
+    end rqth,
     concat(ctr_mis.contrat_code_rome, '-', code_rome.description_code_rome) as metier,
     case
         when niv_formation.rnf_libelle_niveau_form_empl = 'JAMAIS SCOLARISE' then 'a- Jamais scolarisé'
@@ -98,8 +101,14 @@ select
         else 'l- Autre'
     end niveau_formation_salarie, 
     to_date (emi.emi_date_fin_reelle ,'dd/mm/yyyy') as date_sortie,
-    salarie_adr_qpv_type as qpv,
-    salarie_adr_is_zrr as zrr,
+    case 
+        when salarie_adr_qpv_type = 'true' then 'Oui'
+        else 'Non'
+    end qpv,
+    case 
+        when salarie_adr_is_zrr = 'true' then 'Oui'
+        else 'Non'
+    end zrr,
     salarie_annee_naissance,
     salarie.age_salarie,
     salarie_codeinseecom as code_insee_commune_resi_salarie,
