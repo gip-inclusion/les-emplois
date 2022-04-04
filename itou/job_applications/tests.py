@@ -15,9 +15,9 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
-from itou.eligibility.models import EligibilityDiagnosis
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.admin_forms import JobApplicationAdminForm
@@ -377,6 +377,23 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertTrue(hasattr(qs, "has_suspended_approval"))
         self.assertFalse(qs.has_suspended_approval)
 
+    def test_with_has_active_approval(self):
+        job_app = JobApplicationSentByJobSeekerFactory()
+        qs = JobApplication.objects.with_has_suspended_approval().with_has_active_approval().get(pk=job_app.pk)
+        self.assertTrue(hasattr(qs, "has_active_approval"))
+        self.assertFalse(qs.has_active_approval)
+
+        job_app = JobApplicationWithApprovalFactory()
+        qs = JobApplication.objects.with_has_suspended_approval().with_has_active_approval().get(pk=job_app.pk)
+        self.assertTrue(hasattr(qs, "has_active_approval"))
+        self.assertTrue(qs.has_active_approval)
+
+        job_app = JobApplicationWithApprovalFactory()
+        SuspensionFactory(approval=job_app.approval)
+        qs = JobApplication.objects.with_has_suspended_approval().with_has_active_approval().get(pk=job_app.pk)
+        self.assertTrue(hasattr(qs, "has_active_approval"))
+        self.assertFalse(qs.has_active_approval)
+
     def test_with_last_change(self):
         job_app = JobApplicationSentByJobSeekerFactory()
         qs = JobApplication.objects.with_last_change().get(pk=job_app.pk)
@@ -413,6 +430,69 @@ class JobApplicationQuerySetTest(TestCase):
         job_app = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
         self.assertFalse(qs.is_pending_for_too_long)
+
+    def test_with_last_jobseeker_eligibility_diagnosis(self):
+        job_app = JobApplicationWithApprovalFactory()
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
+        qs = JobApplication.objects.with_last_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
+        self.assertEqual(qs.last_jobseeker_eligibility_diagnosis, diagnosis.pk)
+
+    def test_with_last_eligibility_diagnosis_criterion(self):
+        job_app = JobApplicationWithApprovalFactory()
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
+
+        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
+        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+        level1_other_criterion = AdministrativeCriteria.objects.filter(
+            level=AdministrativeCriteria.Level.LEVEL_1
+        ).last()
+
+        diagnosis.administrative_criteria.add(level1_criterion)
+        diagnosis.administrative_criteria.add(level2_criterion)
+        diagnosis.save()
+
+        qs = (
+            JobApplication.objects.with_last_jobseeker_eligibility_diagnosis()
+            .with_last_eligibility_diagnosis_criterion(level1_criterion.pk)
+            .with_last_eligibility_diagnosis_criterion(level2_criterion.pk)
+            .with_last_eligibility_diagnosis_criterion(level1_other_criterion.pk)
+            .get(pk=job_app.pk)
+        )
+        self.assertTrue(getattr(qs, f"last_eligibility_diagnosis_criterion_{level1_criterion.pk}"))
+        self.assertTrue(getattr(qs, f"last_eligibility_diagnosis_criterion_{level2_criterion.pk}"))
+        self.assertFalse(getattr(qs, f"last_eligibility_diagnosis_criterion_{level1_other_criterion.pk}"))
+
+    def test_with_list_related_data(self):
+        job_app = JobApplicationWithApprovalFactory()
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
+
+        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
+        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+        level1_other_criterion = AdministrativeCriteria.objects.filter(
+            level=AdministrativeCriteria.Level.LEVEL_1
+        ).last()
+
+        diagnosis.administrative_criteria.add(level1_criterion)
+        diagnosis.administrative_criteria.add(level2_criterion)
+        diagnosis.save()
+
+        criteria = [level1_criterion.pk, level2_criterion.pk, level1_other_criterion.pk]
+        qs = JobApplication.objects.with_list_related_data(criteria).get(pk=job_app.pk)
+
+        self.assertTrue(hasattr(qs, "approval"))
+        self.assertTrue(hasattr(qs, "job_seeker"))
+        self.assertTrue(hasattr(qs, "sender"))
+        self.assertTrue(hasattr(qs, "sender_siae"))
+        self.assertTrue(hasattr(qs, "sender_prescriber_organization"))
+        self.assertTrue(hasattr(qs, "to_siae"))
+        self.assertTrue(hasattr(qs, "selected_jobs"))
+        self.assertTrue(hasattr(qs, "has_suspended_approval"))
+        self.assertTrue(hasattr(qs, "is_pending_for_too_long"))
+        self.assertTrue(hasattr(qs, "has_active_approval"))
+        self.assertTrue(hasattr(qs, "last_jobseeker_eligibility_diagnosis"))
+        self.assertTrue(hasattr(qs, f"last_eligibility_diagnosis_criterion_{level1_criterion.pk}"))
+        self.assertTrue(hasattr(qs, f"last_eligibility_diagnosis_criterion_{level2_criterion.pk}"))
+        self.assertTrue(hasattr(qs, f"last_eligibility_diagnosis_criterion_{level1_other_criterion.pk}"))
 
     def test_eligible_as_employee_record(self):
         # Results must be a list of job applications:

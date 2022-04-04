@@ -9,13 +9,13 @@ from django.conf import settings
 from django.core import mail
 from django.db import models
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, Subquery, When
-from django.db.models.functions import Greatest, TruncMonth
+from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Suspension
-from itou.eligibility.models import EligibilityDiagnosis
+from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.job_applications.tasks import huey_notify_pole_employ
 from itou.utils.apis.esd import get_access_token
 from itou.utils.apis.pole_emploi import (
@@ -117,12 +117,19 @@ class JobApplicationQuerySet(models.QuerySet):
         Get unique foreign key objects in a single query.
         TODO: move this method in a custom manager since it's not chainable.
         """
-        if fk_field not in ["job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"]:
+        if fk_field not in [
+            "job_seeker",
+            "sender",
+            "sender_siae",
+            "sender_prescriber_organization",
+            "to_siae",
+        ]:
             raise RuntimeError("Unauthorized fk_field")
 
+        job_applications = self.order_by(fk_field).distinct(fk_field).select_related(fk_field)
         return [
             getattr(job_application, fk_field)
-            for job_application in self.order_by(fk_field).distinct(fk_field).select_related(fk_field)
+            for job_application in job_applications
             if getattr(job_application, fk_field)
         ]
 
@@ -148,6 +155,16 @@ class JobApplicationQuerySet(models.QuerySet):
         has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
         return self.annotate(has_suspended_approval=Exists(has_suspended_approval))
 
+    def with_has_active_approval(self):
+        has_valid_approval = Approval.objects.filter(pk=OuterRef("approval")).valid()
+        return self.annotate(
+            has_active_approval=Case(
+                When(Exists(has_valid_approval), has_suspended_approval=False, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        )
+
     def with_last_change(self):
         return self.annotate(last_change=Greatest("created_at", Max("logs__timestamp")))
 
@@ -162,11 +179,39 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
-    def with_list_related_data(self):
+    def with_last_jobseeker_eligibility_diagnosis(self):
+        """
+        Gives the last eligibility diagnosis for jobseeker because the "eligibility_diagnosis"
+        on `job_applications` model is rarely present.
+        """
+        sub_query = Subquery(
+            (
+                EligibilityDiagnosis.objects.filter(job_seeker=OuterRef("job_seeker"))
+                .order_by("-created_at")
+                .values("id")[:1]
+            ),
+            output_field=models.IntegerField(),
+        )
+        return self.annotate(last_jobseeker_eligibility_diagnosis=Coalesce(sub_query, None))
+
+    def with_last_eligibility_diagnosis_criterion(self, criterion):
+        """
+        Create an annotation by criterion given (used in the filters form).
+        The criterion parameter must be the primary key of an AdministrativeCriteria.
+        """
+        subquery = SelectedAdministrativeCriteria.objects.filter(
+            eligibility_diagnosis=OuterRef("last_jobseeker_eligibility_diagnosis"), administrative_criteria=criterion
+        )
+        return self.annotate(**{f"last_eligibility_diagnosis_criterion_{criterion}": Exists(subquery)})
+
+    def with_list_related_data(self, criteria=None):
         """
         Stop the deluge of database queries that is caused by accessing related
         objects in job applications's lists.
         """
+        if criteria is None:
+            criteria = []
+
         qs = self.select_related(
             "approval",
             "job_seeker",
@@ -176,11 +221,23 @@ class JobApplicationQuerySet(models.QuerySet):
             "to_siae__convention",
         ).prefetch_related("selected_jobs__appellation")
 
+        qs = (
+            qs.with_has_suspended_approval()
+            .with_is_pending_for_too_long()
+            .with_has_active_approval()
+            .with_last_jobseeker_eligibility_diagnosis()
+        )
+
+        # Adding an annotation by selected criterion
+        for criterion in criteria:
+            # The criterion given to this method is a primary key of an AdministrativeCriteria
+            qs = qs.with_last_eligibility_diagnosis_criterion(int(criterion))
+
         # Many job applications from AI exports share the exact same `created_at` value thus we secondarily order
         # by pk to prevent flakyness in the resulting pagination (a same job application appearing both on page 1
         # and page 2). Note that pk is a hash and not the usual incrementing integer, thus ordering by it does not
         # make any other sense than being deterministic for pagination purposes.
-        return qs.with_has_suspended_approval().with_is_pending_for_too_long().order_by("-created_at", "pk")
+        return qs.order_by("-created_at", "pk")
 
     def with_monthly_counts(self):
         """
