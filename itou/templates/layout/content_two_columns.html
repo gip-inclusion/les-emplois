@@ -3,15 +3,17 @@
 
     {% block pre_content %}{% endblock %}
 
-    <main class="{% block content_container_css_classes %}{% endblock %} container-fluid">
-        <div class="row">
-            <div class="col-sm order-sm-12">
-                {% block right_content %}{% endblock %}
-            </div>
-            <div class="col-sm order-sm-1 bg-emploi-lightest">
-                {% block left_content %}{% endblock %}
+    <section class="s-section-twocolumns {% block content_container_css_classes %}{% endblock %}">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6 order-md-2 pl-lg-5">
+                    {% block right_content %}{% endblock %}
+                </div>
+                <div class="col-12 col-lg-6 order-md-1 bg-emploi-lightest pr-lg-5">
+                    {% block left_content %}{% endblock %}
+                </div>
             </div>
         </div>
-    </main>
+    </section>
 
 {% endblock %}

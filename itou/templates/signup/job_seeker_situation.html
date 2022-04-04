@@ -6,7 +6,7 @@
 {% block title %}Inscription candidat{{ block.super }}{% endblock %}
 
 {% block right_content %}
-    <div class="mt-5">
+    <div class="py-5 py-lg-7">
         <h1 class="h1-hero-c1">
             Inscription <span class="text-muted">candidat</span>
         </h1>
@@ -28,8 +28,8 @@
 
 {% block left_content %}
     <!-- Hide left column on small devices. -->
-    <div class="my-5 text-center d-none d-sm-block">
-        <h2 class="h1 ff-extra-01">Votre éligibilité à l'IAE dépend de votre situation</h2>
-        <img class="mt-5 img-fluid" src="{% static 'img/job_seeker_signup_situation.svg' %}" alt="">
+    <div class="d-none d-md-block py-md-5 py-lg-7 text-center">
+        <p class="display-1 ff-extra-01 mb-5">Votre éligibilité à l'IAE dépend de votre situation</p>
+        <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/job_seeker_signup_situation.svg' %}" alt="">
     </div>
 {% endblock %}
