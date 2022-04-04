@@ -687,6 +687,10 @@ class EmployeeRecordUpdateNotification(models.Model):
 
     objects = models.Manager.from_queryset(EmployeeRecordUpdateNotificationQuerySet)()
 
+    class Meta:
+        verbose_name = "Modification de changement de la fiche salarié"
+        verbose_name_plural = "Modifications de changement des fiches salarié"
+
     def update_as_sent(self, filename, line_number):
         if self.status not in [NotificationStatus.NEW, NotificationStatus.REJECTED]:
             raise ValidationError(f"Invalid status to update as SENT (currently: {self.status})")
