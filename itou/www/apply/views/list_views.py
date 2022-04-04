@@ -21,17 +21,22 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     List of applications for a job seeker.
     """
     filters_form = FilterJobApplicationsForm(request.GET or None)
-    filters = None
     job_applications = request.user.job_applications
     job_applications = job_applications.with_list_related_data()
 
+    filters_counter = 0
     if filters_form.is_valid():
-        job_applications = job_applications.filter(*filters_form.get_qs_filters())
-        filters = filters_form.humanize_filters()
+        qs_filters = filters_form.get_qs_filters()
+        job_applications = job_applications.filter(*qs_filters)
+        filters_counter = filters_form.get_qs_filters_counter(qs_filters)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
-    context = {"job_applications_page": job_applications_page, "filters_form": filters_form, "filters": filters}
+    context = {
+        "job_applications_page": job_applications_page,
+        "filters_form": filters_form,
+        "filters_counter": filters_counter,
+    }
     return render(request, template_name, context)
 
 
@@ -44,17 +49,25 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     job_applications = get_all_available_job_applications_as_prescriber(request)
 
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
-    filters = None
 
-    job_applications = job_applications.with_list_related_data()
+    # Add related data giving the criteria for adding the necessary annotations
+    job_applications = job_applications.not_archived().with_list_related_data(
+        criteria=filters_form.data.getlist("criteria", [])
+    )
 
+    filters_counter = 0
     if filters_form.is_valid():
-        job_applications = job_applications.filter(*filters_form.get_qs_filters())
-        filters = filters_form.humanize_filters()
+        qs_filters = filters_form.get_qs_filters()
+        job_applications = job_applications.filter(*qs_filters)
+        filters_counter = filters_form.get_qs_filters_counter(qs_filters)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
-    context = {"job_applications_page": job_applications_page, "filters_form": filters_form, "filters": filters}
+    context = {
+        "job_applications_page": job_applications_page,
+        "filters_form": filters_form,
+        "filters_counter": filters_counter,
+    }
     return render(request, template_name, context)
 
 
@@ -103,14 +116,18 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     siae = get_current_siae_or_404(request)
     job_applications = siae.job_applications_received
 
-    filters_form = SiaeFilterJobApplicationsForm(job_applications, request.GET or None)
-    filters = None
+    filters_form = SiaeFilterJobApplicationsForm(job_applications, siae, request.GET or None)
 
-    job_applications = job_applications.not_archived().with_list_related_data()
+    # Add related data giving the criteria for adding the necessary annotations
+    job_applications = job_applications.not_archived().with_list_related_data(
+        filters_form.data.getlist("criteria", [])
+    )
 
+    filters_counter = 0
     if filters_form.is_valid():
-        job_applications = job_applications.filter(*filters_form.get_qs_filters())
-        filters = filters_form.humanize_filters()
+        qs_filters = filters_form.get_qs_filters()
+        job_applications = job_applications.filter(*qs_filters)
+        filters_counter = filters_form.get_qs_filters_counter(qs_filters)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
@@ -118,7 +135,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "siae": siae,
         "job_applications_page": job_applications_page,
         "filters_form": filters_form,
-        "filters": filters,
+        "filters_counter": filters_counter,
     }
     return render(request, template_name, context)
 

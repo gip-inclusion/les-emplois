@@ -3,8 +3,16 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
+from itou.approvals.factories import SuspensionFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.eligibility.models import AdministrativeCriteria
+from itou.job_applications.factories import (
+    JobApplicationSentByJobSeekerFactory,
+    JobApplicationSentByPrescriberFactory,
+    JobApplicationWithApprovalFactory,
+)
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.jobs.models import Appellation
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberMembershipFactory,
@@ -121,10 +129,40 @@ class ProcessListJobSeekerTest(ProcessListTest):
 
         # Result page should only contain job applications which status
         # matches the one selected by the user.
-        self.assertGreater(len(applications), 0)
+        self.assertEqual(len(applications), 1)
+        self.assertEqual(applications[0].state, expected_state)
 
-        for application in applications:
-            self.assertEqual(application.state, expected_state)
+    def test_list_for_job_seeker_view_filtered_by_dates(self):
+        """
+        Provide a list of job applications sent by a job seeker
+        and filtered by dates
+        """
+        now = timezone.now()
+
+        for diff_day in [7, 5, 3, 0]:
+            JobApplicationSentByJobSeekerFactory(
+                created_at=now - timezone.timedelta(days=diff_day), job_seeker=self.maggie
+            )
+
+        self.client.login(username=self.maggie.email, password=DEFAULT_PASSWORD)
+
+        date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
+
+        start_date = now - timezone.timedelta(days=5)
+        end_date = now - timezone.timedelta(days=1)
+        query = urlencode(
+            {
+                "start_date": timezone.localdate(start_date).strftime(date_format),
+                "end_date": timezone.localdate(end_date).strftime(date_format),
+            }
+        )
+        url = f"{self.job_seeker_base_url}?{query}"
+        response = self.client.get(url)
+        applications = response.context["job_applications_page"].object_list
+
+        self.assertEqual(len(applications), 2)
+        self.assertGreaterEqual(applications[0].created_at, start_date)
+        self.assertLessEqual(applications[0].created_at, end_date)
 
 
 ###################################################
@@ -157,10 +195,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertEqual(application.state, state_accepted)
+        self.assertEqual(len(applications), 1)
+        self.assertEqual(applications[0].state, state_accepted)
 
     def test_list_for_siae_view__filtered_by_many_states(self):
         """
@@ -174,10 +210,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertIn(application.state.name, job_applications_states)
+        self.assertEqual(len(applications), 3)
+        self.assertIn(applications[0].state.name, job_applications_states)
 
     def test_list_for_siae_view__filtered_by_dates(self):
         """
@@ -201,11 +235,9 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
 
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertGreaterEqual(application.created_at, start_date)
-            self.assertLessEqual(application.created_at, end_date)
+        self.assertEqual(len(applications), 5)
+        self.assertGreaterEqual(applications[0].created_at, start_date)
+        self.assertLessEqual(applications[0].created_at, end_date)
 
     def test_list_for_siae_view__empty_dates_in_params(self):
         """
@@ -232,10 +264,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertEqual(application.sender_prescriber_organization.id, sender_organization.id)
+        self.assertEqual(len(applications), 8)
+        self.assertEqual(applications[0].sender_prescriber_organization.id, sender_organization.id)
 
     def test_view__filtered_by_sender_name(self):
         """
@@ -249,10 +279,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertEqual(application.sender.id, sender.id)
+        self.assertEqual(len(applications), 7)
+        self.assertEqual(applications[0].sender.id, sender.id)
 
     def test_view__filtered_by_job_seeker_name(self):
         """
@@ -266,10 +294,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertIn(application.job_seeker.id, job_seekers_ids)
+        self.assertEqual(len(applications), 2)
+        self.assertIn(applications[0].job_seeker.id, job_seekers_ids)
 
     def test_view__filtered_by_many_organization_names(self):
         """
@@ -283,10 +309,160 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertGreater(len(applications), 0)
+        self.assertEqual(len(applications), 8)
+        self.assertIn(applications[0].sender_prescriber_organization.id, senders_ids)
 
-        for application in applications:
-            self.assertIn(application.sender_prescriber_organization.id, senders_ids)
+    def test_view__filtered_by_pass_state(self):
+        """
+        Eddie wants to see applications with a suspended or in progress IAE PASS.
+        """
+        now = timezone.now()
+        yesterday = (now - timezone.timedelta(days=1)).date()
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+
+        params = urlencode(
+            {
+                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
+                "pass_iae_active": True,
+            },
+            True,
+        )
+        response = self.client.get(f"{self.siae_base_url}?{params}")
+        self.assertEqual(len(response.context["job_applications_page"].object_list), 0)
+
+        job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            hiring_start_at=yesterday,
+            approval__start_at=yesterday,
+            to_siae=self.hit_pit,
+        )
+        response = self.client.get(f"{self.siae_base_url}?{params}")
+        applications = response.context["job_applications_page"].object_list
+        self.assertEqual(len(applications), 1)
+        self.assertIn(job_application, applications)
+
+        params = urlencode(
+            {
+                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
+                "pass_iae_suspended": True,
+            },
+            True,
+        )
+        response = self.client.get(f"{self.siae_base_url}?{params}")
+        self.assertEqual(len(response.context["job_applications_page"].object_list), 0)
+
+        SuspensionFactory(
+            approval=job_application.approval,
+            start_at=yesterday,
+            end_at=now + timezone.timedelta(days=2),
+        )
+        response = self.client.get(f"{self.siae_base_url}?{params}")
+
+        applications = response.context["job_applications_page"].object_list
+        self.assertEqual(len(applications), 1)
+        self.assertIn(job_application, applications)
+
+    def test_view__filtered_by_eligibility_validated(self):
+        """
+        Eddie wants to see applications of job seeker for whom
+        the diagnosis of eligibility has been validated.
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+
+        params = urlencode({"eligibility_validated": True})
+        url = f"{self.siae_base_url}?{params}"
+
+        response = self.client.get(url)
+        self.assertEqual(len(response.context["job_applications_page"].object_list), 0)
+
+        EligibilityDiagnosisFactory(job_seeker=self.maggie)
+
+        response = self.client.get(url)
+        # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
+        self.assertEqual(len(response.context["job_applications_page"].object_list), 2)
+
+    def test_view__filtered_by_administrative_criteria(self):
+        """
+        Eddie wants to see applications of job seeker for whom
+        the diagnosis of eligibility has been validated with specific criteria.
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
+
+        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
+        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+        level1_other_criterion = AdministrativeCriteria.objects.filter(
+            level=AdministrativeCriteria.Level.LEVEL_1
+        ).last()
+
+        diagnosis.administrative_criteria.add(level1_criterion)
+        diagnosis.administrative_criteria.add(level2_criterion)
+        diagnosis.save()
+
+        # Filter by level1 criterion
+        params = urlencode({"criteria": [level1_criterion.pk]}, True)
+        url = f"{self.siae_base_url}?{params}"
+        response = self.client.get(url)
+        applications = response.context["job_applications_page"].object_list
+        self.assertEqual(len(applications), 2)
+
+        # Filter by level2 criterion
+        params = urlencode({"criteria": [level2_criterion.pk]}, True)
+        url = f"{self.siae_base_url}?{params}"
+        response = self.client.get(url)
+        applications = response.context["job_applications_page"].object_list
+        self.assertEqual(len(applications), 2)
+
+        # Filter by two criteria
+        params = urlencode({"criteria": [level1_criterion.pk, level2_criterion.pk]}, True)
+        url = f"{self.siae_base_url}?{params}"
+        response = self.client.get(url)
+        applications = response.context["job_applications_page"].object_list
+        self.assertEqual(len(applications), 2)
+
+        # Filter by other criteria
+        params = urlencode({"criteria": [level1_other_criterion.pk]}, True)
+        url = f"{self.siae_base_url}?{params}"
+        response = self.client.get(url)
+        applications = response.context["job_applications_page"].object_list
+        self.assertEqual(len(applications), 0)
+
+    def test_view__filtered_by_jobseeker_department(self):
+        """
+        Eddie wants to see applications of job seeker who live in given department.
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+
+        # Maggie moves to Department 37
+        self.maggie.post_code = "37000"
+        self.maggie.save()
+
+        params = urlencode({"departments": ["37"]}, True)
+        url = f"{self.siae_base_url}?{params}"
+        response = self.client.get(url)
+        applications = response.context["job_applications_page"].object_list
+
+        # Maggie has two applications and is the only one living in department 37.
+        self.assertEqual(len(applications), 2)
+
+    def test_view__filtered_by_selected_job(self):
+        """
+        Eddie wants to see applications with a given job appellation.
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+
+        (appellation1, appellation2) = Appellation.objects.all().order_by("?")[0:2]
+        JobApplicationSentByJobSeekerFactory(to_siae=self.hit_pit, selected_jobs=[appellation1])
+        JobApplicationSentByJobSeekerFactory(to_siae=self.hit_pit, selected_jobs=[appellation2])
+
+        params = urlencode({"selected_jobs": [appellation1.pk]}, True)
+        url = f"{self.siae_base_url}?{params}"
+        response = self.client.get(url)
+        applications = response.context["job_applications_page"].object_list
+
+        self.assertEqual(len(applications), 1)
+        self.assertIn(appellation1, [job_desc.appellation for job_desc in applications[0].selected_jobs.all()])
 
 
 ####################################################
@@ -347,10 +523,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertEqual(application.state, expected_state)
+        self.assertEqual(len(applications), 2)
+        self.assertEqual(applications[0].state, expected_state)
 
     def test_view__filtered_by_sender_name(self):
         """
@@ -364,10 +538,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertEqual(application.sender.id, sender_id)
+        self.assertEqual(len(applications), 1)
+        self.assertEqual(applications[0].sender.id, sender_id)
 
     def test_view__filtered_by_job_seeker_name(self):
         """
@@ -380,10 +552,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertIn(application.job_seeker.id, job_seekers_ids)
+        self.assertEqual(len(applications), 2)
+        self.assertIn(applications[0].job_seeker.id, job_seekers_ids)
 
     def test_view__filtered_by_siae_name(self):
         """
@@ -396,10 +566,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
-        self.assertGreater(len(applications), 0)
-
-        for application in applications:
-            self.assertIn(application.to_siae.pk, to_siaes_ids)
+        self.assertEqual(len(applications), 8)
+        self.assertIn(applications[0].to_siae.pk, to_siaes_ids)
 
 
 ####################################################
