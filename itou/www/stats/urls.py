@@ -17,5 +17,5 @@ urlpatterns = [
     path("dgefp/af/", views.stats_dgefp_af, name="stats_dgefp_af"),
     path("pilotage/<int:dashboard_id>/", views.stats_pilotage, name="stats_pilotage"),
     path("poc_matomo_custom_url/", views.poc_matomo_custom_url, name="test_matomo_custom_url"),
-    path("siae/", views.stats_siae, name="stats_siae"),
+    path("siae/", views.stats_siae_etp, name="stats_siae_etp"),
 ]

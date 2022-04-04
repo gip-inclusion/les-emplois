@@ -64,7 +64,7 @@ def stats_pilotage(request, dashboard_id, template_name="stats/stats_pilotage.ht
 
 
 @login_required
-def stats_siae(request, template_name=_STATS_HTML_TEMPLATE):
+def stats_siae_etp(request, template_name=_STATS_HTML_TEMPLATE):
     """
     SIAE stats shown to their own members.
     They can only view data for their own SIAE.
