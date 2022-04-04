@@ -1,7 +1,7 @@
 {% load bootstrap4 %}
 <div class="card my-4">
     <a id="js-search-filter-button" class="btn btn-primary d-block d-md-none" href="#search-filter-form" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="search-filter-form">
-        Filtres des résultats {% include "includes/icon.html" with icon="filter" %}
+        Filtres des résultats <i class="ri-filter-line"></i>
     </a>
     <div id="search-filter-form" class="card-body collapse show">
         {% bootstrap_field form.distance form_group_class="form-group" label_class="h3 font-weight-bold text-muted" %}

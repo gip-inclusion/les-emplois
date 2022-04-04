@@ -1,0 +1,10 @@
+{% if user.is_prescriber or user.is_siae_staff %}
+    <span class="btn btn-outline-primary">
+        <i class="ri-download-2-fill"></i>
+        {% if user.is_prescriber %}
+            <a href="{% url 'apply:list_for_prescriber_exports' %}" class="text-decoration-none">Exporter</a>
+        {% elif user.is_siae_staff %}
+            <a href="{% url 'apply:list_for_siae_exports' %}" class="text-decoration-none">Exporter</a>
+        {% endif %}
+    </span>
+{% endif %}
