@@ -7,7 +7,7 @@
 
 {% block right_content %}
     {{ block.super }}
-    <div class="mt-5">
+    <div>
         <!-- SAME AS submit_base.html. -->
         <!-- Not possible to extend from it as we need a full layout (layout/base.html) -->
         <!-- instead of the tiny layout/content_small.html. -->
@@ -40,7 +40,7 @@
 
 {% block left_content %}
     {{ block.super }}
-    <div class="my-5 text-center">
+    <div class="text-center">
         {% block left_column %}{% endblock %}
     </div>
 {% endblock %}

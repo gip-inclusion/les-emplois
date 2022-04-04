@@ -6,7 +6,7 @@
 {% block title %}Inscription candidat{{ block.super }}{% endblock %}
 
 {% block right_content %}
-    <div class="mt-5">
+    <div class="py-5 py-lg-7">
         <h1 class="h1-hero-c1">Inscription <span class="text-muted">candidat</span></h1>
         <form method="post" action="{% url 'signup:job_seeker_nir' %}" class="js-prevent-multiple-submit js-format-nir">
 
@@ -42,13 +42,12 @@
             <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale" title="Article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)" rel="noopener" target="_blank">ameli.fr</a><i class="ri-external-link-line ml-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.
         </p>
     </div>
-
 {% endblock %}
 
 {% block left_content %}
-    <div class="my-5 text-center">
-        <h2 class="h1 ff-extra-01">Où trouver mon numéro de sécurité sociale ?</h2>
-        <img class="mt-5 img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
+    <div class="py-md-5 py-lg-7 text-center">
+        <p class="display-1 ff-extra-01 mb-5">Où trouver mon numéro de sécurité sociale ?</p>
+        <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
         <p class="ff-extra-01 mt-0">Il est présent à cet endroit sur votre carte Vitale.</p>
     </div>
 {% endblock %}

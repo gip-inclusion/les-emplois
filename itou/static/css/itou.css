@@ -2,7 +2,8 @@
     background-position: top left, top right;
     background-repeat: no-repeat;
     min-height: 17rem;
-    background-image: url(../img/search-bg-left.svg), url(../img/search-bg-right.svg);
+    background-image: url(../img/search-bg-left.svg),
+        url(../img/search-bg-right.svg);
 }
 
 @media only screen and (max-width: 992px) {
@@ -15,13 +16,12 @@
     margin-top: 1rem;
 }
 
-
 /* Spacing.
 --------------------------------------------------------------------------- */
 
 .s-main > section {
-	padding-top: 2rem;
-	padding-bottom: 3rem;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
 }
 
 .h1-hero-c1 {
@@ -29,7 +29,7 @@
     margin-bottom: 1.5rem;
 }
 
-@media (min-width:992px) {
+@media (min-width: 992px) {
     .s-main > section {
         padding-top: 3rem;
         padding-bottom: 4rem;
@@ -64,12 +64,11 @@
     background: transparent;
 }
 
-
 /* BETA banner.
 --------------------------------------------------------------------------- */
 
 body:after {
-    content: 'BETA';
+    content: "BETA";
     color: #fff;
     background: #d63626;
     text-align: center;
@@ -83,12 +82,11 @@ body:after {
     transform: rotate(-45deg);
 }
 
-
 /* Forms.
 --------------------------------------------------------------------------- */
 
 .form-group-required > label:first-of-type:after {
-    content: ' *';
+    content: " *";
     color: #d63626;
 }
 
@@ -106,10 +104,9 @@ See also `duet_date_picker.html`.
 https://getbootstrap.com/docs/4.6/components/forms/#server-side
 */
 
-duet-date-picker.is-invalid~.invalid-feedback {
+duet-date-picker.is-invalid ~ .invalid-feedback {
     display: block;
 }
-
 
 /* Dropdown menus.
 --------------------------------------------------------------------------- */
@@ -123,7 +120,6 @@ Credits go to https://stackoverflow.com/a/19229738
     max-height: 360px;
     overflow-y: auto;
 }
-
 
 /* Missing Boostrap utilities.
 --------------------------------------------------------------------------- */
@@ -159,17 +155,14 @@ Credits go to https://stackoverflow.com/a/19229738
     border-style: dashed !important;
 }
 
-
 /* Overrides opacity for disabled button (search cities) */
 
 .js-search-button {
     opacity: 100% !important;
 }
 
-
 /* Browser-specific issues.
 --------------------------------------------------------------------------- */
-
 
 /* Firefox applies `:-moz-ui-invalid` as soon as it considers
 an input field being invalid, generating an uncontrolled red box-shadow. */
@@ -182,7 +175,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     box-shadow: none;
 }
 
-
 /* Old browsers.
 --------------------------------------------------------------------------- */
 
@@ -190,9 +182,7 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     display: none;
 }
 
-
 /* Target only IE 11. */
-
 
 /* https://stackoverflow.com/a/27315792 */
 
@@ -201,17 +191,14 @@ _:-ms-fullscreen,
     display: block;
 }
 
-
 /* JavaScript disabled.
 ---------------------------------------------------------------------------- */
-
 
 /* Element is shown with JavaScript. See static > js > utils.js */
 
 .js-display-if-javascript-enabled {
     display: none;
 }
-
 
 /* Responsive Multi-Step Progress Bar.
 https://codepen.io/athimannil/pen/wWPYkQ
@@ -225,12 +212,12 @@ Usage:
 --------------------------------------------------------------------------- */
 
 .multi-steps > li.is-active:before,
-.multi-steps > li.is-active~li:before {
+.multi-steps > li.is-active ~ li:before {
     content: counter(stepNum);
 }
 
 .multi-steps > li.is-active:after,
-.multi-steps > li.is-active~li:after {
+.multi-steps > li.is-active ~ li:after {
     background-color: #ededed;
 }
 
@@ -250,7 +237,7 @@ Usage:
 }
 
 .multi-steps > li:before {
-    content: '\2713';
+    content: "\2713";
     /* Check mark symbol. */
     display: block;
     margin: 0 auto 4px;
@@ -265,7 +252,7 @@ Usage:
 }
 
 .multi-steps > li:after {
-    content: '';
+    content: "";
     height: 2px;
     width: 100%;
     background-color: #28a745;
@@ -284,19 +271,17 @@ Usage:
     border-color: #28a745;
 }
 
-.multi-steps > li.is-active~li {
+.multi-steps > li.is-active ~ li {
     color: #808080;
 }
 
-.multi-steps > li.is-active~li:before {
+.multi-steps > li.is-active ~ li:before {
     background-color: #ededed;
     border-color: #ededed;
 }
 
-
 /* Dropzone component used to upload files to an S3 bucket.
 --------------------------------------------------------------------------- */
-
 
 /* By default, an error message is displayed only on hover */
 
@@ -335,7 +320,7 @@ Usage:
     font-size: 1.25rem;
 }
 
-.title-with-badge .badge{
+.title-with-badge .badge {
     font-size: 1rem;
 }
 
@@ -374,19 +359,19 @@ Usage:
 }
 
 .itou-france-connect {
-  display: inline-block;
-  height: 60px !important;
-  width: 230px;
-  margin: auto;
-  /*margin-bottom: 8px;*/
-  background-image: url(../img/franceconnect-bouton.svg);
-  background-repeat: no-repeat;
-  background-size: cover;
-  cursor: pointer;
+    display: inline-block;
+    height: 60px !important;
+    width: 230px;
+    margin: auto;
+    /*margin-bottom: 8px;*/
+    background-image: url(../img/franceconnect-bouton.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    cursor: pointer;
 }
 
 .itou-france-connect:hover {
-  background-image: url(../img/franceconnect-bouton-hover.svg);
+    background-image: url(../img/franceconnect-bouton-hover.svg);
 }
 
 .s-postheader {
@@ -394,6 +379,23 @@ Usage:
 }
 
 .job-appellation-nb_open_positions {
-    width:80px;
-    margin:0 auto;
+    width: 80px;
+    margin: 0 auto;
+}
+
+.s-section-twocolumns {
+    height: 100%;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+@media (min-width: 992px) {
+    .s-section-twocolumns {
+        background-color: #fff;
+        background: linear-gradient(to left, #fbfbfb 50%, #f2f8fd 50%);
+    }
+
+    .s-section-twocolumns .w-md-auto {
+        width: auto !important;
+    }    
 }
