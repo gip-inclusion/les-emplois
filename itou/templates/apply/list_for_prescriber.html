@@ -1,4 +1,6 @@
 {% extends "layout/content.html" %}
+{% load static %}
+{% load str_filters %}
 
 {% block title %}Suivi des candidatures{{ block.super }}{% endblock %}
 
@@ -8,36 +10,79 @@
 
     <h1 class="h1-hero-c1">Suivi des candidatures</h1>
 
-    {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
-
-    {% if not job_applications_page %}
-        <h2 class="h1 font-weight-normal text-muted">
-            Aucune candidature pour le moment.
-        </h2>
-    {% endif %}
-
-    {% for job_application in job_applications_page %}
-
-        <div class="card mb-3 mt-4">
-
-            {% include "apply/includes/list_card_header.html" with job_application=job_application %}
-
-            {% include "apply/includes/list_card_body.html" with job_application=job_application %}
-
-            <div class="card-footer">
-                <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}">
-                    Plus d’informations
-                </a>
-            </div>
+    <div class="row">
+        <div class="col-12 col-md-4 mt-2">
+            <a id="js-job-applications-filters-button" class="btn btn-primary d-block d-md-none" href="#js-job-applications-filters-form" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseFilter">
+                Filtres des résultats <i class="ri-filter-line"></i>
+            </a>
+            <form method="get" action="" id="js-job-applications-filters-form" class="collapse show">
+                <div class="card c-card h-100 w-100 c-card--emploi">
+                    <div class="card-header">
+                        <h3>Filtrer les candidatures</h3>
+                    </div>
+                    <div class="card-body">
+                        {% include "apply/includes/job_applications_filters/job_seekers.html" %}
+                        {% include "apply/includes/job_applications_filters/statut.html" %}
+                        {% include "apply/includes/job_applications_filters/to_siaes.html" %}
+                        {% include "apply/includes/job_applications_filters/sender.html" %}
+                        {% include "apply/includes/job_applications_filters/dates.html" %}
+                        {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
+                        {% include "apply/includes/job_applications_filters/pass.html" %}
+                        {% include "apply/includes/job_applications_filters/eligibility_validated.html" %}
+                        {% include "apply/includes/job_applications_filters/criteria.html" %}
+                        {% include "apply/includes/job_applications_filters/departments.html" %}
+                    </div>
+                    <div class="card-footer text-right">
+                        <button id="js-job-applications-filters-apply-button" type="submit" class="btn btn-primary">Appliquer</button>
+                    </div>
+                </div>
+            </form>
         </div>
-    {% endfor %}
+        <div class="col-12 col-md-8 mt-2">
+            <div class="clearfix">
+                <div class="float-left">
+                    <p class="h1">
+                        {% with job_applications_page.paginator.count as counter %}
+                            <span class="badge badge-emploi">{{ counter }}</span> <strong>Résultat{{ counter|pluralizefr }}</strong>
+                        {% endwith %}
+                    </p>
+                </div>
+                <div class="float-right">
+                    {% include "apply/includes/job_applications_export_button.html" %}
+                    {% if filters_counter > 0 %}
+                        <a href="{% url 'apply:list_for_prescriber' %}" class="btn btn-outline-primary">
+                            Réinitialiser les filtres ({{ filters_counter }})
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
 
-    {% include "includes/pagination.html" with page=job_applications_page %}
+            {% if not job_applications_page %}
+                <h2 class="font-weight-normal text-muted">
+                    Aucune candidature pour le moment.
+                </h2>
+            {% else %}
+                {% for job_application in job_applications_page %}
+                    <div class="card mb-3 mt-4">
+                        {% include "apply/includes/list_card_header.html" with job_application=job_application %}
+                        {% include "apply/includes/list_card_body.html" with job_application=job_application %}
+                        <div class="card-footer">
+                            <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}">
+                                Plus d’informations
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
 
+                {% include "includes/pagination.html" with page=job_applications_page %}
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block script %}
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ filters_form.media.js }}
+    <script src='{% static "js/job_applications_filters.js" %}'></script>
 {% endblock %}
