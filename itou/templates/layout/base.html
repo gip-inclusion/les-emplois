@@ -181,7 +181,7 @@
                 {% endfor %}
                 /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
                 {% if matomo_custom_url %}
-                    _paq.push(['setCustomUrl', '{{ matomo_custom_url }}']);
+                    _paq.push(['setCustomUrl', location.origin + '{{ matomo_custom_url }}']);
                 {% endif %}
                 _paq.push(['trackPageView']);
                 _paq.push(['enableLinkTracking']);
