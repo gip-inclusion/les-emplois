@@ -9,11 +9,11 @@ from django.utils.safestring import mark_safe
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.common_apps.resume.forms import ResumeFormMixin
+from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget
@@ -427,14 +427,13 @@ class FilterJobApplicationsForm(forms.Form):
     states = forms.MultipleChoiceField(
         required=False, choices=JobApplicationWorkflow.STATE_CHOICES, widget=forms.CheckboxSelectMultiple
     )
-    pass_iae_suspended = forms.BooleanField(label="PASS IAE suspendu", required=False)
     start_date = forms.DateField(
-        label="Début",
+        label="À partir du",
         required=False,
         widget=DuetDatePickerWidget(),
     )
     end_date = forms.DateField(
-        label="Fin",
+        label="Jusqu'au",
         required=False,
         widget=DuetDatePickerWidget(),
     )
@@ -475,39 +474,38 @@ class FilterJobApplicationsForm(forms.Form):
         if data.get("pass_iae_suspended"):
             # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
             filters["has_suspended_approval"] = True
+        if data.get("pass_iae_active"):
+            filters["has_active_approval"] = True
+        if data.get("eligibility_validated"):
+            filters["last_jobseeker_eligibility_diagnosis__isnull"] = False
         if data.get("start_date"):
             filters["created_at__gte"] = data.get("start_date")
         if data.get("end_date"):
             filters["created_at__lte"] = data.get("end_date")
+        if data.get("departments"):
+            filters["job_seeker__department__in"] = data.get("departments")
+        if data.get("selected_jobs"):
+            filters["selected_jobs__appellation__code__in"] = data.get("selected_jobs")
+        if data.get("criteria"):
+            # Filter on the `last_eligibility_diagnosis_criterion_{criterion}` annotation,
+            # which is set in `with_list_related_data()`.
+            for criterion in data.get("criteria"):
+                filters[f"last_eligibility_diagnosis_criterion_{criterion}"] = True
 
         filters = [Q(**filters)]
 
         return filters
 
-    def humanize_filters(self):
+    def get_qs_filters_counter(self, qs_filters):
         """
-        Return active filters to be displayed in a template.
+        Get number of filters to be applied to a query set.
         """
-        start_date = self.cleaned_data.get("start_date")
-        end_date = self.cleaned_data.get("end_date")
-        states = self.cleaned_data.get("states")
-        active_filters = []
+        filters_counter = 0
+        for qs_filter in qs_filters:
+            for filters in qs_filter.children:
+                filters_counter += len(filters[1]) if type(filters[1]) is list else 1
 
-        if start_date:
-            label = self.base_fields.get("start_date").label
-            active_filters.append([label, start_date])
-
-        if end_date:
-            label = self.base_fields.get("end_date").label
-            active_filters.append([label, end_date])
-
-        if states:
-            values = [str(JobApplicationWorkflow.states[state].title) for state in states]
-            value = ", ".join(values)
-            label = "Statuts" if (len(values) > 1) else "Statut"
-            active_filters.append([label, value])
-
-        return [{"label": f[0], "value": f[1]} for f in active_filters]
+        return filters_counter
 
 
 class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
@@ -515,15 +513,29 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     Job applications filters common to SIAE and Prescribers.
     """
 
-    senders = forms.MultipleChoiceField(required=False, label="Nom", widget=Select2MultipleWidget)
+    senders = forms.MultipleChoiceField(required=False, label="Nom de la personne", widget=Select2MultipleWidget)
 
-    job_seekers = forms.MultipleChoiceField(required=False, label="Candidat", widget=Select2MultipleWidget)
+    job_seekers = forms.MultipleChoiceField(required=False, label="Nom du candidat", widget=Select2MultipleWidget)
+
+    pass_iae_suspended = forms.BooleanField(label="PASS IAE suspendu", required=False)
+    pass_iae_active = forms.BooleanField(label="PASS IAE actif", required=False)
+    criteria = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple)
+    eligibility_validated = forms.BooleanField(label="Éligibilité validée", required=False)
+    departments = forms.MultipleChoiceField(
+        required=False, label="Département du candidat", widget=forms.CheckboxSelectMultiple
+    )
+    selected_jobs = forms.MultipleChoiceField(
+        required=False, label="Fiches de poste", widget=forms.CheckboxSelectMultiple
+    )
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
         self.fields["senders"].choices += self._get_choices_for("sender")
         self.fields["job_seekers"].choices = self._get_choices_for("job_seeker")
+        self.fields["criteria"].choices = self._get_choices_for_administrativecriteria()
+        self.fields["departments"].choices = self._get_choices_for_departments()
+        self.fields["selected_jobs"].choices = self._get_choices_for_jobs()
 
     def _get_choices_for(self, user_type):
         users = self.job_applications_qs.get_unique_fk_objects(user_type)
@@ -531,13 +543,20 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         users = [(user.id, user.get_full_name().title()) for user in users]
         return sorted(users, key=lambda l: l[1])
 
-    def _humanize_multiple_choice_for_users(self, user_ids, field_name):
-        users = User.objects.filter(pk__in=[int(user_id) for user_id in user_ids])
-        values = [user.get_full_name().title() for user in users]
-        value = ", ".join(values)
-        label = self.base_fields.get(field_name).label
-        label = f"{label}s" if (len(values) > 1) else label
-        return label, value
+    def _get_choices_for_administrativecriteria(self):
+        return [(c.pk, c.name) for c in AdministrativeCriteria.objects.all()]
+
+    def _get_choices_for_departments(self):
+        job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
+        departments = {(user.department, DEPARTMENTS.get(user.department)) for user in job_seekers if user.department}
+        return sorted(departments, key=lambda l: l[1])
+
+    def _get_choices_for_jobs(self):
+        jobs = set()
+        for job_application in self.job_applications_qs.prefetch_related("selected_jobs__appellation"):
+            for job in job_application.selected_jobs.all():
+                jobs.add((job.appellation.code, job.appellation.name))
+        return sorted(jobs, key=lambda l: l[1])
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
@@ -555,21 +574,6 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
 
         return qs_list
 
-    def humanize_filters(self):
-        humanized_filters = super().humanize_filters()
-        senders = self.cleaned_data.get("senders")
-        job_seekers = self.cleaned_data.get("job_seekers")
-
-        if senders:
-            label, value = self._humanize_multiple_choice_for_users(senders, "senders")
-            humanized_filters.append({"label": label, "value": value})
-
-        if job_seekers:
-            label, value = self._humanize_multiple_choice_for_users(job_seekers, "job_seekers")
-            humanized_filters.append({"label": label, "value": value})
-
-        return humanized_filters
-
 
 class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
     """
@@ -577,12 +581,15 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
     """
 
     sender_organizations = forms.MultipleChoiceField(
-        required=False, label="Prescripteur", widget=Select2MultipleWidget
+        required=False, label="Nom de l'organisme prescripteur", widget=Select2MultipleWidget
     )
 
-    def __init__(self, job_applications_qs, *args, **kwargs):
+    def __init__(self, job_applications_qs, siae, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)
         self.fields["sender_organizations"].choices += self.get_sender_organization_choices()
+
+        if siae.kind not in siae.ELIGIBILITY_REQUIRED_KINDS:
+            del self.fields["eligibility_validated"]
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
@@ -600,23 +607,6 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
         sender_orgs = [sender for sender in sender_orgs if sender.display_name]
         sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
         return sorted(sender_orgs, key=lambda l: l[1])
-
-    def humanize_filters(self):
-        humanized_filters = super().humanize_filters()
-        sender_organizations = self.cleaned_data.get("sender_organizations")
-
-        if sender_organizations:
-            values = [
-                PrescriberOrganization.objects.get(pk=int(organization_id)).display_name.title()
-                for organization_id in sender_organizations
-            ]
-            value = ", ".join(values)
-            label = self.base_fields.get("sender_organizations").label
-            label = f"{label}s" if (len(values) > 1) else label
-
-            humanized_filters.append({"label": label, "value": value})
-
-        return humanized_filters
 
 
 class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
@@ -646,17 +636,3 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
         to_siaes = [siae for siae in to_siaes if siae.display_name]
         to_siaes = [(siae.id, siae.display_name.title()) for siae in to_siaes]
         return sorted(to_siaes, key=lambda l: l[1])
-
-    def humanize_filters(self):
-        humanized_filters = super().humanize_filters()
-        to_siaes = self.cleaned_data.get("to_siaes")
-
-        if to_siaes:
-            values = [Siae.objects.get(pk=int(siae_pk)).display_name.title() for siae_pk in to_siaes]
-            value = ", ".join(values)
-            label = self.base_fields.get("to_siaes").label
-            label = f"{label}s" if (len(values) > 1) else label
-
-            humanized_filters.append({"label": label, "value": value})
-
-        return humanized_filters
