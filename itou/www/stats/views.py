@@ -21,7 +21,13 @@ from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, REGIONS
-from itou.utils.apis.metabase import DEPARTMENT_FILTER_KEY, REGION_FILTER_KEY, SIAE_FILTER_KEY, metabase_embedded_url
+from itou.utils.apis.metabase import (
+    ASP_SIAE_FILTER_KEY,
+    C1_SIAE_FILTER_KEY,
+    DEPARTMENT_FILTER_KEY,
+    REGION_FILTER_KEY,
+    metabase_embedded_url,
+)
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -68,14 +74,34 @@ def stats_siae_etp(request, template_name=_STATS_HTML_TEMPLATE):
     """
     SIAE stats shown to their own members.
     They can only view data for their own SIAE.
+    These stats are about ETP data from the ASP.
     """
     current_org = get_current_siae_or_404(request)
     if not request.user.can_view_stats_siae(current_org=current_org):
         raise PermissionDenied
-    params = {SIAE_FILTER_KEY: current_org.convention.asp_id}
+    params = {ASP_SIAE_FILTER_KEY: current_org.convention.asp_id}
     context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
-        "page_title": "Données de ma structure",
+        "page_title": "Données de ma structure (extranet ASP)",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def stats_siae_hiring(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    SIAE stats shown to their own members.
+    They can only view data for their own SIAE.
+    These stats are about hiring and are built directly from C1 data.
+    """
+    current_org = get_current_siae_or_404(request)
+    if not request.user.can_view_stats_siae(current_org=current_org):
+        raise PermissionDenied
+    params = {C1_SIAE_FILTER_KEY: str(current_org.id)}
+    context = {
+        "iframeurl": metabase_embedded_url(request=request, params=params),
+        "page_title": "Données de recrutement de ma structure (Plateforme de l'inclusion)",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)

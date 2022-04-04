@@ -560,6 +560,7 @@ METABASE_DASHBOARD_IDS = {
     "stats_dreets_iae": 117,
     "stats_public": 119,
     "stats_siae_etp": 128,
+    "stats_siae_hiring": 165,
 }
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
 

@@ -448,7 +448,11 @@
                         {% if can_view_stats_siae %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
-                                <a href="{% url 'stats:stats_siae_etp' %}">Voir les données de ma structure</a>
+                                <a href="{% url 'stats:stats_siae_etp' %}">Voir les données de ma structure (extranet ASP)</a>
+                            </li>
+                            <li class="card-text mb-3">
+                                <i class="ri-pulse-line ri-lg mr-1"></i>
+                                <a href="{% url 'stats:stats_siae_hiring' %}">Voir les données de recrutement de ma structure (Plateforme de l'inclusion)</a>
                                 <span class="badge badge-info">Nouveau</span>
                             </li>
                         {% endif %}
