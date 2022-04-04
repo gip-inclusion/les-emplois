@@ -7,22 +7,22 @@
     <div class="card-body">
         <div class="row">
             <div class="col-md-7">
-                <p class="m-0">Début de contrat : <b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b></p>
-                <p class="m-0">Fin de contrat : <b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b></p>
-                <p class="m-0">Numéro de PASS IAE (agrément) : <b>{{ item.approval.number_with_spaces }}</b></p>
+                <p class="m-0">Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b></p>
+                <p class="m-0">Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b></p>
+                <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.approval.number_with_spaces }}</b></p>
             </div>
 
             {# Statuses #}
             <div class="col-md-5 text-right">
                 <p class="small mb-0">
                     {% if form.status.value == "SENT" %}
-                        <p class="badge badge-warning">Transmise à l'ASP le <b>{{ employee_record.updated_at }}</b></p>
+                        <p class="badge badge-warning">Transmise à l'ASP le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
                     {% elif form.status.value == "REJECTED" %}
-                        <p class="badge badge-danger">Retour en erreur le <b>{{ employee_record.updated_at }}</b></p>
+                        <p class="badge badge-danger">Retour en erreur le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
                     {% elif form.status.value == "PROCESSED" %}
-                        <p class="badge badge-success">Intégrée ASP le <b>{{ employee_record.updated_at }}</b></p>
+                        <p class="badge badge-success">Intégrée ASP le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
                     {% elif form.status.value == "READY" %}
-                        <p class="badge badge-secondary">Complétée le <b>{{ employee_record.updated_at }}</b></p>
+                        <p class="badge badge-secondary">Complétée le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
                     {% endif %}
                 </p>
             </div>
@@ -32,8 +32,8 @@
         {% if form.status.value == "REJECTED" %}
             <div class="my-3 alert alert-emploi">
                 <p><b>Informations sur l'erreur de traitement :</b></p>
-                <p>Erreur {{ employee_record.asp_processing_code }} : <small>{{ employee_record.asp_processing_label }}</small></p>
-                <p>Référence fichier ASP : <small>{{ employee_record.asp_batch_file }} (ligne {{ employee_record.asp_batch_line_number }})</small></p>
+                <p>Erreur {{ employee_record.asp_processing_code }} :&nbsp;<small>{{ employee_record.asp_processing_label }}</small></p>
+                <p>Référence fichier ASP :&nbsp;<small>{{ employee_record.asp_batch_file }} (ligne {{ employee_record.asp_batch_line_number }})</small></p>
             </div>
         {% endif %}
 

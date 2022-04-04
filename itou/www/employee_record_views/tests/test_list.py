@@ -67,21 +67,15 @@ class ListEmployeeRecordsTest(TestCase):
             self.assertNotContains(response, job_seeker_name)
 
     def test_employee_records_with_hiring_end_at(self):
-        """
-        Check "hiring_end_at" display
-        """
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
         hiring_end_at = self.job_application.hiring_end_at
 
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, f"Fin de contrat : <b>{hiring_end_at.strftime('%e').lstrip()}")
+        self.assertContains(response, f"Fin de contrat :&nbsp;<b>{hiring_end_at.strftime('%e').lstrip()}")
 
     def test_employee_records_without_hiring_end_at(self):
-        """
-        Check "hiring_end_at" display when None
-        """
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
         self.job_application.hiring_end_at = None
         self.job_application.save()
@@ -89,4 +83,4 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Fin de contrat : <b>Non renseigné")
+        self.assertContains(response, "Fin de contrat :&nbsp;<b>Non renseigné")
