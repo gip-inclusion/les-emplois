@@ -493,6 +493,16 @@ class UtilsTemplateTagsTestCase(TestCase):
         expected = "True"
         self.assertEqual(out, expected)
 
+    def test_pluralizefr(self):
+        """Test `pluralizefr` template tag."""
+        template = Template("{% load str_filters %}Résultat{{ counter|pluralizefr }}")
+        out = template.render(Context({"counter": 0}))
+        self.assertEqual(out, "Résultat")
+        out = template.render(Context({"counter": 1}))
+        self.assertEqual(out, "Résultat")
+        out = template.render(Context({"counter": 10}))
+        self.assertEqual(out, "Résultats")
+
 
 class UtilsTemplateFiltersTestCase(TestCase):
     def test_format_phone(self):
