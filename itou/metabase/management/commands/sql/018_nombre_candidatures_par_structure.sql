@@ -21,6 +21,7 @@ with z_candidatures as (
 	c.nom_org_prescripteur	
     from 
 	public.candidatures c 
+    where injection_ai = 0
     group by 
 	état,
 	c.date_candidature,
