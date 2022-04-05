@@ -56,68 +56,25 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <h2 class="h1 mb-2">Les dernières offres d'emploi</h2>
-                            <p class="h3">16 224 Recrutements en cours</p>
+                            <p class="h3">{{ siae_jobs_count }} recrutements en cours</p>
                         </div>
                         <span><img src="{% static 'img/home/hp-illu-01.svg' %}" alt="" width="75"></span>
                     </div>
                     <ul class="list-group c-list-group">
-                        <li class="list-group-item c-list-group-item list-group-item-action">
-                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
-                                <span class="d-flex align-items-center">
-                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
-                                    <strong class="font-weight-bold text-decoration-underline">Préparateur/préparatrice de commande </strong>
-                                </span>
-                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Le Bouscat - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
-                            </a>
-                        </li>
-                        <li class="list-group-item c-list-group-item list-group-item-action">
-                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
-                                <span class="d-flex align-items-center">
-                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
-                                    <strong class="font-weight-bold text-decoration-underline">Chargé(e) d'affaires commerciales et marketing opérationnel</strong>
-                                </span>
-                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Beychac-et-Caillau - 72<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
-                            </a>
-                        </li>
-                        <li class="list-group-item c-list-group-item list-group-item-action">
-                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
-                                <span class="d-flex align-items-center">
-                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
-                                    <strong class="font-weight-bold text-decoration-underline">Préparateur/préparatrice de commande</strong>
-                                </span>
-                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Belvès-de-Castillon - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
-                            </a>
-                        </li>
-                        <li class="list-group-item c-list-group-item list-group-item-action">
-                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
-                                <span class="d-flex align-items-center">
-                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
-                                    <strong class="font-weight-bold text-decoration-underline">Ouvrier en pépinère horticole</strong>
-                                </span>
-                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Belvès-de-Castillon - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
-                            </a>
-                        </li>
-                        <li class="list-group-item c-list-group-item list-group-item-action">
-                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
-                                <span class="d-flex align-items-center">
-                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
-                                    <strong class="font-weight-bold text-decoration-underline">Ouvrier paysagiste création des espaces verts </strong>
-                                </span>
-                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Belvès-de-Castillon - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
-                            </a>
-                        </li>
-                        <li class="list-group-item c-list-group-item list-group-item-action">
-                            <a href="" class="d-flex flex-column flex-lg-row text-decoration-none">
-                                <span class="d-flex align-items-center">
-                                    <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
-                                    <strong class="font-weight-bold text-decoration-underline">Ouvrier en pépinère horticole</strong>
-                                </span>
-                                <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>Bordeaux - 33<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
-                            </a>
-                        </li>
+                        {% for siae_job in siae_jobs %}
+                            <li class="list-group-item c-list-group-item list-group-item-action">
+                                <a href="{% url 'siaes_views:job_description_card' job_description_id=siae_job.pk %} " class="d-flex flex-column flex-lg-row text-decoration-none">
+                                    <span class="d-flex align-items-center">
+                                        <i class="ri-checkbox-blank-circle-fill ri-xs mr-2 text-success"></i>
+                                        <strong class="font-weight-bold text-decoration-underline">{{ siae_job.display_name }}</strong>
+                                    </span>
+                                    <span class="fs-sm ml-auto d-flex align-items-center"><i class="ri-map-pin-2-line ri-sm mr-1"></i>{{ siae_job.siae.city | lower | capfirst }} - {{ siae_job.siae.department}}<i class="ri-arrow-right-s-line ri-xl font-weight-bold ml-1"></i></span>
+                                </a>
+                            </li>
+                        {% endfor %}
                     </ul>
                     <p class="text-center mt-3 mt-md-6">
-                        <a href="" class="btn btn-primary d-block d-md-inline-block">Toutes les offres</a>
+                        <a href="#main" data- class="btn btn-primary d-block d-md-inline-block">Rechercher une offre</a>
                     </p>
                 </div>
             </div>
@@ -130,7 +87,7 @@
                 <div class="col-12 col-md">
                     <div>
                         <h2 class="h1 mb-2">Inscrivez-vous pour commencer à utiliser la plateforme</h2>
-                        <h3 class="h3">Candidats, Employeurs, orienteurs et prescripteurs</h3>
+                        <h3 class="h3">Candidats, employeurs et prescripteurs</h3>
                         <p>La plateforme « Les emplois de l’inclusion » permet, tant pour les candidats que pour les employeurs, de faciliter les démarches administratives liées aux parcours d’insertion et de mieux faire se rencontrer les offres d’emploi et les différents profils éligibles</p>
                         <div class="row no-gutters">
                             <div class="col-6 col-md-auto pt-3 pr-2">
