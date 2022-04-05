@@ -342,30 +342,26 @@ Usage:
 /* To be discussed.
 --------------------------------------------------------------------------- */
 
-.collapse-caret, .collapse-caret:hover{
-    text-decoration: unset;
+.collapse-caret, 
+.collapse-caret:hover {
+    position: relative;
+    text-decoration: none !important;
 }
-.collapse-caret>.h5::after {
-    /* when not collapsed */
-    display: inline-block;
-    content: " ";
-    /* icon arrow-down-s-fill from remix icon */
-    background-image: url("../vendor/theme-inclusion/images/ico-arrow-down-s-fill.svg");
-    /* h6 font size = 1rem */
-    background-size: 16px 16px;
-    height: 16px;
-    width: 24px;
-    background-position-y: bottom;
-    margin-left: 8px;
-    transform: rotate(180deg);
-    background-repeat: no-repeat;
-    background-size: cover;
+.collapse-caret > *::after {
+  content: '\ea4e';
+  font-family: remixicon !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1;
+  vertical-align: text-bottom;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-left: 0.5rem;
 }
 
-.collapse-caret.collapsed>.h5::after {
-    background-position-y: center;
-    height: 12px;
-    transform: rotate(0deg);
+.collapse-caret[aria-expanded=true] > *::after {
+    content: '\ea78';
 }
 
 .employee-records-list .badge {
