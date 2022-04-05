@@ -32,16 +32,16 @@ HELP_TEXT = """
     does everything.
 
     Examples of use in local dev:
-    $ make django_admin COMMAND="move_siae_data --from 3243 --to 9612 --dry-run"
-    $ make django_admin COMMAND="move_siae_data --from 3243 --to 9612 --only-job-applications --dry-run"
+    $ make django_admin COMMAND="move_siae_data --from 3243 --to 9612"
+    $ make django_admin COMMAND="move_siae_data --from 3243 --to 9612 --only-job-applications"
 
     And in production:
-    $ cd && cd app_* && django-admin move_siae_data --from 3243 --to 9612 --dry-run
+    $ cd && cd app_* && django-admin move_siae_data --from 3243 --to 9612 --wet-run
 
 """
 
 
-def move_siae_data(from_id, to_id, dry_run=True, only_job_applications=False):
+def move_siae_data(from_id, to_id, wet_run=False, only_job_applications=False):
     if from_id == to_id:
         logger.error("Unable to use the same siae as source and destination (ID %s)", from_id)
         return
@@ -58,10 +58,6 @@ def move_siae_data(from_id, to_id, dry_run=True, only_job_applications=False):
         to_siae = to_siae_qs.get()
     except siaes_models.Siae.DoesNotExist:
         logger.error("Unable to find the siae ID %s", to_id)
-        return
-
-    if from_siae.kind != to_siae.kind:
-        logger.error("Both siaes should have the same kind but they don't")
         return
 
     # Intermediate variable for better readability
@@ -136,7 +132,7 @@ def move_siae_data(from_id, to_id, dry_run=True, only_job_applications=False):
         logger.info(f"| Coords '{to_siae.coords}' will be updated with '{from_siae.coords}'")
         logger.info(f"| Geoscore '{to_siae.geocoding_score}' will be updated with '{from_siae.geocoding_score}'")
 
-    if dry_run:
+    if not wet_run:
         logger.info("Nothing to do in dry run mode.")
         return
 
@@ -240,7 +236,7 @@ class Command(BaseCommand):
             default=False,
             help="Set to True to move only job applications, nothing else!",
         )
-        parser.add_argument("--dry-run", action=argparse.BooleanOptionalAction, default=False)
+        parser.add_argument("--wet-run", action=argparse.BooleanOptionalAction, default=False)
 
     def handle(self, *args, **options):
-        move_siae_data(options["from_id"], options["to_id"], options["dry_run"], options["only_job_applications"])
+        move_siae_data(options["from_id"], options["to_id"], options["wet_run"], options["only_job_applications"])
