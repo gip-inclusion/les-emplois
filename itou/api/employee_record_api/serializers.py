@@ -4,12 +4,7 @@ from django.conf import settings
 from django.utils.crypto import salted_hmac
 from rest_framework import serializers
 
-from itou.employee_record.serializers import (  # _PersonSerializer,; _SituationSerializer,
-    EmployeeRecordSerializer,
-    _AddressSerializer,
-    _EmployeeSerializer,
-)
-from itou.users.models import User
+from itou.employee_record.serializers import EmployeeRecordSerializer, _AddressSerializer, _PersonSerializer
 
 
 class DummyEmployeeRecordSerializer(serializers.Serializer):
@@ -111,28 +106,12 @@ class _API_AddressSerializer(_AddressSerializer):
     adrMail = serializers.CharField(source="email")
 
 
-class _API_EmployeeSerializer(_EmployeeSerializer):
+class _API_PersonSerializer(_PersonSerializer):
     """
     Specific fields added to the API (not used in ASP transfers)
     """
 
-    NIR = serializers.CharField(source="nir")
-
-    class Meta:
-        model = User
-        fields = [
-            "sufPassIae",
-            "idItou",
-            "NIR",
-            "civilite",
-            "nomUsage",
-            "prenom",
-            "dateNaissance",
-            "codeComInsee",
-            "codeDpt",
-            "codeInseePays",
-            "codeGroupePays",
-        ]
+    NIR = serializers.CharField(source="job_seeker.nir")
 
 
 class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
@@ -144,5 +123,5 @@ class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
     """
 
     numeroAnnexe = serializers.CharField(source="financial_annex_number")
-    adresse = _API_AddressSerializer(source="job_application.job_seeker")
-    personnePhysique = _API_EmployeeSerializer(source="job_application.job_seeker")
+    adresse = _API_AddressSerializer(source="job_seeker")
+    personnePhysique = _API_PersonSerializer(source="*")
