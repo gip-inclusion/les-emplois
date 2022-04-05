@@ -143,8 +143,6 @@ def job_description_list(request, template_name="siaes/job_description_list.html
 
 
 def _get_job_description(session_data):
-    if not session_data:
-        return None
     if pk := session_data.get("pk"):
         job_description = get_object_or_404(
             SiaeJobDescription.objects.select_related(
@@ -197,6 +195,10 @@ def edit_job_description(request, template_name="siaes/edit_job_description.html
 def edit_job_description_details(request, template_name="siaes/edit_job_description_details.html"):
     siae = get_current_siae_or_404(request)
     session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+
+    if not session_data:
+        return HttpResponseRedirect(reverse("siaes_views:edit_job_description"))
+
     job_description = _get_job_description(session_data)
 
     rome = get_object_or_404(
@@ -245,6 +247,10 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
 def edit_job_description_preview(request, template_name="siaes/edit_job_description_preview.html"):
     siae = get_current_siae_or_404(request)
     session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+
+    if not session_data:
+        return HttpResponseRedirect(reverse("siaes_views:edit_job_description"))
+
     job_description = _get_job_description(session_data) or SiaeJobDescription()
 
     job_description.__dict__.update(**session_data)
