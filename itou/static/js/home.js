@@ -38,6 +38,7 @@ let showEvents = () => {
   $.ajax({ 
     url: 'https://communaute.inclusion.beta.gouv.fr/wp-json/tribe/events/v1/events', 
     method: 'GET', 
+    async : true,
     data: { 'page': 1, 'per_page': 3, } 
   })
   .done(renderEvents)
