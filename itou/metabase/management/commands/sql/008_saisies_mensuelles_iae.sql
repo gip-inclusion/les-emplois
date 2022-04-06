@@ -44,7 +44,7 @@ salarie as (
            when (annee_en_cours - salarie.salarie_annee_naissance) <= 25 then 'a- Moins de 25 ans'
            when (annee_en_cours - salarie.salarie_annee_naissance) >= 26 and (annee_en_cours - salarie.salarie_annee_naissance) <= 30  then 'b- Entre 26 ans et 30 ans'
            when (annee_en_cours - salarie.salarie_annee_naissance) >= 31 and (annee_en_cours - salarie.salarie_annee_naissance) <= 50  then 'c- Entre 31 ans et 50 ans'
-           when (annee_en_cours - salarie.salarie_annee_naissance) >= 51 then 'd- 50 ans et plus'
+           when (annee_en_cours - salarie.salarie_annee_naissance) >= 51 then 'd- 51 ans et plus'
            else 'autre'
         end tranche_age,
         departement_com_salarie.nom_departement as departement_salarie,
