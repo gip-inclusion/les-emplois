@@ -258,14 +258,22 @@ class Command(BaseCommand):
 
     @timeit
     def check_whether_signup_is_possible_for_all_siaes(self):
-        for siae in Siae.objects.prefetch_related("memberships").filter(members__isnull=True):
-            if not siae.has_members and not siae.auth_email:
-                self.stdout.write(
-                    f"FATAL ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
-                    f"kind={siae.kind} dpt={siae.department} source={siae.source} "
-                    f"created_by={siae.created_by} siae.email={siae.email}"
-                )
-                self.fatal_errors += 1
+        for siae in (
+            Siae.objects.filter(
+                auth_email="",
+            )
+            .exclude(
+                siaemembership__user__is_active=True,
+                siaemembership__is_active=False,
+            )
+            .distinct()
+        ):
+            self.stdout.write(
+                f"FATAL ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
+                f"kind={siae.kind} dpt={siae.department} source={siae.source} "
+                f"created_by={siae.created_by} siae.email={siae.email}"
+            )
+            self.fatal_errors += 1
 
     @timeit
     def create_conventions(self):
