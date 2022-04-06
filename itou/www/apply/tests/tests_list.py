@@ -12,13 +12,14 @@ from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberMembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -57,7 +58,7 @@ class ProcessListTest(TestCase):
         audrey_envol = l_envol.members.get(first_name="Audrey")
 
         # Hit Pit
-        hit_pit = SiaeWithMembershipAndJobsFactory(name="Hit Pit", membership__user__first_name="Eddie")
+        hit_pit = SiaeWithMembershipFactory(name="Hit Pit", membership__user__first_name="Eddie")
         eddie_hit_pit = hit_pit.members.get(first_name="Eddie")
 
         # Now send applications
@@ -452,7 +453,8 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
 
-        (appellation1, appellation2) = Appellation.objects.all().order_by("?")[0:2]
+        create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
+        (appellation1, appellation2) = Appellation.objects.all().order_by("?")[:2]
         JobApplicationSentByJobSeekerFactory(to_siae=self.hit_pit, selected_jobs=[appellation1])
         JobApplicationSentByJobSeekerFactory(to_siae=self.hit_pit, selected_jobs=[appellation2])
 
