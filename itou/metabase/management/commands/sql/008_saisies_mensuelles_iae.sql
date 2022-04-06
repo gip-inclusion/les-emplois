@@ -3,7 +3,6 @@
 L'objectif est de créer une table agrégée avec plusieurs données retravaillées qui proviennent des saisies mensuelles des structures 
 dans l'extranet asp.
 Le choix a été fait d'avoir les données de l'année en cours + 2 ans d'historique
-
 */
 
 with constantes as ( 
@@ -102,7 +101,7 @@ select
     end niveau_formation_salarie, 
     to_date (emi.emi_date_fin_reelle ,'dd/mm/yyyy') as date_sortie,
     case 
-        when salarie_adr_qpv_type = 'true' then 'Oui'
+        when salarie_adr_qpv_type = 'QP' then 'Oui'
         else 'Non'
     end qpv,
     case 
