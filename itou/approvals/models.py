@@ -38,12 +38,6 @@ class CommonApprovalMixin(models.Model):
     # obtain a new one except from an "authorized prescriber".
     WAITING_PERIOD_YEARS = 2
 
-    # Due to COVID lockdown restrictions, the end date of overlapping approvals
-    # has been extended by 3 months.
-    LOCKDOWN_START_AT = datetime.date(2020, 3, 17)
-    LOCKDOWN_END_AT = datetime.date(2020, 6, 16)
-    LOCKDOWN_EXTENSION_DELAY_MONTHS = 3
-
     start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
     end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
@@ -88,23 +82,6 @@ class CommonApprovalMixin(models.Model):
     @property
     def duration(self):
         return self.end_at - self.start_at
-
-    @property
-    def overlaps_covid_lockdown(self):
-        ends_before_lockdown = self.end_at < self.LOCKDOWN_START_AT
-        starts_after_lockdown = self.start_at > self.LOCKDOWN_END_AT
-        return not (ends_before_lockdown or starts_after_lockdown)
-
-    @property
-    def extended_end_at(self):
-        """
-        See `PoleEmploiApproval.extended_end_at`.
-        """
-        return self.end_at
-
-    @staticmethod
-    def get_extended_covid_end_at(end_at):
-        return end_at + relativedelta(months=CommonApprovalMixin.LOCKDOWN_EXTENSION_DELAY_MONTHS)
 
 
 class CommonApprovalQuerySet(models.QuerySet):
@@ -191,20 +168,9 @@ class Approval(CommonApprovalMixin):
 
     def save(self, *args, **kwargs):
         self.clean()
-
-        already_exists = bool(self.pk)
-
         if not self.number:
             # `get_next_number` will lock rows until the end of the transaction.
             self.number = self.get_next_number()
-
-        if not already_exists:
-
-            # Handle COVID extensions for approvals originally issued by Pôle emploi.
-            # Approvals issued by Itou have already been extended through SQL.
-            if not self.originates_from_itou and self.overlaps_covid_lockdown:
-                self.end_at = self.get_extended_covid_end_at(self.end_at)
-
         super().save(*args, **kwargs)
 
     def clean(self):
@@ -1125,10 +1091,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
         return self.number
 
     def is_valid(self):
-        """
-        See `self.extended_end_at`.
-        """
-        return super().is_valid(end_at=self.extended_end_at)
+        return super().is_valid(end_at=self.end_at)
 
     @staticmethod
     def format_name_as_pole_emploi(name):
@@ -1137,31 +1100,6 @@ class PoleEmploiApproval(CommonApprovalMixin):
         Upper-case ASCII transliterations of Unicode text.
         """
         return unidecode(name.strip()).upper()
-
-    @property
-    def extended_end_at(self):
-        """
-        When importing Pôle emploi approvals from a file, the COVID prolongation is not integrated
-        to the set we receive and we decided not to apply it at this moment to preserve data integrity.
-        We set it when transforming an approval into a PASS IAE (concretely PoleEmploiApproval => Approval).
-        But a beforehand step is distorting the process: the fetching of valid approvals (see
-        ApprovalsWrapper). In fact, an expired approval that could benefit from the COVID prolongation
-        is still considered invalid as its end date has not been updated yet.
-
-        Steps:
-        - Fetching of the last available approval: Approval.get_or_create_from_valid(approvals_wrapper)
-        - If a PoleEmploiApproval is found and is valid, continue to the save()
-        - In Approval > save(), apply the COVID prolongation.
-
-        To apply this prolongation without reflecting it into the database,
-        we override two parent methods:
-        - self.is_valid()
-        - self.extended_end_at: extended end_at
-        """
-        end_at = self.end_at
-        if self.overlaps_covid_lockdown:
-            end_at = self.get_extended_covid_end_at(end_at)
-        return end_at
 
     @property
     def number_with_spaces(self):

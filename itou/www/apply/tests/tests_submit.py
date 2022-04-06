@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.approvals.models import ApprovalsWrapper, PoleEmploiApproval
+from itou.approvals.models import ApprovalsWrapper
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.eligibility.models import EligibilityDiagnosis
@@ -247,9 +247,7 @@ class ApplyAsJobSeekerTest(TestCase):
         Apply as jobseeker to a SIAE (not a GEIQ) with an approval in waiting period.
         Waiting period cannot be bypassed.
         """
-
-        # Avoid COVID lockdown specific cases
-        now_date = PoleEmploiApproval.LOCKDOWN_START_AT - relativedelta(months=1)
+        now_date = timezone.now().date() - relativedelta(months=1)
         now = timezone.datetime(year=now_date.year, month=now_date.month, day=now_date.day, tzinfo=timezone.utc)
 
         with mock.patch("django.utils.timezone.now", side_effect=lambda: now):

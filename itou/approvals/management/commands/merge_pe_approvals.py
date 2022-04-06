@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
-from psycopg2 import sql  # noqa
 from tqdm import tqdm
 
 from itou.approvals.models import MergedPoleEmploiApproval, PoleEmploiApproval
@@ -30,12 +29,9 @@ class Command(BaseCommand):
             # We need to find the exact duration:
             # - the oldest start date
             # - the most recent end date
-            # - if we have a suspension during covid lockdown, we need to add 3 months
             pe_approval = PoleEmploiApproval()
             pe_approval.start_at = min([a.start_at for a in matching_approvals])
             pe_approval.end_at = max([a.end_at for a in matching_approvals])
-            if pe_approval.overlaps_covid_lockdown:
-                pe_approval.end_at = pe_approval.get_extended_covid_end_at(pe_approval.end_at)
 
             # and we can copy all the other data we have during the SQL insert
             approval = matching_approvals.first()

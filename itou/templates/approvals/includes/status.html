@@ -52,7 +52,7 @@
 
         {# Validity. #}
         <li{% if not approval.is_suspended %} class="text-success"{% endif %}>
-            Valide du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.extended_end_at|date:"d/m/Y" }}
+            Valide du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}
         </li>
 
         {# Delivery date. #}
@@ -119,7 +119,7 @@
 {% elif approval.is_in_waiting_period %}
 
     <p class="text-danger">
-        <b>Expiré</b> le {{ approval.extended_end_at|date:"d/m/Y" }} (depuis {{ approval.extended_end_at|timesince }})
+        <b>Expiré</b> le {{ approval.end_at|date:"d/m/Y" }} (depuis {{ approval.end_at|timesince }})
     </p>
 
     {% if user.is_siae_staff %}
