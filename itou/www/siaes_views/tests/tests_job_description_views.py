@@ -275,6 +275,72 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
         self.assertEqual(opcs.job_description_through.count(), 5)
 
+    def test_empty_session_during_edit(self):
+        # If the session data have been erased during one of the job description
+        # crestion / update tunnel (browser navigation for instance),
+        # then redirect to the first step.
+
+        response = self._login(self.user)
+
+        self.assertEqual(response.status_code, 200)
+
+        # Step 1: edit job description
+        response = self.client.get(self.edit_url)
+
+        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+
+        post_data = {
+            "job_appellation_code": 11076,  # Must be a non existing one for the SIAE
+            "job_appellation": "Whatever",
+            "custom_name": "custom_name",
+            "location_code": "paris-75",
+            "hours_per_week": 35,
+            "contract_type": ContractType.OTHER.value,
+            "other_contract_type": "other_contract_type",
+            "open_positions": 5,
+        }
+        response = self.client.post(self.edit_url, data=post_data)
+
+        self.assertRedirects(response, self.edit_details_url)
+        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+
+        # Remove session data
+        # - do not remove directly from client (i.e self.client.session.pop(...) )
+        # - don't forget to call session.save()
+        session = self.client.session
+        session.pop(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session.save()
+
+        self.assertIsNone(session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY))
+
+        response = self.client.get(self.edit_details_url)
+        self.assertRedirects(response, self.edit_url)
+
+        # Step 1 + 2
+        response = self.client.post(self.edit_url, data=post_data)
+        response = self.client.post(self.edit_details_url, data=post_data)
+        post_data = {
+            "description": "description",
+            "profile_description": "profile_description",
+            "is_resume_mandatory": True,
+            "is_qpv_mandatory": True,
+        }
+
+        response = self.client.post(self.edit_details_url, data=post_data)
+
+        self.assertRedirects(response, self.edit_preview_url)
+        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+
+        # Remove session data
+        session = self.client.session
+        session.pop(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session.save()
+
+        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+
+        response = self.client.get(self.edit_preview_url)
+        self.assertRedirects(response, self.edit_url)
+
 
 class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
     def setUp(self):
