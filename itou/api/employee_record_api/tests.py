@@ -246,7 +246,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
 
 class EmployeeRecordAPIParametersTest(APITestCase):
 
-    # Fixtures and mock will have to be removed after merging
+    # Fixtures and mocks will have to be removed after merging
     # employee record updates PR (simpler and better factories)
 
     fixtures = [
@@ -271,9 +271,14 @@ class EmployeeRecordAPIParametersTest(APITestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        result = response.json()
+        results = response.json()
 
-        self.assertEqual(len(result.get("results")), 1)
+        self.assertEqual(len(results.get("results")), 1)
+        # there is no "direct" way to match an API result to given employee record
+        # (f.i. no pk exported)
+        result = results.get("results")[0]
+
+        self.assertEqual(result.get("personnePhysique", {}).get("passIae"), job_application.approval.number)
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -281,14 +286,14 @@ class EmployeeRecordAPIParametersTest(APITestCase):
     )
     def test_status_array_parameter(self, _mock):
 
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
-        employee_record = EmployeeRecord.from_job_application(JobApplicationWithCompleteJobSeekerProfileFactory())
+        job_application_1 = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application_1)
         employee_record.update_as_ready()
 
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
+        job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(
             to_siae=employee_record.job_application.to_siae
         )
-        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record = EmployeeRecord.from_job_application(job_application_2)
         employee_record.update_as_ready()
         employee_record.update_as_sent("RIAE_FS_20220101000000.json", 1)
 
@@ -298,14 +303,21 @@ class EmployeeRecordAPIParametersTest(APITestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        result = response.json()
+        results = response.json()
 
-        self.assertEqual(len(result.get("results")), 1)
+        self.assertEqual(len(results.get("results")), 1)
 
         response = self.client.get(ENDPOINT_URL + "?status=SENT&status=READY", format="json")
 
         self.assertEqual(response.status_code, 200)
 
-        result = response.json()
+        results = response.json()
 
-        self.assertEqual(len(result.get("results")), 2)
+        self.assertEqual(len(results.get("results")), 2)
+
+        # results are ordered by created_at DESC
+        result_1 = results.get("results")[0]
+        result_2 = results.get("results")[1]
+
+        self.assertEqual(result_1.get("personnePhysique", {}).get("passIae"), job_application_2.approval.number)
+        self.assertEqual(result_2.get("personnePhysique", {}).get("passIae"), job_application_1.approval.number)

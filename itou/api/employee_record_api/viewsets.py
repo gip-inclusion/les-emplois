@@ -67,6 +67,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     Ce paramètre est un tableau permettant de filtrer les fiches retournées par leur statut
 
     Les valeurs possibles pour ce paramètre sont :
+
     - `NEW` : nouvelle fiche en cours de saisie,
     - `READY` : la fiche est prête à être transmise à l'ASP,
     - `SENT` : la fiche a été transmise et est en attente de traitement,
@@ -132,7 +133,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         if status := params.getlist("status", ""):
             status_filter = [s.upper() for s in status]
 
-            return queryset.filter(status__in=status_filter)
+            return queryset.filter(status__in=status_filter).order_by("-created_at")
 
         # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
 
