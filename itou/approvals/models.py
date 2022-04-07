@@ -247,11 +247,8 @@ class Approval(CommonApprovalMixin):
         )
 
     def can_be_suspended_by_siae(self, siae):
-        return (
-            self.can_be_suspended
-            # Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
-            and self.user.last_hire_was_made_by_siae(siae)
-        )
+        # Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
+        return self.can_be_suspended and self.user.last_hire_was_made_by_siae(siae)
 
     @cached_property
     def last_in_progress_suspension(self):

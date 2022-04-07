@@ -563,7 +563,7 @@ class User(AbstractUser, AddressMixin):
         #
         # Some candidates may not have accepted job applications
         # Assuming its the case can lead to issues downstream
-        return self.job_applications.accepted().order_by("created_at", "hiring_start_at").last()
+        return self.job_applications.accepted().order_by("hiring_start_at").last()
 
     @cached_property
     def jobseeker_hash_id(self):
