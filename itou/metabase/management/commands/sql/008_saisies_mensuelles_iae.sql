@@ -41,7 +41,7 @@ salarie as (
         end genre_salarie, 
         (annee_en_cours - salarie.salarie_annee_naissance) as age_salarie,
         case 
-           when (annee_en_cours - salarie.salarie_annee_naissance) <= 25 then 'a- Moins de 25 ans'
+           when (annee_en_cours - salarie.salarie_annee_naissance) <= 25 then 'a- Moins de 26 ans'
            when (annee_en_cours - salarie.salarie_annee_naissance) >= 26 and (annee_en_cours - salarie.salarie_annee_naissance) <= 30  then 'b- Entre 26 ans et 30 ans'
            when (annee_en_cours - salarie.salarie_annee_naissance) >= 31 and (annee_en_cours - salarie.salarie_annee_naissance) <= 50  then 'c- Entre 31 ans et 50 ans'
            when (annee_en_cours - salarie.salarie_annee_naissance) >= 51 then 'd- 51 ans et plus'
