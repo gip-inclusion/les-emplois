@@ -1017,7 +1017,7 @@ class PoleEmploiApprovalManager(models.Manager):
 
 class PoleEmploiApproval(CommonApprovalMixin):
     """
-    Store approvals (`agréments` in French) delivered by Pôle emploi.
+    Store consolidated approvals (`agréments` in French) delivered by Pôle emploi.
 
     Two approval's delivering systems co-exist. Pôle emploi's approvals
     are issued in parallel.
@@ -1029,42 +1029,18 @@ class PoleEmploiApproval(CommonApprovalMixin):
     admin command on a regular basis with data shared by Pôle emploi.
 
     If a valid Pôle emploi's approval is found, it's copied in the `Approval`
-    at the time of issuance.
+    at the time of issuance. See Approval model's code for more information.
     """
 
     # Matches prescriber_organization.code_safir_pole_emploi.
     pe_structure_code = models.CharField("Code structure Pôle emploi", max_length=5)
 
-    # The normal length of a number is 12 chars.
-    # Sometimes the number ends with an extension ('A01', 'E02', 'P03', 'S04' etc.) that
-    # increases the length to 15 chars.
-    # Suffixes meaning in French:
-    class Suffix(models.TextChoices):
-        # `P`: Prolongation = la personne a besoin d'encore quelques mois
-        P = "prolongation", "Prolongation"
-        # `E`: Extension = la personne est passée d'une structure à une autre
-        E = "extension", "Extension"
-        # `A`: Interruption = la personne ne s'est pas présentée
-        A = "interruption", "Interruption"
-        # `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
-        S = "suspension", "Suspension"
-
-    # Parts of an Approval number:
-    #     - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
-    #     - next 2 digits = 2-digit year of delivery
-    #     - next 5 digits = decision number with autonomous increment per PE agency, e.g.: 75631 14 10001
-    #         - decisions are starting with 1
-    #         - decisions starting with 0 are reserved for "Reprise des décisions", e.g.: 75631 14 00001
-    #     - next 3 chars (optional suffix) = status change, e.g.: 75631 14 10001 E01
-    #         - first char = kind of amendment:
-    #             - E for "Extension"
-    #             - S for "Suspension"
-    #             - P for "Prolongation"
-    #             - A for "Interruption"
-    #         - next 2 digits = refer to the act number (e.g. E02 = second extension)
-    # An Approval number is not modifiable, there is a new entry for each new status change.
-    # Suffixes are not taken into account in Itou.
-    number = models.CharField(verbose_name="Numéro", max_length=15, unique=True)
+    # - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
+    # - next 2 digits = 2-digit year of delivery
+    # - next 5 digits = decision number with autonomous increment per PE agency, e.g.: 75631 14 10001
+    #     - decisions are starting with 1
+    #     - decisions starting with 0 are reserved for "Reprise des décisions", e.g.: 75631 14 00001
+    number = models.CharField(verbose_name="Numéro", max_length=12, unique=True)
 
     pole_emploi_id = models.CharField("Identifiant Pôle emploi", max_length=8)
     first_name = models.CharField("Prénom", max_length=150)
@@ -1076,8 +1052,6 @@ class PoleEmploiApproval(CommonApprovalMixin):
     # https://www.net-entreprises.fr/astuces/identification-des-salaries%E2%80%AF-nir-nia-et-ntt/
     # NTT max length = 40 chars, max duration = 3 months
     ntt_nia = models.CharField(verbose_name="NTT ou NIA", max_length=40, null=True, blank=True)
-
-    merged = models.BooleanField(default=False, verbose_name="Agrément fusionné avec les doublons ?")
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 
@@ -1103,29 +1077,57 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
     @property
     def number_with_spaces(self):
-        """
-        Insert spaces to format the number as in the Pôle emploi export file
-        (number is stored without spaces).
-        """
-        if len(self.number) == 15:
-            return f"{self.number[:5]} {self.number[5:7]} {self.number[7:12]} {self.number[12:]}"
-        # 12 chars.
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
 
-class MergedPoleEmploiApproval(CommonApprovalMixin):
+class OriginalPoleEmploiApproval(CommonApprovalMixin):
     """
-    This is a temporary model, bound to replicate the PoleEmploiApproval model, with a twist.
-    It exists to materialize that at some point:
-     - Pole emploi provided us with a large dump of all the "PoleEmploiApproval" that they delivered
-     - in order to simplify, we merged those approvals
+    This table contains the original, "unmerged" PEApprovals: in particular it may have
+    several lines for a single person, one being actually a suspension, others an Approval
+    and some others, a prolongation.
 
-    The **merge_pe_approvals** management command implements the merge behavior we decided
+    The merged PE Approvals that we generated are present in the "PoleEmploiApproval" model and
+    have been merged using a one-time command (merge_pe_approvals) on March 18th, 2022.
+
+    This table is kept for reference and historical reasons. It does not contain any import
+    later than March 18th, 2022; in particular the one that has been done on March 30th 2022
+    only has been made to the PoleEmploiApproval table.
     """
+
+    # The normal length of a number is 12 chars.
+    # Sometimes the number ends with an extension ('A01', 'E02', 'P03', 'S04' etc.) that
+    # increases the length to 15 chars.
+    # Suffixes meaning in French:
+    class Suffix(models.TextChoices):
+        # `P`: Prolongation = la personne a besoin d'encore quelques mois
+        P = "prolongation", "Prolongation"
+        # `E`: Extension = la personne est passée d'une structure à une autre
+        E = "extension", "Extension"
+        # `A`: Interruption = la personne ne s'est pas présentée
+        A = "interruption", "Interruption"
+        # `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
+        S = "suspension", "Suspension"
 
     # All those fields are copied from PoleEmploiApproval
     pe_structure_code = models.CharField("Code structure Pôle emploi", max_length=5)
+
+    # Parts of an "original" PE Approval number:
+    #     - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
+    #     - next 2 digits = 2-digit year of delivery
+    #     - next 5 digits = decision number with autonomous increment per PE agency, e.g.: 75631 14 10001
+    #         - decisions are starting with 1
+    #         - decisions starting with 0 are reserved for "Reprise des décisions", e.g.: 75631 14 00001
+    #     - next 3 chars (optional suffix) = status change, e.g.: 75631 14 10001 E01
+    #         - first char = kind of amendment:
+    #             - E for "Extension"
+    #             - S for "Suspension"
+    #             - P for "Prolongation"
+    #             - A for "Interruption"
+    #         - next 2 digits = refer to the act number (e.g. E02 = second extension)
+    # An Approval number is not modifiable, there is a new entry for each new status change.
+    # Suffixes are not taken into account in Itou.
     number = models.CharField(verbose_name="Numéro", max_length=15, unique=True)
+
     pole_emploi_id = models.CharField("Identifiant Pôle emploi", max_length=8)
     first_name = models.CharField("Prénom", max_length=150)
     last_name = models.CharField("Nom", max_length=150)
@@ -1135,9 +1137,12 @@ class MergedPoleEmploiApproval(CommonApprovalMixin):
     ntt_nia = models.CharField(verbose_name="NTT ou NIA", max_length=40, null=True, blank=True)
 
     class Meta:
+        # the table name is misleading but is called "merged" for historical reasons.
+        # actually, the table contains original, **unmerged** approvals (after tables were swapped
+        # in production on March 18th, 2022)
         db_table = "merged_approvals_poleemploiapproval"
-        verbose_name = "Agrément Pôle emploi fusionnés"
-        verbose_name_plural = "Agréments Pôle emploi fusionnés"
+        verbose_name = "Agrément Pôle emploi original"
+        verbose_name_plural = "Agréments Pôle emploi originaux"
         ordering = ["-start_at"]
         indexes = [models.Index(fields=["pole_emploi_id", "birthdate"], name="merged_pe_id_and_birthdate_idx")]
 

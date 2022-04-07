@@ -339,7 +339,7 @@ class ApprovalModelTest(TestCase):
 
         user = JobSeekerFactory()
         valid_pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, number="625741810182A01"
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, number="625741810182"
         )
         approvals_wrapper = ApprovalsWrapper(user)
 
@@ -488,15 +488,8 @@ class PoleEmploiApprovalModelTest(TestCase):
         self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("N Guessan"), "N GUESSAN")
 
     def test_number_with_spaces(self):
-
-        # 12 chars.
         pole_emploi_approval = PoleEmploiApprovalFactory(number="400121910144")
         expected = "40012 19 10144"
-        self.assertEqual(pole_emploi_approval.number_with_spaces, expected)
-
-        # 15 chars.
-        pole_emploi_approval = PoleEmploiApprovalFactory(number="010331610106A01")
-        expected = "01033 16 10106 A01"
         self.assertEqual(pole_emploi_approval.number_with_spaces, expected)
 
     def test_is_valid(self):
