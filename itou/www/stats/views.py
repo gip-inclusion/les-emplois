@@ -20,7 +20,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
 
-from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, REGIONS
+from itou.common_apps.address.departments import (
+    DEPARTMENT_TO_REGION,
+    DEPARTMENTS,
+    REGIONS,
+    format_region_and_department_for_matomo,
+    format_region_for_matomo,
+)
 from itou.utils.apis.metabase import (
     ASP_SIAE_FILTER_KEY,
     C1_SIAE_FILTER_KEY,
@@ -84,6 +90,7 @@ def stats_siae_etp(request, template_name=_STATS_HTML_TEMPLATE):
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": "Données de ma structure (extranet ASP)",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "matomo_custom_url": f"/stats/siae/etp/{format_region_and_department_for_matomo(current_org.department)}",
     }
     return render(request, template_name, context)
 
@@ -103,6 +110,7 @@ def stats_siae_hiring(request, template_name=_STATS_HTML_TEMPLATE):
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": "Données de recrutement de ma structure (Plateforme de l'inclusion)",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "matomo_custom_url": f"/stats/siae/hiring/{format_region_and_department_for_matomo(current_org.department)}",
     }
     return render(request, template_name, context)
 
@@ -125,6 +133,7 @@ def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "matomo_custom_url": f"/stats/cd/{format_region_and_department_for_matomo(department)}",
     }
     return render(request, template_name, context)
 
@@ -148,6 +157,7 @@ def stats_ddets_iae(request, template_name=_STATS_HTML_TEMPLATE):
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "matomo_custom_url": f"/stats/ddets/iae/{format_region_and_department_for_matomo(department)}",
     }
     return render(request, template_name, context)
 
@@ -173,6 +183,7 @@ def stats_ddets_diagnosis_control(request, template_name=_STATS_HTML_TEMPLATE):
         "stats_base_url": settings.METABASE_SITE_URL,
         "back_url": reverse("siae_evaluations_views:samples_selection"),
         "show_diagnosis_control_message": True,
+        "matomo_custom_url": f"/stats/ddets/diagnosis_control/{format_region_and_department_for_matomo(department)}",
     }
     return render(request, template_name, context)
 
@@ -195,6 +206,7 @@ def stats_ddets_hiring(request, template_name=_STATS_HTML_TEMPLATE):
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": f"Données facilitation de l'embauche de mon département : {DEPARTMENTS[department]}",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "matomo_custom_url": f"/stats/ddets/hiring/{format_region_and_department_for_matomo(department)}",
     }
     return render(request, template_name, context)
 
@@ -219,6 +231,7 @@ def stats_dreets_iae(request, template_name=_STATS_HTML_TEMPLATE):
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "page_title": f"Données de ma région : {region}",
         "stats_base_url": settings.METABASE_SITE_URL,
+        "matomo_custom_url": f"/stats/dreets/iae/{format_region_for_matomo(region)}",
     }
     return render(request, template_name, context)
 
