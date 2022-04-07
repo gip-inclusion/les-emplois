@@ -242,3 +242,70 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
 
         self.assertEqual(results.get("adresse").get("adrTelephone"), self.user.phone)
         self.assertEqual(results.get("adresse").get("adrMail"), self.user.email)
+
+
+class EmployeeRecordAPIParametersTest(APITestCase):
+
+    # Fixtures and mock will have to be removed after merging
+    # employee record updates PR (simpler and better factories)
+
+    fixtures = [
+        "test_asp_INSEE_countries.json",
+        "test_INSEE_communes.json",
+    ]
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_status_parameter(self, _mock):
+
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record.update_as_ready()
+
+        member = employee_record.job_application.to_siae.members.first()
+        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        result = response.json()
+
+        self.assertEqual(len(result.get("results")), 1)
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_status_array_parameter(self, _mock):
+
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(JobApplicationWithCompleteJobSeekerProfileFactory())
+        employee_record.update_as_ready()
+
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
+            to_siae=employee_record.job_application.to_siae
+        )
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record.update_as_ready()
+        employee_record.update_as_sent("RIAE_FS_20220101000000.json", 1)
+
+        member = employee_record.job_application.to_siae.members.first()
+        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+        response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        result = response.json()
+
+        self.assertEqual(len(result.get("results")), 1)
+
+        response = self.client.get(ENDPOINT_URL + "?status=SENT&status=READY", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        result = response.json()
+
+        self.assertEqual(len(result.get("results")), 2)

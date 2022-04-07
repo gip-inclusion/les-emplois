@@ -106,20 +106,16 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
     def _filter_by_query_params(self, request, queryset):
         """
-        Register query parameters result filtering.
-
-        Only using employee record `status` is available for now
+        Register query parameters result filtering:
+        - only using employee record `status` is available for now.
+        - `status` query param can be an array of value.
         """
         params = request.query_params
 
-        if status := params.get("status"):
-            status_filter = {
-                "ready": EmployeeRecord.Status.READY,
-                "sent": EmployeeRecord.Status.SENT,
-                "rejected": EmployeeRecord.Status.REJECTED,
-            }.get(status.lower(), EmployeeRecord.Status.PROCESSED)
+        if status := params.getlist("status", ""):
+            status_filter = [s.upper() for s in status]
 
-            return queryset.filter(status=status_filter)
+            return queryset.filter(status__in=status_filter)
 
         # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
 
