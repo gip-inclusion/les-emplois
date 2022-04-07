@@ -11,6 +11,7 @@ select
     c.délai_de_réponse,
     (current_date - c.date_candidature) as anciennete_candidature,
     (current_date - fdp.date_création) as delai_mise_en_ligne,
+    (date_embauche - date_candidature) as delai_embauche, /* nous donne une date en jours */
     c.délai_prise_en_compte,
     c.département_structure,
     c.id_anonymisé as id_candidature_anonymisé,
@@ -27,6 +28,8 @@ select
     c.type_structure,
     c.état as état_candidature,
     fdp.recrutement_ouvert as recrutement_ouvert_fdp,
+    crdp.grand_domaine,
+	   crdp.domaine_professionnel,
     fdp.code_rome as code_rome_fpd,
     fdp.date_création as date_création_fdp,
     fdp.date_mise_à_jour_metabase,
@@ -42,3 +45,6 @@ inner join
 inner join 
     fiches_de_poste fdp 
     on fdp.id = fdppc.id_fiche_de_poste
+inner join 
+    code_rome_domaine_professionnel as crdp 
+	   on fdp.code_rome = crdp.code_rome 
