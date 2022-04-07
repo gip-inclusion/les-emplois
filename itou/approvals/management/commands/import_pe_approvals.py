@@ -50,6 +50,18 @@ def load_and_sort(file_path):
     return df
 
 
+FIELDS = (
+    "pe_structure_code",
+    "pole_emploi_id",
+    "first_name",
+    "last_name",
+    "birth_name",
+    "birthdate",
+    "start_at",
+    "end_at",
+)
+
+
 class Command(BaseCommand):
     """
     Import Pole emploi's approvals (or `agrément` in French) into the database.
@@ -81,14 +93,15 @@ class Command(BaseCommand):
         count_errors = 0
         count_invalid_agr_dec = 0
         count_canceled_approvals = 0
-        count_success = 0
-        unique_approval_suffixes = {}
+        count_parse_success = 0
+        count_update = 0
+        count_add = 0
+        count_skip = 0
 
         df = load_and_sort(file_path)
         self.stdout.write(f"Ready to import up to length={len(df)} approvals from file={file_path}")
 
-        bulk_create_queue = []
-        for idx, row in df.iterrows():
+        for _, row in df.iterrows():
             CODE_STRUCT_AFFECT_BENE = str(row["CODE_STRUCT_AFFECT_BENE"])
             if len(CODE_STRUCT_AFFECT_BENE) not in [4, 5]:
                 self.stderr.write(f"! wrong CODE_STRUCT_AFFECT_BENE={CODE_STRUCT_AFFECT_BENE}, skipping...")
@@ -128,16 +141,10 @@ class Command(BaseCommand):
                 continue
 
             NUM_AGR_DEC = str(row["NUM_AGR_DEC"]).strip().replace(" ", "")
-            if len(NUM_AGR_DEC) not in [12, 15]:
+            if len(NUM_AGR_DEC) != 12:
                 self.stderr.write(f"! invalid NUM_AGR_DEC={NUM_AGR_DEC} len={len(NUM_AGR_DEC)}, skipping…")
                 count_invalid_agr_dec += 1
                 continue
-
-            # Keep track of unique suffixes added by PE at the end of a 12 chars number
-            # that increases the length to 15 chars.
-            if len(NUM_AGR_DEC) > 12:
-                suffix = NUM_AGR_DEC[12:]
-                unique_approval_suffixes[suffix] = unique_approval_suffixes.get(suffix, 0) + 1
 
             DATE_DEB_AGR_DEC = parse_date(row["DATE_DEB"])
             DATE_FIN_AGR_DEC = parse_date(row["DATE_FIN"])
@@ -162,40 +169,54 @@ class Command(BaseCommand):
                 str_d = f"19{str_d[2:]}"
                 DATE_NAISS_BENE = datetime.datetime.strptime(str_d, "%Y-%m-%d")
 
-            count_success += 1
-            if wet_run:
-                pe_approval = PoleEmploiApproval()
-                pe_approval.pe_structure_code = CODE_STRUCT_AFFECT_BENE
-                pe_approval.pole_emploi_id = ID_REGIONAL_BENE
-                pe_approval.number = NUM_AGR_DEC
-                pe_approval.first_name = PRENOM_BENE
-                pe_approval.last_name = NOM_USAGE_BENE
-                pe_approval.birth_name = NOM_NAISS_BENE
-                pe_approval.birthdate = DATE_NAISS_BENE
-                pe_approval.start_at = DATE_DEB_AGR_DEC
-                pe_approval.end_at = DATE_FIN_AGR_DEC
-                bulk_create_queue.append(pe_approval)
-                if len(bulk_create_queue) > FLUSH_SIZE:
-                    # Setting the ignore_conflicts parameter to True tells the
-                    # database to ignore failure to insert any rows that fail
-                    # constraints such as duplicate unique values.
-                    # This allows us to update the database when a new source
-                    # file is available.
-                    PoleEmploiApproval.objects.bulk_create(bulk_create_queue, ignore_conflicts=True)
-                    bulk_create_queue = []
+            count_parse_success += 1
+            pe_approval = PoleEmploiApproval()
+            pe_approval.pe_structure_code = CODE_STRUCT_AFFECT_BENE
+            pe_approval.pole_emploi_id = ID_REGIONAL_BENE
+            pe_approval.number = NUM_AGR_DEC
+            pe_approval.first_name = PRENOM_BENE
+            pe_approval.last_name = NOM_USAGE_BENE
+            pe_approval.birth_name = NOM_NAISS_BENE
+            pe_approval.birthdate = DATE_NAISS_BENE
+            pe_approval.start_at = DATE_DEB_AGR_DEC
+            pe_approval.end_at = DATE_FIN_AGR_DEC
+            existing_approval = PoleEmploiApproval.objects.filter(number=NUM_AGR_DEC).first()
+            if existing_approval:
+                diffing_fields = [
+                    f for f in FIELDS if getattr(existing_approval, f, None) != getattr(pe_approval, f, None)
+                ]
+                if not diffing_fields:
+                    self.stderr.write("> canceled update for number=%s (no changes), skipping..." % NUM_AGR_DEC)
+                    count_skip += 1
+                else:
+                    self.stdout.write(
+                        "- will update number=%s last_name=%s diff_fields=%s"
+                        % (NUM_AGR_DEC, NOM_USAGE_BENE, diffing_fields)
+                    )
+                    count_update += 1
+            else:
+                self.stdout.write("- will add number=%s last_name=%s" % (NUM_AGR_DEC, NOM_USAGE_BENE))
+                count_add += 1
 
-        # Create any remaining objects.
-        if wet_run and bulk_create_queue:
-            PoleEmploiApproval.objects.bulk_create(bulk_create_queue, ignore_conflicts=True)
+            if wet_run:
+                try:
+                    pe_approval.save()
+                except Exception as exc:
+                    self.stdout.write(">>> FATAL ERROR when saving number=%s exception=%s" % (NUM_AGR_DEC, exc))
 
         count_after = PoleEmploiApproval.objects.count()
 
         self.stdout.write("PEApprovals import summary:")
         self.stdout.write(f"  Number of approvals, before    : {count_before}")
         self.stdout.write(f"  Number of approvals, after     : {count_after}")
-        self.stdout.write(f"  Added approvals                : {count_after - count_before}")
-        self.stdout.write(f"  Sucessfully parsed lines       : {count_success}")
+        self.stdout.write(f"  Actually added approvals       : {count_after - count_before}")
+        self.stdout.write("Parsing:")
+        self.stdout.write(f"  Sucessfully parsed lines       : {count_parse_success}")
         self.stdout.write(f"  Unexpected parsing errors      : {count_errors}")
         self.stdout.write(f"  Invalid approval number errors : {count_invalid_agr_dec}")
         self.stdout.write(f"  Canceled approvals             : {count_canceled_approvals}")
+        self.stdout.write("Detail of expected modifications:")
+        self.stdout.write(f"  Added approvals                : {count_add}")
+        self.stdout.write(f"  Updated approvals              : {count_update}")
+        self.stdout.write(f"  Skipped approvals (no changes) : {count_skip}")
         self.stdout.write("Done.")

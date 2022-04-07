@@ -2,7 +2,7 @@ import datetime
 import io
 
 from django.core import management
-from django.test import TestCase
+from django.test import TransactionTestCase
 
 from itou.approvals.models import PoleEmploiApproval
 
@@ -10,7 +10,7 @@ from itou.approvals.models import PoleEmploiApproval
 TEST_FILE_PATH = "itou/approvals/tests/liste-agrements-22_03-fake.xlsx"
 
 
-class ImportPEApprovalTestCase(TestCase):
+class ImportPEApprovalTestCase(TransactionTestCase):
     def test_command_output(self):
         stdout = io.StringIO()
         stderr = io.StringIO()
@@ -26,14 +26,20 @@ class ImportPEApprovalTestCase(TestCase):
             [
                 "Ready to import up to length=4 approvals from "
                 "file=itou/approvals/tests/liste-agrements-22_03-fake.xlsx\n",
+                "- will add number=666112110666 last_name=SPAGHETTI\n",
                 "PEApprovals import summary:\n",
                 "  Number of approvals, before    : 0\n",
                 "  Number of approvals, after     : 0\n",
-                "  Added approvals                : 0\n",
+                "  Actually added approvals       : 0\n",
+                "Parsing:\n",
                 "  Sucessfully parsed lines       : 1\n",
                 "  Unexpected parsing errors      : 1\n",
                 "  Invalid approval number errors : 1\n",
                 "  Canceled approvals             : 1\n",
+                "Detail of expected modifications:\n",
+                "  Added approvals                : 1\n",
+                "  Updated approvals              : 0\n",
+                "  Skipped approvals (no changes) : 0\n",
                 "Done.\n",
             ],
         )
@@ -50,15 +56,12 @@ class ImportPEApprovalTestCase(TestCase):
         stdout = io.StringIO()
         management.call_command("import_pe_approvals", file_path=TEST_FILE_PATH, wet_run=True, stdout=stdout)
         stdout.seek(0)
-        output = stdout.readlines()[2:5]
-        self.assertEqual(
-            output,
-            [
-                "  Number of approvals, before    : 0\n",
-                "  Number of approvals, after     : 1\n",
-                "  Added approvals                : 1\n",
-            ],
-        )
+        output = stdout.readlines()[3:6]
+        assert output == [
+            "  Number of approvals, before    : 0\n",
+            "  Number of approvals, after     : 1\n",
+            "  Actually added approvals       : 1\n",
+        ]
         approvals = PoleEmploiApproval.objects.all()
         self.assertEqual(len(approvals), 1)
         pe_approval = approvals[0]
@@ -76,14 +79,11 @@ class ImportPEApprovalTestCase(TestCase):
         stdout = io.StringIO()  # clear it
         management.call_command("import_pe_approvals", file_path=TEST_FILE_PATH, wet_run=True, stdout=stdout)
         stdout.seek(0)
-        output = stdout.readlines()[2:5]
-        self.assertEqual(
-            output,
-            [
-                "  Number of approvals, before    : 1\n",
-                "  Number of approvals, after     : 1\n",
-                "  Added approvals                : 0\n",
-            ],
-        )
+        output = stdout.readlines()[4:7]
+        assert output == [
+            "  Number of approvals, before    : 1\n",
+            "  Number of approvals, after     : 1\n",
+            "  Actually added approvals       : 0\n",
+        ]
         approvals = PoleEmploiApproval.objects.all()
         self.assertEqual(len(approvals), 1)
