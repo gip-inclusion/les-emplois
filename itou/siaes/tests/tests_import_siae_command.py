@@ -165,8 +165,9 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
         # an SIAE with 2 inactive members and no auth email does yield a new error
         instance.fatal_errors = 0
+        set_inactive(members[0])
         set_inactive(members[1])
-        siae2.siaemembership_set.set(members)
+        siae2.siaemembership_set.set([members[0], members[1]])
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         self.assertEqual(instance.fatal_errors, 2)
