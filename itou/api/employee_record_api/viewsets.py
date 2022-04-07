@@ -60,6 +60,23 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     - seulement dans un environnement de développement
     - si l'utilisateur connecté est membre d'une ou plusieurs SIAE éligible aux fiches salarié
 
+    # Paramètres
+    Les paramètres suivants sont utilisables en paramètres de requête (query string):
+
+    ## `status` : statut des fiches salarié
+    Ce paramètre est un tableau permettant de filtrer les fiches retournées par leur statut
+
+    Les valeurs possibles pour ce paramètre sont :
+    - `NEW` : nouvelle fiche en cours de saisie,
+    - `READY` : la fiche est prête à être transmise à l'ASP,
+    - `SENT` : la fiche a été transmise et est en attente de traitement,
+    - `PROCESSED` : la fiche a correctement été intégrée par l'ASP,
+    - `REJECTED` : la fiche est retournée en erreur après transmission.
+
+    ### Exemples
+    - ajouter `?status=NEW` à l'URL pour les nouvelles fiches.
+    - ajouter `?status=NEW&status=READY` pour les nouvelles fiches et celles prêtes pour la transmission.
+
     """
 
     # Above doc section is in french for Swagger / OAS auto doc generation
