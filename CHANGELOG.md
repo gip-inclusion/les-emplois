@@ -1,5 +1,34 @@
 # Journal des modifications
 
+## [40] - 2022-04-08
+
+### Ajouté
+- Ajout du premier lot de fonctionnalités concernant le contrôle a posteriori
+- API Fiche de poste: ajout d'un paramètre d'état
+- Stats: ajout de `siae_hiring`, renommage de `stats_siae` en `states_siae_etp`
+- Refonte globale des filtres externes de l'interface (en particulier pour les candidatures)
+
+### Modifié
+- Analyses: mises à jour des exports de saisies mensuelles, sorites, etp par salarié, recrutements et candidatures reçues
+- Stats: amélioration des envois à Matomo
+- Thème: mise à jour du thème ITOU en 0.3.4
+- Technique: Correction d'une régression affectant nos tâches planifiées
+- Technique: Améliorations concernant l'affichage de champs de lieux dans l'administration
+- Technique: refonte des sorties standard dans les commandes Django
+- Technique: modification de la notation des paramètres de l'API Pole Emploi
+- Technique: réparer l'import du fichier des villes
+- Correction de la redirection de l'utilisateur dans les formulaires à plusieurs étapes des fiches de poste
+- Correction d'un problème de concurrence lors de l'attribution de numéros de PASS IAE
+- Modification des termes "DIRECCTE" par "DDETS"
+- Modifications graphiques mineures concernant les badges et les sources de données
+- Amélioration du script de déplacement de SIAE vers une autre
+- Amélioration du script d'import de données d'agréments PE
+- Amélioration notable des performances de l'interface d'administration
+
+### Supprimé
+- Retrait du code associé aux prolongations pour confinement
+
+
 ## [39] - 2022-03-25
 
 ### Ajouté
