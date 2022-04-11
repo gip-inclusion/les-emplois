@@ -16,7 +16,6 @@ class Status(models.TextChoices):
     REJECTED = "REJECTED", "En erreur"
     PROCESSED = "PROCESSED", "Intégrée"
     ARCHIVED = "ARCHIVED", "Archivée"
-    # TODO consistent state
 
 
 class NotificationStatus(models.TextChoices):
@@ -32,7 +31,7 @@ class NotificationType(models.TextChoices):
     """
 
     APPROVAL = "APPROVAL", "Modification du PASS IAE"
-    JOB_SEEKER = "JOB_SEEKER", "Modification de l'employé.e"
+    JOB_SEEKER = "JOB_SEEKER", "Modification de l'employé"
 
 
 class MovementType(models.TextChoices):

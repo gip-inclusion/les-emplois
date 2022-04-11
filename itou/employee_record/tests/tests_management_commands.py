@@ -184,7 +184,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
         "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
-    def test_archive(self, _mock):
+    def test_archive_employee_records(self, _mock):
         """
         Check archiving old processed employee records
         """
