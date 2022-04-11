@@ -28,7 +28,7 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
         messages.success(
             request,
             f"Le pourcentage de sélection pour le contrôle a posteriori "
-            f"a bien été enregitré ({form.cleaned_data['chosen_percent']}%).",
+            f"a bien été enregistré ({form.cleaned_data['chosen_percent']}%).",
         )
         return HttpResponseRedirect(back_url)
 
