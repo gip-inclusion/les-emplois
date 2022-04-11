@@ -9,7 +9,7 @@ from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
-from itou.employee_record.enums import Status
+from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
@@ -147,13 +147,13 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         if not records:
             self.logger.error("Could not get any employee record from file: %s", feedback_file)
 
-            return 1
+            return
 
         # Check for notification records :
         # Notifications are not mixed with employee records
         notification_number = 0
         for record in records:
-            if record.get("typeMouvement") == "M":
+            if record.get("typeMouvement") == MovementType.UPDATE:
                 notification_number += 1
         if notification_number == len(records):
             self.logger.warning("File `%s` is a notification file, passing.", feedback_file)
