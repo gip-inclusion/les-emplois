@@ -11,7 +11,11 @@ with candidats_p as ( /* Ici on sélectionne les colonnes pertinentes à partir 
 	distinct cdd.id_anonymisé as id_candidat_anonymise, 
 	cdd.actif,   
 	cdd.age,    
-	cdd.date_diagnostic, 
+	cdd.date_diagnostic,
+	case /* On soustrait 6 mois à la date de diagnostic pour déterminer s'il est toujours en cours ou pas */
+    	    when date_diagnostic >= CURRENT_DATE - INTERVAL '6 months' then 'Oui' 
+    	    else 'non'
+	end diagnostic_valide,
 	cdd.département as departement_candidat,
 	cdd.nom_département as nom_departement_candidat,
 	cdd.région as region_candidat,
@@ -32,11 +36,12 @@ select /* On selectionne les colonnes finales qui nous intéressent */
     actif,
     age,
     date_diagnostic,
+    diagnostic_valide,
     departement_candidat,
     nom_departement_candidat,
     region_candidat,
     type_auteur_diagnostic,
-    case 
+    case /* Modification des noms pour plus de clarté */
 	when candidats_p.sous_type_auteur_diagnostic = 'Prescripteur AFPA' then 'AFPA - Agence nationale pour la formation professionnelle des adultes'
 	when candidats_p.sous_type_auteur_diagnostic = 'Prescripteur ASE' then 'ASE - Aide sociale à l''enfance'
 	when candidats_p.sous_type_auteur_diagnostic = 'Prescripteur Autre' then 'Autre' 
