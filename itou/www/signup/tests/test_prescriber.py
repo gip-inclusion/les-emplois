@@ -28,7 +28,7 @@ from itou.www.signup.forms import PrescriberChooseKindForm
 class PrescriberSignupTest(TestCase):
     def test_create_user_prescriber_member_of_pole_emploi(self):
         """
-        Test the creation of a user of type prescriber and his joining to a Pole emploi agency.
+        Test the creation of a user of type prescriber and his joining to a Pôle emploi agency.
         """
 
         organization = PrescriberPoleEmploiFactory()
@@ -46,7 +46,22 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 3: fill the user information
+        # Step 3: check email
+        url = reverse("signup:prescriber_check_pe_email")
+        self.assertRedirects(response, url)
+        post_data = {
+            "email": "athos@lestroismousquetaires.com",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["form"].errors.get("email"))
+
+        post_data = {
+            "email": f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
+        }
+        response = self.client.post(url, data=post_data)
+
+        # Step 4: fill the user information
         # Ensures that the parent form's clean() method is called by testing
         # with a password that does not comply with CNIL recommendations.
         url = reverse("signup:prescriber_pole_emploi_user")

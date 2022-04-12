@@ -1,0 +1,35 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block title %}Prescripteur Pôle emploi - Inscription{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1 class="h1-hero-c1">
+        Inscription
+        <small class="text-muted">Prescripteur Pôle emploi</small>
+    </h1>
+
+    <div class="alert alert-emploi">
+        <p class="lead mb-0">
+            Vous allez rejoindre <b>{{ pole_emploi_org.display_name }}</b>
+        </p>
+    </div>
+
+    <form method="post" action="" class="js-prevent-multiple-submit">
+
+        {% csrf_token %}
+
+        {% bootstrap_form form alert_error_type="all" %}
+
+        {% buttons %}
+            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
+                Retour
+            </a>
+            <button type="submit" class="btn btn-primary">Continuer</button>
+        {% endbuttons %}
+
+    </form>
+
+{% endblock %}
