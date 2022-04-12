@@ -9,13 +9,67 @@ from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdat
 from itou.employee_record.serializers import (
     EmployeeRecordUpdateNotificationBatchSerializer,
     EmployeeRecordUpdateNotificationSerializer,
+    _AddressSerializer,
 )
 
 
+class EmployeeRecordAddressSerializerTest(TestCase):
+    def test_hexa_additional_address(self):
+        # If additional address contains special characters
+        # or is more than 32 charactrs long
+        # then resulting additional address becomes `None`
+        employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+        job_seeker = employee_record.job_seeker
+        profile = job_seeker.jobseeker_profile
+        profile.hexa_additional_address = "Bad additional address with %$£"
+
+        serializer = _AddressSerializer(job_seeker)
+        data = serializer.data
+
+        self.assertIsNotNone(data)
+        self.assertIsNone(data["adrCpltDistribution"])
+
+        profile.hexa_additional_address = "Bad additional address because it is really over 32 characters"
+        serializer = _AddressSerializer(job_seeker)
+        data = serializer.data
+
+        self.assertIsNotNone(data)
+        self.assertIsNone(data["adrCpltDistribution"])
+
+        good_address = "Good additional address"
+        profile.hexa_additional_address = good_address
+
+        serializer = _AddressSerializer(job_seeker)
+        data = serializer.data
+
+        self.assertIsNotNone(data)
+        self.assertEqual(good_address, data["adrCpltDistribution"])
+
+    def test_hexa_lane_name(self):
+        # If lane name contains parens,
+        # then remove them from resulting lane name
+        # (better geolocation)
+        employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+        job_seeker = employee_record.job_seeker
+        profile = job_seeker.jobseeker_profile
+        profile.hexa_lane_name = "Lane name (with parens)"
+
+        serializer = _AddressSerializer(job_seeker)
+        data = serializer.data
+
+        self.assertIsNotNone(data)
+        self.assertEqual("Lane name with parens", data["adrLibelleVoie"])
+
+        good_lane_name = "Lane name without parens"
+        profile.hexa_lane_name = good_lane_name
+        serializer = _AddressSerializer(job_seeker)
+        data = serializer.data
+
+        self.assertIsNotNone(data)
+        self.assertEqual(good_lane_name, data["adrLibelleVoie"])
+
+
 class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
-
-    # Fixtures needed for EmployeeRecordWithProfileFactory
-
     def test_notification_serializer(self):
         # High-level : just check basic information
         start_at = timezone.now().date()

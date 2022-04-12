@@ -77,15 +77,17 @@ class _PersonSerializer(serializers.Serializer):
 
 class _AddressSerializer(serializers.Serializer):
 
+    # Source object is a job seeker
+
     adrTelephone = NullField()
     adrMail = NullField()
 
     adrNumeroVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_number")
-    # codeextensionvoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension", allow_blank=True)
     codeextensionvoie = NullIfEmptyCharField(source="jobseeker_profile.hexa_std_extension", allow_blank=True)
     codetypevoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
-    adrLibelleVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_name")
-    adrCpltDistribution = serializers.CharField(source="jobseeker_profile.hexa_additional_address", allow_blank=True)
+
+    adrLibelleVoie = serializers.SerializerMethodField()
+    adrCpltDistribution = serializers.SerializerMethodField()
 
     codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code")
     codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")
@@ -107,7 +109,7 @@ class _AddressSerializer(serializers.Serializer):
     def get_adrLibelleVoie(self, obj: User):
         # Remove diacritics and parenthesis from adrLibelleVoie field fixes ASP error 3330
         # (parenthesis are not described as invalid characters in specification document).
-        lane = obj.jobseeker_profile.hexa_lane_number
+        lane = obj.jobseeker_profile.hexa_lane_name
         if lane:
             return unidecode(lane.translate({ord(ch): "" for ch in "()"}))
         return None
