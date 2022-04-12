@@ -13,7 +13,6 @@ L'objectif est définir une fiche de poste en difficulté de recrutement
 - l’employeur n'a pas refusé des candidatures dans les 30 derniers jours pour le motif “Pas de poste ouvert
 
 */
-
 with fiches_de_poste as (
     select 
         recrutement_ouvert_fdp,
@@ -44,7 +43,6 @@ with fiches_de_poste as (
     left join
         structures s    
         on fdp.id_structure = s.id
-            
     group by 
         recrutement_ouvert_fdp,
         id_fdp,
@@ -70,7 +68,6 @@ id_structures_pas_poste_ouvert as (
     select 
         distinct id_structure,
         motif_de_refus
-
     from 
         candidatures_recues_par_fiche_de_poste fdp
     where 
@@ -78,14 +75,11 @@ id_structures_pas_poste_ouvert as (
         and 
         motif_de_refus = 'Pas de poste ouvert en ce moment'
 ),
-
 /* Nombre de jours nécessaires pour qu'une fiche de poste reçoit une première candidature */
-
 delai_1_ere_candidature as (
     select 
         30 as delai_moyen_crea_1ere_candidature
 ),
-
 /* Identifier les fiches de poste qui ont reçu une candidature ou embauché dans les 30 derniers jours */
 fiches_de_poste_avec_candidature as (  
     select 
@@ -116,7 +110,7 @@ fiches_de_poste_avec_candidature as (
         id_structures_pas_poste_ouvert s
         on tab1.id_structure = s.id_structure
 ),
-etapes_entonnoire as (  
+etapes_entonnoir as (  
     select
         domaine_professionnel,
         grand_domaine,
@@ -154,8 +148,7 @@ etapes_entonnoire as (
                     ( recrutement_ouvert_fdp = 1 
                         and embauche_30_derniers_jours = 0 
                         and structure_pas_poste_ouvert = 0 ) )
-                ) as "nb fdp sans embauche dans les 30 derniers jours et hors motif de refus-Pas de poste ouvert ", 
-                
+                ) as "nb fdp sans embauche dans les 30 derniers jours et hors motif de refus-Pas de poste ouvert ",              
         count(distinct(id_fdp)) 
             filter 
                 (where (
@@ -196,7 +189,7 @@ select
     '1- Fiches de poste' as  etape,
     "nb global fdp"    as  valeur
 from    
-    etapes_entonnoire
+    etapes_entonnoir
 union all
     select
         domaine_professionnel,
@@ -211,7 +204,7 @@ union all
         '2- Fiches de poste actives' as  etape,
         "nb fdp actives" as  valeur
     from   
-            etapes_entonnoire
+        etapes_entonnoir
 union all
     select
         domaine_professionnel,
@@ -226,7 +219,7 @@ union all
         '3- Fiches de poste actives sans recrutement dans les 30 derniers jours' as  etape,
         "nb fdp sans candidatures ou sans embauche dans les 30 derniers jours"   as  valeur
     from   
-        etapes_entonnoire
+        etapes_entonnoir
 union all
     select
         domaine_professionnel,
@@ -241,7 +234,7 @@ union all
         '4- Fiches de poste actives sans recrutement dans les 30 derniers jours et sans motif pas de poste ouvert' as  etape,
         "nb fdp sans embauche dans les 30 derniers jours et hors motif de refus-Pas de poste ouvert"   as  valeur
     from    
-        etapes_entonnoire                          
+        etapes_entonnoir                          
 union all
     select
         domaine_professionnel,
@@ -256,4 +249,4 @@ union all
         '5- Fiches de poste en difficulté de recrutement' as  etape,
         "nb fiches de poste en difficulté de recrutement"    as  valeur
     from    
-        etapes_entonnoire
+        etapes_entonnoir
