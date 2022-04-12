@@ -94,7 +94,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         (employee_record_badges.get(Status.SENT, 0), "warning"),
         (employee_record_badges.get(Status.REJECTED, 0), "danger"),
         (employee_record_badges.get(Status.PROCESSED, 0), "success"),
-        (employee_record_badges.get(Status.DISABLED, 0), "danger"),
+        (employee_record_badges.get(Status.DISABLED, 0), "emploi-lightest"),
     ]
 
     # Override defaut value (NEW status)
@@ -364,4 +364,39 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
         "status": status,
     }
 
+    return render(request, template_name, context)
+
+
+@login_required
+def disable(request, employee_record_id, template_name="employee_record/disable.html"):
+    """
+    Display the form for disable a given employee record
+    """
+    siae = get_current_siae_or_404(request)
+
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
+    query_base = EmployeeRecord.objects.full_fetch()
+    employee_record = get_object_or_404(query_base, pk=employee_record_id)
+    job_application = employee_record.job_application
+
+    if not siae_is_allowed(job_application, siae):
+        raise PermissionDenied
+
+    # TODO: check ER state
+
+    status = request.GET.get("status")
+    list_url = reverse("employee_record_views:list")
+    back_url = f"{ list_url }?status={ status }"
+
+    if request.method == "POST" and request.POST.get("confirm") == "true":
+        employee_record.update_as_disabled()
+        messages.success(request, "La fiche salarié a bien été désactivée.")
+        return HttpResponseRedirect(back_url)
+
+    context = {
+        "employee_record": employee_record,
+        "back_url": back_url,
+    }
     return render(request, template_name, context)
