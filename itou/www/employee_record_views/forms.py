@@ -26,6 +26,7 @@ class SelectEmployeeRecordStatusForm(forms.Form):
         Status.SENT,
         Status.REJECTED,
         Status.PROCESSED,
+        Status.DISABLED,
     ]
 
     STATUS_CHOICES = [(choice.name, choice.label) for choice in STATUSES]
