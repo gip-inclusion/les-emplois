@@ -94,6 +94,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         (employee_record_badges.get(Status.SENT, 0), "warning"),
         (employee_record_badges.get(Status.REJECTED, 0), "danger"),
         (employee_record_badges.get(Status.PROCESSED, 0), "success"),
+        (employee_record_badges.get(Status.DISABLED, 0), "danger"),
     ]
 
     # Override defaut value (NEW status)
@@ -115,6 +116,8 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         data = EmployeeRecord.objects.rejected_for_siae(siae)
     elif status == Status.PROCESSED:
         data = base_query.processed_for_siae(siae)
+    elif status == Status.DISABLED:
+        data = base_query.disabled_for_siae(siae)
 
     if data:
         navigation_pages = pager(data, request.GET.get("page", 1), items_per_page=10)
