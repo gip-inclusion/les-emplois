@@ -6,7 +6,7 @@
 </p>
 
 {% if show_ic_button %}
-    {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
+    {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name login_hint=login_hint %}
 {% endif %}
 
 <p class="text-center font-weight-bold mt-5">

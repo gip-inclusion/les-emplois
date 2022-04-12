@@ -1,6 +1,7 @@
 import dataclasses
 import datetime
 from unittest import mock
+from urllib import parse
 
 import httpx
 import respx
@@ -196,6 +197,12 @@ class InclusionConnectViewTest(TestCase):
         # Don't use assertRedirects to avoid fetching the last URL.
         self.assertTrue(response.url.startswith(INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
 
+    def test_authorize_endpoint_with_params(self):
+        email = parse.quote("porthos@mousquetairestoujours.com")
+        url = reverse("inclusion_connect:authorize") + f"?login_hint={email}"
+        response = self.client.get(url, follow=False)
+        self.assertIn(email, response.url)
+
     # @respx.mock
     # def test_logout(self):
     # Logout user from Inclusion Connect and from Django.
@@ -312,7 +319,7 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         He wants to join a Pôle emploi organization (as first admin).
         """
         pe_org = PrescriberPoleEmploiFactory()
-        email = "maxime@pole-emploi.fr"
+        email = f"maxime{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
 
         # Go through each step to ensure session data is recorded properly.
         # Step 1: choose organization kind or go to the "no organization" page.
@@ -323,6 +330,11 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         response = self.client.get(safir_step_url)
         post_data = {"safir_code": pe_org.code_safir_pole_emploi}
         response = self.client.post(safir_step_url, data=post_data, follow=True)
+
+        # Step 3: check email
+        check_email_url = reverse("signup:prescriber_check_pe_email")
+        post_data = {"email": f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"}
+        response = self.client.post(check_email_url, data=post_data, follow=True)
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
@@ -600,6 +612,49 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         organization_exists = PrescriberOrganization.objects.filter(siret=org.siret).exists()
         self.assertFalse(organization_exists)
         self.assertFalse(user.prescriberorganization_set.exists())
+
+    @respx.mock
+    def test_prescriber_signup__pe_organization_wrong_email(self):
+        """
+        A user creates a prescriber account on Itou with Inclusion Connect.
+        He wants to join a Pôle emploi organization
+        but his e-mail suffix is wrong. An error should be raised.
+        """
+        pe_org = PrescriberPoleEmploiFactory()
+        email = f"maxime{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
+
+        # Go through each step to ensure session data is recorded properly.
+        # Step 1: choose organization kind or go to the "no organization" page.
+        self.client.get(reverse("signup:prescriber_check_already_exists"))
+
+        # Step 2: find PE organization by SAFIR code.
+        safir_step_url = reverse("signup:prescriber_pole_emploi_safir_code")
+        response = self.client.get(safir_step_url)
+        post_data = {"safir_code": pe_org.code_safir_pole_emploi}
+        response = self.client.post(safir_step_url, data=post_data, follow=True)
+
+        # Step 3: check email
+        check_email_url = reverse("signup:prescriber_check_pe_email")
+        post_data = {"email": f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"}
+        response = self.client.post(check_email_url, data=post_data, follow=True)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        # Connect with Inclusion Connect but, this time, don't use a PE email.
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            response = _oauth_dance(self, assert_redirects=False)
+            # Follow the redirection.
+            response = self.client.get(response.url)
+
+        self.assertNotContains(response, reverse("apply:list_for_prescriber"))
+        self.assertContains(response, "inclusion_connect_button.svg")
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertIn("email", str(messages[0]))
+
+        # Organization
+        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY))
+        self.assertFalse(User.objects.filter(email=email).exists())
 
 
 class InclusionConnectLoginTest(TestCase):

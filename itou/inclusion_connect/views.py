@@ -102,6 +102,8 @@ def inclusion_connect_authorize(request):
         "acr_values": "eidas1",
         "from": "emplois",  # Display a "Les emplois" logo on the connection page.
     }
+    if request.GET.get("login_hint"):
+        data["login_hint"] = request.GET.get("login_hint")
     url = INCLUSION_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 

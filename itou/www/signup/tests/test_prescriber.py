@@ -56,16 +56,22 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context["form"].errors.get("email"))
 
+        email = f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
         post_data = {
-            "email": f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
+            "email": email,
         }
         response = self.client.post(url, data=post_data)
+        session_data = self.client.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        self.assertEqual(email, session_data.get("email"))
 
         # Step 4: fill the user information
         # Ensures that the parent form's clean() method is called by testing
         # with a password that does not comply with CNIL recommendations.
         url = reverse("signup:prescriber_pole_emploi_user")
         self.assertRedirects(response, url)
+        response = self.client.get(url)
+        self.assertContains(response, email)
+
         post_data = {
             "first_name": "John",
             "last_name": "Doe",

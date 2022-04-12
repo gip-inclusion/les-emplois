@@ -259,6 +259,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
     # of using a direct link, its state must be kept clean in each step.
     request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {
         "authorization_status": None,
+        "email": None,
         "kind": None,
         "prescriber_org_data": None,
         "pole_emploi_org_pk": None,
@@ -500,13 +501,16 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
 
 
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe_email.html"):
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
     form = forms.PrescriberCheckPEemail(data=request.POST or None)
     if request.method == "POST" and form.is_valid():
+        session_data["email"] = form.cleaned_data["email"]
+        request.session.modified = True
         next_url = reverse("signup:prescriber_pole_emploi_user")
         return HttpResponseRedirect(next_url)
 
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
     kind = session_data.get("kind")
     pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
 
@@ -549,6 +553,7 @@ class PrescriberPoleEmploiUserSignupView(SignupView):
         self.pole_emploi_org = get_object_or_404(
             PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
         )
+        self.email = session_data["email"]
 
         self.next = session_data.get("next")
 
@@ -563,6 +568,7 @@ class PrescriberPoleEmploiUserSignupView(SignupView):
         context = super().get_context_data(**kwargs)
         context["pole_emploi_org"] = self.pole_emploi_org
         context["prev_url"] = get_prev_url_from_history(self.request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        context["email"] = self.email
         return context
 
     def form_valid(self, form):
