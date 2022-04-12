@@ -32,18 +32,16 @@
                                 <p class="text-muted"><b>Par statut</b></p>
                                 <div class="container form-group m-0" id="status-filter-form-group">
                                     {% for status, badge in form.status|zip:badges %}
-                                        {% if badge.0 != 0 %}
-                                            <div class="row">
-                                                <div class="col-10 p-0">
-                                                    {{ status }}
-                                                </div>
-                                                <div class="col-2 p-0 text-right">
-                                                    <p class="small mb-0">
-                                                        <span class="badge badge-{{ badge.1 }}">{{ badge.0 }}</span>
-                                                    </p>
-                                                </div>
+                                        <div class="row">
+                                            <div class="col-10 p-0">
+                                                {{ status }}
                                             </div>
-                                        {% endif %}
+                                            <div class="col-2 p-0 text-right">
+                                                <p class="small mb-0">
+                                                    <span class="badge badge-{{ badge.1 }}">{{ badge.0 }}</span>
+                                                </p>
+                                            </div>
+                                        </div>
                                     {% endfor %}
                                 </div>
                             </div>
@@ -87,6 +85,9 @@
                     {% elif form.status.value == "PROCESSED" %}
                         <p class="mb-0">Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
                         <p class="mb-0">Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter le détail de la fiche salarié.</p>
+                    {% elif form.status.value == "DISABLED" %}
+                        <p class="mb-0">Vous trouverez ici les fiches salarié que vous avez désactivées.</p>
+                        <p class="mb-0">En cas de besoin vous pouvez réactiver une fiche, elle sera transférée dans la catégorie "Nouvelle".</p>
                     {% endif%}
                 </div>
 

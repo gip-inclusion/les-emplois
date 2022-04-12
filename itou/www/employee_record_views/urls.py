@@ -13,4 +13,5 @@ urlpatterns = [
     path("create_step_4/<uuid:job_application_id>", views.create_step_4, name="create_step_4"),
     path("create_step_5/<uuid:job_application_id>", views.create_step_5, name="create_step_5"),
     path("summary/<employee_record_id>", views.summary, name="summary"),
+    path("disable/<employee_record_id>", views.disable, name="disable"),
 ]
