@@ -4,6 +4,7 @@ from django.db.models import DateField
 from django.db.models.functions import Cast
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.throttling import UserRateThrottle
 
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordUpdateNotificationSerializer
@@ -14,6 +15,14 @@ from .serializers import DummyEmployeeRecordSerializer, EmployeeRecordAPISeriali
 
 
 logger = logging.getLogger("api_drf")
+
+
+class EmployeeRecordRateThrottle(UserRateThrottle):
+    # Pulled out for testing
+    EMPLOYEE_RECORD_API_REQUESTS_NUMBER = 10
+
+    # For all employee record API endpoints
+    rate = f"{EMPLOYEE_RECORD_API_REQUESTS_NUMBER}/min"
 
 
 class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
@@ -41,6 +50,9 @@ class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class AbstractEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
+
+    # Every employee record endpoint is now throttled
+    throttle_classes = [EmployeeRecordRateThrottle]
 
     # Possible authentication frameworks:
     # - token auth: for external access / real world use case

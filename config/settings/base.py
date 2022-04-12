@@ -642,6 +642,17 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    # Throttling:
+    # See: https://www.django-rest-framework.org/api-guide/throttling/
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    # Default values: overridden in custom throttling classes
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "10/day",
+        "user": "100/day",
+    },
 }
 
 # DRF Spectacular
