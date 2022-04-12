@@ -356,6 +356,11 @@ class EmployeeRecord(models.Model):
             # Override .save() update of `updated_at` when using bulk updates
             self.updated_at = timezone.now()
 
+    def update_as_disabled(self):
+        self.status = Status.DISABLED
+        self.updated_at = timezone.now()  # TODO: needed ?
+        self.save()
+
     @property
     def is_archived(self):
         """
