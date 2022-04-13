@@ -451,8 +451,30 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
     def clean_email(self):
         email = super().clean_email()
         if not email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
-            raise ValidationError("L'adresse e-mail doit être une adresse Pôle emploi.")
+            raise ValidationError(
+                "L’adresse e-mail que vous avez utilisée n’est pas une adresse e-mail "
+                "en pole-emploi.fr. Veuillez renouveler votre inscription en utilisant "
+                "le bon format d’adresse e-mail."
+            )
         return email
+
+    def validate_unique_email(self, value):
+        """
+        Override default Allauth ValidationError to change its message.
+        See https://github.com/pennersr/django-allauth/blob/master/allauth/account/adapter.py#L309
+        """
+        try:
+            result = super().validate_unique_email(value)
+        except forms.ValidationError as exception:
+            if exception.message == "Un autre utilisateur utilise déjà cette adresse e-mail.":
+                message = (
+                    "Un compte existe déjà avec cette adresse e-mail. "
+                    "Si vous souhaitez créer un compte pour une autre organisation "
+                    "et y être rattaché avec cette adresse e-mail, "
+                    f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>contactez-nous</a>."
+                )
+                raise forms.ValidationError(mark_safe(message))
+        return result
 
     def save(self, request):
         # Avoid django-allauth to call its own often failing `generate_unique_username`
@@ -488,6 +510,24 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
         super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
         self.fields["email"].help_text = "Utilisez une adresse e-mail professionnelle."
+
+    def validate_unique_email(self, value):
+        """
+        Override default Allauth ValidationError to change its message.
+        See https://github.com/pennersr/django-allauth/blob/master/allauth/account/adapter.py#L309
+        """
+        try:
+            result = super().validate_unique_email(value)
+        except forms.ValidationError as exception:
+            if exception.message == "Un autre utilisateur utilise déjà cette adresse e-mail.":
+                message = (
+                    "Un compte existe déjà avec cette adresse e-mail. "
+                    "Si vous souhaitez créer un compte pour une autre organisation "
+                    "et y être rattaché avec cette adresse e-mail, "
+                    f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>contactez-nous</a>."
+                )
+                raise forms.ValidationError(mark_safe(message))
+        return result
 
     def save(self, request):
         # Avoid django-allauth to call its own often failing `generate_unique_username`

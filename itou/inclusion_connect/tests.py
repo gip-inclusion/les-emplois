@@ -533,7 +533,10 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertIn("email", str(messages[0]))
+        error_message = "Un compte existe déjà avec cette adresse e-mail"
+        self.assertIn(error_message, str(messages[0]))
+        self.assertIn(settings.ITOU_ASSISTANCE_URL, str(messages[0]))
+        self.assertNotIn("*", str(messages[0]))
 
         user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
         self.assertNotEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
@@ -596,7 +599,8 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertIn("email", str(messages[0]))
+        error_message = "Un compte existe déjà avec cette adresse e-mail"
+        self.assertIn(error_message, str(messages[0]))
 
         user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
         self.assertNotEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
@@ -641,7 +645,10 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertIn("email", str(messages[0]))
+        self.assertIn(
+            "L’adresse e-mail que vous avez utilisée n’est pas une adresse e-mail en pole-emploi.fr.",
+            str(messages[0]),
+        )
 
         # Organization
         self.assertFalse(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY))

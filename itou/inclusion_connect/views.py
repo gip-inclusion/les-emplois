@@ -202,8 +202,9 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
             if form.is_valid():
                 user = form.save(request=request)
             else:
-                for key, errors in form.errors.items():
-                    messages.error(request, f"{key} : {errors.as_text()}")
+                for _, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, error)
 
                 params = {
                     INCLUSION_CONNECT_SESSION_TOKEN: token_data["id_token"],
