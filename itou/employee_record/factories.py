@@ -3,7 +3,7 @@ import string
 import factory
 
 from itou.employee_record.enums import NotificationStatus, NotificationType
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
@@ -42,6 +42,9 @@ class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
 
 
 class EmployeeRecordUpdateNotificationFactory(factory.django.DjangoModelFactory):
-    employee_record = factory.SubFactory(EmployeeRecordFactory)
+    employee_record = factory.SubFactory(EmployeeRecordWithProfileFactory)
     notification_type = NotificationType.APPROVAL
     status = NotificationStatus.NEW
+
+    class Meta:
+        model = EmployeeRecordUpdateNotification
