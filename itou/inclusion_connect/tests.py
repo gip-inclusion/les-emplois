@@ -10,6 +10,7 @@ from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode
 
 from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberPoleEmploiFactory
 from itou.prescribers.models import PrescriberOrganization
@@ -18,8 +19,11 @@ from ..users.factories import PrescriberFactory, SiaeStaffFactory, UserFactory
 from ..users.models import User
 from .constants import (
     INCLUSION_CONNECT_ENDPOINT_AUTHORIZE,
+    INCLUSION_CONNECT_ENDPOINT_LOGOUT,
     INCLUSION_CONNECT_ENDPOINT_TOKEN,
     INCLUSION_CONNECT_ENDPOINT_USERINFO,
+    INCLUSION_CONNECT_SESSION_STATE,
+    INCLUSION_CONNECT_SESSION_TOKEN,
     INCLUSION_CONNECT_STATE_EXPIRATION,
     PROVIDER_INCLUSION_CONNECT,
 )
@@ -35,8 +39,11 @@ INCLUSION_CONNECT_USERINFO = {
 }
 
 
-@respx.mock
+# Make sure this decorator is before test definition, not here.
+# @respx.mock
 def _oauth_dance(test_class, email=None, assert_redirects=True):
+    # Mock logout page user is redirected to when an error happens..
+    respx.get(INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
     user_info = INCLUSION_CONNECT_USERINFO.copy()
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
@@ -203,29 +210,11 @@ class InclusionConnectViewTest(TestCase):
         response = self.client.get(url, follow=False)
         self.assertIn(email, response.url)
 
-    # @respx.mock
-    # def test_logout(self):
-    # Logout user from Inclusion Connect and from Django.
-    # Test not working. TODO: make it work!
-    # _oauth_dance(self)
-    # respx.post(url=INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
-    # url = reverse("account_logout")
-
-    # response = self.client.post(url, follow=True)
-
-    # self.assertEqual(response.status_code, 200)
-    # self.assertFalse(response.request.user.is_authenticated)
-
-    # def test_logout_no_id_token(self):
-    #     url = reverse("inclusion_connect:logout")
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, 400)
-    #     self.assertEqual(response.json()["message"], "Le paramètre « id_token » est manquant.")
-
     ####################################
     ######### Callback tests ###########
     ####################################
 
+    @respx.mock
     def test_callback_user_created(self):
         ### User does not exist.
         _oauth_dance(self)
@@ -238,6 +227,7 @@ class InclusionConnectViewTest(TestCase):
         # self.assertTrue(user.has_sso_provider)
         # self.assertEqual(user.identiy_provider, users_enums.INCLUSION_CONNECT)
 
+    @respx.mock
     def test_callback_user_no_change(self):
         ### User already exists on Itou with exactly the same data
         # as in Inclusion Connect. No change should have been made.
@@ -255,6 +245,7 @@ class InclusionConnectViewTest(TestCase):
         self.assertEqual(user.last_name, user_info["last_name"])
         self.assertEqual(user.username, user_info["username"])
 
+    @respx.mock
     def test_callback_user_updated(self):
         # User already exists on Itou but some attributes differs.
         # An update should be made.
@@ -534,7 +525,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         # Connect with Inclusion Connect.
         response = _oauth_dance(self, assert_redirects=False)
         # Follow the redirection.
-        response = self.client.get(response.url)
+        response = self.client.get(response.url, follow=True)
 
         # Show an error and don't create an organization.
         self.assertEqual(response.wsgi_request.path, signup_url)
@@ -597,7 +588,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         # Connect with Inclusion Connect.
         response = _oauth_dance(self, assert_redirects=False)
         # Follow the redirection.
-        response = self.client.get(response.url)
+        response = self.client.get(response.url, follow=True)
 
         # Show an error and don't create an organization.
         self.assertEqual(response.wsgi_request.path, signup_url)
@@ -644,7 +635,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
             response = _oauth_dance(self, assert_redirects=False)
             # Follow the redirection.
-            response = self.client.get(response.url)
+            response = self.client.get(response.url, follow=True)
 
         self.assertNotContains(response, reverse("apply:list_for_prescriber"))
         self.assertContains(response, "inclusion_connect_button.svg")
@@ -655,6 +646,40 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         # Organization
         self.assertFalse(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY))
         self.assertFalse(User.objects.filter(email=email).exists())
+
+
+class InclusionConnectLogoutTest(TestCase):
+    @respx.mock
+    def test_simple_logout(self):
+        _oauth_dance(self)
+        params = {
+            INCLUSION_CONNECT_SESSION_TOKEN: self.client.session.get(INCLUSION_CONNECT_SESSION_TOKEN),
+            INCLUSION_CONNECT_SESSION_STATE: self.client.session.get(INCLUSION_CONNECT_SESSION_STATE),
+        }
+        logout_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+
+        response = self.client.get(logout_url)
+        self.assertRedirects(response, reverse("home:hp"))
+
+    @respx.mock
+    def test_logout_with_redirection(self):
+        _oauth_dance(self)
+        expected_redirection = reverse("dashboard:index")
+        params = {
+            INCLUSION_CONNECT_SESSION_TOKEN: self.client.session.get(INCLUSION_CONNECT_SESSION_TOKEN),
+            INCLUSION_CONNECT_SESSION_STATE: self.client.session.get(INCLUSION_CONNECT_SESSION_STATE),
+            "redirect_url": expected_redirection,
+        }
+        logout_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+
+        response = self.client.get(logout_url)
+        self.assertRedirects(response, expected_redirection)
+
+    def test_logout_exception_no_id_token(self):
+        url = reverse("inclusion_connect:logout")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "Le paramètre « id_token » est manquant.")
 
 
 class InclusionConnectLoginTest(TestCase):

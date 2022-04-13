@@ -204,7 +204,14 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
             else:
                 for key, errors in form.errors.items():
                     messages.error(request, f"{key} : {errors.as_text()}")
-                return HttpResponseRedirect(prescriber_session_data["url_history"][-1])
+
+                params = {
+                    INCLUSION_CONNECT_SESSION_TOKEN: token_data["id_token"],
+                    INCLUSION_CONNECT_SESSION_STATE: state,
+                    "redirect_url": prescriber_session_data["url_history"][-1],
+                }
+                next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+                return HttpResponseRedirect(next_url)
         else:
             # Create an "Orienteur" account (ie prescriber without organization).
             user, _ = create_or_update_user(ic_user_data)
@@ -227,14 +234,20 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
 def inclusion_connect_logout(request):
     id_token = request.GET.get(INCLUSION_CONNECT_SESSION_TOKEN)
     state = request.GET.get(INCLUSION_CONNECT_SESSION_STATE)
+    post_logout_redirect_url = request.GET.get("redirect_url", reverse("home:hp"))
+
     if not id_token:
         return JsonResponse({"message": "Le paramètre « id_token » est manquant."}, status=400)
 
     params = {
         "id_token_hint": id_token,
         "state": state,
-        "post_logout_redirect_uri": get_absolute_url(reverse("home:hp")),
     }
     url = INCLUSION_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"
-    return HttpResponseRedirect(complete_url)
+    # Logout user from IC with HTTPX to benefit from respx in tests
+    # and to handle post logout redirection more easily.
+    response = httpx.get(complete_url)
+    if response.status_code != 302:
+        logger.error("Error during IC logout. Status code: %s", response.status_code)
+    return HttpResponseRedirect(post_logout_redirect_url)
