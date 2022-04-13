@@ -249,10 +249,12 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         employee_record = None
 
         try:
-            if not job_application.employee_record.first():
+            if not job_application.employee_record.exclude(status=Status.DISABLED).first():
                 employee_record = EmployeeRecord.from_job_application(job_application)
             else:
-                employee_record = EmployeeRecord.objects.get(job_application=job_application)
+                employee_record = EmployeeRecord.objects.exclude(status=Status.DISABLED).get(
+                    job_application=job_application
+                )
 
             employee_record.save()
 
@@ -291,6 +293,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     step = 4
     employee_record = (
         EmployeeRecord.objects.full_fetch()
+        .exclude(status=Status.DISABLED)
         .select_related("job_application__to_siae__convention")
         .get(job_application=job_application)
     )
@@ -323,10 +326,12 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     step = 5
-    employee_record = get_object_or_404(EmployeeRecord.objects.full_fetch(), job_application=job_application)
+    employee_record = get_object_or_404(
+        EmployeeRecord.objects.full_fetch().exclude(status=Status.DISABLED), job_application=job_application
+    )
 
     if request.method == "POST":
-        if employee_record.status in [Status.NEW, Status.REJECTED]:
+        if employee_record.status in [Status.NEW, Status.REJECTED, Status.DISABLED]:
             employee_record.update_as_ready()
         return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.id,)))
 
@@ -350,7 +355,7 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    query_base = EmployeeRecord.objects.full_fetch()
+    query_base = EmployeeRecord.objects.full_fetch().exclude(status=Status.DISABLED)
     employee_record = get_object_or_404(query_base, pk=employee_record_id)
     job_application = employee_record.job_application
 
@@ -377,7 +382,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    query_base = EmployeeRecord.objects.full_fetch()
+    query_base = EmployeeRecord.objects.full_fetch().exclude(status=Status.DISABLED)
     employee_record = get_object_or_404(query_base, pk=employee_record_id)
     job_application = employee_record.job_application
 

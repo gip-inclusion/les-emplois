@@ -3,7 +3,7 @@ from typing import Optional
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.query import QuerySet
+from django.db.models.query import Q, QuerySet
 from django.utils import timezone
 from rest_framework.authtoken.admin import User
 
@@ -203,7 +203,11 @@ class EmployeeRecord(models.Model):
         verbose_name = "Fiche salarié"
         verbose_name_plural = "Fiches salarié"
         constraints = [
-            models.UniqueConstraint(fields=["asp_id", "approval_number"], name="unique_asp_id_approval_number")
+            models.UniqueConstraint(
+                fields=["asp_id", "approval_number"],
+                name="unique_asp_id_approval_number",
+                condition=~Q(status=Status.DISABLED),
+            )
         ]
         unique_together = ["asp_batch_file", "asp_batch_line_number"]
         ordering = ["-created_at"]
@@ -334,6 +338,13 @@ class EmployeeRecord(models.Model):
         self.archived_json = archive
         self.save()
 
+    def update_as_disabled(self):
+        if self.status not in [Status.REJECTED, Status.PROCESSED]:
+            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+
+        self.status = Status.DISABLED
+        self.save()
+
     def update_as_archived(self, save=True):
         """
         Can only archive employee record if already PROCESSED
@@ -355,11 +366,6 @@ class EmployeeRecord(models.Model):
         else:
             # Override .save() update of `updated_at` when using bulk updates
             self.updated_at = timezone.now()
-
-    def update_as_disabled(self):
-        self.status = Status.DISABLED
-        self.updated_at = timezone.now()  # TODO: needed ?
-        self.save()
 
     @property
     def is_archived(self):
@@ -536,10 +542,14 @@ class EmployeeRecord(models.Model):
         fs.clean()
 
         # Mandatory check, must be done only once
-        if EmployeeRecord.objects.filter(
-            asp_id=job_application.to_siae.convention.asp_id,
-            approval_number=job_application.approval.number,
-        ).exists():
+        if (
+            EmployeeRecord.objects.exclude(status=Status.DISABLED)
+            .filter(
+                asp_id=job_application.to_siae.convention.asp_id,
+                approval_number=job_application.approval.number,
+            )
+            .exists()
+        ):
             raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
         fs.asp_id = job_application.to_siae.convention.asp_id
