@@ -23,6 +23,7 @@ def tunnel_step_is_allowed(job_application):
         Status.NEW,
         Status.READY,
         Status.REJECTED,
+        Status.DISABLED,
     ]
 
 

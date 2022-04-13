@@ -16,6 +16,7 @@ from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
+from itou.employee_record import enums as er_enums
 from itou.job_applications.tasks import huey_notify_pole_employ
 from itou.utils.apis.esd import get_access_token
 from itou.utils.apis.pole_emploi import (
@@ -259,7 +260,7 @@ class JobApplicationQuerySet(models.QuerySet):
 
         These job applications must:
         - be definitely accepted
-        - have no one-to-one relationship with an employee record
+        - have no one-to-one relationship with an employee record (or it is disabled)
         - have been created after production date
 
         An eligible job application *may* or *may not* have an employee record object linked
@@ -270,12 +271,30 @@ class JobApplicationQuerySet(models.QuerySet):
         (employee record object creation occurs half-way of the "tunnel")
         """
 
-        # Exclude existing employee records with same approval and asp_id
+        # Exclude existing employee records with same approval and asp_id and not disabled
         # Rule: you can only create *one* employee record for a given asp_id / approval pair
         subquery = Subquery(
-            self.exclude(to_siae=siae).filter(
+            self.exclude(to_siae=siae)
+            .exclude(employee_record__status=er_enums.Status.DISABLED)
+            .filter(
                 employee_record__asp_id=siae.asp_id,
                 employee_record__approval_number=OuterRef("approval__number"),
+            )
+        )
+
+        # Exclude processed employee record (only disabled ones are not excluded)
+        subquery_in_tunnel = Subquery(
+            self.filter(
+                to_siae=siae,
+                hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+                employee_record__asp_id=siae.asp_id,
+                employee_record__approval_number=OuterRef("approval__number"),
+                employee_record__status__in=[
+                    er_enums.Status.READY,
+                    er_enums.Status.SENT,
+                    er_enums.Status.REJECTED,
+                    er_enums.Status.PROCESSED,
+                ],
             )
         )
 
@@ -289,15 +308,16 @@ class JobApplicationQuerySet(models.QuerySet):
             # Only ACCEPTED job applications can be transformed into employee records
             .accepted()
             # Accept only job applications without linked or processed employee record
-            .filter(Q(employee_record__status="NEW") | Q(employee_record__isnull=True))
+            .filter(Q(employee_record__isnull=True) | ~Q(Exists(subquery_in_tunnel)))
             .filter(
                 # Only for current SIAE
                 to_siae=siae,
                 # Hiring must start after production date:
                 hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
             )
+            .distinct("hiring_start_at", "id")
             .select_related("job_seeker", "approval")
-            .order_by("-hiring_start_at")
+            .order_by("-hiring_start_at", "-id")
         )
 
 
