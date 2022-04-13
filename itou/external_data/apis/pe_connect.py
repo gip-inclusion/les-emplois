@@ -285,9 +285,9 @@ def import_user_pe_data(
             elif status == ExternalDataImport.STATUS_PARTIAL:
                 logger.warning("Could only fetch partial results for %s", user)
             else:
-                logger.error("Could not fetch any data for %s: not data stored", user)
+                logger.warning("Could not fetch any data for %s: not data stored", user)
         except Exception as e:
-            logger.error("Data import for %s failed: %s", user, e)
+            logger.warning("Data import for %s failed: %s", user, e)
             pe_data_import.status = ExternalDataImport.STATUS_FAILED
             pe_data_import.save()
 
