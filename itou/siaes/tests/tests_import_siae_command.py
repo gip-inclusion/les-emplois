@@ -193,3 +193,13 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         self.assertEqual(instance.fatal_errors, 1)
+
+    def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_three(self):
+        """
+        Case three: two active members can both invite people thus no error.
+        """
+        instance = self.get_import_siae_command_instance()
+        SiaeWith2MembershipsFactory(auth_email="")
+        with self.assertNumQueries(1):
+            instance.check_whether_signup_is_possible_for_all_siaes()
+        self.assertEqual(instance.fatal_errors, 0)
