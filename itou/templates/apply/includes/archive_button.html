@@ -1,6 +1,6 @@
-<button data-toggle="modal" data-target="#delete-job-application" class="btn btn-danger btn-block">
-    {% include "includes/icon.html" with icon="trash-2" %}
-    Supprimer cette candidature
+<button data-toggle="modal" data-target="#delete-job-application" class="btn btn-danger btn-block btn-ico">
+    <i class="ri-delete-bin-line ri-lg"></i>
+    <span>Supprimer cette candidature</span>
 </button>
 
 <div
@@ -16,7 +16,7 @@
                 {% csrf_token %}
                 <div class="modal-header">
                     <h3 class="modal-title" id="no-email-modal-label">
-                        {% include "includes/icon.html" with icon="trash-2" %}
+                        <i class="ri-delete-bin-line ri-lg mr-1"></i>
                         Supprimer cette candidature de mon tableau de bord
                     </h3>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">

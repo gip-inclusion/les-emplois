@@ -49,9 +49,9 @@
             <p>
                 Si le candidat n'est pas éligible à l'insertion par l'activité économique, vous pouvez décliner sa candidature :
             </p>
-            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
-                Décliner la candidature
-                {% include "includes/icon.html" with icon="arrow-right" %}
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block btn-ico">
+                <span>Décliner la candidature</span>
+                <i class="ri-arrow-right-line ri-lg"></i>
             </a>
         </div>
 

@@ -30,21 +30,21 @@
 
     {% if user.is_authenticated and prescriber_org.email %}
         <p>
-            {% include "includes/icon.html" with icon="mail" title="E-mail" %}
+            <i class="ri-mail-line mr-1" aria-label="E-mail"></i>
             <a href="mailto:{{ prescriber_org.email }}">{{ prescriber_org.email }}</a>
         </p>
     {% endif %}
 
     {% if user.is_authenticated and prescriber_org.phone %}
         <p>
-            {% include "includes/icon.html" with icon="phone" title="Téléphone" %}
+            <i class="ri-phone-line mr-1" aria-label="Téléphone"></i>
             <a href="tel:{{ prescriber_org.phone }}">{{ prescriber_org.phone|format_phone }}</a>
         </p>
     {% endif %}
 
     {% if prescriber_org.website %}
         <p>
-            {% include "includes/icon.html" with icon="external-link" title="Site Internet" %}
+            <i class="ri-external-link-line mr-1"></i>
             <a href="{{ prescriber_org.website }}" rel="noopener" target="_blank" title="{{ prescriber_org.website }} (ouverture dans un nouvel onglet)">{{ prescriber_org.website }}</a>
         </p>
     {% endif %}

@@ -32,8 +32,7 @@
                             <img src="{% static 'img/no_email.svg' %}" alt="">
                         </div>
                         <div class="col">
-                            <br>
-                            <p>Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net.</p>
+                            <p class="pt-3">Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net.</p>
                             <p>Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici.</p>
                         </div>
                     </div>
@@ -43,13 +42,14 @@
                 <a
                     aria-label="Ouverture dans un nouvel onglet"
                     href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI"
-                    class="btn btn-sm btn-primary matomo-event"
+                    class="btn btn-sm btn-primary btn-ico matomo-event"
                     data-matomo-category="inscription-candidat"
                     data-matomo-action="clic"
                     data-matomo-option="je-n-ai-pas-d-adresse-email"
                     rel="noopener"
                     target="_blank">
-                    Créer une adresse e-mail {% include "includes/icon.html" with icon="external-link" %}
+                    <span>Créer une adresse e-mail</span>
+                    <i class="ri-external-link-line"></i>
                 </a>
             </div>
         </div>
