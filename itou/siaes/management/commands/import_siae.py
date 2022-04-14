@@ -262,9 +262,8 @@ class Command(BaseCommand):
             Siae.objects.filter(
                 auth_email="",
             )
-            .exclude(
-                siaemembership__user__is_active=True,
-                siaemembership__is_active=False,
+            .exclude(  # Exclude siae which have at least one active member.
+                siaemembership__is_active=True,
             )
             .distinct()
         ):
