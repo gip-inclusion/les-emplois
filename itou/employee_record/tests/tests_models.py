@@ -16,7 +16,7 @@ from itou.job_applications.factories import (
     JobApplicationWithJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
 )
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
@@ -265,6 +265,74 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertEqual(self.employee_record.status, Status.PROCESSED)
         self.assertEqual(self.employee_record.asp_processing_code, process_code)
         self.assertEqual(self.employee_record.asp_processing_label, process_message)
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_state_disabled(self, _mock):
+        filename = "RIAE_FS_20210410130001.json"
+
+        self.assertNotIn(
+            self.employee_record.job_application,
+            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
+        )
+
+        # Employee record in READY state can't be disable
+        with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
+            self.employee_record.update_as_disabled()
+        self.assertEqual(self.employee_record.status, Status.READY)
+
+        # Employee record in SENT state can't be disable
+        self.employee_record.update_as_sent(filename, 1)
+        with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
+            self.employee_record.update_as_disabled()
+        self.assertEqual(self.employee_record.status, Status.SENT)
+
+        # Employee record in ACCEPTED state can be disable
+        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_disabled()
+
+        self.assertIn(
+            self.employee_record.job_application,
+            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
+        )
+
+        # Now, can create new employee record on same job_application
+        new_employee_record = EmployeeRecord.from_job_application(self.employee_record.job_application)
+        self.assertEqual(new_employee_record.status, Status.NEW)
+
+        new_employee_record.update_as_ready()
+        self.assertEqual(new_employee_record.status, Status.READY)
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_state_disabled_with_reject(self, _mock):
+        filename = "RIAE_FS_20210410130001.json"
+        self.employee_record.update_as_sent(filename, 1)
+
+        self.assertNotIn(
+            self.employee_record.job_application,
+            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
+        )
+
+        err_code, err_message = "12", "JSON Invalide"
+        self.employee_record.update_as_rejected(err_code, err_message)
+        self.employee_record.update_as_disabled()
+
+        self.assertIn(
+            self.employee_record.job_application,
+            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
+        )
+
+        # Now, can create new employee record on same job_application
+        new_employee_record = EmployeeRecord.from_job_application(self.employee_record.job_application)
+        self.assertEqual(new_employee_record.status, Status.NEW)
+        new_employee_record.update_as_ready()
+        self.assertEqual(new_employee_record.status, Status.READY)
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
