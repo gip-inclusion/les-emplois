@@ -73,7 +73,8 @@
                 </td>
                 <td class="align-middle">
                     <a href="#" role="button" class="js-job-delete">
-                        {% include "includes/icon.html" with icon="trash-2" %}
+                        <i class="ri-delete-bin-line"></i>
+                        <span class="sr-only">Supprimer</span>
                     </a>
                     {# will be enable with JavaScript if user click to delete it #}
                     <input type="hidden" name="code-delete"  value="{{ job.appellation.code }}" disabled>

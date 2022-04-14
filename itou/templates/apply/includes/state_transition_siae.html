@@ -59,17 +59,17 @@
     {% else %}
         <p>
             <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
-                class="btn btn-outline-success btn-block">
-                Je l'embauche
-                {% include "includes/icon.html" with icon="arrow-right" %}
+                class="btn btn-outline-success btn-block btn-ico">
+                <span>Je l'embauche</span>
+                <i class="ri-arrow-right-line ri-lg"></i>
             </a>
         </p>
 
         <p>
             <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
-                class="btn btn-outline-success btn-block">
-                Mettre en liste d'attente
-                {% include "includes/icon.html" with icon="arrow-right" %}
+                class="btn btn-outline-success btn-block btn-ico">
+                <span>Mettre en liste d'attente</span>
+                <i class="ri-arrow-right-line ri-lg"></i>
             </a>
         </p>
 
@@ -77,9 +77,9 @@
 
     <p>
         <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
-            class="btn btn-outline-danger btn-block">
-            Décliner la candidature
-            {% include "includes/icon.html" with icon="arrow-right" %}
+            class="btn btn-outline-danger btn-block btn-ico">
+            <span>Décliner la candidature</span>
+            <i class="ri-arrow-right-line ri-lg"></i>
         </a>
     </p>
 
@@ -98,18 +98,18 @@
     {% else %}
         <p>
             <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
-                class="btn btn-outline-success btn-block">
-                Je l'embauche
-                {% include "includes/icon.html" with icon="arrow-right" %}
+                class="btn btn-outline-success btn-block btn-ico">
+                <span>Je l'embauche</span>
+                <i class="ri-arrow-right-line ri-lg"></i>
             </a>
         </p>
     {% endif %}
 
     <p>
         <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
-            class="btn btn-outline-danger btn-block">
-            Décliner la candidature
-            {% include "includes/icon.html" with icon="arrow-right" %}
+            class="btn btn-outline-danger btn-block btn-ico">
+            <span>Décliner la candidature</span>
+            <i class="ri-arrow-right-line ri-lg"></i>
         </a>
     </p>
 
@@ -129,9 +129,9 @@
     {% else %}
         <p>
             <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
-                class="btn btn-outline-success btn-block">
-                Je l'embauche
-                {% include "includes/icon.html" with icon="arrow-right" %}
+                class="btn btn-outline-success btn-block btn-ico">
+                <span>Je l'embauche</span>
+                <i class="ri-arrow-right-line ri-lg"></i>
             </a>
         </p>
     {% endif %}
@@ -178,9 +178,7 @@
             </p>
         {% endif %}
         <p>
-            <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="text-decoration-none">
-                <button class="btn btn-danger btn-block">Annuler l'embauche</button>
-            </a>
+            <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="btn btn-danger btn-block text-decoration-none">Annuler l'embauche</a>
         </p>
     {% endif %}
 

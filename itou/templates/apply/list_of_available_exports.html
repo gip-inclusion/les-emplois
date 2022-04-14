@@ -35,6 +35,7 @@
                             <td>{{ month.c }}</td>
                             <td>
                                 {% if export_for == "siae" %}
+                                    <i class="ri-download-2-line mr-1"></i>
                                     <a
                                         class="matomo-event text-decoration-none"
                                         data-matomo-category="candidatures"
@@ -42,9 +43,10 @@
                                         data-matomo-option="export-siae"
                                         title="Télécharger cet export SIAE"
                                         href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                        {% include "includes/icon.html" with icon="download" %} Télécharger
+                                        Télécharger
                                     </a>
                                 {% else %}
+                                    <i class="ri-download-2-line mr-1"></i>
                                     <a
                                         class="matomo-event text-decoration-none"
                                         data-matomo-category="candidatures"
@@ -52,7 +54,7 @@
                                         data-matomo-option="export-prescripteur"
                                         title="Télécharger cet export prescriteur"
                                         href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                        {% include "includes/icon.html" with icon="download" %} Télécharger
+                                        Télécharger
                                     </a>
                                 {% endif %}
                             </td>
