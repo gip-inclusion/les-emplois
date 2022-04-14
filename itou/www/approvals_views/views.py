@@ -3,16 +3,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import FileResponse, Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.template.response import SimpleTemplateResponse
 from django.urls import reverse
-from django.utils.text import slugify
 
 from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
-from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import UserExistsForm
@@ -20,18 +17,15 @@ from itou.www.approvals_views.forms import DeclareProlongationForm, PoleEmploiAp
 
 
 @login_required
-def approval_as_pdf(request, job_application_id, template_name="approvals/approval_as_pdf.html"):
-    """
-    Displays the approval in pdf format
-    """
+def display_printable_approval(request, job_application_id, template_name="approvals/printable_approval.html"):
     siae = get_current_siae_or_404(request)
 
     queryset = JobApplication.objects.select_related("job_seeker", "eligibility_diagnosis", "approval", "to_siae")
     job_application = get_object_or_404(queryset, pk=job_application_id, to_siae=siae)
 
-    if not job_application.can_download_approval_as_pdf:
+    if not job_application.can_display_approval:
         # Message only visible in DEBUG
-        raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas télécharger cet agrément.")
+        raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
 
     diagnosis = job_application.get_eligibility_diagnosis()
     diagnosis_author = None
@@ -53,7 +47,7 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
         if not job_application.approval.is_from_ai_stock:
             # Keep track of job applications without a proper eligibility diagnosis because
             # it shouldn't happen.
-            # If this occurs too much we may have to change `can_download_approval_as_pdf()`
+            # If this occurs too much we may have to change `can_display_approval()`
             # and investigate a lot more about what's going on.
             # See also migration `0035_link_diagnoses.py`.
             raise Exception(
@@ -61,31 +55,15 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
                 "had no eligibility diagnosis and also was not mass-imported."
             )
 
-    # The PDFShift API can load styles only if it has the full URL.
-    base_url = request.build_absolute_uri("/")[:-1]
-
-    if settings.DEBUG:
-        # Use staging or production styles when working locally
-        # as PDF shift can't access local files.
-        base_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_STAGING_DN}"
-
     context = {
         "approval": job_application.approval,
-        "base_url": base_url,
-        "assistance_url": settings.ITOU_ASSISTANCE_URL,
+        "itou_assistance_url": settings.ITOU_ASSISTANCE_URL,
         "diagnosis_author": diagnosis_author,
         "diagnosis_author_org_name": diagnosis_author_org_name,
         "siae": job_application.to_siae,
         "job_seeker": job_application.job_seeker,
     }
-
-    html = SimpleTemplateResponse(template=template_name, context=context).rendered_content
-
-    full_name_slug = slugify(job_application.job_seeker.get_full_name())
-    filename = f"{full_name_slug}-pass-iae.pdf"
-
-    with HtmlToPdf(html, autoclose=False) as transformer:
-        return FileResponse(transformer.file, as_attachment=True, filename=filename)
+    return render(request, template_name, context)
 
 
 @login_required

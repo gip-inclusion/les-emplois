@@ -580,7 +580,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return self.logs.select_related("user").filter(to_state=JobApplicationWorkflow.STATE_ACCEPTED).last().user
 
     @property
-    def can_download_approval_as_pdf(self):
+    def can_display_approval(self):
         return self.state.is_accepted and self.to_siae.is_subject_to_eligibility_rules and self.approval
 
     @property

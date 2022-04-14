@@ -104,7 +104,7 @@ class JobApplicationModelTest(TestCase):
         self.assertTrue(job_application.is_sent_by_authorized_prescriber)
 
     @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
-    def test_can_download_approval_as_pdf(self, *args, **kwargs):
+    def test_can_display_approval(self, *args, **kwargs):
         """
         A user can download an approval only when certain conditions
         are met:
@@ -113,7 +113,7 @@ class JobApplicationModelTest(TestCase):
         - the job_application has been accepted.
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertTrue(job_application.can_download_approval_as_pdf)
+        self.assertTrue(job_application.can_display_approval)
 
         # SIAE not subject to eligibility rules.
         not_eligible_kinds = [
@@ -121,28 +121,25 @@ class JobApplicationModelTest(TestCase):
         ]
         not_eligible_siae = SiaeFactory(kind=not_eligible_kinds[0])
         job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
-        self.assertFalse(job_application.can_download_approval_as_pdf)
+        self.assertFalse(job_application.can_display_approval)
 
         # Application is not accepted.
         job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_OBSOLETE)
-        self.assertFalse(job_application.can_download_approval_as_pdf)
+        self.assertFalse(job_application.can_display_approval)
 
         # Application accepted but without approval.
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        self.assertFalse(job_application.can_download_approval_as_pdf)
+        self.assertFalse(job_application.can_display_approval)
 
-    def test_can_download_expired_approval_as_pdf(self, *args, **kwargs):
-        """
-        A user can download an expired approval PDF.
-        """
+    def test_can_download_expired_approval(self, *args, **kwargs):
         # Approval has ended
         start = datetime.date.today() - relativedelta(years=2)
         ended_approval = ApprovalFactory(start_at=start)
 
         # `hiring_start_at` must be set in order to pass the `can_be_cancelled` condition
-        # called by `can_download_approval_as_pdf`.
+        # called by `can_display_approval`.
         job_application = JobApplicationWithApprovalFactory(approval=ended_approval, hiring_start_at=start)
-        self.assertTrue(job_application.can_download_approval_as_pdf)
+        self.assertTrue(job_application.can_display_approval)
 
     def test_can_be_cancelled(self, *args, **kwargs):
         """

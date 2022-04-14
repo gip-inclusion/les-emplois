@@ -90,10 +90,16 @@
                                         Gérer la candidature
                                     </a>
                                 </div>
-                                {% if job_application.can_download_approval_as_pdf %}
+                                {% if job_application.can_display_approval %}
                                     <div class="col-sm-3">
-                                        <a class="btn btn-link text-decoration-none disable-on-click matomo-event hidden" href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" data-matomo-category="agrement" data-matomo-action="telechargement-pdf" data-matomo-option="liste-candidatures">
-                                            Télécharger le PASS IAE
+                                        <a
+                                            class="btn btn-outline-primary matomo-event"
+                                            data-matomo-action="telechargement-pdf"
+                                            data-matomo-category="agrement"
+                                            data-matomo-option="liste-candidatures"
+                                            href="{% url 'approvals:display_printable_approval' job_application_id=job_application.id %}"
+                                            target="_blank">
+                                            Afficher le PASS IAE
                                         </a>
                                     </div>
                                 {% endif %}

@@ -1,4 +1,4 @@
-{% extends "layout/base_pdf.html" %}
+{% extends "layout/base_printable.html" %}
 {% load static %}
 
 {% block title %}
@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid" style="padding: 5rem 6rem;">
+    <div class="container py-4 px-5">
         <div class="row">
             <div class="col-sm-3 offset-sm-3 text-right">
                 <img src="{{ base_url }}{% static 'img/pdf/logoMinTravail.png' %}" class="w-75" alt="Logo du Ministère du travail, de l'emploi et de l'insertion">
@@ -19,12 +19,13 @@
 
         <section class="mt-5">
             <span class="d-block font-weight-bold">Votre contact en direct :</span>
-            <span class="d-block text-decoration">{{ itou_assistance_url }}</span>
+            <a target="_blank" href="{{ itou_assistance_url }}" class="d-block text-decoration">{{ itou_assistance_url }}</a>
         </section>
 
         <section class="mt-5">
             <div class="row">
                 <div class="col-sm-4 offset-sm-8">
+                    <span class="d-block font-weight-bold">Votre structure :</span>
                     <span class="d-block">{{ siae.display_name|title }}</span>
                     {% if siae.address_on_one_line %}
                         <span class="d-block">{{ siae.address_line_1 }}</span>
@@ -85,5 +86,15 @@
                 {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}.
             </p>
         </section>
+
+        <div class="row justify-content-center no-print">
+            <div class="mt-5">
+                <button class="btn btn-primary btn-primary-lg btn-ico" href="#" onclick="window.print();return false;">
+                    <i class="ri-printer-line ri-xl"></i>
+                    <span>Imprimer ce PASS IAE</span>
+                </button>
+            </div>
+        </div>
+
     </div>
 {% endblock %}

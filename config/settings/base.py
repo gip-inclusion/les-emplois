@@ -419,13 +419,6 @@ FRANCE_CONNECT_SESSION_STATE = "FC_STATE"
 PROVIDER_PE_CONNECT = "poleemploi_connect"
 PROVIDER_FRANCE_CONNECT = "franceconnect"
 
-# PDFShift
-# ------------------------------------------------------------------------------
-
-PDFSHIFT_API_BASE_URL = "https://api.pdfshift.io/v3"
-PDFSHIFT_API_KEY = os.environ.get("PDFSHIFT_API_KEY")
-PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
-
 # Typeform
 # ------------------------------------------------------------------------------
 
@@ -476,12 +469,6 @@ ITOU_SESSION_NIR_KEY = "job_seeker_nir"
 ITOU_SESSION_EDIT_SIAE_KEY = "edit_siae_session_key"
 ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 ITOU_SESSION_CURRENT_PAGE_KEY = "current_page"
-
-
-# Some external libraries, as PDF Shift, need access to static files
-# but they can't access them when working locally.
-# Use the staging domain name when this case arises.
-ITOU_STAGING_DN = "staging.emplois.inclusion.beta.gouv.fr"
 
 SHOW_TEST_ACCOUNTS_BANNER = False
 
