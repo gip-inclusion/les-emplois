@@ -123,51 +123,73 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         )
         self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, Siae.KIND_ACI))
 
-    def test_check_signup_possible(self):
-        def set_inactive(membership):
-            """Set the membership inactive in the "has_members" meaning, see organization
-            abstract models for details
-            """
-            user = membership.user
-            user.is_active = False
-            user.save(update_fields=["is_active"])
-            membership.is_active = False
-            membership.save(update_fields=["is_active"])
+    def set_inactive(self, membership):
+        """
+        Helper used to set the membership inactive in the "has_members" meaning,
+        see organization abstract models for details.
+        """
+        user = membership.user
+        user.is_active = False
+        user.save(update_fields=["is_active"])
+        membership.is_active = False
+        membership.save(update_fields=["is_active"])
 
-        # has to be lazy-loaded to benefit from the file mock, this management command does crazy stuff at import
+    def get_import_siae_command_instance(self):
+        # Has to be lazy-loaded to benefit from the file mock, this management command does crazy stuff at import.
         from itou.siaes.management.commands import import_siae
 
         instance = import_siae.Command()
+        # Required otherwise the variable is undefined and throws an exception when incrementend the first time.
         instance.fatal_errors = 0
+        return instance
 
-        # an SIAE with no members but an auth email: no errors
+    def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
+        """
+        There is an auth_email thus regular signup is possible, no error.
+        """
+        instance = self.get_import_siae_command_instance()
         SiaeFactory(auth_email="tadaaa")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         self.assertEqual(instance.fatal_errors, 0)
 
-        # an SIAE with no members and no auth email: 1 error
+    def test_check_signup_possible_for_a_siae_without_members_nor_auth_email(self):
+        """
+        There is no auth_email thus no regular signup,
+        and no member thus no invitation possible.
+        This should throw an error.
+        """
+        instance = self.get_import_siae_command_instance()
         SiaeFactory(auth_email="")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         self.assertEqual(instance.fatal_errors, 1)
 
-        # an SIAE with 2 members, one being active and no auth email does not yield a new error
-        instance.fatal_errors = 0
-        siae2 = SiaeWith2MembershipsFactory(auth_email="")
-        members = siae2.siaemembership_set.all()
-        set_inactive(members[0])  # the other member is still active
-        siae2.siaemembership_set.set(members)
+    def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_one(self):
+        """
+        Case one: one active member and one inactive member.
+        The active member can still invite people thus no error.
+        """
+        instance = self.get_import_siae_command_instance()
+        siae = SiaeWith2MembershipsFactory(auth_email="")
+        members = siae.siaemembership_set.all()
+        self.set_inactive(members[0])  # the other member is still active
+        siae.siaemembership_set.set(members)
 
+        with self.assertNumQueries(1):
+            instance.check_whether_signup_is_possible_for_all_siaes()
+        self.assertEqual(instance.fatal_errors, 0)
+
+    def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_two(self):
+        """
+        Case two: two inactive members, thus no invitation possible, this should throw an error.
+        """
+        instance = self.get_import_siae_command_instance()
+        siae = SiaeWith2MembershipsFactory(auth_email="")
+        members = siae.siaemembership_set.all()
+        self.set_inactive(members[0])
+        self.set_inactive(members[1])
+        siae.siaemembership_set.set([members[0], members[1]])
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         self.assertEqual(instance.fatal_errors, 1)
-
-        # an SIAE with 2 inactive members and no auth email does yield a new error
-        instance.fatal_errors = 0
-        set_inactive(members[0])
-        set_inactive(members[1])
-        siae2.siaemembership_set.set([members[0], members[1]])
-        with self.assertNumQueries(1):
-            instance.check_whether_signup_is_possible_for_all_siaes()
-        self.assertEqual(instance.fatal_errors, 2)
