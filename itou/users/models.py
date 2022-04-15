@@ -305,7 +305,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def has_sso_provider(self):
-        return self.identity_provider == IdentityProvider.FRANCE_CONNECT or self.is_peamu
+        return self.identity_provider != IdentityProvider.DJANGO or self.is_peamu
 
     @property
     def has_verified_email(self):
