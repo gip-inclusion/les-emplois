@@ -12,6 +12,28 @@ from itou.siaes.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2Me
 from itou.siaes.models import Siae
 
 
+def set_inactive(membership):
+    """
+    Helper used to set the membership inactive in the "has_members" meaning,
+    see organization abstract models for details.
+    """
+    user = membership.user
+    user.is_active = False
+    user.save(update_fields=["is_active"])
+    membership.is_active = False
+    membership.save(update_fields=["is_active"])
+
+
+def lazy_import_siae_command():
+    # Has to be lazy-loaded to benefit from the file mock, this management command does crazy stuff at import.
+    from itou.siaes.management.commands import import_siae
+
+    instance = import_siae.Command()
+    # Required otherwise the variable is undefined and throws an exception when incrementend the first time.
+    instance.fatal_errors = 0
+    return instance
+
+
 @unittest.skipUnless(
     os.getenv("CI", "False"), "Slow and scarcely updated management command, no need for constant testing!"
 )
@@ -123,31 +145,11 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         )
         self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, Siae.KIND_ACI))
 
-    def set_inactive(self, membership):
-        """
-        Helper used to set the membership inactive in the "has_members" meaning,
-        see organization abstract models for details.
-        """
-        user = membership.user
-        user.is_active = False
-        user.save(update_fields=["is_active"])
-        membership.is_active = False
-        membership.save(update_fields=["is_active"])
-
-    def get_import_siae_command_instance(self):
-        # Has to be lazy-loaded to benefit from the file mock, this management command does crazy stuff at import.
-        from itou.siaes.management.commands import import_siae
-
-        instance = import_siae.Command()
-        # Required otherwise the variable is undefined and throws an exception when incrementend the first time.
-        instance.fatal_errors = 0
-        return instance
-
     def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
         """
         There is an auth_email thus regular signup is possible, no error.
         """
-        instance = self.get_import_siae_command_instance()
+        instance = lazy_import_siae_command()
         SiaeFactory(auth_email="tadaaa")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
@@ -159,7 +161,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         and no member thus no invitation possible.
         This should throw an error.
         """
-        instance = self.get_import_siae_command_instance()
+        instance = lazy_import_siae_command()
         SiaeFactory(auth_email="")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
@@ -170,10 +172,10 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         Case one: one active member and one inactive member.
         The active member can still invite people thus no error.
         """
-        instance = self.get_import_siae_command_instance()
+        instance = lazy_import_siae_command()
         siae = SiaeWith2MembershipsFactory(auth_email="")
         members = siae.siaemembership_set.all()
-        self.set_inactive(members[0])  # the other member is still active
+        set_inactive(members[0])  # the other member is still active
         siae.siaemembership_set.set(members)
 
         with self.assertNumQueries(1):
@@ -184,11 +186,11 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         """
         Case two: two inactive members, thus no invitation possible, this should throw an error.
         """
-        instance = self.get_import_siae_command_instance()
+        instance = lazy_import_siae_command()
         siae = SiaeWith2MembershipsFactory(auth_email="")
         members = siae.siaemembership_set.all()
-        self.set_inactive(members[0])
-        self.set_inactive(members[1])
+        set_inactive(members[0])
+        set_inactive(members[1])
         siae.siaemembership_set.set([members[0], members[1]])
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
@@ -198,7 +200,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         """
         Case three: two active members can both invite people thus no error.
         """
-        instance = self.get_import_siae_command_instance()
+        instance = lazy_import_siae_command()
         SiaeWith2MembershipsFactory(auth_email="")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
