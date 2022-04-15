@@ -783,16 +783,15 @@ class InclusionConnectLoginTest(TestCase):
         self.assertFalse(auth.get_user(self.client).is_authenticated)
 
         # Try to login with Django.
+        # This is already tested in itou.www.login.tests but only at form level.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         response = self.client.post(reverse("login:prescriber"), data=post_data)
         self.assertEqual(response.status_code, 200)
-        error_message = (
-            "Votre compte est relié à Inclusion Connect. Merci de vous connecter en cliquant sur le bouton ci-dessous."
-        )
+        error_message = "Votre compte est relié à Inclusion Connect."
         self.assertContains(response, error_message)
 
         # Then login with Inclusion Connect.
-        _oauth_dance(self)
+        _oauth_dance(self, assert_redirects=False)
         self.assertTrue(auth.get_user(self.client).is_authenticated)
 
 
@@ -801,10 +800,6 @@ class InclusionConnectUserPermissions(TestCase):
     A user how created his account with IC should not be able
     to perform the same actions as someone who did it with Django auth.
     """
-
-    def test_cannot_login_with_django(self):
-        # If login form: remind that this account is an IC one.
-        pass
 
     def test_cannot_update_password(self):
         # Don't show the form.
