@@ -437,7 +437,48 @@ class PrescriberCheckPEemail(forms.Form):
         return email
 
 
-class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
+class PrescriberUserSignupBaseForm(FullnameFormMixin, forms.Form):
+    """
+    Create a new user of type prescriber and add it to the members of the given prescriber organization.
+    """
+
+    email = forms.EmailField(
+        label="E-mail",
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "autocomplete": "off",
+            }
+        ),
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        user_exists = User.objects.filter(email=email).exists()
+        if user_exists:
+            message = (
+                "Un compte existe déjà avec cette adresse e-mail. "
+                "Si vous souhaitez créer un compte pour une autre organisation "
+                "et y être rattaché avec cette adresse e-mail, "
+                f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>contactez-nous</a>."
+            )
+            raise forms.ValidationError(mark_safe(message))
+        return email
+
+    def save(self, request):
+        user_attributes = {
+            "first_name": self.cleaned_data["first_name"],
+            "last_name": self.cleaned_data["last_name"],
+            "is_prescriber": True,
+            "username": User.generate_unique_username(),
+            "email": self.cleaned_data["email"],
+        }
+        user = User.objects.create_user(**user_attributes)
+        return user
+
+
+class PrescriberPoleEmploiUserSignupForm(PrescriberUserSignupBaseForm):
     """
     Create a new user of type prescriber and add it to the members of the given prescriber organization.
     """
@@ -445,48 +486,20 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
     def __init__(self, *args, **kwargs):
         self.pole_emploi_org = kwargs.pop("pole_emploi_org")
         super().__init__(*args, **kwargs)
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = f"Exemple : nom.prenom{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
 
     def clean_email(self):
-        email = super().clean_email()
+        email = self.cleaned_data["email"]
         if not email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
             raise ValidationError(
                 "L’adresse e-mail que vous avez utilisée n’est pas une adresse e-mail "
                 "en pole-emploi.fr. Veuillez renouveler votre inscription en utilisant "
                 "le bon format d’adresse e-mail."
             )
+        super().clean_email()
         return email
 
-    def validate_unique_email(self, value):
-        """
-        Override default Allauth ValidationError to change its message.
-        See https://github.com/pennersr/django-allauth/blob/master/allauth/account/adapter.py#L309
-        """
-        try:
-            result = super().validate_unique_email(value)
-        except forms.ValidationError as exception:
-            if exception.message == "Un autre utilisateur utilise déjà cette adresse e-mail.":
-                message = (
-                    "Un compte existe déjà avec cette adresse e-mail. "
-                    "Si vous souhaitez créer un compte pour une autre organisation "
-                    "et y être rattaché avec cette adresse e-mail, "
-                    f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>contactez-nous</a>."
-                )
-                raise forms.ValidationError(mark_safe(message))
-        return result
-
     def save(self, request):
-        # Avoid django-allauth to call its own often failing `generate_unique_username`
-        # function by forcing a username.
-        self.cleaned_data["username"] = User.generate_unique_username()
-        # Create the user.
         user = super().save(request)
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
-        user.is_prescriber = True
-        user.save()
-
         # The member becomes a member of the PE agency.
         membership = PrescriberMembership()
         membership.user = user
@@ -498,7 +511,7 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
         return user
 
 
-class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
+class PrescriberUserSignupForm(PrescriberUserSignupBaseForm):
     """
     Create a new user of type prescriber and his organization (if any).
     """
@@ -508,37 +521,9 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
         self.kind = kwargs.pop("kind")
         self.prescriber_org_data = kwargs.pop("prescriber_org_data")
         super().__init__(*args, **kwargs)
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = "Utilisez une adresse e-mail professionnelle."
-
-    def validate_unique_email(self, value):
-        """
-        Override default Allauth ValidationError to change its message.
-        See https://github.com/pennersr/django-allauth/blob/master/allauth/account/adapter.py#L309
-        """
-        try:
-            result = super().validate_unique_email(value)
-        except forms.ValidationError as exception:
-            if exception.message == "Un autre utilisateur utilise déjà cette adresse e-mail.":
-                message = (
-                    "Un compte existe déjà avec cette adresse e-mail. "
-                    "Si vous souhaitez créer un compte pour une autre organisation "
-                    "et y être rattaché avec cette adresse e-mail, "
-                    f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>contactez-nous</a>."
-                )
-                raise forms.ValidationError(mark_safe(message))
-        return result
 
     def save(self, request):
-        # Avoid django-allauth to call its own often failing `generate_unique_username`
-        # function by forcing a username.
-        self.cleaned_data["username"] = User.generate_unique_username()
-        # Create the user.
         user = super().save(request)
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
-        user.is_prescriber = True
-        user.save()
 
         # Create the organization if any: an orienteur may not belong to any organization.
         if self.prescriber_org_data:

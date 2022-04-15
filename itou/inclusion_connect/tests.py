@@ -403,17 +403,6 @@ class InclusionConnectPrescribersViewsTest(TestCase):
             "kind": org.kind,
             "prescriber_org_data": prescriber_org_data,
         }
-        """
-        # authorization_status': 'NOT_SET', 'kind': 'CAP_EMPLOI',
-        'prescriber_org_data': {'siret': '83137196800023', 'is_head_office': True,
-        'name': 'HELLO BIRDS', 'address_line_1': '17 RUE JEAN DE LA FONTAINE',
-        'address_line_2': None, 'post_code': '13150', 'city': 'TARASCON',
-        'department': '13', 'longitude': 4.660572, 'latitude': 43.805661,
-        'geocoding_score': 0.8178357293868921'safir_code': None,
-        'url_history': ['/signup/prescriber/check_already_exists',
-        '/signup/prescriber/choose_org', '/signup/prescriber/user'],
-        'next': None  }, 'pole_emploi_org_pk': None
-        """
         client_session = self.client.session
         client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
         client_session.save()

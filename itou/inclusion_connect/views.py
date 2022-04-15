@@ -1,7 +1,5 @@
 import json
 import logging
-import random
-import string
 from urllib.parse import unquote
 
 import httpx
@@ -17,7 +15,6 @@ from django.utils import crypto
 from django.utils.http import urlencode
 
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.models import User
 from itou.utils.urls import get_absolute_url
 from itou.www.signup.forms import PrescriberPoleEmploiUserSignupForm, PrescriberUserSignupForm
 
@@ -164,23 +161,17 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     # TODO: error if email_verified is False
     ic_user_data = InclusionConnectUserData(**userinfo_to_user_model_dict(user_data))
 
+    # User comes from prescriber signup path.
     # Add user to organization if any.
     prescriber_session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
     if prescriber_session_data:
         # A prescriber is trying to create an account with Inclusion Connect.
         kind = prescriber_session_data.get("kind")
         if kind:
-            # User tries to create an account AND create or join an organization.
-            # TODO: this may fail due to the CNILValidator.
-            # Anyway, this is ugly! Split Signuo forms to avoid creating the user
-            # with allauth's magic.
-            fake_password = User.objects.make_random_password(length=20) + random.choice(string.punctuation)
             form_data = {
                 "email": ic_user_data.email,
                 "first_name": ic_user_data.first_name,
                 "last_name": ic_user_data.last_name,
-                "password1": fake_password,
-                "password2": fake_password,
             }
             if kind == "PE":
                 # User tries to join a Pôle emploi organization.
@@ -199,6 +190,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
                     "prescriber_org_data": prescriber_session_data["prescriber_org_data"],
                 }
                 form = PrescriberUserSignupForm(data=form_data, **form_kwargs)
+
             if form.is_valid():
                 user = form.save(request=request)
             else:

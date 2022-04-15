@@ -47,7 +47,13 @@ def userinfo_to_user_model_dict(userinfo: dict) -> dict:
 
 def create_user_from_ic_user_data(ic_user_data: InclusionConnectUserData):
     ic_user_data_dict = dataclasses.asdict(ic_user_data)  # Working with dicts is more readable.
-    user = User(
+    # User.objects.create_user does the following:
+    # - set User.is_active to true,
+    # - call User.set_unusable_password() if no password is given.
+    # See https://docs.djangoproject.com/fr/4.0/ref/contrib/auth/#django.contrib.auth.models.UserManager.create_user
+    # TODO: do the same for FranceConnect.
+    # TODO: refactor with signup forms.
+    user = User.objects.create_user(
         is_prescriber=True, **ic_user_data_dict
     )  # TODO: make this attribute dynamic to prepare SIAE's staff arrival.
     for key, value in ic_user_data_dict.items():
