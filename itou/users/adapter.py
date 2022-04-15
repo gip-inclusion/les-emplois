@@ -56,8 +56,8 @@ class UserAdapter(DefaultAccountAdapter):
         this method is also invoked if you attempt to log out while no users
         is logged in. Therefore, request.user is not guaranteed to be an
         authenticated user.
+        Tests are in itou.inclusion_connect.tests.
         TODO: do it too for FranceConnect.
-        TODO: add a test.
         """
         # Is user is from SSO, get params from session.
         redirect_url = reverse("home:hp")

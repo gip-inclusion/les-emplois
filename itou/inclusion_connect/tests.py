@@ -6,6 +6,7 @@ from urllib import parse
 import httpx
 import respx
 from django.conf import settings
+from django.contrib import auth
 from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
@@ -15,7 +16,8 @@ from django.utils.http import urlencode
 from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberPoleEmploiFactory
 from itou.prescribers.models import PrescriberOrganization
 
-from ..users.factories import PrescriberFactory, SiaeStaffFactory, UserFactory
+from ..users import enums as users_enums
+from ..users.factories import DEFAULT_PASSWORD, PrescriberFactory, SiaeStaffFactory, UserFactory
 from ..users.models import User
 from .constants import (
     INCLUSION_CONNECT_ENDPOINT_AUTHORIZE,
@@ -62,7 +64,7 @@ def _oauth_dance(test_class, email=None, assert_redirects=True):
     return response
 
 
-def _logout_from_IC(test_class, redirect_url=None):
+def _logout_from_IC(test_class, redirect_url=None, follow=False):
     respx.get(INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
     params = {
         INCLUSION_CONNECT_SESSION_TOKEN: test_class.client.session.get(INCLUSION_CONNECT_SESSION_TOKEN),
@@ -73,7 +75,7 @@ def _logout_from_IC(test_class, redirect_url=None):
 
     logout_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
 
-    return test_class.client.get(logout_url)
+    return test_class.client.get(logout_url, follow=follow)
 
 
 class InclusionConnectModelTest(TestCase):
@@ -237,9 +239,8 @@ class InclusionConnectViewTest(TestCase):
         self.assertEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
         self.assertEqual(user.last_name, INCLUSION_CONNECT_USERINFO["family_name"])
         self.assertEqual(user.username, INCLUSION_CONNECT_USERINFO["sub"])
-        # TODO: later.
-        # self.assertTrue(user.has_sso_provider)
-        # self.assertEqual(user.identiy_provider, users_enums.INCLUSION_CONNECT)
+        self.assertTrue(user.has_sso_provider)
+        self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
 
     @respx.mock
     def test_callback_user_no_change(self):
@@ -258,6 +259,8 @@ class InclusionConnectViewTest(TestCase):
         self.assertEqual(user.first_name, user_info["first_name"])
         self.assertEqual(user.last_name, user_info["last_name"])
         self.assertEqual(user.username, user_info["username"])
+        self.assertTrue(user.has_sso_provider)
+        self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
 
     @respx.mock
     def test_callback_user_updated(self):
@@ -275,9 +278,8 @@ class InclusionConnectViewTest(TestCase):
         self.assertEqual(user.first_name, INCLUSION_CONNECT_USERINFO["given_name"])
         self.assertEqual(user.last_name, INCLUSION_CONNECT_USERINFO["family_name"])
         self.assertEqual(user.username, INCLUSION_CONNECT_USERINFO["sub"])
-        # TODO: later.
-        # self.assertTrue(user.has_sso_provider)
-        # self.assertEqual(user.identiy_provider, users_enums.INCLUSION_CONNECT)
+        self.assertTrue(user.has_sso_provider)
+        self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
 
 
 class InclusionConnectPrescribersViewsTest(TestCase):
@@ -671,6 +673,41 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
 
 class InclusionConnectLogoutTest(TestCase):
     @respx.mock
+    def test_django_account_logout_from_ic(self):
+        """
+        When ac IC wants to log out from his local account,
+        he should be logged out too from IC.
+        """
+        response = _oauth_dance(self)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+        # Follow the redirection.
+        response = self.client.get(response.url)
+        logout_url = reverse("account_logout")
+        self.assertContains(response, logout_url)
+
+        response = self.client.post(logout_url)
+        expected_redirection = reverse("inclusion_connect:logout")
+        # For simplicity, exclude GET params. They are tested elsewhere anyway..
+        self.assertTrue(response.url.startswith(expected_redirection))
+
+        response = self.client.get(response.url)
+        # The following redirection is tested in self.test_logout_with_redirection
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(auth.get_user(self.client).is_authenticated)
+
+    def test_django_account_logout(self):
+        """
+        When a local user wants to log out from his local account,
+        he should be logged out without inclusion connect.
+        """
+        user = PrescriberFactory()
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.post(reverse("account_logout"))
+        expected_redirection = reverse("home:hp")
+        self.assertRedirects(response, expected_redirection)
+        self.assertFalse(auth.get_user(self.client).is_authenticated)
+
+    @respx.mock
     def test_simple_logout(self):
         _oauth_dance(self)
         response = _logout_from_IC(self)
@@ -689,3 +726,89 @@ class InclusionConnectLogoutTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "Le paramètre « id_token » est manquant.")
+
+
+class InclusionConnectLoginTest(TestCase):
+    @respx.mock
+    def test_normal_signin(self):
+        """
+        A user has created an account with Inclusion Connect.
+        He logs out.
+        He can log in again later.
+        """
+        # Create an account with IC.
+        _oauth_dance(self)
+
+        # Then log out.
+        response = self.client.post(reverse("account_logout"))
+
+        # Then log in again.
+        login_url = reverse("login:prescriber")
+        response = self.client.get(login_url)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        response = _oauth_dance(self, assert_redirects=False)
+        expected_redirection = reverse("dashboard:index")
+        self.assertRedirects(response, expected_redirection)
+
+        # Make sure it was a login instead of a new signup.
+        users_count = User.objects.filter(email=INCLUSION_CONNECT_USERINFO["email"]).count()
+        self.assertEqual(users_count, 1)
+
+    @respx.mock
+    def test_old_django_account(self):
+        """
+        A user has a Django account.
+        He clicks on IC button and creates his account.
+        His old Django account should now be considered as an IC one.
+        """
+        user_info = INCLUSION_CONNECT_USERINFO
+        user = PrescriberFactory(**userinfo_to_user_model_dict(user_info), has_completed_welcoming_tour=True)
+
+        # Existing user connects with IC which results in:
+        # - IC side: account creation
+        # - Django side: account update.
+        # This logic is already tested here: InclusionConnectModelTest
+        response = _oauth_dance(self, assert_redirects=False)
+        # This existing user should not see the welcoming tour.
+        expected_redirection = reverse("dashboard:index")
+        self.assertRedirects(response, expected_redirection)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+        # Make sure it was a login instead of a new signup.
+        users_count = User.objects.filter(email=INCLUSION_CONNECT_USERINFO["email"]).count()
+        self.assertEqual(users_count, 1)
+
+        response = self.client.post(reverse("account_logout"))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(auth.get_user(self.client).is_authenticated)
+
+        # Try to login with Django.
+        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
+        response = self.client.post(reverse("login:prescriber"), data=post_data)
+        self.assertEqual(response.status_code, 200)
+        error_message = (
+            "Votre compte est relié à Inclusion Connect. Merci de vous connecter en cliquant sur le bouton ci-dessous."
+        )
+        self.assertContains(response, error_message)
+
+        # Then login with Inclusion Connect.
+        _oauth_dance(self)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+
+
+class InclusionConnectUserPermissions(TestCase):
+    """
+    A user how created his account with IC should not be able
+    to perform the same actions as someone who did it with Django auth.
+    """
+
+    def test_cannot_login_with_django(self):
+        # If login form: remind that this account is an IC one.
+        pass
+
+    def test_cannot_update_password(self):
+        # Don't show the form.
+        # Done in another PR.
+
+        # Don't allow update.
+        pass

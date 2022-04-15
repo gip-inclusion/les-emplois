@@ -3,6 +3,7 @@ import dataclasses
 from django.db import models
 from django.utils import timezone
 
+from itou.users import enums as users_enums
 from itou.users.models import User
 
 from .constants import INCLUSION_CONNECT_STATE_EXPIRATION, PROVIDER_INCLUSION_CONNECT
@@ -28,6 +29,7 @@ class InclusionConnectUserData:  # pylint: disable=too-many-instance-attributes
     first_name: str
     last_name: str
     email: str
+    identity_provider: str = users_enums.IdentityProvider.INCLUSION_CONNECT
 
 
 def userinfo_to_user_model_dict(userinfo: dict) -> dict:
@@ -35,10 +37,10 @@ def userinfo_to_user_model_dict(userinfo: dict) -> dict:
     Map User model attributes to provider's ones (USERINFO endpoint).
     """
     user_model_dict = {
-        "email": userinfo["email"],
+        "username": userinfo["sub"],
         "first_name": userinfo["given_name"],
         "last_name": userinfo["family_name"],
-        "username": userinfo["sub"],
+        "email": userinfo["email"],
     }
     return user_model_dict
 
