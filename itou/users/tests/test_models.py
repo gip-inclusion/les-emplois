@@ -205,6 +205,9 @@ class ModelTest(TestCase):
         job_seeker = JobSeekerFactory.build(identity_provider=IdentityProvider.FRANCE_CONNECT)
         self.assertTrue(job_seeker.has_sso_provider)
 
+        job_seeker = JobSeekerFactory.build(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        self.assertTrue(job_seeker.has_sso_provider)
+
         job_seeker = JobSeekerFactory()
         job_seeker.socialaccount_set.create(provider="peamu")
         self.assertTrue(job_seeker.has_sso_provider)

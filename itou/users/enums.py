@@ -13,3 +13,4 @@ class Title(models.TextChoices):
 class IdentityProvider(models.TextChoices):
     DJANGO = "DJANGO", "Django"
     FRANCE_CONNECT = "FC", "FranceConnect"
+    INCLUSION_CONNECT = "IC", "Inclusion Connect"
