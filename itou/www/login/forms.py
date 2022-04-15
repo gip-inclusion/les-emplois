@@ -10,10 +10,11 @@ class ItouLoginForm(LoginForm):
         self.fields["login"].label = "Adresse e-mail"
 
     def clean(self):
-        # Parent method performs authentication on form success.
+        # Parent method authenticates user on form success.
         super().clean()
         if self.user and self.user.has_sso_provider:
             identity_provider = self.user.get_identity_provider_display()
-            error_message = f"Votre compte est relié à {identity_provider}. Merci de vous connecter avec ce service."
-            raise forms.ValidationError(error_message)
+            error_message = (
+                f"Votre compte est relié à {identity_provider}. " "Merci de vous connecter avec ce service."
+            )
         return self.cleaned_data
