@@ -3,12 +3,14 @@ import uuid
 from unittest import mock
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
 import itou.asp.factories as asp
 from itou.asp.models import AllocationDuration, EmployerType
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.institutions.models import Institution
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
@@ -377,9 +379,10 @@ class ModelTest(TestCase):
 
     def test_can_view_stats_siae(self):
         # An employer can only view stats of their own SIAE.
-        siae1 = SiaeWithMembershipFactory()
+        deployed_department = settings.STATS_SIAE_DEPARTMENT_WHITELIST[0]
+        siae1 = SiaeWithMembershipFactory(department=deployed_department)
         user1 = siae1.members.get()
-        siae2 = SiaeFactory()
+        siae2 = SiaeFactory(department=deployed_department)
 
         self.assertTrue(siae1.has_member(user1))
         self.assertTrue(user1.can_view_stats_siae(current_org=siae1))
@@ -387,9 +390,16 @@ class ModelTest(TestCase):
         self.assertFalse(user1.can_view_stats_siae(current_org=siae2))
 
         # Even non admin members can view their SIAE stats.
-        siae3 = SiaeWithMembershipFactory(membership__is_admin=False)
+        siae3 = SiaeWithMembershipFactory(department=deployed_department, membership__is_admin=False)
         user3 = siae3.members.get()
         self.assertTrue(user3.can_view_stats_siae(current_org=siae3))
+
+        # Non deployed department cannot be accessed.
+        non_deployed_departments = [dpt for dpt in DEPARTMENTS if dpt not in settings.STATS_SIAE_DEPARTMENT_WHITELIST]
+        non_deployed_department = non_deployed_departments[0]
+        siae4 = SiaeWithMembershipFactory(department=non_deployed_department)
+        user4 = siae4.members.get()
+        self.assertFalse(user4.can_view_stats_siae(current_org=siae4))
 
     def test_can_view_stats_cd(self):
         """

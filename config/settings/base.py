@@ -531,11 +531,6 @@ METABASE_INSERT_BATCH_SIZE = 100
 METABASE_SITE_URL = "https://stats.inclusion.beta.gouv.fr"
 METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 
-# Once SIAE stats are released, all SIAE can view their data.
-# Until then, only whitelisted users can view them.
-RELEASE_STATS_SIAE = False
-STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
-
 # Metabase embedded dashboards
 METABASE_DASHBOARD_IDS = {
     # Public stats.
@@ -559,6 +554,11 @@ METABASE_DASHBOARD_IDS = {
     "stats_dgefp_af": 142,
 }
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
+
+# Specific stats are progressively being deployed to more and more departments and specific users.
+STATS_SIAE_DEPARTMENT_WHITELIST = ["38", "62", "67", "93"]
+STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
+STATS_PE_DEPARTMENT_WHITELIST = ["38", "62", "67", "93"]
 
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
 PILOTAGE_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/pilotage"

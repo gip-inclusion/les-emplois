@@ -413,8 +413,7 @@ class User(AbstractUser, AddressMixin):
         return (
             self.can_view_stats_siae(current_org=current_org)
             or self.can_view_stats_cd(current_org=current_org)
-            # FIXME Uncomment once ready for release.
-            # or self.can_view_stats_pe(current_org=current_org)
+            or self.can_view_stats_pe(current_org=current_org)
             or self.can_view_stats_ddets(current_org=current_org)
             or self.can_view_stats_dreets(current_org=current_org)
             or self.can_view_stats_dgefp(current_org=current_org)
@@ -433,7 +432,10 @@ class User(AbstractUser, AddressMixin):
             # Some SIAE don't have a convention (SIAE created by support, GEIQ, EA...).
             and current_org.convention is not None
             # Temporary whitelist system until the feature is released.
-            and (settings.RELEASE_STATS_SIAE or self.pk in settings.STATS_SIAE_USER_PK_WHITELIST)
+            and (
+                current_org.department in settings.STATS_SIAE_DEPARTMENT_WHITELIST
+                or self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
+            )
         )
 
     def can_view_stats_cd(self, current_org):
@@ -475,6 +477,7 @@ class User(AbstractUser, AddressMixin):
             and current_org.kind == current_org.Kind.PE
             and current_org.is_authorized
             and current_org.authorization_status == current_org.AuthorizationStatus.VALIDATED
+            and current_org.department in settings.STATS_PE_DEPARTMENT_WHITELIST
         )
 
     def get_stats_pe_department(self, current_org):

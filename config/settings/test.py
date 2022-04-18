@@ -29,9 +29,6 @@ ITOU_ENVIRONMENT = "TEST"
 ITOU_PROTOCOL = "http"
 ITOU_FQDN = "testserver"
 
-# SIAE stats are always enabled for tests. We do not test the temporary whitelist system.
-RELEASE_STATS_SIAE = True
-
 ASP_FS_KNOWN_HOSTS = None
 
 # Employee record production deployment
