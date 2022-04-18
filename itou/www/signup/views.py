@@ -4,16 +4,17 @@ Handle multiple user types sign up with django-allauth.
 """
 import logging
 
+from allauth.account.adapter import get_adapter
 from allauth.account.views import PasswordResetView, SignupView
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.views.decorators.http import require_GET
 
@@ -369,7 +370,7 @@ def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.h
         else:
             # A pre-existing kind of authorized organization was chosen.
             authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
-            next_url = reverse("signup:prescriber_user")
+            next_url = reverse("signup:prescriber_inclusion_connect_button")
 
         session_data.update(
             {
@@ -409,7 +410,7 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
         next_url = reverse(
             "signup:prescriber_confirm_authorization"
             if prescriber_kind == form.KIND_AUTHORIZED_ORG
-            else "signup:prescriber_user"
+            else "signup:prescriber_inclusion_connect_button"
         )
 
         if prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
@@ -458,7 +459,7 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
             }
         )
         request.session.modified = True
-        next_url = reverse("signup:prescriber_user")
+        next_url = reverse("signup:prescriber_inclusion_connect_button")
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -508,7 +509,7 @@ def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe
     if request.method == "POST" and form.is_valid():
         session_data["email"] = form.cleaned_data["email"]
         request.session.modified = True
-        next_url = reverse("signup:prescriber_pole_emploi_user")
+        next_url = reverse("signup:prescriber_pe_inclusion_connect_button")
         return HttpResponseRedirect(next_url)
 
     kind = session_data.get("kind")
@@ -528,157 +529,147 @@ def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe
     return render(request, template_name, context)
 
 
-class PrescriberPoleEmploiUserSignupView(SignupView):
+@valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+def prescriber_pe_inclusion_connect_button(request, template_name="signup/prescriber_ic_button.html"):
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    kind = session_data.get("kind")
+    pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
+
+    # Check session data.
+    if not pole_emploi_org_pk or kind != PrescriberOrganization.Kind.PE.value:
+        raise PermissionDenied
+
+    pole_emploi_org = get_object_or_404(
+        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
+    )
+
+    context = {
+        "pole_emploi_org": pole_emploi_org,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "email": session_data["email"],
+    }
+    return render(request, template_name, context)
+
+
+@valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+def prescriber_inclusion_connect_button(request, template_name="signup/prescriber_ic_button.html"):
     """
-    Create a user of type prescriber and make him join a pre-existing Pôle emploi organization.
-    TODO: delete this view? No signup outside Inclusion Connect is allowed anymore.
+    Display Inclusion Connect button.
+    This page is also shown if an error is detected during
+    oAuth callback.
+    """
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    authorization_status = session_data.get("authorization_status")
+    prescriber_org_data = session_data.get("prescriber_org_data")
+    kind = session_data.get("kind")
+
+    join_as_orienteur_without_org = kind is None and authorization_status is None and prescriber_org_data is None
+
+    join_as_orienteur_with_org = (
+        authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
+        and kind == PrescriberOrganization.Kind.OTHER.value
+        and prescriber_org_data is not None
+    )
+
+    join_authorized_org = (
+        authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET.value
+        and kind not in [None, PrescriberOrganization.Kind.PE.value]
+        and prescriber_org_data is not None
+    )
+
+    # Check session data. There can be only one kind.
+    if sum([join_as_orienteur_without_org, join_as_orienteur_with_org, join_authorized_org]) != 1:
+        raise PermissionDenied
+
+    if kind not in PrescriberOrganization.Kind.values:
+        kind = None
+
+    try:
+        authorization_status = PrescriberOrganization.AuthorizationStatus[authorization_status]
+    except KeyError:
+        authorization_status = None
+
+    # Get kind label
+    kind_label = dict(PrescriberOrganization.Kind.choices).get(kind)
+
+    context = {
+        "join_as_orienteur_without_org": join_as_orienteur_without_org,
+        "join_authorized_org": join_authorized_org,
+        "kind_label": kind_label,
+        "kind_is_other": kind == PrescriberOrganization.Kind.OTHER.value,
+        "prescriber_org_data": prescriber_org_data,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
+    return render(request, template_name, context)
+
+
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@valid_prescriber_signup_session_required
+@login_required
+def prescriber_join_org(request):
+    """
+    User is redirected here after a successful oauth signup.
+    This is the last step of the signup path.
     """
 
-    form_class = forms.PrescriberPoleEmploiUserSignupForm
-    template_name = "signup/prescriber_pole_emploi_user.html"
+    # Get useful information from session.
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
-    @transaction.atomic
-    @method_decorator(valid_prescriber_signup_session_required)
-    @method_decorator(push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY))
-    def dispatch(self, request, *args, **kwargs):
-
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        kind = session_data.get("kind")
-        pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
-
-        # Check session data.
-        if not pole_emploi_org_pk or kind != PrescriberOrganization.Kind.PE.value:
-            raise PermissionDenied
-
-        self.pole_emploi_org = get_object_or_404(
-            PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
-        )
-        self.email = session_data["email"]
-
-        self.next = session_data.get("next")
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self, **kwargs):
-        kwargs = super().get_form_kwargs(**kwargs)
-        kwargs["pole_emploi_org"] = self.pole_emploi_org
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["pole_emploi_org"] = self.pole_emploi_org
-        context["prev_url"] = get_prev_url_from_history(self.request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-        context["email"] = self.email
-        return context
-
-    def form_valid(self, form):
-        # Drop the signup session.
-        del self.request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        # A ?next=URL param takes precedence.
-        if self.next:
-            return self.next
-        return super().get_success_url()
-
-
-class PrescriberUserSignupView(SignupView):
-    """
-    Create a new user of kind prescriber:
-
-    - member of a new authorized organization ("prescripteur habilité")
-    - or member of a new unauthorized organization ("orienteur")
-    - or without any organization ("orienteur")
-
-    The "authorized" character of a new organization is still to be validated by the support.
-    TODO: delete these views? No signup is allowed outside Inclusion Connect anymore.
-    """
-
-    form_class = forms.PrescriberUserSignupForm
-    template_name = "signup/prescriber_signup.html"
-
-    @transaction.atomic
-    @method_decorator(valid_prescriber_signup_session_required)
-    @method_decorator(push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY))
-    def dispatch(self, request, *args, **kwargs):
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        authorization_status = session_data.get("authorization_status")
-        prescriber_org_data = session_data.get("prescriber_org_data")
-        kind = session_data.get("kind")
-
-        join_as_orienteur_without_org = kind is None and authorization_status is None and prescriber_org_data is None
-
-        join_as_orienteur_with_org = (
-            authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
-            and kind == PrescriberOrganization.Kind.OTHER.value
-            and prescriber_org_data is not None
-        )
-
-        join_authorized_org = (
-            authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET.value
-            and kind not in [None, PrescriberOrganization.Kind.PE.value]
-            and prescriber_org_data is not None
-        )
-
-        # Check session data. There can be only one kind.
-        if sum([join_as_orienteur_without_org, join_as_orienteur_with_org, join_authorized_org]) != 1:
-            raise PermissionDenied
-
-        if kind not in PrescriberOrganization.Kind.values:
-            kind = None
-
-        try:
-            authorization_status = PrescriberOrganization.AuthorizationStatus[authorization_status]
-        except KeyError:
-            authorization_status = None
-
-        self.authorization_status = authorization_status
-        self.kind = kind
-        # Get kind label
-        self.kind_label = dict(PrescriberOrganization.Kind.choices).get(kind)
-        self.prescriber_org_data = prescriber_org_data
-        self.join_as_orienteur_without_org = join_as_orienteur_without_org
-        self.join_authorized_org = join_authorized_org
-        self.next = session_data.get("next")
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self, **kwargs):
-        kwargs = super().get_form_kwargs(**kwargs)
-        kwargs.update(
-            {
-                "authorization_status": self.authorization_status,
-                "kind": self.kind,
-                "prescriber_org_data": self.prescriber_org_data,
+    with transaction.atomic():
+        if session_data["kind"] == "PE":
+            # Organization creation is not allowed for PE.
+            pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
+            prescriber_org = get_object_or_404(
+                PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
+            )
+        else:
+            org_attributes = {
+                "siret": session_data["prescriber_org_data"]["siret"],
+                "name": session_data["prescriber_org_data"]["name"],
+                "address_line_1": session_data["prescriber_org_data"]["address_line_1"] or "",
+                "address_line_2": session_data["prescriber_org_data"]["address_line_2"] or "",
+                "post_code": session_data["prescriber_org_data"]["post_code"],
+                "city": session_data["prescriber_org_data"]["city"],
+                "department": session_data["prescriber_org_data"]["department"],
+                "coords": lat_lon_to_coords(
+                    session_data["prescriber_org_data"]["latitude"], session_data["prescriber_org_data"]["longitude"]
+                ),
+                "geocoding_score": session_data["prescriber_org_data"]["geocoding_score"],
+                "kind": session_data["kind"],
+                "authorization_status": session_data["authorization_status"],
+                "created_by": request.user,
             }
-        )
-        return kwargs
+            prescriber_org = PrescriberOrganization.objects.create_organization(attributes=org_attributes)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "join_as_orienteur_without_org": self.join_as_orienteur_without_org,
-                "join_authorized_org": self.join_authorized_org,
-                "kind_label": self.kind_label,
-                "kind_is_other": self.kind == PrescriberOrganization.Kind.OTHER.value,
-                "prescriber_org_data": self.prescriber_org_data,
-                "prev_url": get_prev_url_from_history(self.request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
-            }
-        )
-        return context
+        prescriber_org.add_member(user=request.user)
+    ###
+    # TODO: handle exceptions
+    # ic_session_data = {
+    #     "token": request.session["IC_ID_TOKEN"],
+    #     "state": request.session["IC_STATE"]
+    # }
+    # if form.is_valid():
+    #     user = form.save()
+    # else:
+    #     for _, errors in form.errors.items():
+    #         for error in errors:
+    #             messages.error(request, error)
 
-    def form_valid(self, form):
-        # Drop the signup session.
-        del self.request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        # A ?next=URL param takes precedence.
-        if self.next:
-            return self.next
-        return super().get_success_url()
+    #     params = {
+    #         "token": ic_session_data["token"],
+    #         "state": ic_session_data["state"],
+    #         "redirect_url": session_data["url_history"][-1],
+    #     }
+    #     next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+    #     return HttpResponseRedirect(next_url)
+    # redirect to post login page.
+    next_url = get_adapter(request).get_login_redirect_url(request)
+    # delete session data
+    request.session.pop(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+    request.session.modified = True
+    return HttpResponseRedirect(next_url)
 
 
 def facilitator_search(request, template_name="signup/facilitator_search.html"):

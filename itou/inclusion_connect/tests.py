@@ -298,7 +298,7 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
         # Step 2: register as a simple prescriber (orienteur).
-        response = self.client.get(reverse("signup:prescriber_user"))
+        response = self.client.get(reverse("signup:prescriber_inclusion_connect_button"))
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
@@ -354,7 +354,7 @@ class InclusionConnectPrescribersViewsTest(TestCase):
             "email": email,
         }
         response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("signup:prescriber_pole_emploi_user"))
+        self.assertRedirects(response, reverse("signup:prescriber_pe_inclusion_connect_button"))
         session_data = self.client.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         self.assertEqual(email, session_data.get("email"))
 
@@ -367,7 +367,7 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
             response = _oauth_dance(self, email=email, assert_redirects=False)
             # Follow the redirection.
-            response = self.client.get(response.url)
+            response = self.client.get(response.url, follow=True)
 
         # Response should contain links available only to prescribers.
         self.assertContains(response, reverse("apply:list_for_prescriber"))
@@ -439,7 +439,7 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
         client_session.save()
 
-        response = self.client.get(reverse("signup:prescriber_user"))
+        response = self.client.get(reverse("signup:prescriber_inclusion_connect_button"))
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
@@ -448,7 +448,7 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
             response = _oauth_dance(self, assert_redirects=False)
             # Follow the redirection.
-            response = self.client.get(response.url)
+            response = self.client.get(response.url, follow=True)
 
         # Response should contain links available only to prescribers.
         self.assertContains(response, reverse("apply:list_for_prescriber"))
@@ -477,6 +477,9 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         self.assertEqual(user.prescribermembership_set.first().organization_id, org.pk)
         self.assertEqual(user.siae_set.count(), 0)
 
+        # Session data
+        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY))
+
 
 class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
     """
@@ -488,13 +491,14 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         """
         He does not want to join an organization, only create an account.
         He likely forgot he had an account.
+        He should log in.
         """
         #### User is a prescriber. Update it and connect. ####
         PrescriberFactory(email=INCLUSION_CONNECT_USERINFO["email"])
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
         # Step 2: register as a simple prescriber (orienteur).
-        response = self.client.get(reverse("signup:prescriber_user"))
+        response = self.client.get(reverse("signup:prescriber_inclusion_connect_button"))
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
@@ -503,13 +507,14 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
             response = _oauth_dance(self, assert_redirects=False)
             # Follow the redirection.
-            response = self.client.get(response.url)
+            response = self.client.get(response.url, follow=True)
 
         # Response should contain links available only to prescribers.
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        self.assertNotContains(response, reverse("apply:list_for_prescriber"))
+        self.assertContains(response, "Un compte existe déjà avec cette adresse e-mail.")
 
-        User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
-        # self.assertTrue(user.has_sso_provider)
+        user = User.objects.get(email=INCLUSION_CONNECT_USERINFO["email"])
+        self.assertFalse(user.has_sso_provider)
 
     @respx.mock
     def test_prescriber_already_exists__create_organization(self):
@@ -554,7 +559,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         client_session = self.client.session
         client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
         client_session.save()
-        signup_url = reverse("signup:prescriber_user")
+        signup_url = reverse("signup:prescriber_inclusion_connect_button")
 
         response = self.client.get(signup_url)
         self.assertContains(response, "inclusion_connect_button.svg")
@@ -620,7 +625,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         client_session = self.client.session
         client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
         client_session.save()
-        signup_url = reverse("signup:prescriber_user")
+        signup_url = reverse("signup:prescriber_inclusion_connect_button")
 
         response = self.client.get(signup_url)
         self.assertContains(response, "inclusion_connect_button.svg")

@@ -65,13 +65,18 @@ urlpatterns = [
     ),
     path(
         "prescriber/pole_emploi/user",
-        views.PrescriberPoleEmploiUserSignupView.as_view(),
-        name="prescriber_pole_emploi_user",
+        views.prescriber_pe_inclusion_connect_button,
+        name="prescriber_pe_inclusion_connect_button",
     ),
     path(
         "prescriber/user",
-        views.PrescriberUserSignupView.as_view(),
-        name="prescriber_user",
+        views.prescriber_inclusion_connect_button,
+        name="prescriber_inclusion_connect_button",
+    ),
+    path(
+        "prescriber/join_org",
+        views.prescriber_join_org,
+        name="prescriber_join_org",
     ),
     # SIAE.
     path("siae/select", views.siae_select, name="siae_select"),

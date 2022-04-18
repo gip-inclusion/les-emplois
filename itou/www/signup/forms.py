@@ -7,8 +7,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.common_apps.address.models import lat_lon_to_coords
-from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
@@ -466,7 +465,7 @@ class PrescriberUserSignupBaseForm(FullnameFormMixin, forms.Form):
             raise forms.ValidationError(mark_safe(message))
         return email
 
-    def save(self, request):
+    def save(self):
         user_attributes = {
             "first_name": self.cleaned_data["first_name"],
             "last_name": self.cleaned_data["last_name"],
@@ -483,10 +482,6 @@ class PrescriberPoleEmploiUserSignupForm(PrescriberUserSignupBaseForm):
     Create a new user of type prescriber and add it to the members of the given prescriber organization.
     """
 
-    def __init__(self, *args, **kwargs):
-        self.pole_emploi_org = kwargs.pop("pole_emploi_org")
-        super().__init__(*args, **kwargs)
-
     def clean_email(self):
         email = self.cleaned_data["email"]
         if not email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
@@ -497,67 +492,6 @@ class PrescriberPoleEmploiUserSignupForm(PrescriberUserSignupBaseForm):
             )
         super().clean_email()
         return email
-
-    def save(self, request):
-        user = super().save(request)
-        # The member becomes a member of the PE agency.
-        membership = PrescriberMembership()
-        membership.user = user
-        membership.organization = self.pole_emploi_org
-        # The first member becomes an admin.
-        membership.is_admin = membership.organization.members.count() == 0
-        membership.save()
-
-        return user
-
-
-class PrescriberUserSignupForm(PrescriberUserSignupBaseForm):
-    """
-    Create a new user of type prescriber and his organization (if any).
-    """
-
-    def __init__(self, *args, **kwargs):
-        self.authorization_status = kwargs.pop("authorization_status")
-        self.kind = kwargs.pop("kind")
-        self.prescriber_org_data = kwargs.pop("prescriber_org_data")
-        super().__init__(*args, **kwargs)
-
-    def save(self, request):
-        user = super().save(request)
-
-        # Create the organization if any: an orienteur may not belong to any organization.
-        if self.prescriber_org_data:
-
-            prescriber_org = PrescriberOrganization()
-            prescriber_org.siret = self.prescriber_org_data["siret"]
-            prescriber_org.name = self.prescriber_org_data["name"]
-            prescriber_org.address_line_1 = self.prescriber_org_data["address_line_1"] or ""
-            prescriber_org.address_line_2 = self.prescriber_org_data["address_line_2"] or ""
-            prescriber_org.post_code = self.prescriber_org_data["post_code"]
-            prescriber_org.city = self.prescriber_org_data["city"]
-            prescriber_org.department = self.prescriber_org_data["department"]
-            prescriber_org.coords = lat_lon_to_coords(
-                self.prescriber_org_data["latitude"], self.prescriber_org_data["longitude"]
-            )
-            prescriber_org.geocoding_score = self.prescriber_org_data["geocoding_score"]
-            prescriber_org.kind = self.kind
-            prescriber_org.authorization_status = self.authorization_status
-            prescriber_org.created_by = user
-            prescriber_org.save()
-
-            # The member becomes a member of the organization.
-            membership = PrescriberMembership()
-            membership.user = user
-            membership.organization = prescriber_org
-            # The first member becomes an admin.
-            membership.is_admin = membership.organization.members.count() == 0
-            membership.save()
-
-            # Notify support.
-            if prescriber_org.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET:
-                prescriber_org.must_validate_prescriber_organization_email().send()
-
-        return user
 
 
 class FacilitatorSignupForm(SignupForm, FullnameFormMixin):

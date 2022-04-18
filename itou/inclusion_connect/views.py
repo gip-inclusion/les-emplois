@@ -7,16 +7,14 @@ from allauth.account.adapter import get_adapter
 from django.conf import settings  # TODO: move to itou.prescribers.constants
 from django.contrib import messages
 from django.contrib.auth import login
-from django.core import exceptions, signing
+from django.core import signing
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import crypto
 from django.utils.http import urlencode
 
-from itou.prescribers.models import PrescriberOrganization
 from itou.utils.urls import get_absolute_url
-from itou.www.signup.forms import PrescriberPoleEmploiUserSignupForm, PrescriberUserSignupForm
+from itou.www.signup.forms import PrescriberPoleEmploiUserSignupForm, PrescriberUserSignupBaseForm
 
 from .constants import (  # INCLUSION_CONNECT_SCOPES,
     INCLUSION_CONNECT_CLIENT_ID,
@@ -164,56 +162,41 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     # User comes from prescriber signup path.
     # Add user to organization if any.
     prescriber_session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+    next_url = None
     if prescriber_session_data:
-        # A prescriber is trying to create an account with Inclusion Connect.
-        kind = prescriber_session_data.get("kind")
-        if kind:
-            form_data = {
-                "email": ic_user_data.email,
-                "first_name": ic_user_data.first_name,
-                "last_name": ic_user_data.last_name,
-            }
-            if kind == "PE":
-                # User tries to join a Pôle emploi organization.
-                pole_emploi_org_pk = prescriber_session_data.get("pole_emploi_org_pk")
-
-                # Check session data.
-                if not pole_emploi_org_pk or kind != PrescriberOrganization.Kind.PE.value:
-                    raise exceptions.PermissionDenied
-
-                pole_emploi_org = get_object_or_404(PrescriberOrganization, pk=pole_emploi_org_pk)
-                form = PrescriberPoleEmploiUserSignupForm(data=form_data, pole_emploi_org=pole_emploi_org)
-            else:
-                form_kwargs = {
-                    "authorization_status": prescriber_session_data["authorization_status"],
-                    "kind": prescriber_session_data["kind"],
-                    "prescriber_org_data": prescriber_session_data["prescriber_org_data"],
-                }
-                form = PrescriberUserSignupForm(data=form_data, **form_kwargs)
-
-            if form.is_valid():
-                user = form.save(request=request)
-            else:
-                for _, errors in form.errors.items():
-                    for error in errors:
-                        messages.error(request, error)
-
-                params = {
-                    INCLUSION_CONNECT_SESSION_TOKEN: token_data["id_token"],
-                    INCLUSION_CONNECT_SESSION_STATE: state,
-                    "redirect_url": prescriber_session_data["url_history"][-1],
-                }
-                next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
-                return HttpResponseRedirect(next_url)
+        # Prescriber signup path callback.
+        form_data = {
+            "email": ic_user_data.email,
+            "first_name": ic_user_data.first_name,
+            "last_name": ic_user_data.last_name,
+        }
+        org_kind = prescriber_session_data.get("kind")
+        if org_kind == "PE":
+            form = PrescriberPoleEmploiUserSignupForm(data=form_data)
         else:
-            # Create an "Orienteur" account (ie prescriber without organization).
-            user, _ = create_or_update_user(ic_user_data)
-    else:
-        # User tries to login.
-        user, _ = create_or_update_user(ic_user_data)
+            form = PrescriberUserSignupBaseForm(data=form_data)
 
+        if form.is_valid():
+            user = form.save()
+            if org_kind:
+                next_url = reverse("signup:prescriber_join_org")
+        else:
+            for _, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+
+            params = {
+                INCLUSION_CONNECT_SESSION_TOKEN: token_data["id_token"],
+                INCLUSION_CONNECT_SESSION_STATE: state,
+                "redirect_url": prescriber_session_data["url_history"][-1],
+            }
+            next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+            return HttpResponseRedirect(next_url)
+    else:
+        # Other path.
+        user, _ = create_or_update_user(ic_user_data)
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-    next_url = get_adapter(request).get_login_redirect_url(request)
+    next_url = next_url or get_adapter(request).get_login_redirect_url(request)
 
     # Keep token_data["id_token"] to logout from FC
     # At this step, we can update the user's fields in DB and create a session if required
