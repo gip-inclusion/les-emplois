@@ -12,6 +12,7 @@ urlpatterns = [
     path("ddets/diagnosis_control/", views.stats_ddets_diagnosis_control, name="stats_ddets_diagnosis_control"),
     path("ddets/hiring/", views.stats_ddets_hiring, name="stats_ddets_hiring"),
     path("dreets/iae/", views.stats_dreets_iae, name="stats_dreets_iae"),
+    path("dreets/hiring/", views.stats_dreets_hiring, name="stats_dreets_hiring"),
     path("dgefp/iae/", views.stats_dgefp_iae, name="stats_dgefp_iae"),
     path("dgefp/diagnosis_control/", views.stats_dgefp_diagnosis_control, name="stats_dgefp_diagnosis_control"),
     path("dgefp/af/", views.stats_dgefp_af, name="stats_dgefp_af"),

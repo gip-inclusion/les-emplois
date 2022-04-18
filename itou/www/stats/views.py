@@ -54,6 +54,14 @@ def get_stats_ddets_department(request):
     return department
 
 
+def get_stats_dreets_region(request):
+    current_org = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_dreets(current_org=current_org):
+        raise PermissionDenied
+    region = request.user.get_stats_dreets_region(current_org=current_org)
+    return region
+
+
 def ensure_stats_dgefp_permission(request):
     current_org = get_current_institution_or_404(request)
     if not request.user.can_view_stats_dgefp(current_org=current_org):
@@ -65,6 +73,15 @@ def get_params_for_departement(department):
         DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
         REGION_FILTER_KEY: DEPARTMENT_TO_REGION[department],
     }
+
+
+def get_params_for_region(region):
+    departments = [DEPARTMENTS[dpt] for dpt in REGIONS[region]]
+    params = {
+        DEPARTMENT_FILTER_KEY: departments,
+        REGION_FILTER_KEY: region,
+    }
+    return params
 
 
 def get_params_for_whole_country():
@@ -209,9 +226,7 @@ def stats_ddets_hiring(request):
     This dashboard shows data about hiring ("Facilitation de l'embauche").
     """
     department = get_stats_ddets_department(request)
-    params = {
-        DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
-    }
+    params = get_params_for_departement(department)
     context = {
         "page_title": f"Données facilitation de l'embauche de mon département : {DEPARTMENTS[department]}",
         "matomo_custom_url": f"/stats/ddets/hiring/{format_region_and_department_for_matomo(department)}",
@@ -226,18 +241,27 @@ def stats_dreets_iae(request):
     relevant members. They can only view data for their own region and can filter by department.
     This dashboard shows data about IAE in general.
     """
-    current_org = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_dreets(current_org=current_org):
-        raise PermissionDenied
-    region = request.user.get_stats_dreets_region(current_org=current_org)
-    departments = [DEPARTMENTS[dpt] for dpt in REGIONS[region]]
-    params = {
-        DEPARTMENT_FILTER_KEY: departments,
-        REGION_FILTER_KEY: region,
-    }
+    region = get_stats_dreets_region(request)
+    params = get_params_for_region(region)
     context = {
         "page_title": f"Données de ma région : {region}",
         "matomo_custom_url": f"/stats/dreets/iae/{format_region_for_matomo(region)}",
+    }
+    return render_stats(request=request, context=context, params=params)
+
+
+@login_required
+def stats_dreets_hiring(request):
+    """
+    DREETS ("Directions régionales de l’économie, de l’emploi, du travail et des solidarités") stats shown to
+    relevant members. They can only view data for their own region and can filter by department.
+    This dashboard shows data about hiring ("Facilitation de l'embauche").
+    """
+    region = get_stats_dreets_region(request)
+    params = get_params_for_region(region)
+    context = {
+        "page_title": f"Données facilitation de l'embauche de ma région : {region}",
+        "matomo_custom_url": f"/stats/dreets/hiring/{format_region_for_matomo(region)}",
     }
     return render_stats(request=request, context=context, params=params)
 

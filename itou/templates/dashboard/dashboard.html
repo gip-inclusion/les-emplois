@@ -478,6 +478,11 @@
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_dreets_iae' %}">Voir les données IAE de ma région</a>
                             </li>
+                            <li class="card-text mb-3">
+                                <i class="ri-pulse-line ri-lg mr-1"></i>
+                                <a href="{% url 'stats:stats_dreets_hiring' %}">Voir les données facilitation de l'embauche</a>
+                                <span class="badge badge-info">Nouveau</span>
+                            </li>
                         {% endif %}
                         {% if can_view_stats_dgefp %}
                             <li class="card-text mb-3">
