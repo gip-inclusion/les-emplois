@@ -413,6 +413,8 @@ class User(AbstractUser, AddressMixin):
         return (
             self.can_view_stats_siae(current_org=current_org)
             or self.can_view_stats_cd(current_org=current_org)
+            # FIXME Uncomment once ready for release.
+            # or self.can_view_stats_pe(current_org=current_org)
             or self.can_view_stats_ddets(current_org=current_org)
             or self.can_view_stats_dreets(current_org=current_org)
             or self.can_view_stats_dgefp(current_org=current_org)
@@ -463,6 +465,20 @@ class User(AbstractUser, AddressMixin):
         CD as in "Conseil Départemental".
         """
         if not self.can_view_stats_cd(current_org=current_org):
+            raise PermissionDenied
+        return current_org.department
+
+    def can_view_stats_pe(self, current_org):
+        return (
+            self.is_prescriber
+            and isinstance(current_org, PrescriberOrganization)
+            and current_org.kind == current_org.Kind.PE
+            and current_org.is_authorized
+            and current_org.authorization_status == current_org.AuthorizationStatus.VALIDATED
+        )
+
+    def get_stats_pe_department(self, current_org):
+        if not self.can_view_stats_pe(current_org=current_org):
             raise PermissionDenied
         return current_org.department
 

@@ -537,18 +537,25 @@ STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHI
 
 # Metabase embedded dashboards
 METABASE_DASHBOARD_IDS = {
+    # Public stats.
+    "stats_public": 119,
+    # Employer stats.
+    "stats_siae_etp": 128,
+    "stats_siae_hiring": 165,
+    # Prescriber stats.
     "stats_cd": 118,
+    "stats_pe": 162,
+    # Institution stats - DDETS - department level.
     "stats_ddets_iae": 117,
     "stats_ddets_diagnosis_control": 144,
     "stats_ddets_hiring": 160,
+    # Institution stats - DREETS - region level.
+    "stats_dreets_iae": 117,
+    "stats_dreets_hiring": 160,
+    # Institution stats - DGEFP - nation level.
     "stats_dgefp_iae": 117,
     "stats_dgefp_diagnosis_control": 144,
     "stats_dgefp_af": 142,
-    "stats_dreets_iae": 117,
-    "stats_dreets_hiring": 160,
-    "stats_public": 119,
-    "stats_siae_etp": 128,
-    "stats_siae_hiring": 165,
 }
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
 

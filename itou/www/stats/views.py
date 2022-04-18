@@ -185,6 +185,27 @@ def stats_cd(request):
 
 
 @login_required
+def stats_pe(request):
+    """
+    PE ("Pôle emploi") stats shown to relevant members.
+    They can view data for their whole departement, not only their agency.
+    They cannot view data for other departments than their own.
+    """
+    current_org = get_current_org_or_404(request)
+    if not request.user.can_view_stats_pe(current_org=current_org):
+        raise PermissionDenied
+    department = request.user.get_stats_pe_department(current_org=current_org)
+    params = {
+        DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
+    }
+    context = {
+        "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
+        "matomo_custom_url": f"/stats/pe/{format_region_and_department_for_matomo(department)}",
+    }
+    return render_stats(request=request, context=context, params=params)
+
+
+@login_required
 def stats_ddets_iae(request):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
