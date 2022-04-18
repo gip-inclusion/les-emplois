@@ -214,9 +214,9 @@ def build_custom_table(table_name, sql_request, dry_run):
     switch_table_atomically(table_name=table_name)
 
 
-def build_custom_tables(dry_run):
+def build_final_tables(dry_run):
     """
-    Build custom tables one by one by playing SQL requests in `sql` folder.
+    Build final custom tables one by one by playing SQL requests in `sql` folder.
 
     Typically:
     - 001_fluxIAE_DateDerniereMiseAJour.sql

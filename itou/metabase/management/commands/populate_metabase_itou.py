@@ -55,7 +55,7 @@ from itou.metabase.management.commands._database_tables import (
 from itou.metabase.management.commands._dataframes import get_df_from_rows, store_df
 from itou.metabase.management.commands._utils import (
     anonymize,
-    build_custom_tables,
+    build_final_tables,
     chunked_queryset,
     compose,
     convert_boolean_to_int,
@@ -449,8 +449,8 @@ class Command(BaseCommand):
                 "manual resolution, see command output"
             )
 
-    def build_custom_tables(self):
-        build_custom_tables(dry_run=self.dry_run)
+    def build_final_tables(self):
+        build_final_tables(dry_run=self.dry_run)
 
     def populate_metabase_itou(self):
         if not settings.ALLOW_POPULATING_METABASE:
@@ -479,7 +479,7 @@ class Command(BaseCommand):
             self.populate_rome_codes,
             self.populate_insee_codes,
             self.populate_departments,
-            self.build_custom_tables,
+            self.build_final_tables,
             self.report_data_inconsistencies,
         ]
 
