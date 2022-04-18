@@ -182,9 +182,6 @@ def format_district(post_code, department):
 
 
 def format_region_for_matomo(region):
-    """
-    Format and sanitize region name for use in a Matomo custom URL.
-    """
     if not region:
         return "Region-inconnue"
     # E.g. `Provence-Alpes-Côte d&#x27;Azur` becomes `Provence-Alpes-C-te-d-Azur`.
@@ -192,9 +189,6 @@ def format_region_for_matomo(region):
 
 
 def format_department_for_matomo(department):
-    """
-    Format and sanitize department name for use in a Matomo custom URL.
-    """
     if not department or department not in DEPARTMENTS:
         return "Departement-inconnu"
     # E.g. `13 - Bouches-du-Rhône` becomes `13---Bouches-du-Rh-ne`.
@@ -202,9 +196,6 @@ def format_department_for_matomo(department):
 
 
 def format_region_and_department_for_matomo(department):
-    """
-    Format and sanitize region+department name for use in a Matomo custom URL.
-    """
     formatted_department = format_department_for_matomo(department)
     region = DEPARTMENT_TO_REGION.get(department)
     formatted_region = format_region_for_matomo(region)
