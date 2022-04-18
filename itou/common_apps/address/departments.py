@@ -1,5 +1,7 @@
 import re
 
+import unidecode
+
 
 REGIONS = {
     "Auvergne-Rhône-Alpes": ["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"],
@@ -184,20 +186,20 @@ def format_district(post_code, department):
 def format_region_for_matomo(region):
     if not region:
         return "Region-inconnue"
-    # E.g. `Provence-Alpes-Côte d&#x27;Azur` becomes `Provence-Alpes-C-te-d-Azur`.
-    return re.sub("[^A-Za-z0-9-]+", "-", region)
+    # E.g. `Provence-Alpes-Côte d&#x27;Azur` becomes `Provence-Alpes-Cote-d-Azur`.
+    return re.sub("[^A-Za-z0-9-]+", "-", unidecode.unidecode(region))
 
 
 def format_department_for_matomo(department):
     if not department or department not in DEPARTMENTS:
         return "Departement-inconnu"
-    # E.g. `13 - Bouches-du-Rhône` becomes `13---Bouches-du-Rh-ne`.
-    return re.sub("[^A-Za-z0-9-]+", "-", DEPARTMENTS[department])
+    # E.g. `13 - Bouches-du-Rhône` becomes `13---Bouches-du-Rhone`.
+    return re.sub("[^A-Za-z0-9-]+", "-", unidecode.unidecode(DEPARTMENTS[department]))
 
 
 def format_region_and_department_for_matomo(department):
     formatted_department = format_department_for_matomo(department)
     region = DEPARTMENT_TO_REGION.get(department)
     formatted_region = format_region_for_matomo(region)
-    # E.g. `/stats/ddets/iae/Provence-Alpes-C-te-d-Azur/04---Alpes-de-Haute-Provence`
+    # E.g. `/stats/ddets/iae/Provence-Alpes-Cote-d-Azur/04---Alpes-de-Haute-Provence`
     return f"{formatted_region}/{formatted_department}"
