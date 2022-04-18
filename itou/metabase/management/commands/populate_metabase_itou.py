@@ -61,6 +61,7 @@ from itou.metabase.management.commands._utils import (
     convert_boolean_to_int,
 )
 from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.management.commands._import_siae.utils import timeit
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.slack import send_slack_message
@@ -429,6 +430,7 @@ class Command(BaseCommand):
         df = get_df_from_rows(rows)
         store_df(df=df, table_name=table_name, dry_run=self.dry_run)
 
+    @timeit
     def report_data_inconsistencies(self):
         """
         Report data inconsistencies that were previously ignored during `populate_approvals` method in order to avoid
@@ -449,6 +451,7 @@ class Command(BaseCommand):
                 "manual resolution, see command output"
             )
 
+    @timeit
     def build_final_tables(self):
         build_final_tables(dry_run=self.dry_run)
 
@@ -495,6 +498,7 @@ class Command(BaseCommand):
             " dernières données C1 :white_check_mark:"
         )
 
+    @timeit
     def handle(self, dry_run=False, **options):
         self.dry_run = dry_run
         self.populate_metabase_itou()

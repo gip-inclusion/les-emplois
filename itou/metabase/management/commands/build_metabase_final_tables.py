@@ -11,6 +11,7 @@ having to complete a long `populate_metabase_itou` command which takes several h
 from django.core.management.base import BaseCommand
 
 from itou.metabase.management.commands._utils import build_final_tables
+from itou.siaes.management.commands._import_siae.utils import timeit
 
 
 class Command(BaseCommand):
@@ -35,6 +36,7 @@ class Command(BaseCommand):
             "--dry-run", dest="dry_run", action="store_true", help="Populate alternate tables with sample data"
         )
 
+    @timeit
     def handle(self, dry_run=False, **options):
         build_final_tables(dry_run=dry_run)
         self.stdout.write("-" * 80)

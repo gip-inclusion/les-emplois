@@ -14,6 +14,7 @@ from itou.metabase.management.commands._database_tables import (
     get_new_table_name,
     switch_table_atomically,
 )
+from itou.siaes.management.commands._import_siae.utils import timeit
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -191,6 +192,7 @@ def chunked_queryset(queryset, chunk_size=10000):
     yield queryset.filter(pk__gte=start_pk)
 
 
+@timeit
 def build_custom_table(table_name, sql_request, dry_run):
     """
     Build a new table with given sql_request.
