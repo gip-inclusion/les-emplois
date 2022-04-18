@@ -339,9 +339,26 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         response = self.client.post(safir_step_url, data=post_data, follow=True)
 
         # Step 3: check email
-        check_email_url = reverse("signup:prescriber_check_pe_email")
-        post_data = {"email": f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"}
-        response = self.client.post(check_email_url, data=post_data, follow=True)
+        # Step 3: check email
+        url = reverse("signup:prescriber_check_pe_email")
+        self.assertRedirects(response, url)
+        post_data = {
+            "email": "athos@lestroismousquetaires.com",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["form"].errors.get("email"))
+
+        email = f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
+        post_data = {
+            "email": email,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertRedirects(response, reverse("signup:prescriber_pole_emploi_user"))
+        session_data = self.client.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        self.assertEqual(email, session_data.get("email"))
+
+        response = self.client.get(response.url)
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
@@ -360,6 +377,21 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         self.assertContains(response, f"Code SAFIR {pe_org.code_safir_pole_emploi}")
 
         user = User.objects.get(email=email)
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+
+        user_emails = user.emailaddress_set.all()
+        # Emails are not checked in Django anymore.
+        # Make sure no confirmation email is sent.
+        self.assertEqual(len(user_emails), 0)
+
+        # Check organization.
+        self.assertTrue(pe_org.is_authorized)
+        self.assertEqual(pe_org.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
+
+        # Check membership.
+        self.assertEqual(1, user.prescriberorganization_set.count())
         self.assertEqual(user.prescribermembership_set.count(), 1)
         self.assertEqual(user.prescribermembership_set.first().organization_id, pe_org.pk)
         self.assertEqual(user.siae_set.count(), 0)
