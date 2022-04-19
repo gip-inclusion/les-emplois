@@ -36,6 +36,9 @@ def get_permissions_dict():
             approvals_models.PoleEmploiApproval: PERMS_READ,
             approvals_models.Suspension: PERMS_ALL,
             approvals_models.Prolongation: PERMS_ALL,
+            asp_models.Commune: PERMS_READ,
+            asp_models.Country: PERMS_READ,
+            asp_models.Department: PERMS_READ,
             cities_models.City: PERMS_READ,
             employee_record_models.EmployeeRecord: PERMS_EDIT,
             eligibility_models.AdministrativeCriteria: PERMS_READ,
@@ -59,15 +62,43 @@ def get_permissions_dict():
             siaes_models.SiaeMembership: PERMS_ALL,
             users_models.User: PERMS_ADD,
             users_models.JobSeekerProfile: PERMS_EDIT,
-        }
-        | {
+        },
+        "itou-support-externe": {
             model: PERMS_READ
             for model in (
+                account_models.EmailAddress,
+                approvals_models.Approval,
+                approvals_models.PoleEmploiApproval,
+                approvals_models.Suspension,
+                approvals_models.Prolongation,
                 asp_models.Commune,
                 asp_models.Country,
                 asp_models.Department,
+                cities_models.City,
+                employee_record_models.EmployeeRecord,
+                eligibility_models.AdministrativeCriteria,
+                eligibility_models.EligibilityDiagnosis,
+                eligibility_models.SelectedAdministrativeCriteria,
+                institution_models.Institution,
+                institution_models.InstitutionMembership,
+                invitation_models.LaborInspectorInvitation,
+                invitation_models.PrescriberWithOrgInvitation,
+                invitation_models.SiaeStaffInvitation,
+                job_applications_models.JobApplication,
+                job_applications_models.JobApplicationTransitionLog,
+                jobs_models.Appellation,
+                jobs_models.Rome,
+                prescribers_models.PrescriberMembership,
+                prescribers_models.PrescriberOrganization,
+                siaes_models.Siae,
+                siaes_models.SiaeConvention,
+                siaes_models.SiaeFinancialAnnex,
+                siaes_models.SiaeJobDescription,
+                siaes_models.SiaeMembership,
+                users_models.User,
+                users_models.JobSeekerProfile,
             )
-        }
+        },
     }
 
 

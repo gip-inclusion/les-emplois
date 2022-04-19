@@ -856,10 +856,14 @@ class TestSyncPermsTestCase(TestCase):
             output,
             [
                 "group name=itou-admin created\n",
+                "group name=itou-support-externe created\n",
                 "All done!\n",
             ],
         )
-        self.assertEqual(Group.objects.all().count(), 1)
-        group = Group.objects.get()
-        self.assertEqual(group.name, "itou-admin")
-        self.assertEqual(group.permissions.count(), 76)
+        self.assertEqual(Group.objects.all().count(), 2)
+        admin_group = Group.objects.all()[0]
+        self.assertEqual(admin_group.name, "itou-admin")
+        self.assertEqual(admin_group.permissions.count(), 76)
+        support_group = Group.objects.all()[1]
+        self.assertEqual(support_group.name, "itou-support-externe")
+        self.assertEqual(support_group.permissions.count(), 31)
