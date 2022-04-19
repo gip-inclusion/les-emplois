@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, Subquery, When
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -308,16 +308,16 @@ class JobApplicationQuerySet(models.QuerySet):
             # Only ACCEPTED job applications can be transformed into employee records
             .accepted()
             # Accept only job applications without linked or processed employee record
-            .filter(Q(employee_record__isnull=True) | ~Q(Exists(subquery_in_tunnel)))
+            .exclude(Exists(subquery_in_tunnel))
             .filter(
                 # Only for current SIAE
                 to_siae=siae,
                 # Hiring must start after production date:
                 hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
             )
-            .distinct("hiring_start_at", "id")
             .select_related("job_seeker", "approval")
-            .order_by("-hiring_start_at", "-id")
+            .prefetch_related("employee_record")
+            .order_by("-hiring_start_at")
         )
 
 

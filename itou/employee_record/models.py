@@ -339,7 +339,7 @@ class EmployeeRecord(models.Model):
         self.save()
 
     def update_as_disabled(self):
-        if self.status not in [Status.REJECTED, Status.PROCESSED]:
+        if self.status not in [Status.NEW, Status.REJECTED, Status.PROCESSED]:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.status = Status.DISABLED

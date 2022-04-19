@@ -107,6 +107,12 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
     if status == Status.NEW:
         data = JobApplication.objects.eligible_as_employee_record(siae)
+        # Browse to get only the linked employee record in "new" state
+        for item in data:
+            for e in item.employee_record.all():
+                if e.status == Status.NEW:
+                    item.employee_record_new = e
+                    break
         employee_records_list = False
     elif status == Status.READY:
         data = base_query.ready_for_siae(siae)
