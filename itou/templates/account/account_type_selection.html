@@ -1,0 +1,61 @@
+{% extends "layout/content.html" %}
+{% load redirection_fields %}
+{% load static %}
+
+{% block title %}Connexion{{ block.super }}{% endblock %}
+
+{% block content %}
+    <div class="card-deck card-deck-itou">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="h4 card-title font-weight-light">
+                    <span class="d-block">Vous êtes un employeur solidaire</span>
+                </h3>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-primary" href="{% url 'login:siae_staff' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                    Se connecter
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h3 class="h4 card-title font-weight-light">
+                    Vous êtes prescripteur ou orienteur
+                </h3>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-primary" href="{% url 'login:prescriber' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                    Se connecter
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h3 class="h4 card-title font-weight-light">
+                    Vous êtes inspecteur du travail
+                </h3>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-primary" href="{% url 'login:labor_inspector' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                    Se connecter
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h3 class="h4 card-title font-weight-light">
+                    Vous êtes candidat en recherche d'emploi
+                </h3>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-primary" href="{% url 'login:job_seeker' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                    Se connecter
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
