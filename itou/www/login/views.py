@@ -16,7 +16,9 @@ class ItouLoginView(LoginView):
     """
 
     form_class = ItouLoginForm
-    template_name = "account/login_generic.html"
+
+    # Allow users to choose their account type
+    template_name = "account/account_type_selection.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -66,6 +68,8 @@ class ItouLoginView(LoginView):
 
 
 class PrescriberLoginView(ItouLoginView):
+    template_name = "account/login_generic.html"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         extra_context = {
@@ -78,6 +82,8 @@ class PrescriberLoginView(ItouLoginView):
 
 
 class SiaeStaffLoginView(ItouLoginView):
+    template_name = "account/login_generic.html"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         extra_context = {
@@ -90,6 +96,8 @@ class SiaeStaffLoginView(ItouLoginView):
 
 
 class LaborInspectorLoginView(ItouLoginView):
+    template_name = "account/login_generic.html"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         extra_context = {
