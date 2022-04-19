@@ -42,6 +42,9 @@
         {# Actions #}
         {% if form.status.value == "NEW" %}
             <div class="text-right">
+                {% if item.employee_record_new %}
+                    <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}?status=NEW" class="btn btn-outline-primary mt-2">Désactiver la fiche salarié</a>
+                {% endif %}
                 <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary mt-2">Créer la fiche salarié</a>
             </div>
         {% elif form.status.value == "READY" %}
