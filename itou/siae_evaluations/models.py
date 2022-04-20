@@ -31,8 +31,8 @@ def select_min_max_job_applications(job_applications):
 def validate_institution(institution_id):
     try:
         institution = Institution.objects.get(pk=institution_id)
-    except Institution.DoesNotExist:
-        raise ValidationError("L'institution sélectionnée n'existe pas.")
+    except Institution.DoesNotExist as exception:
+        raise ValidationError("L'institution sélectionnée n'existe pas.") from exception
 
     if institution.kind != Institution.Kind.DDETS:
         raise ValidationError(f"Sélectionnez une institution de type {Institution.Kind.DDETS}")
