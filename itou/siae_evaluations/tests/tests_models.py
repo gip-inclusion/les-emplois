@@ -25,6 +25,17 @@ from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
 
 
+def create_batch_of_job_applications(siae):
+    JobApplicationWithApprovalFactory.create_batch(
+        evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+        to_siae=siae,
+        sender_siae=siae,
+        eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+        eligibility_diagnosis__author_siae=siae,
+        hiring_start_at=timezone.now() - relativedelta(months=2),
+    )
+
+
 class EvaluationCampaignMiscMethodsTest(TestCase):
     def test_select_min_max_job_applications(self):
         siae = SiaeFactory()
@@ -310,15 +321,10 @@ class EvaluationCampaignManagerTest(TestCase):
             eligibility_diagnosis__author_siae=siae1,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
+
         siae2 = SiaeFactory(department="14")
-        JobApplicationWithApprovalFactory.create_batch(
-            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-            to_siae=siae2,
-            sender_siae=siae2,
-            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-            eligibility_diagnosis__author_siae=siae2,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-        )
+        create_batch_of_job_applications(siae2)
+
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
         self.assertEqual(1, eligible_siaes_res.count())
         self.assertIn(
@@ -330,41 +336,82 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory()
         self.assertEqual(0, evaluation_campaign.number_of_siaes_to_select())
 
-        for i in range(3):
+        for _ in range(3):
             siae = SiaeFactory(department="14")
-            JobApplicationWithApprovalFactory.create_batch(
-                evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-                to_siae=siae,
-                sender_siae=siae,
-                eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-                eligibility_diagnosis__author_siae=siae,
-                hiring_start_at=timezone.now() - relativedelta(months=2),
-            )
-            self.assertEqual(1, evaluation_campaign.number_of_siaes_to_select())
+            create_batch_of_job_applications(siae)
 
-        for i in range(3):
+        self.assertEqual(1, evaluation_campaign.number_of_siaes_to_select())
+
+        for _ in range(3):
             siae = SiaeFactory(department="14")
-            JobApplicationWithApprovalFactory.create_batch(
-                evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-                to_siae=siae,
-                sender_siae=siae,
-                eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-                eligibility_diagnosis__author_siae=siae,
-                hiring_start_at=timezone.now() - relativedelta(months=2),
-            )
+            create_batch_of_job_applications(siae)
+
         self.assertEqual(2, evaluation_campaign.number_of_siaes_to_select())
 
     def test_eligible_siaes_under_ratio(self):
         evaluation_campaign = EvaluationCampaignFactory()
 
-        for i in range(6):
+        for _ in range(6):
             siae = SiaeFactory(department="14")
-            JobApplicationWithApprovalFactory.create_batch(
-                evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-                to_siae=siae,
-                sender_siae=siae,
-                eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-                eligibility_diagnosis__author_siae=siae,
-                hiring_start_at=timezone.now() - relativedelta(months=2),
-            )
+            create_batch_of_job_applications(siae)
+
         self.assertEqual(2, evaluation_campaign.eligible_siaes_under_ratio().count())
+
+    def test_populate(self):
+        # integration tests
+        evaluation_campaign = EvaluationCampaignFactory()
+        siae = SiaeWithMembershipFactory(department=evaluation_campaign.institution.department)
+        job_seeker = JobSeekerFactory()
+        user = siae.members.first()
+        user_info = UserInfo(
+            user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
+        )
+        criteria1 = AdministrativeCriteria.objects.get(
+            level=AdministrativeCriteria.Level.LEVEL_1, name="Bénéficiaire du RSA"
+        )
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker, user_info, administrative_criteria=[criteria1]
+        )
+        JobApplicationWithApprovalFactory.create_batch(
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+            to_siae=siae,
+            sender_siae=siae,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+        fake_now = timezone.now() - relativedelta(weeks=1)
+
+        self.assertEqual(0, EvaluatedSiae.objects.all().count())
+        self.assertEqual(0, EvaluatedJobApplication.objects.all().count())
+
+        # first regular method exec
+        evaluation_campaign.populate(fake_now)
+        evaluation_campaign.refresh_from_db()
+
+        self.assertEqual(fake_now, evaluation_campaign.percent_set_at)
+        self.assertEqual(fake_now, evaluation_campaign.evaluations_asked_at)
+        self.assertEqual(1, EvaluatedSiae.objects.all().count())
+        self.assertEqual(2, EvaluatedJobApplication.objects.all().count())
+
+        # check links between EvaluatedSiae and EvaluatedJobApplication
+        evaluated_siae = EvaluatedSiae.objects.first()
+        for evaluated_job_application in EvaluatedJobApplication.objects.all():
+            with self.subTest(evaluated_job_application=evaluated_job_application):
+                self.assertEqual(evaluated_siae, evaluated_job_application.evaluated_siae)
+
+
+class EvaluationCampaignEmailMethodsTest(TestCase):
+    def test_get_email_institution_notification(self):
+        institution = InstitutionWith2MembershipFactory()
+        evaluation_campaign = EvaluationCampaignFactory(institution=institution)
+
+        date = timezone.now().date()
+        email = evaluation_campaign.get_email_institution_notification(date)
+
+        self.assertEqual(email.to, list(institution.active_members))
+        self.assertIn(reverse("dashboard:index"), email.body)
+        self.assertIn(
+            f"Le choix du taux de SIAE à contrôler est possible jusqu’au {dateformat.format(date, 'd E Y')}",
+            email.body,
+        )
+        self.assertIn(f"avant le {dateformat.format(date, 'd E Y')}", email.subject)
