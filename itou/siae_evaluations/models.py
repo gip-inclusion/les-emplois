@@ -174,15 +174,6 @@ class EvaluationCampaign(models.Model):
             self.eligible_siaes().values_list("to_siae", flat=True).order_by("?")[: self.number_of_siaes_to_select()]
         )
 
-    def eligible_job_applications_under_ratio(self, evaluated_siaes):
-        return [
-            EvaluatedJobApplication(evaluated_siae=evaluated_siae, job_application=job_application)
-            for evaluated_siae in evaluated_siaes
-            for job_application in select_min_max_job_applications(
-                self.eligible_job_applications().filter(to_siae=evaluated_siae.siae)
-            )
-        ]
-
     def populate_campaign(self):
 
         if self.evaluations_asked_at:

@@ -369,25 +369,6 @@ class EvaluationCampaignManagerTest(TestCase):
             )
         self.assertEqual(2, evaluation_campaign.eligible_siaes_under_ratio().count())
 
-    def test_eligible_job_applications_under_ratio(self):
-        evaluation_campaign = EvaluationCampaignFactory()
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
-
-        JobApplicationWithApprovalFactory.create_batch(
-            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-            to_siae=evaluated_siae.siae,
-            sender_siae=evaluated_siae.siae,
-            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-            eligibility_diagnosis__author_siae=evaluated_siae.siae,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-        )
-
-        results = evaluation_campaign.eligible_job_applications_under_ratio(
-            EvaluatedSiae.objects.filter(evaluation_campaign=evaluation_campaign)
-        )
-        self.assertIsInstance(results[0], EvaluatedJobApplication)
-        self.assertEqual(2, len(results))
-
     def test_populate_campaign(self):
         # integration tests
         evaluation_campaign = EvaluationCampaignFactory()
