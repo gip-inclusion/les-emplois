@@ -1,0 +1,6 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+
+Contrôle a posteriori sur vos embauches réalisées du {{campaign.evaluated_period_start_at|date:"d E Y"}} au {{campaign.evaluated_period_end_at|date:"d E Y"}}
+
+{% endblock %}

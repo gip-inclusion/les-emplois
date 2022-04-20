@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
@@ -214,6 +215,10 @@ class EvaluationCampaign(models.Model):
                 ]
             )
 
+            connection = mail.get_connection()
+            emails = [evaluated_siae.get_email_eligible_siae() for evaluated_siae in evaluated_siaes]
+            connection.send_messages(emails)
+
     def get_email_institution_notification(self, ratio_selection_end_at):
         to = self.institution.active_members
         context = {
@@ -262,6 +267,22 @@ class EvaluatedSiae(models.Model):
 
     def __str__(self):
         return f"{self.siae}"
+
+    def get_email_eligible_siae(self):
+        to = self.siae.active_admin_members
+        context = {
+            "campaign": self.evaluation_campaign,
+            "siae": self.siae,
+            # end_date for eligible siaes to return their documents of proofs is 6 weeks after notification
+            "end_date": timezone.now() + relativedelta(weeks=6),
+            "url": (
+                f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}"
+                f"{reverse('siae_evaluations_views:siae_job_applications_list')}"
+            ),
+        }
+        subject = "siae_evaluations/email/eligible_siaes_subject.txt"
+        body = "siae_evaluations/email/eligible_siaes_body.txt"
+        return get_email_message(to, context, subject, body)
 
 
 class EvaluatedJobApplication(models.Model):

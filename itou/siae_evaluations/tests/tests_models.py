@@ -432,6 +432,26 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         )
         self.assertIn(f"avant le {dateformat.format(date, 'd E Y')}", email.subject)
 
+    def test_get_email_eligible_siae(self):
+        siae = SiaeWith2MembershipsFactory()
+        evaluated_siae = EvaluatedSiaeFactory(siae=siae)
+        email = evaluated_siae.get_email_eligible_siae()
+
+        self.assertEqual(email.to, list(evaluated_siae.siae.active_admin_members))
+        self.assertEqual(
+            email.subject,
+            (
+                "Contrôle a posteriori sur vos embauches réalisées "
+                + f"du {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, 'd E Y')} "
+                + f"au {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, 'd E Y')}"
+            ),
+        )
+        self.assertIn(siae.name, email.body)
+        self.assertIn(siae.kind, email.body)
+        self.assertIn(siae.convention.siret_signature, email.body)
+        self.assertIn(dateformat.format(timezone.now() + relativedelta(weeks=6), "d E Y"), email.body)
+
+
 class EvaluatedSiaeQuerySetTest(TestCase):
     def test_for_siae(self):
         siae1 = SiaeFactory()
