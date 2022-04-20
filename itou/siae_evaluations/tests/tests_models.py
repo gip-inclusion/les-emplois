@@ -2,7 +2,8 @@ from dateutil.relativedelta import relativedelta
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils import timezone
+from django.urls import reverse
+from django.utils import dateformat, timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
@@ -195,21 +196,27 @@ class EvaluationCampaignManagerTest(TestCase):
         # not DDETS
         for kind in [k for k in Institution.Kind if k != Institution.Kind.DDETS]:
             with self.subTest(kind=kind):
-                institution = InstitutionFactory(kind=kind)
+                InstitutionFactory(kind=kind)
                 self.assertEqual(
                     0, create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at)
                 )
+                self.assertEqual(0, EvaluationCampaign.objects.all().count())
+                self.assertEqual(len(mail.outbox), 0)
 
         # institution DDETS
-        institution = InstitutionWith2MembershipFactory(kind=Institution.Kind.DDETS)
+        InstitutionWith2MembershipFactory.create_batch(2, kind=Institution.Kind.DDETS)
         self.assertEqual(
-            1,
+            2,
             create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at),
         )
-        self.assertEqual(
-            EvaluationCampaign.objects.filter(institution=institution).first(),
-            EvaluationCampaign.objects.first(),
-        )
+        self.assertEqual(2, EvaluationCampaign.objects.all().count())
+
+        # An email should have been sent to the institution members.
+        self.assertEqual(len(mail.outbox), 2)
+        email = mail.outbox[0]
+        self.assertEqual(len(email.to), 2)
+        email = mail.outbox[1]
+        self.assertEqual(len(email.to), 2)
 
     def test_eligible_job_applications(self):
         evaluation_campaign = EvaluationCampaignFactory()
