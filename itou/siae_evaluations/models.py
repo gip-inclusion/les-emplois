@@ -174,26 +174,6 @@ class EvaluationCampaign(models.Model):
             self.eligible_siaes().values_list("to_siae", flat=True).order_by("?")[: self.number_of_siaes_to_select()]
         )
 
-    def populate_campaign(self):
-
-        if self.evaluations_asked_at:
-
-            return f"La selection de l'échantillon à contrôler a déjà été réalisée pour {self.name}"
-
-        with transaction.atomic():
-            if not self.percent_set_at:
-                self.percent_set_at = timezone.now()
-            self.evaluations_asked_at = timezone.now()
-
-            self.save(update_fields=["percent_set_at", "evaluations_asked_at"])
-
-            evaluated_siaes = EvaluatedSiae.objects.bulk_create(
-                EvaluatedSiae(evaluation_campaign=self, siae=Siae.objects.get(pk=pk))
-                for pk in self.eligible_siaes_under_ratio()
-            )
-            EvaluatedJobApplication.objects.bulk_create(self.eligible_job_applications_under_ratio(evaluated_siaes))
-            return f"{len(evaluated_siaes)} SIAE(s) ont été ajoutées dans la campagne {self.name}"
-
 
 class EvaluatedSiae(models.Model):
 
