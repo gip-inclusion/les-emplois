@@ -415,6 +415,20 @@
                 </div>
             </div>
 
+            {% if has_active_campaign %}
+                <div class="card">
+                    <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info">Nouveau</span></p>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="card-text mb-3">
+                                <i class="ri-pulse-line ri-lg mr-1"></i>
+                                <a href="{% url 'siae_evaluations_views:siae_job_applications_list' %}">Justifier mes auto-prescriptions</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+
         {% endif %}{# end of if user.is_siae_staff #}
 
         {% if user.is_labor_inspector %}
