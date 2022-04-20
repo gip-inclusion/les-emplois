@@ -1,21 +1,23 @@
 from django.contrib import admin, messages
+from django.utils import timezone
 
 from itou.siae_evaluations import models
 
 
 @admin.register(models.EvaluationCampaign)
 class EvaluationCampaignAdmin(admin.ModelAdmin):
-    @admin.action(description="Sélectionner les échantillons à contrôler")
-    def populate_campaigns(self, request, queryset):
-        for campaign in queryset:
-            mess = campaign.populate_campaign()
-            messages.success(request, mess)
 
-    actions = [
-        populate_campaigns,
-    ]
+    list_display = (
+        "name",
+        "institution",
+        "evaluated_period_start_at",
+        "evaluated_period_end_at",
+        "chosen_percent",
+        "created_at",
+        "evaluations_asked_at",
+        "ended_at",
+    )
 
-    list_display = ("name", "institution", "chosen_percent", "created_at", "evaluations_asked_at", "ended_at")
     list_display_links = ("name",)
     readonly_fields = ("created_at",)
     raw_id_fields = ("institution",)
