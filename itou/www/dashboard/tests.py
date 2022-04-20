@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
@@ -17,7 +18,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.prescribers import factories as prescribers_factories
-from itou.siae_evaluations.factories import EvaluationCampaignFactory
+from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
@@ -184,6 +185,11 @@ class DashboardViewTest(TestCase):
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
+
+        fake_now = timezone.now()
+        EvaluatedSiaeFactory(siae=siae, evaluation_campaign__evaluations_asked_at=fake_now)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Contrôle a posteriori")
 
 
 class EditUserInfoViewTest(TestCase):

@@ -15,7 +15,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
-from itou.siae_evaluations.models import EvaluationCampaign
+from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae
 from itou.utils.password_validation import FRANCE_CONNECT_PASSWORD_EXPLANATION
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -40,6 +40,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         current_org = get_current_siae_or_404(request)
         can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
         can_show_employee_records = current_org.can_use_employee_record
+        has_active_campaign = EvaluatedSiae.objects.has_active_campaign(current_org)
 
         job_applications_categories = [
             {
