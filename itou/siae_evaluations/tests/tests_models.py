@@ -11,7 +11,11 @@ from itou.institutions.models import Institution
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.factories import EvaluationCampaignFactory
+from itou.siae_evaluations.factories import (
+    EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory,
+    EvaluationCampaignFactory,
+)
 from itou.siae_evaluations.models import (
     CampaignAlreadyPopulatedException,
     EvaluatedJobApplication,
@@ -21,7 +25,7 @@ from itou.siae_evaluations.models import (
     select_min_max_job_applications,
     validate_institution,
 )
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
@@ -427,3 +431,38 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
             email.body,
         )
         self.assertIn(f"avant le {dateformat.format(date, 'd E Y')}", email.subject)
+
+class EvaluatedSiaeQuerySetTest(TestCase):
+    def test_for_siae(self):
+        siae1 = SiaeFactory()
+        siae2 = SiaeFactory()
+        EvaluatedSiaeFactory(siae=siae2)
+
+        self.assertEqual(0, EvaluatedSiae.objects.for_siae(siae1).count())
+        self.assertEqual(1, EvaluatedSiae.objects.for_siae(siae2).count())
+
+    def test_in_progress(self):
+        fake_now = timezone.now()
+
+        # evaluations_asked_at is None
+        EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=None)
+        self.assertEqual(0, EvaluatedSiae.objects.in_progress().count())
+
+        # ended_at is not None
+        EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
+        self.assertEqual(0, EvaluatedSiae.objects.in_progress().count())
+
+        # evaluations_asked_at is not None, ended_at is None
+        EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=fake_now, evaluation_campaign__ended_at=None)
+        self.assertEqual(1, EvaluatedSiae.objects.in_progress().count())
+
+
+class EvaluatedSiaeManagerTest(TestCase):
+    def test_has_active_campaign(self):
+        fake_now = timezone.now()
+
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
+        self.assertFalse(EvaluatedSiae.objects.has_active_campaign(evaluated_siae.siae))
+
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=fake_now)
+        self.assertTrue(EvaluatedSiae.objects.has_active_campaign(evaluated_siae.siae))
