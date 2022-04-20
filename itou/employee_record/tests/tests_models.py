@@ -303,6 +303,17 @@ class EmployeeRecordLifeCycleTest(TestCase):
         new_employee_record = EmployeeRecord.from_job_application(self.employee_record.job_application)
         self.assertEqual(new_employee_record.status, Status.NEW)
 
+        # Employee record in NEW state can be disable
+        new_employee_record.update_as_disabled()
+        self.assertIn(
+            new_employee_record.job_application,
+            JobApplication.objects.eligible_as_employee_record(new_employee_record.job_application.to_siae),
+        )
+
+        # Now, can create another one employee record on same job_application
+        new_employee_record = EmployeeRecord.from_job_application(new_employee_record.job_application)
+        self.assertEqual(new_employee_record.status, Status.NEW)
+
         new_employee_record.update_as_ready()
         self.assertEqual(new_employee_record.status, Status.READY)
 

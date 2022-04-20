@@ -131,6 +131,8 @@ class EmployeeRecord(models.Model):
 
     ERROR_NO_CONVENTION_AVAILABLE = "La structure actuelle ne dispose d'aucune convention"
 
+    CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED]
+
     # 'C' stands for Creation
     ASP_MOVEMENT_TYPE = "C"
 
@@ -339,7 +341,7 @@ class EmployeeRecord(models.Model):
         self.save()
 
     def update_as_disabled(self):
-        if self.status not in [Status.NEW, Status.REJECTED, Status.PROCESSED]:
+        if self.status not in self.CAN_BE_DISABLED_STATES:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.status = Status.DISABLED

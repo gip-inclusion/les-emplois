@@ -395,11 +395,13 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     if not siae_is_allowed(job_application, siae):
         raise PermissionDenied
 
-    # TODO: check ER state
-
     status = request.GET.get("status")
     list_url = reverse("employee_record_views:list")
     back_url = f"{ list_url }?status={ status }"
+
+    if employee_record.status not in EmployeeRecord.CAN_BE_DISABLED_STATES:
+        messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+        return HttpResponseRedirect(back_url)
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
         employee_record.update_as_disabled()
