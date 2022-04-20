@@ -10,7 +10,7 @@ from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siaes.models import Siae
-from itou.utils.emails import get_email_message, sanitize_mailjet_recipients_list
+from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_SIAE_STAFF
 
 
@@ -38,19 +38,6 @@ def validate_institution(institution_id):
         raise ValidationError(f"Sélectionnez une institution de type {Institution.Kind.DDETS}")
 
 
-def email_campaign_is_setup(emails, ratio_selection_end_at):
-    return get_email_message(
-        to=[settings.DEFAULT_FROM_EMAIL],
-        context={
-            "ratio_selection_end_at": ratio_selection_end_at,
-            "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
-        },
-        subject="siae_evaluations/email/campaign_is_setup_subject.txt",
-        body="siae_evaluations/email/campaign_is_setup_body.txt",
-        bcc=emails,
-    )
-
-
 def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at):
     """
     Create a campaign for each institution whose kind is DDETS.
@@ -73,13 +60,6 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_s
         )
         for institution in institutions
     )
-
-    if evaluation_campaign_list:
-
-        for chunk_emails in sanitize_mailjet_recipients_list(
-            institutions.prefetch_active_memberships().values_list("members__email", flat=True).distinct(), 2
-        ):
-            email_campaign_is_setup(chunk_emails, ratio_selection_end_at).send()
 
     return len(evaluation_campaign_list)
 

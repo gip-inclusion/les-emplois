@@ -66,13 +66,6 @@ _MAILJET_MAX_RECIPIENTS = 50
 _EMAIL_KEYS = ("from_email", "cc", "bcc", "subject", "body")
 
 
-def sanitize_mailjet_recipients_list(recipients, downsize: int):
-    # This method is used to sanitize bcc list of emails.
-    # Downsize _MAILJET_MAX_RECIPIENTS to prevent list of
-    # 'TO' + chunked list of 'BCC' > _MAILJET_MAX_RECIPIENTS
-    return chunks(recipients, _MAILJET_MAX_RECIPIENTS - downsize)
-
-
 def sanitize_mailjet_recipients(email_message):
     """
     Mailjet API has a **50** number limit for anytype of email recipient:

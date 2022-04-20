@@ -188,10 +188,6 @@ class EvaluationCampaignManagerTest(TestCase):
                 self.assertEqual(
                     0, create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at)
                 )
-                for box in mail.outbox:
-                    print(box.to)
-                    print(box.subject)
-                self.assertEqual(len(mail.outbox), 0)
 
         # institution DDETS
         institution = InstitutionWith2MembershipFactory(kind=Institution.Kind.DDETS)
@@ -203,30 +199,6 @@ class EvaluationCampaignManagerTest(TestCase):
             EvaluationCampaign.objects.filter(institution=institution).first(),
             EvaluationCampaign.objects.first(),
         )
-
-        # An email should have been sent to the institution members.
-
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(len(email.bcc), 2)
-        self.assertIn(
-            "Le choix du taux de SIAE à contrôler est possible jusqu’au " f"{ratio_selection_end_at.strftime('%d')}",
-            email.body,
-        )
-
-        # mass mail send
-        # made 48 institutions * 2 members = 96 emails addresses
-        # 96 emails addresses splitted in 2 lists of 48 items
-        InstitutionWith2MembershipFactory.create_batch(47, kind=Institution.Kind.DDETS)
-        create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at)
-        self.assertEqual(len(mail.outbox), 3)
-        email = mail.outbox[1]
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(len(email.bcc), 48)
-        email = mail.outbox[2]
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(len(email.bcc), 48)
 
     def test_eligible_job_applications(self):
         evaluation_campaign = EvaluationCampaignFactory()
