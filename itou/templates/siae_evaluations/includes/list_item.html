@@ -1,0 +1,35 @@
+<div class="card my-5">
+
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-7">
+                <h3 class="h2">{{ item.job_application.job_seeker.get_full_name|title }}</h3>
+            </div>
+            <div class="col-md-5 text-right">
+                <p class="small mb-0">
+                    {% if item.state == "PENDING" %}
+                        <p class="badge badge-warning">à traiter</b></p>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-7">
+                <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.job_application.approval.number_with_spaces }}</b></p>
+            </div>
+
+        </div>
+
+        {% if item.state == "PENDING" %}
+            <div>
+                <a href="#" class="btn btn-outline-primary float-right">Ajouter ses justificatifs</a>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
