@@ -288,6 +288,11 @@ class EvaluatedJobApplication(models.Model):
     def __str__(self):
         return f"{self.job_application}"
 
+    @property
+    def state(self):
+        # property in progress, new conditionnal state will be added further
+        return evaluation_enums.EvaluationJobApplicationsState.PENDING
+
 
 class EvaluatedAdministrativeCriteria(models.Model):
 

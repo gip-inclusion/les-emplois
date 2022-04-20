@@ -1,3 +1,5 @@
+from django.db import models
+
 from itou.siaes.models import Siae
 
 
@@ -24,3 +26,7 @@ class EvaluationJobApplicationsBoundariesNumber:
     MAX = 100
     SELECTION_PERCENTAGE = 20
     SELECTED_MAX = int(MAX * SELECTION_PERCENTAGE / 100)
+
+
+class EvaluationJobApplicationsState(models.TextChoices):
+    PENDING = "PENDING"

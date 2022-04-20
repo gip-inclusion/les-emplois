@@ -466,3 +466,9 @@ class EvaluatedSiaeManagerTest(TestCase):
 
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=fake_now)
         self.assertTrue(EvaluatedSiae.objects.has_active_campaign(evaluated_siae.siae))
+
+
+class EvaluatedJobApplicationModelTest(TestCase):
+    def test_state(self):
+        evaluated_job_application = EvaluatedJobApplicationFactory()
+        self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PENDING, evaluated_job_application.state)
