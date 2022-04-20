@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
@@ -60,6 +61,15 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_s
         )
         for institution in institutions
     )
+
+    # Send notification.
+    if evaluation_campaign_list:
+        connection = mail.get_connection()
+        emails = [
+            evaluation_campaign.get_email_institution_notification(ratio_selection_end_at)
+            for evaluation_campaign in evaluation_campaign_list
+        ]
+        connection.send_messages(emails)
 
     return len(evaluation_campaign_list)
 
@@ -174,6 +184,15 @@ class EvaluationCampaign(models.Model):
             self.eligible_siaes().values_list("to_siae", flat=True).order_by("?")[: self.number_of_siaes_to_select()]
         )
 
+    def get_email_institution_notification(self, ratio_selection_end_at):
+        to = self.institution.active_members
+        context = {
+            "ratio_selection_end_at": ratio_selection_end_at,
+            "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
+        }
+        subject = "siae_evaluations/email/email_institution_notification_subject.txt"
+        body = "siae_evaluations/email/email_institution_notification_body.txt"
+        return get_email_message(to, context, subject, body)
 
 class EvaluatedSiae(models.Model):
 
