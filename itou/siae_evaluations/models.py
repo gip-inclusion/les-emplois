@@ -225,6 +225,19 @@ class EvaluationCampaign(models.Model):
         return get_email_message(to, context, subject, body)
 
 
+class EvaluatedSiaeQuerySet(models.QuerySet):
+    def for_siae(self, siae):
+        return self.filter(siae=siae)
+
+    def in_progress(self):
+        return self.exclude(evaluation_campaign__evaluations_asked_at=None).filter(evaluation_campaign__ended_at=None)
+
+
+class EvaluatedSiaeManager(models.Manager):
+    def has_active_campaign(self, siae):
+        return self.for_siae(siae).in_progress().exists()
+
+
 class EvaluatedSiae(models.Model):
 
     evaluation_campaign = models.ForeignKey(
@@ -239,6 +252,8 @@ class EvaluatedSiae(models.Model):
         on_delete=models.CASCADE,
         related_name="evaluated_siaes",
     )
+
+    objects = EvaluatedSiaeManager.from_queryset(EvaluatedSiaeQuerySet)()
 
     class Meta:
         verbose_name = "Entreprise"
