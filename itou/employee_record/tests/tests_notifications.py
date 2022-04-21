@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.test.testcases import TestCase
 from django.utils import timezone
@@ -16,7 +16,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # A normal case
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
         approval = employee_record.approval
-        today = timezone.now().date()
+        today = date.today()
 
         approval.start_at = today + timedelta(days=1)
         approval.save()
@@ -46,7 +46,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # (which is the last one)
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
         approval = employee_record.approval
-        today = timezone.now().date()
+        today = date.today()
 
         approval.start_at = today + timedelta(days=1)
         approval.save()
