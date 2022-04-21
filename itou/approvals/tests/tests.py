@@ -517,18 +517,51 @@ class PoleEmploiApprovalModelTest(TestCase):
 
 
 class PoleEmploiApprovalManagerTest(TestCase):
-    """
-    Test PoleEmploiApprovalManager.
-    """
+    def test_find_for_no_queries(self):
+        user = JobSeekerFactory(pole_emploi_id="")
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 0)
 
-    def test_find_for(self):
+        user = JobSeekerFactory(birthdate=None)
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 0)
 
+    def test_find_for_user(self):
         user = JobSeekerFactory()
         pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
-        search_results = PoleEmploiApproval.objects.find_for(user)
+        # just another approval, to be sure we don't find the other one "by chance"
+        PoleEmploiApprovalFactory()
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
         self.assertEqual(search_results.count(), 1)
         self.assertEqual(search_results.first(), pe_approval)
-        PoleEmploiApproval.objects.all().delete()
+
+        other_valid_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 2)
+        self.assertEqual(search_results[0], pe_approval)
+        self.assertEqual(search_results[1], other_valid_approval)
+
+        nir_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 3)
+        self.assertEqual(search_results[0], pe_approval)
+        self.assertEqual(search_results[1], other_valid_approval)
+        self.assertEqual(search_results[2], nir_approval)
+
+        nir_approval.birthdate = user.birthdate
+        nir_approval.pole_emploi_id = user.pole_emploi_id
+        nir_approval.save()
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 3)
+        self.assertEqual(search_results[0], pe_approval)
+        self.assertEqual(search_results[1], other_valid_approval)
+        self.assertEqual(search_results[2], nir_approval)
 
 
 class ApprovalsWrapperTest(TestCase):
