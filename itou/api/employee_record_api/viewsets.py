@@ -1,5 +1,7 @@
 import logging
 
+from django.db.models import DateField
+from django.db.models.functions import Cast
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
@@ -50,6 +52,39 @@ class AbstractEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [EmployeeRecordAPIPermission]
 
 
+def _annotate_convert_created_at(queryset):
+    # Add a new `creation_date` field (cast of `created_at` to a date)
+    return queryset.annotate(creation_date=Cast("created_at", output_field=DateField()))
+
+
+def _filter_by_query_params(request, queryset):
+    """
+    Register query parameters result filtering:
+    - only using employee record `status` is available for now.
+    - `status` query param can be an array of value.
+    """
+    result = queryset
+    params = request.query_params
+
+    if not params:
+        return result.processed().order_by("-created_at")
+
+    # Query params are chainable
+
+    if status := params.getlist("status", ""):
+        status_filter = [s.upper() for s in status]
+        result = result.filter(status__in=status_filter)
+
+    if created := params.get("created"):
+        result = _annotate_convert_created_at(result).filter(creation_date=created)
+
+    if since := params.get("since"):
+        result = _annotate_convert_created_at(result).filter(creation_date__gte=since)
+
+    # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
+    return result.order_by("-created_at")
+
+
 class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
     """
     # API fiches salarié
@@ -74,9 +109,15 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
     - si l'utilisateur connecté est membre d'une ou plusieurs SIAE éligible aux fiches salarié
 
     # Paramètres
-    Les paramètres suivants sont utilisables en paramètres de requête (query string):
+    Les paramètres suivants sont :
+    - utilisables en paramètres de requête (query string),
+    - chainables : il est possible de préciser un ou plusieurs de ces paramètres pour affiner la recherche.
 
-    ## `status` : statut des fiches salarié
+    Sans paramètre fourni, la liste de résultats contient les fiches salariés en l'état
+
+    - `PROCESSED` (integrées par l'ASP).
+
+    ## `status` : par statut des fiches salarié
     Ce paramètre est un tableau permettant de filtrer les fiches retournées par leur statut
 
     Les valeurs possibles pour ce paramètre sont :
@@ -90,6 +131,12 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
     ### Exemples
     - ajouter `?status=NEW` à l'URL pour les nouvelles fiches.
     - ajouter `?status=NEW&status=READY` pour les nouvelles fiches et celles prêtes pour la transmission.
+
+    ## `created` : à date de création
+    Permet de récupérer les fiches salarié créées à la date donnée en paramètre (au format `AAAA-MM-JJ`).
+
+    ## `since` : depuis une certaine date
+    Permet de récupérer les fiches salarié créées depuis date donnée en paramètre (au format `AAAA-MM-JJ`).
 
     """
 
@@ -106,7 +153,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
         queryset = EmployeeRecord.objects.full_fetch()
 
         # Get (registered) query parameters filters
-        queryset = self._filter_by_query_params(self.request, queryset)
+        queryset = _filter_by_query_params(self.request, queryset)
 
         # Employee record API will return objects related to
         # all SIAE memberships of authenticated user.
@@ -125,24 +172,6 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
                 "User-Agent: %s",
                 self.request.headers.get("User-Agent"),
             )
-
-    def _filter_by_query_params(self, request, queryset):
-        """
-        Register query parameters result filtering:
-        - only using employee record `status` is available for now.
-        - `status` query param can be an array of value.
-        """
-        params = request.query_params
-
-        if status := params.getlist("status", ""):
-            status_filter = [s.upper() for s in status]
-
-            return queryset.filter(status__in=status_filter).order_by("-created_at")
-
-        # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
-
-        # Default queryset without params
-        return queryset.processed()
 
 
 class EmployeeRecordUpdateNotificationViewSet(AbstractEmployeeRecordViewSet):
