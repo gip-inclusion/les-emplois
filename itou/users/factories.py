@@ -47,8 +47,12 @@ class JobSeekerFactory(UserFactory):
     @factory.lazy_attribute
     def nir(self):
         gender = random.choice([1, 2])
-        year = self.birthdate.strftime("%y")
-        month = self.birthdate.strftime("%m")
+        if self.birthdate:
+            year = self.birthdate.strftime("%y")
+            month = self.birthdate.strftime("%m")
+        else:
+            year = "87"
+            month = "06"
         department = str(random.randint(1, 99)).zfill(2)
         random_1 = str(random.randint(0, 399)).zfill(3)
         random_2 = str(random.randint(0, 399)).zfill(3)

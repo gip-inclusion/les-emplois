@@ -993,20 +993,20 @@ class PoleEmploiApprovalManager(models.Manager):
         - there can be an inversion of first and last name fields
         - imported data can be poorly structured (first and last names in the same field)
 
-        The only solution to ID a person between information systems would be to have
-        a unique ID per user known by everyone (Itou, PE and the job seeker).
+        In many cases, we can identify the user based on its NIR number, when the PoleEmploiApproval
+        has this information (which is the case 90% of the time) and we also have it.
 
-        Yet we don't have such an identifier.
-
-        As a workaround, we rely on the combination of `pole_emploi_id` (non-unique
-        but it is assumed that every job seeker knows his number) and `birthdate`.
+        We'll also return the PE Approvals based on the combination of `pole_emploi_id`
+        (non-unique but it is assumed that every job seeker knows his number) and `birthdate`.
 
         Their input formats can be checked to limit the risk of errors.
         """
         # Save some SQL queries.
-        if not user.pole_emploi_id or not user.birthdate:
+        if not user.nir and (not user.pole_emploi_id and user.birthdate):
             return self.none()
-        return self.filter(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate).order_by("-start_at")
+        return self.filter(Q(nir=user.nir) | Q(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)).order_by(
+            "-start_at"
+        )
 
     def without_nir_ntt_or_nia(self):
         return self.filter(Q(nir=None) & Q(ntt_nia=None))
