@@ -1,6 +1,8 @@
 from unittest import mock
 
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
 from itou.employee_record.enums import Status
@@ -322,3 +324,137 @@ class EmployeeRecordAPIParametersTest(APITestCase):
 
         self.assertEqual(result_1.get("personnePhysique", {}).get("passIae"), job_application_2.approval.number)
         self.assertEqual(result_2.get("personnePhysique", {}).get("passIae"), job_application_1.approval.number)
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_created_parameter(self, _mock):
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record.update_as_ready()  # Also save() the employee record
+        today = f"{timezone.now():%Y-%m-%d}"
+        yesterday = f"{timezone.now() - relativedelta(days=1):%Y-%m-%d}"
+
+        member = employee_record.job_application.to_siae.members.first()
+        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+        response = self.client.get(ENDPOINT_URL + f"?created={today}", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        results = response.json()
+
+        self.assertEqual(len(results.get("results")), 1)
+        result = results.get("results")[0]
+
+        self.assertEqual(result.get("siret"), job_application.to_siae.siret)
+
+        response = self.client.get(ENDPOINT_URL + f"?created={yesterday}", format="json")
+        results = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(results.get("results"))
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_since_parameter(self, _mock):
+        today = f"{timezone.now():%Y-%m-%d}"
+        sooner_ts = timezone.now() - relativedelta(days=3)
+        sooner = f"{sooner_ts:%Y-%m-%d}"
+        ancient_ts = timezone.now() - relativedelta(months=2)
+        ancient = f"{ancient_ts:%Y-%m-%d}"
+
+        job_application_1 = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record_1 = EmployeeRecord.from_job_application(job_application_1)
+        employee_record_1.created_at = sooner_ts
+        employee_record_1.update_as_ready()  # Also save() the employee record
+
+        job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=job_application_1.to_siae)
+        employee_record_2 = EmployeeRecord.from_job_application(job_application_2)
+        employee_record_2.created_at = ancient_ts
+        employee_record_2.update_as_ready()
+
+        member = employee_record_1.job_application.to_siae.members.first()
+
+        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+        response = self.client.get(ENDPOINT_URL + f"?since={today}", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        results = response.json()
+
+        self.assertFalse(results.get("results"))
+
+        response = self.client.get(ENDPOINT_URL + f"?since={sooner}", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        results = response.json().get("results")
+
+        self.assertTrue(results)
+        self.assertEqual(results[0].get("siret"), job_application_1.to_siae.siret)
+
+        response = self.client.get(ENDPOINT_URL + f"?since={ancient}", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        results = response.json().get("results")
+
+        self.assertEqual(len(results), 2)
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_chain_parameters(self, _mock):
+        sooner_ts = timezone.now() - relativedelta(days=3)
+        sooner = f"{sooner_ts:%Y-%m-%d}"
+        ancient_ts = timezone.now() - relativedelta(months=2)
+        ancient = f"{ancient_ts:%Y-%m-%d}"
+
+        job_application_1 = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record_1 = EmployeeRecord.from_job_application(job_application_1)
+        employee_record_1.created_at = sooner_ts
+        employee_record_1.save()  # in state NEW
+
+        job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=job_application_1.to_siae)
+        employee_record_2 = EmployeeRecord.from_job_application(job_application_2)
+        employee_record_2.created_at = ancient_ts
+        employee_record_2.update_as_ready()
+
+        member = employee_record_1.job_application.to_siae.members.first()
+
+        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+        response = self.client.get(ENDPOINT_URL + "?status=NEW", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        results = response.json().get("results")
+
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(ENDPOINT_URL + f"?status=NEW&created={sooner}", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        results = response.json().get("results")
+
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(ENDPOINT_URL + f"?status=READY&since={ancient}", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        results = response.json().get("results")
+
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get(ENDPOINT_URL + f"?status=READY&since={sooner}", format="json")
+
+        self.assertEqual(response.status_code, 200)
+
+        results = response.json().get("results")
+
+        self.assertEqual(len(results), 0)
