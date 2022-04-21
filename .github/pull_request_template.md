@@ -10,11 +10,6 @@ Indiquer le problème que nous sommes en train de résoudre et les objectifs mé
 
 Attirer l'attention sur les décisions d'architecture ou de conception importantes.
 
-### Liens utiles
-
-- [action notion](PASTE-URL-HERE)
-- [discussion slack](PASTE-URL-HERE)
-
 ### Captures d'écran (optionnel)
 
 Utile pour les changements liés à l'UI.
