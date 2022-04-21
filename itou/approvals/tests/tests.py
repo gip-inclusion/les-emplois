@@ -1078,7 +1078,7 @@ class SuspensionModelTest(TestCase):
             self.assertEqual(len(result), 4)
 
     def test_next_min_start_date(self):
-        today = timezone.now()
+        today = datetime.date.today()
         start_at = today - relativedelta(days=10)
 
         job_application_1 = JobApplicationWithApprovalFactory(hiring_start_at=today)
@@ -1092,19 +1092,17 @@ class SuspensionModelTest(TestCase):
         # What should be the expected suspension mimimum start date ?
 
         min_start_at = Suspension.next_min_start_at(job_application_1.approval)
-        self.assertEqual(min_start_at, today.date())
+        self.assertEqual(min_start_at, today)
 
         # Same rules apply for PE approval and PASS IAE
         min_start_at = Suspension.next_min_start_at(job_application_2.approval)
-        self.assertEqual(min_start_at, start_at.date())
+        self.assertEqual(min_start_at, start_at)
         min_start_at = Suspension.next_min_start_at(job_application_3.approval)
-        self.assertEqual(min_start_at, start_at.date())
+        self.assertEqual(min_start_at, start_at)
 
         # Fix a type error when creating a suspension:
         min_start_at = Suspension.next_min_start_at(job_application_4.approval)
-        self.assertEqual(
-            min_start_at, today.date() - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
-        )
+        self.assertEqual(min_start_at, today - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS))
 
 
 class SuspensionModelTestTrigger(TestCase):
