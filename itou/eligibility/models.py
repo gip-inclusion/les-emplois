@@ -304,6 +304,10 @@ class AdministrativeCriteria(models.Model):
     def __str__(self):
         return f"{self.name} - {self.get_level_display()}"
 
+    @property
+    def key(self):
+        return f"level_{self.level}_{self.pk}"
+
 
 class SelectedAdministrativeCriteria(models.Model):
     """

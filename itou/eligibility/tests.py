@@ -318,3 +318,10 @@ class AdministrativeCriteriaModelTest(TestCase):
         qs = AdministrativeCriteria.objects.level2()
         self.assertIn(level2_criterion, qs)
         self.assertNotIn(level1_criterion, qs)
+
+    def test_key_property(self):
+        criterion_level_1 = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
+        self.assertEqual(criterion_level_1.key, f"level_{criterion_level_1.level}_{criterion_level_1.pk}")
+
+        criterion_level_2 = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+        self.assertEqual(criterion_level_2.key, f"level_{criterion_level_2.level}_{criterion_level_2.pk}")

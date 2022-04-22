@@ -31,7 +31,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         criterion4 = AdministrativeCriteria.objects.get(pk=13)
 
         # At least 1 criterion level 1.
-        form_data = {f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "true"}
+        form_data = {f"{criterion1.key}": "true"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion1]
@@ -39,9 +39,9 @@ class AdministrativeCriteriaFormTest(TestCase):
 
         # Or at least 3 criterion level 2.
         form_data = {
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true",
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion3.pk}": "true",
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion4.pk}": "true",
+            f"{criterion2.key}": "true",
+            f"{criterion3.key}": "true",
+            f"{criterion4.key}": "true",
         }
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
@@ -59,14 +59,14 @@ class AdministrativeCriteriaFormTest(TestCase):
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
         criterion3 = AdministrativeCriteria.objects.get(pk=9)
 
-        form_data = {f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "false"}
+        form_data = {f"{criterion1.key}": "false"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
         self.assertIn(form.ERROR_CRITERIA_NUMBER, form.errors["__all__"])
 
         form_data = {
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true",
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion3.pk}": "true",
+            f"{criterion2.key}": "true",
+            f"{criterion3.key}": "true",
         }
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
@@ -81,7 +81,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         criterion3 = AdministrativeCriteria.objects.get(pk=9)
 
         # At least 1 criterion level 1.
-        form_data = {f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "true"}
+        form_data = {f"{criterion1.key}": "true"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion1]
@@ -108,13 +108,13 @@ class AdministrativeCriteriaFormTest(TestCase):
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
 
         # No level 1 criterion.
-        form_data = {f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "false"}
+        form_data = {f"{criterion1.key}": "false"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
         self.assertIn(form.ERROR_CRITERIA_NUMBER_ETTI_AI, form.errors["__all__"])
 
         # Only one level 2 criterion.
-        form_data = {f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true"}
+        form_data = {f"{criterion2.key}": "true"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
         self.assertIn(form.ERROR_CRITERIA_NUMBER_ETTI_AI, form.errors["__all__"])
@@ -147,9 +147,9 @@ class AdministrativeCriteriaFormTest(TestCase):
 
         form_data = {
             # Level 1.
-            f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "true",
+            f"{criterion1.key}": "true",
             # Level 2.
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true",
+            f"{criterion2.key}": "true",
         }
         form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
         form.is_valid()
