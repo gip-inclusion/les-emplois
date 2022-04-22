@@ -8,6 +8,7 @@ from django.db.models import Count, F
 from django.urls import reverse
 from django.utils import timezone
 
+from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
@@ -315,6 +316,38 @@ class EvaluatedJobApplication(models.Model):
         if self.evaluated_eligibility_diagnoses.exists():
             return evaluation_enums.EvaluationJobApplicationsState.PROCESSING
         return evaluation_enums.EvaluationJobApplicationsState.PENDING
+
+    def save_selected_criteria(self, cleaned_keys=None, changed_keys=None):
+        # cleaned_keys are checked fields when form is submitted.
+        #    It contains new AND prexistant choices.
+        # changed_keys are fields which status has changed when form is submitted :
+        #    from unchecked to checked
+        #    from checked to unchecked
+        #    It contains new AND removed choices.
+
+        if changed_keys:
+            if cleaned_keys is None:
+                cleaned_keys = []
+
+            with transaction.atomic():
+
+                EvaluatedEligibilityDiagnosis.objects.filter(
+                    pk__in=(
+                        eval_diag.pk
+                        for eval_diag in self.evaluated_eligibility_diagnoses.all()
+                        if eval_diag.administrative_criteria.key in set(changed_keys) - set(cleaned_keys)
+                    )
+                ).delete()
+
+                EvaluatedEligibilityDiagnosis.objects.bulk_create(
+                    [
+                        EvaluatedEligibilityDiagnosis(
+                            evaluated_job_application=self, administrative_criteria=criterion
+                        )
+                        for criterion in AdministrativeCriteria.objects.all()
+                        if criterion.key in set(changed_keys).intersection(cleaned_keys)
+                    ]
+                )
 
 
 class EvaluatedAdministrativeCriteria(models.Model):

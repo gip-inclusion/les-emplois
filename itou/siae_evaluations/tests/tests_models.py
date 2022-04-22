@@ -514,3 +514,48 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
         )
         self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PROCESSING, evaluated_job_application.state)
+
+    def test_save_selected_criteria(self):
+        evaluated_job_application = EvaluatedJobApplicationFactory()
+        criterion1 = AdministrativeCriteria.objects.filter(level=1).first()
+        criterion2 = AdministrativeCriteria.objects.filter(level=2).first()
+
+        # nothing to do
+        evaluated_job_application.save_selected_criteria()
+        self.assertEqual(0, EvaluatedEligibilityDiagnosis.objects.count())
+
+        # only create criterion1
+        evaluated_job_application.save_selected_criteria(changed_keys=[criterion1.key], cleaned_keys=[criterion1.key])
+        self.assertEqual(1, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(
+            EvaluatedEligibilityDiagnosis.objects.first().administrative_criteria,
+            AdministrativeCriteria.objects.filter(level=1).first(),
+        )
+
+        # create criterion2 and delete criterion1
+        evaluated_job_application.save_selected_criteria(
+            changed_keys=[criterion1.key, criterion2.key], cleaned_keys=[criterion2.key]
+        )
+        self.assertEqual(1, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(
+            EvaluatedEligibilityDiagnosis.objects.first().administrative_criteria,
+            AdministrativeCriteria.objects.filter(level=2).first(),
+        )
+
+        # only delete
+        evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key])
+        self.assertEqual(0, EvaluatedEligibilityDiagnosis.objects.count())
+
+        # delete non-existant criterion does not raise error ^^
+        evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key])
+        self.assertEqual(0, EvaluatedEligibilityDiagnosis.objects.count())
+
+        # atomic : deletion rolled back when trying to create existing criterion
+        evaluated_job_application.save_selected_criteria(
+            changed_keys=[criterion1.key, criterion2.key], cleaned_keys=[criterion1.key, criterion2.key]
+        )
+        with self.assertRaises(IntegrityError):
+            evaluated_job_application.save_selected_criteria(
+                changed_keys=[criterion1.key, criterion2.key], cleaned_keys=[criterion2.key]
+            )
+        self.assertEqual(2, EvaluatedEligibilityDiagnosis.objects.count())
