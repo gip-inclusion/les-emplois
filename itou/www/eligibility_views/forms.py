@@ -54,15 +54,7 @@ class AdministrativeCriteriaForm(forms.Form):
         super().__init__(**kwargs)
 
         for criterion in AdministrativeCriteria.objects.all():
-
-            if criterion.level == AdministrativeCriteria.Level.LEVEL_1:
-                prefix = self.LEVEL_1_PREFIX
-            elif criterion.level == AdministrativeCriteria.Level.LEVEL_2:
-                prefix = self.LEVEL_2_PREFIX
-            else:
-                raise RuntimeError(f"Unknown level: {criterion.level}.")
-
-            key = f"{prefix}{criterion.pk}"
+            key = criterion.key
             self.fields[key] = forms.BooleanField(required=False, label=criterion.name, help_text=criterion.desc)
             self.fields[key].widget.attrs["class"] = "form-check-input"  # Bootstrap CSS class.
             self.OBJECTS[key] = criterion

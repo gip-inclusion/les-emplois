@@ -26,7 +26,6 @@ from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
-from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
 @patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
@@ -548,10 +547,10 @@ class ProcessViewsTest(TestCase):
 
         post_data = {
             # Administrative criteria level 1.
-            f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "true",
+            f"{criterion1.key}": "true",
             # Administrative criteria level 2.
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true",
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion3.pk}": "true",
+            f"{criterion2.key}": "true",
+            f"{criterion3.key}": "true",
             # Confirm.
             "confirm": "true",
         }
