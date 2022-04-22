@@ -205,6 +205,15 @@ class SiaeJobApplicationListViewTest(TestCase):
             f"Contrôle initié le "
             f"{dateformat.format(evaluated_siae.evaluation_campaign.evaluations_asked_at, 'd E Y').lower()}",
         )
+        self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:siae_select_criteria",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+            ),
+        )
+
+
 class SiaeSelectCriteriaViewTest(TestCase):
     def setUp(self):
         membership = SiaeMembershipFactory()

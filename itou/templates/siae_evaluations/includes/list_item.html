@@ -27,9 +27,13 @@
 
         {% if item.state == "PENDING" %}
             <div>
-                <a href="#" class="btn btn-outline-primary float-right">Ajouter ses justificatifs</a>
+                <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-outline-primary float-right">Ajouter ses justificatifs</a>
             </div>
-
+        {% elif item.state == "PROCESSING" %}
+            {# Work In Progress : the link below will be changed soon to redirect to upload view#}
+            <div>
+                <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-outline-primary float-right">Ajouter ses justificatifs</a>
+            </div>
         {% endif %}
 
     </div>
