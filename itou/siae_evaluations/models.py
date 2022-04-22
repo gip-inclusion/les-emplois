@@ -74,6 +74,10 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_s
     return len(evaluation_campaign_list)
 
 
+class CampaignAlreadyPopulatedException(Exception):
+    pass
+
+
 class EvaluationCampaignQuerySet(models.QuerySet):
     def for_institution(self, institution):
         return self.filter(institution=institution).order_by("-evaluated_period_end_at")
@@ -184,6 +188,32 @@ class EvaluationCampaign(models.Model):
             self.eligible_siaes().values_list("to_siae", flat=True).order_by("?")[: self.number_of_siaes_to_select()]
         )
 
+    def populate(self, set_at):
+        if self.evaluations_asked_at:
+            raise CampaignAlreadyPopulatedException()
+
+        with transaction.atomic():
+            if not self.percent_set_at:
+                self.percent_set_at = set_at
+            self.evaluations_asked_at = set_at
+
+            self.save(update_fields=["percent_set_at", "evaluations_asked_at"])
+
+            evaluated_siaes = EvaluatedSiae.objects.bulk_create(
+                EvaluatedSiae(evaluation_campaign=self, siae=Siae.objects.get(pk=pk))
+                for pk in self.eligible_siaes_under_ratio()
+            )
+
+            EvaluatedJobApplication.objects.bulk_create(
+                [
+                    EvaluatedJobApplication(evaluated_siae=evaluated_siae, job_application=job_application)
+                    for evaluated_siae in evaluated_siaes
+                    for job_application in select_min_max_job_applications(
+                        self.eligible_job_applications().filter(to_siae=evaluated_siae.siae)
+                    )
+                ]
+            )
+
     def get_email_institution_notification(self, ratio_selection_end_at):
         to = self.institution.active_members
         context = {
@@ -193,6 +223,7 @@ class EvaluationCampaign(models.Model):
         subject = "siae_evaluations/email/email_institution_notification_subject.txt"
         body = "siae_evaluations/email/email_institution_notification_body.txt"
         return get_email_message(to, context, subject, body)
+
 
 class EvaluatedSiae(models.Model):
 
