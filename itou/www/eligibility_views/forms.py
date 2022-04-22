@@ -95,3 +95,13 @@ class AdministrativeCriteriaForm(forms.Form):
                 raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER)
 
         return selected_objects
+
+
+class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
+    def get_administrative_criteria(self):
+        return AdministrativeCriteria.objects.for_job_application(self.job_application)
+
+    def __init__(self, user, siae, job_application, **kwargs):
+
+        self.job_application = job_application
+        super().__init__(user, siae, **kwargs)
