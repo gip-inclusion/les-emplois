@@ -129,6 +129,7 @@ class ItouLogoutView(LogoutView):
         or notify France Connect when the user logs out.
         Original code:
         https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L775
+        TODO: (celinems) A better place for this should be itou.users.adapter.UserAdapter.get_logout_redirect_url
         """
 
         peamu_id_token = self.request.user.peamu_id_token

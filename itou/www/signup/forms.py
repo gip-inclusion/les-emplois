@@ -436,64 +436,6 @@ class PrescriberCheckPEemail(forms.Form):
         return email
 
 
-class PrescriberUserSignupBaseForm(FullnameFormMixin, forms.Form):
-    """
-    Create a new user of type prescriber and add it to the members of the given prescriber organization.
-    """
-
-    email = forms.EmailField(
-        label="E-mail",
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "type": "email",
-                "autocomplete": "off",
-            }
-        ),
-    )
-
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        user_exists = User.objects.filter(email=email).exists()
-        if user_exists:
-            message = (
-                "Un compte existe déjà avec cette adresse e-mail. "
-                "Si vous souhaitez créer un compte pour une autre organisation "
-                "et y être rattaché avec cette adresse e-mail, "
-                f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>contactez-nous</a>."
-            )
-            raise forms.ValidationError(mark_safe(message))
-        return email
-
-    def save(self):
-        user_attributes = {
-            "first_name": self.cleaned_data["first_name"],
-            "last_name": self.cleaned_data["last_name"],
-            "is_prescriber": True,
-            "username": User.generate_unique_username(),
-            "email": self.cleaned_data["email"],
-        }
-        user = User.objects.create_user(**user_attributes)
-        return user
-
-
-class PrescriberPoleEmploiUserSignupForm(PrescriberUserSignupBaseForm):
-    """
-    Create a new user of type prescriber and add it to the members of the given prescriber organization.
-    """
-
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        if not email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
-            raise ValidationError(
-                "L’adresse e-mail que vous avez utilisée n’est pas une adresse e-mail "
-                "en pole-emploi.fr. Veuillez renouveler votre inscription en utilisant "
-                "le bon format d’adresse e-mail."
-            )
-        super().clean_email()
-        return email
-
-
 class FacilitatorSignupForm(SignupForm, FullnameFormMixin):
 
     email = forms.EmailField(

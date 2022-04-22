@@ -3,7 +3,7 @@
 
 <div class="text-center">
     <a
-        href="{% url 'inclusion_connect:authorize' %}?login_hint={{ login_hint }}"
+        href="{{ button_url }}"
         title="S'identifier avec Inclusion Connect"
         class="matomo-event"
         data-matomo-category="inscription-{{ authentication_type }}"

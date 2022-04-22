@@ -8,13 +8,15 @@ import respx
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.messages import get_messages
-from django.test import TestCase
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
 from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberPoleEmploiFactory
 from itou.prescribers.models import PrescriberOrganization
+from itou.utils.perms.user import KIND_PRESCRIBER
 
 from ..users import enums as users_enums
 from ..users.factories import DEFAULT_PASSWORD, PrescriberFactory, SiaeStaffFactory, UserFactory
@@ -24,13 +26,12 @@ from .constants import (
     INCLUSION_CONNECT_ENDPOINT_LOGOUT,
     INCLUSION_CONNECT_ENDPOINT_TOKEN,
     INCLUSION_CONNECT_ENDPOINT_USERINFO,
-    INCLUSION_CONNECT_SESSION_STATE,
-    INCLUSION_CONNECT_SESSION_TOKEN,
+    INCLUSION_CONNECT_SESSION_KEY,
     INCLUSION_CONNECT_STATE_EXPIRATION,
     PROVIDER_INCLUSION_CONNECT,
 )
 from .models import InclusionConnectState, InclusionConnectUserData, create_or_update_user, userinfo_to_user_model_dict
-from .views import state_is_valid, state_new
+from .views import InclusionConnectSession, state_is_valid, state_new
 
 
 INCLUSION_CONNECT_USERINFO = {
@@ -43,15 +44,30 @@ INCLUSION_CONNECT_USERINFO = {
 
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
-def _oauth_dance(test_class, email=None, assert_redirects=True):
+def _oauth_dance(
+    test_class, previous_url=None, next_url=None, assert_redirects=True, login_hint=None, user_info_email=None
+):
+    respx.get(INCLUSION_CONNECT_ENDPOINT_AUTHORIZE).respond(302)
+    # Authorize params depend on user kind.
+    authorize_params = {
+        "user_kind": KIND_PRESCRIBER,
+        "previous_url": previous_url,
+        "next_url": next_url,
+        "login_hint": login_hint,
+    }
+    authorize_params = {k: v for k, v in authorize_params.items() if v}
+
+    # Calling this view is mandatory to start a new session.
+    authorize_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(authorize_params)}"
+    test_class.client.get(authorize_url)
     # User is logged out from IC when an error happens during the oauth dance.
     respx.get(INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
     user_info = INCLUSION_CONNECT_USERINFO.copy()
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
-    if email:
-        user_info["email"] = email
+    if user_info_email:
+        user_info["email"] = user_info_email
 
     respx.get(INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
@@ -64,17 +80,9 @@ def _oauth_dance(test_class, email=None, assert_redirects=True):
     return response
 
 
-def _logout_from_IC(test_class, redirect_url=None, follow=False):
+def _logout_from_IC(test_class, follow=False):
     respx.get(INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
-    params = {
-        INCLUSION_CONNECT_SESSION_TOKEN: test_class.client.session.get(INCLUSION_CONNECT_SESSION_TOKEN),
-        INCLUSION_CONNECT_SESSION_STATE: test_class.client.session.get(INCLUSION_CONNECT_SESSION_STATE),
-    }
-    if redirect_url:
-        params["redirect_url"] = redirect_url
-
-    logout_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
-
+    logout_url = reverse("inclusion_connect:logout")
     return test_class.client.get(logout_url, follow=follow)
 
 
@@ -216,15 +224,21 @@ class InclusionConnectViewTest(TestCase):
 
     def test_authorize_endpoint(self):
         url = reverse("inclusion_connect:authorize")
-        response = self.client.get(url, follow=False)
+        with self.assertRaises(KeyError):
+            response = self.client.get(url, follow=False)
+
+        url = f"{reverse('inclusion_connect:authorize')}?user_kind={KIND_PRESCRIBER}"
         # Don't use assertRedirects to avoid fetching the last URL.
+        response = self.client.get(url, follow=False)
         self.assertTrue(response.url.startswith(INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
+        self.assertTrue(self.client.get(INCLUSION_CONNECT_SESSION_KEY))
 
     def test_authorize_endpoint_with_params(self):
-        email = parse.quote("porthos@mousquetairestoujours.com")
-        url = reverse("inclusion_connect:authorize") + f"?login_hint={email}"
+        email = "porthos@touspourun.com"
+        params = {"login_hint": email, "user_kind": KIND_PRESCRIBER}
+        url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
-        self.assertIn(email, response.url)
+        self.assertIn(parse.quote(email), response.url)
 
     ####################################
     ######### Callback tests ###########
@@ -305,7 +319,8 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         # Skip the welcoming tour to test dashboard content.
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = _oauth_dance(self, assert_redirects=False)
+            previous_url = reverse("signup:prescriber_inclusion_connect_button")
+            response = _oauth_dance(self, assert_redirects=False, previous_url=previous_url)
             # Follow the redirection.
             response = self.client.get(response.url)
         # Response should contain links available only to prescribers.
@@ -365,7 +380,16 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         # Skip the welcoming tour to test dashboard content.
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = _oauth_dance(self, email=email, assert_redirects=False)
+            previous_url = reverse("signup:prescriber_pe_inclusion_connect_button")
+            next_url = reverse("signup:prescriber_join_org")
+            response = _oauth_dance(
+                self,
+                assert_redirects=False,
+                login_hint=email,
+                user_info_email=email,
+                previous_url=previous_url,
+                next_url=next_url,
+            )
             # Follow the redirection.
             response = self.client.get(response.url, follow=True)
 
@@ -446,7 +470,9 @@ class InclusionConnectPrescribersViewsTest(TestCase):
         # Skip the welcoming tour to test dashboard content.
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = _oauth_dance(self, assert_redirects=False)
+            previous_url = reverse("signup:prescriber_pe_inclusion_connect_button")
+            next_url = reverse("signup:prescriber_join_org")
+            response = _oauth_dance(self, assert_redirects=False, previous_url=previous_url, next_url=next_url)
             # Follow the redirection.
             response = self.client.get(response.url, follow=True)
 
@@ -505,7 +531,8 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         # Skip the welcoming tour to test dashboard content.
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = _oauth_dance(self, assert_redirects=False)
+            previous_url = reverse("signup:prescriber_inclusion_connect_button")
+            response = _oauth_dance(self, assert_redirects=False, previous_url=previous_url)
             # Follow the redirection.
             response = self.client.get(response.url, follow=True)
 
@@ -565,7 +592,9 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
-        response = _oauth_dance(self, assert_redirects=False)
+        previous_url = reverse("signup:prescriber_inclusion_connect_button")
+        next_url = reverse("signup:prescriber_join_org")
+        response = _oauth_dance(self, assert_redirects=False, previous_url=previous_url, next_url=next_url)
         # Follow the redirection.
         response = self.client.get(response.url, follow=True)
 
@@ -631,7 +660,9 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
-        response = _oauth_dance(self, assert_redirects=False)
+        previous_url = reverse("signup:prescriber_inclusion_connect_button")
+        next_url = reverse("signup:prescriber_join_org")
+        response = _oauth_dance(self, assert_redirects=False, previous_url=previous_url, next_url=next_url)
         # Follow the redirection.
         response = self.client.get(response.url, follow=True)
 
@@ -658,7 +689,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         but his e-mail suffix is wrong. An error should be raised.
         """
         pe_org = PrescriberPoleEmploiFactory()
-        email = f"maxime{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
+        pe_email = f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
 
         # Go through each step to ensure session data is recorded properly.
         # Step 1: choose organization kind or go to the "no organization" page.
@@ -672,14 +703,24 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
 
         # Step 3: check email
         check_email_url = reverse("signup:prescriber_check_pe_email")
-        post_data = {"email": f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"}
+        post_data = {"email": pe_email}
         response = self.client.post(check_email_url, data=post_data, follow=True)
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect but, this time, don't use a PE email.
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = _oauth_dance(self, assert_redirects=False)
+            previous_url = reverse("signup:prescriber_pe_inclusion_connect_button")
+            next_url = reverse("signup:prescriber_join_org")
+            wrong_email = "athos@touspourun.com"
+            response = _oauth_dance(
+                self,
+                login_hint=pe_email,
+                assert_redirects=False,
+                previous_url=previous_url,
+                next_url=next_url,
+                user_info_email=wrong_email,
+            )
             # Follow the redirection.
             response = self.client.get(response.url, follow=True)
 
@@ -688,13 +729,13 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertIn(
-            "L’adresse e-mail que vous avez utilisée n’est pas une adresse e-mail en pole-emploi.fr.",
+            "est différente de celle que vous avez indiquée précédemment",
             str(messages[0]),
         )
 
         # Organization
         self.assertFalse(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY))
-        self.assertFalse(User.objects.filter(email=email).exists())
+        self.assertFalse(User.objects.filter(email=pe_email).exists())
 
 
 class InclusionConnectLogoutTest(TestCase):
@@ -710,6 +751,7 @@ class InclusionConnectLogoutTest(TestCase):
         response = self.client.get(response.url)
         logout_url = reverse("account_logout")
         self.assertContains(response, logout_url)
+        self.assertTrue(self.client.session.get(INCLUSION_CONNECT_SESSION_KEY))
 
         response = self.client.post(logout_url)
         expected_redirection = reverse("inclusion_connect:logout")
@@ -744,14 +786,17 @@ class InclusionConnectLogoutTest(TestCase):
     def test_logout_with_redirection(self):
         _oauth_dance(self)
         expected_redirection = reverse("dashboard:index")
-        response = _logout_from_IC(self, redirect_url=expected_redirection)
+        respx.get(INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
+
+        params = {"redirect_url": expected_redirection}
+        logout_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+        response = self.client.get(logout_url)
         self.assertRedirects(response, expected_redirection)
 
-    def test_logout_exception_no_id_token(self):
+    def test_logout_exception_no_session_no_param(self):
         url = reverse("inclusion_connect:logout")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Le paramètre « id_token » est manquant.")
+        with self.assertRaises(KeyError):
+            self.client.get(url)
 
 
 class InclusionConnectLoginTest(TestCase):
@@ -772,6 +817,7 @@ class InclusionConnectLoginTest(TestCase):
         login_url = reverse("login:prescriber")
         response = self.client.get(login_url)
         self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, reverse("inclusion_connect:authorize"))
 
         response = _oauth_dance(self, assert_redirects=False)
         expected_redirection = reverse("dashboard:index")
@@ -833,3 +879,23 @@ class InclusionConnectUserPermissions(TestCase):
 
         # Don't allow update.
         pass
+
+
+class InclusionConnectSessionTest(TestCase):
+    def test_start_session(self):
+        ic_session = InclusionConnectSession()
+        self.assertEqual(ic_session.key, INCLUSION_CONNECT_SESSION_KEY)
+
+        expected_keys = ["token", "state", "previous_url", "next_url", "user_email", "user_kind", "request"]
+        ic_session_dict = ic_session.asdict()
+        for key in expected_keys:
+            with self.subTest(key):
+                self.assertIn(key, ic_session_dict.keys())
+                self.assertEqual(ic_session_dict[key], None)
+
+        request = RequestFactory().get("/")
+        middleware = SessionMiddleware(lambda x: x)
+        middleware.process_request(request)
+        request.session.save()
+        request = ic_session.bind_to_request(request=request)
+        self.assertTrue(request.session.get(INCLUSION_CONNECT_SESSION_KEY))

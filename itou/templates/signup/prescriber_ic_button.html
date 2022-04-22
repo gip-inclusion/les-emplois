@@ -33,6 +33,13 @@
         {% include "signup/includes/authorization_proof.html" %}
     {% endif %}
 
-    {% include "inclusion_connect/includes/description.html" with show_ic_button=True %}
+    {% include "inclusion_connect/includes/description.html" with show_ic_button=True button_url=inclusion_connect_url %}
+
+    <div class="mt-3">
+        <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
+            Retour
+        </a>
+
+    </div>
 
 {% endblock %}

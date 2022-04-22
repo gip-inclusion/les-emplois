@@ -61,14 +61,11 @@ class UserAdapter(DefaultAccountAdapter):
         """
         # Is user is from SSO, get params from session.
         redirect_url = reverse("home:hp")
-        ic_token = request.session.get(ic_constants.INCLUSION_CONNECT_SESSION_TOKEN)
-        ic_state = request.session.get(ic_constants.INCLUSION_CONNECT_SESSION_STATE)
-
-        if ic_token:
-            params = {
-                ic_constants.INCLUSION_CONNECT_SESSION_TOKEN: ic_token,
-                ic_constants.INCLUSION_CONNECT_SESSION_STATE: ic_state,
-            }
+        ic_session = request.session.get(ic_constants.INCLUSION_CONNECT_SESSION_KEY)
+        if ic_session:
+            # Session data is flushed on user logout so we need to pass this information
+            # with params.
+            params = {"token": ic_session["token"], "state": ic_session["state"]}
             redirect_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
 
         return redirect_url

@@ -16,6 +16,7 @@ from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.perms.user import KIND_PRESCRIBER
 from itou.www.signup.forms import PrescriberChooseKindForm
 
 
@@ -61,7 +62,10 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_inclusion_connect_button")
         self.assertRedirects(response, url)
 
-        # TODO: test the following steps.
+        response = self.client.get(response.url)
+        ic_authorize_url = reverse("inclusion_connect:authorize")
+        self.assertContains(response, ic_authorize_url)
+        self.assertContains(response, f"user_kind={KIND_PRESCRIBER}")
 
         # # Step 3: user information.
         # url = reverse("signup:prescriber_user")

@@ -22,6 +22,7 @@ from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
+from itou.utils.perms.user import KIND_PRESCRIBER
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
 
@@ -525,6 +526,7 @@ def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe
     context = {
         "pole_emploi_org": pole_emploi_org,
         "form": form,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
@@ -543,11 +545,18 @@ def prescriber_pe_inclusion_connect_button(request, template_name="signup/prescr
     pole_emploi_org = get_object_or_404(
         PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
     )
+    params = {
+        "login_hint": session_data["email"],
+        "user_kind": KIND_PRESCRIBER,
+        "previous_url": request.resolver_match.view_name,
+        "next_url": reverse("signup:prescriber_join_org"),
+    }
+    inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
 
     context = {
+        "inclusion_connect_url": inclusion_connect_url,
         "pole_emploi_org": pole_emploi_org,
         "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
-        "email": session_data["email"],
     }
     return render(request, template_name, context)
 
@@ -594,7 +603,18 @@ def prescriber_inclusion_connect_button(request, template_name="signup/prescribe
     # Get kind label
     kind_label = dict(PrescriberOrganization.Kind.choices).get(kind)
 
+    ic_params = {
+        "user_kind": KIND_PRESCRIBER,
+        "previous_url": request.resolver_match.view_name,
+    }
+    if join_as_orienteur_with_org:
+        # Redirect to the join organization view after login or signup.
+        ic_params["next_url"] = reverse("signup:prescriber_join_org")
+
+    inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(ic_params)}"
+
     context = {
+        "inclusion_connect_url": inclusion_connect_url,
         "join_as_orienteur_without_org": join_as_orienteur_without_org,
         "join_authorized_org": join_authorized_org,
         "kind_label": kind_label,
