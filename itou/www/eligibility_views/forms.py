@@ -1,5 +1,6 @@
 from django import forms
 
+from itou.eligibility import enums as eligibilty_enums
 from itou.eligibility.models import AdministrativeCriteria
 
 
@@ -23,8 +24,8 @@ class ConfirmEligibilityForm(forms.Form):
 
 class AdministrativeCriteriaForm(forms.Form):
 
-    LEVEL_1_PREFIX = "level_1_"
-    LEVEL_2_PREFIX = "level_2_"
+    LEVEL_1_PREFIX = eligibilty_enums.AdministrativeCriteriaLevelPrefix.LEVEL_1_PREFIX
+    LEVEL_2_PREFIX = eligibilty_enums.AdministrativeCriteriaLevelPrefix.LEVEL_2_PREFIX
 
     OBJECTS = {}
 
