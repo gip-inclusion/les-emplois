@@ -9,6 +9,8 @@
                 <p class="small mb-0">
                     {% if item.state == "PENDING" %}
                         <p class="badge badge-warning">A traiter</b></p>
+                    {% elif item.state == "PROCESSING" %}
+                        <p class="badge badge-warning">En cours</b></p>
                     {% endif %}
                 </p>
             </div>

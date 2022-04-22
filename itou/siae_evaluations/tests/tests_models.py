@@ -508,3 +508,9 @@ class EvaluatedJobApplicationModelTest(TestCase):
     def test_state(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
         self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PENDING, evaluated_job_application.state)
+
+        criterion = AdministrativeCriteria.objects.first()
+        EvaluatedEligibilityDiagnosis.objects.create(
+            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
+        )
+        self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PROCESSING, evaluated_job_application.state)

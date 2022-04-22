@@ -312,6 +312,8 @@ class EvaluatedJobApplication(models.Model):
     @property
     def state(self):
         # property in progress, new conditionnal state will be added further
+        if self.evaluated_eligibility_diagnoses.exists():
+            return evaluation_enums.EvaluationJobApplicationsState.PROCESSING
         return evaluation_enums.EvaluationJobApplicationsState.PENDING
 
 
