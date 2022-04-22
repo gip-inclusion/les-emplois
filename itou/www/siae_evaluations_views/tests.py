@@ -205,3 +205,139 @@ class SiaeJobApplicationListViewTest(TestCase):
             f"Contrôle initié le "
             f"{dateformat.format(evaluated_siae.evaluation_campaign.evaluations_asked_at, 'd E Y').lower()}",
         )
+class SiaeSelectCriteriaViewTest(TestCase):
+    def setUp(self):
+        membership = SiaeMembershipFactory()
+        self.user = membership.user
+        self.siae = membership.siae
+
+    def test_access_without_activ_campaign(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        evaluated_job_application = EvaluatedJobApplicationFactory()
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:siae_select_criteria",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_access(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=self.siae)
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:siae_select_criteria",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            evaluated_job_application.job_application.job_seeker,
+            response.context["job_seeker"],
+        )
+        self.assertEqual(
+            evaluated_job_application.job_application.approval,
+            response.context["approval"],
+        )
+        self.assertEqual(
+            reverse("siae_evaluations_views:siae_job_applications_list"),
+            response.context["back_url"],
+        )
+
+    def test_context_fields_list(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        # Combinations :
+        # (True, False) = eligibility diagnosis with level 1 administrative criteria
+        # (False, True) = eligibility diagnosis with level 2 administrative criteria
+        # (True, True) = eligibility diagnosis with level 1 and level 2 administrative criteria
+        # (False, False) = eligibility diagnosis ~without~ administrative criteria
+
+        for level_1, level_2 in [(True, False), (False, True), (True, True), (False, False)]:
+            with self.subTest(level_1=level_1, level_2=level_2):
+                evaluated_job_application = create_evaluated_siae_with_consistent_datas(
+                    self.siae, self.user, level_1=level_1, level_2=level_2
+                )
+            response = self.client.get(
+                reverse(
+                    "siae_evaluations_views:siae_select_criteria",
+                    kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+                )
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertIs(level_1, bool(response.context["level_1_fields"]))
+            self.assertIs(level_2, bool(response.context["level_2_fields"]))
+
+    def test_post(self):
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        criterion = (
+            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+        )
+
+        url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {criterion.administrative_criteria.key: True}
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(1, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(
+            criterion.administrative_criteria,
+            EvaluatedEligibilityDiagnosis.objects.first().administrative_criteria,
+        )
+
+    def test_initial_data_form(self):
+
+        # no preselected criteria
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        for i in range(len(response.context["level_1_fields"])):
+            with self.subTest(i):
+                self.assertNotIn("checked", response.context["level_1_fields"][i].subwidgets[0].data["attrs"])
+        for i in range(len(response.context["level_2_fields"])):
+            with self.subTest(i):
+                self.assertNotIn("checked", response.context["level_2_fields"][i].subwidgets[0].data["attrs"])
+
+        # preselected criteria
+        criterion = (
+            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+        )
+        EvaluatedEligibilityDiagnosis.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=criterion.administrative_criteria,
+        )
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertIn("checked", response.context["level_1_fields"][0].subwidgets[0].data["attrs"])
+        for i in range(1, len(response.context["level_1_fields"])):
+            with self.subTest(i):
+                self.assertNotIn("checked", response.context["level_1_fields"][i].subwidgets[0].data["attrs"])
+        for i in range(len(response.context["level_2_fields"])):
+            with self.subTest(i):
+                self.assertNotIn("checked", response.context["level_2_fields"][i].subwidgets[0].data["attrs"])

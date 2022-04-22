@@ -1,0 +1,34 @@
+{% load bootstrap4 %}
+
+<form method="post" action="" role="form" class="js-prevent-multiple-submit">
+
+    {% csrf_token %}
+
+    {% bootstrap_form_errors form_administrative_criteria type="all" %}
+
+    {% if level_1_fields %}
+        <h3 class="h2">
+            Critères administratifs de niveau 1
+        </h3>
+
+        {% for field in level_1_fields %}
+            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
+        {% endfor %}
+    {% endif %}
+
+    {% if level_2_fields %}
+        <h3 class="h2">
+            Critères administratifs de niveau 2
+        </h3>
+
+        {% for field in level_2_fields %}
+            {# notice that eligibility/includes/criteria_input.html requires form_administrative_criteria.OBJECTS #}
+            {# altough field is already sent ~ vincentporte's note - april 2022#}
+            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
+        {% endfor %}
+    {% endif %}
+
+    {% buttons %}
+        <button type="submit" class="btn btn-outline-primary float-right">Enregistrer ce(s) critère(s)</button>
+    {% endbuttons %}
+
