@@ -14,7 +14,6 @@ class ItouLoginForm(LoginForm):
         super().clean()
         if self.user and self.user.has_sso_provider:
             identity_provider = self.user.get_identity_provider_display()
-            error_message = (
-                f"Votre compte est relié à {identity_provider}. " "Merci de vous connecter avec ce service."
-            )
+            error_message = f"Votre compte est relié à {identity_provider}. Merci de vous connecter avec ce service."
+            raise forms.ValidationError(error_message)
         return self.cleaned_data
