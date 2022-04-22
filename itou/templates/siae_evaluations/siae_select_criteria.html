@@ -1,0 +1,65 @@
+{% extends "layout/content.html" %}
+{% load format_filters %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block title %}
+    Auto-prescriptions à justifier pour
+    {{full_name|title}}
+{% endblock %}
+
+{% block content %}
+    <div class="row mt-3">
+
+        <div class="col-2 mt-2">
+            {# placeholder #}
+        </div>
+        <div class="col-8 mt-2">
+
+            <div class="card my-5">
+
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3 class="h2">Auto-prescriptions à justifier pour
+                                <span class="text-muted">
+                                    {{job_seeker.get_full_name|title}}
+                                </span></h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ approval.number_with_spaces }}</b></p>
+
+                        </div>
+
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            {% include "siae_evaluations/includes/criteria_form.html" %}
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+            {% if back_url %}
+                <p class="mt-4">
+                    <a href="{{ back_url }}">Retour</a>
+                </p>
+            {% endif %}
+
+        </div>
+    </div>
+
+
+
+
+
+{% endblock %}
