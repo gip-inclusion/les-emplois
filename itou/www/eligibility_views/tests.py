@@ -1,10 +1,14 @@
+from dateutil.relativedelta import relativedelta
 from django.test import TestCase
+from django.utils import timezone
 
-from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import Siae
-from itou.users.factories import PrescriberFactory
-from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
+from itou.users.factories import JobSeekerFactory, PrescriberFactory
+from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
+from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
 
 
 class AdministrativeCriteriaFormTest(TestCase):
@@ -161,3 +165,42 @@ class AdministrativeCriteriaFormTest(TestCase):
         form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
         form.is_valid()
         self.assertIn(form.ERROR_LONG_TERM_JOB_SEEKER, form.errors["__all__"])
+
+
+class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
+    def test_job_application(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        job_seeker = JobSeekerFactory()
+
+        user_info = UserInfo(
+            user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
+        )
+
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker,
+            user_info,
+            administrative_criteria=[
+                AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
+            ]
+            + [AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()],
+        )
+
+        job_application = JobApplicationWithApprovalFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+
+        form = AdministrativeCriteriaOfJobApplicationForm(user, siae, job_application=job_application)
+        self.assertEquals(2, len(form.fields))
+        self.assertIn(
+            AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first().key,
+            form.fields.keys(),
+        )
+        self.assertIn(
+            AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first().key,
+            form.fields.keys(),
+        )
