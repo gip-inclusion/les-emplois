@@ -11,8 +11,9 @@ from itou.institutions.models import Institution
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
+from itou.siae_evaluations.factories import EvaluationCampaignFactory
 from itou.siae_evaluations.models import (
+    CampaignAlreadyPopulatedException,
     EvaluatedJobApplication,
     EvaluatedSiae,
     EvaluationCampaign,
@@ -405,6 +406,10 @@ class EvaluationCampaignManagerTest(TestCase):
         for evaluated_job_application in EvaluatedJobApplication.objects.all():
             with self.subTest(evaluated_job_application=evaluated_job_application):
                 self.assertEqual(evaluated_siae, evaluated_job_application.evaluated_siae)
+
+        # retry on populated campaign
+        with self.assertRaises(CampaignAlreadyPopulatedException):
+            evaluation_campaign.populate(fake_now)
 
 
 class EvaluationCampaignEmailMethodsTest(TestCase):
