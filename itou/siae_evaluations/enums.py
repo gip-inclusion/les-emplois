@@ -30,3 +30,4 @@ class EvaluationJobApplicationsBoundariesNumber:
 
 class EvaluationJobApplicationsState(models.TextChoices):
     PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
