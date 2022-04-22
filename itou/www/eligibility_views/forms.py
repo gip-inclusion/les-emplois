@@ -66,12 +66,6 @@ class AdministrativeCriteriaForm(forms.Form):
             self.fields[key].widget.attrs["class"] = "form-check-input"  # Bootstrap CSS class.
             self.OBJECTS[key] = criterion
 
-        # Ensure that `NAME_*` exist in DB.
-        existing_names_in_db = [obj.name for obj in self.OBJECTS.values()]
-        for name in self.NAMES:
-            if name not in existing_names_in_db:
-                raise RuntimeError(f"Unknown name: {name}.")
-
     def clean(self):
         selected_objects = [self.OBJECTS[key] for key, selected in self.cleaned_data.items() if selected]
 
