@@ -1,18 +1,71 @@
+from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionMembershipFactory
+from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import (
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from itou.siae_evaluations.models import EvaluationCampaign
+from itou.siae_evaluations.models import EvaluatedEligibilityDiagnosis, EvaluationCampaign
 from itou.siaes.factories import SiaeMembershipFactory
-from itou.users.factories import DEFAULT_PASSWORD
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
 from itou.www.siae_evaluations_views.forms import SetChosenPercentForm
+
+
+def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_2=False):
+    job_seeker = JobSeekerFactory()
+
+    user_info = UserInfo(
+        user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
+    )
+
+    eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+        job_seeker,
+        user_info,
+        administrative_criteria=list(
+            AdministrativeCriteria.objects.filter(
+                level__in=[AdministrativeCriteria.Level.LEVEL_1 if level_1 else None]
+                + [AdministrativeCriteria.Level.LEVEL_2 if level_2 else None]
+            )
+        ),
+    )
+
+    job_application = JobApplicationWithApprovalFactory(
+        to_siae=siae,
+        sender_siae=siae,
+        eligibility_diagnosis=eligibility_diagnosis,
+        hiring_start_at=timezone.now() - relativedelta(months=2),
+    )
+
+    evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=siae)
+    evaluated_job_application = EvaluatedJobApplicationFactory(
+        job_application=job_application, evaluated_siae=evaluated_siae
+    )
+
+    return evaluated_job_application
+
+
+def create_evaluated_eligibility_diagnosis_from_evaluated_job_application(evaluated_job_application, level):
+    administrative_criteria = (
+        evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.all()
+    )
+    return EvaluatedEligibilityDiagnosis.objects.bulk_create(
+        [
+            EvaluatedEligibilityDiagnosis(
+                evaluated_job_application=evaluated_job_application,
+                administrative_criteria=sel_adm.administrative_criteria,
+            )
+            for sel_adm in administrative_criteria
+            if sel_adm.administrative_criteria.level == level
+        ]
+    )
 
 
 class SamplesSelectionViewTest(TestCase):
