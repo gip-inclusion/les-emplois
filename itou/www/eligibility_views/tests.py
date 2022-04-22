@@ -48,6 +48,13 @@ class AdministrativeCriteriaFormTest(TestCase):
         expected_cleaned_data = [criterion2, criterion3, criterion4]
         self.assertEqual(form.cleaned_data, expected_cleaned_data)
 
+    def test_criteria_fields(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        form = AdministrativeCriteriaForm(user, siae)
+        self.assertEquals(AdministrativeCriteria.objects.all().count(), len(form.fields))
+
     def test_error_criteria_number_for_siae(self):
         """
         Test errors for SIAEs.
