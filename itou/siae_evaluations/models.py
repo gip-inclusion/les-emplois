@@ -337,6 +337,7 @@ class EvaluatedAdministrativeCriteria(models.Model):
     class Meta:
         verbose_name = "Critère administratif"
         verbose_name_plural = "Critères administratifs"
+        unique_together = ("administrative_criteria", "evaluated_job_application")
 
     def __str__(self):
         return f"{self.evaluated_job_application} - {self.administrative_criteria}"

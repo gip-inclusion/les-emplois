@@ -1,6 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.core import mail
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
@@ -18,6 +19,7 @@ from itou.siae_evaluations.factories import (
 )
 from itou.siae_evaluations.models import (
     CampaignAlreadyPopulatedException,
+    EvaluatedEligibilityDiagnosis,
     EvaluatedJobApplication,
     EvaluatedSiae,
     EvaluationCampaign,
@@ -489,6 +491,20 @@ class EvaluatedSiaeManagerTest(TestCase):
 
 
 class EvaluatedJobApplicationModelTest(TestCase):
+    def test_unicity_constraint(self):
+        evaluated_job_application = EvaluatedJobApplicationFactory()
+        criterion = AdministrativeCriteria.objects.first()
+
+        self.assertTrue(
+            EvaluatedEligibilityDiagnosis.objects.create(
+                evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
+            )
+        )
+        with self.assertRaises(IntegrityError):
+            EvaluatedEligibilityDiagnosis.objects.create(
+                evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
+            )
+
     def test_state(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
         self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PENDING, evaluated_job_application.state)
