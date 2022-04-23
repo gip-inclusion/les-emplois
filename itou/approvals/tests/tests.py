@@ -1078,7 +1078,7 @@ class SuspensionModelTest(TestCase):
             self.assertEqual(len(result), 4)
 
     def test_next_min_start_date(self):
-        today = datetime.date.today()
+        today = timezone.localdate()
         start_at = today - relativedelta(days=10)
 
         job_application_1 = JobApplicationWithApprovalFactory(hiring_start_at=today)

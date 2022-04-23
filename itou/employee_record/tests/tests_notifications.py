@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.test.testcases import TestCase
 from django.utils import timezone
@@ -16,7 +16,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # A normal case
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
         approval = employee_record.approval
-        today = date.today()
+        today = timezone.localdate()
 
         approval.start_at = today + timedelta(days=1)
         approval.save()
@@ -31,7 +31,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # Another normal case
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
         approval = employee_record.approval
-        today = timezone.now().date()
+        today = timezone.localdate()
 
         approval.end_at = today + timedelta(days=2)
         approval.save()
@@ -46,7 +46,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # (which is the last one)
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
         approval = employee_record.approval
-        today = date.today()
+        today = timezone.localdate()
 
         approval.start_at = today + timedelta(days=1)
         approval.save()
@@ -68,7 +68,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
         approval = employee_record.approval
 
-        approval.created_at = timezone.now()
+        approval.created_at = timezone.localtime()
         approval.save()
 
         self.assertEqual(1, EmployeeRecord.objects.count())
@@ -78,7 +78,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # If a date modification occurs on an approval NOT linked to any employee record,
         # then no notification object must be created.
         approval = ApprovalFactory()
-        today = timezone.now().date()
+        today = timezone.localdate()
 
         approval.end_at = today + timedelta(days=2)
         approval.save()
@@ -92,7 +92,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
             with self.subTest(status):
                 employee_record = EmployeeRecordFactory(status=status)
                 approval = employee_record.approval
-                today = timezone.now().date()
+                today = timezone.localtime()
 
                 approval.created_at = today + timedelta(days=2)
                 approval.save()
@@ -113,6 +113,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         employee_record_2.save()
 
         approval.end_at = timezone.now().date() + timedelta(days=2)
+        approval.end_at = timezone.localdate() + timedelta(days=2)
         approval.save()
 
         self.assertEqual(2, EmployeeRecordUpdateNotification.objects.new().count())
@@ -124,7 +125,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # must also create a new employee record update notification.
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
         approval = employee_record.approval
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
 
         SuspensionFactory(
             approval=approval,
