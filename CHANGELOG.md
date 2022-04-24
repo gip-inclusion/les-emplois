@@ -1,5 +1,34 @@
 # Journal des modifications
 
+## [41] - 2022-04-22
+
+### Ajouté
+- Refus de la connexion Django pour les utilisateurs SSO
+- Ajout du fournisseur d'identité Inclusion Connect dans IdentityProvider 
+- PASS IAE : retrait de PDFShift et affichage une page HTML prête à imprimer
+- Ajout d'un comportement dynamique sur le champ "Autre type de contrat" dans le formulaire des fiches de poste
+- Ajout d'une page de connexion générique reprenant les différents types de profils utilisateur
+- Affichage du bon message d'erreur aux utilisateurs de PE Connect qui utilisent le formulaire Django
+- Ajout d'une Github Action pour Metabase
+- Ajout d'une seconde vue stats "Facilitation de l'embauche" pour les DREETS
+- Ajout des notifications de modifications du PASS IAE pour l'ASP - modèles et sérialiseurs
+- Ajout de custom URLs Matomo sur toutes les stats.
+
+### Modifié
+- Mise à jour vers Django 4.0.4 
+- Correction de tests unitaires instables (suspension et fiche salarié)
+- Synchronisation du groupe de permissions du support externe
+- Correction de la fixture PE Approvals
+- Correction du script d'import des SIAE
+- Correction d'une erreur de sérialisation de l'adresse de l'employé
+- Correction d'une erreur dans le message de confirmation aux DDETS lors de la sélection du ratio.
+- Correction d'une régression concernant les dates de suspensions
+- Modification et ajout d'information concernant la commande d'import des agréments Pôle emploi
+
+### Supprimé
+- Retrait des mentions à la DGEFP sur le dashboard
+- Retrait des imports de données `external-data` des remontées d'erreur sur Sentry 
+
 ## [40] - 2022-04-08
 
 ### Ajouté
