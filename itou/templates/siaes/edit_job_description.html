@@ -42,6 +42,9 @@
             {% bootstrap_field form.custom_name %}
             {% bootstrap_field form.location_label %}
             {% bootstrap_field form.location_code %}
+            {% if form.market_context_description %}
+                {% bootstrap_field form.market_context_description %}
+            {% endif %}
             {% bootstrap_field form.contract_type %}
             <div id="_other_contract_type_group">
                 {% bootstrap_field form.other_contract_type %}
