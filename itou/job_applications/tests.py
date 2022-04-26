@@ -1497,11 +1497,11 @@ class JobApplicationPoleEmploiNotificationLogTest(TestCase):
         "itou.job_applications.models.recherche_individu_certifie_api", return_value=sample_individual_search_failure
     )
     def test_get_individual_not_found(self, get_individual_mock):
-        encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
-            self.sample_pole_emploi_individual, self.sample_token
-        )
+        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+            JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
+                self.sample_pole_emploi_individual, self.sample_token
+            )
         get_individual_mock.assert_called_with(self.sample_pole_emploi_individual, self.sample_token)
-        self.assertEqual(encrypted_nir, self.sample_individual_search_failure.id_national_demandeur)
 
 
 # We patch sleep since it is used in the real calls, but we don’t want to slow down the tests

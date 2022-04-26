@@ -1043,7 +1043,7 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
     def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
         individual_pole_emploi_result = recherche_individu_certifie_api(individual, api_token)
         if individual is not None:
-            if individual_pole_emploi_result.is_valid:
+            if individual_pole_emploi_result.is_valid():
                 return individual_pole_emploi_result.id_national_demandeur
             else:
                 raise PoleEmploiMiseAJourPassIAEException(

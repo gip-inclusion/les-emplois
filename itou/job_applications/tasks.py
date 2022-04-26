@@ -74,15 +74,6 @@ def notify_pole_emploi_pass(job_application, job_seeker):
         log.save()
         return False
 
-    # despite some earlier checks, we keep having invalid encrypted indentifier errors
-    if not encrypted_nir:
-        log = JobApplicationPoleEmploiNotificationLog(
-            job_application=job_application,
-            status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
-            details="empty encrypted nir",
-        )
-        log.save()
-        return False
     # Step 3: we finally notify Pole Emploi that something happened for this user
     try:
         mise_a_jour_pass_iae(job_application, encrypted_nir, token)
