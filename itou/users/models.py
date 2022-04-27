@@ -413,7 +413,8 @@ class User(AbstractUser, AddressMixin):
         return (
             self.can_view_stats_siae(current_org=current_org)
             or self.can_view_stats_cd(current_org=current_org)
-            or self.can_view_stats_pe(current_org=current_org)
+            # FIXME Uncomment once ready for release.
+            # or self.can_view_stats_pe(current_org=current_org)
             or self.can_view_stats_ddets(current_org=current_org)
             or self.can_view_stats_dreets(current_org=current_org)
             or self.can_view_stats_dgefp(current_org=current_org)

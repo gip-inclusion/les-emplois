@@ -463,11 +463,14 @@
                             </li>
                         {% endif %}
                         {% if can_view_stats_pe %}
+                            {% comment %}
+                            {# FIXME uncomment once ready for release #}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_pe' %}">Voir les données IAE de mon département</a>
                                 <span class="badge badge-info">Nouveau</span>
                             </li>
+                            {% endcomment %}
                         {% endif %}
                         {% if can_view_stats_ddets %}
                             <li class="card-text mb-3">
