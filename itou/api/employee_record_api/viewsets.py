@@ -57,34 +57,6 @@ def _annotate_convert_created_at(queryset):
     return queryset.annotate(creation_date=Cast("created_at", output_field=DateField()))
 
 
-def _filter_by_query_params(request, queryset):
-    """
-    Register query parameters result filtering:
-    - only using employee record `status` is available for now.
-    - `status` query param can be an array of value.
-    """
-    result = queryset
-    params = request.query_params
-
-    if not params:
-        return result.processed().order_by("-created_at")
-
-    # Query params are chainable
-
-    if status := params.getlist("status", ""):
-        status_filter = [s.upper() for s in status]
-        result = result.filter(status__in=status_filter)
-
-    if created := params.get("created"):
-        result = _annotate_convert_created_at(result).filter(creation_date=created)
-
-    if since := params.get("since"):
-        result = _annotate_convert_created_at(result).filter(creation_date__gte=since)
-
-    # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
-    return result.order_by("-created_at")
-
-
 class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
     """
     # API fiches salarié
@@ -93,7 +65,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
 
     - dans l'état `PROCESSED` (par défaut)
     - pour toutes les embauches / candidatures des SIAE liées au token d'identification
-    - classées par date de création et date de mise à jour (plus récent au plus ancien)
+    - classées par date de création (plus récent au plus ancien)
 
     Il est également possible d'obtenir le détail d'une fiche salarié par son
     identifiant (dans les mêmes conditions d'autorisation que pour la liste complète)
@@ -148,12 +120,37 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
 
     serializer_class = EmployeeRecordAPISerializer
 
+    def _filter_by_query_params(self, request, queryset):
+        """
+        Register query parameters for result filtering
+        """
+        result = queryset
+        params = request.query_params
+
+        # Query params are chainable
+
+        if status := params.getlist("status"):
+            status_filter = [s.upper() for s in status]
+            result = result.filter(status__in=status_filter)
+        else:
+            # if no status given, return employee records in PROCESSED state
+            result = result.processed()
+
+        if created := params.get("created"):
+            result = _annotate_convert_created_at(result).filter(creation_date=created)
+
+        if since := params.get("since"):
+            result = _annotate_convert_created_at(result).filter(creation_date__gte=since)
+
+        # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
+        return result.order_by("-created_at")
+
     def get_queryset(self):
         # We only get to this point if permissions are OK
         queryset = EmployeeRecord.objects.full_fetch()
 
         # Get (registered) query parameters filters
-        queryset = _filter_by_query_params(self.request, queryset)
+        queryset = self._filter_by_query_params(self.request, queryset)
 
         # Employee record API will return objects related to
         # all SIAE memberships of authenticated user.

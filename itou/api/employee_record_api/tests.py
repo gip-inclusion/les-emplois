@@ -332,13 +332,16 @@ class EmployeeRecordAPIParametersTest(APITestCase):
     def test_created_parameter(self, _mock):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
-        employee_record.update_as_ready()  # Also save() the employee record
-        today = f"{timezone.now():%Y-%m-%d}"
-        yesterday = f"{timezone.now() - relativedelta(days=1):%Y-%m-%d}"
+        employee_record.status = Status.PROCESSED  # Default status if no `status` params present
+        employee_record.save()
+
+        today = timezone.localdate()
+        today_param = f"{today:%Y-%m-%d}"
+        yesterday_param = f"{today - relativedelta(days=1):%Y-%m-%d}"
 
         member = employee_record.job_application.to_siae.members.first()
         self.client.login(username=member.username, password=DEFAULT_PASSWORD)
-        response = self.client.get(ENDPOINT_URL + f"?created={today}", format="json")
+        response = self.client.get(ENDPOINT_URL + f"?created={today_param}", format="json")
 
         self.assertEqual(response.status_code, 200)
 
@@ -349,7 +352,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
 
         self.assertEqual(result.get("siret"), job_application.to_siae.siret)
 
-        response = self.client.get(ENDPOINT_URL + f"?created={yesterday}", format="json")
+        response = self.client.get(ENDPOINT_URL + f"?created={yesterday_param}", format="json")
         results = response.json()
 
         self.assertEqual(response.status_code, 200)
@@ -360,21 +363,23 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_since_parameter(self, _mock):
-        today = f"{timezone.now():%Y-%m-%d}"
-        sooner_ts = timezone.now() - relativedelta(days=3)
+        today = f"{timezone.localdate():%Y-%m-%d}"
+        sooner_ts = timezone.localtime() - relativedelta(days=3)
         sooner = f"{sooner_ts:%Y-%m-%d}"
-        ancient_ts = timezone.now() - relativedelta(months=2)
+        ancient_ts = timezone.localtime() - relativedelta(months=2)
         ancient = f"{ancient_ts:%Y-%m-%d}"
 
         job_application_1 = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record_1 = EmployeeRecord.from_job_application(job_application_1)
         employee_record_1.created_at = sooner_ts
-        employee_record_1.update_as_ready()  # Also save() the employee record
+        employee_record_1.status = Status.PROCESSED  # Default status if no `status` params present
+        employee_record_1.save()
 
         job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=job_application_1.to_siae)
         employee_record_2 = EmployeeRecord.from_job_application(job_application_2)
         employee_record_2.created_at = ancient_ts
-        employee_record_2.update_as_ready()
+        employee_record_2.status = Status.PROCESSED  # Default status if no `status` params present
+        employee_record_2.save()
 
         member = employee_record_1.job_application.to_siae.members.first()
 
