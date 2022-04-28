@@ -94,4 +94,6 @@ pyyaml==6.0  # https://github.com/yaml/pyyaml
 # For automatic export/import of models in the admin
 django-import-export==2.7.1
 
+# Scalingo
 gunicorn
+dj_static
