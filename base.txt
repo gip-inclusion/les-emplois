@@ -97,4 +97,3 @@ django-import-export==2.7.1
 # Scalingo
 gunicorn
 dj_static
-gdal
