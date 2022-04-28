@@ -1,1 +1,1 @@
-requirements/prod.txt
+-r ./deploy.txt
