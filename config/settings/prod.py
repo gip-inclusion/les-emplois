@@ -6,6 +6,7 @@ from .base import *  # noqa: F401,F403
 
 # See `itou.utils.new_dns.middleware.NewDnsRedirectMiddleware`.
 ALLOWED_HOSTS = [
+    "*",
     "itou-prod.cleverapps.io",
     "inclusion.beta.gouv.fr",
     "emploi.inclusion.beta.gouv.fr",
@@ -29,7 +30,7 @@ ITOU_FQDN = "emplois.inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "assistance@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
-sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])
+# sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])
 
 ALLOW_POPULATING_METABASE = True
 
@@ -38,7 +39,7 @@ REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ["rest_framework.renderers.JSONRend
 
 # Active Elastic APM metrics
 # See https://www.elastic.co/guide/en/apm/agent/python/current/configuration.html
-INSTALLED_APPS += ["elasticapm.contrib.django"]  # noqa F405
+# INSTALLED_APPS += ["elasticapm.contrib.django"]  # noqa F405
 
 ELASTIC_APM = {
     "ENABLED": os.environ.get("APM_ENABLED", True),
