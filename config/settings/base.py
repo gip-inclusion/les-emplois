@@ -11,6 +11,7 @@ from django.utils import timezone
 
 # Paths.
 # ------------------------------------------------------------------------------
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -215,8 +216,8 @@ DATE_INPUT_FORMATS = ["%d/%m/%Y", "%d-%m-%Y", "%d %m %Y"]
 
 # Path to the directory where collectstatic will collect static files for deployment.
 STATIC_ROOT = os.path.join(APPS_DIR, "static_collected")
-
 STATIC_URL = "/static/"
+STATICFILES_DIRS = (os.path.join(APPS_DIR, "static"),)
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
@@ -225,7 +226,8 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
-STATICFILES_DIRS = (os.path.join(APPS_DIR, "static"),)
+
+print(f"{STATICFILES_DIRS=}")
 
 # Security.
 # ------------------------------------------------------------------------------

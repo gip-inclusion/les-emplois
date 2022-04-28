@@ -1,2 +1,3 @@
 libgdal-dev
 gdal-bin
+libblas3

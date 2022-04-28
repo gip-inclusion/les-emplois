@@ -1,28 +1,28 @@
 import os
 
-from ._sentry import sentry_init
+# from ._sentry import sentry_init
 from .base import *  # noqa: F401,F403
 
 
 # See `itou.utils.new_dns.middleware.NewDnsRedirectMiddleware`.
 ALLOWED_HOSTS = [
-    "*",
     "itou-prod.cleverapps.io",
     "inclusion.beta.gouv.fr",
     "emploi.inclusion.beta.gouv.fr",
     "emplois.inclusion.beta.gouv.fr",
+    "c1-itou.osc-fr1.scalingo.io",
 ]
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "HOST": os.environ.get("POSTGRESQL_ADDON_DIRECT_HOST"),
-        "PORT": os.environ.get("POSTGRESQL_ADDON_DIRECT_PORT"),
-        "NAME": os.environ.get("POSTGRESQL_ADDON_DB"),
-        "USER": os.environ.get("POSTGRESQL_ADDON_CUSTOM_USER"),
-        "PASSWORD": os.environ.get("POSTGRESQL_ADDON_CUSTOM_PASSWORD"),
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.contrib.gis.db.backends.postgis",
+#         "HOST": os.environ.get("POSTGRESQL_ADDON_DIRECT_HOST"),
+#         "PORT": os.environ.get("POSTGRESQL_ADDON_DIRECT_PORT"),
+#         "NAME": os.environ.get("POSTGRESQL_ADDON_DB"),
+#         "USER": os.environ.get("POSTGRESQL_ADDON_CUSTOM_USER"),
+#         "PASSWORD": os.environ.get("POSTGRESQL_ADDON_CUSTOM_PASSWORD"),
+#     }
+# }
 
 ITOU_ENVIRONMENT = "PROD"
 ITOU_PROTOCOL = "https"
