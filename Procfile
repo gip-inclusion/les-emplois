@@ -1,1 +1,1 @@
-web: gunicorn c1-itou.wsgi --log-file -
+web: gunicorn itou.wsgi --log-file -
