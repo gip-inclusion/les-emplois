@@ -62,9 +62,11 @@ def siae_job_applications_list(request, template_name="siae_evaluations/siae_job
         evaluations_asked_at = evaluated_siaes.aggregate(date=Min("evaluation_campaign__evaluations_asked_at")).get(
             "date"
         )
-        evaluated_job_applications = EvaluatedJobApplication.objects.filter(
-            evaluated_siae__in=evaluated_siaes
-        ).select_related("job_application", "job_application__job_seeker", "job_application__approval")
+        evaluated_job_applications = (
+            EvaluatedJobApplication.objects.filter(evaluated_siae__in=evaluated_siaes)
+            .select_related("job_application", "job_application__job_seeker", "job_application__approval")
+            .prefetch_related("evaluated_eligibility_diagnoses")
+        )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     context = {
