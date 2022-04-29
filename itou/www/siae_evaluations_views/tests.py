@@ -184,7 +184,15 @@ class SiaeJobApplicationListViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=self.siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(
+            1  # fetch django session
+            + 1  # fetch user
+            + 2  # fetch siae membership and siae infos
+            + 2  # fetch evaluated_siae and its prefetch_related evaluation_campaign
+            + 1  # aggregate min evaluation_campaign notification date
+            + 2  # weird fetch siae membership and social account
+            + 2  # fetch evuluated_job_application and its prefetch_related evaluated_eligibility_diagnoses
+        ):
             response = self.client.get(self.url)
 
         self.assertEqual(
