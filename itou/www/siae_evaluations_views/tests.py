@@ -286,7 +286,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
             response.context["approval"],
         )
         self.assertEqual(
-            reverse("siae_evaluations_views:siae_job_applications_list"),
+            reverse("siae_evaluations_views:siae_job_applications_list") + f"#{evaluated_job_application.pk}",
             response.context["back_url"],
         )
 

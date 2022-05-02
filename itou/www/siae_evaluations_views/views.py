@@ -98,6 +98,8 @@ def siae_select_criteria(
         initial=initial_data,
     )
 
+    url = reverse("siae_evaluations_views:siae_job_applications_list") + f"#{evaluated_job_application.pk}"
+
     if request.method == "POST" and form_administrative_criteria.is_valid():
         evaluated_job_application.save_selected_criteria(
             cleaned_keys=[
@@ -106,9 +108,7 @@ def siae_select_criteria(
             changed_keys=form_administrative_criteria.changed_data,
         )
 
-        messages.success(request, "Votre sélection est prise en compte")
-
-        next_url = reverse("dashboard:index")
+        next_url = url
         return HttpResponseRedirect(next_url)
 
     level_1_fields = [
@@ -122,9 +122,7 @@ def siae_select_criteria(
         if AdministrativeCriteriaOfJobApplicationForm.LEVEL_2_PREFIX in field.name
     ]
 
-    back_url = get_safe_url(
-        request, "back_url", fallback_url=reverse("siae_evaluations_views:siae_job_applications_list")
-    )
+    back_url = get_safe_url(request, "back_url", fallback_url=url)
 
     context = {
         "job_seeker": evaluated_job_application.job_application.job_seeker,
