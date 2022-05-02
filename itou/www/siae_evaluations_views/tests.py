@@ -289,6 +289,10 @@ class SiaeSelectCriteriaViewTest(TestCase):
             reverse("siae_evaluations_views:siae_job_applications_list") + f"#{evaluated_job_application.pk}",
             response.context["back_url"],
         )
+        self.assertEqual(
+            evaluated_job_application.state,
+            response.context["state"],
+        )
 
     def test_context_fields_list(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
