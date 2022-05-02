@@ -274,20 +274,20 @@ class EvaluatedJobApplication(models.Model):
         return f"{self.job_application}"
 
 
-class EvaluatedEligibilityDiagnosis(models.Model):
+class EvaluatedAdministrativeCriteria(models.Model):
 
     administrative_criteria = models.ForeignKey(
         "eligibility.AdministrativeCriteria",
         verbose_name="Critère administratif",
         on_delete=models.CASCADE,
-        related_name="evaluated_eligibility_diagnoses",
+        related_name="evaluated_administrative_criteria",
     )
 
     evaluated_job_application = models.ForeignKey(
         EvaluatedJobApplication,
         verbose_name="Candidature évaluée",
         on_delete=models.CASCADE,
-        related_name="evaluated_eligibility_diagnoses",
+        related_name="evaluated_administrative_criteria",
     )
 
     proof_url = models.URLField(max_length=500, verbose_name="Lien vers le justificatif", blank=True)

@@ -85,8 +85,8 @@ class EvaluatedJobApplication(admin.ModelAdmin):
     )
 
 
-@admin.register(models.EvaluatedEligibilityDiagnosis)
-class EvaluatedEligibilityDiagnosis(admin.ModelAdmin):
+@admin.register(models.EvaluatedAdministrativeCriteria)
+class EvaluatedAdministrativeCriteria(admin.ModelAdmin):
     list_display = ("evaluated_job_application", "administrative_criteria")
     list_display_links = ("evaluated_job_application", "administrative_criteria")
     readonly_fields = ("uploaded_at", "proof_url")
