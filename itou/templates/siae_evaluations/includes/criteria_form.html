@@ -6,9 +6,13 @@
 
     {% bootstrap_form_errors form_administrative_criteria type="all" %}
 
+    <h3 class="h2">
+        Critères administratifs déclarés lors de l'embauche
+    </h3>
+
     {% if level_1_fields %}
         <h3 class="h2">
-            Critères administratifs de niveau 1
+            Niveau 1
         </h3>
 
         {% for field in level_1_fields %}
@@ -18,7 +22,7 @@
 
     {% if level_2_fields %}
         <h3 class="h2">
-            Critères administratifs de niveau 2
+            Niveau 2
         </h3>
 
         {% for field in level_2_fields %}
@@ -29,6 +33,6 @@
     {% endif %}
 
     {% buttons %}
-        <button type="submit" class="btn btn-outline-primary float-right">Enregistrer ce(s) critère(s)</button>
+        <button type="submit" class="btn btn-primary float-right">Enregistrer ce(s) critère(s)</button>
     {% endbuttons %}
 
