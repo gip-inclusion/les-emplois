@@ -12,7 +12,7 @@ from itou.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from itou.siae_evaluations.models import EvaluatedEligibilityDiagnosis, EvaluationCampaign
+from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluationCampaign
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
@@ -52,13 +52,13 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
     return evaluated_job_application
 
 
-def create_evaluated_eligibility_diagnosis_from_evaluated_job_application(evaluated_job_application, level):
+def create_evaluated_administrative_criterion_from_evaluated_job_application(evaluated_job_application, level):
     administrative_criteria = (
         evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.all()
     )
-    return EvaluatedEligibilityDiagnosis.objects.bulk_create(
+    return EvaluatedAdministrativeCriteria.objects.bulk_create(
         [
-            EvaluatedEligibilityDiagnosis(
+            EvaluatedAdministrativeCriteria(
                 evaluated_job_application=evaluated_job_application,
                 administrative_criteria=sel_adm.administrative_criteria,
             )
@@ -191,7 +191,7 @@ class SiaeJobApplicationListViewTest(TestCase):
             + 2  # fetch evaluated_siae and its prefetch_related evaluation_campaign
             + 1  # aggregate min evaluation_campaign notification date
             + 2  # weird fetch siae membership and social account
-            + 2  # fetch evuluated_job_application and its prefetch_related evaluated_eligibility_diagnoses
+            + 2  # fetch evuluated_job_application and its prefetch_related evaluated_administrative_criteria
         ):
             response = self.client.get(self.url)
 
@@ -226,7 +226,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         criterion = (
             evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
         )
-        EvaluatedEligibilityDiagnosis.objects.create(
+        EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application,
             administrative_criteria=criterion.administrative_criteria,
         )
@@ -333,10 +333,10 @@ class SiaeSelectCriteriaViewTest(TestCase):
         post_data = {criterion.administrative_criteria.key: True}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(1, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(1, EvaluatedAdministrativeCriteria.objects.count())
         self.assertEqual(
             criterion.administrative_criteria,
-            EvaluatedEligibilityDiagnosis.objects.first().administrative_criteria,
+            EvaluatedAdministrativeCriteria.objects.first().administrative_criteria,
         )
 
     def test_initial_data_form(self):
@@ -364,7 +364,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
         criterion = (
             evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
         )
-        EvaluatedEligibilityDiagnosis.objects.create(
+        EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application,
             administrative_criteria=criterion.administrative_criteria,
         )
