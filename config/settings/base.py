@@ -683,18 +683,18 @@ S3_STORAGE_BUCKET_REGION = os.environ.get("S3_STORAGE_BUCKET_REGION", "")
 
 STORAGE_UPLOAD_KINDS = {
     "default": {
-        "allowed_mime_types": ["*"],
-        "upload_expiration": 60 * 60,  # in seconds
+        "allowed_mime_types": ["application/pdf"],
+        "upload_expiration": 90 * 60,  # in seconds
         "key_path": "",  # appended before the file key. No backslash!
-        "max_files": 3,
+        "max_files": 1,
         "max_file_size": 5,  # in mb
         "timeout": 20000,  # in ms
     },
     "resume": {
-        "allowed_mime_types": ["application/pdf"],
-        "upload_expiration": 90 * 60,  # in seconds
         "key_path": "resume",
-        "max_files": 1,
+    },
+    "evaluations": {
+        "key_path": "evaluations",
     },
 }
 

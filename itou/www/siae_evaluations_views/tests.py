@@ -16,6 +16,7 @@ from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, Evalua
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
+from itou.utils.storage.s3 import S3Upload
 from itou.www.siae_evaluations_views.forms import SetChosenPercentForm
 
 
@@ -52,7 +53,7 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
     return evaluated_job_application
 
 
-def create_evaluated_administrative_criterion_from_evaluated_job_application(evaluated_job_application, level):
+def create_evaluated_administrative_criteria_from_evaluated_job_application(evaluated_job_application, level):
     administrative_criteria = (
         evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.all()
     )
@@ -383,3 +384,125 @@ class SiaeSelectCriteriaViewTest(TestCase):
         for i in range(len(response.context["level_2_fields"])):
             with self.subTest(i):
                 self.assertNotIn("checked", response.context["level_2_fields"][i].subwidgets[0].data["attrs"])
+
+
+class SiaeUploadDocsViewTest(TestCase):
+    def setUp(self):
+        membership = SiaeMembershipFactory()
+        self.user = membership.user
+        self.siae = membership.siae
+
+    def test_access_on_unknown_evaluated_job_application(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:siae_upload_doc",
+                kwargs={"evaluated_eligibility_diagnosis_pk": 10000},
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_access_without_ownership(self):
+        membership = SiaeMembershipFactory()
+        user = membership.user
+        siae = membership.siae
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(siae, user)
+        criterion = (
+            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+        )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=criterion.administrative_criteria,
+        )
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:siae_upload_doc",
+                kwargs={"evaluated_eligibility_diagnosis_pk": evaluated_administrative_criteria.pk},
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_access(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        criterion = (
+            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+        )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=criterion.administrative_criteria,
+        )
+
+        s3_upload = S3Upload(kind="evaluations")
+        s3_form_values = s3_upload.form_values
+        s3_upload_config = s3_upload.config
+
+        url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_eligibility_diagnosis_pk": evaluated_administrative_criteria.pk},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            evaluated_job_application.job_application.job_seeker,
+            response.context["job_seeker"],
+        )
+        self.assertEqual(
+            evaluated_job_application.job_application.approval,
+            response.context["approval"],
+        )
+        self.assertEqual(
+            evaluated_job_application.state,
+            response.context["state"],
+        )
+        self.assertEqual(
+            reverse("siae_evaluations_views:siae_job_applications_list") + f"#{evaluated_job_application.pk}",
+            response.context["back_url"],
+        )
+        self.assertEqual(evaluated_administrative_criteria, response.context["evaluated_eligibility_diagnosis"])
+        self.assertEqual(s3_form_values, response.context["s3_form_values"])
+        self.assertEqual(s3_upload_config, response.context["s3_upload_config"])
+
+    def test_post(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        criterion = (
+            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+        )
+        evaluated_eligibility_diagnosis = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=criterion.administrative_criteria,
+        )
+        url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_eligibility_diagnosis_pk": evaluated_eligibility_diagnosis.pk},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Test fields mandatory to upload to S3
+        s3_upload = S3Upload(kind="evaluations")
+        s3_upload_config = s3_upload.config
+        s3_form_endpoint = s3_upload.form_values["url"]
+
+        # Don't test S3 form fields as it led to flaky tests and
+        # it's already done by the Boto library.
+        self.assertContains(response, s3_form_endpoint)
+
+        # Config variables
+        for _, value in s3_upload_config.items():
+            self.assertContains(response, value)
+
+        post_data = {
+            "proof_url": "https://server.com/rocky-balboa.pdf",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        next_url = reverse("siae_evaluations_views:siae_job_applications_list") + f"#{evaluated_job_application.pk}"
+        self.assertEqual(response.url, next_url)

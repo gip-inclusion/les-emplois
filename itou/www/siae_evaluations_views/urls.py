@@ -14,4 +14,9 @@ urlpatterns = [
         views.siae_select_criteria,
         name="siae_select_criteria",
     ),
+    path(
+        "siae_upload_doc/<int:evaluated_administrative_criteria_pk>/",
+        views.siae_upload_doc,
+        name="siae_upload_doc",
+    ),
 ]
