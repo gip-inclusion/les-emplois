@@ -1001,12 +1001,14 @@ class PoleEmploiApprovalManager(models.Manager):
 
         Their input formats can be checked to limit the risk of errors.
         """
-        # Save some SQL queries.
-        if not user.nir and (not user.pole_emploi_id and user.birthdate):
-            return self.none()
-        return self.filter(Q(nir=user.nir) | Q(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)).order_by(
-            "-start_at"
-        )
+        filter_expression = Q(pk=None)  # no match
+        if user.nir:
+            # Allow duplicated NIR within PE approvals, but that will most probably change with the
+            # ApprovalsWrapper code revamp later on. For now there is no unicity constraint on this column.
+            filter_expression |= Q(nir=user.nir)
+        if user.pole_emploi_id and user.birthdate:
+            filter_expression |= Q(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        return self.filter(filter_expression).order_by("-start_at")
 
     def without_nir_ntt_or_nia(self):
         return self.filter(Q(nir=None) & Q(ntt_nia=None))

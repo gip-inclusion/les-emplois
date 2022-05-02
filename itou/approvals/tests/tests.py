@@ -529,6 +529,8 @@ class PoleEmploiApprovalManagerTest(TestCase):
         self.assertEqual(search_results.count(), 0)
 
     def test_find_for_user(self):
+
+        # given a User, ensure we can find a PE approval using its pole_emploi_id and not the others.
         user = JobSeekerFactory()
         pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         # just another approval, to be sure we don't find the other one "by chance"
@@ -538,6 +540,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
         self.assertEqual(search_results.count(), 1)
         self.assertEqual(search_results.first(), pe_approval)
 
+        # ensure we can find **all** PE approvals using their pole_emploi_id and not the others.
         other_valid_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
@@ -545,6 +548,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
         self.assertEqual(search_results[0], pe_approval)
         self.assertEqual(search_results[1], other_valid_approval)
 
+        # ensure we **also** find PE approvals using the user's NIR.
         nir_approval = PoleEmploiApprovalFactory(nir=user.nir)
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
@@ -553,15 +557,42 @@ class PoleEmploiApprovalManagerTest(TestCase):
         self.assertEqual(search_results[1], other_valid_approval)
         self.assertEqual(search_results[2], nir_approval)
 
-        nir_approval.birthdate = user.birthdate
-        nir_approval.pole_emploi_id = user.pole_emploi_id
-        nir_approval.save()
+        # since we can have multiple PE approvals with the same nir, let's fetch them all
+        other_nir_approval = PoleEmploiApprovalFactory(nir=user.nir)
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
-        self.assertEqual(search_results.count(), 3)
+        self.assertEqual(search_results.count(), 4)
         self.assertEqual(search_results[0], pe_approval)
         self.assertEqual(search_results[1], other_valid_approval)
         self.assertEqual(search_results[2], nir_approval)
+        self.assertEqual(search_results[3], other_nir_approval)
+
+        # ensure it's not an issue if the PE approval matches both NIR, pole_emploi_id and birthdate.
+        nir_approval.birthdate = user.birthdate
+        nir_approval.pole_emploi_id = user.pole_emploi_id
+        nir_approval.save()
+
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 4)
+        self.assertEqual(search_results[0], pe_approval)
+        self.assertEqual(search_results[1], other_valid_approval)
+
+        # the order changes because now, the first WHERE clause gets `nir_approval` alone "first",
+        # and the ordering on `start_at DESC` doesn't change this as both columns are set to "today".
+        # this may depend on PostgreSQL or pysocpg behaviour though, it may be wiser to:
+        # - also order by pk or creation date
+        # - use a fixture that has a clearly different start_at
+        # in order to ensure this test does not become flaky.
+        self.assertEqual(search_results[2], other_nir_approval)
+        self.assertEqual(search_results[3], nir_approval)
+
+    def test_find_for_no_nir(self):
+        user = JobSeekerFactory(nir=None)
+        PoleEmploiApprovalFactory(nir=None)  # entirely unrelated
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 0)
 
 
 class ApprovalsWrapperTest(TestCase):
