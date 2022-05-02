@@ -19,7 +19,7 @@ from itou.siae_evaluations.factories import (
 )
 from itou.siae_evaluations.models import (
     CampaignAlreadyPopulatedException,
-    EvaluatedEligibilityDiagnosis,
+    EvaluatedAdministrativeCriteria,
     EvaluatedJobApplication,
     EvaluatedSiae,
     EvaluationCampaign,
@@ -496,12 +496,12 @@ class EvaluatedJobApplicationModelTest(TestCase):
         criterion = AdministrativeCriteria.objects.first()
 
         self.assertTrue(
-            EvaluatedEligibilityDiagnosis.objects.create(
+            EvaluatedAdministrativeCriteria.objects.create(
                 evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
             )
         )
         with self.assertRaises(IntegrityError):
-            EvaluatedEligibilityDiagnosis.objects.create(
+            EvaluatedAdministrativeCriteria.objects.create(
                 evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
             )
 
@@ -510,7 +510,7 @@ class EvaluatedJobApplicationModelTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PENDING, evaluated_job_application.state)
 
         criterion = AdministrativeCriteria.objects.first()
-        EvaluatedEligibilityDiagnosis.objects.create(
+        EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
         )
         self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PROCESSING, evaluated_job_application.state)
@@ -522,13 +522,13 @@ class EvaluatedJobApplicationModelTest(TestCase):
 
         # nothing to do
         evaluated_job_application.save_selected_criteria()
-        self.assertEqual(0, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(0, EvaluatedAdministrativeCriteria.objects.count())
 
         # only create criterion1
         evaluated_job_application.save_selected_criteria(changed_keys=[criterion1.key], cleaned_keys=[criterion1.key])
-        self.assertEqual(1, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(1, EvaluatedAdministrativeCriteria.objects.count())
         self.assertEqual(
-            EvaluatedEligibilityDiagnosis.objects.first().administrative_criteria,
+            EvaluatedAdministrativeCriteria.objects.first().administrative_criteria,
             AdministrativeCriteria.objects.filter(level=1).first(),
         )
 
@@ -536,19 +536,19 @@ class EvaluatedJobApplicationModelTest(TestCase):
         evaluated_job_application.save_selected_criteria(
             changed_keys=[criterion1.key, criterion2.key], cleaned_keys=[criterion2.key]
         )
-        self.assertEqual(1, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(1, EvaluatedAdministrativeCriteria.objects.count())
         self.assertEqual(
-            EvaluatedEligibilityDiagnosis.objects.first().administrative_criteria,
+            EvaluatedAdministrativeCriteria.objects.first().administrative_criteria,
             AdministrativeCriteria.objects.filter(level=2).first(),
         )
 
         # only delete
         evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key])
-        self.assertEqual(0, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(0, EvaluatedAdministrativeCriteria.objects.count())
 
         # delete non-existant criterion does not raise error ^^
         evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key])
-        self.assertEqual(0, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(0, EvaluatedAdministrativeCriteria.objects.count())
 
         # atomic : deletion rolled back when trying to create existing criterion
         evaluated_job_application.save_selected_criteria(
@@ -558,4 +558,4 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluated_job_application.save_selected_criteria(
                 changed_keys=[criterion1.key, criterion2.key], cleaned_keys=[criterion2.key]
             )
-        self.assertEqual(2, EvaluatedEligibilityDiagnosis.objects.count())
+        self.assertEqual(2, EvaluatedAdministrativeCriteria.objects.count())

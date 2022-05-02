@@ -313,7 +313,7 @@ class EvaluatedJobApplication(models.Model):
     @property
     def state(self):
         # property in progress, new conditionnal state will be added further
-        if self.evaluated_eligibility_diagnoses.exists():
+        if self.evaluated_administrative_criteria.exists():
             return evaluation_enums.EvaluationJobApplicationsState.PROCESSING
         return evaluation_enums.EvaluationJobApplicationsState.PENDING
 
@@ -331,17 +331,17 @@ class EvaluatedJobApplication(models.Model):
 
             with transaction.atomic():
 
-                EvaluatedEligibilityDiagnosis.objects.filter(
+                EvaluatedAdministrativeCriteria.objects.filter(
                     pk__in=(
-                        eval_diag.pk
-                        for eval_diag in self.evaluated_eligibility_diagnoses.all()
-                        if eval_diag.administrative_criteria.key in set(changed_keys) - set(cleaned_keys)
+                        eval_criterion.pk
+                        for eval_criterion in self.evaluated_administrative_criteria.all()
+                        if eval_criterion.administrative_criteria.key in set(changed_keys) - set(cleaned_keys)
                     )
                 ).delete()
 
-                EvaluatedEligibilityDiagnosis.objects.bulk_create(
+                EvaluatedAdministrativeCriteria.objects.bulk_create(
                     [
-                        EvaluatedEligibilityDiagnosis(
+                        EvaluatedAdministrativeCriteria(
                             evaluated_job_application=self, administrative_criteria=criterion
                         )
                         for criterion in AdministrativeCriteria.objects.all()

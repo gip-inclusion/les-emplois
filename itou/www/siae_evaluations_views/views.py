@@ -65,7 +65,7 @@ def siae_job_applications_list(request, template_name="siae_evaluations/siae_job
         evaluated_job_applications = (
             EvaluatedJobApplication.objects.filter(evaluated_siae__in=evaluated_siaes)
             .select_related("job_application", "job_application__job_seeker", "job_application__approval")
-            .prefetch_related("evaluated_eligibility_diagnoses")
+            .prefetch_related("evaluated_administrative_criteria")
         )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
@@ -87,7 +87,7 @@ def siae_select_criteria(
     )
     initial_data = {
         eval_criterion.administrative_criteria.key: True
-        for eval_criterion in evaluated_job_application.evaluated_eligibility_diagnoses.all()
+        for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
     }
 
     form_administrative_criteria = AdministrativeCriteriaOfJobApplicationForm(

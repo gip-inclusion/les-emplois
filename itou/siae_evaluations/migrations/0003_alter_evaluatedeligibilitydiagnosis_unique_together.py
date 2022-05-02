@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterUniqueTogether(
-            name="evaluatedeligibilitydiagnosis",
+            name="evaluatedadministrativecriteria",
             unique_together={("administrative_criteria", "evaluated_job_application")},
         ),
     ]
