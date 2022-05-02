@@ -7,6 +7,7 @@ import uuid
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
@@ -64,6 +65,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_REFUSE = "refuse"
     TRANSITION_CANCEL = "cancel"
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
+    TRANSITION_TRANSFER = "transfer"
 
     TRANSITION_CHOICES = (
         (TRANSITION_PROCESS, "Étudier la candidature"),
@@ -72,6 +74,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_REFUSE, "Décliner la candidature"),
         (TRANSITION_CANCEL, "Annuler la candidature"),
         (TRANSITION_RENDER_OBSOLETE, "Rendre obsolete la candidature"),
+        (TRANSITION_TRANSFER, "Transfert de la candidature vers une autre SIAE"),
     )
 
     CAN_BE_ACCEPTED_STATES = [STATE_PROCESSING, STATE_POSTPONED, STATE_OBSOLETE, STATE_REFUSED, STATE_CANCELLED]
@@ -83,6 +86,11 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_POSTPONED], STATE_REFUSED),
         (TRANSITION_CANCEL, STATE_ACCEPTED, STATE_CANCELLED),
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
+        (
+            TRANSITION_TRANSFER,
+            [STATE_PROCESSING, STATE_POSTPONED, STATE_REFUSED, STATE_CANCELLED, STATE_OBSOLETE],
+            STATE_NEW,
+        ),
     )
 
     PENDING_STATES = [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED]
@@ -532,6 +540,19 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     hidden_for_siae = models.BooleanField(default=False, verbose_name="Masqué coté employeur")
 
+    transferred_at = models.DateTimeField(verbose_name="Date de transfert", null=True, blank=True)
+    transferred_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name="Transferée par", null=True, blank=True, on_delete=models.SET_NULL
+    )
+    transferred_from = models.ForeignKey(
+        "siaes.Siae",
+        verbose_name="SIAE d'origine",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="job_application_transferred",
+    )
+
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
 
@@ -712,6 +733,71 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         return is_application_valid and not self.candidate_has_employee_record and self.to_siae.can_use_employee_record
 
+    @property
+    def is_transferable(self):
+        return self.state not in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW]
+
+    def can_be_transferred(self, user, target_siae):
+        # Can't transfer to same structure
+        if target_siae == self.to_siae:
+            return False
+        # User must be SIAE user / employee
+        if not user.is_siae_staff:
+            return False
+        # User must be member of both origin and target SIAE to make a transfer
+        if not (self.to_siae.has_member(user) and target_siae.has_member(user)):
+            return False
+        return self.is_transferable
+
+    def transfer_to(self, transferred_by, target_siae):
+        if not (self.is_transferable and self.can_be_transferred(transferred_by, target_siae)):
+            raise ValidationError(
+                f"Cette candidature n'est pas transferable ({transferred_by=}, {target_siae=}, {self.to_siae=})"
+            )
+
+        self.transferred_from = self.to_siae
+        self.transferred_by = transferred_by
+        self.transferred_at = timezone.localtime()
+        self.to_siae = target_siae
+        self.state = JobApplicationWorkflow.STATE_NEW
+
+        # Delete eligibility diagnosis if not provided by an authorized prescriber
+        eligibility_diagnosis = self.eligibility_diagnosis
+        is_eligibility_diagnosis_made_by_siae = (
+            eligibility_diagnosis and eligibility_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
+        )
+        self.eligibility_diagnosis = None if is_eligibility_diagnosis_made_by_siae else eligibility_diagnosis
+
+        self.save(
+            update_fields=[
+                "eligibility_diagnosis",
+                "to_siae",
+                "state",
+                "eligibility_diagnosis",
+                "transferred_at",
+                "transferred_by",
+                "transferred_from",
+            ]
+        )
+
+        # As 1:N or 1:1 objects must have a pk before being saved,
+        # eligibility diagnosis must be deleted after saving current object.
+        if is_eligibility_diagnosis_made_by_siae:
+            eligibility_diagnosis.delete()
+
+        # Always send an email to job seeker and origin SIAE
+        emails = [
+            self.email_transfer_origin_siae(transferred_by, self.transferred_from, target_siae),
+            self.email_transfer_job_seeker(transferred_by, self.transferred_from, target_siae),
+        ]
+
+        # Send email to prescriber or orienter if any
+        if self.sender_kind == self.SENDER_KIND_PRESCRIBER:
+            emails.append(self.email_transfer_prescriber(transferred_by, self.transferred_from, target_siae))
+
+        connection = mail.get_connection()
+        connection.send_messages(emails)
+
     def get_eligibility_diagnosis(self):
         """
         Returns the eligibility diagnosis linked to this job application or None.
@@ -846,6 +932,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def render_obsolete(self, *args, **kwargs):
         pass
 
+    @xwf_models.transition()
+    def transfer(self, *args, **kwargs):
+        # TODO: send transfer notification by email
+        pass
+
     # Emails.
     @property
     def email_new_for_prescriber(self):
@@ -942,6 +1033,46 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_application": self}
         subject = "approvals/email/refuse_manually_subject.txt"
         body = "approvals/email/refuse_manually_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def email_transfer_origin_siae(self, transferred_by, origin_siae, target_siae):
+        # Send email to every active member of the origin SIAE
+        to = list(origin_siae.active_members.values_list("email", flat=True))
+        context = {
+            "job_application": self,
+            "transferred_by": transferred_by,
+            "origin_siae": origin_siae,
+            "target_siae": target_siae,
+        }
+        subject = "apply/email/transfer_origin_siae_subject.txt"
+        body = "apply/email/transfer_origin_siae_body.txt"
+
+        return get_email_message(to, context, subject, body)
+
+    def email_transfer_job_seeker(self, transferred_by, origin_siae, target_siae):
+        to = [self.job_seeker.email]
+        context = {
+            "job_application": self,
+            "transferred_by": transferred_by,
+            "origin_siae": origin_siae,
+            "target_siae": target_siae,
+        }
+        subject = "apply/email/transfer_job_seeker_subject.txt"
+        body = "apply/email/transfer_job_seeker_body.txt"
+
+        return get_email_message(to, context, subject, body)
+
+    def email_transfer_prescriber(self, transferred_by, origin_siae, target_siae):
+        to = [self.sender.email]
+        context = {
+            "job_application": self,
+            "transferred_by": transferred_by,
+            "origin_siae": origin_siae,
+            "target_siae": target_siae,
+        }
+        subject = "apply/email/transfer_prescriber_subject.txt"
+        body = "apply/email/transfer_prescriber_body.txt"
+
         return get_email_message(to, context, subject, body)
 
     def manually_deliver_approval(self, delivered_by):
