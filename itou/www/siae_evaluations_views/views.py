@@ -7,12 +7,18 @@ from django.urls import reverse
 from django.utils import timezone
 
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.models import EvaluatedJobApplication, EvaluatedSiae, EvaluationCampaign
+from itou.siae_evaluations.models import (
+    EvaluatedAdministrativeCriteria,
+    EvaluatedJobApplication,
+    EvaluatedSiae,
+    EvaluationCampaign,
+)
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaOfJobApplicationForm
-from itou.www.siae_evaluations_views.forms import SetChosenPercentForm
+from itou.www.siae_evaluations_views.forms import SetChosenPercentForm, SubmitEvaluatedAdministrativeCriteriaProofForm
 
 
 @login_required
@@ -131,6 +137,47 @@ def siae_select_criteria(
         "form_administrative_criteria": form_administrative_criteria,
         "level_1_fields": level_1_fields,
         "level_2_fields": level_2_fields,
+        "back_url": back_url,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def siae_upload_doc(
+    request, evaluated_eligibility_diagnosis_pk, template_name="siae_evaluations/siae_upload_doc.html"
+):
+
+    evaluated_administrative_criteria = get_object_or_404(
+        EvaluatedAdministrativeCriteria,
+        pk=evaluated_eligibility_diagnosis_pk,
+        evaluated_job_application__evaluated_siae__siae=get_current_siae_or_404(request),
+    )
+
+    form = SubmitEvaluatedAdministrativeCriteriaProofForm(
+        instance=evaluated_administrative_criteria, data=request.POST or None
+    )
+
+    url = (
+        reverse("siae_evaluations_views:siae_job_applications_list")
+        + f"#{evaluated_administrative_criteria.evaluated_job_application.pk}"
+    )
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return HttpResponseRedirect(url)
+
+    s3_upload = S3Upload(kind="evaluations")
+
+    back_url = get_safe_url(request, "back_url", fallback_url=url)
+
+    context = {
+        "job_seeker": evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker,
+        "approval": evaluated_administrative_criteria.evaluated_job_application.job_application.approval,
+        "state": evaluated_administrative_criteria.evaluated_job_application.state,
+        "evaluated_administrative_criteria": evaluated_administrative_criteria,
+        "s3_form_values": s3_upload.form_values,
+        "s3_upload_config": s3_upload.config,
+        "form": form,
         "back_url": back_url,
     }
     return render(request, template_name, context)

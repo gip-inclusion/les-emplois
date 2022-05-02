@@ -34,11 +34,11 @@ class S3Tests(SimpleTestCase):
         with self.settings(STORAGE_UPLOAD_KINDS=test_resume_settings):
             s3_upload_resume = S3Upload(kind="resume")
             result = s3_upload_resume.config
-            self.assertEqual(result["allowed_mime_types"], "*")
+            self.assertEqual(result["allowed_mime_types"], "application/pdf")
             self.assertEqual(result["key_path"], "")
-            self.assertEqual(result["upload_expiration"], 3600)
+            self.assertEqual(result["upload_expiration"], 5400)
             self.assertEqual(result["max_file_size"], 5)
-            self.assertEqual(result["max_files"], 3)
+            self.assertEqual(result["max_files"], 1)
 
         # Test allowed mime types formatting
         file_type = "application/pdf"
