@@ -129,6 +129,7 @@ def siae_select_criteria(
     context = {
         "job_seeker": evaluated_job_application.job_application.job_seeker,
         "approval": evaluated_job_application.job_application.approval,
+        "state": evaluated_job_application.state,
         "form_administrative_criteria": form_administrative_criteria,
         "level_1_fields": level_1_fields,
         "level_2_fields": level_2_fields,
