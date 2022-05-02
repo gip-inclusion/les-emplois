@@ -13,6 +13,7 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django_xworkflows import models as xwf_models
 
+from itou.approvals.models import ApprovalAlreadyExistsError
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
@@ -256,6 +257,31 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 # so use `commit=False` to avoid a double save.
                 job_application = form_accept.save(commit=False)
                 job_application.accept(user=request.user)
+        except ApprovalAlreadyExistsError:
+            link_to_form = get_external_link_markup(
+                url=f"{settings.ITOU_COMMUNITY_URL }/aide/emplois/#support",
+                text="ce formulaire",
+            )
+            messages.error(
+                request,
+                # NOTE(vperron): maybe a small template would be better if this gets more complex.
+                mark_safe(
+                    "Ce candidat semble avoir plusieurs comptes sur Les emplois de l'inclusion "
+                    "(même identifiant Pôle emploi mais adresse e-mail différente). "
+                    "<br>"
+                    "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. "
+                    "<br>"
+                    f"Pour que nous régularisions la situation, merci de remplir {link_to_form} en nous indiquant : "
+                    "<ul>"
+                    "<li> nom et prénom du salarié"
+                    "<li> numéro de sécurité sociale"
+                    "<li> sa date de naissance"
+                    "<li> son identifiant Pôle Emploi"
+                    "<li> la référence d’un agrément Pôle Emploi ou d’un PASS IAE lui appartenant (si vous l’avez) "
+                    "<ul>"
+                ),
+            )
+            return HttpResponseRedirect(next_url)
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.")
             return HttpResponseRedirect(next_url)

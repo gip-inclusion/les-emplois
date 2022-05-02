@@ -113,6 +113,10 @@ class CommonApprovalQuerySet(models.QuerySet):
         return self.filter(Q(start_at__gt=now))
 
 
+class ApprovalAlreadyExistsError(Exception):
+    pass
+
+
 class Approval(CommonApprovalMixin):
     """
     Store "PASS IAE" whose former name was "approval" ("agréments" in French)
@@ -364,12 +368,13 @@ class Approval(CommonApprovalMixin):
             raise RuntimeError("Invalid approval.")
         if isinstance(approval, cls):
             return approval
+        if Approval.objects.filter(number=approval.number).exists():
+            raise ApprovalAlreadyExistsError()
         approval_from_pe = cls(
             start_at=approval.start_at,
             end_at=approval.end_at,
             user=approvals_wrapper.user,
-            # Only store 12 chars numbers.
-            number=approval.number[:12],
+            number=approval.number,
         )
         approval_from_pe.save()
         return approval_from_pe
