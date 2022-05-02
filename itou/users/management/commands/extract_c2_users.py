@@ -51,6 +51,7 @@ class Command(BaseCommand):
             "Prénom": user.first_name,
             "Nom": user.last_name,
             "Admin": membership.is_admin,
+            "DateRattachement": membership.created_at.date(),
             "Département": DEPARTMENTS[org.department] if org.department else None,
             "Région": org.region,
         }
