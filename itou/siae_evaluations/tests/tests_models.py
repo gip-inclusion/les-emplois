@@ -510,10 +510,15 @@ class EvaluatedJobApplicationModelTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PENDING, evaluated_job_application.state)
 
         criterion = AdministrativeCriteria.objects.first()
-        EvaluatedAdministrativeCriteria.objects.create(
+        evaluated_adiministrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
         )
         self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PROCESSING, evaluated_job_application.state)
+
+        evaluated_adiministrative_criteria.proof_url = "https://www.test.com"
+        evaluated_adiministrative_criteria.save()
+        evaluated_adiministrative_criteria.refresh_from_db()
+        self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.UPLOADED, evaluated_job_application.state)
 
     def test_save_selected_criteria(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()

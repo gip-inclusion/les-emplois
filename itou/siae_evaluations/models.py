@@ -314,7 +314,9 @@ class EvaluatedJobApplication(models.Model):
     def state(self):
         # property in progress, new conditionnal state will be added further
         if self.evaluated_administrative_criteria.exists():
-            return evaluation_enums.EvaluationJobApplicationsState.PROCESSING
+            if self.evaluated_administrative_criteria.filter(proof_url="").exists():
+                return evaluation_enums.EvaluationJobApplicationsState.PROCESSING
+            return evaluation_enums.EvaluationJobApplicationsState.UPLOADED
         return evaluation_enums.EvaluationJobApplicationsState.PENDING
 
     def save_selected_criteria(self, cleaned_keys, changed_keys):

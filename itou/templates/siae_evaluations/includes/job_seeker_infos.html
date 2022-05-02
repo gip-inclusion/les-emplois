@@ -13,7 +13,9 @@
                 <p class="badge badge-pilotage">à traiter</b></p>
             {% elif state == "PROCESSING" %}
                 <p class="badge badge-pilotage">en cours</b></p>
-            {%endif%}
+            {% elif state == "UPLOADED" %}
+                <p class="badge badge-success">traité</b></p>
+            {% endif %}
         </p>
     </div>
 </div>
