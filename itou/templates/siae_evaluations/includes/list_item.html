@@ -1,41 +1,34 @@
-<div class="card my-5">
+<div class="card my-3" id="{{item.pk}}" >
 
     <div class="card-header">
-        <div class="row">
-            <div class="col-md-7">
-                <h3 class="h2">{{ item.job_application.job_seeker.get_full_name|title }}</h3>
-            </div>
-            <div class="col-md-5 text-right">
-                <p class="small mb-0">
-                    {% if item.state == "PENDING" %}
-                        <p class="badge badge-warning">A traiter</b></p>
-                    {% elif item.state == "PROCESSING" %}
-                        <p class="badge badge-warning">En cours</b></p>
-                    {% endif %}
-                </p>
-            </div>
-        </div>
+        {% include "siae_evaluations/includes/job_seeker_infos.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.state%}
     </div>
 
     <div class="card-body">
-        <div class="row">
-            <div class="col-md-7">
-                <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.job_application.approval.number_with_spaces }}</b></p>
+
+        {%for evaluated_eligibility_diagnosis in item.evaluated_eligibility_diagnoses.all %}
+            <div class="row mt-3">
+                <div class="col-md-12">
+
+                    {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_eligibility_diagnosis.administrative_criteria %}
+                </div>
             </div>
 
+        {%endfor%}
+
+        <div class="row mt-5">
+            <div class="col-md-12">
+                {% if item.state == "PENDING" %}
+                    <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}"
+                        class="btn btn-primary">Sélectionner les critères</a>
+                {% elif item.state == "PROCESSING" or item.state == "UPLOADED" %}
+                    <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}"
+                        class="btn btn-outline-primary">Modifier les critères</a>
+                {% endif %}
+
+            </div>
         </div>
 
-        {% if item.state == "PENDING" %}
-            <div>
-                <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-outline-primary float-right">Ajouter ses justificatifs</a>
-            </div>
-        {% elif item.state == "PROCESSING" %}
-            {# Work In Progress : the link below will be changed soon to redirect to upload view#}
-            <div>
-                <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-outline-primary float-right">Ajouter ses justificatifs</a>
-            </div>
-        {% endif %}
 
     </div>
-
 </div>

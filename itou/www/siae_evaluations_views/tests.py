@@ -221,6 +221,27 @@ class SiaeJobApplicationListViewTest(TestCase):
             ),
         )
 
+    def test_content_with_selected_criteria(self):
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        criterion = (
+            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+        )
+        EvaluatedEligibilityDiagnosis.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=criterion.administrative_criteria,
+        )
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:siae_select_criteria",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+            ),
+        )
+        self.assertContains(response, criterion.administrative_criteria.name)
+
 
 class SiaeSelectCriteriaViewTest(TestCase):
     def setUp(self):
