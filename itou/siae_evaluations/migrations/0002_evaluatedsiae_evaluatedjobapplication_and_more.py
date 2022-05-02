@@ -76,7 +76,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name="EvaluatedEligibilityDiagnosis",
+            name="EvaluatedAdministrativeCriteria",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("proof_url", models.URLField(blank=True, max_length=500, verbose_name="Lien vers le justificatif")),
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
                     "administrative_criteria",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="evaluated_eligibility_diagnoses",
+                        related_name="evaluated_administrative_criteria",
                         to="eligibility.administrativecriteria",
                         verbose_name="Critère administratif",
                     ),
@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
                     "evaluated_job_application",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="evaluated_eligibility_diagnoses",
+                        related_name="evaluated_administrative_criteria",
                         to="siae_evaluations.evaluatedjobapplication",
                         verbose_name="Candidature évaluée",
                     ),
