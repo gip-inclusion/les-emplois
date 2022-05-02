@@ -199,7 +199,7 @@ def stats_pe(request):
         DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
     }
     context = {
-        "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
+        "page_title": f"Fiches de poste en tension de mon département : {DEPARTMENTS[department]}",
         "matomo_custom_url": f"/stats/pe/{format_region_and_department_for_matomo(department)}",
     }
     return render_stats(request=request, context=context, params=params)
