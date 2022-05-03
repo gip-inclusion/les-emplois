@@ -56,8 +56,8 @@ def get_fluxiae_referential_filenames():
         if filename.startswith("fluxIAE_Ref")
     ]
 
-    if len(filename_prefixes) != 28:
-        raise RuntimeError(f"Fatal error: 28 fluxIAE referentials expected but only {len(filename_prefixes)} found.")
+    if len(filename_prefixes) != 29:
+        raise RuntimeError(f"Fatal error: 29 fluxIAE referentials expected but only {len(filename_prefixes)} found.")
 
     return filename_prefixes
 
