@@ -28,10 +28,10 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.User
 
-    username = factory.Faker("user_name")
+    username = factory.Sequence("user_name{0}".format)
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
-    email = factory.Faker("email")
+    email = factory.Sequence("email{0}@domain.com".format)
     password = factory.PostGenerationMethodCall("set_password", DEFAULT_PASSWORD)
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     phone = factory.Faker("phone_number", locale="fr_FR")
