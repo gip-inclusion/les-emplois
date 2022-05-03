@@ -239,7 +239,7 @@ class SiaeJobDescription(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "is_active",
-        "nb_open_positions",
+        "open_positions",
     )
     raw_id_fields = ("appellation", "siae", "location")
     search_fields = (

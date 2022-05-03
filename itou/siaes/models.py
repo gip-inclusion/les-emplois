@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.gis.measure import D
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models import BooleanField, Case, Count, Exists, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.functions import Cast, Coalesce
@@ -549,9 +549,6 @@ class SiaeJobDescription(models.Model):
     is_active = models.BooleanField(verbose_name="Recrutement ouvert", default=True)
     custom_name = models.CharField(verbose_name="Nom personnalisé", blank=True, max_length=255)
     description = models.TextField(verbose_name="Description", blank=True)
-    nb_open_positions = models.PositiveIntegerField(
-        verbose_name="Nombre de postes ouverts", default=1, validators=[MinValueValidator(1)]
-    )
     # is used to order job descriptions in the UI
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
     contract_type = models.CharField(
