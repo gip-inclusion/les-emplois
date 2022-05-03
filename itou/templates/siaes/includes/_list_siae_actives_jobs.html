@@ -1,34 +1,23 @@
 {% comment %} takes 2 arguments: siae=<Siae> and jobs_descriptions=<List of SiaeJobDescription> {% endcomment %}
 
-<p class="h3 pb-2">Recrutement{{ jobs_descriptions|pluralize }} en cours</p>
+<p class="h5 text-uppercase pb-2">{{ jobs_descriptions|length }} recrutement{{ jobs_descriptions|pluralize }} en cours</p>
 
-{% if not siae.block_job_applications %}
-    {% for job in jobs_descriptions %}
-        <a class="matomo-event btn btn-outline-primary mb-2"
-            href="{% if job.pk %}{{job.get_absolute_url}}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
-            data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
-            {{ job.display_name }}
-        </a>
-        {% if job.is_popular %}
-            <small>
-                <span class="ml-3">
-                    <i class="ri-stack-line mr-1 text-danger"></i>
-                    Plus de {{ job.POPULAR_THRESHOLD }} candidatures reçues
-                </span>
-            </small>
-        {% endif %}
-        <br >
-        {# Collapsing block start (more than 5 jobs descriptions) #}
-        {% if forloop.counter == 5 and not forloop.last %}
-            <div class="pt-2 mb-2">
-                <button class="btn collapsed collapse-caret p-0" data-toggle="collapse" data-target="#collapse_{{ forloop.parentloop.counter0 }}" type="button" aria-expanded="false" aria-controls="collapse_{{ forloop.parentloop.counter0 }}">
-                    <span class="h5">Voir tous les recrutements en cours ({{ forloop.revcounter0 }} de plus)</span>
-                </button>
-            </div>
-            <div class="collapse" id="collapse_{{forloop.parentloop.counter0}}">
-        {% elif forloop.last and forloop.counter > 5 %}
-            {# Collapsing block end #}
-            </div>
-        {% endif %}
+<ul class="list-group">
+    {% for job in jobs_descriptions|slice:":5" %}
+        {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=job %}
     {% endfor %}
+</ul>
+{% if jobs_descriptions|length > 5 %}
+    <ul class="list-group collapse" id="collapse_{{ forloop.counter0 }}">
+        {% for job in jobs_descriptions|slice:"5:" %}
+            {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=job is_appended=forloop.first %}
+        {% endfor %}
+    </ul>
+    <div class="mt-3 text-center">
+        <button type="button" class="btn collapsed collapse-caret p-0"
+            data-toggle="collapse" data-target="#collapse_{{ forloop.counter0 }}"
+            aria-expanded="false" aria-controls="collapse_{{ forloop.counter0 }}">
+            <span>Afficher tout</span>
+        </button>
+    </div>
 {% endif %}
