@@ -317,7 +317,7 @@ class EvaluatedJobApplication(models.Model):
             return evaluation_enums.EvaluationJobApplicationsState.PROCESSING
         return evaluation_enums.EvaluationJobApplicationsState.PENDING
 
-    def save_selected_criteria(self, cleaned_keys=None, changed_keys=None):
+    def save_selected_criteria(self, cleaned_keys, changed_keys):
         # cleaned_keys are checked fields when form is submitted.
         #    It contains new AND prexistant choices.
         # changed_keys are fields which status has changed when form is submitted :
@@ -325,29 +325,23 @@ class EvaluatedJobApplication(models.Model):
         #    from checked to unchecked
         #    It contains new AND removed choices.
 
-        if changed_keys:
-            if cleaned_keys is None:
-                cleaned_keys = []
+        with transaction.atomic():
 
-            with transaction.atomic():
-
-                EvaluatedAdministrativeCriteria.objects.filter(
-                    pk__in=(
-                        eval_criterion.pk
-                        for eval_criterion in self.evaluated_administrative_criteria.all()
-                        if eval_criterion.administrative_criteria.key in set(changed_keys) - set(cleaned_keys)
-                    )
-                ).delete()
-
-                EvaluatedAdministrativeCriteria.objects.bulk_create(
-                    [
-                        EvaluatedAdministrativeCriteria(
-                            evaluated_job_application=self, administrative_criteria=criterion
-                        )
-                        for criterion in AdministrativeCriteria.objects.all()
-                        if criterion.key in set(changed_keys).intersection(cleaned_keys)
-                    ]
+            EvaluatedAdministrativeCriteria.objects.filter(
+                pk__in=(
+                    eval_criterion.pk
+                    for eval_criterion in self.evaluated_administrative_criteria.all()
+                    if eval_criterion.administrative_criteria.key in set(changed_keys) - set(cleaned_keys)
                 )
+            ).delete()
+
+            EvaluatedAdministrativeCriteria.objects.bulk_create(
+                [
+                    EvaluatedAdministrativeCriteria(evaluated_job_application=self, administrative_criteria=criterion)
+                    for criterion in AdministrativeCriteria.objects.all()
+                    if criterion.key in set(changed_keys).intersection(cleaned_keys)
+                ]
+            )
 
 
 class EvaluatedAdministrativeCriteria(models.Model):

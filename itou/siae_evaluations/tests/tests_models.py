@@ -521,7 +521,7 @@ class EvaluatedJobApplicationModelTest(TestCase):
         criterion2 = AdministrativeCriteria.objects.filter(level=2).first()
 
         # nothing to do
-        evaluated_job_application.save_selected_criteria()
+        evaluated_job_application.save_selected_criteria(changed_keys=[], cleaned_keys=[])
         self.assertEqual(0, EvaluatedAdministrativeCriteria.objects.count())
 
         # only create criterion1
@@ -543,11 +543,11 @@ class EvaluatedJobApplicationModelTest(TestCase):
         )
 
         # only delete
-        evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key])
+        evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key], cleaned_keys=[])
         self.assertEqual(0, EvaluatedAdministrativeCriteria.objects.count())
 
         # delete non-existant criterion does not raise error ^^
-        evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key])
+        evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key], cleaned_keys=[])
         self.assertEqual(0, EvaluatedAdministrativeCriteria.objects.count())
 
         # atomic : deletion rolled back when trying to create existing criterion
