@@ -222,7 +222,7 @@ def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) ->
     headers = {"Authorization": token}
 
     try:
-        r = httpx.post(RECHERCHE_INDIVIDU_URL, json=individu.as_api_params(), headers=headers)
+        r = httpx.post(RECHERCHE_INDIVIDU_URL, json=individu.as_api_params(), headers=headers, timeout=60)
         data = r.json()
         # we can’t use `raise_for_error` since actual data are stored with status code 4xx
         # if r.status_code not in [200, 400, 401, 404, 429]
@@ -231,6 +231,11 @@ def recherche_individu_certifie_api(individu: PoleEmploiIndividu, token: str) ->
             # The only thing we care about is http code 200
             raise PoleEmploiMiseAJourPassIAEException(r.status_code, extract_code_sortie(data))
         return PoleEmploiIndividuResult.from_data(data)
+    except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ReadError, httpx.RemoteProtocolError):  # noqa
+        # We need to deal with this special case because
+        # ConnectTimeout do not carry a response
+        HTTP_CODE_REQUEST_TIMEOUT = 408
+        raise PoleEmploiMiseAJourPassIAEException(HTTP_CODE_REQUEST_TIMEOUT)
     except httpx.HTTPError as e:
         raise PoleEmploiMiseAJourPassIAEException(e.response.status_code)
     except ValueError:
@@ -259,7 +264,7 @@ def mise_a_jour_pass_iae(job_application, encrypted_identifier, token):
 
     try:
         params = _mise_a_jour_parameters(encrypted_identifier, job_application)
-        r = httpx.post(MISE_A_JOUR_PASS_PRODUCTION_URL, json=params, headers=headers)
+        r = httpx.post(MISE_A_JOUR_PASS_PRODUCTION_URL, json=params, headers=headers, timeout=60)
         # The status code are 200, 401, 500.
         # Visibly non-200 HTTP codes do not return parsable json but I do not have samples
         if r.status_code != 200:
@@ -283,7 +288,7 @@ def mise_a_jour_pass_iae(job_application, encrypted_identifier, token):
         except Exception:
             details = f"{r.content} {token}"
             raise PoleEmploiMiseAJourPassIAEException(r.status_code, details)
-    except httpx.ConnectTimeout:  # noqa
+    except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ReadError, httpx.RemoteProtocolError):  # noqa
         # We need to deal with this special case because
         # ConnectTimeout do not carry a response
         HTTP_CODE_REQUEST_TIMEOUT = 408
