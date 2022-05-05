@@ -1,5 +1,16 @@
-<div class="card my-3" id="{{item.pk}}" >
+{# navigation : style to force the scroll down and avoid the banner to hide the map #}
+<style>
+    a.anchor {
+        display: block;
+        position: relative;
+        top: -130px;
+        visibility: hidden;
+    }
+</style>
 
+<div class="card my-3"  >
+    {# navigation : anchor to scroll to a specific card when returning to this page #}
+    <a class="anchor" id="{{item.pk}}"></a>
     <div class="card-header">
         {% include "siae_evaluations/includes/job_seeker_infos.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.state%}
     </div>
@@ -9,6 +20,14 @@
         {%for evaluated_administrative_criteria in item.evaluated_administrative_criteria.all %}
             <div class="row mt-3">
                 <div class="col-md-12">
+                    <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}"
+                        class="btn {% if evaluated_administrative_criteria.proof_url %}btn-outline-primary {%else%}btn-primary {%endif%}float-right">
+                        {% if evaluated_administrative_criteria.proof_url %}
+                            Modifier le justificatif
+                        {%else%}
+                            Ajouter un justificatif
+                        {%endif%}
+                    </a>
                     {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria %}
                 </div>
             </div>
