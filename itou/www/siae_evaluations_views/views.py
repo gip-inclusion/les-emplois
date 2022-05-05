@@ -144,12 +144,12 @@ def siae_select_criteria(
 
 @login_required
 def siae_upload_doc(
-    request, evaluated_eligibility_diagnosis_pk, template_name="siae_evaluations/siae_upload_doc.html"
+    request, evaluated_administrative_criteria_pk, template_name="siae_evaluations/siae_upload_doc.html"
 ):
 
     evaluated_administrative_criteria = get_object_or_404(
         EvaluatedAdministrativeCriteria,
-        pk=evaluated_eligibility_diagnosis_pk,
+        pk=evaluated_administrative_criteria_pk,
         evaluated_job_application__evaluated_siae__siae=get_current_siae_or_404(request),
     )
 
