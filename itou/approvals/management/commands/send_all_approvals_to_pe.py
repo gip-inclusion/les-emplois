@@ -25,12 +25,9 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
     def handle(self, wet_run=False, **options):
-        # only send Pole Emploi the approvals tied to an accepted job_application
-        approvals = Approval.objects.filter(start_at__lt=PE_API_START_DATE)
         job_applications = JobApplication.objects.filter(
-            approval__pk__in=Subquery(approvals.values("pk")), state=JobApplicationWorkflow.STATE_ACCEPTED
+            approval__start_at__lte=PE_API_START_DATE, state=JobApplicationWorkflow.STATE_ACCEPTED
         )
-        self.stdout.write(f"approvals          count={approvals.count()}")
         self.stdout.write(f"job_applications   count={job_applications.count()}")
 
         CharField.register_lookup(Length)
@@ -42,7 +39,10 @@ class Command(BaseCommand):
         self.stdout.write(f"> with valid users count={with_valid_users.count()}")
 
         not_already_sent = with_valid_users.exclude(
-            jobapplicationpoleemploinotificationlog__status=JobApplicationPoleEmploiNotificationLog.STATUS_OK
+            jobapplicationpoleemploinotificationlog__status__in=[
+                JobApplicationPoleEmploiNotificationLog.STATUS_OK,
+                JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
+            ]
         )
         self.stdout.write(f"> not already sent count={not_already_sent.count()}")
         for job_application in not_already_sent:
