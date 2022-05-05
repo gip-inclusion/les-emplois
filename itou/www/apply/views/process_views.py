@@ -16,6 +16,7 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.models import ApprovalAlreadyExistsError
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.models import Siae
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup, get_safe_url
@@ -423,6 +424,34 @@ def archive(request, job_application_id):
             messages.error(request, "Action déjà effectuée.")
 
     return HttpResponseRedirect(next_url)
+
+
+@login_required
+def transfer(request, job_application_id):
+    job_application = get_object_or_404(JobApplication.objects, pk=job_application_id)
+    target_siae = get_object_or_404(Siae.objects, pk=request.POST.get("target_siae_id"))
+    back_url = request.POST.get("back_url", reverse("apply:list_for_siae"))
+
+    try:
+        job_application.transfer_to(request.user, target_siae)
+        messages.success(
+            request,
+            mark_safe(
+                f"<p>La candidature de <b>{ job_application.job_seeker.first_name }"
+                f" { job_application.job_seeker.last_name }</b>"
+                f" a bien été transférée à la SIAE <b>{ target_siae.display_name }</b>,"
+                f" { target_siae.address_on_one_line }.</p>"
+                "<p>Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure.</p>",
+            ),
+        )
+    except Exception as ex:
+        messages.error(
+            request,
+            "Une erreur est survenue lors du transfert de la candidature : "
+            f"{ job_application= }, { target_siae= }, { ex= }",
+        )
+
+    return HttpResponseRedirect(back_url)
 
 
 @login_required

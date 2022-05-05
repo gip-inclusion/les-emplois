@@ -60,6 +60,7 @@ urlpatterns = [
     path("<uuid:job_application_id>/siae/accept", process_views.accept, name="accept"),
     path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),
     path("<uuid:job_application_id>/siae/archive", process_views.archive, name="archive"),
+    path("<uuid:job_application_id>/siae/transfer", process_views.transfer, name="transfer"),
     # Variant of accept process (employer does not need an approval)
     path(
         "<uuid:job_application_id>/siae/accept_without_approval",

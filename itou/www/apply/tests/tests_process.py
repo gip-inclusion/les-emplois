@@ -949,3 +949,99 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_refuse)
         self.assertNotContains(response, self.url_postpone)
         self.assertNotContains(response, self.url_accept)
+
+
+class ProcessTransferJobApplicationTest(TestCase):
+
+    TRANSFER_TO_OTHER_SIAE_SENTENCE = "Transférer vers une autre structure"
+
+    def test_job_application_transfer_disabled_for_lone_users(self):
+        # A user member of only one SIAE
+        # must not be able to transfer a job application to another SIAE
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            to_siae=siae, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(
+            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        )
+
+        self.assertNotContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+
+    def test_job_application_transfer_disabled_for_bad_state(self):
+        # A user member of only one SIAE must not be able to transfert
+        # to another SIAE
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        job_application_1 = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            to_siae=siae, state=JobApplicationWorkflow.STATE_NEW
+        )
+        job_application_2 = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            to_siae=siae, state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(
+            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application_1.pk})
+        )
+        self.assertNotContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+
+        response = self.client.get(
+            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application_2.pk})
+        )
+
+        self.assertNotContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+
+    def test_job_application_transfer_enabled(self):
+        # A user member of several SIAE can transfer a job application
+        siae = SiaeWithMembershipFactory()
+        other_siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        other_siae.members.add(user)
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            to_siae=siae, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+
+        self.assertEqual(2, user.siaemembership_set.count())
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(
+            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+
+    def test_job_application_transfer_redirection(self):
+        # After transfering a job application,
+        # user must be redirected to job application list
+        # with a nice message
+        siae = SiaeWithMembershipFactory()
+        other_siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        other_siae.members.add(user)
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            to_siae=siae, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(
+            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        )
+
+        self.assertContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+        self.assertContains(response, f"transfer_confirmation_modal_{other_siae.pk}")
+        self.assertContains(response, "target_siae_id")
+        self.assertContains(response, transfer_url)
+
+        # Confirm from modal window
+        post_data = {"target_siae_id": other_siae.pk}
+        response = self.client.post(transfer_url, data=post_data, follow=True)
+        messages = list(response.context.get("messages"))
+
+        self.assertRedirects(response, reverse("apply:list_for_siae"))
+        self.assertTrue(messages)
+        self.assertEqual(len(messages), 1)
+        self.assertIn(f"transférée à la SIAE <b>{other_siae.display_name}</b>", str(messages[0]))
