@@ -324,9 +324,9 @@ class Command(BaseCommand):
         self.fatal_errors = 0
 
         self.delete_user_created_siaes_without_members()
-        update_existing_conventions()
         self.manage_staff_created_siaes()
         self.update_siret_and_auth_email_of_existing_siaes()
+        update_existing_conventions()
         self.create_new_siaes()
         self.create_conventions()
         self.delete_conventions()
