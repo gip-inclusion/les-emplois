@@ -2,15 +2,105 @@
 {% load redirection_fields %}
 
 {% if user.is_authenticated %}
+    {% if user.is_siae_staff and user_siaes|length > 1 %}
+        <li class="dropdown">
+            <button type="button" class="btn btn-outline-primary btn-ico" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                <span>({{ current_siae.kind }}) {{ current_siae.display_name|truncatechars:50 }}</span>
+                <i class="ri-arrow-down-s-line ri-lg"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
+                <form action="{% url 'dashboard:switch_siae' %}" method="post">
+                    {% csrf_token %}
+                    <ul class="list-unstyled">
+                        {% for s in user_siaes %}
+                            {% if s.pk != current_siae.pk %}
+                                <li>
+                                    <button
+                                        class="dropdown-item text-primary font-weight-bold"
+                                        type="submit"
+                                        name="siae_id"
+                                        value="{{ s.pk }}">
+                                        <span class="badge badge-primary">{{ s.kind }}</span>
+                                        {{ s.display_name|truncatechars:50 }}
+                                    </button>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </form>
+            </div>
+        </li>
+    {% endif %}
+    {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
+        <li class="dropdown">
+            <button type="button" class="btn btn-outline-primary btn-ico" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                <span>({{ current_prescriber_organization.kind }}) {{ current_prescriber_organization.display_name|truncatechars:50 }}</span>
+                <i class="ri-arrow-down-s-line ri-lg"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
+                <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
+                    {% csrf_token %}
+                    <ul class="list-unstyled">
+                        {% for po in user_prescriberorganizations %}
+                            {% if po.pk != current_prescriber_organization.pk %}
+                                <li>
+                                    <button
+                                        class="dropdown-item text-primary"
+                                        type="submit"
+                                        name="prescriber_organization_id"
+                                        value="{{ po.pk }}">
+                                        <span class="badge badge-primary">{{ po.kind }}</span>
+                                        {{ po.display_name|truncatechars:50 }}
+                                    </button>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </form>
+            </div>
+        </li>
+    {% endif %}
+
+    {% if user.is_labor_inspector and user_institutions|length > 1 %}
+        <li class="dropdown">
+            <button type="button" class="btn btn-outline-primary btn-ico" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                <span>({{ current_institution.kind }}) {{ current_institution.display_name|truncatechars:50 }}</span>
+                <i class="ri-arrow-down-s-line ri-lg"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
+                <form action="{% url 'dashboard:switch_institution' %}" method="post">
+                    {% csrf_token %}
+                    <ul class="list-unstyled">
+                        {% for i in user_institutions %}
+                            {% if i.pk != current_institution.pk %}
+                                <li>
+                                    <button
+                                        class="dropdown-item text-primary"
+                                        type="submit"
+                                        name="institution_id"
+                                        value="{{ i.pk }}">
+                                        <span class="badge badge-primary">{{ i.kind }}</span>
+                                        {{ i.display_name|truncatechars:50 }}
+                                    </button>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </form>
+            </div>
+        </li>
+    {% endif %}
+
     <li class="dropdown mr-2">
         <button
             type="button"
-            class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle"
+            class="btn btn-primary btn-ico"
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-controls="dashboardUserDropdown"
             aria-expanded="false">
-            Mon espace
+            <span>Mon espace</span>
+            <i class="ri-arrow-down-s-fill ri-lg"></i>
         </button>
         <div class="dropdown-menu dropdown-menu-left" id="dashboardUserDropdown">
             <ul class="list-unstyled">
@@ -73,92 +163,11 @@
             </ul>
         </div>
     </li>
-
-    {% if user.is_siae_staff and user_siaes|length > 1 %}
-        <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
-                Changer de structure
-            </button>
-            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
-                <form action="{% url 'dashboard:switch_siae' %}" method="post">
-                    {% csrf_token %}
-                    <ul class="list-unstyled">
-                        {% for s in user_siaes %}
-                            <li>
-                                <button
-                                    class="dropdown-item text-primary {% if s.pk == current_siae.pk %} font-weight-bold disabled{% endif %}"
-                                    type="submit"
-                                    name="siae_id"
-                                    value="{{ s.pk }}">
-                                    <span class="badge badge-primary">{{ s.kind }}</span>
-                                    {{ s.display_name }}
-                                </button>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </form>
-            </div>
-        </li>
-    {% endif %}
-
-    {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
-        <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
-                Changer de structure
-            </button>
-            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
-                <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
-                    {% csrf_token %}
-                    <ul class="list-unstyled">
-                        {% for po in user_prescriberorganizations %}
-                            <li>
-                                <button
-                                    class="dropdown-item text-primary {% if po.pk == current_prescriber_organization.pk %} font-weight-bold disabled{% endif %}"
-                                    type="submit"
-                                    name="prescriber_organization_id"
-                                    value="{{ po.pk }}">
-                                    <span class="badge badge-primary">{{ po.kind }}</span>
-                                    {{ po.display_name }}
-                                </button>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </form>
-            </div>
-        </li>
-    {% endif %}
-
-    {% if user.is_labor_inspector and user_institutions|length > 1 %}
-        <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
-                Changer de structure
-            </button>
-            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
-                <form action="{% url 'dashboard:switch_institution' %}" method="post">
-                    {% csrf_token %}
-                    <ul class="list-unstyled">
-                        {% for i in user_institutions %}
-                            <li>
-                                <button
-                                    class="dropdown-item text-primary {% if i.pk == current_institution.pk %} font-weight-bold disabled{% endif %}"
-                                    type="submit"
-                                    name="institution_id"
-                                    value="{{ i.pk }}">
-                                    <span class="badge badge-primary">{{ i.kind }}</span>
-                                    {{ i.display_name }}
-                                </button>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </form>
-            </div>
-        </li>
-    {% endif %}
-
 {% else %}
     <li class="dropdown mr-2">
-        <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
-            S'inscrire | Se connecter
+        <button type="button" class="btn btn-primary btn-ico" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
+            <span>S'inscrire | Se connecter</span>
+            <i class="ri-arrow-down-s-fill ri-lg"></i>
         </button>
         <div class="dropdown-menu" id="loginUserDropdown">
             <ul class="list-unstyled">
