@@ -364,6 +364,7 @@ class EvaluatedAdministrativeCriteria(models.Model):
 
     proof_url = models.URLField(max_length=500, verbose_name="Lien vers le justificatif", blank=True)
     uploaded_at = models.DateTimeField(verbose_name=("Téléversé le"), blank=True, null=True)
+    submitted_at = models.DateTimeField(verbose_name=("Transmis le"), blank=True, null=True)
 
     class Meta:
         verbose_name = "Critère administratif"
