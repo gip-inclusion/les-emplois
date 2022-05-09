@@ -179,6 +179,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context["evaluations_asked_at"])
         self.assertFalse(response.context["evaluated_job_applications"])
+        self.assertFalse(response.context["is_submittable"])
         self.assertContains(response, "Vous n'avez aucun contrôle en cours.")
 
         # siae with active campaign
