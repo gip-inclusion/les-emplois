@@ -7,12 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.models import (
-    EvaluatedAdministrativeCriteria,
-    EvaluatedJobApplication,
-    EvaluatedSiae,
-    EvaluationCampaign,
-)
+from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.storage.s3 import S3Upload
@@ -55,29 +50,34 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
 
 @login_required
 def siae_job_applications_list(request, template_name="siae_evaluations/siae_job_applications_list.html"):
-    evaluations_asked_at = False
-    evaluated_job_applications = False
 
-    evaluated_siaes = (
-        EvaluatedSiae.objects.for_siae(get_current_siae_or_404(request))
-        .in_progress()
-        .prefetch_related("evaluation_campaign")
+    siae = get_current_siae_or_404(request)
+
+    evaluated_job_applications = (
+        EvaluatedJobApplication.objects.exclude(evaluated_siae__evaluation_campaign__evaluations_asked_at=None)
+        .filter(evaluated_siae__siae=siae, evaluated_siae__evaluation_campaign__ended_at=None)
+        .select_related("job_application", "job_application__job_seeker", "job_application__approval")
+        .prefetch_related("evaluated_administrative_criteria")
     )
 
-    if evaluated_siaes:
-        evaluations_asked_at = evaluated_siaes.aggregate(date=Min("evaluation_campaign__evaluations_asked_at")).get(
-            "date"
+    if evaluated_job_applications:
+        is_submittable = all(
+            evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
+            for evaluated_job_application in evaluated_job_applications
         )
-        evaluated_job_applications = (
-            EvaluatedJobApplication.objects.filter(evaluated_siae__in=evaluated_siaes)
-            .select_related("job_application", "job_application__job_seeker", "job_application__approval")
-            .prefetch_related("evaluated_administrative_criteria")
-        )
+    else:
+        is_submittable = False
+
+    evaluations_asked_at = evaluated_job_applications.aggregate(
+        date=Min("evaluated_siae__evaluation_campaign__evaluations_asked_at")
+    ).get("date")
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
+
     context = {
         "evaluated_job_applications": evaluated_job_applications,
         "evaluations_asked_at": evaluations_asked_at,
+        "is_submittable": is_submittable,
         "back_url": back_url,
     }
     return render(request, template_name, context)
