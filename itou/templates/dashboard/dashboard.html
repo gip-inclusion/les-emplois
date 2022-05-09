@@ -415,7 +415,7 @@
                 </div>
             </div>
 
-            {% if has_active_campaign %}
+            {% if active_campaigns %}
                 <div class="card">
                     <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info">Nouveau</span></p>
                     <div class="card-body">
@@ -533,7 +533,7 @@
 
         {% endif %}
 
-        {% if can_view_stats_ddets and has_active_campaign %}
+        {% if can_view_stats_ddets and active_campaigns %}
             <div class="card">
                 <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info">Nouveau</span></p>
                 <div class="card-body">

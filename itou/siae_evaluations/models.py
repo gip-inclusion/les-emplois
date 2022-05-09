@@ -90,9 +90,6 @@ class EvaluationCampaignQuerySet(models.QuerySet):
 
 
 class EvaluationCampaignManager(models.Manager):
-    def has_active_campaign(self, institution):
-        return self.for_institution(institution).in_progress().exists()
-
     def first_active_campaign(self, institution):
         return self.for_institution(institution).in_progress().first()
 
@@ -254,8 +251,7 @@ class EvaluatedSiaeQuerySet(models.QuerySet):
 
 
 class EvaluatedSiaeManager(models.Manager):
-    def has_active_campaign(self, siae):
-        return self.for_siae(siae).in_progress().exists()
+    pass
 
 
 class EvaluatedSiae(models.Model):
