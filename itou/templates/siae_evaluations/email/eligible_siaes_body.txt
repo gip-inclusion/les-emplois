@@ -22,16 +22,17 @@ Accès direct à votre liste d’auto-prescriptions : {{ url }}
 
 2- Transmettez vos justificatifs en ligne
 
-Pour chaque embauche, cliquez sur “Ajouter ses justificatifs”,
-les critères que vous avez enregistrés sont affichés.
+Pour chaque embauche, cliquez sur “Sélectionner les critères”, les critères que vous avez enregistrés sont affichés.
 Sélectionnez le ou les critères que vous souhaitez justifier (un nombre minimum de justificatifs est requis en fonction du type de critères et de SIAE).
-Déposez le ou les justificatifs demandés.
+Ensuite cliquez sur  “Ajouter un justificatif”  pour déposer le justificatif demandé.
 
 3- Validez votre dossier de contrôle :
 
 Lorsque tous les justificatifs sont ajoutés, cliquez sur “Soumettre à validation” pour les transmettre à votre DDETS.
 
 Vous serez notifié(e) par e-mail lorsque la DDETS aura vérifié vos justificatifs.
+
+Voir le mode d’emploi : https://communaute.inclusion.beta.gouv.fr/doc/emplois/controle-a-posteriori-pour-les-siae/
 
 En cas de question sur les critères ou les justificatifs vous devez vous adresser uniquement à votre DDETS.
 

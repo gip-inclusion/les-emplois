@@ -219,6 +219,7 @@ class EvaluationCampaign(models.Model):
 
             connection = mail.get_connection()
             emails = [evaluated_siae.get_email_eligible_siae() for evaluated_siae in evaluated_siaes]
+            emails += [self.get_email_institution_opening_siae()]
             connection.send_messages(emails)
 
     def get_email_institution_notification(self, ratio_selection_end_at):
@@ -229,6 +230,18 @@ class EvaluationCampaign(models.Model):
         }
         subject = "siae_evaluations/email/email_institution_notification_subject.txt"
         body = "siae_evaluations/email/email_institution_notification_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def get_email_institution_opening_siae(self):
+        to = self.institution.active_members
+        context = {
+            # end_date for eligible siaes to return their documents of proofs is 6 weeks after notification
+            "end_date": timezone.now() + relativedelta(weeks=6),
+            "evaluated_period_start_at": self.evaluated_period_start_at,
+            "evaluated_period_end_at": self.evaluated_period_end_at,
+        }
+        subject = "siae_evaluations/email/email_institution_opening_siae_subject.txt"
+        body = "siae_evaluations/email/email_institution_opening_siae_body.txt"
         return get_email_message(to, context, subject, body)
 
 
