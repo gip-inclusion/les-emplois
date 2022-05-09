@@ -122,34 +122,6 @@ class EvaluationCampaignQuerySetTest(TestCase):
 
 
 class EvaluationCampaignManagerTest(TestCase):
-    def test_institution_with_campaign_in_progress(self):
-        institution = InstitutionFactory()
-        EvaluationCampaignFactory(institution=institution)
-        self.assertTrue(EvaluationCampaign.objects.has_active_campaign(institution))
-
-    def test_institution_without_any_campaign(self):
-        institution = InstitutionFactory()
-        self.assertFalse(EvaluationCampaign.objects.has_active_campaign(institution))
-
-    def test_institution_with_ended_campaign(self):
-        ended_at = timezone.now() - relativedelta(years=1)
-        institution = InstitutionFactory()
-        EvaluationCampaignFactory(institution=institution, ended_at=ended_at)
-        self.assertFalse(EvaluationCampaign.objects.has_active_campaign(institution))
-
-    def test_institution_with_ended_and_in_progress_campaign(self):
-        now = timezone.now()
-        ended_at = now - relativedelta(years=1)
-        institution = InstitutionFactory()
-        EvaluationCampaignFactory(
-            institution=institution,
-            ended_at=ended_at,
-        )
-        EvaluationCampaignFactory(
-            institution=institution,
-        )
-        self.assertTrue(EvaluationCampaign.objects.has_active_campaign(institution))
-
     def test_first_active_campaign(self):
         institution = InstitutionFactory()
         now = timezone.now()
@@ -487,17 +459,6 @@ class EvaluatedSiaeQuerySetTest(TestCase):
         # evaluations_asked_at is not None, ended_at is None
         EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=fake_now, evaluation_campaign__ended_at=None)
         self.assertEqual(1, EvaluatedSiae.objects.in_progress().count())
-
-
-class EvaluatedSiaeManagerTest(TestCase):
-    def test_has_active_campaign(self):
-        fake_now = timezone.now()
-
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
-        self.assertFalse(EvaluatedSiae.objects.has_active_campaign(evaluated_siae.siae))
-
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=fake_now)
-        self.assertTrue(EvaluatedSiae.objects.has_active_campaign(evaluated_siae.siae))
 
 
 class EvaluatedSiaeModelTest(TestCase):

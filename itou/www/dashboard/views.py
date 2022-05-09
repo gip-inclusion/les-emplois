@@ -31,7 +31,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     can_show_employee_records = False
     job_applications_categories = []
     num_rejected_employee_records = 0
-    has_active_campaign = False
+    active_campaigns = []
 
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
@@ -40,7 +40,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         current_org = get_current_siae_or_404(request)
         can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
         can_show_employee_records = current_org.can_use_employee_record
-        has_active_campaign = EvaluatedSiae.objects.has_active_campaign(current_org)
+        active_campaigns = EvaluatedSiae.objects.for_siae(current_org).in_progress()
 
         job_applications_categories = [
             {
@@ -86,7 +86,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     if request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
-        has_active_campaign = EvaluationCampaign.objects.has_active_campaign(current_org)
+        active_campaigns = EvaluationCampaign.objects.for_institution(current_org).in_progress()
 
     context = {
         "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
@@ -102,7 +102,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_dreets": request.user.can_view_stats_dreets(current_org=current_org),
         "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
         "num_rejected_employee_records": num_rejected_employee_records,
-        "has_active_campaign": has_active_campaign,
+        "active_campaigns": active_campaigns,
     }
 
     return render(request, template_name, context)

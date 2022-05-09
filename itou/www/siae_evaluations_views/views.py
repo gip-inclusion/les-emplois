@@ -21,7 +21,6 @@ from itou.www.siae_evaluations_views.forms import SetChosenPercentForm, SubmitEv
 def samples_selection(request, template_name="siae_evaluations/samples_selection.html"):
     institution = get_current_institution_or_404(request)
     evaluation_campaign = EvaluationCampaign.objects.first_active_campaign(institution)
-    has_active_campaign = EvaluationCampaign.objects.has_active_campaign(institution)
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
@@ -40,7 +39,6 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
     context = {
         "institution": institution,
         "evaluation_campaign": evaluation_campaign,
-        "has_active_campaign": has_active_campaign,
         "min": evaluation_enums.EvaluationChosenPercent.MIN,
         "max": evaluation_enums.EvaluationChosenPercent.MAX,
         "back_url": back_url,
