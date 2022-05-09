@@ -173,9 +173,22 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
 
-        EvaluationCampaignFactory(institution=institution)
+        evaluation_campaign = EvaluationCampaignFactory(institution=institution)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
+        self.assertContains(response, reverse("siae_evaluations_views:samples_selection"))
+
+        evaluation_campaign.evaluations_asked_at = timezone.now()
+        evaluation_campaign.save(update_fields=["evaluations_asked_at"])
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Contrôle a posteriori")
+        self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            ),
+        )
 
     def test_dashboard_siae_evaluations_siae_access(self):
         # preset for incoming new pages
