@@ -139,12 +139,11 @@
                             {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
                             {{ siae.post_code }} {{ siae.city }}
                             <br>
-                            {% if siae.active_admin_members %}
-                                {% with siae.active_admin_members.first as admin %}
-                                    {# For security, display only the first char of the last name. #}
-                                    <i>Pour obtenir une invitation, contactez {{ admin.first_name|title }} {{ admin.last_name|slice:1 }}.</i>
-                                {% endwith %}
-                            {% endif %}
+                            {# note: memberships.first does not work, it does not take the prefetch into account. #}
+                            {% with siae.memberships.all.0.user as admin %}
+                                {# For security, display only the first char of the last name. #}
+                                <i>Pour obtenir une invitation, contactez {{ admin.first_name|title }} {{ admin.last_name|slice:1 }}.</i>
+                            {% endwith %}
                         </p>
                     </li>
                 {% endfor %}

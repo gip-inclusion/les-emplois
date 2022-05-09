@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
 
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
@@ -235,3 +235,22 @@ class SiaeSignupTest(TestCase):
         url = reverse("signup:siae_select")
         response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
         self.assertContains(response, "Si votre organisation est porteuse de la clause sociale")
+
+    def test_siae_select_does_not_die_under_requests(self):
+        SiaeWithMembershipAndJobsFactory(siret="40219166200001")
+        SiaeWithMembershipAndJobsFactory(siret="40219166200002")
+        SiaeWithMembershipAndJobsFactory(siret="40219166200003")
+        SiaeWithMembershipAndJobsFactory(siret="40219166200004")
+        SiaeWithMembershipAndJobsFactory(siret="40219166200005")
+        url = reverse("signup:siae_select")
+        # ensure we only perform 4 requests, whatever the number of SIAEs sharing the
+        # same SIREN. Before, this request was issuing 3*N slow requests, N being the
+        # number of SIAEs.
+        with self.assertNumQueries(
+            1  # SELECT siaes with active admins
+            + 1  # SELECT the conventions for those siaes
+            + 1  # prefetch memberships
+            + 1  # prefetch users associated with those memberships
+        ):
+            response = self.client.get(url, {"siren": "402191662"})
+        self.assertEqual(response.status_code, 200)

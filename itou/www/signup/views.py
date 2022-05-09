@@ -163,7 +163,15 @@ def siae_select(request, template_name="signup/siae_select.html"):
         siaes_for_siren = Siae.objects.active().filter(siret__startswith=siren_form.cleaned_data["siren"])
         # A user cannot join structures that already have members.
         # Show these structures in the template to make that clear.
-        siaes_with_members = siaes_for_siren.exclude(members=None)
+        siaes_with_members = (
+            siaes_for_siren.exclude(members=None)
+            # the template directly displays the first membership's user "as the admin".
+            # that's why we only select SIAEs that have at least an active admin user.
+            # it should always be the case, but lets enforce it anyway.
+            .filter(siaemembership__is_admin=True, siaemembership__user__is_active=True)
+            # avoid the template issuing requests for every member and user.
+            .prefetch_related("memberships__user")
+        )
         siaes_without_members = siaes_for_siren.filter(members=None)
         siae_select_form = forms.SiaeSelectForm(data=request.POST or None, siaes=siaes_without_members)
 
