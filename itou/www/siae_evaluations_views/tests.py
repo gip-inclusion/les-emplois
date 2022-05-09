@@ -189,10 +189,9 @@ class SiaeJobApplicationListViewTest(TestCase):
             1  # fetch django session
             + 1  # fetch user
             + 2  # fetch siae membership and siae infos
-            + 2  # fetch evaluated_siae and its prefetch_related evaluation_campaign
+            + 2  # fetch evaluatedjobapplication and its prefetched evaluatedadministrativecriteria
             + 1  # aggregate min evaluation_campaign notification date
             + 2  # weird fetch siae membership and social account
-            + 2  # fetch evuluated_job_application and its prefetch_related evaluated_administrative_criteria
         ):
             response = self.client.get(self.url)
 

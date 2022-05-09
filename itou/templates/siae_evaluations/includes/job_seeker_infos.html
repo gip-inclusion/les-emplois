@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-md-9">
-        <h3 class="h2">Auto-prescriptions pour
+        <h3 class="h2">Auto-prescription pour
             <span class="text-muted">
                 {{job_seeker.get_full_name|title}}
             </span>
@@ -9,12 +9,15 @@
     </div>
     <div class="col-md-3 text-right">
         <p class="small mb-0">
+            {# note vincentporte: state should be computed in view instead of in template to make this include reuseable for institution views #}
             {% if state == "PENDING" %}
                 <p class="badge badge-pilotage">à traiter</b></p>
             {% elif state == "PROCESSING" %}
                 <p class="badge badge-pilotage">en cours</b></p>
             {% elif state == "UPLOADED" %}
                 <p class="badge badge-success">traité</b></p>
+            {% elif state == "SUBMITTED" %}
+                <p class="badge badge-communaute-light">transmis</b></p>
             {% endif %}
         </p>
     </div>

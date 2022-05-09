@@ -507,18 +507,57 @@ class EvaluatedJobApplicationModelTest(TestCase):
 
     def test_state(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
-        self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PENDING, evaluated_job_application.state)
+        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PENDING, evaluated_job_application.state)
+        del evaluated_job_application.__dict__["state"]  # clear cached_property stored value
 
         criterion = AdministrativeCriteria.objects.first()
-        evaluated_adiministrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
         )
-        self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.PROCESSING, evaluated_job_application.state)
+        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PROCESSING, evaluated_job_application.state)
+        del evaluated_job_application.__dict__["state"]
 
-        evaluated_adiministrative_criteria.proof_url = "https://www.test.com"
-        evaluated_adiministrative_criteria.save()
-        evaluated_adiministrative_criteria.refresh_from_db()
-        self.assertEqual(evaluation_enums.EvaluationJobApplicationsState.UPLOADED, evaluated_job_application.state)
+        evaluated_administrative_criteria.proof_url = "https://www.test.com"
+        evaluated_administrative_criteria.save(update_fields=["proof_url"])
+        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.UPLOADED, evaluated_job_application.state)
+        del evaluated_job_application.__dict__["state"]
+
+        evaluated_administrative_criteria.submitted_at = timezone.now()
+        evaluated_administrative_criteria.save(update_fields=["submitted_at"])
+        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED, evaluated_job_application.state)
+
+    def test_should_select_criteria(self):
+        evaluated_job_application = EvaluatedJobApplicationFactory()
+        self.assertEqual(
+            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING,
+            evaluated_job_application.should_select_criteria,
+        )
+        del evaluated_job_application.__dict__["state"]
+
+        criterion = AdministrativeCriteria.objects.first()
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
+        )
+        self.assertEqual(
+            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
+            evaluated_job_application.should_select_criteria,
+        )
+        del evaluated_job_application.__dict__["state"]
+
+        evaluated_administrative_criteria.proof_url = "https://www.test.com"
+        evaluated_administrative_criteria.save(update_fields=["proof_url"])
+        self.assertEqual(
+            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
+            evaluated_job_application.should_select_criteria,
+        )
+        del evaluated_job_application.__dict__["state"]
+
+        evaluated_administrative_criteria.submitted_at = timezone.now()
+        evaluated_administrative_criteria.save(update_fields=["submitted_at"])
+        self.assertEqual(
+            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
+            evaluated_job_application.should_select_criteria,
+        )
 
     def test_save_selected_criteria(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()

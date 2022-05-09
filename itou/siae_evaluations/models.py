@@ -7,6 +7,7 @@ from django.db import models, transaction
 from django.db.models import Count, F
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.models import Institution
@@ -310,14 +311,29 @@ class EvaluatedJobApplication(models.Model):
     def __str__(self):
         return f"{self.job_application}"
 
-    @property
+    @cached_property
     def state(self):
         # property in progress, new conditionnal state will be added further
         if self.evaluated_administrative_criteria.exists():
             if self.evaluated_administrative_criteria.filter(proof_url="").exists():
-                return evaluation_enums.EvaluationJobApplicationsState.PROCESSING
-            return evaluation_enums.EvaluationJobApplicationsState.UPLOADED
-        return evaluation_enums.EvaluationJobApplicationsState.PENDING
+                return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
+            if self.evaluated_administrative_criteria.filter(submitted_at__isnull=True).exists():
+                return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
+            return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
+        return evaluation_enums.EvaluatedJobApplicationsState.PENDING
+
+    @property
+    def should_select_criteria(self):
+        if self.state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
+            return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
+
+        if self.state in [
+            evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
+            evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
+        ]:
+            return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE
+
+        return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
 
     def save_selected_criteria(self, cleaned_keys, changed_keys):
         # cleaned_keys are checked fields when form is submitted.
