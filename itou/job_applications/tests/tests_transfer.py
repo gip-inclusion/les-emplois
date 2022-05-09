@@ -1,8 +1,9 @@
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
-from itou.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationFactory,
@@ -135,6 +136,7 @@ class JobApplicationTransferModelTest(TestCase):
         self.assertIsNone(job_application.transferred_from)
         self.assertIsNone(job_application.transferred_at)
 
+        # TODO : optimization
         with self.assertNumQueries(7):
             job_application.transfer_to(origin_user, target_siae)
 

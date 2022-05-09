@@ -78,6 +78,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     )
 
     CAN_BE_ACCEPTED_STATES = [STATE_PROCESSING, STATE_POSTPONED, STATE_OBSOLETE, STATE_REFUSED, STATE_CANCELLED]
+    CAN_BE_TRANSFERRED_STATES = CAN_BE_ACCEPTED_STATES
 
     transitions = (
         (TRANSITION_PROCESS, STATE_NEW, STATE_PROCESSING),
@@ -86,11 +87,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_POSTPONED], STATE_REFUSED),
         (TRANSITION_CANCEL, STATE_ACCEPTED, STATE_CANCELLED),
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
-        (
-            TRANSITION_TRANSFER,
-            [STATE_PROCESSING, STATE_POSTPONED, STATE_REFUSED, STATE_CANCELLED, STATE_OBSOLETE],
-            STATE_NEW,
-        ),
+        (TRANSITION_TRANSFER, CAN_BE_TRANSFERRED_STATES, STATE_NEW),
     )
 
     PENDING_STATES = [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED]
@@ -773,7 +770,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 "eligibility_diagnosis",
                 "to_siae",
                 "state",
-                "eligibility_diagnosis",
                 "transferred_at",
                 "transferred_by",
                 "transferred_from",
@@ -930,11 +926,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def render_obsolete(self, *args, **kwargs):
-        pass
-
-    @xwf_models.transition()
-    def transfer(self, *args, **kwargs):
-        # TODO: send transfer notification by email
         pass
 
     # Emails.
