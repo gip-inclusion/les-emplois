@@ -39,3 +39,9 @@ class EvaluatedJobApplicationsSelectCriteriaState(models.TextChoices):
     PENDING = "PENDING"
     EDITABLE = "EDITABLE"
     NOTEDITABLE = "NOTEDITABLE"
+
+
+class EvaluatedSiaeState(models.TextChoices):
+    PENDING = "PENDING"
+    SUBMITTABLE = "SUBMITTABLE"
+    SUBMITTED = "SUBMITTED"
