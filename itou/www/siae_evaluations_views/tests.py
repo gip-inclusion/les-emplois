@@ -162,6 +162,76 @@ class SamplesSelectionViewTest(TestCase):
         self.assertEqual(updated_evaluation_campaign.chosen_percent, post_data["chosen_percent"])
 
 
+class InstitutionEvaluatedSiaeListViewTest(TestCase):
+    def setUp(self):
+        membership = InstitutionMembershipFactory()
+        self.user = membership.user
+        self.institution = membership.institution
+
+    def test_access(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        # institution without evaluation_campaign
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": 1},
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+        # institution with evaluation_campaign in "institution sets its ratio" phase
+        evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
+        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+        # institution with evaluation_campaign in "siae upload its proofs" phase
+        evaluation_campaign.evaluations_asked_at = timezone.now()
+        evaluation_campaign.save()
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # institution with ended evaluation_campaign
+        evaluation_campaign.ended_at = timezone.now()
+        evaluation_campaign.save()
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_content(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution, evaluations_asked_at=timezone.now()
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, evaluated_siae)
+        self.assertEqual(response.context["back_url"], reverse("dashboard:index"))
+        self.assertContains(response, dateformat.format(evaluation_campaign.evaluations_asked_at, "d F Y"))
+
+
 class SiaeJobApplicationListViewTest(TestCase):
     def setUp(self):
         membership = SiaeMembershipFactory()

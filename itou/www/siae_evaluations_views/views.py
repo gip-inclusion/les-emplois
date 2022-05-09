@@ -2,13 +2,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Min
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
+from itou.siae_evaluations.models import (
+    EvaluatedAdministrativeCriteria,
+    EvaluatedJobApplication,
+    EvaluatedSiae,
+    EvaluationCampaign,
+)
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.storage.s3 import S3Upload
@@ -43,6 +48,26 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
         "max": evaluation_enums.EvaluationChosenPercent.MAX,
         "back_url": back_url,
         "form": form,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def institution_evaluated_siae_list(
+    request, evaluation_campaign_pk, template_name="siae_evaluations/institution_evaluated_siae_list.html"
+):
+    institution = get_current_institution_or_404(request)
+    evaluated_siaes = get_list_or_404(
+        EvaluatedSiae,
+        evaluation_campaign__pk=evaluation_campaign_pk,
+        evaluation_campaign__institution=institution,
+        evaluation_campaign__ended_at=None,
+        evaluation_campaign__evaluations_asked_at__isnull=False,
+    )
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
+    context = {
+        "evaluated_siaes": evaluated_siaes,
+        "back_url": back_url,
     }
     return render(request, template_name, context)
 
