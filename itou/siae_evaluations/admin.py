@@ -87,9 +87,9 @@ class EvaluatedJobApplication(admin.ModelAdmin):
 
 @admin.register(models.EvaluatedAdministrativeCriteria)
 class EvaluatedAdministrativeCriteria(admin.ModelAdmin):
-    list_display = ("evaluated_job_application", "administrative_criteria")
+    list_display = ("evaluated_job_application", "administrative_criteria", "submitted_at")
     list_display_links = ("evaluated_job_application", "administrative_criteria")
-    readonly_fields = ("uploaded_at", "proof_url")
+    readonly_fields = ("uploaded_at", "proof_url", "submitted_at")
     raw_id_fields = (
         "evaluated_job_application",
         "administrative_criteria",
