@@ -195,7 +195,7 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
         )
 
         form = AdministrativeCriteriaOfJobApplicationForm(user, siae, job_application=job_application)
-        self.assertEquals(2, len(form.fields))
+        self.assertEqual(2, len(form.fields))
         self.assertIn(
             AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first().key,
             form.fields.keys(),
@@ -204,3 +204,21 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
             AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first().key,
             form.fields.keys(),
         )
+
+    def test_num_level2_admin_criteria(self):
+        for kind, _ in Siae.KIND_CHOICES:
+            with self.subTest(kind):
+                siae = SiaeWithMembershipFactory(kind=kind)
+                user = siae.members.first()
+
+                job_application = JobApplicationWithApprovalFactory(
+                    to_siae=siae,
+                    sender_siae=siae,
+                    hiring_start_at=timezone.now() - relativedelta(months=2),
+                )
+                form = AdministrativeCriteriaOfJobApplicationForm(user, siae, job_application=job_application)
+
+                if kind in [Siae.KIND_ETTI, Siae.KIND_AI]:
+                    self.assertEqual(2, form.num_level2_admin_criteria)
+                else:
+                    self.assertEqual(3, form.num_level2_admin_criteria)

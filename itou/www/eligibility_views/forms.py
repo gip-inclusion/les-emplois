@@ -104,4 +104,10 @@ class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
     def __init__(self, user, siae, job_application, **kwargs):
 
         self.job_application = job_application
+
+        self.siae = siae
+        if self.siae.kind == self.siae.KIND_ETTI or self.siae.kind == self.siae.KIND_AI:
+            self.num_level2_admin_criteria = 2
+        else:
+            self.num_level2_admin_criteria = 3
         super().__init__(user, siae, **kwargs)
