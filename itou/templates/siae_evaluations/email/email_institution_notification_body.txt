@@ -13,8 +13,5 @@ Le choix du taux de SIAE à contrôler est possible jusqu’au {{ratio_selection
 
 Cordialement,
 
-{% if itou_environment != "PROD"%}
-[{{itou_environment}}] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [{{itou_environment}}]
-{% endif %}
 
 {% endblock %}

@@ -37,8 +37,4 @@ En cas de question sur les critères ou les justificatifs vous devez vous adress
 
 Cordialement,
 
-{% if itou_environment != "PROD"%}
-[{{itou_environment}}] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [{{itou_environment}}]
-{% endif %}
-
 {% endblock %}
