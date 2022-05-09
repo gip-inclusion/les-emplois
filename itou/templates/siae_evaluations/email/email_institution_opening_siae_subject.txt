@@ -1,0 +1,6 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+
+[Contrôle a posteriori] Ouverture de la phase de transmission des justificatifs
+
+{% endblock %}

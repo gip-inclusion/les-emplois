@@ -453,6 +453,16 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         self.assertIn(siae.convention.siret_signature, email.body)
         self.assertIn(dateformat.format(timezone.now() + relativedelta(weeks=6), "d E Y"), email.body)
 
+    def test_get_email_institution_opening_siae(self):
+        institution = InstitutionWith2MembershipFactory()
+        evaluation_campaign = EvaluationCampaignFactory(institution=institution)
+
+        email = evaluation_campaign.get_email_institution_opening_siae()
+        self.assertEqual(email.to, list(institution.active_members))
+        self.assertIn(dateformat.format(timezone.now() + relativedelta(weeks=6), "d E Y"), email.body)
+        self.assertIn(dateformat.format(evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body)
+        self.assertIn(dateformat.format(evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body)
+
 
 class EvaluatedSiaeQuerySetTest(TestCase):
     def test_for_siae(self):
