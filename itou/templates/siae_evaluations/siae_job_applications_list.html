@@ -45,6 +45,7 @@
                     </div>
 
                     <div class="col-md-4">
+                        <a class="btn {% if is_submittable %}btn-primary {% else %}btn-outline-primary disabled {% endif %}float-right" href="{% url 'siae_evaluations_views:siae_submit_proofs' %}">
                             Soumettre à validation
                         </a>
                     </div>
@@ -57,10 +58,23 @@
                     </div>
                 </div>
 
+                {% if is_submittable %}
+                    <div class="row mt-3">
+                        <div class="col-8">
+                            <p>Lorsque vous aurez ajouté<strong> tous vos justificatifs</strong>,
+                                veuillez les soumettre à validation, la DDETS effectuera un contrôle de ceux-ci et reviendra vers vous.
+                            </p>
                         </div>
 
+                        <div class="col-4">
+                            <a class="btn btn-primary float-right" href="{% url 'siae_evaluations_views:siae_submit_proofs' %}">
+                                Soumettre à validation
+                            </a>
+                        </div>
                     </div>
-                </div>
+                {% endif%}
+
+
             {% else %}
                 <p>Vous n'avez aucun contrôle en cours.</p>
             {% endif %}

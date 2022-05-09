@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
@@ -181,3 +182,51 @@ def siae_upload_doc(
         "back_url": back_url,
     }
     return render(request, template_name, context)
+
+
+@login_required
+def siae_submit_proofs(request):
+    # notice this is a blind view, without template.
+
+    siae = get_current_siae_or_404(request)
+
+    # info : this queryset is used to check that each EvaluatedJobApplication
+    # is linked to at least one EvaluatedAdministrativeCriteria, to prevent
+    # submitting orphan EvaluatedJobApplication
+    evaluated_job_applications = (
+        EvaluatedJobApplication.objects.exclude(
+            evaluated_siae__evaluation_campaign__evaluations_asked_at=None,
+        )
+        .filter(
+            evaluated_siae__siae=siae,
+            evaluated_siae__evaluation_campaign__ended_at=None,
+        )
+        .select_related(
+            "evaluated_siae",
+            "evaluated_siae__evaluation_campaign",
+        )
+        .prefetch_related("evaluated_administrative_criteria")
+    )
+
+    if all(
+        evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
+        for evaluated_job_application in evaluated_job_applications
+    ):
+
+        EvaluatedAdministrativeCriteria.objects.filter(
+            evaluated_job_application__in=evaluated_job_applications
+        ).update(submitted_at=timezone.now())
+
+        back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
+        messages.success(
+            request,
+            mark_safe(
+                "<b>Justificatifs transmis !</b><br>"
+                "Merci d'avoir pris le temps de transmettre vos pièces justificatives.<br>"
+                "Le contrôle de celles-ci est à la charge de votre DDETS maintenant, vous serez notifié du résultat "
+                "(qu'il soit positif ou négatif) par mail lorsque celui-ci sera finalisé."
+            ),
+        )
+        return HttpResponseRedirect(back_url)
+
+    return HttpResponseRedirect(reverse("siae_evaluations_views:siae_job_applications_list"))
