@@ -275,6 +275,62 @@ class SiaeJobApplicationListViewTest(TestCase):
             ),
         )
 
+    def test_links_mechanism(self):
+        fake_now = timezone.now()
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        criterion = AdministrativeCriteria.objects.first()
+
+        submit_disabled = (
+            '<a class="btn btn-outline-primary disabled float-right" href="'
+            + reverse("siae_evaluations_views:siae_submit_proofs")
+            + '">'
+        )
+        submit_active = (
+            '<a class="btn btn-primary float-right" href="'
+            + reverse("siae_evaluations_views:siae_submit_proofs")
+            + '">'
+        )
+        select_criteria = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        # no criterion selected
+        response = self.client.get(self.url)
+        self.assertContains(response, submit_disabled)
+        self.assertContains(response, select_criteria)
+
+        # criterion selected
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
+        )
+        upload_proof = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
+        response = self.client.get(self.url)
+        self.assertContains(response, submit_disabled)
+        self.assertContains(response, select_criteria)
+        self.assertContains(response, upload_proof)
+
+        # criterion with uploaded proof
+        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
+        evaluated_administrative_criteria.save(update_fields=["proof_url"])
+        response = self.client.get(self.url)
+        self.assertContains(response, submit_active)
+        self.assertContains(response, select_criteria)
+        self.assertContains(response, upload_proof)
+
+        # criterion submitted
+        evaluated_administrative_criteria.submitted_at = fake_now
+        evaluated_administrative_criteria.save(update_fields=["submitted_at"])
+        response = self.client.get(self.url)
+        self.assertContains(response, submit_disabled)
+        self.assertNotContains(response, select_criteria)
+        self.assertNotContains(response, upload_proof)
+
 
 class SiaeSelectCriteriaViewTest(TestCase):
     def setUp(self):
@@ -538,3 +594,53 @@ class SiaeUploadDocsViewTest(TestCase):
 
         next_url = reverse("siae_evaluations_views:siae_job_applications_list") + f"#{evaluated_job_application.pk}"
         self.assertEqual(response.url, next_url)
+
+
+class SiaeSubmitProofsViewTest(TestCase):
+    def setUp(self):
+        membership = SiaeMembershipFactory()
+        self.user = membership.user
+        self.siae = membership.siae
+        self.url = reverse("siae_evaluations_views:siae_submit_proofs")
+
+    def test_is_submittable(self):
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        criterion = AdministrativeCriteria.objects.first()
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=criterion,
+            proof_url="https://server.com/rocky-balboa.pdf",
+        )
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        with self.assertNumQueries(
+            1  # fetch django session
+            + 1  # fetch user
+            + 1  # fetch siae membership
+            + 2  # fetch siae infos
+            + 2  # fetch evaluatedjobapplication and its prefetch evaluatedadministrativecriteria
+            + 2  # fetch evaluatedadministrativecriteria, because of `state` property, to be fixed later
+            + 1  # update evaluatedadministrativecriteria
+            + 1  # savepoint
+            + 1  # update session
+            + 1  # release savepoint
+        ):
+
+            response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("dashboard:index"))
+        evaluated_administrative_criteria.refresh_from_db()
+        self.assertNotEqual(evaluated_administrative_criteria.submitted_at, None)
+
+    def test_is_not_submittable(self):
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        criterion = AdministrativeCriteria.objects.first()
+        EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
+        )
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("siae_evaluations_views:siae_job_applications_list"))

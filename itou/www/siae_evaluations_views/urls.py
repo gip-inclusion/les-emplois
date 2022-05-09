@@ -19,4 +19,5 @@ urlpatterns = [
         views.siae_upload_doc,
         name="siae_upload_doc",
     ),
+    path("siae_submit_proofs", views.siae_submit_proofs, name="siae_submit_proofs"),
 ]
