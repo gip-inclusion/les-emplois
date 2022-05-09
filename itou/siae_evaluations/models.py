@@ -286,6 +286,22 @@ class EvaluatedSiae(models.Model):
         body = "siae_evaluations/email/eligible_siaes_body.txt"
         return get_email_message(to, context, subject, body)
 
+    @cached_property
+    def state(self):
+
+        if (
+            self.evaluated_job_applications.filter(evaluated_administrative_criteria__isnull=True).exists()
+            or self.evaluated_job_applications.filter(evaluated_administrative_criteria__proof_url="").exists()
+        ):
+            return evaluation_enums.EvaluatedSiaeState.PENDING
+
+        if self.evaluated_job_applications.filter(
+            evaluated_administrative_criteria__submitted_at__isnull=True
+        ).exists():
+            return evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
+
+        return evaluation_enums.EvaluatedSiaeState.SUBMITTED
+
 
 class EvaluatedJobApplication(models.Model):
 

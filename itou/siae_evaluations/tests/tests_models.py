@@ -490,6 +490,66 @@ class EvaluatedSiaeManagerTest(TestCase):
         self.assertTrue(EvaluatedSiae.objects.has_active_campaign(evaluated_siae.siae))
 
 
+class EvaluatedSiaeModelTest(TestCase):
+    def test_state(self):
+        fake_now = timezone.now()
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        criteria = AdministrativeCriteria.objects.all()[:3]
+
+        ## unit tests
+        # no evaluated_administrative_criterion
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
+        del evaluated_siae.__dict__["state"]
+
+        # one evaluated_administrative_criterion
+        # empty : proof_url and submitted_at empty)
+        evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application, administrative_criteria=criteria[0]
+        )
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
+        del evaluated_siae.__dict__["state"]
+
+        # with proof_url
+        evaluated_administrative_criteria0.proof_url = "https://server.com/rocky-balboa.pdf"
+        evaluated_administrative_criteria0.save(update_fields=["proof_url"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTABLE, evaluated_siae.state)
+        del evaluated_siae.__dict__["state"]
+
+        # with submitted_at
+        evaluated_administrative_criteria0.submitted_at = fake_now
+        evaluated_administrative_criteria0.save(update_fields=["submitted_at"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        del evaluated_siae.__dict__["state"]
+
+        ## integration tests
+        # three evaluated_administrative_criteria
+        evaluated_administrative_criteria1 = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=criteria[1],
+            proof_url="https://server.com/rocky-balboa.pdf",
+        )
+        evaluated_administrative_criteria2 = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application, administrative_criteria=criteria[2]
+        )
+        # one empty, one with proof_url, one with proof_url and submitted_at
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
+        del evaluated_siae.__dict__["state"]
+
+        # two with proof_url, one with proof_url and submitted_at
+        evaluated_administrative_criteria2.proof_url = "https://server.com/rocky-balboa.pdf"
+        evaluated_administrative_criteria2.save(update_fields=["proof_url"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTABLE, evaluated_siae.state)
+        del evaluated_siae.__dict__["state"]
+
+        # three with proof_url and submitted_at
+        evaluated_administrative_criteria1.submitted_at = fake_now
+        evaluated_administrative_criteria1.save(update_fields=["submitted_at"])
+        evaluated_administrative_criteria2.submitted_at = fake_now
+        evaluated_administrative_criteria2.save(update_fields=["submitted_at"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+
+
 class EvaluatedJobApplicationModelTest(TestCase):
     def test_unicity_constraint(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
