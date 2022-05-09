@@ -28,7 +28,14 @@ class EvaluationJobApplicationsBoundariesNumber:
     SELECTED_MAX = int(MAX * SELECTION_PERCENTAGE / 100)
 
 
-class EvaluationJobApplicationsState(models.TextChoices):
+class EvaluatedJobApplicationsState(models.TextChoices):
     PENDING = "PENDING"
     PROCESSING = "PROCESSING"
     UPLOADED = "UPLOADED"
+    SUBMITTED = "SUBMITTED"
+
+
+class EvaluatedJobApplicationsSelectCriteriaState(models.TextChoices):
+    PENDING = "PENDING"
+    EDITABLE = "EDITABLE"
+    NOTEDITABLE = "NOTEDITABLE"

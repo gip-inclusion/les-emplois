@@ -36,10 +36,10 @@
 
         <div class="row mt-5">
             <div class="col-md-12">
-                {% if item.state == "PENDING" %}
+                {% if item.should_select_criteria == "PENDING"%}
                     <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}"
                         class="btn btn-primary">Sélectionner les critères</a>
-                {% elif item.state == "PROCESSING" or item.state == "UPLOADED" %}
+                {% elif item.should_select_criteria == "EDITABLE" %}
                     <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}"
                         class="btn btn-outline-primary">Modifier les critères</a>
                 {% endif %}
