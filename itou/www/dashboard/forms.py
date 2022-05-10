@@ -7,8 +7,8 @@ from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
+from itou.users.enums import IdentityProvider
 from itou.users.models import User
-from itou.utils.perms.user import is_user_france_connected
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
@@ -21,10 +21,7 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         editor = kwargs.pop("editor")
-        request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
-
-        user_france_connected = is_user_france_connected(request)
 
         if not self.instance.is_job_seeker:
             del self.fields["birthdate"]
@@ -40,13 +37,14 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
                 }
             )
 
-        if user_france_connected:
-            # When a user is logged-in through France Connect,
+        if self.instance.identity_provider == IdentityProvider.FRANCE_CONNECT:
+            # When a user has logged in with FranceConnect,
             # it should see the field but most should be disabled
-            # (that’s a requirement on FC’s side)
+            # (that’s a requirement on FranceConnect’s side).
             disabled_fields = ["first_name", "last_name", "email", "birthdate"]
             for field_name in disabled_fields:
-                self.fields[field_name].disabled = True
+                if field_name in self.fields.keys():
+                    self.fields[field_name].disabled = True
 
             edit_email_url = reverse("dashboard:edit_user_email")
             self.fields["email"].help_text = f'<a href="{edit_email_url}"> Modifier votre adresse email</a>'
