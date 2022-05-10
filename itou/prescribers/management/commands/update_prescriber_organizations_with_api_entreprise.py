@@ -63,9 +63,7 @@ class Command(BaseCommand):
         ).exclude(siret__isnull=True)[:n_organizations]
         for prescriber_org in prescriber_orgs:
             self.logger.info("ID %s - SIRET %s - %s", prescriber_org.pk, prescriber_org.siret, prescriber_org.name)
-            etablissement, error = etablissement_get_or_error(
-                prescriber_org.siret, reason="Update prescriber organization"
-            )
+            etablissement, error = etablissement_get_or_error(prescriber_org.siret)
             if error:
                 self.logger.error("| Unable to fetch information: %s", error)
             elif prescriber_org.is_head_office != etablissement.is_head_office:

@@ -19,13 +19,20 @@ from itou.prescribers.factories import (
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
-from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
+from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.www.signup.forms import PrescriberChooseKindForm
 
 
 class PrescriberSignupTest(TestCase):
+    def setUp(self):
+        super().setUp()
+
+        respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
+            return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
+        )
+
     def test_create_user_prescriber_member_of_pole_emploi(self):
         """
         Test the creation of a user of type prescriber and his joining to a Pole emploi agency.
@@ -129,7 +136,7 @@ class PrescriberSignupTest(TestCase):
             "siret": siret,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         response = self.client.post(url, data=post_data)
@@ -224,7 +231,7 @@ class PrescriberSignupTest(TestCase):
             "siret": siret,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         response = self.client.post(url, data=post_data)
@@ -313,7 +320,7 @@ class PrescriberSignupTest(TestCase):
             "siret": siret,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         response = self.client.post(url, data=post_data)
@@ -397,7 +404,7 @@ class PrescriberSignupTest(TestCase):
             "siret": siret2,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret2}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret2}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         response = self.client.post(url, data=post_data)
@@ -426,7 +433,7 @@ class PrescriberSignupTest(TestCase):
             "siret": siret2,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret2}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret2}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         response = self.client.post(url, data=post_data)
@@ -467,7 +474,7 @@ class PrescriberSignupTest(TestCase):
             "siret": siret2,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret2}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret2}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         response = self.client.post(url, data=post_data)
@@ -539,7 +546,7 @@ class PrescriberSignupTest(TestCase):
 
         # Same SIRET as mock.
         siret = "26570134200148"
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.ML)
@@ -588,7 +595,7 @@ class PrescriberSignupTest(TestCase):
 
         # Same SIRET as mock but with same expected kind.
         siret = "26570134200148"
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         prescriber_organization = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.PLIE)
@@ -614,7 +621,7 @@ class PrescriberSignupTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_form_to_request_for_an_invitation(self, mock_call_ban_geocoding_api):
         siret = "26570134200148"
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         prescriber_org = PrescriberOrganizationWithMembershipFactory(siret=siret)

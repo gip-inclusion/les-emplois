@@ -352,13 +352,14 @@ API_BAN_BASE_URL = "https://api-adresse.data.gouv.fr"
 # https://api.gouv.fr/api/api-geo.html#doc_tech
 API_GEO_BASE_URL = "https://geo.api.gouv.fr"
 
+# INSEE API
+API_INSEE_BASE_URL = "https://api.insee.fr"
+API_INSEE_CONSUMER_KEY = os.environ.get("API_INSEE_CONSUMER_KEY", "")
+API_INSEE_CONSUMER_SECRET = os.environ.get("API_INSEE_CONSUMER_SECRET", "")
+
 # API Entreprise.
-# https://dashboard.entreprise.api.gouv.fr/login (login is done through auth.api.gouv.fr)
-# https://doc.entreprise.api.gouv.fr/
-API_ENTREPRISE_BASE_URL = "https://entreprise.api.gouv.fr/v2"
-API_ENTREPRISE_CONTEXT = "emplois.inclusion.beta.gouv.fr"
-API_ENTREPRISE_RECIPIENT = os.environ.get("API_ENTREPRISE_RECIPIENT")
-API_ENTREPRISE_TOKEN = os.environ.get("API_ENTREPRISE_TOKEN")
+# https://api.gouv.fr/documentation/sirene_v3
+API_ENTREPRISE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene/V3"
 
 # Pôle emploi's Emploi Store Dev aka ESD. There is a production AND a recette environment:
 #  - Production: https://www.pole-emploi.io

@@ -14,7 +14,7 @@ from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
-from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
+from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
 
@@ -142,6 +142,10 @@ class SiaeSignupTest(TestCase):
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_create_facilitator(self, mock_call_ban_geocoding_api):
+        respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
+            return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
+        )
+
         FAKE_SIRET = "26570134200148"  # matches the one from ETABLISSEMENT_API_RESULT_MOCK for consistency
 
         url = reverse("signup:facilitator_search")
@@ -150,8 +154,8 @@ class SiaeSignupTest(TestCase):
         }
 
         # Mocks an invalid answer from the server
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{FAKE_SIRET}").mock(
-            return_value=httpx.Response(422, json={})
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{FAKE_SIRET}").mock(
+            return_value=httpx.Response(404, json={})
         )
         response = self.client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_not_called()
@@ -159,7 +163,7 @@ class SiaeSignupTest(TestCase):
         self.assertContains(response, f"SIRET « {FAKE_SIRET} » non reconnu.")
 
         # Mock a valid answer from the server
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{FAKE_SIRET}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{FAKE_SIRET}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         response = self.client.post(url, data=post_data)

@@ -1,4 +1,7 @@
+import copy
 import datetime
+import json
+import logging
 from collections import OrderedDict
 from unittest import mock
 
@@ -32,7 +35,7 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
-from itou.utils.apis.api_entreprise import etablissement_get_or_error
+from itou.utils.apis import api_entreprise
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.pole_emploi import (
     PoleEmploiIndividu,
@@ -41,7 +44,7 @@ from itou.utils.apis.pole_emploi import (
     recherche_individu_certifie_api,
 )
 from itou.utils.emails import sanitize_mailjet_recipients
-from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
+from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.pole_emploi import (
     POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_ERROR_MOCK,
@@ -774,15 +777,57 @@ class CnilCompositionPasswordValidatorTest(SimpleTestCase):
         self.assertEqual(CnilCompositionPasswordValidator().get_help_text(), CnilCompositionPasswordValidator.HELP_MSG)
 
 
-class ApiEntrepriseTest(SimpleTestCase):
+class INSEEApiTest(SimpleTestCase):
     @respx.mock
-    def test_etablissement_api(self):
-        siret = "26570134200148"
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
-            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+    def test_access_token(self):
+        endpoint = respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(200, json=INSEE_API_RESULT_MOCK)
+
+        access_token = api_entreprise.get_access_token()
+
+        self.assertTrue(endpoint.called)
+        self.assertIn(b"grant_type=client_credentials", endpoint.calls.last.request.content)
+        self.assertTrue(endpoint.calls.last.request.headers["Authorization"].startswith("Basic "))
+        self.assertEqual(access_token, INSEE_API_RESULT_MOCK["access_token"])
+
+    @respx.mock
+    def test_access_token_with_http_error(self):
+        respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(400)
+
+        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
+            access_token = api_entreprise.get_access_token()
+
+        self.assertIsNone(access_token)
+        self.assertIn("Failed to retrieve an access token", cm.records[0].message)
+        self.assertIs(cm.records[0].exc_info[0], httpx.HTTPStatusError)
+
+    @respx.mock
+    def test_access_token_with_json_error(self):
+        respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(200, content=b"not-json")
+
+        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
+            access_token = api_entreprise.get_access_token()
+
+        self.assertIsNone(access_token)
+        self.assertIn("Failed to retrieve an access token", cm.records[0].message)
+        self.assertIs(cm.records[0].exc_info[0], json.JSONDecodeError)
+
+
+class ApiEntrepriseTest(SimpleTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.token_endpoint = respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(
+            200,
+            json=INSEE_API_RESULT_MOCK,
         )
 
-        etablissement, error = etablissement_get_or_error(siret)
+        self.siret_endpoint = respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/26570134200148")
+
+    @respx.mock
+    def test_etablissement_get_or_error(self):
+        self.siret_endpoint.respond(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+
+        etablissement, error = api_entreprise.etablissement_get_or_error("26570134200148")
 
         self.assertIsNone(error)
         self.assertEqual(etablissement.name, "CENTRE COMMUNAL D'ACTION SOCIALE")
@@ -793,6 +838,86 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(etablissement.department, "57")
         self.assertFalse(etablissement.is_closed)
         self.assertTrue(etablissement.is_head_office)
+
+    @respx.mock
+    def test_etablissement_get_or_error_with_closed_status(self):
+        data = copy.deepcopy(ETABLISSEMENT_API_RESULT_MOCK)
+        data["etablissement"]["periodesEtablissement"][0]["etatAdministratifEtablissement"] = "F"
+        self.siret_endpoint.respond(200, json=data)
+
+        etablissement, error = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertIsNone(error)
+        self.assertTrue(etablissement.is_closed)
+
+    @respx.mock
+    def test_etablissement_get_or_error_without_token(self):
+        self.token_endpoint.respond(404)
+
+        result = api_entreprise.etablissement_get_or_error("whatever")
+
+        self.assertEqual(result, (None, "Problème de connexion à la base Sirene. Essayez ultérieurement."))
+
+    @respx.mock
+    def test_etablissement_get_or_error_with_other_http_bad_request_error(self):
+        self.siret_endpoint.respond(400)
+
+        result = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertEqual(result, (None, "Erreur dans le format du SIRET : « 26570134200148 »."))
+
+    @respx.mock
+    def test_etablissement_get_or_error_with_other_http_not_found_error(self):
+        self.siret_endpoint.respond(404)
+
+        result = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertEqual(result, (None, "SIRET « 26570134200148 » non reconnu."))
+
+    @respx.mock
+    def test_etablissement_get_or_error_with_http_error(self):
+        self.siret_endpoint.respond(401)
+
+        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
+            result = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertEqual(result, (None, "Problème de connexion à la base Sirene. Essayez ultérieurement."))
+        self.assertTrue(cm.records[0].message.startswith("Error while fetching"))
+
+    @respx.mock
+    def test_etablissement_get_or_error_when_content_is_not_json(self):
+        self.siret_endpoint.respond(200, content=b"not-json")
+
+        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
+            result = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertEqual(result, (None, "Le format de la réponse API Entreprise est non valide."))
+        self.assertTrue(cm.records[0].message.startswith("Invalid format of response from API Entreprise"))
+        self.assertIs(cm.records[0].exc_info[0], json.JSONDecodeError)
+
+    @respx.mock
+    def test_etablissement_get_or_error_when_content_is_missing_data(self):
+        self.siret_endpoint.respond(200, json={})
+
+        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
+            result = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertEqual(result, (None, "Le format de la réponse API Entreprise est non valide."))
+        self.assertTrue(cm.records[0].message.startswith("Invalid format of response from API Entreprise"))
+        self.assertIs(cm.records[0].exc_info[0], KeyError)
+
+    @respx.mock
+    def test_etablissement_get_or_error_when_content_is_missing_historical_data(self):
+        data = copy.deepcopy(ETABLISSEMENT_API_RESULT_MOCK)
+        data["etablissement"]["periodesEtablissement"] = []
+        self.siret_endpoint.respond(200, json=data)
+
+        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
+            result = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertEqual(result, (None, "Le format de la réponse API Entreprise est non valide."))
+        self.assertTrue(cm.records[0].message.startswith("Invalid format of response from API Entreprise"))
+        self.assertIs(cm.records[0].exc_info[0], IndexError)
 
 
 class PoleEmploiIndividuTest(TestCase):

@@ -10,9 +10,8 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 # Prevent calls to external APIs but keep a valid scheme
 API_BAN_BASE_URL = None
+API_INSEE_BASE_URL = "http://example.com"
 API_ENTREPRISE_BASE_URL = "http://example.com"
-API_ENTREPRISE_TOKEN = 12345
-API_ENTREPRISE_RECIPIENT = 12345
 
 # Don't show logs and traceback in unit tests for readability.
 LOGGING = {
