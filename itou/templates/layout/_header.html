@@ -46,20 +46,17 @@
                             <li>
                                 <a class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}" href="{% url 'dashboard:index' %}">
                                     <span>Tableau de bord</span>
-                                    <i class="ri-arrow-right-line ri-lg"></i>
                                 </a>
                             </li>
                         {% endif %}
                         <li>
                             <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="/">
                                 <span>Rechercher des employeurs</span>
-                                <i class="ri-arrow-right-line ri-lg"></i>
                             </a>
                         </li>
                         <li>
                             <a class="{% if '/search/prescribers' in request.path %}font-weight-bold{% endif %}" href="{% url 'search:prescribers_home' %}">
                                 <span>Rechercher des prescripteurs</span>
-                                <i class="ri-arrow-right-line ri-lg"></i>
                             </a>
                         </li>
                         <li>
