@@ -79,7 +79,6 @@ def create_or_update_user(ic_user_data: InclusionConnectUserData):
     """
     Create a user using Inclusion Connect:
      - if there is already a user with this InclusionConnect ID, we return it.
-     # TODO: username may not a good key as it's shared with FranceConnect and Django system.
      - if there is already a user with the email sent by InclusionConnect, we return this user
      - otherwise, we create a new user based on the data IC sent us.
     """

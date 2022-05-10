@@ -27,6 +27,7 @@ from .constants import (  # INCLUSION_CONNECT_SCOPES,
     INCLUSION_CONNECT_ENDPOINT_TOKEN,
     INCLUSION_CONNECT_ENDPOINT_USERINFO,
     INCLUSION_CONNECT_SESSION_KEY,
+    INCLUSION_CONNECT_TIMEOUT,
 )
 from .models import InclusionConnectState, InclusionConnectUserData, create_or_update_user, userinfo_to_user_model_dict
 
@@ -115,7 +116,6 @@ def inclusion_connect_authorize(request):
         "scope": "openid",
         "state": csrf_signed,
         "nonce": crypto.get_random_string(length=12),
-        "acr_values": "eidas1",
         "from": "emplois",  # Display a "Les emplois" logo on the connection page.
     }
     login_hint = request.GET.get("login_hint")
@@ -124,8 +124,7 @@ def inclusion_connect_authorize(request):
         ic_session["user_email"] = login_hint
         request.session.modified = True
 
-    url = INCLUSION_CONNECT_ENDPOINT_AUTHORIZE
-    return HttpResponseRedirect(f"{url}?{urlencode(data)}")
+    return HttpResponseRedirect(f"{INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
 
 
 def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
@@ -146,9 +145,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         "redirect_uri": token_redirect_uri,
     }
 
-    # Exceptions catched by Sentry
-    url = INCLUSION_CONNECT_ENDPOINT_TOKEN
-    response = httpx.post(url, data=data, timeout=30)
+    response = httpx.post(INCLUSION_CONNECT_ENDPOINT_TOKEN, data=data, timeout=INCLUSION_CONNECT_TIMEOUT)
 
     if response.status_code != 200:
         return _redirect_to_login_page_on_error(error_msg="Impossible to get IC token.", request=request)
@@ -159,20 +156,19 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     if not access_token:
         return _redirect_to_login_page_on_error(error_msg="Access token field missing.", request=request)
 
-    # Keep token_data["id_token"] to logout from FC
-    # At this step, we can update the user's fields in DB and create a session if required
+    # Keep token_data["id_token"] to logout from IC.
+    # At this step, we can update the user's fields in DB and create a session if required.
     ic_session["token"] = token_data["id_token"]
     ic_session["state"] = state
     request.session.modified = True
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
-    url = INCLUSION_CONNECT_ENDPOINT_USERINFO
     response = httpx.get(
-        url,
+        INCLUSION_CONNECT_ENDPOINT_USERINFO,
         params={"schema": "openid"},
         headers={"Authorization": "Bearer " + access_token},
-        timeout=60,
+        timeout=INCLUSION_CONNECT_TIMEOUT,
     )
     if response.status_code != 200:
         return _redirect_to_login_page_on_error(error_msg="Impossible to get user infos.", request=request)
@@ -193,7 +189,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     if ic_session_email and ic_session_email != ic_user_data.email:
         error = (
             "L’adresse e-mail que vous avez utilisée pour vous connecter avec Inclusion Connect "
-            "({ic_user_data.email}) "
+            f"({ic_user_data.email}) "
             f"est différente de celle que vous avez indiquée précédemment ({ic_session_email})."
         )
         messages.error(request, error)
@@ -228,6 +224,8 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         return HttpResponseRedirect(next_url)
 
     user, _ = create_or_update_user(ic_user_data)
+    # ValueError: You have multiple authentication backends configured and therefore must provide the 
+    # `backend` argument or set the `backend` attribute on the user.
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
     next_url = next_url or get_adapter(request).get_login_redirect_url(request)
@@ -251,8 +249,7 @@ def inclusion_connect_logout(request):
         "id_token_hint": token,
         "state": state,
     }
-    url = INCLUSION_CONNECT_ENDPOINT_LOGOUT
-    complete_url = f"{url}?{urlencode(params)}"
+    complete_url = f"{INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
     # Logout user from IC with HTTPX to benefit from respx in tests
     # and to handle post logout redirection more easily.
     response = httpx.get(complete_url)
