@@ -78,6 +78,7 @@ LOCAL_APPS = [
     "itou.approvals",
     "itou.eligibility",
     "itou.france_connect",
+    "itou.inclusion_connect",
     "itou.invitations",
     "itou.external_data",
     "itou.metabase",
