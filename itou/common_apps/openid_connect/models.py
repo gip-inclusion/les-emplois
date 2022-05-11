@@ -48,7 +48,6 @@ class OIDConnectUserData:
         # https://docs.djangoproject.com/fr/4.0/ref/contrib/auth/#django.contrib.auth.models.UserManager.create_user
         user = User.objects.create_user(**user_data_dict)
         for key, value in user_data_dict.items():
-            # TODO: this method should be able to update every field.
             user.update_external_data_source_history_field(
                 provider_name=self.identity_provider.name, field=key, value=value
             )
@@ -59,7 +58,6 @@ class OIDConnectUserData:
         for key, value in user_data_dict.items():
             if value:
                 setattr(user, key, value)
-                # TODO: this method should be able to update every field.
                 user.update_external_data_source_history_field(
                     provider_name=self.identity_provider.name, field=key, value=value
                 )

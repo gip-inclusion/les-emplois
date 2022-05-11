@@ -1,5 +1,4 @@
 import dataclasses
-import datetime
 
 from django.test import TestCase
 from django.utils import timezone
@@ -56,15 +55,12 @@ class InclusionConnectModelTest(TestCase):
         self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
         self.assertEqual(user.username, OIDC_USERINFO["sub"])
 
-        # TODO: this should be tested separately in User.test_models
-        # TODO: update FC test to use PROVIDER_FRANCE_CONNECT instead.
         for field in dataclasses.fields(ic_user_data):
             self.assertEqual(
                 user.external_data_source_history[field.name]["source"],
                 users_enums.IdentityProvider.INCLUSION_CONNECT.name,
             )
             self.assertEqual(user.external_data_source_history[field.name]["value"], getattr(user, field.name))
-            self.assertEqual(user.external_data_source_history[field.name]["created_at"].date(), datetime.date.today())
 
     def test_create_user_from_user_info_with_already_existing_id(self):
         """
@@ -100,14 +96,6 @@ class InclusionConnectModelTest(TestCase):
         user = UserFactory(**dataclasses.asdict(InclusionConnectUserData.from_user_info_dict(OIDC_USERINFO)))
         ic_user = InclusionConnectUserData.from_user_info_dict(OIDC_USERINFO)
 
-        # TODO: this should be tested separately.
-        for field in dataclasses.fields(ic_user):
-            value = getattr(ic_user, field.name)
-            user.update_external_data_source_history_field(
-                provider_name=users_enums.IdentityProvider.INCLUSION_CONNECT.name, field=field.name, value=value
-            )
-            user.save()
-
         new_ic_user = InclusionConnectUserData(
             first_name="Jean", last_name="Gabin", username=ic_user.username, email="jean@lestontons.fr"
         )
@@ -115,23 +103,8 @@ class InclusionConnectModelTest(TestCase):
         self.assertFalse(created)
 
         for field in dataclasses.fields(new_ic_user):
-            value = getattr(new_ic_user, field.name)
-            self.assertEqual(getattr(user, field.name), value)
-
-        # TODO: this should be tested separately.
-        # TODO: (celine-m-s) I'm not very comfortable with this behaviour as we don't really
-        # keep a history of changes but only the last one.
-        # Field name don't reflect actual behaviour.
-        # Also, keeping a trace of old data is interesting in a debug purpose.
-        for field in dataclasses.fields(new_ic_user):
             self.assertEqual(
                 user.external_data_source_history[field.name]["source"],
                 users_enums.IdentityProvider.INCLUSION_CONNECT.name,
             )
-            self.assertEqual(user.external_data_source_history[field.name]["value"], getattr(user, field.name))
-            # Because external_data_source_history is a JSONField,
-            # dates are actually stored as strings in the database.
-            created_at = user.external_data_source_history[field.name]["created_at"]
-            if isinstance(created_at, str):
-                created_at = datetime.datetime.fromisoformat(created_at[:19])  # Remove milliseconds
-            self.assertEqual(created_at.date(), datetime.date.today())
+            self.assertEqual(getattr(user, field), getattr(new_ic_user, field))

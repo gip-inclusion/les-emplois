@@ -214,6 +214,73 @@ class ModelTest(TestCase):
         job_seeker.socialaccount_set.create(provider="peamu")
         self.assertTrue(job_seeker.has_sso_provider)
 
+    def test_update_external_data_source_history_field(self):
+        # TODO: (celine-m-s) I'm not very comfortable with this behaviour as we don't really
+        # keep a history of changes but only the last one.
+        # Field name don't reflect actual behaviour.
+        # Also, keeping a trace of old data is interesting in a debug purpose.
+        user = UserFactory()
+        self.assertFalse(user.external_data_source_history)
+
+        provider_name = IdentityProvider.FRANCE_CONNECT.name
+        expected_field = "first_name"
+        expected_value = "Lola"
+        has_performed_update = user.update_external_data_source_history_field(
+            provider_name=provider_name, field=expected_field, value=expected_value
+        )
+        user.save()
+        user.refresh_from_db()  # Retrieve object as stored in DB to get raw JSON values and avoid surprises.
+        self.assertTrue(has_performed_update)
+        self.assertTrue(user.external_data_source_history)
+        self.assertEqual(len(user.external_data_source_history.keys()), 1)
+        self.assertTrue(user.external_data_source_history.get(expected_field))
+        self.assertEqual(user.external_data_source_history[expected_field]["value"], expected_value)
+        self.assertEqual(user.external_data_source_history[expected_field]["source"], provider_name)
+        # Because external_data_source_history is a JSONField,
+        # dates are actually stored as strings in the database.
+        created_at = user.external_data_source_history[expected_field]["created_at"]
+        created_at = datetime.datetime.fromisoformat(created_at[:19])
+        self.assertEqual(created_at.date(), datetime.date.today())
+
+        # Update history.
+        expected_value = "Jeanne"
+        has_performed_update = user.update_external_data_source_history_field(
+            provider_name=provider_name, field=expected_field, value=expected_value
+        )
+        user.save()
+        self.assertTrue(has_performed_update)
+        self.assertEqual(len(user.external_data_source_history.keys()), 1)
+        self.assertEqual(user.external_data_source_history[expected_field]["value"], expected_value)
+
+        # Don't update the history if value is the same.
+        has_performed_update = user.update_external_data_source_history_field(
+            provider_name=provider_name, field=expected_field, value=expected_value
+        )
+        user.save()
+        self.assertFalse(has_performed_update)
+        self.assertEqual(len(user.external_data_source_history.keys()), 1)
+        self.assertEqual(user.external_data_source_history[expected_field]["value"], expected_value)
+
+        # Allow storing empty values.
+        expected_field = "last_name"
+        has_performed_update = user.update_external_data_source_history_field(
+            provider_name=provider_name, field=expected_field, value=""
+        )
+        user.save()
+        self.assertTrue(has_performed_update)
+        self.assertEqual(len(user.external_data_source_history.keys()), 2)
+        self.assertEqual(user.external_data_source_history[expected_field]["value"], "")
+
+        # Allow replacing empty values.
+        expected_value = "Trombignard"
+        has_performed_update = user.update_external_data_source_history_field(
+            provider_name=provider_name, field=expected_field, value=expected_value
+        )
+        user.save()
+        self.assertTrue(has_performed_update)
+        self.assertEqual(len(user.external_data_source_history.keys()), 2)
+        self.assertEqual(user.external_data_source_history[expected_field]["value"], expected_value)
+
     def test_last_hire_was_made_by_siae(self):
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         user = job_application.job_seeker
