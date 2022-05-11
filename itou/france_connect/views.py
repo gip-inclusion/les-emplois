@@ -152,11 +152,11 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         logger.error(error_msg)
         return _redirect_to_job_seeker_login_on_error(error_msg)
 
-    fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+    fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(user_data)
 
     # Keep token_data["id_token"] to logout from FC
     # At this step, we can update the user's fields in DB and create a session if required
-    user, created = france_connect_models.create_or_update_user(fc_user_data)
+    user, _ = fc_user_data.create_or_update_user()
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     request.session[settings.FRANCE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
     request.session[settings.FRANCE_CONNECT_SESSION_STATE] = state
