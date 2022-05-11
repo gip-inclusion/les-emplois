@@ -4,7 +4,6 @@ from django.conf import settings
 
 
 INCLUSION_CONNECT_SCOPES = "openid profile email"
-# "openid","offline_access","address","microprofile-jwt","phone","profile","email","web-origins","roles"
 
 INCLUSION_CONNECT_CLIENT_ID = settings.INCLUSION_CONNECT_CLIENT_ID
 INCLUSION_CONNECT_CLIENT_SECRET = settings.INCLUSION_CONNECT_CLIENT_SECRET
@@ -18,9 +17,6 @@ INCLUSION_CONNECT_ENDPOINT_USERINFO = f"{INCLUSION_CONNECT_REALM_ENDPOINT}/useri
 INCLUSION_CONNECT_ENDPOINT_LOGOUT = f"{INCLUSION_CONNECT_REALM_ENDPOINT}/logout"
 
 # These expiration times have been chosen arbitrarily.
-INCLUSION_CONNECT_STATE_EXPIRATION = datetime.timedelta(hours=1)
 INCLUSION_CONNECT_TIMEOUT = 60
 
 INCLUSION_CONNECT_SESSION_KEY = "inclusion_connect"
-
-PROVIDER_INCLUSION_CONNECT = settings.PROVIDER_INCLUSION_CONNECT

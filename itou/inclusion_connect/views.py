@@ -29,7 +29,7 @@ from .constants import (  # INCLUSION_CONNECT_SCOPES,
     INCLUSION_CONNECT_SESSION_KEY,
     INCLUSION_CONNECT_TIMEOUT,
 )
-from .models import InclusionConnectState, InclusionConnectUserData, create_or_update_user, userinfo_to_user_model_dict
+from .models import InclusionConnectState, InclusionConnectUser
 
 
 logger = logging.getLogger(__name__)
@@ -183,7 +183,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         return _redirect_to_login_page_on_error(error_msg="Sub parameter missing.", request=request)
 
     is_successful = True
-    ic_user_data = InclusionConnectUserData(**userinfo_to_user_model_dict(user_data))
+    ic_user_data = InclusionConnectUser.from_user_info_dict(user_data)
     ic_session_email = ic_session.get("user_email")
 
     if ic_session_email and ic_session_email != ic_user_data.email:
@@ -223,8 +223,8 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(logout_url_params)}"
         return HttpResponseRedirect(next_url)
 
-    user, _ = create_or_update_user(ic_user_data)
-    # ValueError: You have multiple authentication backends configured and therefore must provide the 
+    user, _ = ic_user_data.create_or_update_user()
+    # ValueError: You have multiple authentication backends configured and therefore must provide the
     # `backend` argument or set the `backend` attribute on the user.
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
