@@ -51,6 +51,8 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "sender_prescriber_organization",
         "to_siae",
         "approval",
+        "transferred_by",
+        "transferred_from",
     )
     exclude = ("selected_jobs",)
     list_filter = (
@@ -70,6 +72,9 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "approval_manually_delivered_by",
         "approval_manually_refused_by",
         "approval_manually_refused_at",
+        "transferred_by",
+        "transferred_at",
+        "transferred_from",
     )
     inlines = (JobsInline, TransitionLogInline, UUIDSupportRemarkInline)
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
