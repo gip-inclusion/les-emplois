@@ -1,3 +1,5 @@
+import datetime
+
 import httpx
 import respx
 from django.conf import settings
@@ -11,7 +13,7 @@ from ..users.models import User
 from . import models as france_connect_models, views as france_connect_views
 
 
-FRANCE_CONNECT_USERINFO = {
+FC_USERINFO = {
     "given_name": "Angela Claire Louise",
     "family_name": "DUBOIS",
     "birthdate": "1962-08-24",
@@ -66,37 +68,96 @@ class FranceConnectTest(TestCase):
         Nominal scenario: there is no user with the FranceConnect id or FranceConnect email
         that is sent, so we create one
         """
-        user_data = FRANCE_CONNECT_USERINFO
-        fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(FC_USERINFO)
         self.assertFalse(User.objects.filter(username=fc_user_data.username).exists())
         self.assertFalse(User.objects.filter(email=fc_user_data.email).exists())
-        user, created = france_connect_models.create_or_update_user(fc_user_data)
+        user, created = fc_user_data.create_or_update_user()
         self.assertTrue(created)
-        self.assertEqual(user.last_name, user_data["family_name"])
-        self.assertEqual(user.first_name, user_data["given_name"])
-        self.assertEqual(user.external_data_source_history["last_name"]["source"], "franceconnect")
+        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
+        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
+        self.assertEqual(user.phone, FC_USERINFO["phone_number"])
+        self.assertEqual(user.birthdate, datetime.date.fromisoformat(FC_USERINFO["birthdate"]))
+        self.assertEqual(user.address_line_1, FC_USERINFO["address"]["street_address"])
+        self.assertEqual(user.post_code, FC_USERINFO["address"]["postal_code"])
+        self.assertEqual(user.city, FC_USERINFO["address"]["locality"])
+
+        self.assertEqual(
+            user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.name
+        )
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+        self.assertTrue(user.is_job_seeker)
 
         # Update user
         fc_user_data.last_name = "DUPUIS"
-        user, created = france_connect_models.create_or_update_user(fc_user_data)
+        user, created = fc_user_data.create_or_update_user()
         self.assertFalse(created)
         self.assertEqual(user.last_name, "DUPUIS")
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+
+    def test_create_user_from_user_data_optional_fields(self):
+        fc_info = FC_USERINFO | {
+            "given_name": "",
+            "family_name": "",
+            "birthdate": "",
+            "phone_number": "",
+            "address": {
+                "street_address": "",
+                "postal_code": "",
+                "locality": "",
+            },
+        }
+        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(fc_info)
+        user, created = fc_user_data.create_or_update_user()
+        self.assertTrue(created)
+        self.assertFalse(user.first_name)
+        self.assertFalse(user.post_code)
+        self.assertFalse(user.birthdate)
+        self.assertFalse(user.phone)
+        self.assertFalse(user.address_line_1)
+        self.assertFalse(user.post_code)
+
+    def test_create_user_from_user_data_country_other_than_france(self):
+        """
+        Nominal scenario: there is no user with the FranceConnect id or FranceConnect email
+        that is sent, so we create one
+        """
+        user_info = FC_USERINFO | {
+            "address": {
+                "country": "Colombia",
+                "locality": "Granada",
+                "postal_code": "",
+                "street_address": "Parque central",
+            },
+        }
+        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(user_info)
+        self.assertFalse(User.objects.filter(username=fc_user_data.username).exists())
+        self.assertFalse(User.objects.filter(email=fc_user_data.email).exists())
+        user, created = fc_user_data.create_or_update_user()
+        self.assertTrue(created)
+        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
+        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
+        self.assertEqual(
+            user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.name
+        )
+        self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+        self.assertEqual(user.address_line_1, "")
+        self.assertEqual(user.post_code, "")
+        self.assertEqual(user.city, "")
 
     def test_create_user_from_user_data_with_already_existing_fc_id(self):
         """
         If there already is an existing user with this FranceConnectId, we do not create it again,
         we use it and we update it
         """
-        user_data = FRANCE_CONNECT_USERINFO
-        fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(FC_USERINFO)
         UserFactory(username=fc_user_data.username, last_name="will_be_forgotten")
-        user, created = france_connect_models.create_or_update_user(fc_user_data)
+        user, created = fc_user_data.create_or_update_user()
         self.assertFalse(created)
-        self.assertEqual(user.last_name, user_data["family_name"])
-        self.assertEqual(user.first_name, user_data["given_name"])
-        self.assertEqual(user.external_data_source_history["last_name"]["source"], "franceconnect")
+        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
+        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
+        self.assertEqual(
+            user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.name
+        )
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
 
     def test_create_user_from_user_data_with_already_existing_fc_email(self):
@@ -104,13 +165,12 @@ class FranceConnectTest(TestCase):
         If there already is an existing user with email FranceConnect sent us, we do not create it again,
         we use it but we do not update it
         """
-        user_data = FRANCE_CONNECT_USERINFO
-        fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))
+        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(FC_USERINFO)
         UserFactory(email=fc_user_data.email)
-        user, created = france_connect_models.create_or_update_user(fc_user_data)
+        user, created = fc_user_data.create_or_update_user()
         self.assertFalse(created)
-        self.assertNotEqual(user.last_name, user_data["family_name"])
-        self.assertNotEqual(user.first_name, user_data["given_name"])
+        self.assertNotEqual(user.last_name, FC_USERINFO["family_name"])
+        self.assertNotEqual(user.first_name, FC_USERINFO["given_name"])
         # We did not fill this data using external data, so it is not set
         self.assertIsNone(user.external_data_source_history)
         self.assertNotEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
@@ -137,7 +197,7 @@ class FranceConnectTest(TestCase):
         respx.post(url_fc_token).mock(return_value=httpx.Response(200, json=token_json))
 
         url_fc_userinfo = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_USERINFO
-        respx.get(url_fc_userinfo).mock(return_value=httpx.Response(200, json=FRANCE_CONNECT_USERINFO))
+        respx.get(url_fc_userinfo).mock(return_value=httpx.Response(200, json=FC_USERINFO))
 
         csrf_signed = france_connect_views.state_new()
         url = reverse("france_connect:callback")
