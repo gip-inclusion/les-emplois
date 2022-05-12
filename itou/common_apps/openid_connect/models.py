@@ -1,7 +1,8 @@
 import dataclasses
-
+from urllib.parse import unquote
+from django.core import signing
 from django.db import models
-from django.utils import timezone
+from django.utils import crypto, timezone
 
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
@@ -24,6 +25,41 @@ class OIDConnectState(models.Model):
 
     class Meta:
         abstract = True
+
+    @classmethod
+    def create_signed_csrf_token(cls):
+        """
+            Create and sign a new CSRF token to protect requests to identity providers. 
+        """
+        token = crypto.get_random_string(length=12)
+        cls.objects.create(csrf=token)
+
+        signer = signing.Signer()
+        signed_token = signer.sign(token)
+        return signed_token
+
+    @classmethod
+    def is_valid(cls, signed_csrf):
+        if not signed_csrf:
+            return False
+
+        signer = signing.Signer()
+        try:
+            csrf = signer.unsign(unquote(signed_csrf))
+        except signing.BadSignature:
+            return False
+
+        # Cleanup old states if any.
+        cls.objects.cleanup()
+
+        state = cls.objects.filter(csrf=csrf).first()
+        if not state:
+            return False
+
+        # One-time use
+        state.delete()
+
+        return True
 
 
 @dataclasses.dataclass

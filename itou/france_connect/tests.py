@@ -11,7 +11,8 @@ from django.utils import timezone
 from ..users.enums import IdentityProvider
 from ..users.factories import UserFactory
 from ..users.models import User
-from . import models as france_connect_models, views as france_connect_views
+from . import views as france_connect_views
+from .models import FranceConnectState, FranceConnectUserData
 
 
 FC_USERINFO = {
@@ -36,9 +37,9 @@ FC_USERINFO = {
 
 class FranceConnectTest(TestCase):
     def test_state_delete(self):
-        state = france_connect_models.FranceConnectState.objects.create(csrf="foo")
+        state = FranceConnectState.objects.create(csrf="foo")
 
-        france_connect_models.FranceConnectState.objects.cleanup()
+        FranceConnectState.objects.cleanup()
 
         state.refresh_from_db()
         self.assertIsNotNone(state)
@@ -47,14 +48,14 @@ class FranceConnectTest(TestCase):
         state.created_at = timezone.now() - settings.FRANCE_CONNECT_STATE_EXPIRATION * 2
         state.save()
 
-        france_connect_models.FranceConnectState.objects.cleanup()
+        FranceConnectState.objects.cleanup()
 
-        with self.assertRaises(france_connect_models.FranceConnectState.DoesNotExist):
+        with self.assertRaises(FranceConnectState.DoesNotExist):
             state.refresh_from_db()
 
     def test_state_verification(self):
-        csrf_signed = france_connect_views.state_new()
-        self.assertTrue(france_connect_views.state_is_valid(csrf_signed))
+        csrf_signed = FranceConnectState.create_signed_csrf_token()
+        self.assertTrue(FranceConnectState.is_valid(csrf_signed))
 
     def test_authorize(self):
         url = reverse("france_connect:authorize")
@@ -69,7 +70,7 @@ class FranceConnectTest(TestCase):
         Nominal scenario: there is no user with the FranceConnect id or FranceConnect email
         that is sent, so we create one
         """
-        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(FC_USERINFO)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         self.assertFalse(User.objects.filter(username=fc_user_data.username).exists())
         self.assertFalse(User.objects.filter(email=fc_user_data.email).exists())
         user, created = fc_user_data.create_or_update_user()
@@ -107,7 +108,7 @@ class FranceConnectTest(TestCase):
                 "locality": "",
             },
         }
-        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(fc_info)
+        fc_user_data = FranceConnectUserData.from_user_info(fc_info)
         user, created = fc_user_data.create_or_update_user()
         self.assertTrue(created)
         self.assertFalse(user.first_name)
@@ -130,7 +131,7 @@ class FranceConnectTest(TestCase):
                 "street_address": "Parque central",
             },
         }
-        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(user_info)
+        fc_user_data = FranceConnectUserData.from_user_info(user_info)
         self.assertFalse(User.objects.filter(username=fc_user_data.username).exists())
         self.assertFalse(User.objects.filter(email=fc_user_data.email).exists())
         user, created = fc_user_data.create_or_update_user()
@@ -150,7 +151,7 @@ class FranceConnectTest(TestCase):
         If there already is an existing user with this FranceConnectId, we do not create it again,
         we use it and we update it
         """
-        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(FC_USERINFO)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         UserFactory(
             username=fc_user_data.username,
             last_name="will_be_forgotten",
@@ -170,7 +171,7 @@ class FranceConnectTest(TestCase):
         If there already is an existing user with this FranceConnectId, but it comes from another SSO.
         The email is also different, so it will crash while trying to create a new user.
         """
-        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(FC_USERINFO)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         UserFactory(
             username=fc_user_data.username,
             last_name="will_be_forgotten",
@@ -185,7 +186,7 @@ class FranceConnectTest(TestCase):
         If there already is an existing user with email FranceConnect sent us, we do not create it again,
         we use it but we do not update it
         """
-        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(FC_USERINFO)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         UserFactory(email=fc_user_data.email)
         user, created = fc_user_data.create_or_update_user()
         self.assertFalse(created)
@@ -219,7 +220,7 @@ class FranceConnectTest(TestCase):
         url_fc_userinfo = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_USERINFO
         respx.get(url_fc_userinfo).mock(return_value=httpx.Response(200, json=FC_USERINFO))
 
-        csrf_signed = france_connect_views.state_new()
+        csrf_signed = FranceConnectState.create_signed_csrf_token()
         url = reverse("france_connect:callback")
         response = self.client.get(url, data={"code": "123", "state": csrf_signed})
         self.assertEqual(response.status_code, 302)

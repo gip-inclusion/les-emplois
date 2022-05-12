@@ -1,12 +1,10 @@
 import json
 import logging
-from urllib.parse import unquote
 
 import httpx
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
-from django.core import signing
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.utils import crypto
@@ -14,7 +12,7 @@ from django.utils.http import urlencode
 
 from itou.utils.urls import get_absolute_url
 
-from . import models as france_connect_models
+from .models import FranceConnectState, FranceConnectUserData
 
 
 logger = logging.getLogger(__name__)
@@ -38,48 +36,15 @@ def get_callback_redirect_uri(request) -> str:
     return redirect_uri
 
 
-def state_new() -> str:
-    # Generate CSRF and save the state for further verification
-    signer = signing.Signer()
-    csrf = crypto.get_random_string(length=12)
-    csrf_signed = signer.sign(csrf)
-    france_connect_models.FranceConnectState.objects.create(csrf=csrf)
-
-    return csrf_signed
-
-
-def state_is_valid(csrf_signed: str) -> bool:
-    if not csrf_signed:
-        return False
-
-    signer = signing.Signer()
-    try:
-        csrf = signer.unsign(unquote(csrf_signed))
-    except signing.BadSignature:
-        return False
-
-    # Cleanup old states if any
-    france_connect_models.FranceConnectState.objects.cleanup()
-
-    france_connect_state = france_connect_models.FranceConnectState.objects.filter(csrf=csrf).first()
-    if not france_connect_state:
-        return False
-
-    # One-time use
-    france_connect_state.delete()
-
-    return True
-
-
 def france_connect_authorize(request):
     redirect_uri = get_callback_redirect_uri(request)
-    csrf_signed = state_new()
+    signed_csrf = FranceConnectState.create_signed_csrf_token()
     data = {
         "response_type": "code",
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
         "redirect_uri": redirect_uri,
         "scope": settings.FRANCE_CONNECT_SCOPES,
-        "state": csrf_signed,
+        "state": signed_csrf,
         "nonce": crypto.get_random_string(length=12),
         "acr_values": "eidas1",
     }
@@ -94,7 +59,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     state = request.GET.get("state")
-    if not state_is_valid(state):
+    if not FranceConnectState.is_valid(state):
         error_msg = (
             "Le paramètre « state » fourni par France Connect et nécessaire à votre authentification n’est pas valide."
         )
@@ -152,7 +117,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         logger.error(error_msg)
         return _redirect_to_job_seeker_login_on_error(error_msg)
 
-    fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(user_data)
+    fc_user_data = FranceConnectUserData.from_user_info(user_data)
 
     # Keep token_data["id_token"] to logout from FC
     # At this step, we can update the user's fields in DB and create a session if required
