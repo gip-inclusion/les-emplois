@@ -17,7 +17,6 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae
-from itou.utils.password_validation import FRANCE_CONNECT_PASSWORD_EXPLANATION
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -114,11 +113,6 @@ class ItouPasswordChangeView(PasswordChangeView):
     """
 
     success_url = reverse_lazy("dashboard:index")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["password_change_message"] = FRANCE_CONNECT_PASSWORD_EXPLANATION
-        return context
 
 
 password_change = login_required(ItouPasswordChangeView.as_view())
