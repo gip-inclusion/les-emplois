@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 from django.utils.dateparse import parse_datetime
 
 from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
+from itou.users import enums as users_enums
 
 
 # PE Connect API data retrieval tools
@@ -202,40 +203,39 @@ def set_pe_data_import_from_user_data(pe_data_import, user, status, user_data):
     initial_user = model_to_dict(user)
 
     for k in fields_fetched:
+        pe_connect_provider = users_enums.IdentityProvider.PE_CONNECT.name
         v = user_data.get(k)
 
         # User part:
         if k == "dateDeNaissance":
             new_value = user.birthdate or parse_datetime(v)
             user.birthdate = new_value
-            user.update_external_data_source_history_field(settings.PROVIDER_PE_CONNECT, "birthdate", new_value)
+            user.update_external_data_source_history_field(pe_connect_provider, "birthdate", new_value)
         elif k == "adresse4":
             new_value = "" or user.address_line_1 or v
             user.address_line_1 = new_value
-            user.update_external_data_source_history_field(settings.PROVIDER_PE_CONNECT, "address_line_1", new_value)
+            user.update_external_data_source_history_field(pe_connect_provider, "address_line_1", new_value)
         elif k == "adresse2":
             new_value = "" or user.address_line_2 or v
             user.address_line_2 = new_value
-            user.update_external_data_source_history_field(settings.PROVIDER_PE_CONNECT, "address_line_2", new_value)
+            user.update_external_data_source_history_field(pe_connect_provider, "address_line_2", new_value)
         elif k == "codePostal":
             new_value = user.post_code or v
             user.post_code = new_value
-            user.update_external_data_source_history_field(settings.PROVIDER_PE_CONNECT, "post_code", new_value)
+            user.update_external_data_source_history_field(pe_connect_provider, "post_code", new_value)
         elif k == "libelleCommune":
             new_value = user.city or v
             user.city = new_value
-            user.update_external_data_source_history_field(settings.PROVIDER_PE_CONNECT, "city", new_value)
+            user.update_external_data_source_history_field(pe_connect_provider, "city", new_value)
 
         # JobSeekerExternalData part:
         if k == "codeStatutIndividu":
             new_value = v == 1
             job_seeker_data.is_pe_jobseeker = new_value
-            user.update_external_data_source_history_field(settings.PROVIDER_PE_CONNECT, "is_pe_jobseeker", new_value)
+            user.update_external_data_source_history_field(pe_connect_provider, "is_pe_jobseeker", new_value)
         elif k == "beneficiairePrestationSolidarite":
             job_seeker_data.has_minimal_social_allowance = v
-            user.update_external_data_source_history_field(
-                settings.PROVIDER_PE_CONNECT, "has_minimal_social_allowance", v
-            )
+            user.update_external_data_source_history_field(pe_connect_provider, "has_minimal_social_allowance", v)
 
     # Check updated fields
     # To be done before saving objects:
