@@ -49,7 +49,7 @@ class OIDConnectUserData:
         user = User.objects.create_user(**user_data_dict)
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(
-                provider_name=self.identity_provider.name, field=key, value=value
+                provider_name=self.identity_provider, field=key, value=value
             )
         return user
 
@@ -59,7 +59,7 @@ class OIDConnectUserData:
             if value:
                 setattr(user, key, value)
                 user.update_external_data_source_history_field(
-                    provider_name=self.identity_provider.name, field=key, value=value
+                    provider_name=self.identity_provider, field=key, value=value
                 )
         user.save()
         return user

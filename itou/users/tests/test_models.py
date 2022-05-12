@@ -222,7 +222,7 @@ class ModelTest(TestCase):
         user = UserFactory()
         self.assertFalse(user.external_data_source_history)
 
-        provider_name = IdentityProvider.FRANCE_CONNECT.name
+        provider_name = IdentityProvider.FRANCE_CONNECT
         expected_field = "first_name"
         expected_value = "Lola"
         has_performed_update = user.update_external_data_source_history_field(
@@ -235,7 +235,8 @@ class ModelTest(TestCase):
         self.assertEqual(len(user.external_data_source_history.keys()), 1)
         self.assertTrue(user.external_data_source_history.get(expected_field))
         self.assertEqual(user.external_data_source_history[expected_field]["value"], expected_value)
-        self.assertEqual(user.external_data_source_history[expected_field]["source"], provider_name)
+        # Enums are stored as strings.
+        self.assertEqual(user.external_data_source_history[expected_field]["source"], provider_name.value)
         # Because external_data_source_history is a JSONField,
         # dates are actually stored as strings in the database.
         created_at = user.external_data_source_history[expected_field]["created_at"]

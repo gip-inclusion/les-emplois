@@ -58,7 +58,7 @@ class InclusionConnectModelTest(TestCase):
         for field in dataclasses.fields(ic_user_data):
             self.assertEqual(
                 user.external_data_source_history[field.name]["source"],
-                users_enums.IdentityProvider.INCLUSION_CONNECT.name,
+                users_enums.IdentityProvider.INCLUSION_CONNECT.value,
             )
             self.assertEqual(user.external_data_source_history[field.name]["value"], getattr(user, field.name))
 
@@ -75,7 +75,7 @@ class InclusionConnectModelTest(TestCase):
         self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
         self.assertEqual(
             user.external_data_source_history["last_name"]["source"],
-            users_enums.IdentityProvider.INCLUSION_CONNECT.name,
+            users_enums.IdentityProvider.INCLUSION_CONNECT.value,
         )
 
     def test_create_user_from_user_info_with_already_existing_email(self):
@@ -90,7 +90,7 @@ class InclusionConnectModelTest(TestCase):
         self.assertNotEqual(user.last_name, OIDC_USERINFO["family_name"])
         self.assertNotEqual(user.first_name, OIDC_USERINFO["given_name"])
         # We did not fill this data using external data, so it is not set.
-        self.assertIsNone(user.external_data_source_history)
+        self.assertFalse(user.external_data_source_history)
 
     def test_update_user_from_user_info(self):
         user = UserFactory(**dataclasses.asdict(InclusionConnectUserData.from_user_info_dict(OIDC_USERINFO)))
@@ -105,6 +105,6 @@ class InclusionConnectModelTest(TestCase):
         for field in dataclasses.fields(new_ic_user):
             self.assertEqual(
                 user.external_data_source_history[field.name]["source"],
-                users_enums.IdentityProvider.INCLUSION_CONNECT.name,
+                users_enums.IdentityProvider.INCLUSION_CONNECT.value,
             )
-            self.assertEqual(getattr(user, field), getattr(new_ic_user, field))
+            self.assertEqual(getattr(user, field.name), getattr(new_ic_user, field.name))

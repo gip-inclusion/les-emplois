@@ -82,7 +82,7 @@ class FranceConnectTest(TestCase):
         self.assertEqual(user.city, FC_USERINFO["address"]["locality"])
 
         self.assertEqual(
-            user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.name
+            user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.value
         )
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
         self.assertTrue(user.is_job_seeker)
@@ -137,7 +137,7 @@ class FranceConnectTest(TestCase):
         self.assertEqual(user.last_name, FC_USERINFO["family_name"])
         self.assertEqual(user.first_name, FC_USERINFO["given_name"])
         self.assertEqual(
-            user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.name
+            user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.value
         )
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
         self.assertEqual(user.address_line_1, "")
@@ -156,7 +156,7 @@ class FranceConnectTest(TestCase):
         self.assertEqual(user.last_name, FC_USERINFO["family_name"])
         self.assertEqual(user.first_name, FC_USERINFO["given_name"])
         self.assertEqual(
-            user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.name
+            user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.value
         )
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
 
@@ -172,7 +172,7 @@ class FranceConnectTest(TestCase):
         self.assertNotEqual(user.last_name, FC_USERINFO["family_name"])
         self.assertNotEqual(user.first_name, FC_USERINFO["given_name"])
         # We did not fill this data using external data, so it is not set
-        self.assertIsNone(user.external_data_source_history)
+        self.assertFalse(user.external_data_source_history)
         self.assertNotEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
 
     def test_callback_no_code(self):
