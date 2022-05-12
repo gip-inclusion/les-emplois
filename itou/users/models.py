@@ -266,7 +266,10 @@ class User(AbstractUser, AddressMixin):
         blank=True,
     )
     external_data_source_history = models.JSONField(
-        verbose_name="Information sur la source des champs", blank=True, null=True, encoder=DjangoJSONEncoder
+        verbose_name="Information sur la source des champs",
+        blank=True,
+        null=True,
+        encoder=DjangoJSONEncoder,
     )
 
     objects = ItouUserManager()
@@ -548,34 +551,30 @@ class User(AbstractUser, AddressMixin):
         `external_data_source_history`, and returns a boolean if the user data was modified,
         so that the database save() can be performed later on
 
-        we store an history of the various data source for the user informations
+        We store a history of the various data sources for the user information
         inside `external_data_source_history`. It can look like:
         {
-            "first_name": {"source": "france_connect", "created_at": "…", "value": "Jean-Michel"},
-            "birth_date": {"source": "pe_connect", "created_at": "…", "value": "…"},
+            "first_name": {"source": "FRANCE_CONNECT", "created_at": "…", "value": "Jean-Michel"},
+            "birth_date": {"source": "PE_CONNECT", "created_at": "…", "value": "…"},
             …
         }
-        we can for instance leverage these information on order :
-         - to display the data source in the UI, or
-         - to check if we have a more recent data from an external data source
         """
         now = timezone.now()
         has_performed_update = False
-        # If we never wrote any value, initialize the dict
-        if self.external_data_source_history is None:
+
+        if not self.external_data_source_history:
             self.external_data_source_history = {}
-        if not self.external_data_source_history.get(field):
-            # If we never stored something for this property, store it for this provider
-            self.external_data_source_history[field] = {"source": provider_name, "created_at": now, "value": value}
+
+        if (
+            not self.external_data_source_history.get(field)
+            or self.external_data_source_history[field]["value"] != value
+        ):
+            self.external_data_source_history[field] = {
+                "source": provider_name,
+                "created_at": now,
+                "value": value,
+            }
             has_performed_update = True
-        else:
-            # If we already have something, we want to update it only if it changed
-            if (
-                not self.external_data_source_history[field].get("value")
-                or self.external_data_source_history[field]["value"] != value
-            ):
-                self.external_data_source_history[field] = {"source": provider_name, "created_at": now, "value": value}
-                has_performed_update = True
         return has_performed_update
 
     @cached_property
