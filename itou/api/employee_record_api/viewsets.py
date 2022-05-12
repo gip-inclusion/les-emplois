@@ -19,7 +19,10 @@ logger = logging.getLogger("api_drf")
 
 class EmployeeRecordRateThrottle(UserRateThrottle):
     # Pulled out for testing
-    EMPLOYEE_RECORD_API_REQUESTS_NUMBER = 10
+    # For the record, we suspect API calls made by GTA software (used by SIAEs)
+    # to be a bit excessive for the least.
+    # We will adapt rates if needed.
+    EMPLOYEE_RECORD_API_REQUESTS_NUMBER = 12
 
     # For all employee record API endpoints
     rate = f"{EMPLOYEE_RECORD_API_REQUESTS_NUMBER}/min"
