@@ -2,7 +2,7 @@
 
 {% bootstrap_form_errors form type="all" %}
 <div class="row no-gutters my-3 itou-banner-blue{% if align == 'center' %} justify-content-sm-center{% endif %}">
-    <div class="col col-12 col-sm-8 col-md-6 mb-1">
+    <div class="col-12 col-md mb-2">
         {{ form.city }}
         <div class="input-group">
             <div class="input-group-prepend bg-white">
@@ -20,7 +20,7 @@
             {{ form.city_name }}
         </div>
     </div>
-    <div class="col col-12 col-sm-8 ml-0 mt-2 col-md-2 ml-md-2 mt-md-0">
+    <div class="col-12 col-md-3 col-lg-2 mb-2 pl-md-3">
         <button type="submit" class="btn btn-primary form-control js-search-button" title="Rechercher">
             Rechercher
         </button>

@@ -31,7 +31,7 @@
 
         {% if form.is_valid %}
             <h2 class="h2">
-                Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
+                Employeurs solidaires à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
             </h2>
         {% endif %}
 
@@ -57,7 +57,7 @@
                 {% empty %}
                     <div class="card my-4">
                         <div class="card-body">
-                            Aucun résultat avec les filtres actuels.
+                            <p>Aucun résultat avec les filtres actuels.</p>
                         </div>
                     </div>
                 {% endfor %}
