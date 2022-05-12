@@ -4,11 +4,10 @@
 {% if user.is_authenticated %}
     {% if user.is_siae_staff and user_siaes|length > 1 %}
         <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary btn-ico" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
-                <span>({{ current_siae.kind }}) {{ current_siae.display_name|truncatechars:50 }}</span>
-                <i class="ri-arrow-down-s-line ri-lg"></i>
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                ({{ current_siae.kind }}) {{ current_siae.display_name|truncatechars:50 }}
             </button>
-            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
+            <div class="dropdown-menu" id="switchUserDropdown">
                 <form action="{% url 'dashboard:switch_siae' %}" method="post">
                     {% csrf_token %}
                     <ul class="list-unstyled">
@@ -20,7 +19,7 @@
                                         type="submit"
                                         name="siae_id"
                                         value="{{ s.pk }}">
-                                        <span class="badge badge-primary">{{ s.kind }}</span>
+                                        <span class="badge badge-sm badge-primary mr-1">{{ s.kind }}</span>
                                         {{ s.display_name|truncatechars:50 }}
                                     </button>
                                 </li>
@@ -33,11 +32,10 @@
     {% endif %}
     {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
         <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary btn-ico" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
-                <span>({{ current_prescriber_organization.kind }}) {{ current_prescriber_organization.display_name|truncatechars:50 }}</span>
-                <i class="ri-arrow-down-s-line ri-lg"></i>
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                ({{ current_prescriber_organization.kind }}) {{ current_prescriber_organization.display_name|truncatechars:50 }}
             </button>
-            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
+            <div class="dropdown-menu" id="switchUserDropdown">
                 <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
                     {% csrf_token %}
                     <ul class="list-unstyled">
@@ -49,7 +47,7 @@
                                         type="submit"
                                         name="prescriber_organization_id"
                                         value="{{ po.pk }}">
-                                        <span class="badge badge-primary">{{ po.kind }}</span>
+                                        <span class="badge badge-sm badge-primary mr-1">{{ po.kind }}</span>
                                         {{ po.display_name|truncatechars:50 }}
                                     </button>
                                 </li>
@@ -63,11 +61,10 @@
 
     {% if user.is_labor_inspector and user_institutions|length > 1 %}
         <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary btn-ico" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
-                <span>({{ current_institution.kind }}) {{ current_institution.display_name|truncatechars:50 }}</span>
-                <i class="ri-arrow-down-s-line ri-lg"></i>
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                ({{ current_institution.kind }}) {{ current_institution.display_name|truncatechars:50 }}
             </button>
-            <div class="dropdown-menu dropdown-menu-left" id="switchUserDropdown">
+            <div class="dropdown-menu" id="switchUserDropdown">
                 <form action="{% url 'dashboard:switch_institution' %}" method="post">
                     {% csrf_token %}
                     <ul class="list-unstyled">
@@ -79,7 +76,7 @@
                                         type="submit"
                                         name="institution_id"
                                         value="{{ i.pk }}">
-                                        <span class="badge badge-primary">{{ i.kind }}</span>
+                                        <span class="badge badge-sm badge-primary mr-1">{{ i.kind }}</span>
                                         {{ i.display_name|truncatechars:50 }}
                                     </button>
                                 </li>
@@ -91,27 +88,29 @@
         </li>
     {% endif %}
 
-    <li class="dropdown mr-2">
+    <li class="dropdown">
         <button
             type="button"
-            class="btn btn-primary btn-ico"
+            class="btn btn-primary dropdown-toggle"
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-controls="dashboardUserDropdown"
             aria-expanded="false">
-            <span>Mon espace</span>
-            <i class="ri-arrow-down-s-line ri-lg"></i>
+            Mon espace
         </button>
-        <div class="dropdown-menu dropdown-menu-left" id="dashboardUserDropdown">
+        <div class="dropdown-menu" id="dashboardUserDropdown">
             <ul class="list-unstyled">
                 <li>
-                    <div class="dropdown-item media">
-                        <span class="align-self-center"><i class="ri-user-line ri-2x"></i></span>
-                        <div class="media-body align-self-center text-wrap">
-                            {% if user.get_full_name %}
-                                <div>{{ user.get_full_name }}</div>
-                            {% endif %}
-                            <div class="text-secondary">{{ user.email }}</div>
+                    <div class="dropdown-item">
+                        <div class="media align-items-center">
+                            <span class="mr-2"><i class="ri-user-line ri-2x"></i></span>
+                            <div class="media-body">
+                                {% if user.get_full_name %}
+                                    <span>{{ user.get_full_name }}</span>
+                                    <br>
+                                {% endif %}
+                                <span class="fs-sm lh-sm text-secondary">{{ user.email }}</span>
+                            </div>
                         </div>
                     </div>
                 </li>
@@ -165,9 +164,8 @@
     </li>
 {% else %}
     <li class="dropdown mr-2">
-        <button type="button" class="btn btn-primary btn-ico" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
-            <span>S'inscrire | Se connecter</span>
-            <i class="ri-arrow-down-s-line ri-lg"></i>
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
+            S'inscrire | Se connecter
         </button>
         <div class="dropdown-menu" id="loginUserDropdown">
             <ul class="list-unstyled">
