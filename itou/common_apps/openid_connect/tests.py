@@ -2,6 +2,7 @@ import dataclasses
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from itou.inclusion_connect.models import InclusionConnectState, InclusionConnectUserData
@@ -130,3 +131,45 @@ class InclusionConnectModelTest(TestCase):
                     users_enums.IdentityProvider.INCLUSION_CONNECT.value,
                 )
                 self.assertEqual(getattr(user, field.name), getattr(new_ic_user, field.name))
+
+    def test_state_is_valid(self):
+        csrf_signed = InclusionConnectState.create_signed_csrf_token()
+        self.assertTrue(isinstance(csrf_signed, str))
+        self.assertTrue(InclusionConnectState.is_valid(csrf_signed))
+
+
+class InclusionConnectViewTest(TestCase):
+    # Test abstract class using one of its concrete implementations.
+
+    def test_callback_invalid_state(self):
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url, data={"code": "123", "state": "000"})
+        self.assertEqual(response.status_code, 302)
+
+    def test_callback_no_state(self):
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url, data={"code": "123"})
+        self.assertEqual(response.status_code, 302)
+
+    def test_callback_no_code(self):
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    # def test_authorize_endpoint(self):
+    #     url = reverse("inclusion_connect:authorize")
+    #     with self.assertRaises(KeyError):
+    #         response = self.client.get(url, follow=False)
+
+    #     url = f"{reverse('inclusion_connect:authorize')}?user_kind={KIND_PRESCRIBER}"
+    #     # Don't use assertRedirects to avoid fetching the last URL.
+    #     response = self.client.get(url, follow=False)
+    #     self.assertTrue(response.url.startswith(INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
+    #     self.assertTrue(self.client.get(INCLUSION_CONNECT_SESSION_KEY))
+
+    # def test_authorize_endpoint_with_params(self):
+    #     email = "porthos@touspourun.com"
+    #     params = {"login_hint": email, "user_kind": KIND_PRESCRIBER}
+    #     url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+    #     response = self.client.get(url, follow=False)
+    #     self.assertIn(parse.quote(email), response.url)
