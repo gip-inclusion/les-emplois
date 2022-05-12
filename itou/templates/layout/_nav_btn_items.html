@@ -1,4 +1,3 @@
-{% load france_connect %}
 {% load redirection_fields %}
 
 {% if user.is_authenticated %}
@@ -137,14 +136,12 @@
                         Modifier mon profil
                     </a>
                 </li>
-                {% if not user.is_peamu %}
-                    {% if not request|user_is_france_connected %}
-                        <li>
-                            <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
-                                Modifier mon mot de passe
-                            </a>
-                        </li>
-                    {% endif %}
+                {% if not user.has_sso_provider %}
+                    <li>
+                        <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
+                            Modifier mon mot de passe
+                        </a>
+                    </li>
                     <li>
                         <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_email' %}">
                             Modifier mon adresse e-mail

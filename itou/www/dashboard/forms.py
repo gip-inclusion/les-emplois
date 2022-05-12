@@ -42,9 +42,9 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
             # it should see the field but most should be disabled
             # (that’s a requirement on FranceConnect’s side).
             disabled_fields = ["first_name", "last_name", "email", "birthdate"]
-            for field_name in disabled_fields:
-                if field_name in self.fields.keys():
-                    self.fields[field_name].disabled = True
+            for name in self.fields.keys():
+                if name in disabled_fields:
+                    self.fields[name].disabled = True
 
             edit_email_url = reverse("dashboard:edit_user_email")
             self.fields["email"].help_text = f'<a href="{edit_email_url}"> Modifier votre adresse email</a>'
