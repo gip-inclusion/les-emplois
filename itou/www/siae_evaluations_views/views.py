@@ -73,6 +73,32 @@ def institution_evaluated_siae_list(
 
 
 @login_required
+def institution_evaluated_siae_detail(
+    request, evaluated_siae_pk, template_name="siae_evaluations/institution_evaluated_siae_detail.html"
+):
+    institution = get_current_institution_or_404(request)
+    evaluated_siae = get_object_or_404(
+        EvaluatedSiae,
+        pk=evaluated_siae_pk,
+        evaluation_campaign__institution=institution,
+        evaluation_campaign__evaluations_asked_at__isnull=False,
+    )
+    back_url = get_safe_url(
+        request,
+        "back_url",
+        fallback_url=reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign.pk},
+        ),
+    )
+    context = {
+        "evaluated_siae": evaluated_siae,
+        "back_url": back_url,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
 def siae_job_applications_list(request, template_name="siae_evaluations/siae_job_applications_list.html"):
 
     siae = get_current_siae_or_404(request)

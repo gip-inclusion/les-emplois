@@ -27,6 +27,15 @@
                             <div class="card-header">
                                 {% include "siae_evaluations/includes/siae_infos.html" with evaluated_siae=evaluated_siae%}
                             </div>
+                            <div class="card-body">
+                                <div class="col-md-12">
+                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}"
+                                        class="btn btn-outline-primary float-right">
+                                        Voir
+                                    </a>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

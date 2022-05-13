@@ -291,6 +291,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
         evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
+        evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_detail",
@@ -299,6 +300,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, evaluated_siae)
+        self.assertContains(response, evaluated_job_application.job_application.approval.number_with_spaces)
+        self.assertContains(response, evaluated_job_application.job_application.job_seeker.last_name)
         self.assertEqual(
             response.context["back_url"],
             reverse(
