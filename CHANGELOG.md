@@ -1,5 +1,47 @@
 # Journal des modifications
 
+## [42] - 2022-05-13
+
+### Ajouté
+- Ajout d'un champ manquant dans les fiches de postes pour les OPCS
+- Ajout de stats PE qui permettent à tout membre d'agence PE de consulter les stats de son département
+- Ajout de champs de recherche pour l'API fiches salarié 
+- Message d'information sur la mise en place de l'assistance technique par téléphone
+- Contrôle a posteriori : phase enrichissement des données 
+- Contrôle a posteriori, Pack SIAE : notification et liste des justificatifs demandés (cartes 1 à 3)
+- Contrôle a posteriori, Pack SIAE : sélection et enregistrement des critères à justifier (carte 4)
+- Ajout du champs "origine détaillée" dans l'export Metabase pour créer un filtre (TB 160)
+- Contrôle a posteriori, Pack SIAE : dépôt des pièces justificatives (carte 5)
+- Contrôle a posteriori, Pack SIAE : soumission des justificatifs (carte 6)
+- Contrôle a posteriori, Pack DDETS : notification ouverture de la phase de transmission des justificatifs (carte 1/5)
+- Contrôle a posteriori, Pack DDETS : liste des siae contrôlées (carte 2/5)
+- Fonctionnalités techniques permettant de notifier l'ASP des modifications de date de début ou de fin d'un PASS IAE rattaché à une fiche salarié.
+- Droits d'administration sur les candidatures et les fiches salariées
+- Contrôle a posteriori, Pack DDETS : liste des autoprescriptions contrôlées pour une Siae (carte 3/5)
+- Améliorer la visibilité en affichant le nom de la structure dans l'entête
+
+### Modifié
+- Remplacer les icônes Feather par icônes Remix
+- Amélioration de la commande d'envoi du stock de PASS IAE à Pôle emploi
+- Modification du critère d’éligibilité réfugié
+- Ajustement de la mise en page d'un message d'alerte dans le processus d'éligbilité
+- Ajustement de l'agencement de certaines pages de connexion/création de compte
+- Reformulation de "données IAE" sur les statistiques Pôle emploi pour "fiches de poste en tension"
+- Ajout d'une colonne "DateRattachement" dans l'extract des utilisateurs C2
+- Mise à jour du theme itou vers la v0.3.8
+- Correction technique sur les tests unitaires pour éviter les erreurs d'unicité aléatoires
+- Prise en compte d'un nouveau référentiel dans le FluxIAE dans l'import ASP des SIAE
+- Rendre plus robuste le code de l'API Pole Emploi le temps de l'envoi des PASS IAE
+- Correction de la recherche d'agréments Pôle emploi par NIR
+- Correction technique du chargement des villes en base de données
+- Correction d'un cas particulier sur les conventions dans l'import ASP des SIAE 
+- Correction des erreurs d'accessibilité sur les tableaux et les scripts
+- Correction d'un bug lorsqu'un PASS IAE existe déjà pour le même NIR ou ID Pôle emploi
+- Résolutions d'erreurs diverses dans FranceConnect
+
+### Supprimé
+- Champ en double dans le modèle des fiches de poste
+ 
 ## [41] - 2022-04-22
 
 ### Ajouté
