@@ -13,6 +13,11 @@ urlpatterns = [
         views.institution_evaluated_siae_list,
         name="institution_evaluated_siae_list",
     ),
+    path(
+        "institution_evaluated_siae_detail/<int:evaluated_siae_pk>/",
+        views.institution_evaluated_siae_detail,
+        name="institution_evaluated_siae_detail",
+    ),
     path("siae_job_applications_list", views.siae_job_applications_list, name="siae_job_applications_list"),
     path(
         "siae_select_criteria/<int:evaluated_job_application_pk>/",

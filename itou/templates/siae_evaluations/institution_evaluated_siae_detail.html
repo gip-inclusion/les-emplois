@@ -1,0 +1,67 @@
+{% extends "layout/content.html" %}
+{% load format_filters %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block content %}
+
+    <div class="row justify-content-center">
+        <div class="col-8 ">
+            <div class="row mt-3">
+                <div class="col-12">
+
+                    <h1 class="h1">
+                        Contrôler les pièces justificatives
+                    </h1>
+                    <h3 class="h3">
+                        Liste des auto-prescriptions de <span class="text-muted">{{evaluated_siae}}</span>
+                    </h3>
+                    <p>
+                        Numéro de téléphone à utiliser au besoin :
+                        <a title="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone }}">
+                            {{ evaluated_siae.siae.phone|format_phone }}
+                        </a>
+                    </p>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <p>Lorsque vous aurez contrôlé<strong> tous vos justificatifs</strong> pour cette SIAE,
+                                veuillez valider le contrôle effectué pour la notifier de son résultat.
+                            </p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <a class="btn btn-outline-primary disabled float-right" href="#">
+                                Valider
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    {% for evaluated_job_application in evaluated_siae.evaluated_job_applications.all %}
+                        <div class="card my-3"  >
+                            {# navigation : anchor to scroll to a specific card when returning to this page #}
+                            <a class="scrolldown-anchor" id="{{evaluated_job_application.pk}}"></a>
+                            <div class="card-header">
+                                {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.state%}
+                            </div>
+
+                            <div class="card-body">
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if back_url %}
+                <p class="mt-4">
+                    <a href="{{ back_url }}">Retour</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+
+{% endblock %}
+
