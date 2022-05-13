@@ -1,18 +1,9 @@
-{# navigation : style to force the scroll down and avoid the banner to hide the map #}
-<style>
-    a.anchor {
-        display: block;
-        position: relative;
-        top: -130px;
-        visibility: hidden;
-    }
-</style>
 
 <div class="card my-3"  >
     {# navigation : anchor to scroll to a specific card when returning to this page #}
-    <a class="anchor" id="{{item.pk}}"></a>
+    <a class="scrolldown-anchor" id="{{item.pk}}"></a>
     <div class="card-header">
-        {% include "siae_evaluations/includes/job_seeker_infos.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.state%}
+        {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.state%}
     </div>
 
     <div class="card-body">

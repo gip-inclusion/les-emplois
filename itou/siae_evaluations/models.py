@@ -347,7 +347,7 @@ class EvaluatedJobApplication(models.Model):
             return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
         return evaluation_enums.EvaluatedJobApplicationsState.PENDING
 
-    @property
+    @cached_property
     def should_select_criteria(self):
         if self.state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
             return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING

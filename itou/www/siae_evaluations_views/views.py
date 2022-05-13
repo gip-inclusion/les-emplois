@@ -161,6 +161,7 @@ def siae_select_criteria(
         "form_administrative_criteria": form_administrative_criteria,
         "level_1_fields": level_1_fields,
         "level_2_fields": level_2_fields,
+        "kind": siae.kind,
         "back_url": back_url,
     }
     return render(request, template_name, context)
