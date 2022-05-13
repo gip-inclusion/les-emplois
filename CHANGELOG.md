@@ -4,7 +4,7 @@
 
 ### Ajouté
 - Ajout d'un champ manquant dans les fiches de postes pour les OPCS
-- Ajout de stats PE qui permettent à tout membre d'agence PE de consulter les stats de son département
+- Ajout de stats PE qui permettent à tout membre d'agence PE de consulter les stats de son département (fonctionnalité cachée en attente de déploiement)
 - Ajout de champs de recherche pour l'API fiches salarié 
 - Message d'information sur la mise en place de l'assistance technique par téléphone
 - Contrôle a posteriori : phase enrichissement des données 
