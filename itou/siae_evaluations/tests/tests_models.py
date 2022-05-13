@@ -564,6 +564,7 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluated_job_application.should_select_criteria,
         )
         del evaluated_job_application.__dict__["state"]
+        del evaluated_job_application.__dict__["should_select_criteria"]
 
         criterion = AdministrativeCriteria.objects.first()
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
@@ -574,6 +575,7 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluated_job_application.should_select_criteria,
         )
         del evaluated_job_application.__dict__["state"]
+        del evaluated_job_application.__dict__["should_select_criteria"]
 
         evaluated_administrative_criteria.proof_url = "https://www.test.com"
         evaluated_administrative_criteria.save(update_fields=["proof_url"])
@@ -582,6 +584,7 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluated_job_application.should_select_criteria,
         )
         del evaluated_job_application.__dict__["state"]
+        del evaluated_job_application.__dict__["should_select_criteria"]
 
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])

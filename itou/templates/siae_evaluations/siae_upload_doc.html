@@ -15,17 +15,13 @@
 
 
 {% block content %}
-    <div class="row">
-
-        <div class="col-2 ">
-            {# placeholder #}
-        </div>
+    <div class="row justify-content-center">
         <div class="col-8 ">
 
             <div class="card">
 
                 <div class="card-header">
-                    {% include "siae_evaluations/includes/job_seeker_infos.html" with job_seeker=job_seeker approval=approval state=state%}
+                    {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=job_seeker approval=approval state=state%}
                 </div>
 
                 <div class="card-body">

@@ -4,20 +4,13 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.factories import (
-    EvaluatedJobApplicationFactory,
-    EvaluatedSiaeFactory,
-    EvaluationCampaignFactory,
-)
-from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluationCampaign
+from itou.siae_evaluations.factories import EvaluatedJobApplicationFactory, EvaluatedSiaeFactory
+from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
 from itou.utils.storage.s3 import S3Upload
-from itou.www.siae_evaluations_views.forms import SetChosenPercentForm
 
 
 def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_2=False):
@@ -51,185 +44,6 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
     )
 
     return evaluated_job_application
-
-
-def create_evaluated_administrative_criteria_from_evaluated_job_application(evaluated_job_application, level):
-    administrative_criteria = (
-        evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.all()
-    )
-    return EvaluatedAdministrativeCriteria.objects.bulk_create(
-        [
-            EvaluatedAdministrativeCriteria(
-                evaluated_job_application=evaluated_job_application,
-                administrative_criteria=sel_adm.administrative_criteria,
-            )
-            for sel_adm in administrative_criteria
-            if sel_adm.administrative_criteria.level == level
-        ]
-    )
-
-
-class SamplesSelectionViewTest(TestCase):
-    def setUp(self):
-        membership = InstitutionMembershipFactory()
-        self.user = membership.user
-        self.institution = membership.institution
-        self.url = reverse("siae_evaluations_views:samples_selection")
-
-    def test_access(self):
-
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 302)
-
-        # institution without active campaign
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Vous n'avez pas de contrôle en cours.")
-
-        # institution with active campaign to select
-        evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
-        response = self.client.get(self.url)
-        self.assertContains(response, "Sélection des salariés à contrôler")
-
-        # institution with active campaign selected
-        evaluation_campaign.percent_set_at = timezone.now()
-        evaluation_campaign.save()
-        response = self.client.get(self.url)
-        self.assertContains(
-            response, "Vous serez notifié lorsque l'étape de transmission des pièces justificatives commencera."
-        )
-
-        # institution with ended campaign
-        evaluation_campaign.percent_set_at = timezone.now()
-        evaluation_campaign.ended_at = timezone.now()
-        evaluation_campaign.save()
-        response = self.client.get(self.url)
-        self.assertContains(response, "Vous n'avez pas de contrôle en cours.")
-
-    def test_content(self):
-        evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
-        back_url = reverse("dashboard:index")
-
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.context["institution"], self.institution)
-        self.assertEqual(response.context["evaluation_campaign"], evaluation_campaign)
-        self.assertEqual(response.context["back_url"], back_url)
-
-    def test_form(self):
-        evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
-
-        form_data = {"chosen_percent": evaluation_enums.EvaluationChosenPercent.DEFAULT}
-        form = SetChosenPercentForm(instance=evaluation_campaign, data=form_data)
-        self.assertTrue(form.is_valid())
-
-        form_data = {"chosen_percent": evaluation_enums.EvaluationChosenPercent.MIN}
-        form = SetChosenPercentForm(instance=evaluation_campaign, data=form_data)
-        self.assertTrue(form.is_valid())
-
-        form_data = {"chosen_percent": evaluation_enums.EvaluationChosenPercent.MIN - 1}
-        form = SetChosenPercentForm(instance=evaluation_campaign, data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors["chosen_percent"], ["Assurez-vous que cette valeur est supérieure ou égale à 20."]
-        )
-
-        form_data = {"chosen_percent": evaluation_enums.EvaluationChosenPercent.MAX}
-        form = SetChosenPercentForm(instance=evaluation_campaign, data=form_data)
-        self.assertTrue(form.is_valid())
-
-        form_data = {"chosen_percent": evaluation_enums.EvaluationChosenPercent.MAX + 1}
-        form = SetChosenPercentForm(instance=evaluation_campaign, data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors["chosen_percent"], ["Assurez-vous que cette valeur est inférieure ou égale à 40."]
-        )
-
-    def test_post_form(self):
-        evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
-
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
-        response = self.client.get(self.url)
-
-        post_data = {"chosen_percent": evaluation_enums.EvaluationChosenPercent.MIN}
-        response = self.client.post(self.url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
-        updated_evaluation_campaign = EvaluationCampaign.objects.get(pk=evaluation_campaign.pk)
-        self.assertIsNotNone(updated_evaluation_campaign.percent_set_at)
-        self.assertEqual(updated_evaluation_campaign.chosen_percent, post_data["chosen_percent"])
-
-
-class InstitutionEvaluatedSiaeListViewTest(TestCase):
-    def setUp(self):
-        membership = InstitutionMembershipFactory()
-        self.user = membership.user
-        self.institution = membership.institution
-
-    def test_access(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
-
-        # institution without evaluation_campaign
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": 1},
-            )
-        )
-        self.assertEqual(response.status_code, 404)
-
-        # institution with evaluation_campaign in "institution sets its ratio" phase
-        evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
-        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-            )
-        )
-        self.assertEqual(response.status_code, 404)
-
-        # institution with evaluation_campaign in "siae upload its proofs" phase
-        evaluation_campaign.evaluations_asked_at = timezone.now()
-        evaluation_campaign.save()
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-            )
-        )
-        self.assertEqual(response.status_code, 200)
-
-        # institution with ended evaluation_campaign
-        evaluation_campaign.ended_at = timezone.now()
-        evaluation_campaign.save()
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-            )
-        )
-        self.assertEqual(response.status_code, 404)
-
-    def test_content(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
-        evaluation_campaign = EvaluationCampaignFactory(
-            institution=self.institution, evaluations_asked_at=timezone.now()
-        )
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
-
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-            )
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, evaluated_siae)
-        self.assertEqual(response.context["back_url"], reverse("dashboard:index"))
-        self.assertContains(response, dateformat.format(evaluation_campaign.evaluations_asked_at, "d F Y"))
 
 
 class SiaeJobApplicationListViewTest(TestCase):
@@ -451,6 +265,10 @@ class SiaeSelectCriteriaViewTest(TestCase):
         self.assertEqual(
             evaluated_job_application.state,
             response.context["state"],
+        )
+        self.assertEqual(
+            evaluated_siae.siae.kind,
+            response.context["kind"],
         )
 
     def test_context_fields_list(self):
