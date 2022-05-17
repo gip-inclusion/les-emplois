@@ -17,15 +17,27 @@ echo "Running the ASP import script"
 # Every command in this script will be written before being executed
 set +x
 
-cd $APP_HOME
+cd $APP_HOME || exit 255
+
+FLUX_IAE_FILE=$(find asp_shared_bucket/ -name 'fluxIAE_*.zip' -type f -mtime -5)
+if [[ ! -f "$FLUX_IAE_FILE" ]]; then
+    echo "Missing the flux IAE file."
+    exit 0
+fi
+
+CONTACT_EA_FILE=$(find asp_shared_bucket/ -name 'Liste_Contact_EA_*.zip' -type f -mtime -5)
+if [[ ! -f "$CONTACT_EA_FILE" ]]; then
+    echo "Missing the contact EA file."
+    exit 0
+fi
 
 # Create the "data" directory inside of the app and clear it of any previously existing data
 mkdir -p itou/siaes/management/commands/data/
 rm -rf itou/siaes/management/commands/data/*
 
 # Unzip ASP files
-unzip -P $ASP_UNZIP_PASSWORD asp_shared_bucket/fluxIAE_*.zip -d itou/siaes/management/commands/data/
-unzip -P $ASP_UNZIP_PASSWORD asp_shared_bucket/Liste_Contact_EA*.zip -d itou/siaes/management/commands/data/
+unzip -P $ASP_UNZIP_PASSWORD "$FLUX_IAE_FILE" -d itou/siaes/management/commands/data/
+unzip -P $ASP_UNZIP_PASSWORD "$CONTACT_EA_FILE" -d itou/siaes/management/commands/data/
 
 # Perform the necessary data imports
 mkdir -p $OUTPUT_PATH/populate_metabase_fluxiae
@@ -38,3 +50,6 @@ time ./manage.py import_ea_eatt --verbosity=2 |& tee -a "$OUTPUT_PATH/import_ea_
 
 # Destroy the cleartext ASP data
 rm -rf itou/siaes/management/commands/data/
+
+# Remove ASP files from 2 weeks ago
+find asp_shared_bucket/ -name '*.zip' -type f -mtime +13 -delete
