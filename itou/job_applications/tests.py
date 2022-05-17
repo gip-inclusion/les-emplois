@@ -766,6 +766,26 @@ class JobApplicationNotificationsTest(TestCase):
         email = job_application.email_deliver_approval(accepted_by)
         self.assertIn("Se terminant le : Non renseigné", email.body)
 
+    def test_email_deliver_approval_when_subject_to_eligibility_rules(self, *args, **kwargs):
+        job_application = JobApplicationWithApprovalFactory(to_siae__subject_to_eligibility=True)
+
+        email = job_application.email_deliver_approval(job_application.to_siae.members.first())
+
+        self.assertEqual(
+            f"PASS IAE pour {job_application.job_seeker.get_full_name()} et avis sur les emplois de l'inclusion",
+            email.subject,
+        )
+        self.assertIn("PASS IAE", email.body)
+
+    def test_email_deliver_approval_when_not_subject_to_eligibility_rules(self, *args, **kwargs):
+        job_application = JobApplicationWithApprovalFactory(to_siae__not_subject_to_eligibility=True)
+
+        email = job_application.email_deliver_approval(job_application.to_siae.members.first())
+
+        self.assertEqual("Confirmation de l'embauche", email.subject)
+        self.assertNotIn("PASS IAE", email.body)
+        self.assertIn(settings.ITOU_ASSISTANCE_URL, email.body)
+
     def test_manually_deliver_approval(self, *args, **kwargs):
         staff_member = UserFactory(is_staff=True)
         job_seeker = JobSeekerFactory(
