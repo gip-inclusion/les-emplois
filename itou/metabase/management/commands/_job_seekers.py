@@ -72,6 +72,22 @@ def get_latest_diagnosis_author_sub_kind(job_seeker):
     return None
 
 
+def get_latest_diagnosis_author_display_name(job_seeker):
+    latest_diagnosis = get_latest_diagnosis(job_seeker)
+    if latest_diagnosis:
+        if (
+            latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
+            and latest_diagnosis.author_siae
+        ):
+            return latest_diagnosis.author_siae.display_name
+        elif (
+            latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
+            and latest_diagnosis.author_prescriber_organization
+        ):
+            return latest_diagnosis.author_prescriber_organization.display_name
+    return None
+
+
 def _get_latest_diagnosis_criteria_by_level(job_seeker, level):
     """
     Count criteria of given level for the latest diagnosis of
@@ -215,6 +231,12 @@ TABLE_COLUMNS += [
         "type": "varchar",
         "comment": "Sous type auteur du dernier diagnostic",
         "fn": get_latest_diagnosis_author_sub_kind,
+    },
+    {
+        "name": "nom_auteur_diagnostic",
+        "type": "varchar",
+        "comment": "Nom auteur du dernier diagnostic",
+        "fn": get_latest_diagnosis_author_display_name,
     },
     {
         "name": "type_structure_dernière_embauche",
