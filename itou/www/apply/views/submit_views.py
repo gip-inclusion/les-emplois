@@ -40,7 +40,7 @@ def valid_session_required(function=None):
     def decorated(request, *args, **kwargs):
         session_data = request.session.get(settings.ITOU_SESSION_JOB_APPLICATION_KEY)
         if not session_data or (session_data["to_siae_pk"] != kwargs["siae_pk"]):
-            raise PermissionDenied
+            raise PermissionDenied("invalid session data")
         return function(request, *args, **kwargs)
 
     return decorated
@@ -316,7 +316,9 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
 
 @login_required
 @valid_session_required
-def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeker_create.html"):
+def step_create_job_seeker(
+    request, siae_pk, template_name="apply/submit_step_job_seeker_create.html"
+):  # pylint: disable=unused-argument
     """
     Create a job seeker if he can't be found in the DB.
     """
@@ -353,7 +355,9 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
 
 @login_required
 @valid_session_required
-def step_check_prev_applications(request, siae_pk, template_name="apply/submit_step_check_prev_applications.html"):
+def step_check_prev_applications(
+    request, siae_pk, template_name="apply/submit_step_check_prev_applications.html"
+):  # pylint: disable=unused-argument
     """
     Check previous job applications to avoid duplicates.
     """
@@ -510,7 +514,9 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
 
 @login_required
 @valid_session_required
-def step_application_sent(request, siae_pk, template_name="apply/submit_step_application_sent.html"):
+def step_application_sent(
+    request, siae_pk, template_name="apply/submit_step_application_sent.html"
+):  # pylint: disable=unused-argument
     if request.user.is_siae_staff:
         dashboard_url = reverse("apply:list_for_siae")
         messages.success(request, "Candidature bien envoyée !")
