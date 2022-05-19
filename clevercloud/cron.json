@@ -1,4 +1,5 @@
 [
+  "*/5 * * * * $ROOT/clevercloud/status-probes.sh",
   "1 0 * * * $ROOT/clevercloud/update-prescriber-organization-with-api-entreprise.sh",
   "25 8-18/2 * * 1-5 $ROOT/clevercloud/download_employee_records.sh",
   "55 8-18/2 * * 1-5 $ROOT/clevercloud/upload_employee_records.sh",

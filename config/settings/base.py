@@ -103,6 +103,8 @@ LOCAL_APPS = [
     "itou.www.siae_evaluations_views",
     # API
     "itou.api",
+    # Status
+    "itou.status",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
