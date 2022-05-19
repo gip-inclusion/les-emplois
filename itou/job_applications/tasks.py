@@ -58,7 +58,7 @@ def notify_pole_emploi_pass(job_application, job_seeker):
     try:
         token = JobApplicationPoleEmploiNotificationLog.get_token()
         sleep(SLEEP_DELAY)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         logger.error("! fetching token raised exception=%s", e)
         log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION
         log.details = str(e)
@@ -71,7 +71,7 @@ def notify_pole_emploi_pass(job_application, job_seeker):
         logger.info("> got encrypted_nir=%s", encrypted_nir)
         sleep(SLEEP_DELAY)
     except PoleEmploiMiseAJourPassIAEException as e:
-        logger.error("! fetching encrypted NIR raised http_code=%s message=%s", e.http_code, e.response_code)
+        logger.info("! fetching encrypted NIR raised http_code=%s message=%s", e.http_code, e.response_code)
         log = JobApplicationPoleEmploiNotificationLog(
             job_application=job_application,
             status=JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
@@ -86,7 +86,7 @@ def notify_pole_emploi_pass(job_application, job_seeker):
         logger.info("> pass nir=%s updated successfully", job_application.job_seeker.nir)
         sleep(SLEEP_DELAY)
     except PoleEmploiMiseAJourPassIAEException as e:
-        logger.error("! updating pass iae raised http_code=%s message=%s", e.http_code, e.response_code)
+        logger.info("! updating pass iae raised http_code=%s message=%s", e.http_code, e.response_code)
         log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
         # We log the encrypted nir in case its not empty but
         # it leads to an E_ERR_EX042_PROBLEME_DECHIFFREMEMENT anyway
