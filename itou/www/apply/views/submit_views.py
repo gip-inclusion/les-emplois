@@ -1,7 +1,10 @@
+import logging
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -28,6 +31,9 @@ from itou.www.apply.forms import (
     UserExistsForm,
 )
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
+
+
+logger = logging.getLogger(__name__)
 
 
 def valid_session_required(function=None):
@@ -228,9 +234,20 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
                 session_data["job_seeker_pk"] = job_seeker.pk
                 request.session.modified = True
                 if can_add_nir:
-                    job_seeker.nir = session_data["nir"]
-                    job_seeker.save()
-                return HttpResponseRedirect(next_url)
+                    try:
+                        job_seeker.nir = session_data["nir"]
+                        job_seeker.save(update_fields=["nir"])
+                    except ValidationError:
+                        msg = mark_safe(
+                            f"Le<b> numéro de sécurité sociale</b> renseigné ({ nir }) est "
+                            "déjà utilisé par un autre candidat sur la Plateforme.<br>"
+                            "Merci de renseigner <b>le numéro personnel et unique</b> "
+                            "du candidat pour lequel vous souhaitez postuler."
+                        )
+                        messages.warning(request, msg)
+                        logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
+                    else:
+                        return HttpResponseRedirect(next_url)
 
             # Display a modal containing more information.
             if request.POST.get("preview"):
@@ -306,17 +323,29 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
+    email = request.GET.get("email")
     nir = session_data["nir"]
-    form = CreateJobSeekerForm(
-        proxy_user=request.user, nir=nir, data=request.POST or None, initial={"email": request.GET.get("email")}
-    )
+    form = CreateJobSeekerForm(proxy_user=request.user, nir=nir, data=request.POST or None, initial={"email": email})
 
     if request.method == "POST" and form.is_valid():
-        job_seeker = form.save()
-        session_data["job_seeker_pk"] = job_seeker.pk
-        request.session.modified = True
-        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
-        return HttpResponseRedirect(next_url)
+        try:
+            job_seeker = form.save()
+        except ValidationError:
+            # the e-mail is not mentioned in the error message as it may be blank and we don't want too complicated
+            # or conditional error messages for this quite rare issue.
+            msg = mark_safe(
+                f"Le<b> numéro de sécurité sociale</b> renseigné ({ nir }) est "
+                "déjà utilisé par un autre candidat sur la Plateforme.<br>"
+                "Merci de renseigner <b>le numéro personnel et unique</b> "
+                "du candidat pour lequel vous souhaitez postuler."
+            )
+            messages.warning(request, msg)
+            logger.exception("step_create_job_seeker: error when saving job seeker email=%s nir=%s", email, nir)
+        else:
+            session_data["job_seeker_pk"] = job_seeker.pk
+            request.session.modified = True
+            next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+            return HttpResponseRedirect(next_url)
 
     context = {"siae": siae, "form": form}
     return render(request, template_name, context)
