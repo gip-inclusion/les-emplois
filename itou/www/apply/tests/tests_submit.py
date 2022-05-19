@@ -615,8 +615,6 @@ class ApplyAsPrescriberTest(TestCase):
         }
 
     def test_apply_as_prescriber(self):
-        """Apply as prescriber."""
-
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         user = PrescriberFactory()
@@ -699,6 +697,9 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
+        # Let's add another job seeker with exactly the same NIR, in the middle of the process.
+        # ----------------------------------------------------------------------
+        other_job_seeker = JobSeekerFactory(nir=nir)
         post_data = {
             "email": "new.job.seeker@test.com",
             "first_name": "John",
@@ -712,6 +713,18 @@ class ApplyAsPrescriberTest(TestCase):
             "city": "Sommerau (67)",
             "city_slug": "sommerau-67",
         }
+
+        response = self.client.post(next_url, data=post_data)
+        self.assertTrue(response.status_code, 200)
+        self.assertIn(
+            "Le<b> numéro de sécurité sociale</b> renseigné (141068078200557) "
+            "est déjà utilisé par un autre candidat sur la Plateforme.",
+            str(list(response.context["messages"])[0]),
+        )
+
+        # Remove that extra job seeker and proceed with "normal" flow
+        # ----------------------------------------------------------------------
+        other_job_seeker.delete()
 
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -857,17 +870,36 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
         self.assertRedirects(response, next_url)
 
+        # Create a job seeker with this NIR right after the check. Sorry.
+        # ----------------------------------------------------------------------
+        other_job_seeker = JobSeekerFactory(nir=nir)
+
         # Enter an existing email.
         # ----------------------------------------------------------------------
         post_data = {"email": job_seeker.email, "save": "1"}
         response = self.client.post(next_url, data=post_data)
-        next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
-        self.assertRedirects(response, next_url, target_status_code=302)
+        self.assertTrue(response.status_code, 200)
+        self.assertIn(
+            "Le<b> numéro de sécurité sociale</b> renseigné (141068078200557) "
+            "est déjà utilisé par un autre candidat sur la Plateforme.",
+            str(list(response.context["messages"])[0]),
+        )
+
+        # Remove that extra job seeker and proceed with "normal" flow
+        # ----------------------------------------------------------------------
+        other_job_seeker.delete()
+
+        response = self.client.post(next_url, data=post_data)
+        self.assertRedirects(
+            response, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}), target_status_code=302
+        )
+
+        response = self.client.post(next_url, data=post_data, follow=True)
+        self.assertTrue(response.status_code, 200)
+        self.assertEqual(0, len(list(response.context["messages"])))
 
         # Follow all redirections until the end.
         # ----------------------------------------------------------------------
-        response = self.client.get(next_url, follow=True)
-        self.assertTrue(response.status_code, 200)
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         post_data = {
