@@ -1,8 +1,8 @@
 import logging
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
+from django.views import View
+from django.views.generic.base import ContextMixin, TemplateView
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
@@ -34,26 +36,6 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
 logger = logging.getLogger(__name__)
-
-
-def valid_session_required(required_keys=None):
-    def wrapper(function=None):
-        def decorated(request, *args, **kwargs):
-            session_data = request.session.get(settings.ITOU_SESSION_JOB_APPLICATION_KEY)
-            if not session_data:
-                raise PermissionDenied("no opened session")
-            if required_keys:
-                for key in required_keys:
-                    if session_data[key] != kwargs[key]:
-                        raise PermissionDenied("missing session data information", key)
-            return function(request, *args, **kwargs)
-
-        return decorated
-
-    return wrapper
-
-
-siae_session_required = valid_session_required(["siae_pk"])
 
 
 def get_approvals_wrapper(request, job_seeker, siae):
@@ -86,63 +68,120 @@ def get_approvals_wrapper(request, job_seeker, siae):
     return approvals_wrapper
 
 
-@login_required
-def start(request, siae_pk):
+def valid_session_required(required_keys=None):
+    def wrapper(function=None):
+        def decorated(request, *args, **kwargs):
+            siae_pk = kwargs["siae_pk"]
+            session_data = request.session[f"job_application-{siae_pk}"]
+            if not session_data:
+                raise PermissionDenied("no opened session")
+            if required_keys:
+                for key in required_keys:
+                    if session_data[key] != kwargs[key]:
+                        raise PermissionDenied("missing session data information", key)
+            return function(request, *args, **kwargs)
+
+        return decorated
+
+    return wrapper
+
+
+siae_session_required = valid_session_required(["siae_pk"])
+
+
+class SessionDataBaseMixin(LoginRequiredMixin, ContextMixin):
+    """A mixin that helps the programmer to handle its session data, through a dedicated session key.
+    It also takes care of re-injecting a "back_url" to the context if it was saved in it.
     """
-    Entry point.
-    """
 
-    siae = get_object_or_404(Siae, pk=siae_pk)
+    def get_session_key(self):
+        raise NotImplementedError()
 
-    if request.user.is_siae_staff and not siae.has_member(request.user):
-        raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
+    def get_session(self, key=None):
+        session_data = self.request.session[self.get_session_key()]
+        if key:
+            return session_data[key]
+        return session_data
 
-    # Refuse all applications except those issued by the SIAE
-    if siae.block_job_applications and not siae.has_member(request.user):
-        # Message only visible in DEBUG
-        raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
+    def init_session(self, data):
+        self.request.session[self.get_session_key()] = data
 
-    back_url = get_safe_url(request, "back_url")
+    def set_session(self, key, value):
+        session_data = self.get_session()
+        session_data[key] = value
+        self.request.session.modified = True
 
-    # Start a fresh session.
-    request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
-        "back_url": back_url,
-        "job_seeker_pk": None,
-        "nir": None,
-        "siae_pk": siae.pk,
-        "sender_pk": None,
-        "sender_kind": None,
-        "sender_siae_pk": None,
-        "sender_prescriber_organization_pk": None,
-        "job_description_id": request.GET.get("job_description_id"),
-    }
+    def get_back_url(self):
+        session_back_url = self.get_session().get("back_url")
+        if session_back_url:
+            return get_safe_url(request=self.request, url=session_back_url)
+        return None
 
-    next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
-    return HttpResponseRedirect(next_url)
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "back_url": self.get_back_url(),
+        }
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.get_session():
+            # please take care of initializing your session data with init_session() in
+            # one of your views's setup() method. Usually, the first view of a series.
+            raise PermissionDenied("no opened session")
+        return super().dispatch(request, *args, **kwargs)
 
 
-@login_required
-@siae_session_required
-def step_sender(request, siae_pk):
-    """
-    Determine info about the sender.
-    """
-    user_info = get_user_info(request)
+class ApplyStepBaseMixin(SessionDataBaseMixin):
+    siae = None
 
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    session_data["sender_pk"] = user_info.user.pk
-    session_data["sender_kind"] = user_info.kind
+    def get_session_key(self):
+        return f"job_application-{self.siae.pk}"
 
-    if user_info.prescriber_organization:
-        session_data["sender_prescriber_organization_pk"] = user_info.prescriber_organization.pk
+    def setup(self, request, *args, **kwargs):
+        self.siae = get_object_or_404(Siae, pk=kwargs["siae_pk"])
+        super().setup(request, *args, **kwargs)
 
-    if user_info.siae:
-        session_data["sender_siae_pk"] = user_info.siae.pk
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "siae": self.siae,
+        }
 
-    request.session.modified = True
 
-    next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae_pk})
-    return HttpResponseRedirect(next_url)
+class StartStepView(ApplyStepBaseMixin, View):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.init_session(
+            {
+                "back_url": get_safe_url(request, "back_url"),
+                "job_description_id": request.GET.get("job_description_id"),
+                "job_seeker_pk": None,
+                "nir": None,
+                "sender_kind": None,
+                "sender_pk": None,
+                "sender_prescriber_organization_pk": None,
+                "sender_siae_pk": None,
+                "siae_pk": self.siae.pk,
+            }
+        )
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_siae_staff and not self.siae.has_member(request.user):
+            raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
+        # Refuse all applications except those issued by the SIAE
+        if self.siae.block_job_applications and not self.siae.has_member(request.user):
+            raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
+        return HttpResponseRedirect(reverse("apply:step_sender", kwargs={"siae_pk": self.siae.pk}))
+
+
+class SenderStepView(ApplyStepBaseMixin, View):
+    def get(self, request, *args, **kwargs):
+        user_info = get_user_info(request)
+        self.set_session("sender_pk", user_info.user.pk)
+        self.set_session("sender_kind", user_info.kind)
+        if user_info.prescriber_organization:
+            self.set_session("sender_prescriber_organization_pk", user_info.prescriber_organization.pk)
+        if user_info.siae:
+            self.set_session("sender_siae_pk", user_info.siae.pk)
+        return HttpResponseRedirect(reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": self.siae.pk}))
 
 
 @login_required
@@ -151,7 +190,7 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
     """
     Ensure the job seeker has a NIR. If not and if possible, update it.
     """
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    session_data = request.session[f"job_application-{siae_pk}"]
     next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
     siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
     job_seeker = None
@@ -220,7 +259,7 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
     """
     Determine the job seeker, in the cases where the application is sent by a proxy.
     """
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    session_data = request.session[f"job_application-{siae_pk}"]
     next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
 
     # The user submit an application for himself.
@@ -300,7 +339,7 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
     """
     Ensure the job seeker has all required info.
     """
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    session_data = request.session[f"job_application-{siae_pk}"]
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
     siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
@@ -332,7 +371,7 @@ def step_create_job_seeker(
     """
     Create a job seeker if he can't be found in the DB.
     """
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    session_data = request.session[f"job_application-{siae_pk}"]
     siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
 
     email = request.GET.get("email")
@@ -371,7 +410,7 @@ def step_check_prev_applications(
     """
     Check previous job applications to avoid duplicates.
     """
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    session_data = request.session[f"job_application-{siae_pk}"]
     siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
@@ -412,7 +451,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
     """
     Check eligibility (as an authorized prescriber).
     """
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    session_data = request.session[f"job_application-{siae_pk}"]
     siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
@@ -461,7 +500,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     queryset = Siae.objects.prefetch_job_description_through()
     siae = get_object_or_404(queryset, pk=siae_pk)
 
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    session_data = request.session[f"job_application-{siae_pk}"]
     initial_data = {"selected_jobs": [session_data["job_description_id"]]}
     form = SubmitJobApplicationForm(data=request.POST or None, siae=siae, initial=initial_data)
 
@@ -505,6 +544,8 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         if job_application.is_sent_by_proxy:
             job_application.email_new_for_prescriber.send()
 
+        # TODO(vperron): Test that this cleanup is useful
+        # self.init_session({})
         return HttpResponseRedirect(next_url)
 
     s3_upload = S3Upload(kind="resume")
@@ -522,24 +563,18 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     return render(request, template_name, context)
 
 
-@login_required
-@siae_session_required
-def step_application_sent(
-    request, siae_pk, template_name="apply/submit_step_application_sent.html"
-):  # pylint: disable=unused-argument
-    if request.user.is_siae_staff:
-        dashboard_url = reverse("apply:list_for_siae")
-        messages.success(request, "Candidature bien envoyée !")
-        return HttpResponseRedirect(dashboard_url)
+class ApplicationSentStepView(ApplyStepBaseMixin, TemplateView):
+    template_name = "apply/submit_step_application_sent.html"
 
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    back_url = get_safe_url(request=request, url=session_data["back_url"])
-    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
+    def get_context_data(self, **kwargs):
+        job_seeker = get_object_or_404(User, pk=self.get_session("job_seeker_pk"))
+        return super().get_context_data(**kwargs) | {
+            "job_seeker": job_seeker,
+        }
 
-    context = {
-        "back_url": back_url,
-        "job_seeker": job_seeker,
-        "siae": siae,
-    }
-    return render(request, template_name, context)
+    def get(self, request, *args, **kwargs):
+        if request.user.is_siae_staff:
+            dashboard_url = reverse("apply:list_for_siae")
+            messages.success(self.request, "Candidature bien envoyée !")
+            return HttpResponseRedirect(dashboard_url)
+        return super().get(request, *args, **kwargs)
