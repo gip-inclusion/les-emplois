@@ -8,8 +8,8 @@ app_name = "apply"
 
 urlpatterns = [
     # Submit.
-    path("<int:siae_pk>/start", submit_views.start, name="start"),
-    path("<int:siae_pk>/step_sender", submit_views.step_sender, name="step_sender"),
+    path("<int:siae_pk>/start", submit_views.StartStepView.as_view(), name="start"),
+    path("<int:siae_pk>/step_sender", submit_views.SenderStepView.as_view(), name="step_sender"),
     path("<int:siae_pk>/step_job_seeker", submit_views.step_job_seeker, name="step_job_seeker"),
     path(
         "<int:siae_pk>/step_check_job_seeker_nir",
@@ -29,7 +29,11 @@ urlpatterns = [
     ),
     path("<int:siae_pk>/step_eligibility", submit_views.step_eligibility, name="step_eligibility"),
     path("<int:siae_pk>/step_application", submit_views.step_application, name="step_application"),
-    path("<int:siae_pk>/step_application_sent", submit_views.step_application_sent, name="step_application_sent"),
+    path(
+        "<int:siae_pk>/step_application_sent",
+        submit_views.ApplicationSentStepView.as_view(),
+        name="step_application_sent",
+    ),
     # List.
     path("job_seeker/list", list_views.list_for_job_seeker, name="list_for_job_seeker"),
     path("prescriber/list", list_views.list_for_prescriber, name="list_for_prescriber"),

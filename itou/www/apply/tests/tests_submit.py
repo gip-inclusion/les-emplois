@@ -2,7 +2,6 @@ import datetime
 from unittest import mock
 
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -53,7 +52,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
         }
@@ -69,7 +68,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -96,7 +95,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(user.nir, nir)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": user.pk,
             "siae_pk": siae.pk,
@@ -308,7 +307,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
         }
@@ -324,7 +323,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -347,7 +346,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "nir": nir,
             "siae_pk": siae.pk,
@@ -397,7 +396,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         new_job_seeker = User.objects.get(email=post_data["email"])
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
             "nir": new_job_seeker.nir,
@@ -512,7 +511,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
         }
@@ -528,7 +527,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -628,7 +627,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
         }
@@ -644,7 +643,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -666,7 +665,7 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "nir": nir,
             "siae_pk": siae.pk,
@@ -732,7 +731,7 @@ class ApplyAsPrescriberTest(TestCase):
         new_job_seeker = User.objects.get(email=post_data["email"])
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
             "nir": new_job_seeker.nir,
@@ -965,7 +964,7 @@ class ApplyAsSiaeTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
         }
@@ -981,7 +980,7 @@ class ApplyAsSiaeTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -1004,7 +1003,7 @@ class ApplyAsSiaeTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "nir": nir,
             "siae_pk": siae.pk,
@@ -1054,7 +1053,7 @@ class ApplyAsSiaeTest(TestCase):
         new_job_seeker = User.objects.get(email=post_data["email"])
 
         session = self.client.session
-        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
             "nir": new_job_seeker.nir,
