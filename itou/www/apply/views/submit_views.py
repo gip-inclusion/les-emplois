@@ -1,3 +1,4 @@
+import functools
 import logging
 
 from django.conf import settings
@@ -36,14 +37,22 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 logger = logging.getLogger(__name__)
 
 
-def valid_session_required(function=None):
-    def decorated(request, *args, **kwargs):
-        session_data = request.session.get(settings.ITOU_SESSION_JOB_APPLICATION_KEY)
-        if not session_data or (session_data["to_siae_pk"] != kwargs["siae_pk"]):
-            raise PermissionDenied
-        return function(request, *args, **kwargs)
+def valid_session_required(required_keys=None):
+    def wrapper(function):
+        @functools.wraps(function)
+        def decorated(request, *args, **kwargs):
+            session_data = request.session.get(settings.ITOU_SESSION_JOB_APPLICATION_KEY)
+            if not session_data:
+                raise PermissionDenied("no opened session")
+            if required_keys:
+                for key in required_keys:
+                    if session_data[key] != kwargs[key]:
+                        raise PermissionDenied("missing session data information", key)
+            return function(request, *args, **kwargs)
 
-    return decorated
+        return decorated
+
+    return wrapper
 
 
 def get_approvals_wrapper(request, job_seeker, siae):
@@ -99,7 +108,7 @@ def start(request, siae_pk):
         "back_url": back_url,
         "job_seeker_pk": None,
         "nir": None,
-        "to_siae_pk": siae.pk,
+        "siae_pk": siae.pk,
         "sender_pk": None,
         "sender_kind": None,
         "sender_siae_pk": None,
@@ -112,7 +121,7 @@ def start(request, siae_pk):
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_sender(request, siae_pk):
     """
     Determine info about the sender.
@@ -141,20 +150,20 @@ def step_sender(request, siae_pk):
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_pending_authorization(request, siae_pk, template_name="apply/submit_step_pending_authorization.html"):
     return render(request, template_name, {"siae_pk": siae_pk})
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step_check_job_seeker_nir.html"):
     """
     Ensure the job seeker has a NIR. If not and if possible, update it.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
     job_seeker = None
     job_seeker_name = None
 
@@ -221,7 +230,7 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeker.html"):
     """
     Determine the job seeker, in the cases where the application is sent by a proxy.
@@ -238,7 +247,7 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
     nir = session_data.get("nir")
     can_add_nir = False
     preview_mode = False
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
 
     if request.method == "POST" and form.is_valid():
         job_seeker = form.get_user()
@@ -303,14 +312,14 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_step_job_seeker_check_info.html"):
     """
     Ensure the job seeker has all required info.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
     next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk})
 
@@ -333,13 +342,13 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeker_create.html"):
     """
     Create a job seeker if he can't be found in the DB.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
 
     email = request.GET.get("email")
     nir = session_data["nir"]
@@ -370,13 +379,13 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_check_prev_applications(request, siae_pk, template_name="apply/submit_step_check_prev_applications.html"):
     """
     Check previous job applications to avoid duplicates.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
     prev_applications = job_seeker.job_applications.filter(to_siae=siae)
@@ -411,13 +420,13 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibility.html"):
     """
     Check eligibility (as an authorized prescriber).
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
     if not siae.is_subject_to_eligibility_rules:
@@ -457,7 +466,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_application(request, siae_pk, template_name="apply/submit_step_application.html"):
     """
     Create and submit the job application.
@@ -527,7 +536,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
 
 
 @login_required
-@valid_session_required
+@valid_session_required(["siae_pk"])
 def step_application_sent(request, siae_pk, template_name="apply/submit_step_application_sent.html"):
     if request.user.is_siae_staff:
         dashboard_url = reverse("apply:list_for_siae")
@@ -537,7 +546,7 @@ def step_application_sent(request, siae_pk, template_name="apply/submit_step_app
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     back_url = get_safe_url(request=request, url=session_data["back_url"])
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
 
     context = {
         "back_url": back_url,

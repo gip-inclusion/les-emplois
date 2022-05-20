@@ -30,7 +30,7 @@ class ApplyAsJobSeekerTest(TestCase):
             "back_url": None,
             "job_seeker_pk": None,
             "nir": None,
-            "to_siae_pk": None,
+            "siae_pk": None,
             "sender_pk": None,
             "sender_kind": None,
             "sender_siae_pk": None,
@@ -56,7 +56,7 @@ class ApplyAsJobSeekerTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -72,7 +72,7 @@ class ApplyAsJobSeekerTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.JOB_SEEKER,
         }
@@ -100,7 +100,7 @@ class ApplyAsJobSeekerTest(TestCase):
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": user.pk,
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.JOB_SEEKER,
         }
@@ -284,7 +284,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "back_url": None,
             "job_seeker_pk": None,
             "nir": None,
-            "to_siae_pk": None,
+            "siae_pk": None,
             "sender_pk": None,
             "sender_kind": None,
             "sender_siae_pk": None,
@@ -311,7 +311,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -327,7 +327,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -361,7 +361,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
             "nir": nir,
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -412,7 +412,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
             "nir": new_job_seeker.nir,
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -479,7 +479,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -495,7 +495,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -519,7 +519,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
             "nir": nir,
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -570,7 +570,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
             "nir": new_job_seeker.nir,
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -683,7 +683,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -699,7 +699,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -775,7 +775,7 @@ class ApplyAsPrescriberTest(TestCase):
             "back_url": None,
             "job_seeker_pk": None,
             "nir": None,
-            "to_siae_pk": None,
+            "siae_pk": None,
             "sender_pk": None,
             "sender_kind": None,
             "sender_siae_pk": None,
@@ -799,7 +799,7 @@ class ApplyAsPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -815,7 +815,7 @@ class ApplyAsPrescriberTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
         }
@@ -838,7 +838,7 @@ class ApplyAsPrescriberTest(TestCase):
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
             "nir": nir,
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
         }
@@ -905,7 +905,7 @@ class ApplyAsPrescriberTest(TestCase):
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
             "nir": new_job_seeker.nir,
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
         }
@@ -1135,7 +1135,7 @@ class ApplyAsSiaeTest(TestCase):
             "back_url": None,
             "job_seeker_pk": None,
             "nir": None,
-            "to_siae_pk": None,
+            "siae_pk": None,
             "sender_pk": None,
             "sender_kind": None,
             "sender_siae_pk": None,
@@ -1173,7 +1173,7 @@ class ApplyAsSiaeTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -1189,7 +1189,7 @@ class ApplyAsSiaeTest(TestCase):
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.SIAE_STAFF,
             "sender_siae_pk": siae.pk,
@@ -1213,7 +1213,7 @@ class ApplyAsSiaeTest(TestCase):
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
         expected_session_data = self.default_session_data | {
             "nir": nir,
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.SIAE_STAFF,
             "sender_siae_pk": siae.pk,
@@ -1264,7 +1264,7 @@ class ApplyAsSiaeTest(TestCase):
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
             "nir": new_job_seeker.nir,
-            "to_siae_pk": siae.pk,
+            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.SIAE_STAFF,
             "sender_siae_pk": siae.pk,
