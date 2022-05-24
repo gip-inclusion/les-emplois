@@ -69,7 +69,7 @@ def get_vue_af_df():
     df["kind"] = df["kind"].str.replace("_DC", "")
 
     # Filter out rows with irrelevant kind.
-    df = df[df.kind != "FDI"]
+    df = df[~df.kind.isin(["FDI", "EIPA"])]
 
     # Build complete AF number.
     df["number"] = df.number_prefix + "A" + df.renewal_number.astype(str) + "M" + df.modification_number.astype(str)
