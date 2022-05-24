@@ -45,3 +45,9 @@ class EvaluatedSiaeState(models.TextChoices):
     PENDING = "PENDING"
     SUBMITTABLE = "SUBMITTABLE"
     SUBMITTED = "SUBMITTED"
+
+
+class EvaluatedAdministrativeCriteriaState(models.TextChoices):
+    PENDING = ("PENDING", "En attente")
+    ACCEPTED = ("ACCEPTED", "Validé")
+    REFUSED = ("REFUSED", "Problème constaté")
