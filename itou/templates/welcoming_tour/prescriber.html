@@ -14,71 +14,59 @@
         </ol>
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <div class="d-block w-100">
-                    <h1 class="h1-hero-c1 text-center">Bienvenue sur les emplois de l'inclusion !</h1>
-
-                    <img src="{% static 'img/welcoming_tour/prescripteur_1.svg' %}" class="d-block mx-auto my-4 w-sm-25" alt="">
-
-                    <p class="w-sm-50 m-auto lead text-center pb-5">
+                <div class="d-block w-100 text-center">
+                    <h1 class="h1-hero-c1">Bienvenue sur les emplois de l'inclusion !</h1>
+                    <figure class="mx-auto mb-3 mb-lg-5 w-sm-50">
+                        <img src="{% static 'img/welcoming_tour/prescripteur_1.svg' %}" class="img-fitcover img-fluid" alt="">
+                    </figure>
+                    <p class="w-sm-75 m-auto lead pb-5">
                         Découvrez un outil qui accélère la mise en relation des candidats à l’insertion auprès des employeurs solidaires et simplifie la mission des acteurs de l’IAE.
                     </p>
-                    <p class="pt-3 text-center">
-                        <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="next">
-                            <span type="button" class="btn btn-primary">Suivant</span>
-                        </a>
+                    <p class="my-3">
+                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-slide="next">Suivant</a>
                     </p>
                 </div>
             </div>
             <div class="carousel-item">
-                <div class="d-block w-100">
-                    <h1 class="h1-hero-c1 text-center">Identifiez toutes les offres d’emploi de l’inclusion localement !</h1>
-
-                    <img src="{% static 'img/welcoming_tour/prescripteur_2.svg' %}" class="d-block mx-auto my-4 w-sm-25" alt="">
-
-                    <p class="w-sm-50 m-auto lead text-center pb-5">
+                <div class="d-block w-100 text-center">
+                    <h1 class="h1-hero-c1">Identifiez toutes les offres d’emploi de l’inclusion localement !</h1>
+                    <figure class="mx-auto mb-3 mb-lg-5 w-sm-50">
+                        <img src="{% static 'img/welcoming_tour/prescripteur_2.svg' %}" class="img-fitcover img-fluid" alt="">
+                    </figure>
+                    <p class="w-sm-75 m-auto lead pb-5">
                         Optimisez les chances de vos candidats et renforcez le pilotage de leur parcours en insertion.<br>
                         Profitez d’un outil mutualisé d’accompagnement de l’IAE : mise en relation simplifiée, partage entre acteurs, simplification des procédures d’agrément, réduction des délais de recrutement.
                     </p>
-                    <p class="pt-3 text-center">
-                        <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="prev">
-                            <span type="button" class="btn btn-secondary">Précédent</span>
-                        </a>
-                        <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="next">
-                            <span type="button" class="btn btn-primary">Suivant</span>
-                        </a>
+                    <p class="my-3">
+                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-slide="prev">Précédent</a>
+                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-slide="next">Suivant</a>
                     </p>
                 </div>
             </div>
             <div class="carousel-item">
-                <div class="d-block w-100">
-                    <h1 class="text-center">Suivez toutes vos candidatures en ligne</h1>
-
-                    <img src="{% static 'img/welcoming_tour/prescripteur_3.svg' %}" class="d-block mx-auto my-4 w-sm-25" alt="">
-
-                    <p class="w-sm-50 m-auto lead text-center">
+                <div class="d-block w-100 text-center">
+                    <h1 class="h1-hero-c1">Suivez toutes vos candidatures en ligne</h1>
+                    <figure class="mx-auto mb-3 mb-lg-5 w-sm-50">
+                        <img src="{% static 'img/welcoming_tour/prescripteur_3.svg' %}" class="img-fitcover img-fluid" alt="">
+                    </figure>
+                    <p class="w-sm-75 m-auto lead">
                         Prescripteur ou orienteur... affilié ou pas à une organisation... habilitée ou non, vous pouvez tous vous inscrire !<br>
                         Postulez pour un candidat à l’insertion en quelques clics, suivez l’avancement de ses candidatures en temps réel, échangez avec les collaborateurs de votre organisation ou rejoignez la communauté active.
                     </p>
-                    <p class="w-sm-50 m-auto lead text-center pt-2 pb-5">
+                    <p class="w-sm-75 m-auto lead pt-2 pb-5">
                         À vous de jouer maintenant !<br>
                         Bonne découverte et bon accompagnement.
                     </p>
-                    <p class="pt-3 text-center">
-                        <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="prev">
-                            <span type="button" class="btn btn-secondary">Précédent</span>
-                        </a>
-                        <a class="text-decoration-none" href="{% url 'dashboard:index' %}" role="button" data-slide="next">
-                            <span type="button" class="btn btn-primary">Terminer</span>
-                        </a>
+                    <p class="my-3">
+                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-slide="prev">Précédent</a>
+                        <a class="btn btn-sm btn-primary" href="{% url 'dashboard:index' %}" role="button" data-slide="next">Terminer</a>
                     </p>
                 </div>
             </div>
         </div>
     </div>
-    <p class="text-center pt-5 mb-0">
-        <a href="{% url 'dashboard:index' %}">
-            <span type="button" class="btn btn-link">Ignorer la présentation</span>
-        </a>
+    <p class="text-center my-3">
+        <a href="{% url 'dashboard:index' %}" class="btn btn-sm btn-sm btn-link">Ignorer la présentation</a>
     </p>
 
 {% endblock content %}

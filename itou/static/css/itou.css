@@ -327,7 +327,7 @@ Usage:
 /* To be discussed.
 --------------------------------------------------------------------------- */
 
-.collapse-caret, 
+.collapse-caret,
 .collapse-caret:hover {
     position: relative;
     text-decoration: none !important;
@@ -397,7 +397,7 @@ Usage:
 
     .s-section-twocolumns .w-md-auto {
         width: auto !important;
-    }    
+    }
 }
 
 .scrolldown-anchor {
@@ -406,4 +406,24 @@ Usage:
     position: relative;
     top: -130px;
     visibility: hidden;
+}
+
+
+/* Welcoming tour.
+--------------------------------------------------------------------------- */
+#welcoming_tour {
+    margin-bottom: 32px;
+}
+
+#welcoming_tour .carousel-indicators {
+    margin-bottom: 0;
+    bottom: -16px;
+}
+
+#welcoming_tour .carousel-indicators li {
+  background-color: #3F3E62;
+}
+
+#welcoming_tour .carousel-indicators li.active {
+  background-color: #000638;
 }
