@@ -32,7 +32,11 @@
                             <div class="card-body">
                                 <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}"
                                     class="btn btn-outline-primary float-right">
+                                    {%if evaluated_siae.state == "SUBMITTED"%}
+                                        Contrôler cette SIAE
+                                    {% else %}
                                         Voir
+                                    {%endif%}
                                 </a>
                             </div>
                         </div>
