@@ -21,7 +21,7 @@ from itou.job_applications.tasks import huey_notify_pole_employ
 from itou.utils.apis.esd import get_access_token
 from itou.utils.apis.pole_emploi import (
     PoleEmploiIndividu,
-    PoleEmploiMiseAJourPassIAEException,
+    PoleEmploiAPIException,
     recherche_individu_certifie_api,
 )
 from itou.utils.emails import get_email_message
@@ -1064,8 +1064,6 @@ class JobApplicationPoleEmploiNotificationLog(models.Model):
             if individual_pole_emploi_result.is_valid():
                 return individual_pole_emploi_result.id_national_demandeur
             else:
-                raise PoleEmploiMiseAJourPassIAEException(
-                    http_code=200, message=individual_pole_emploi_result.code_sortie
-                )
+                raise PoleEmploiAPIException(http_code=200, message=individual_pole_emploi_result.code_sortie)
         else:
-            raise PoleEmploiMiseAJourPassIAEException(http_code=200, message="pas d'individu")
+            raise PoleEmploiAPIException(http_code=200, message="pas d'individu")

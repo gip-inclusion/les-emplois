@@ -71,7 +71,7 @@ def notify_pole_emploi_pass(job_application, job_seeker):
         encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(individual, token)
         logger.info("> got encrypted_nir=%s", encrypted_nir)
         sleep(SLEEP_DELAY)
-    except PoleEmploiMiseAJourPassIAEException as e:
+    except PoleEmploiAPIException as e:
         logger.info("! fetching encrypted NIR raised http_code=%s message=%s", e.http_code, e.response_code)
         log = JobApplicationPoleEmploiNotificationLog(
             job_application=job_application,
@@ -90,7 +90,7 @@ def notify_pole_emploi_pass(job_application, job_seeker):
         mise_a_jour_pass_iae(job_application, encrypted_nir, token)
         logger.info("> pass nir=%s updated successfully", job_application.job_seeker.nir)
         sleep(SLEEP_DELAY)
-    except PoleEmploiMiseAJourPassIAEException as e:
+    except PoleEmploiAPIException as e:
         logger.info("! updating pass iae raised http_code=%s message=%s", e.http_code, e.response_code)
         log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
         # We log the encrypted nir in case its not empty but

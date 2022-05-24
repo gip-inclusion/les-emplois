@@ -50,7 +50,7 @@ from itou.users.models import User
 from itou.utils.apis.pole_emploi import (
     PoleEmploiIndividu,
     PoleEmploiIndividuResult,
-    PoleEmploiMiseAJourPassIAEException,
+    PoleEmploiAPIException,
 )
 from itou.utils.templatetags import format_filters
 
@@ -1512,9 +1512,9 @@ class JobApplicationPoleEmploiNotificationLogTest(TestCase):
         get_access_token_mock.assert_called_with(ANY)
         self.assertEqual(token, self.sample_token)
 
-    @patch("itou.job_applications.models.get_access_token", side_effect=PoleEmploiMiseAJourPassIAEException("", ""))
+    @patch("itou.job_applications.models.get_access_token", side_effect=PoleEmploiAPIException("", ""))
     def test_get_token_error(self, get_access_token_mock):
-        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+        with self.assertRaises(PoleEmploiAPIException):
             JobApplicationPoleEmploiNotificationLog.get_token()
             get_access_token_mock.assert_called_with(ANY)
 
@@ -1532,7 +1532,7 @@ class JobApplicationPoleEmploiNotificationLogTest(TestCase):
         "itou.job_applications.models.recherche_individu_certifie_api", return_value=sample_individual_search_failure
     )
     def test_get_individual_not_found(self, get_individual_mock):
-        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+        with self.assertRaises(PoleEmploiAPIException):
             JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
                 self.sample_pole_emploi_individual, self.sample_token
             )
@@ -1634,7 +1634,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         "itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual",
         return_value=encrypted_nir,
     )
-    @patch("itou.job_applications.models.get_access_token", side_effect=PoleEmploiMiseAJourPassIAEException("401"))
+    @patch("itou.job_applications.models.get_access_token", side_effect=PoleEmploiAPIException("401"))
     def test_notification_authentication_failure(self, access_token_mock, nir_mock, maj_mock, _sleep_mock):
         """
         Authentication failed: only the get_token call should be made, and an entry with the failure should be added
@@ -1653,7 +1653,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
     @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", return_value=True)
     @patch(
         "itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual",
-        side_effect=PoleEmploiMiseAJourPassIAEException("200", "R010"),
+        side_effect=PoleEmploiAPIException("200", "R010"),
     )
     @patch("itou.job_applications.models.get_access_token", return_value=token)
     def test_notification_recherche_individu_not_found(self, access_token_mock, nir_mock, maj_mock, _sleep_mock):
@@ -1675,7 +1675,7 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         job_application.approval.refresh_from_db()
         self.assertEqual(job_application.approval.pe_notification_status, "notification_should_retry")
 
-    @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", side_effect=PoleEmploiMiseAJourPassIAEException("500"))
+    @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", side_effect=PoleEmploiAPIException("500"))
     @patch(
         "itou.job_applications.models.JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual",
         return_value=encrypted_nir,
