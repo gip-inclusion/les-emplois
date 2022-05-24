@@ -27,6 +27,7 @@ class TestDisplayApproval(TestCase):
         self.assertEqual(response.context["job_seeker"], job_application.job_seeker)
         self.assertContains(response, settings.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
+        self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
     def test_impossible_display_when_approval_is_missing(self, *args, **kwargs):
         job_application = JobApplicationFactory()
@@ -60,6 +61,7 @@ class TestDisplayApproval(TestCase):
         self.assertEqual(response.context["job_seeker"], job_application.job_seeker)
         self.assertContains(response, settings.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
+        self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
     def test_display_approval_missing_diagnosis_ai(self, *args, **kwargs):
         # On November 30th, 2021, AI were delivered approvals without a diagnosis.
@@ -85,6 +87,7 @@ class TestDisplayApproval(TestCase):
         self.assertEqual(response.context["job_seeker"], job_application.job_seeker)
         self.assertContains(response, settings.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
+        self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
     def test_no_display_if_missing_diagnosis(self, *args, **kwargs):
         """
