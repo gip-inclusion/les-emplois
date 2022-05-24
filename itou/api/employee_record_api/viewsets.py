@@ -172,12 +172,19 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
         # There's something similar in context processors, but:
         # - ctx processors are called AFTER this
         # - and only when rendering a template
-        siaes = self.request.user.siae_set.filter(
-            siaemembership__is_active=True, siaemembership__is_admin=True
-        ).active_or_in_grace_period()
 
+        # Query optimization:
+        # if `siaes` is not wrapped into a list,
+        # the resulting queryset will be reused as a subquery in the main query (below),
+        # leading to ghastly performance issues.
+        # Using a list gives a 20-50x speed gain on the query.
+        siaes = list(
+            self.request.user.siae_set.filter(siaemembership__is_active=True, siaemembership__is_admin=True)
+            .active_or_in_grace_period()
+            .values_list("pk", flat=True)
+        )
         try:
-            return queryset.filter(job_application__to_siae__in=siaes).order_by("-created_at", "-updated_at")
+            return queryset.filter(job_application__to_siae__id__in=siaes).order_by("-created_at", "-updated_at")
         finally:
             # Tracking is currently done via user-agent header
             logger.info(
