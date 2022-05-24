@@ -79,6 +79,7 @@ select /* On selectionne les colonnes finales qui nous intéressent */
     total_diagnostics,
     total_embauches,
     type_inscription,
-    pe_inscrit 
+    pe_inscrit,
+    injection_ai
 from 
     candidats_p
