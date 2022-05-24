@@ -684,6 +684,10 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Confirmer l'annulation de l'embauche")
+        self.assertContains(
+            response, "L’annulation d’embauche ne concerne que les salariés n’ayant jamais travaillé pour vous."
+        )
 
         post_data = {
             "confirm": "true",
