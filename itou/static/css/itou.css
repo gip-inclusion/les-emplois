@@ -412,7 +412,7 @@ Usage:
 /* Welcoming tour.
 --------------------------------------------------------------------------- */
 #welcoming_tour {
-    margin-bottom: 32px;
+    margin-bottom: 16px;
 }
 
 #welcoming_tour .carousel-indicators {
