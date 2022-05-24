@@ -34,8 +34,14 @@ def notify_pole_emploi_pass(job_application, job_seeker):
     # We do not send approvals that start in the future to PE, because the information system in front
     # can’t handle them. I’ll keep my opinion about this for talks that involve an unreasonnable amount of beer.
     # Another mechanism will be in charge of sending them on their start date
-    if job_application.approval.start_at > timezone.now().date():
-        logger.info("! job_application starts after today, skipping.")
+    today = timezone.now().date()
+    if job_application.approval.start_at > today:
+        logger.info(
+            "! job_application approval=%s start_at=%s starts after today=%s, skipping.",
+            job_application.approval,
+            job_application.approval.start_at,
+            today,
+        )
         return False
     from itou.job_applications.models import JobApplicationPoleEmploiNotificationLog
 

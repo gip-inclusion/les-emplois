@@ -1674,6 +1674,21 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
             notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
         )
 
+    @patch("itou.job_applications.models.get_access_token", return_value=token)
+    def test_invalid_start_at(self, access_token_mock, _sleep_mock):
+        today = timezone.now().date()
+        job_seeker = JobSeekerFactory(nir="")
+        approval = ApprovalFactory(start_at=today + datetime.timedelta(days=1))
+        job_application = JobApplicationFactory(job_seeker=job_seeker, approval=approval)
+        with self.assertLogs("itou.job_applications.tasks") as logs:
+            notif_result = notify_pole_emploi_pass(job_application, job_application.job_seeker)
+        self.assertIn(
+            f"job_application approval={approval} start_at={approval.start_at} starts after today={today}, skipping.",
+            logs.output[0],
+        )
+        self.assertFalse(notif_result)
+        access_token_mock.assert_not_called()
+
 
 class JobApplicationAdminFormTest(TestCase):
     def test_job_application_admin_form_validation(self):
