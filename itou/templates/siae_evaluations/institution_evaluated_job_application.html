@@ -1,0 +1,37 @@
+{% extends "layout/content.html" %}
+
+{% load bootstrap4 %}
+{% load static %}
+
+{% block title%}Contrôler les pièces justificatives{{ block.super }}{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card"  >
+                        <div class="card-header">
+                            {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.state%}
+                        </div>
+                        <div class="card-body">
+                            {% for evaluated_administrative_criteria in evaluated_job_application.evaluated_administrative_criteria.all %}
+                                {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state %}
+                                {% include "siae_evaluations/includes/criterion_validation.html" with evaluated_administrative_criteria=evaluated_administrative_criteria %}
+                            {%endfor%}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if back_url %}
+                <p class="mt-4">
+                    <a href="{{ back_url }}">Retour</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+
+{% endblock %}
+

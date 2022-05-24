@@ -9,6 +9,11 @@
     </div>
     <div class="col-md-3 text-right">
         <p class="small mb-0">
+            {%if state == "SUBMITTED" %}
+                <p class="badge badge-pilotage">À traiter</p>
+            {% else %}
+                <p class="badge badge-emploi">En attente</p>
+            {%endif%}
         </p>
     </div>
 </div>

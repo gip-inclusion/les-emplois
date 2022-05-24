@@ -113,6 +113,67 @@ def institution_evaluated_siae_detail(
 
 
 @login_required
+def institution_evaluated_job_application(
+    request, evaluated_job_application_pk, template_name="siae_evaluations/institution_evaluated_job_application.html"
+):
+    institution = get_current_institution_or_404(request)
+    evaluated_job_application = get_object_or_404(
+        EvaluatedJobApplication.objects.prefetch_related(
+            "evaluated_administrative_criteria",
+            "evaluated_administrative_criteria__administrative_criteria",
+            "job_application",
+            "job_application__approval",
+            "job_application__job_seeker",
+        ),
+        pk=evaluated_job_application_pk,
+        evaluated_siae__evaluation_campaign__institution=institution,
+        evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
+    )
+    back_url = (
+        get_safe_url(
+            request,
+            "back_url",
+            fallback_url=reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae.pk},
+            ),
+        )
+        + f"#{evaluated_job_application.pk}"
+    )
+    context = {
+        "evaluated_job_application": evaluated_job_application,
+        "back_url": back_url,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def institution_evaluated_administrative_criteria(request, evaluated_administrative_criteria_pk, action):
+    institution = get_current_institution_or_404(request)
+    evaluated_administrative_criteria = get_object_or_404(
+        EvaluatedAdministrativeCriteria,
+        pk=evaluated_administrative_criteria_pk,
+        evaluated_job_application__evaluated_siae__evaluation_campaign__institution=institution,
+        evaluated_job_application__evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
+    )
+    if action == "reinit":
+        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+    elif action == "accept":
+        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+    elif action == "refuse":
+        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+
+    evaluated_administrative_criteria.save(update_fields=["review_state"])
+
+    return HttpResponseRedirect(
+        reverse(
+            "siae_evaluations_views:institution_evaluated_job_application",
+            args=[evaluated_administrative_criteria.evaluated_job_application.pk],
+        )
+    )
+
+
+@login_required
 def siae_job_applications_list(request, template_name="siae_evaluations/siae_job_applications_list.html"):
 
     siae = get_current_siae_or_404(request)

@@ -1,0 +1,31 @@
+<div class="card my-3">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-lg-8 col-md-10 col-12">
+                <a href="{{ evaluated_administrative_criteria.proof_url }}" rel="noopener" target="_blank" title="Vérifier ce justificatif (ouverture dans un nouvel onglet)">
+                    <i class="ri-file-copy-2-line ri-lg mr-1"></i>
+                    Vérifier ce justificatif
+                    <i class="ri-share-box-line"></i>
+                </a>
+            </div>
+
+            {% if evaluated_administrative_criteria.review_state == 'PENDING' %}
+                <div class="col-lg-2 col-md-2 col-4">
+                    <a href="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk "accept"%}" class="btn btn-success">Accepter</a>
+                </div>
+                <div class="col-lg-2 col-md-2 col-4">
+                    <a href="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk "refuse"%}" class="btn btn-danger">Refuser</a>
+                </div>
+            {% else %}
+                <div class="col-lg-2 col-md-2">
+                </div>
+                <div class="col-lg-2 col-md-2">
+                    <a href="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk "reinit"%}"
+                        class="btn btn-primary">
+                        Modifier
+                    </a>
+                </div>
+            {%endif%}
+        </div>
+    </div>
+</div>

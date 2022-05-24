@@ -5,6 +5,13 @@
                 {{ criteria.name }}
             </h3>
         </div>
+        <div class="col-md-3 text-right">
+            {%if review_state == "ACCEPTED" %}
+                <p class="text-success"><i class="ri-checkbox-circle-line"></i> Validé</p>
+            {% elif review_state == "REFUSED" %}
+                <p class="text-danger"><i class="ri-indeterminate-circle-line"></i> Refusé</p>
+            {% endif %}
+        </div>
     </div>
     <div class="row">
         <div class="col-md-12">
