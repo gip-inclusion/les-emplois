@@ -28,6 +28,11 @@ urlpatterns = [
         views.institution_evaluated_administrative_criteria,
         name="institution_evaluated_administrative_criteria",
     ),
+    path(
+        "institution_evaluated_siae_validation/<int:evaluated_siae_pk>/",
+        views.institution_evaluated_siae_validation,
+        name="institution_evaluated_siae_validation",
+    ),
     path("siae_job_applications_list", views.siae_job_applications_list, name="siae_job_applications_list"),
     path(
         "siae_select_criteria/<int:evaluated_job_application_pk>/",

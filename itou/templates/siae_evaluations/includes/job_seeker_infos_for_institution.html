@@ -10,9 +10,13 @@
     <div class="col-md-3 text-right">
         <p class="small mb-0">
             {%if state == "SUBMITTED" %}
-                <p class="badge badge-pilotage">À traiter</p>
+                <p class="badge badge-pilotage float-right">À traiter</p>
+            {%elif state == "REFUSED" %}
+                <p class="badge badge-danger float-right">Problème constaté</p>
+            {%elif state == "ACCEPTED" %}
+                <p class="badge badge-success float-right">Validé</p>
             {% else %}
-                <p class="badge badge-emploi">En attente</p>
+                <p class="badge badge-emploi float-right">En attente</p>
             {%endif%}
         </p>
     </div>
