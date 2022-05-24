@@ -1,25 +1,32 @@
 <div>
-    <h3>
-        {{ criteria.name }}
-    </h3>
-
-    {% if criteria.written_proof %}
-        <p class="small mb-0 form-text text-muted">
-            <strong>Pièce justificative :</strong>
-            <i>{{ criteria.written_proof }}</i>
-        </p>
-    {% endif %}
-    {% if criteria.written_proof_validity %}
-        <p class="small mb-0 form-text text-muted">
-            <strong>Durée de validité du justificatif :</strong>
-            <i>{{ criteria.written_proof_validity }}</i>
-        </p>
-    {% endif %}
-    {% if criteria.written_proof_url %}
-        <p class="small mb-0 form-text text-muted">
-            <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" title="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
-                {{ criteria.written_proof_url }}
-            </a>
-        </p>
-    {% endif %}
+    <div class="row">
+        <div class="col-md-9">
+            <h3>
+                {{ criteria.name }}
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            {% if criteria.written_proof %}
+                <p class="small mb-0 form-text text-muted">
+                    <strong>Pièce justificative :</strong>
+                    <i>{{ criteria.written_proof }}</i>
+                </p>
+            {% endif %}
+            {% if criteria.written_proof_validity %}
+                <p class="small mb-0 form-text text-muted">
+                    <strong>Durée de validité du justificatif :</strong>
+                    <i>{{ criteria.written_proof_validity }}</i>
+                </p>
+            {% endif %}
+            {% if criteria.written_proof_url %}
+                <p class="small mb-0 form-text text-muted">
+                    <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" title="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
+                        {{ criteria.written_proof_url }}
+                    </a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
 </div>

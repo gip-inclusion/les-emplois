@@ -3,10 +3,12 @@
 {% load bootstrap4 %}
 {% load static %}
 
+{%block title%}Contrôler les pièces justificatives{{ block.super }}{% endblock %}
+
 {% block content %}
 
     <div class="row justify-content-center">
-        <div class="col-8 ">
+        <div class="col-lg-8 col-md-10 col-12">
             <div class="row mt-3">
                 <div class="col-12">
 
@@ -23,13 +25,13 @@
                         </a>
                     </p>
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-8">
                             <p>Lorsque vous aurez contrôlé<strong> tous vos justificatifs</strong> pour cette SIAE,
                                 veuillez valider le contrôle effectué pour la notifier de son résultat.
                             </p>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-4">
                             <a class="btn btn-outline-primary disabled float-right" href="#">
                                 Valider
                             </a>
