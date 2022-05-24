@@ -273,7 +273,7 @@ class JobApplicationQuerySet(models.QuerySet):
 
         # Exclude existing employee records with same approval and asp_id and not disabled
         # Rule: you can only create *one* employee record for a given asp_id / approval pair
-        subquery = Subquery(
+        exclude_same_asp_and_approval = Subquery(
             self.exclude(to_siae=siae, employee_record__status=er_enums.Status.DISABLED).filter(
                 employee_record__asp_id=siae.asp_id,
                 employee_record__approval_number=OuterRef("approval__number"),
@@ -302,7 +302,7 @@ class JobApplicationQuerySet(models.QuerySet):
             # Prevent employee records creation (batch import for example).
             .filter(create_employee_record=True)
             # See `subquery` above : exclude possible ASP duplicates
-            .exclude(Exists(subquery))
+            .exclude(Exists(exclude_same_asp_and_approval))
             # Only ACCEPTED job applications can be transformed into employee records
             .accepted()
             # Accept only job applications without linked or processed employee record
