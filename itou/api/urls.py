@@ -3,6 +3,8 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView
 from rest_framework import routers
 from rest_framework.authtoken import views as auth_views
 
+from itou.api.data_inclusion_api.views import DataInclusionStructureView
+
 from .employee_record_api.viewsets import (
     DummyEmployeeRecordViewSet,
     EmployeeRecordUpdateNotificationViewSet,
@@ -48,3 +50,7 @@ urlpatterns = [
 ]
 
 urlpatterns += router.urls
+
+urlpatterns += [
+    path("structures/", DataInclusionStructureView.as_view(), name="structures-list"),
+]

@@ -6,8 +6,9 @@ from django.db import models
 from django.db.models import BooleanField, Case, Count, Exists, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import crypto, timezone
 from django.utils.encoding import force_bytes
+from django.utils.functional import cached_property
 from django.utils.http import urlencode, urlsafe_base64_encode
 
 from itou.common_apps.address.models import AddressMixin
@@ -261,6 +262,12 @@ class Siae(AddressMixin, OrganizationAbstract):
         verbose_name = "Entreprise"
         verbose_name_plural = "Entreprises"
         unique_together = ("siret", "kind")
+
+    @cached_property
+    def public_id(self):
+        """Obfuscated ID for external usage."""
+        salt = crypto.salted_hmac(key_salt="job_seeker.id", value=self.id, secret=settings.SECRET_KEY)
+        return salt.hexdigest()[:30]
 
     @property
     def accept_survey_url(self):
