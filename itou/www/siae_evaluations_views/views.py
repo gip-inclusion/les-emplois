@@ -124,11 +124,12 @@ def institution_evaluated_job_application(
             "job_application",
             "job_application__approval",
             "job_application__job_seeker",
-        ),
+        ).select_related("evaluated_siae"),
         pk=evaluated_job_application_pk,
         evaluated_siae__evaluation_campaign__institution=institution,
         evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
     )
+
     back_url = (
         get_safe_url(
             request,
@@ -142,6 +143,10 @@ def institution_evaluated_job_application(
     )
     context = {
         "evaluated_job_application": evaluated_job_application,
+        # note vincentporte: Can't find why additionnal queries are made to access `EvaluatedSiae` `state`
+        # cached_property when iterating over `EvaluatedAdministrativeCriteria` in template.
+        # Tried to push `EvaluatedSiae` instance in context without benefical results. weird.
+        "evaluated_siae": evaluated_job_application.evaluated_siae,
         "back_url": back_url,
     }
     return render(request, template_name, context)
@@ -169,6 +174,28 @@ def institution_evaluated_administrative_criteria(request, evaluated_administrat
         reverse(
             "siae_evaluations_views:institution_evaluated_job_application",
             args=[evaluated_administrative_criteria.evaluated_job_application.pk],
+        )
+    )
+
+
+@login_required
+def institution_evaluated_siae_validation(request, evaluated_siae_pk):
+    institution = get_current_institution_or_404(request)
+    evaluated_siae = get_object_or_404(
+        EvaluatedSiae.objects.select_related("evaluation_campaign").prefetch_related(
+            "evaluated_job_applications",
+            "evaluated_job_applications__evaluated_administrative_criteria",
+        ),
+        pk=evaluated_siae_pk,
+        evaluation_campaign__institution=institution,
+        evaluation_campaign__evaluations_asked_at__isnull=False,
+    )
+
+    evaluated_siae.review()
+    return HttpResponseRedirect(
+        reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign.pk},
         )
     )
 
