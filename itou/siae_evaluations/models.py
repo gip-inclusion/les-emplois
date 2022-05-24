@@ -298,15 +298,32 @@ class EvaluatedSiae(models.Model):
     @cached_property
     def state(self):
 
+        # assuming the EvaluatedSiae instance is fully hydrated with its evaluated_job_applications
+        # and evaluated_administrative_criteria before being called,
+        # to prevent tons of additionnal queries in db.
+
         if (
-            self.evaluated_job_applications.filter(evaluated_administrative_criteria__isnull=True).exists()
-            or self.evaluated_job_applications.filter(evaluated_administrative_criteria__proof_url="").exists()
+            # edge case, evaluated_siae has no evaluated_job_application
+            len(self.evaluated_job_applications.all()) == 0
+            # at least one evaluated_job_application has no evaluated_administrative_criteria
+            or any(
+                len(evaluated_job_application.evaluated_administrative_criteria.all()) == 0
+                for evaluated_job_application in self.evaluated_job_applications.all()
+            )
+            # at least one evaluated_administrative_criteria proof is not uploaded
+            or any(
+                eval_admin_crit.proof_url == ""
+                for eval_job_app in self.evaluated_job_applications.all()
+                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+            )
         ):
             return evaluation_enums.EvaluatedSiaeState.PENDING
 
-        if self.evaluated_job_applications.filter(
-            evaluated_administrative_criteria__submitted_at__isnull=True
-        ).exists():
+        if any(
+            eval_admin_crit.submitted_at is None
+            for eval_job_app in self.evaluated_job_applications.all()
+            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+        ):
             return evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
 
         return evaluation_enums.EvaluatedSiaeState.SUBMITTED
@@ -338,14 +355,23 @@ class EvaluatedJobApplication(models.Model):
 
     @cached_property
     def state(self):
-        # property in progress, new conditionnal state will be added further
-        if self.evaluated_administrative_criteria.exists():
-            if self.evaluated_administrative_criteria.filter(proof_url="").exists():
-                return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
-            if self.evaluated_administrative_criteria.filter(submitted_at__isnull=True).exists():
-                return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
-            return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
-        return evaluation_enums.EvaluatedJobApplicationsState.PENDING
+
+        # assuming the EvaluatedJobApplication instance is fully hydrated
+        # with its evaluated_administrative_criteria before being called,
+        # to prevent tons of additionnal queries in db.
+
+        if len(self.evaluated_administrative_criteria.all()) == 0:
+            return evaluation_enums.EvaluatedJobApplicationsState.PENDING
+
+        if any(eval_admin_crit.proof_url == "" for eval_admin_crit in self.evaluated_administrative_criteria.all()):
+            return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
+
+        if any(
+            eval_admin_crit.submitted_at is None for eval_admin_crit in self.evaluated_administrative_criteria.all()
+        ):
+            return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
+
+        return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
 
     @cached_property
     def should_select_criteria(self):
@@ -406,6 +432,12 @@ class EvaluatedAdministrativeCriteria(models.Model):
     proof_url = models.URLField(max_length=500, verbose_name="Lien vers le justificatif", blank=True)
     uploaded_at = models.DateTimeField(verbose_name=("Téléversé le"), blank=True, null=True)
     submitted_at = models.DateTimeField(verbose_name=("Transmis le"), blank=True, null=True)
+    review_state = models.CharField(
+        verbose_name="Vérification",
+        max_length=10,
+        choices=evaluation_enums.EvaluatedAdministrativeCriteriaState.choices,
+        default=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+    )
 
     class Meta:
         verbose_name = "Critère administratif"

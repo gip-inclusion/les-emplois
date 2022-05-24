@@ -513,11 +513,8 @@ class SiaeSubmitProofsViewTest(TestCase):
             + 1  # fetch siae membership
             + 2  # fetch siae infos
             + 2  # fetch evaluatedjobapplication and its prefetch evaluatedadministrativecriteria
-            + 2  # fetch evaluatedadministrativecriteria, because of `state` property, to be fixed later
             + 1  # update evaluatedadministrativecriteria
-            + 1  # savepoint
-            + 1  # update session
-            + 1  # release savepoint
+            + 3  # savepoint, update session, release savepoint
         ):
 
             response = self.client.get(self.url)

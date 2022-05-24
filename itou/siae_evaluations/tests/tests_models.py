@@ -465,33 +465,37 @@ class EvaluatedSiaeModelTest(TestCase):
     def test_state(self):
         fake_now = timezone.now()
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
-        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        criteria = AdministrativeCriteria.objects.all()[:3]
 
         ## unit tests
-        # no evaluated_administrative_criterion
+        # no evaluated_job_application
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
-        del evaluated_siae.__dict__["state"]
+        del evaluated_siae.state
+
+        # no evaluated_administrative_criterion
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
+        del evaluated_siae.state
 
         # one evaluated_administrative_criterion
         # empty : proof_url and submitted_at empty)
+        criteria = AdministrativeCriteria.objects.all()[:3]
         evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application, administrative_criteria=criteria[0]
         )
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
-        del evaluated_siae.__dict__["state"]
+        del evaluated_siae.state
 
         # with proof_url
         evaluated_administrative_criteria0.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria0.save(update_fields=["proof_url"])
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTABLE, evaluated_siae.state)
-        del evaluated_siae.__dict__["state"]
+        del evaluated_siae.state
 
         # with submitted_at
         evaluated_administrative_criteria0.submitted_at = fake_now
         evaluated_administrative_criteria0.save(update_fields=["submitted_at"])
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
-        del evaluated_siae.__dict__["state"]
+        del evaluated_siae.state
 
         ## integration tests
         # three evaluated_administrative_criteria
@@ -505,13 +509,13 @@ class EvaluatedSiaeModelTest(TestCase):
         )
         # one empty, one with proof_url, one with proof_url and submitted_at
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
-        del evaluated_siae.__dict__["state"]
+        del evaluated_siae.state
 
         # two with proof_url, one with proof_url and submitted_at
         evaluated_administrative_criteria2.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria2.save(update_fields=["proof_url"])
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTABLE, evaluated_siae.state)
-        del evaluated_siae.__dict__["state"]
+        del evaluated_siae.state
 
         # three with proof_url and submitted_at
         evaluated_administrative_criteria1.submitted_at = fake_now
@@ -539,19 +543,19 @@ class EvaluatedJobApplicationModelTest(TestCase):
     def test_state(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
         self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PENDING, evaluated_job_application.state)
-        del evaluated_job_application.__dict__["state"]  # clear cached_property stored value
+        del evaluated_job_application.state  # clear cached_property stored value
 
         criterion = AdministrativeCriteria.objects.first()
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
         )
         self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PROCESSING, evaluated_job_application.state)
-        del evaluated_job_application.__dict__["state"]
+        del evaluated_job_application.state
 
         evaluated_administrative_criteria.proof_url = "https://www.test.com"
         evaluated_administrative_criteria.save(update_fields=["proof_url"])
         self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.UPLOADED, evaluated_job_application.state)
-        del evaluated_job_application.__dict__["state"]
+        del evaluated_job_application.state
 
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
@@ -563,8 +567,8 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING,
             evaluated_job_application.should_select_criteria,
         )
-        del evaluated_job_application.__dict__["state"]
-        del evaluated_job_application.__dict__["should_select_criteria"]
+        del evaluated_job_application.state
+        del evaluated_job_application.should_select_criteria
 
         criterion = AdministrativeCriteria.objects.first()
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
@@ -574,8 +578,8 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
             evaluated_job_application.should_select_criteria,
         )
-        del evaluated_job_application.__dict__["state"]
-        del evaluated_job_application.__dict__["should_select_criteria"]
+        del evaluated_job_application.state
+        del evaluated_job_application.should_select_criteria
 
         evaluated_administrative_criteria.proof_url = "https://www.test.com"
         evaluated_administrative_criteria.save(update_fields=["proof_url"])
@@ -583,8 +587,8 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
             evaluated_job_application.should_select_criteria,
         )
-        del evaluated_job_application.__dict__["state"]
-        del evaluated_job_application.__dict__["should_select_criteria"]
+        del evaluated_job_application.state
+        del evaluated_job_application.should_select_criteria
 
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
