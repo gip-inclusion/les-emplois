@@ -233,6 +233,30 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             ),
         )
 
+    def test_num_queries(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution, evaluations_asked_at=timezone.now()
+        )
+        _ = create_evaluated_siae_consistent_datas(evaluation_campaign)
+        EvaluatedSiaeFactory.create_batch(10, evaluation_campaign=evaluation_campaign)
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+        )
+
+        with self.assertNumQueries(
+            1  # django session
+            + 1  # fetch user
+            + 3  # fetch institution membership & institution x 2 !should be fixed!
+            + 3  # fetch evaluated_siae and its prefetch_related eval_job_app & eval_admin_crit
+            + 1  # one again institution membership
+            + 1  # social account
+            + 3  # savepoint, update session, release savepoint
+        ):
+            response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
 
 class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
     def setUp(self):
