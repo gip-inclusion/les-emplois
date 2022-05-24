@@ -58,14 +58,22 @@ def institution_evaluated_siae_list(
 ):
     institution = get_current_institution_or_404(request)
     evaluated_siaes = get_list_or_404(
-        EvaluatedSiae,
+        EvaluatedSiae.objects.select_related(
+            "evaluation_campaign", "siae"
+        ).prefetch_related(  # select related `siae`` because of __str__() method of EvaluatedSiae
+            "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
+        ),
         evaluation_campaign__pk=evaluation_campaign_pk,
         evaluation_campaign__institution=institution,
         evaluation_campaign__ended_at=None,
         evaluation_campaign__evaluations_asked_at__isnull=False,
     )
+
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     context = {
+        "evaluations_asked_at": evaluated_siaes[0].evaluation_campaign.evaluations_asked_at
+        if evaluated_siaes
+        else None,
         "evaluated_siaes": evaluated_siaes,
         "back_url": back_url,
     }
@@ -78,7 +86,13 @@ def institution_evaluated_siae_detail(
 ):
     institution = get_current_institution_or_404(request)
     evaluated_siae = get_object_or_404(
-        EvaluatedSiae,
+        EvaluatedSiae.objects.select_related("evaluation_campaign", "siae").prefetch_related(
+            "evaluated_job_applications",
+            "evaluated_job_applications__evaluated_administrative_criteria",
+            "evaluated_job_applications__job_application",
+            "evaluated_job_applications__job_application__approval",
+            "evaluated_job_applications__job_application__job_seeker",
+        ),
         pk=evaluated_siae_pk,
         evaluation_campaign__institution=institution,
         evaluation_campaign__evaluations_asked_at__isnull=False,
