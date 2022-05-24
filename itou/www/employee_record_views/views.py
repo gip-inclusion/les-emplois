@@ -381,7 +381,7 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
 @login_required
 def disable(request, employee_record_id, template_name="employee_record/disable.html"):
     """
-    Display the form for disable a given employee record
+    Display the form to disable a given employee record
     """
     siae = get_current_siae_or_404(request)
 

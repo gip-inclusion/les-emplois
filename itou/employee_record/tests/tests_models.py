@@ -278,18 +278,18 @@ class EmployeeRecordLifeCycleTest(TestCase):
             JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
         )
 
-        # Employee record in READY state can't be disable
+        # Employee record in READY state can't be disabled
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
             self.employee_record.update_as_disabled()
         self.assertEqual(self.employee_record.status, Status.READY)
 
-        # Employee record in SENT state can't be disable
+        # Employee record in SENT state can't be disabled
         self.employee_record.update_as_sent(filename, 1)
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
             self.employee_record.update_as_disabled()
         self.assertEqual(self.employee_record.status, Status.SENT)
 
-        # Employee record in ACCEPTED state can be disable
+        # Employee record in ACCEPTED state can be disabled
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         self.employee_record.update_as_accepted(process_code, process_message, "{}")
         self.employee_record.update_as_disabled()
