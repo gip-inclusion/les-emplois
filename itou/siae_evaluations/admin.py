@@ -61,10 +61,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
 
 @admin.register(models.EvaluatedSiae)
 class EvaluatedSiae(admin.ModelAdmin):
-    list_display = (
-        "evaluation_campaign",
-        "siae",
-    )
+    list_display = ("evaluation_campaign", "siae", "reviewed_at")
     list_display_links = (
         "evaluation_campaign",
         "siae",

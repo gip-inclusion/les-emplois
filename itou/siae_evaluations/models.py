@@ -268,6 +268,7 @@ class EvaluatedSiae(models.Model):
         on_delete=models.CASCADE,
         related_name="evaluated_siaes",
     )
+    reviewed_at = models.DateTimeField(verbose_name=("Contrôlée le"), blank=True, null=True)
 
     objects = EvaluatedSiaeManager.from_queryset(EvaluatedSiaeQuerySet)()
 
@@ -278,6 +279,12 @@ class EvaluatedSiae(models.Model):
 
     def __str__(self):
         return f"{self.siae}"
+
+    def review(self):
+        if self.state in [evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluation_enums.EvaluatedSiaeState.REFUSED]:
+            with transaction.atomic():
+                self.reviewed_at = timezone.now()
+                self.save(update_fields=["reviewed_at"])
 
     def get_email_eligible_siae(self):
         to = self.siae.active_admin_members
@@ -326,7 +333,27 @@ class EvaluatedSiae(models.Model):
         ):
             return evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
 
-        return evaluation_enums.EvaluatedSiaeState.SUBMITTED
+        if any(
+            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+            for eval_job_app in self.evaluated_job_applications.all()
+            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+        ):
+            return evaluation_enums.EvaluatedSiaeState.SUBMITTED
+
+        if any(
+            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+            for eval_job_app in self.evaluated_job_applications.all()
+            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+        ):
+            if self.reviewed_at is None:
+                return evaluation_enums.EvaluatedSiaeState.REFUSED
+            else:
+                return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+
+        if self.reviewed_at is None:
+            return evaluation_enums.EvaluatedSiaeState.ACCEPTED
+        else:
+            return evaluation_enums.EvaluatedSiaeState.REVIEWED
 
 
 class EvaluatedJobApplication(models.Model):
@@ -371,7 +398,19 @@ class EvaluatedJobApplication(models.Model):
         ):
             return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
 
-        return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
+        if any(
+            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+            for eval_admin_crit in self.evaluated_administrative_criteria.all()
+        ):
+            return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
+
+        if any(
+            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+            for eval_admin_crit in self.evaluated_administrative_criteria.all()
+        ):
+            return evaluation_enums.EvaluatedJobApplicationsState.REFUSED
+
+        return evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
 
     @cached_property
     def should_select_criteria(self):

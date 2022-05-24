@@ -33,6 +33,8 @@ class EvaluatedJobApplicationsState(models.TextChoices):
     PROCESSING = "PROCESSING"
     UPLOADED = "UPLOADED"
     SUBMITTED = "SUBMITTED"
+    ACCEPTED = "ACCEPTED"
+    REFUSED = "REFUSED"
 
 
 class EvaluatedJobApplicationsSelectCriteriaState(models.TextChoices):
@@ -45,6 +47,10 @@ class EvaluatedSiaeState(models.TextChoices):
     PENDING = "PENDING"
     SUBMITTABLE = "SUBMITTABLE"
     SUBMITTED = "SUBMITTED"
+    ACCEPTED = "ACCEPTED"
+    REFUSED = "REFUSED"
+    REVIEWED = "REVIEWED"
+    ADVERSARIAL_STAGE = "ADVERSARIAL_STAGE"
 
 
 class EvaluatedAdministrativeCriteriaState(models.TextChoices):
