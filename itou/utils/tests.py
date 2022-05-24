@@ -38,8 +38,8 @@ from itou.users.models import User
 from itou.utils.apis import api_entreprise
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.pole_emploi import (
+    PoleEmploiAPIException,
     PoleEmploiIndividu,
-    PoleEmploiMiseAJourPassIAEException,
     mise_a_jour_pass_iae,
     recherche_individu_certifie_api,
 )
@@ -1019,7 +1019,7 @@ class PoleEmploiTest(TestCase):
     )
     def test_recherche_individu_certifie_invalid_token(self, mock_post):
         individual = PoleEmploiIndividu("EVARISTE", "GALOIS", datetime.date(1979, 6, 3), "152062441001270")
-        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+        with self.assertRaises(PoleEmploiAPIException):
             individu_result = recherche_individu_certifie_api(individual, "broken_token")
             self.assertIsNone(individu_result)
 
@@ -1046,7 +1046,7 @@ class PoleEmploiTest(TestCase):
         mise_a_jour_pass_iae will return false
         """
         job_application = JobApplicationWithApprovalFactory()
-        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+        with self.assertRaises(PoleEmploiAPIException):
             mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
             mock_post.assert_called()
 
@@ -1060,7 +1060,7 @@ class PoleEmploiTest(TestCase):
         mise_a_jour_pass_iae will return false
         """
         job_application = JobApplicationWithApprovalFactory()
-        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+        with self.assertRaises(PoleEmploiAPIException):
             mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
             mock_post.assert_called()
 
@@ -1071,7 +1071,7 @@ class PoleEmploiTest(TestCase):
     def test_mise_a_jour_pass_iae_invalid_token(self, mock_post):
         """If the API answers with a non-200 http code, mise_a_jour_pass_iae will return false"""
         job_application = JobApplicationWithApprovalFactory()
-        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+        with self.assertRaises(PoleEmploiAPIException):
             mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
             mock_post.assert_called()
 
