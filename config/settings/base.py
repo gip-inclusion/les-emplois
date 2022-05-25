@@ -578,6 +578,12 @@ REDIS_DB = os.environ.get("REDIS_DB", 1)
 # Complete URL (containing the instance password)
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 
+# NOTE(vperron): those parameters are defaulted to the production instance.
+# This means that we would crash if a task was sent and no Redis was present (in local dev for instance)
+# I'm leaving this as-is, since this means that in development if we sent a task to huey we have
+# to mock that call or crash. This makes sense, since either we would test a non-real async queue
+# (in memory for instance) or just send something to some state and forget about it.
+
 # Huey instance
 # If any performance issue, increasing the number of workers *can* be a good idea
 # Parameter `immediate` means `synchronous` (async here)
