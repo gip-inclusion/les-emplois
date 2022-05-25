@@ -31,7 +31,7 @@
                             </div>
                             <div class="card-body">
                                 <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}"
-                                    class="btn btn-outline-primary float-right">
+                                    class="btn btn-outline-primary btn-sm float-right">
                                     {%if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED"%}
                                         Contrôler cette SIAE
                                     {%elif evaluated_siae.state == "REVIEWED" or evaluated_siae.state == "ADVERSARIAL_STAGE"%}
