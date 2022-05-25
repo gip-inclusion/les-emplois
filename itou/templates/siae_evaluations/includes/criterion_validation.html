@@ -16,20 +16,20 @@
                 {% if evaluated_administrative_criteria.review_state == 'PENDING' %}
                     <div class="col-lg-2 col-md-2 col-9">
                         <a href="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk "accept"%}"
-                            class="btn btn-success float-right" title="Accepter ce justificatif">
+                            class="btn btn-success btn-sm float-right" title="Accepter ce justificatif">
                             Accepter
                         </a>
                     </div>
                     <div class="col-lg-2 col-md-2 col-3">
                         <a href="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk "refuse"%}"
-                            class="btn btn-danger float-right" title="Refuser ce justificatif">
+                            class="btn btn-danger btn-sm float-right" title="Refuser ce justificatif">
                             Refuser
                         </a>
                     </div>
                 {% else %}
                     <div class="col-lg-4 col-md-4 col-12">
                         <a href="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk "reinit"%}"
-                            class="btn btn-primary float-right" title="Modifier l'état de ce justificatif">
+                            class="btn btn-outline-primary btn-sm float-right" title="Modifier l'état de ce justificatif">
                             Modifier
                         </a>
                     </div>

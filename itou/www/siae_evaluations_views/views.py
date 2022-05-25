@@ -58,11 +58,11 @@ def institution_evaluated_siae_list(
 ):
     institution = get_current_institution_or_404(request)
     evaluated_siaes = get_list_or_404(
-        EvaluatedSiae.objects.select_related(
-            "evaluation_campaign", "siae"
-        ).prefetch_related(  # select related `siae`` because of __str__() method of EvaluatedSiae
+        EvaluatedSiae.objects.select_related("evaluation_campaign", "siae")
+        .prefetch_related(  # select related `siae`` because of __str__() method of EvaluatedSiae
             "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
-        ),
+        )
+        .order_by("siae__name"),
         evaluation_campaign__pk=evaluation_campaign_pk,
         evaluation_campaign__institution=institution,
         evaluation_campaign__ended_at=None,
@@ -192,10 +192,11 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
     )
 
     evaluated_siae.review()
+
     return HttpResponseRedirect(
         reverse(
-            "siae_evaluations_views:institution_evaluated_siae_list",
-            kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign.pk},
+            "siae_evaluations_views:institution_evaluated_siae_detail",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
     )
 
