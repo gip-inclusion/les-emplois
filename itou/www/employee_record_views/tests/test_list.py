@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.employee_record import factories as employee_record_factories
 from itou.employee_record.enums import Status
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
@@ -84,3 +85,54 @@ class ListEmployeeRecordsTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Fin de contrat :&nbsp;<b>Non renseigné")
+
+    def test_rejected_without_custom_message(self):
+        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+
+        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.siae)
+        record.update_as_ready()
+        record.update_as_sent("RIAE_FS_20210410130002.json", 1)
+        record.update_as_rejected("0012", "JSON Invalide")
+
+        response = self.client.get(self.url + "?status=REJECTED")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Erreur 0012")
+        self.assertContains(response, "JSON Invalide")
+
+    def test_rejected_custom_messages(self):
+        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+
+        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.siae)
+
+        tests_specs = [
+            (
+                "3308",
+                "Le champ Commune de Naissance doit être en cohérence avec le champ Département de Naissance",
+                "Il semblerait que la commune de naissance sélectionnée ne corresponde pas au département",
+            ),
+            (
+                "3417",
+                "Le code INSEE de la commune de l’adresse doit correspondre à un code INSEE de commune référencée",
+                "L’adresse renseignée n’est pas référencée.",
+            ),
+            (
+                "3435",
+                "L’annexe de la structure doit être à l’état Valide ou Provisoire",
+                "Nous n’avons pas encore reçu d’annexe financière à jour pour votre structure.",
+            ),
+            (
+                "3436",
+                "Un PASS IAE doit être unique pour un même SIRET",
+                "La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.",
+            ),
+        ]
+        for err_code, err_message, custom_err_message in tests_specs:
+            with self.subTest(err_code):
+                record.status = Status.SENT
+                record.update_as_rejected(err_code, err_message)
+
+                response = self.client.get(self.url + "?status=REJECTED")
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, f"Erreur {err_code}")
+                self.assertNotContains(response, err_message)
+                self.assertContains(response, custom_err_message)
