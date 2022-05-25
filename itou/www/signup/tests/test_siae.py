@@ -234,7 +234,9 @@ class SiaeSignupTest(TestCase):
     def test_facilitator_base_signup_process(self):
         url = reverse("signup:siae_select")
         response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
-        self.assertContains(response, "Si votre organisation est porteuse de la clause sociale")
+        self.assertContains(response, "https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support")
+        self.assertContains(response, f"{settings.TYPEFORM_URL}/to/RYfNLR79")
+        self.assertContains(response, reverse("signup:facilitator_search"))
 
     def test_siae_select_does_not_die_under_requests(self):
         SiaeWithMembershipAndJobsFactory(siret="40219166200001")
