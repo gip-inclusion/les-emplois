@@ -108,6 +108,9 @@ test:
 test-interactive:
 	docker exec -ti itou_django django-admin test --settings=config.settings.test --failfast $(TARGET)
 
+test_venv:
+	./manage.py test --settings=config.settings.test --verbosity 1 --force-color --timing $(TARGET)
+
 # Docker shell.
 # =============================================================================
 
