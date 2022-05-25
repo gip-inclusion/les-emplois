@@ -10,17 +10,17 @@ from .constants import OIDC_STATE_EXPIRATION
 
 
 class OIDConnectQuerySet(models.QuerySet):
-    def cleanup(self):
-        expired_datetime = timezone.now() - OIDC_STATE_EXPIRATION
-        return self.filter(created_at__lte=expired_datetime).delete()
+    def cleanup(self, at=None):
+        at = at if at else timezone.now() - OIDC_STATE_EXPIRATION
+        return self.filter(created_at__lte=at).delete()
 
 
 class OIDConnectState(models.Model):
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
     # Length used in call to get_random_string()
-    csrf = models.CharField(max_length=12, blank=False, null=False, unique=True)
+    csrf = models.CharField(max_length=12, unique=True)
 
-    objects = models.Manager.from_queryset(OIDConnectQuerySet)()
+    objects = OIDConnectQuerySet.as_manager()
 
     class Meta:
         abstract = True
@@ -40,30 +40,6 @@ class OIDConnectUserData:
     username: str
     identity_provider: IdentityProvider
 
-    def create_django_user(self):
-        user_data_dict = dataclasses.asdict(self)
-        # User.objects.create_user does the following:
-        # - set User.is_active to true,
-        # - call User.set_unusable_password() if no password is given.
-        # https://docs.djangoproject.com/fr/4.0/ref/contrib/auth/#django.contrib.auth.models.UserManager.create_user
-        user = User.objects.create_user(**user_data_dict)
-        for key, value in user_data_dict.items():
-            user.update_external_data_source_history_field(
-                provider_name=self.identity_provider, field=key, value=value
-            )
-        return user
-
-    def update_django_user(self, user: User):
-        user_data_dict = dataclasses.asdict(self)
-        for key, value in user_data_dict.items():
-            if value:
-                setattr(user, key, value)
-                user.update_external_data_source_history_field(
-                    provider_name=self.identity_provider, field=key, value=value
-                )
-        user.save()
-        return user
-
     def create_or_update_user(self):
         """
         Create or update a user managed by another identity provider.
@@ -71,30 +47,49 @@ class OIDConnectUserData:
          - If there is already a user with the email, we return this user.
          - otherwise, we create a new user based on the data we received.
         """
-        # We can't use a get_or_create here because we have to set the provider data for each field.
+        user_data_dict = dataclasses.asdict(self)
+        user_data_dict = {key: value for key, value in user_data_dict.items() if value}
         try:
+            # We can't use a get_or_create here because we have to set the provider data for each field.
             user = User.objects.get(username=self.username)
-            user = self.update_django_user(user=user)
+            for key, value in user_data_dict.items():
+                setattr(user, key, value)
             created = False
         except User.DoesNotExist:
             try:
+                # Don't update a user not created by this provider.
                 user = User.objects.get(email=self.email)
                 created = False
+                return user, created
             except User.DoesNotExist:
-                user = self.create_django_user()
+                # User.objects.create_user does the following:
+                # - set User.is_active to true,
+                # - call User.set_unusable_password() if no password is given.
+                # https://docs.djangoproject.com/fr/4.0/ref/contrib/auth/#django.contrib.auth.models.UserManager.create_user
+                user = User.objects.create_user(**user_data_dict)
                 created = True
 
+        for key, value in user_data_dict.items():
+            user.update_external_data_source_history_field(
+                provider_name=self.identity_provider, field=key, value=value
+            )
+        user.save()
         return user, created
 
-    @classmethod
-    def from_user_info_dict(cls, user_info_dict):
+    @staticmethod
+    def user_info_mapping_dict(user_info: dict):
         """
-        Map Django-User class attributes to the identity provider ones.
+        Map Django's User class attributes to the identity provider ones.
+        Override this method to add or change attributes.
+        See https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
         """
-        attrs = {
-            "username": user_info_dict["sub"],
-            "first_name": user_info_dict["given_name"],
-            "last_name": user_info_dict["family_name"],
-            "email": user_info_dict["email"],
+        return {
+            "username": user_info["sub"],
+            "first_name": user_info["given_name"],
+            "last_name": user_info["family_name"],
+            "email": user_info["email"],
         }
-        return cls(**attrs)
+
+    @classmethod
+    def from_user_info(cls, user_info: dict):
+        return cls(**cls.user_info_mapping_dict(user_info))

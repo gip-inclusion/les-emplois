@@ -44,7 +44,7 @@ class InclusionConnectModelTest(TestCase):
         Similar to france_connect.tests.FranceConnectTest.test_create_django_user
         but with more tests.
         """
-        ic_user_data = InclusionConnectUserData.from_user_info_dict(OIDC_USERINFO)
+        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
         self.assertFalse(User.objects.filter(username=ic_user_data.username).exists())
         self.assertFalse(User.objects.filter(email=ic_user_data.email).exists())
 
@@ -56,18 +56,19 @@ class InclusionConnectModelTest(TestCase):
         self.assertEqual(user.username, OIDC_USERINFO["sub"])
 
         for field in dataclasses.fields(ic_user_data):
-            self.assertEqual(
-                user.external_data_source_history[field.name]["source"],
-                users_enums.IdentityProvider.INCLUSION_CONNECT.value,
-            )
-            self.assertEqual(user.external_data_source_history[field.name]["value"], getattr(user, field.name))
+            with self.subTest(field):
+                self.assertEqual(
+                    user.external_data_source_history[field.name]["source"],
+                    users_enums.IdentityProvider.INCLUSION_CONNECT.value,
+                )
+                self.assertEqual(user.external_data_source_history[field.name]["value"], getattr(user, field.name))
 
     def test_create_user_from_user_info_with_already_existing_id(self):
         """
         If there already is an existing user with this FranceConnectId, we do not create it again,
         we use it and we update it.
         """
-        ic_user_data = InclusionConnectUserData.from_user_info_dict(OIDC_USERINFO)
+        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
         UserFactory(username=ic_user_data.username, last_name="will_be_forgotten")
         user, created = ic_user_data.create_or_update_user()
         self.assertFalse(created)
@@ -83,7 +84,7 @@ class InclusionConnectModelTest(TestCase):
         If there already is an existing user with email InclusionConnect sent us, we do not create it again,
         we use it but we do not update it.
         """
-        ic_user_data = InclusionConnectUserData.from_user_info_dict(OIDC_USERINFO)
+        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
         UserFactory(email=ic_user_data.email)
         user, created = ic_user_data.create_or_update_user()
         self.assertFalse(created)
@@ -93,8 +94,8 @@ class InclusionConnectModelTest(TestCase):
         self.assertFalse(user.external_data_source_history)
 
     def test_update_user_from_user_info(self):
-        user = UserFactory(**dataclasses.asdict(InclusionConnectUserData.from_user_info_dict(OIDC_USERINFO)))
-        ic_user = InclusionConnectUserData.from_user_info_dict(OIDC_USERINFO)
+        user = UserFactory(**dataclasses.asdict(InclusionConnectUserData.from_user_info(OIDC_USERINFO)))
+        ic_user = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
 
         new_ic_user = InclusionConnectUserData(
             first_name="Jean", last_name="Gabin", username=ic_user.username, email="jean@lestontons.fr"
@@ -103,8 +104,9 @@ class InclusionConnectModelTest(TestCase):
         self.assertFalse(created)
 
         for field in dataclasses.fields(new_ic_user):
-            self.assertEqual(
-                user.external_data_source_history[field.name]["source"],
-                users_enums.IdentityProvider.INCLUSION_CONNECT.value,
-            )
-            self.assertEqual(getattr(user, field.name), getattr(new_ic_user, field.name))
+            with self.subTest(field):
+                self.assertEqual(
+                    user.external_data_source_history[field.name]["source"],
+                    users_enums.IdentityProvider.INCLUSION_CONNECT.value,
+                )
+                self.assertEqual(getattr(user, field.name), getattr(new_ic_user, field.name))
