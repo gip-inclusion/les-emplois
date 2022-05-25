@@ -1,7 +1,6 @@
 /*
  
 L'objectif est définir une fiche de poste en difficulté de recrutement
-
  Une fiche de poste est considérée en difficulté de recrutement si :
 - elle est active 
     (l'employeur a déclaré sur les emplois de l'inclusion que le recrutement est ouvert sur cette fiche de poste)
@@ -13,7 +12,51 @@ L'objectif est définir une fiche de poste en difficulté de recrutement
 - l’employeur n'a pas refusé des candidatures dans les 30 derniers jours pour le motif “Pas de poste ouvert
 
 */
-with fiches_de_poste as (
+with candidatures_recues_par_fiche_de_poste as (
+    select 
+        c.date_candidature,
+        c.date_embauche,
+        c.délai_de_réponse,
+        (current_date - c.date_candidature) as anciennete_candidature,
+        (current_date - fdp.date_création) as delai_mise_en_ligne,
+        (date_embauche - date_candidature) as delai_embauche, /* nous donne un délai en jours */
+        c.délai_prise_en_compte,
+        c.département_structure,
+        c.id_anonymisé as id_candidature_anonymisé,
+        c.id_candidat_anonymisé ,
+        c.id_structure,
+        c.motif_de_refus,
+        c.nom_département_structure,
+        c.nom_org_prescripteur,
+        c.nom_structure,
+        c.origine as origine_candidature,
+        c.origine_détaillée as origine_détaillée_candidature,
+        c.région_structure,
+        c.safir_org_prescripteur,
+        c.type_structure,
+        c.état as état_candidature,
+        fdp.recrutement_ouvert as recrutement_ouvert_fdp,
+        crdp.grand_domaine,
+        crdp.domaine_professionnel,
+        fdp.code_rome as code_rome_fpd,
+        fdp.date_création as date_création_fdp,
+        fdp.date_mise_à_jour_metabase,
+        fdp.id as id_fdp,
+        fdp.nom_rome as nom_rome_fdp,
+        fdp.siret_employeur
+    from 
+        fiches_de_poste fdp 
+    left join 
+        fiches_de_poste_par_candidature fdppc 
+        on fdp.id = fdppc.id_fiche_de_poste
+    left join 
+        candidatures c
+        on c.id_anonymisé = fdppc.id_anonymisé_candidature 
+    left join 
+        code_rome_domaine_professionnel as crdp 
+        on fdp.code_rome = crdp.code_rome 
+),
+fiches_de_poste as (
     select 
         recrutement_ouvert_fdp,
         id_fdp,
@@ -36,7 +79,7 @@ with fiches_de_poste as (
         concat(code_rome_fpd, '-', nom_rome_fdp) as rome,
         s.ville
     from 
-        candidatures_recues_par_fiche_de_poste fdp
+        candidatures_recues_par_fiche_de_poste fdp    
     left join 
         code_rome_domaine_professionnel crdp
         on fdp.code_rome_fpd = crdp.code_rome
@@ -89,7 +132,13 @@ fiches_de_poste_avec_candidature as (
                 >= date_trunc('month',  current_date) - interval '1 month' 
             then 1
             else 0 
-        end recu_candidatures_dernieres_30_jours , 
+        end recu_candidatures_dernieres_30_jours, 
+        case 
+            when date_derniere_candidature_recue 
+                is null 
+            then 1
+            else 0
+        end jamais_candidatures_recues, 
         case 
             when date_derniere_embauche 
                 >= date_trunc('month',  current_date) - interval '1 month' 
@@ -161,7 +210,22 @@ etapes_entonnoir as (
                         and embauche_30_derniers_jours = 0 
                         and delai_mise_en_ligne >= delai_moyen_crea_1ere_candidature
                         and structure_pas_poste_ouvert = 0 ) )
-               ) as "nb fiches de poste en difficulté de recrutement"
+               ) as "nb fiches de poste en difficulté de recrutement",
+        count(distinct(id_fdp)) 
+            filter 
+                (where (
+                    ( recrutement_ouvert_fdp = 1 
+                        and recu_candidatures_dernieres_30_jours = 0 
+                        and delai_mise_en_ligne >= delai_moyen_crea_1ere_candidature 
+                        and structure_pas_poste_ouvert = 0
+                        and jamais_candidatures_recues = 1
+                    ) or 
+                    ( recrutement_ouvert_fdp = 1 
+                        and embauche_30_derniers_jours = 0 
+                        and delai_mise_en_ligne >= delai_moyen_crea_1ere_candidature
+                        and structure_pas_poste_ouvert = 0
+                        and jamais_candidatures_recues = 1) )
+               ) as "nb fiches de poste en difficulté de recrutement n'ayant jamais reçu de candidatures"        
     from 
         fiches_de_poste_avec_candidature
     group by
@@ -248,5 +312,20 @@ union all
         ville,
         '5- Fiches de poste en difficulté de recrutement' as  etape,
         "nb fiches de poste en difficulté de recrutement"    as  valeur
+    from    
+        etapes_entonnoir                          
+union all
+    select
+        domaine_professionnel,
+        grand_domaine,
+        rome,
+        nom_département_structure,
+        département_structure,
+        type_structure,
+        id_structure,
+        nom_structure,
+        ville,
+        '6- Fiches de poste en difficulté de recrutement n ayant jamais reçu de candidatures' as  etape,
+        "nb fiches de poste en difficulté de recrutement n'ayant jamais reçu de candidatures"   as  valeur
     from    
         etapes_entonnoir
