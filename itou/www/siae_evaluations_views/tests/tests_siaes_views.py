@@ -440,8 +440,14 @@ class SiaeUploadDocsViewTest(TestCase):
             response.context["back_url"],
         )
         self.assertEqual(evaluated_administrative_criteria, response.context["evaluated_administrative_criteria"])
-        self.assertEqual(s3_form_values, response.context["s3_form_values"])
-        self.assertEqual(s3_upload_config, response.context["s3_upload_config"])
+
+        for k, v in s3_form_values.items():
+            with self.subTest(k=k, v=v):
+                self.assertEqual(v, response.context["s3_form_values"][k])
+
+        for k, v in s3_upload_config.items():
+            with self.subTest(k=k, v=v):
+                self.assertEqual(v, response.context["s3_upload_config"][k])
 
     def test_post(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
