@@ -411,7 +411,8 @@ class User(AbstractUser, AddressMixin):
         It should be displayed if one or more stats sections are available for the user.
         """
         return (
-            self.can_view_stats_siae(current_org=current_org)
+            self.can_view_stats_siae_etp(current_org=current_org)
+            or self.can_view_stats_siae_hiring(current_org=current_org)
             or self.can_view_stats_cd(current_org=current_org)
             or self.can_view_stats_pe(current_org=current_org)
             or self.can_view_stats_ddets(current_org=current_org)
@@ -419,9 +420,11 @@ class User(AbstractUser, AddressMixin):
             or self.can_view_stats_dgefp(current_org=current_org)
         )
 
-    def can_view_stats_siae(self, current_org):
+    def _can_view_stats_siae(self, current_org):
         """
         Users of a SIAE can view their SIAE data and only theirs.
+        This internal method is not supposed to be called directly and is only used to share code between
+        actual callable methods `can_view_stats_siae_*`.
         """
         return (
             self.is_siae_staff
@@ -431,11 +434,15 @@ class User(AbstractUser, AddressMixin):
             # we require a convention object to exist here.
             # Some SIAE don't have a convention (SIAE created by support, GEIQ, EA...).
             and current_org.convention is not None
-            # Temporary whitelist system until the feature is released.
-            and (
-                current_org.department in settings.STATS_SIAE_DEPARTMENT_WHITELIST
-                or self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
-            )
+        )
+
+    def can_view_stats_siae_etp(self, current_org):
+        return self._can_view_stats_siae(current_org) and self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
+
+    def can_view_stats_siae_hiring(self, current_org):
+        return self._can_view_stats_siae(current_org) and (
+            current_org.department in settings.STATS_SIAE_DEPARTMENT_WHITELIST
+            or self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
         )
 
     def can_view_stats_cd(self, current_org):

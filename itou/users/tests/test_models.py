@@ -377,29 +377,29 @@ class ModelTest(TestCase):
         user = siae.members.get()
         self.assertTrue(user.can_create_siae_antenna(siae))
 
-    def test_can_view_stats_siae(self):
-        # An employer can only view stats of their own SIAE.
+    def test_can_view_stats_siae_hiring(self):
+        # An employer can only view hiring stats of their own SIAE.
         deployed_department = settings.STATS_SIAE_DEPARTMENT_WHITELIST[0]
         siae1 = SiaeWithMembershipFactory(department=deployed_department)
         user1 = siae1.members.get()
         siae2 = SiaeFactory(department=deployed_department)
 
         self.assertTrue(siae1.has_member(user1))
-        self.assertTrue(user1.can_view_stats_siae(current_org=siae1))
+        self.assertTrue(user1.can_view_stats_siae_hiring(current_org=siae1))
         self.assertFalse(siae2.has_member(user1))
-        self.assertFalse(user1.can_view_stats_siae(current_org=siae2))
+        self.assertFalse(user1.can_view_stats_siae_hiring(current_org=siae2))
 
         # Even non admin members can view their SIAE stats.
         siae3 = SiaeWithMembershipFactory(department=deployed_department, membership__is_admin=False)
         user3 = siae3.members.get()
-        self.assertTrue(user3.can_view_stats_siae(current_org=siae3))
+        self.assertTrue(user3.can_view_stats_siae_hiring(current_org=siae3))
 
         # Non deployed department cannot be accessed.
         non_deployed_departments = [dpt for dpt in DEPARTMENTS if dpt not in settings.STATS_SIAE_DEPARTMENT_WHITELIST]
         non_deployed_department = non_deployed_departments[0]
         siae4 = SiaeWithMembershipFactory(department=non_deployed_department)
         user4 = siae4.members.get()
-        self.assertFalse(user4.can_view_stats_siae(current_org=siae4))
+        self.assertFalse(user4.can_view_stats_siae_hiring(current_org=siae4))
 
     def test_can_view_stats_cd(self):
         """

@@ -39,9 +39,16 @@ from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 
 
-def get_stats_siae_current_org(request):
+def get_stats_siae_etp_current_org(request):
     current_org = get_current_siae_or_404(request)
-    if not request.user.can_view_stats_siae(current_org=current_org):
+    if not request.user.can_view_stats_siae_etp(current_org=current_org):
+        raise PermissionDenied
+    return current_org
+
+
+def get_stats_siae_hiring_current_org(request):
+    current_org = get_current_siae_or_404(request)
+    if not request.user.can_view_stats_siae_hiring(current_org=current_org):
         raise PermissionDenied
     return current_org
 
@@ -135,7 +142,7 @@ def stats_siae_etp(request):
     They can only view data for their own SIAE.
     These stats are about ETP data from the ASP.
     """
-    current_org = get_stats_siae_current_org(request)
+    current_org = get_stats_siae_etp_current_org(request)
     context = {
         "page_title": "Données de ma structure (extranet ASP)",
         "matomo_custom_url": f"/stats/siae/etp/{format_region_and_department_for_matomo(current_org.department)}",
@@ -154,7 +161,7 @@ def stats_siae_hiring(request):
     They can only view data for their own SIAE.
     These stats are about hiring and are built directly from C1 data.
     """
-    current_org = get_stats_siae_current_org(request)
+    current_org = get_stats_siae_hiring_current_org(request)
     context = {
         "page_title": "Données de recrutement de ma structure (Plateforme de l'inclusion)",
         "matomo_custom_url": f"/stats/siae/hiring/{format_region_and_department_for_matomo(current_org.department)}",

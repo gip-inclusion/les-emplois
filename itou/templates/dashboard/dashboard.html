@@ -456,11 +456,13 @@
                 <p class="h4 card-header">Statistiques et pilotage</p>
                 <div class="card-body">
                     <ul class="list-unstyled">
-                        {% if can_view_stats_siae %}
+                        {% if can_view_stats_siae_etp %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_siae_etp' %}">Voir les données de ma structure (extranet ASP)</a>
                             </li>
+                        {% endif %}
+                        {% if can_view_stats_siae_hiring %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_siae_hiring' %}">Voir les données de recrutement de ma structure (Plateforme de l'inclusion)</a>
