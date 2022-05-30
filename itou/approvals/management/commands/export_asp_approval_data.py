@@ -23,7 +23,7 @@ class Command(BaseCommand):
             dest="file_path",
             required=True,
             action="store",
-            help="Path of the ASP CSV file to import",
+            help="Path of the ASP CSV file to augment",
         )
         parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
@@ -34,7 +34,7 @@ class Command(BaseCommand):
         nb_ok_records = 0
         end_dates = []
 
-        self.stdout.write("Update and export ASP data for approvals")
+        self.stdout.write("Augment ASP data file with the end date of approval if it has changed")
         self.stdout.write(f"params: {file_path=}, {wet_run=}")
 
         def check_id_itou(approval: Approval, id_itou: str):
@@ -43,7 +43,8 @@ class Command(BaseCommand):
                 raise ItouHashError(f"User hash ids don't match {id_itou=} {actual_hash_id=}")
 
         def get_end_date_column_value(approval, end_date):
-            return None if approval.end_at == end_date else f"{approval.end_at:%Y-%m-%d}"
+            approval_date_as_str = f"{approval.end_at:%Y-%m-%d}"
+            return None if approval_date_as_str == end_date else approval_date_as_str
 
         def append_new_dates_to_file(file_path, end_dates):
             filename, ext = splitext(file_path)
