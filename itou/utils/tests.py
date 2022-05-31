@@ -919,6 +919,40 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertTrue(cm.records[0].message.startswith("Invalid format of response from API Entreprise"))
         self.assertIs(cm.records[0].exc_info[0], IndexError)
 
+    @respx.mock
+    def test_etablissement_get_or_error_with_missing_address_number(self):
+        data = copy.deepcopy(ETABLISSEMENT_API_RESULT_MOCK)
+        data["etablissement"]["adresseEtablissement"]["numeroVoieEtablissement"] = None
+        self.siret_endpoint.respond(200, json=data)
+
+        etablissement, error = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertIsNone(error)
+        self.assertEqual(etablissement.address_line_1, "RUE DU WAD BILLY")
+
+    @respx.mock
+    def test_etablissement_get_or_error_with_empty_address(self):
+        data = copy.deepcopy(ETABLISSEMENT_API_RESULT_MOCK)
+        data["etablissement"]["adresseEtablissement"] = {
+            "complementAdresseEtablissement": None,
+            "numeroVoieEtablissement": None,
+            "typeVoieEtablissement": None,
+            "libelleVoieEtablissement": None,
+            "codePostalEtablissement": None,
+            "libelleCommuneEtablissement": None,
+            "codeCommuneEtablissement": None,
+        }
+        self.siret_endpoint.respond(200, json=data)
+
+        etablissement, error = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertIsNone(error)
+        self.assertEqual(etablissement.address_line_1, None)
+        self.assertEqual(etablissement.address_line_2, None)
+        self.assertEqual(etablissement.post_code, None)
+        self.assertEqual(etablissement.city, None)
+        self.assertEqual(etablissement.department, None)
+
 
 class PoleEmploiIndividuTest(TestCase):
     def test_name_conversion_for_special_characters(self):

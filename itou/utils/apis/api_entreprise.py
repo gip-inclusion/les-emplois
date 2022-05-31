@@ -87,11 +87,11 @@ def etablissement_get_or_error(siret):
 
     etablissement = Etablissement(
         name=name,
-        address_line_1=" ".join(address_parts),
+        address_line_1=" ".join(filter(None, address_parts)) or None,
         address_line_2=address.get("complementAdresseEtablissement"),
         post_code=post_code,
         city=city,
-        department=department_from_postcode(post_code),
+        department=department_from_postcode(post_code) or None,
         is_closed=(establishments_status == "F"),
         is_head_office=is_head_office,
     )
