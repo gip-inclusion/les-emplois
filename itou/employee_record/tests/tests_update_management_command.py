@@ -28,7 +28,7 @@ class EmployeeRecordUpdatesManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_dry_run_upload(self):
-        out, _ = self.call_command(upload=True, download=False, dry_run=True)
+        out, _ = self.call_command(upload=True, download=False)
 
         self.assertIn("DRY-RUN mode", out)
         self.assertIn("Connected to:", out)
@@ -42,7 +42,7 @@ class EmployeeRecordUpdatesManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_upload(self):
-        out, _ = self.call_command(upload=True, download=False)
+        out, _ = self.call_command(upload=True, download=False, wet_run=True)
 
         self.assertNotIn("DRY-RUN mode", out)
         self.assertIn("Connected to:", out)
@@ -57,7 +57,7 @@ class EmployeeRecordUpdatesManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_dry_run_empty_download(self):
-        out, _ = self.call_command(upload=False, download=True, dry_run=True)
+        out, _ = self.call_command(upload=False, download=True)
 
         self.assertIn("DRY-RUN mode", out)
         self.assertIn("Connected to:", out)
@@ -70,7 +70,7 @@ class EmployeeRecordUpdatesManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_download(self):
-        out, _ = self.call_command(upload=False, download=True)
+        out, _ = self.call_command(upload=False, download=True, wet_run=True)
 
         self.assertNotIn("DRY-RUN mode", out)
         self.assertIn("Connected to:", out)
@@ -82,12 +82,12 @@ class EmployeeRecordUpdatesManagementCommandTest(TestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_asp_test(self):
-        out, _ = self.call_command(upload=False, download=False, test=True)
+        out, _ = self.call_command(upload=False, download=False, test=True, wet_run=True)
 
         self.assertIn("Using *TEST* JSON serializers", out)
 
     @override_settings(EMPLOYEE_RECORD_TRANSFER_ENABLED=False)
     def test_wrong_environment(self):
-        out, _ = self.call_command(upload=False, download=False)
+        out, _ = self.call_command(upload=False, download=False, wet_run=True)
 
         self.assertIn("Update Django settings if needed.", out)
