@@ -22,7 +22,7 @@ class Command(EmployeeRecordTransferCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--dry-run", dest="dry_run", action="store_true", help="Do not perform real SFTP transfer operations"
+            "--wet-run", dest="wet_run", action="store_true", help="Perform *real* SFTP transfer operations"
         )
         parser.add_argument(
             "--download", dest="download", action="store_true", help="Download employee record processing feedback"
@@ -34,7 +34,7 @@ class Command(EmployeeRecordTransferCommand):
             "--test",
             dest="asp_test",
             action="store_true",
-            help="Update employee records with test SIRET and financial annex number",
+            help="Update employee records with *test* SIRET and financial annex number provided by ASP",
         )
 
     def _upload_batch_file(
@@ -198,13 +198,15 @@ class Command(EmployeeRecordTransferCommand):
         for batch in chunks(new_notifications, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(conn, batch, dry_run)
 
-    def handle(self, upload=True, download=True, dry_run=False, asp_test=False, **options):
+    def handle(self, upload=True, download=True, wet_run=False, asp_test=False, **options):
         if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
             self.stdout.write(
                 "This management command can't be used in this environment. Update Django settings if needed."
             )
             # Goodbye Marylou
             return
+
+        dry_run = not wet_run
 
         self.asp_test = asp_test
         if self.asp_test:
