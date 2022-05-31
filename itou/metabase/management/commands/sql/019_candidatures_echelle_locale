@@ -9,7 +9,7 @@ with candidatures_p as (
     select  
         *
     from
-    public.candidatures as cddr 
+        candidatures 
 ),
 bassin_emploi as ( /* On récupère les infos locales à partir des données infra départementales */
     select 
@@ -20,10 +20,10 @@ bassin_emploi as ( /* On récupère les infos locales à partir des données inf
         be.nom_epci,
         be.code_commune,
         be.nom_arrondissement,
-        be.nom_zone_emploi_2020 as bassin_d_emploi, /* zone d'emploi= bassin d'emploi */
+        be.nom_zone_emploi_2020 as bassin_d_emploi, /* zone d'emploi = bassin d'emploi */
         s.id as id_structure /* on récupère que l'id des structures de la table structure */
     from sa_zones_infradepartementales be
-        left join public.structures s 
+        left join structures s 
             on s.ville = be.libelle_commune and s.nom_département = be.nom_departement /* il faut rajouter le département car la France n'est pas originale en terme de noms de ville */
 ) 
 select 
