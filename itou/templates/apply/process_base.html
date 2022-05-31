@@ -51,14 +51,15 @@
                                 Prolonger
                             </a>
                         {% endif %}
-                        {% if job_application.can_download_approval_as_pdf %}
+                        {% if job_application.can_display_approval %}
                             <a
-                                href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}"
-                                class="btn btn-outline-primary float-right disable-on-click matomo-event"
-                                data-matomo-category="agrement"
+                                class="btn btn-outline-primary float-right matomo-event"
                                 data-matomo-action="telechargement-pdf"
-                                data-matomo-option="details-candidature">
-                                Télécharger le PASS IAE
+                                data-matomo-category="agrement"
+                                data-matomo-option="details-candidature"
+                                href="{% url 'approvals:display_printable_approval' job_application_id=job_application.id %}"
+                                target="_blank">
+                                Afficher le PASS IAE
                             </a>
                         {% endif %}
                     {% endif %}

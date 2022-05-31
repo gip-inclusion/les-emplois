@@ -21,7 +21,7 @@ from itou.prescribers.factories import (
 from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import DEFAULT_PASSWORD, UserFactory
-from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
+from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 
 
 class PrescriberOrganizationManagerTest(TestCase):
@@ -158,10 +158,14 @@ class PrescriberOrganizationModelTest(TestCase):
 
     @respx.mock
     def test_update_prescriber_with_api_entreprise(self):
+        respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
+            return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
+        )
+
         siret = ETABLISSEMENT_API_RESULT_MOCK["etablissement"]["siret"]
         organization = PrescriberOrganizationFactory(siret=siret, is_head_office=False)
 
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}").mock(
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
 

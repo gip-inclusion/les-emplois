@@ -62,7 +62,7 @@
     {% if current_siae and not current_siae.is_active %}
         <div class="alert alert-warning mb-0" role="status">
             <p class="mb-0">
-                La DGEFP nous indique que votre structure {% if current_siae.siret %}(inscrite avec le numéro SIRET : {{ current_siae.siret }}) {% endif %}n'est plus conventionnée.<br>
+                Votre structure {% if current_siae.siret %}(inscrite avec le numéro SIRET : {{ current_siae.siret }}) {% endif %}n'est plus conventionnée.<br>
                 Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.<br>
                 À compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.<br>
 
@@ -101,11 +101,11 @@
         {% include "welcoming_tour/includes/message.html" %}
     {% endif %}
 
-    {# Message d'information temporaire pour les fiches salarié / annexes financières #}
+    {# Message d'information temporaire pour les fiches salarié #}
     {% if can_show_employee_records %}
         <div class="alert alert-info">
-            <p>La fin de validité des annexes financières de 2021 n'a pas d'incidence sur l'envoi de vos fiches salarié vers l'ASP.</p>
-            <p class="mb-0">Vous pouvez donc continuer à recruter et générer vos fiches, il n'y a pas de blocage.</p>
+            <p>Pour des raisons de maintenance, le traitement des fiches salarié est temporairement suspendu <b>jusqu’au 31 mai 2022 inclus</b>.</p>
+            <p class="mb-0">Vous pouvez continuer à recruter et générer vos fiches, il n'y a pas de blocage, mais l'envoi et le traitement reprendront dés <b>le 1er juin</b> au matin.</p>
         </div>
     {% endif %}
 
@@ -113,19 +113,14 @@
 
 {% block content %}
 
-    {# Mise en avant temporaire du forum pour les prescripteurs. #}
-    {% if user.is_prescriber %}
+    {# Mise en avant temporaire de l’assistance tehnique par téléphone. #}
+    {% if user.is_prescriber or user.is_job_seeker %}
         <div class="card mb-5 bg-gray-400 text-center">
+            <p class="h4 card-header"><span class="badge badge-warning">Nouveau</span> pour les prescripteurs et les candidats</p>
             <div class="card-body">
-                <p class="h4 mb-3">
-                    <span class="badge badge-warning">Nouveau</span>
-                    Bénéficiez des bonnes pratiques et actualités de la 1ère communauté des professionnels de l'inclusion !
-                </p>
-                <p class="mb-0">
-                    <a href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" class="btn btn-primary" title="Partagez et découvrez les outils qui facilitent votre quotidien (ouverture dans un nouvel onglet)">
-                        Partagez et découvrez les outils qui facilitent votre quotidien
-                        <i class="ri-external-link-line ri-lg"></i>
-                    </a>
+                <p>
+                    Mise en place d’une assistance technique par téléphone au <strong>09 70 75 19 70</strong><br>
+                    Ouverte du Lundi au Vendredi , de 09h00 à 17h00 (hors jours fériés)
                 </p>
             </div>
         </div>
@@ -331,7 +326,7 @@
                             </li>
                         {% endif %}
                         <li class="card-text mb-3">
-                            {% include "includes/icon.html" with icon="briefcase" %}
+                            <i class="ri-briefcase-3-line ri-lg mr-1"></i>
                             <a class="title-with-badge" href="{% url 'siaes_views:job_description_list' %}" title="Gérer les métiers et recrutements">Gérer les métiers et recrutements </a>
                         </li>
                         {% if can_show_financial_annexes %}
@@ -420,6 +415,22 @@
                 </div>
             </div>
 
+            {% if active_campaigns %}
+                <div class="card">
+                    <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info">Nouveau</span></p>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="card-text mb-3">
+                                <i class="ri-file-copy-2-line ri-lg mr-1"></i>
+                                <a href="{% url 'siae_evaluations_views:siae_job_applications_list' %}">Justifier mes auto-prescriptions</a>
+                                {# note vincentporte: static icon, will be displayed dynamically later.#}
+                                <i class="ri-error-warning-fill ri-lg mr-1 text-danger"></i>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+
         {% endif %}{# end of if user.is_siae_staff #}
 
         {% if user.is_labor_inspector %}
@@ -445,11 +456,13 @@
                 <p class="h4 card-header">Statistiques et pilotage</p>
                 <div class="card-body">
                     <ul class="list-unstyled">
-                        {% if can_view_stats_siae %}
+                        {% if can_view_stats_siae_etp %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_siae_etp' %}">Voir les données de ma structure (extranet ASP)</a>
                             </li>
+                        {% endif %}
+                        {% if can_view_stats_siae_hiring %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_siae_hiring' %}">Voir les données de recrutement de ma structure (Plateforme de l'inclusion)</a>
@@ -460,6 +473,13 @@
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_cd' %}">Voir les données IAE de mon département</a>
+                            </li>
+                        {% endif %}
+                        {% if can_view_stats_pe %}
+                            <li class="card-text mb-3">
+                                <i class="ri-pulse-line ri-lg mr-1"></i>
+                                <a href="{% url 'stats:stats_pe' %}">Voir les fiches de poste en tension de mon département</a>
+                                <span class="badge badge-info">Nouveau</span>
                             </li>
                         {% endif %}
                         {% if can_view_stats_ddets %}
@@ -477,6 +497,11 @@
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_dreets_iae' %}">Voir les données IAE de ma région</a>
+                            </li>
+                            <li class="card-text mb-3">
+                                <i class="ri-pulse-line ri-lg mr-1"></i>
+                                <a href="{% url 'stats:stats_dreets_hiring' %}">Voir les données facilitation de l'embauche</a>
+                                <span class="badge badge-info">Nouveau</span>
                             </li>
                         {% endif %}
                         {% if can_view_stats_dgefp %}
@@ -497,8 +522,8 @@
                         {% endif %}
                         <li class="card-text mb-3">
                             <i class="ri-pulse-line ri-lg mr-1"></i>
-                            <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" title="Accéder au Pilotage de l'inclusion (ouverture dans un nouvel onglet)">
-                                Accéder au Pilotage de l'inclusion
+                            <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" title="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)">
+                                Accéder aux tableaux de bord publics
                             </a>
                         </li>
                     </ul>
@@ -507,15 +532,25 @@
 
         {% endif %}
 
-        {% if can_view_stats_ddets and has_active_campaign %}
+        {% if can_view_stats_ddets and active_campaigns %}
             <div class="card">
                 <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info">Nouveau</span></p>
                 <div class="card-body">
                     <ul class="list-unstyled">
-                        <li class="card-text mb-3">
-                            <i class="ri-pulse-line ri-lg mr-1"></i>
-                            <a href="{% url 'siae_evaluations_views:samples_selection' %}">Sélectionner l'échantillon</a>
-                        </li>
+                        {% for active_campaign in active_campaigns %}
+                            {% if active_campaign.evaluations_asked_at %}
+                                <li class="card-text mb-3">
+                                    <i class="ri-file-copy-2-line ri-lg mr-1"></i>
+                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' active_campaign.pk %}">Contrôler les pièces justificatives</a>
+                                </li>
+                            {% else %}
+                                <li class="card-text mb-3">
+                                    <i class="ri-pulse-line ri-lg mr-1"></i>
+                                    <a href="{% url 'siae_evaluations_views:samples_selection' %}">Sélectionner l'échantillon</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
                     </ul>
                 </div>
             </div>

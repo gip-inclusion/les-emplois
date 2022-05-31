@@ -30,12 +30,12 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": city_slug})
 
         self.assertContains(response, "Employeurs solidaires à 25 km du centre de Paris (75)")
-        self.assertContains(response, "<b>2</b> résultats")
+        self.assertContains(response, "2 résultats sur 2")
         self.assertContains(response, "Arrondissements de Paris")
 
         # Filter on district
         response = self.client.get(self.url, {"city": city_slug, "districts_75": ["75001"]})
-        self.assertContains(response, "<b>1</b> résultat")
+        self.assertContains(response, "1 résultat sur 1")
         self.assertContains(response, siae_1.display_name)
 
     def test_kind(self):
@@ -43,7 +43,7 @@ class SearchSiaeTest(TestCase):
         SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=Siae.KIND_AI)
 
         response = self.client.get(self.url, {"city": city.slug, "kinds": [Siae.KIND_AI]})
-        self.assertContains(response, "<b>1</b> résultat")
+        self.assertContains(response, "1 résultat sur 1")
 
         response = self.client.get(self.url, {"city": city.slug, "kinds": [Siae.KIND_EI]})
         self.assertContains(response, "Aucun résultat")
@@ -65,26 +65,26 @@ class SearchSiaeTest(TestCase):
 
         # 100 km
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100})
-        self.assertContains(response, "<b>3</b> résultats")
+        self.assertContains(response, "3 résultats sur 3")
         self.assertContains(response, SIAE_VANNES.capitalize())
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
 
         # 15 km
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 15})
-        self.assertContains(response, "<b>2</b> résultats")
+        self.assertContains(response, "2 résultats sur 2")
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
 
         # 100 km and 44
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
-        self.assertContains(response, "<b>2</b> résultats")
+        self.assertContains(response, "2 résultats sur 2")
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
 
         # 100 km and 56
         response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
-        self.assertContains(response, "<b>1</b> résultat")
+        self.assertContains(response, "1 résultat sur 1")
         self.assertContains(response, SIAE_VANNES.capitalize())
 
     def test_order_by(self):
@@ -134,7 +134,7 @@ class SearchSiaeTest(TestCase):
         SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=Siae.KIND_OPCS)
 
         response = self.client.get(self.url, {"city": city.slug})
-        self.assertContains(response, "<b>1</b> résultat")
+        self.assertContains(response, "1 résultat sur 1")
         self.assertContains(response, "Offres clauses sociales")
 
 

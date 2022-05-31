@@ -1,0 +1,40 @@
+{% load static %}
+{% load theme_inclusion %}
+{% load bootstrap4 %}
+
+<!DOCTYPE HTML>
+<html>
+    <html lang="fr">
+        <head>
+            <meta charset="utf-8">
+            <title>{% block title %} - Les emplois de l'inclusion{% endblock %}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+            {% block meta_description %}{% endblock %}
+            {% import_static_CSS_theme_inclusion %}
+            <link rel="stylesheet" href="{{ base_url }}{% static 'css/itou.css' %}" type="text/css">
+            <style type="text/css">
+                /* Don't display the BETA banner on pdf files. */
+                body:after {
+                    content: "";
+                    background: transparent;
+                    color: transparent;
+                }
+                html {
+                    background: transparent !important;
+                }
+                @page {
+                    margin: 0mm;  /* hides title and date */
+                    size: A4;
+                }
+                @media print {
+                    .no-print {
+                        display: none;
+                    }
+                }
+            </style>
+            {% block extra_head %}{% endblock %}
+        </head>
+        <body>
+            {% block content %}{% endblock %}
+        </body>
+    </html>

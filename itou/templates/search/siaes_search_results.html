@@ -26,29 +26,22 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="h1">Rechercher des employeurs solidaires</h1>
-
     <form id="search-form" method="get" action="" class="d-block mb-5">
         {% include "search/includes/siaes_search_form.html" with form=form %}
 
         {% if form.is_valid %}
             <h2 class="h2">
-                Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
+                Employeurs solidaires à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
             </h2>
         {% endif %}
 
-        <p>
-            <small>
-                Les résultats de recherche affichent en priorité les entreprises qui ont reçu peu de candidatures par rapport aux métiers proposés.
-            </small>
+        <p class="fs-sm">
+            Les résultats de recherche affichent en priorité les entreprises qui ont reçu peu de candidatures par rapport aux métiers proposés.
         </p>
 
-        <p class="font-weight-bold text-muted mb-0 h3" id="siae-number-results" role="status">
-            {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages and siaes_page.paginator.count as counter %}
-                <b>{{ counter }}</b> résultat{% if counter > 1 %}s{% endif %}
-                {% if siaes_page.paginator.num_pages > 1 %}
-                    - Page <b>{{ current_page }}</b>/{{ total_pages }}
-                {% endif %}
+        <p class="font-weight-bold mb-0 text-primary text-right" id="siae-number-results" role="status">
+            {% with number_of_results=siaes_page|length %}
+                {{ number_of_results }} résultat{{ number_of_results|pluralize }} sur {{ siaes_page.paginator.count }}
             {% endwith %}
         </p>
 
@@ -64,7 +57,7 @@
                 {% empty %}
                     <div class="card my-4">
                         <div class="card-body">
-                            Aucun résultat avec les filtres actuels.
+                            <p>Aucun résultat avec les filtres actuels.</p>
                         </div>
                     </div>
                 {% endfor %}

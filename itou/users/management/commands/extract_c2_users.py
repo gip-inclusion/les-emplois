@@ -3,6 +3,7 @@ import datetime
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.institutions.models import Institution, InstitutionMembership
@@ -51,6 +52,7 @@ class Command(BaseCommand):
             "Prénom": user.first_name,
             "Nom": user.last_name,
             "Admin": membership.is_admin,
+            "DateRattachement": membership.created_at.date(),
             "Département": DEPARTMENTS[org.department] if org.department else None,
             "Région": org.region,
         }
@@ -109,8 +111,13 @@ class Command(BaseCommand):
                 " in production with the proper STATS_SIAE_USER_PK_WHITELIST setting?"
             )
 
-        siae_memberships = SiaeMembership.objects.select_related("user", "siae").filter(
-            is_active=True, user_id__in=settings.STATS_SIAE_USER_PK_WHITELIST
+        siae_memberships = (
+            SiaeMembership.objects.select_related("user", "siae")
+            .filter(is_active=True)
+            .filter(
+                Q(user_id__in=settings.STATS_SIAE_USER_PK_WHITELIST)
+                | Q(siae__department__in=settings.STATS_SIAE_DEPARTMENT_WHITELIST),
+            )
         )
 
         for membership in siae_memberships:

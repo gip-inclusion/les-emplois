@@ -17,10 +17,10 @@ on:
 # Locally:
 # - download and install locally "act" (https://github.com/nektos/act)
 # - create a file "act.secrets" with all the necessary secrets (see the env variables below)
-# - "act --secret-file ./act.secrets -j populate_metabase" will run the job populate_metabase with the specified environment variables
+# - "act --secret-file ./act.secrets -j populate_metabase_itou" will run the job populate_metabase_itou with the specified environment variables
 # In production:
 # - automatically, as a cron job configured above
-# - with github cli (https://cli.github.com/manual/): gh workflow run populate-metabase.yml
+# - with github cli (https://cli.github.com/manual/): gh workflow run populate-metabase-itou.yml
 # - with github’s web UI: https://github.com/betagouv/itou/actions
 env:
   CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
@@ -33,7 +33,7 @@ env:
   PYTHON_VERSION: 3.9
 
 jobs:
-  populate_metabase:
+  populate_metabase_itou:
     runs-on: ubuntu-latest
 
     # Default github action workflow timeout is 6 hours (360 minutes). If the script lasts longer than this for any reason,

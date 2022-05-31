@@ -1,9 +1,10 @@
+import json
 import logging
 from dataclasses import dataclass
 
 import httpx
 from django.conf import settings
-from django.utils.http import urlencode
+from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
 
@@ -23,58 +24,76 @@ class Etablissement:
     is_closed: bool
 
 
-def etablissement_get_or_error(siret, reason="Inscription aux emplois de l'inclusion"):
+def get_access_token():
+    try:
+        r = httpx.post(
+            f"{settings.API_INSEE_BASE_URL}/token",
+            data={"grant_type": "client_credentials"},
+            auth=(settings.API_INSEE_CONSUMER_KEY, settings.API_INSEE_CONSUMER_SECRET),
+        )
+        r.raise_for_status()
+        access_token = r.json()["access_token"]
+    except Exception:
+        logger.exception("Failed to retrieve an access token")
+        return None
+    else:
+        return access_token
+
+
+def etablissement_get_or_error(siret):
     """
     Return a tuple (etablissement, error) where error is None on success.
-    https://doc.entreprise.api.gouv.fr/?json#etablissements-v2
+    https://api.gouv.fr/documentation/sirene_v3
     """
-    data = None
-    etablissement = None
-    error = None
 
-    query_string = urlencode(
-        {
-            "recipient": settings.API_ENTREPRISE_RECIPIENT,
-            "context": settings.API_ENTREPRISE_CONTEXT,
-            "object": reason,
-        }
-    )
+    access_token = get_access_token()
+    if not access_token:
+        return None, "Problème de connexion à la base Sirene. Essayez ultérieurement."
 
-    url = f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}?{query_string}"
-    headers = {"Authorization": f"Bearer {settings.API_ENTREPRISE_TOKEN}"}
-
+    url = f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}"
     try:
-        r = httpx.get(url, headers=headers)
+        r = httpx.get(
+            url,
+            headers={"Authorization": f"Bearer {access_token}"},
+            params={"date": timezone.localdate().isoformat()},
+        )
         r.raise_for_status()
-        data = r.json()
     except httpx.HTTPStatusError as e:
-        if e.response.status_code == 422:
+        if e.response.status_code == httpx.codes.BAD_REQUEST:
+            error = f"Erreur dans le format du SIRET : « {siret} »."
+        elif e.response.status_code == httpx.codes.NOT_FOUND:
             error = f"SIRET « {siret} » non reconnu."
         else:
             logger.error("Error while fetching `%s`: %s", url, e)
             error = "Problème de connexion à la base Sirene. Essayez ultérieurement."
         return None, error
 
-    if data and data.get("errors"):
-        error = data["errors"][0]
-        return None, error
+    try:
+        data = r.json()
+        name = data["etablissement"]["uniteLegale"]["denominationUniteLegale"]
+        address = data["etablissement"]["adresseEtablissement"]
+        address_parts = [
+            address["numeroVoieEtablissement"],
+            address["typeVoieEtablissement"],
+            address["libelleVoieEtablissement"],
+        ]
+        post_code = address["codePostalEtablissement"]
+        city = address["libelleCommuneEtablissement"]
+        establishments_status = data["etablissement"]["periodesEtablissement"][0]["etatAdministratifEtablissement"]
+        is_head_office = data["etablissement"]["etablissementSiege"]
+    except (json.JSONDecodeError, KeyError, IndexError):
+        logger.exception("Invalid format of response from API Entreprise")
+        return None, "Le format de la réponse API Entreprise est non valide."
 
-    if not data.get("etablissement") or not data["etablissement"].get("adresse"):
-        logger.error("Invalid format of response from API Entreprise")
-        error = "Le format de la réponse API Entreprise est non valide."
-        return None, error
-
-    address = data["etablissement"]["adresse"]
     etablissement = Etablissement(
-        name=address["l1"],
-        # FIXME To check (l4 => line_1)
-        address_line_1=address["l4"],
-        address_line_2=address["l3"],
-        post_code=address["code_postal"],
-        city=address["localite"],
-        department=department_from_postcode(address["code_postal"]),
-        is_closed=data["etablissement"]["etat_administratif"]["value"] == "F",
-        is_head_office=data["etablissement"].get("siege_social", False),
+        name=name,
+        address_line_1=" ".join(filter(None, address_parts)) or None,
+        address_line_2=address.get("complementAdresseEtablissement"),
+        post_code=post_code,
+        city=city,
+        department=department_from_postcode(post_code) or None,
+        is_closed=(establishments_status == "F"),
+        is_head_office=is_head_office,
     )
 
     return etablissement, None

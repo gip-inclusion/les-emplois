@@ -1,0 +1,23 @@
+<div class="row">
+    <div class="col-md-9">
+        <h3 class="h2">Auto-prescription pour
+            <span class="text-muted">
+                {{job_seeker.get_full_name|title}}
+            </span>
+        </h3>
+        <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ approval.number_with_spaces }}</b></p>
+    </div>
+    <div class="col-md-3 text-right">
+        <p class="small mb-0">
+            {%if state == "SUBMITTED" %}
+                <p class="badge badge-pilotage float-right">À traiter</p>
+            {%elif state == "REFUSED" %}
+                <p class="badge badge-danger float-right">Problème constaté</p>
+            {%elif state == "ACCEPTED" %}
+                <p class="badge badge-success float-right">Validé</p>
+            {% else %}
+                <p class="badge badge-emploi float-right">En attente</p>
+            {%endif%}
+        </p>
+    </div>
+</div>

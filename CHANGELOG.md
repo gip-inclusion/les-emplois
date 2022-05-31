@@ -1,5 +1,105 @@
 # Journal des modifications
 
+## [42] - 2022-05-13
+
+### Ajouté
+- Ajout d'un champ manquant dans les fiches de postes pour les OPCS
+- Ajout de stats PE qui permettent à tout membre d'agence PE de consulter les stats de son département (fonctionnalité cachée en attente de déploiement)
+- Ajout de champs de recherche pour l'API fiches salarié 
+- Message d'information sur la mise en place de l'assistance technique par téléphone
+- Contrôle a posteriori : phase enrichissement des données 
+- Contrôle a posteriori, Pack SIAE : notification et liste des justificatifs demandés (cartes 1 à 3)
+- Contrôle a posteriori, Pack SIAE : sélection et enregistrement des critères à justifier (carte 4)
+- Ajout du champs "origine détaillée" dans l'export Metabase pour créer un filtre (TB 160)
+- Contrôle a posteriori, Pack SIAE : dépôt des pièces justificatives (carte 5)
+- Contrôle a posteriori, Pack SIAE : soumission des justificatifs (carte 6)
+- Contrôle a posteriori, Pack DDETS : notification ouverture de la phase de transmission des justificatifs (carte 1/5)
+- Contrôle a posteriori, Pack DDETS : liste des siae contrôlées (carte 2/5)
+- Fonctionnalités techniques permettant de notifier l'ASP des modifications de date de début ou de fin d'un PASS IAE rattaché à une fiche salarié.
+- Droits d'administration sur les candidatures et les fiches salariées
+- Contrôle a posteriori, Pack DDETS : liste des autoprescriptions contrôlées pour une Siae (carte 3/5)
+- Améliorer la visibilité en affichant le nom de la structure dans l'entête
+
+### Modifié
+- Remplacer les icônes Feather par icônes Remix
+- Amélioration de la commande d'envoi du stock de PASS IAE à Pôle emploi
+- Modification du critère d’éligibilité réfugié
+- Ajustement de la mise en page d'un message d'alerte dans le processus d'éligbilité
+- Ajustement de l'agencement de certaines pages de connexion/création de compte
+- Reformulation de "données IAE" sur les statistiques Pôle emploi pour "fiches de poste en tension"
+- Ajout d'une colonne "DateRattachement" dans l'extract des utilisateurs C2
+- Mise à jour du theme itou vers la v0.3.8
+- Correction technique sur les tests unitaires pour éviter les erreurs d'unicité aléatoires
+- Prise en compte d'un nouveau référentiel dans le FluxIAE dans l'import ASP des SIAE
+- Rendre plus robuste le code de l'API Pole Emploi le temps de l'envoi des PASS IAE
+- Correction de la recherche d'agréments Pôle emploi par NIR
+- Correction technique du chargement des villes en base de données
+- Correction d'un cas particulier sur les conventions dans l'import ASP des SIAE 
+- Correction des erreurs d'accessibilité sur les tableaux et les scripts
+- Correction d'un bug lorsqu'un PASS IAE existe déjà pour le même NIR ou ID Pôle emploi
+- Résolutions d'erreurs diverses dans FranceConnect
+
+### Supprimé
+- Champ en double dans le modèle des fiches de poste
+ 
+## [41] - 2022-04-22
+
+### Ajouté
+- Refus de la connexion Django pour les utilisateurs SSO
+- Ajout du fournisseur d'identité Inclusion Connect dans IdentityProvider 
+- PASS IAE : retrait de PDFShift et affichage une page HTML prête à imprimer
+- Ajout d'un comportement dynamique sur le champ "Autre type de contrat" dans le formulaire des fiches de poste
+- Ajout d'une page de connexion générique reprenant les différents types de profils utilisateur
+- Affichage du bon message d'erreur aux utilisateurs de PE Connect qui utilisent le formulaire Django
+- Ajout d'une Github Action pour Metabase
+- Ajout d'une seconde vue stats "Facilitation de l'embauche" pour les DREETS
+- Ajout des notifications de modifications du PASS IAE pour l'ASP - modèles et sérialiseurs
+- Ajout de custom URLs Matomo sur toutes les stats.
+
+### Modifié
+- Mise à jour vers Django 4.0.4 
+- Correction de tests unitaires instables (suspension et fiche salarié)
+- Synchronisation du groupe de permissions du support externe
+- Correction de la fixture PE Approvals
+- Correction du script d'import des SIAE
+- Correction d'une erreur de sérialisation de l'adresse de l'employé
+- Correction d'une erreur dans le message de confirmation aux DDETS lors de la sélection du ratio.
+- Correction d'une régression concernant les dates de suspensions
+- Modification et ajout d'information concernant la commande d'import des agréments Pôle emploi
+
+### Supprimé
+- Retrait des mentions à la DGEFP sur le dashboard
+- Retrait des imports de données `external-data` des remontées d'erreur sur Sentry 
+
+## [40] - 2022-04-08
+
+### Ajouté
+- Ajout du premier lot de fonctionnalités concernant le contrôle a posteriori
+- API Fiche de poste: ajout d'un paramètre d'état
+- Stats: ajout de `siae_hiring`, renommage de `stats_siae` en `states_siae_etp`
+- Refonte globale des filtres externes de l'interface (en particulier pour les candidatures)
+
+### Modifié
+- Analyses: mises à jour des exports de saisies mensuelles, sorites, etp par salarié, recrutements et candidatures reçues
+- Stats: amélioration des envois à Matomo
+- Thème: mise à jour du thème ITOU en 0.3.4
+- Technique: Correction d'une régression affectant nos tâches planifiées
+- Technique: Améliorations concernant l'affichage de champs de lieux dans l'administration
+- Technique: refonte des sorties standard dans les commandes Django
+- Technique: modification de la notation des paramètres de l'API Pole Emploi
+- Technique: réparer l'import du fichier des villes
+- Correction de la redirection de l'utilisateur dans les formulaires à plusieurs étapes des fiches de poste
+- Correction d'un problème de concurrence lors de l'attribution de numéros de PASS IAE
+- Modification des termes "DIRECCTE" par "DDETS"
+- Modifications graphiques mineures concernant les badges et les sources de données
+- Amélioration du script de déplacement de SIAE vers une autre
+- Amélioration du script d'import de données d'agréments PE
+- Amélioration notable des performances de l'interface d'administration
+
+### Supprimé
+- Retrait du code associé aux prolongations pour confinement
+
+
 ## [39] - 2022-03-25
 
 ### Ajouté

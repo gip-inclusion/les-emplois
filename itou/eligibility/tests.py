@@ -11,7 +11,8 @@ from itou.eligibility.factories import (
     ExpiredEligibilityDiagnosisFactory,
     ExpiredEligibilityDiagnosisMadeBySiaeFactory,
 )
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models import AdministrativeCriteria, AdministrativeCriteriaQuerySet, EligibilityDiagnosis
+from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory
@@ -318,3 +319,48 @@ class AdministrativeCriteriaModelTest(TestCase):
         qs = AdministrativeCriteria.objects.level2()
         self.assertIn(level2_criterion, qs)
         self.assertNotIn(level1_criterion, qs)
+
+    def test_for_job_application(self):
+        siae = SiaeWithMembershipFactory(department="14")
+
+        job_seeker = JobSeekerFactory()
+        user = siae.members.first()
+        user_info = UserInfo(
+            user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
+        )
+
+        criteria1 = AdministrativeCriteria.objects.get(
+            level=AdministrativeCriteria.Level.LEVEL_1, name="Bénéficiaire du RSA"
+        )
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker, user_info, administrative_criteria=[criteria1]
+        )
+
+        job_application1 = JobApplicationWithApprovalFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+
+        job_application2 = JobApplicationWithApprovalFactory(
+            to_siae=siae,
+            sender_siae=siae,
+            hiring_start_at=timezone.now() - relativedelta(months=2),
+        )
+
+        self.assertIsInstance(
+            AdministrativeCriteria.objects.for_job_application(job_application1),
+            AdministrativeCriteriaQuerySet,
+        )
+
+        self.assertEqual(1, AdministrativeCriteria.objects.for_job_application(job_application1).count())
+        self.assertEqual(criteria1, AdministrativeCriteria.objects.for_job_application(job_application1).first())
+        self.assertEqual(0, AdministrativeCriteria.objects.for_job_application(job_application2).count())
+
+    def test_key_property(self):
+        criterion_level_1 = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
+        self.assertEqual(criterion_level_1.key, f"level_{criterion_level_1.level}_{criterion_level_1.pk}")
+
+        criterion_level_2 = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+        self.assertEqual(criterion_level_2.key, f"level_{criterion_level_2.level}_{criterion_level_2.pk}")

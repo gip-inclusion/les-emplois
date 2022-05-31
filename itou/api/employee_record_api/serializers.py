@@ -1,13 +1,10 @@
 from random import randint
-from typing import OrderedDict
 
 from django.conf import settings
 from django.utils.crypto import salted_hmac
 from rest_framework import serializers
 
-from itou.employee_record.models import EmployeeRecord
-from itou.employee_record.serializers import EmployeeRecordSerializer, _EmployeeAddressSerializer, _EmployeeSerializer
-from itou.users.models import User
+from itou.employee_record.serializers import EmployeeRecordSerializer, _AddressSerializer, _PersonSerializer
 
 
 class DummyEmployeeRecordSerializer(serializers.Serializer):
@@ -97,7 +94,7 @@ class DummyEmployeeRecordSerializer(serializers.Serializer):
 # software connecting to the API.
 
 
-class _API_EmployeeAddressSerializer(_EmployeeAddressSerializer):
+class _API_AddressSerializer(_AddressSerializer):
     """
     This class in only useful for compatibility.
     We decided not to send phone and email (business concerns and bad ASP address filters).
@@ -105,41 +102,16 @@ class _API_EmployeeAddressSerializer(_EmployeeAddressSerializer):
     (these fields should really be actual data, not fake, by implicit contract).
     """
 
-    def _update_address_and_phone_number(self, result, instance) -> OrderedDict:
-        """
-        Allow overriding these 2 fields:
-        - adrTelephone
-        - adrMail
-        Make data readable again for API users.
-        """
-        result["adrTelephone"] = instance.phone
-        result["adrMail"] = instance.email
-
-        return result
+    adrTelephone = serializers.CharField(source="phone")
+    adrMail = serializers.CharField(source="email")
 
 
-class _API_EmployeeSerializer(_EmployeeSerializer):
+class _API_PersonSerializer(_PersonSerializer):
     """
     Specific fields added to the API (not used in ASP transfers)
     """
 
-    NIR = serializers.CharField(source="nir")
-
-    class Meta:
-        model = User
-        fields = [
-            "sufPassIae",
-            "idItou",
-            "NIR",
-            "civilite",
-            "nomUsage",
-            "prenom",
-            "dateNaissance",
-            "codeComInsee",
-            "codeDpt",
-            "codeInseePays",
-            "codeGroupePays",
-        ]
+    NIR = serializers.CharField(source="job_seeker.nir")
 
 
 class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
@@ -151,24 +123,5 @@ class EmployeeRecordAPISerializer(EmployeeRecordSerializer):
     """
 
     numeroAnnexe = serializers.CharField(source="financial_annex_number")
-    adresse = _API_EmployeeAddressSerializer(source="job_application.job_seeker")
-    personnePhysique = _API_EmployeeSerializer(source="job_application.job_seeker")
-
-    class Meta:
-        model = EmployeeRecord
-        fields = [
-            "passIae",
-            "passDateDeb",
-            "passDateFin",
-            "numLigne",
-            "typeMouvement",
-            "numeroAnnexe",
-            "mesure",
-            "siret",
-            "personnePhysique",
-            "adresse",
-            "situationSalarie",
-            "codeTraitement",
-            "libelleTraitement",
-        ]
-        read_only_fields = fields
+    adresse = _API_AddressSerializer(source="job_seeker")
+    personnePhysique = _API_PersonSerializer(source="*")

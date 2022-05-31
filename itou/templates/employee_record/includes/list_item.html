@@ -23,6 +23,8 @@
                         <p class="badge badge-success">Intégrée ASP le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
                     {% elif form.status.value == "READY" %}
                         <p class="badge badge-secondary">Complétée le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
+                    {% elif form.status.value == "DISABLED" %}
+                        <p class="badge badge-emploi-lightest">Désactivée le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
                     {% endif %}
                 </p>
             </div>
@@ -39,24 +41,29 @@
 
         {# Actions #}
         {% if form.status.value == "NEW" %}
-            <div>
-                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
+            <div class="text-right">
+                {% if item.employee_record_new %}
+                    <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}?status=NEW" class="btn btn-outline-primary mt-2">Désactiver la fiche salarié</a>
+                {% endif %}
+                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary mt-2">Créer la fiche salarié</a>
             </div>
         {% elif form.status.value == "READY" %}
-            <div>
-                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=READY" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+            <div class="text-right">
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=READY" class="btn btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
             </div>
         {% elif form.status.value == "SENT" %}
-            <div>
-                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=SENT" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+            <div class="text-right">
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=SENT" class="btn btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
             </div>
         {% elif form.status.value == "REJECTED" %}
-            <div>
-                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary float-right">Modifier la fiche salarié</a>
+            <div class="text-right">
+                <a href="{% url "employee_record_views:disable" employee_record.id %}?status=REJECTED" class="btn btn-outline-primary mt-2">Désactiver la fiche salarié</a>
+                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary mt-2">Modifier la fiche salarié</a>
             </div>
         {% elif form.status.value == "PROCESSED" %}
-            <div>
-                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=PROCESSED" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+            <div class="text-right">
+                <a href="{% url "employee_record_views:disable" employee_record.id %}?status=PROCESSED" class="btn btn-outline-primary mt-2">Désactiver la fiche salarié</a>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=PROCESSED" class="btn btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
             </div>
         {% endif %}
 

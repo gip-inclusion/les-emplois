@@ -18,8 +18,8 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.csv_export import generate_csv_export
 from itou.job_applications.factories import (
@@ -31,6 +31,7 @@ from itou.job_applications.factories import (
     JobApplicationSentBySiaeFactory,
     JobApplicationWithApprovalFactory,
     JobApplicationWithApprovalNotCancellableFactory,
+    JobApplicationWithCompleteJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import (
@@ -104,7 +105,7 @@ class JobApplicationModelTest(TestCase):
         self.assertTrue(job_application.is_sent_by_authorized_prescriber)
 
     @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
-    def test_can_download_approval_as_pdf(self, *args, **kwargs):
+    def test_can_display_approval(self, *args, **kwargs):
         """
         A user can download an approval only when certain conditions
         are met:
@@ -113,7 +114,7 @@ class JobApplicationModelTest(TestCase):
         - the job_application has been accepted.
         """
         job_application = JobApplicationWithApprovalFactory()
-        self.assertTrue(job_application.can_download_approval_as_pdf)
+        self.assertTrue(job_application.can_display_approval)
 
         # SIAE not subject to eligibility rules.
         not_eligible_kinds = [
@@ -121,28 +122,25 @@ class JobApplicationModelTest(TestCase):
         ]
         not_eligible_siae = SiaeFactory(kind=not_eligible_kinds[0])
         job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
-        self.assertFalse(job_application.can_download_approval_as_pdf)
+        self.assertFalse(job_application.can_display_approval)
 
         # Application is not accepted.
         job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_OBSOLETE)
-        self.assertFalse(job_application.can_download_approval_as_pdf)
+        self.assertFalse(job_application.can_display_approval)
 
         # Application accepted but without approval.
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        self.assertFalse(job_application.can_download_approval_as_pdf)
+        self.assertFalse(job_application.can_display_approval)
 
-    def test_can_download_expired_approval_as_pdf(self, *args, **kwargs):
-        """
-        A user can download an expired approval PDF.
-        """
+    def test_can_download_expired_approval(self, *args, **kwargs):
         # Approval has ended
         start = datetime.date.today() - relativedelta(years=2)
         ended_approval = ApprovalFactory(start_at=start)
 
         # `hiring_start_at` must be set in order to pass the `can_be_cancelled` condition
-        # called by `can_download_approval_as_pdf`.
+        # called by `can_display_approval`.
         job_application = JobApplicationWithApprovalFactory(approval=ended_approval, hiring_start_at=start)
-        self.assertTrue(job_application.can_download_approval_as_pdf)
+        self.assertTrue(job_application.can_display_approval)
 
     def test_can_be_cancelled(self, *args, **kwargs):
         """
@@ -155,21 +153,21 @@ class JobApplicationModelTest(TestCase):
         self.assertTrue(job_application_ok.can_be_cancelled)
 
         # Can be cancelled with a related employee record in NEW, READY, REJECTED status
-        EmployeeRecordFactory(job_application=job_application_ok, status=EmployeeRecord.Status.NEW)
+        EmployeeRecordFactory(job_application=job_application_ok, status=Status.NEW)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
-        EmployeeRecordFactory(job_application=job_application_ok, status=EmployeeRecord.Status.READY)
+        EmployeeRecordFactory(job_application=job_application_ok, status=Status.READY)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
-        EmployeeRecordFactory(job_application=job_application_ok, status=EmployeeRecord.Status.REJECTED)
+        EmployeeRecordFactory(job_application=job_application_ok, status=Status.REJECTED)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
         # Can't be cancelled with a related employee record in PROCESSED or SENT status
         job_application_not_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
-        EmployeeRecordFactory(job_application=job_application_not_ok, status=EmployeeRecord.Status.SENT)
+        EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.SENT)
         self.assertFalse(job_application_not_ok.can_be_cancelled)
 
-        EmployeeRecordFactory(job_application=job_application_not_ok, status=EmployeeRecord.Status.PROCESSED)
+        EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.PROCESSED)
         self.assertFalse(job_application_not_ok.can_be_cancelled)
 
         # Comes from AI stock.
@@ -518,6 +516,20 @@ class JobApplicationQuerySetTest(TestCase):
         job_app = JobApplicationWithApprovalNotCancellableFactory()
         self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
+        # After employee record creation
+        job_app = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecordFactory(
+            job_application=job_app,
+            asp_id=job_app.to_siae.convention.asp_id,
+            approval_number=job_app.approval.number,
+            status=Status.PROCESSED,
+        )
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+
+        # After employee record is disabled
+        employee_record.update_as_disabled()
+        self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+
 
 @patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationNotificationsTest(TestCase):
@@ -768,6 +780,26 @@ class JobApplicationNotificationsTest(TestCase):
         accepted_by = job_application.to_siae.members.first()
         email = job_application.email_deliver_approval(accepted_by)
         self.assertIn("Se terminant le : Non renseigné", email.body)
+
+    def test_email_deliver_approval_when_subject_to_eligibility_rules(self, *args, **kwargs):
+        job_application = JobApplicationWithApprovalFactory(to_siae__subject_to_eligibility=True)
+
+        email = job_application.email_deliver_approval(job_application.to_siae.members.first())
+
+        self.assertEqual(
+            f"PASS IAE pour {job_application.job_seeker.get_full_name()} et avis sur les emplois de l'inclusion",
+            email.subject,
+        )
+        self.assertIn("PASS IAE", email.body)
+
+    def test_email_deliver_approval_when_not_subject_to_eligibility_rules(self, *args, **kwargs):
+        job_application = JobApplicationWithApprovalFactory(to_siae__not_subject_to_eligibility=True)
+
+        email = job_application.email_deliver_approval(job_application.to_siae.members.first())
+
+        self.assertEqual("Confirmation de l'embauche", email.subject)
+        self.assertNotIn("PASS IAE", email.body)
+        self.assertIn(settings.ITOU_ASSISTANCE_URL, email.body)
 
     def test_manually_deliver_approval(self, *args, **kwargs):
         staff_member = UserFactory(is_staff=True)
@@ -1029,6 +1061,28 @@ class JobApplicationWorkflowTest(TestCase):
         pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
         )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertIsNotNone(job_application.approval)
+        self.assertEqual(job_application.approval.number, pe_approval.number)
+        self.assertTrue(job_application.approval_number_sent_by_email)
+        self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC)
+        # Check sent emails.
+        self.assertEqual(len(mail.outbox), 2)
+        # Email sent to the job seeker.
+        self.assertIn(self.accept_email_subject_job_seeker, mail.outbox[0].subject)
+        # Email sent to the employer.
+        self.assertIn(self.sent_pass_email_subject, mail.outbox[1].subject)
+        # Approval delivered -> Pole Emploi is notified
+        notify_mock.assert_called()
+
+    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(
+        self, notify_mock
+    ):
+        job_seeker = JobSeekerFactory(pole_emploi_id="", birthdate=None)
+        pe_approval = PoleEmploiApprovalFactory(nir=job_seeker.nir)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
         )
@@ -1363,7 +1417,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Linked employee record with blocking status
         job_application = JobApplicationWithApprovalFactory(hiring_start_at=(today - relativedelta(days=365)))
         cancellation_user = job_application.to_siae.active_members.first()
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.PROCESSED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
         # xworkflows.base.AbortTransition
         with self.assertRaises(xwf_models.AbortTransition):
@@ -1478,11 +1532,11 @@ class JobApplicationPoleEmploiNotificationLogTest(TestCase):
         "itou.job_applications.models.recherche_individu_certifie_api", return_value=sample_individual_search_failure
     )
     def test_get_individual_not_found(self, get_individual_mock):
-        encrypted_nir = JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
-            self.sample_pole_emploi_individual, self.sample_token
-        )
+        with self.assertRaises(PoleEmploiMiseAJourPassIAEException):
+            JobApplicationPoleEmploiNotificationLog.get_encrypted_nir_from_individual(
+                self.sample_pole_emploi_individual, self.sample_token
+            )
         get_individual_mock.assert_called_with(self.sample_pole_emploi_individual, self.sample_token)
-        self.assertEqual(encrypted_nir, self.sample_individual_search_failure.id_national_demandeur)
 
 
 # We patch sleep since it is used in the real calls, but we don’t want to slow down the tests
@@ -1634,6 +1688,21 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         self.assertEqual(
             notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
         )
+
+    @patch("itou.job_applications.models.get_access_token", return_value=token)
+    def test_invalid_start_at(self, access_token_mock, _sleep_mock):
+        today = timezone.now().date()
+        job_seeker = JobSeekerFactory(nir="")
+        approval = ApprovalFactory(start_at=today + datetime.timedelta(days=1))
+        job_application = JobApplicationFactory(job_seeker=job_seeker, approval=approval)
+        with self.assertLogs("itou.job_applications.tasks") as logs:
+            notif_result = notify_pole_emploi_pass(job_application, job_application.job_seeker)
+        self.assertIn(
+            f"job_application approval={approval} start_at={approval.start_at} starts after today={today}, skipping.",
+            logs.output[0],
+        )
+        self.assertFalse(notif_result)
+        access_token_mock.assert_not_called()
 
 
 class JobApplicationAdminFormTest(TestCase):

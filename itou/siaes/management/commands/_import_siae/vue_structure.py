@@ -22,7 +22,7 @@ def get_vue_structure_df():
     """
     The "Vue Structure" export has the following fields:
     - asp_id
-    - siret (current)
+    - siret (current aka siret_actualise)
     - siret (initial aka siret_signature)
     - auth_email
     - name
@@ -124,36 +124,18 @@ ASP_ID_TO_SIRET_SIGNATURE = get_asp_id_to_siret_signature()
 @timeit
 def get_siret_to_asp_id():
     """
-    This method allows us to link any preexisting siae (without asp_id)
-    in itou database to its ASP counterpart via an asp_id.
+    Provide the asp_id from the "Vue Structure" matching the given siret (i.e. siret_actualise).
 
-    Such preexisting siaes are siaes historically imported without asp_id,
-    new ones are added everytime we open a new region.
-    Later we will also process preexisting siaes created by itou staff
-    and preexisting siaes created by users ("Antennes").
+    Asp_id is a permanent immutable structure ID in ASP exports used to identify a structure à la ASP (an ACI and
+    an EI sharing the same SIRET being considered as a single structure à la ASP). Note that both siret_actualise and
+    siret_signature can change over time thus none of them can act as a good immutable structure ID.
 
-    Asp_id is a permanent immutable ID in ASP exports used to
-    identify a structure à la ASP (an ACI and an EI sharing the same SIRET being
-    considered as a single structure à la ASP). This asp_id can be thought as
-    a "permanent SIRET".
-
-    The SIRET => asp_id match is very important to make sure all itou siaes
-    are matched to their ASP counterpart.
-
-    As there are two siret fields in ASP main export (Vue Structures) we
-    use both to have a maximum chance to get a match and avoid leaving
-    ghost siaes behind.
+    The SIRET (siret_actualise) => asp_id match is very important to make sure all itou siaes
+    are matched to their correct ASP counterpart.
     """
     siret_to_asp_id = {}
     for _, row in VUE_STRUCTURE_DF.iterrows():
         siret_to_asp_id[row.siret] = row.asp_id
-        # Current siret has precedence over siret_signature.
-        # FTR necessary subtelty due to a weird edge case in ASP data:
-        # siret=44431048600030 has two different asp_ids (2338, 4440)
-        # one as a siret_signature, the other as a current siret.
-        # (╯°□°)╯︵ ┻━┻
-        if row.siret_signature not in siret_to_asp_id:
-            siret_to_asp_id[row.siret_signature] = row.asp_id
     return siret_to_asp_id
 
 

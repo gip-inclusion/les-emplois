@@ -4,12 +4,14 @@ from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 from django.conf import settings
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
+from itou.users import enums as users_enums
 
 
 class PEAMUSocialAccountAdapter(DefaultSocialAccountAdapter):
     def populate_user(self, request, sociallogin, data):
         user = super().populate_user(request, sociallogin, data)
         setattr(user, "is_job_seeker", True)
+        setattr(user, "identity_provider", users_enums.IdentityProvider.PE_CONNECT)
         return user
 
 

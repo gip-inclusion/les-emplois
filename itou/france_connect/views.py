@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 def _redirect_to_job_seeker_login_on_error(error_msg, request=None):
     if request:
         messages.error(request, error_msg)
-    logger.error(error_msg)
     return HttpResponseRedirect(reverse("login:job_seeker"))
 
 
@@ -150,6 +149,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     if "sub" not in user_data:
         # 'sub' is the unique identifier from France Connect, we need that to match a user later on
         error_msg = "Le paramètre « sub » n'a pas été retourné par FranceConnect. Il est nécessaire pour identifier un utilisateur."  # noqa E501
+        logger.error(error_msg)
         return _redirect_to_job_seeker_login_on_error(error_msg)
 
     fc_user_data = france_connect_models.FranceConnectUserData(**france_connect_models.load_user_data(user_data))

@@ -258,6 +258,9 @@ class AdministrativeCriteriaQuerySet(models.QuerySet):
     def level2(self):
         return self.filter(level=AdministrativeCriteria.Level.LEVEL_2)
 
+    def for_job_application(self, job_application):
+        return self.filter(eligibilitydiagnosis__jobapplication=job_application)
+
 
 class AdministrativeCriteria(models.Model):
     """
@@ -303,6 +306,10 @@ class AdministrativeCriteria(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.get_level_display()}"
+
+    @property
+    def key(self):
+        return f"level_{self.level}_{self.pk}"
 
 
 class SelectedAdministrativeCriteria(models.Model):

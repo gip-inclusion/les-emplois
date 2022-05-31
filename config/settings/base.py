@@ -352,13 +352,14 @@ API_BAN_BASE_URL = "https://api-adresse.data.gouv.fr"
 # https://api.gouv.fr/api/api-geo.html#doc_tech
 API_GEO_BASE_URL = "https://geo.api.gouv.fr"
 
+# INSEE API
+API_INSEE_BASE_URL = "https://api.insee.fr"
+API_INSEE_CONSUMER_KEY = os.environ.get("API_INSEE_CONSUMER_KEY", "")
+API_INSEE_CONSUMER_SECRET = os.environ.get("API_INSEE_CONSUMER_SECRET", "")
+
 # API Entreprise.
-# https://dashboard.entreprise.api.gouv.fr/login (login is done through auth.api.gouv.fr)
-# https://doc.entreprise.api.gouv.fr/
-API_ENTREPRISE_BASE_URL = "https://entreprise.api.gouv.fr/v2"
-API_ENTREPRISE_CONTEXT = "emplois.inclusion.beta.gouv.fr"
-API_ENTREPRISE_RECIPIENT = os.environ.get("API_ENTREPRISE_RECIPIENT")
-API_ENTREPRISE_TOKEN = os.environ.get("API_ENTREPRISE_TOKEN")
+# https://api.gouv.fr/documentation/sirene_v3
+API_ENTREPRISE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene/V3"
 
 # Pôle emploi's Emploi Store Dev aka ESD. There is a production AND a recette environment:
 #  - Production: https://www.pole-emploi.io
@@ -419,13 +420,6 @@ FRANCE_CONNECT_SESSION_STATE = "FC_STATE"
 PROVIDER_PE_CONNECT = "poleemploi_connect"
 PROVIDER_FRANCE_CONNECT = "franceconnect"
 
-# PDFShift
-# ------------------------------------------------------------------------------
-
-PDFSHIFT_API_BASE_URL = "https://api.pdfshift.io/v3"
-PDFSHIFT_API_KEY = os.environ.get("PDFSHIFT_API_KEY")
-PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
-
 # Typeform
 # ------------------------------------------------------------------------------
 
@@ -476,12 +470,6 @@ ITOU_SESSION_NIR_KEY = "job_seeker_nir"
 ITOU_SESSION_EDIT_SIAE_KEY = "edit_siae_session_key"
 ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 ITOU_SESSION_CURRENT_PAGE_KEY = "current_page"
-
-
-# Some external libraries, as PDF Shift, need access to static files
-# but they can't access them when working locally.
-# Use the staging domain name when this case arises.
-ITOU_STAGING_DN = "staging.emplois.inclusion.beta.gouv.fr"
 
 SHOW_TEST_ACCOUNTS_BANNER = False
 
@@ -543,26 +531,34 @@ METABASE_INSERT_BATCH_SIZE = 100
 METABASE_SITE_URL = "https://stats.inclusion.beta.gouv.fr"
 METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 
-# Once SIAE stats are released, all SIAE can view their data.
-# Until then, only whitelisted users can view them.
-RELEASE_STATS_SIAE = False
-STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
-
 # Metabase embedded dashboards
 METABASE_DASHBOARD_IDS = {
+    # Public stats.
+    "stats_public": 119,
+    # Employer stats.
+    "stats_siae_etp": 128,
+    "stats_siae_hiring": 165,
+    # Prescriber stats.
     "stats_cd": 118,
+    "stats_pe": 162,
+    # Institution stats - DDETS - department level.
     "stats_ddets_iae": 117,
     "stats_ddets_diagnosis_control": 144,
     "stats_ddets_hiring": 160,
+    # Institution stats - DREETS - region level.
+    "stats_dreets_iae": 117,
+    "stats_dreets_hiring": 160,
+    # Institution stats - DGEFP - nation level.
     "stats_dgefp_iae": 117,
     "stats_dgefp_diagnosis_control": 144,
     "stats_dgefp_af": 142,
-    "stats_dreets_iae": 117,
-    "stats_public": 119,
-    "stats_siae_etp": 128,
-    "stats_siae_hiring": 165,
 }
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
+
+# Specific stats are progressively being deployed to more and more departments and specific users.
+STATS_SIAE_DEPARTMENT_WHITELIST = ["38", "62", "67", "93"]
+STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
+STATS_PE_DEPARTMENT_WHITELIST = []
 
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
 PILOTAGE_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/pilotage"
@@ -647,6 +643,19 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    # Throttling:
+    # See: https://www.django-rest-framework.org/api-guide/throttling/
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    # Default values for throttling rates:
+    # - overridden in custom throttling classes,
+    # - arbitrary values, update should the need arise.
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "12/minute",
+        "user": "12/minute",
+    },
 }
 
 # DRF Spectacular
@@ -688,18 +697,18 @@ S3_STORAGE_BUCKET_REGION = os.environ.get("S3_STORAGE_BUCKET_REGION", "")
 
 STORAGE_UPLOAD_KINDS = {
     "default": {
-        "allowed_mime_types": ["*"],
-        "upload_expiration": 60 * 60,  # in seconds
+        "allowed_mime_types": ["application/pdf"],
+        "upload_expiration": 90 * 60,  # in seconds
         "key_path": "",  # appended before the file key. No backslash!
-        "max_files": 3,
+        "max_files": 1,
         "max_file_size": 5,  # in mb
         "timeout": 20000,  # in ms
     },
     "resume": {
-        "allowed_mime_types": ["application/pdf"],
-        "upload_expiration": 90 * 60,  # in seconds
         "key_path": "resume",
-        "max_files": 1,
+    },
+    "evaluations": {
+        "key_path": "evaluations",
     },
 }
 

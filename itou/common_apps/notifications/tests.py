@@ -80,3 +80,21 @@ class NotificationsBaseClassTest(TestCase):
 
         receivers = [receiver for message in mail.outbox for receiver in message.to]
         self.assertEqual(self.notification.email.to, receivers)
+
+
+class NewSpontaneousJobAppEmployersNotificationTest(TestCase):
+    def test_mail_content_when_subject_to_eligibility_rules(self):
+        siae = SiaeWithMembershipFactory(subject_to_eligibility=True)
+        notification = NewSpontaneousJobAppEmployersNotification(
+            job_application=JobApplicationFactory(to_siae=siae),
+        )
+
+        self.assertIn("PASS IAE", notification.email.body)
+
+    def test_mail_content_when_not_subject_to_eligibility_rules(self):
+        siae = SiaeWithMembershipFactory(not_subject_to_eligibility=True)
+        notification = NewSpontaneousJobAppEmployersNotification(
+            job_application=JobApplicationFactory(to_siae=siae),
+        )
+
+        self.assertNotIn("PASS IAE", notification.email.body)

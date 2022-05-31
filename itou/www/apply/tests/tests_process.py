@@ -7,14 +7,14 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.approvals.factories import SuspensionFactory
+from itou.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from itou.approvals.models import Approval, Suspension
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -26,7 +26,6 @@ from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
-from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
 @patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
@@ -187,7 +186,6 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_application.state.is_postponed)
 
     def test_accept(self, *args, **kwargs):
-        """Test the `accept` transition."""
         create_test_cities(["54", "57"], num_per_department=2)
         city = City.objects.first()
         today = timezone.localdate()
@@ -518,6 +516,69 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_app_starting_later.state.is_accepted)
         self.assertEqual(job_app_starting_later.approval.start_at, job_app_starting_earlier.hiring_start_at)
 
+    def test_accept_with_double_user(self, *args, **kwargs):
+        def accept_job_application(job_application, city):
+            today = timezone.localdate()
+            return self.client.post(
+                reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),
+                data={
+                    "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+                    "hiring_start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "hiring_end_at": Approval.get_default_end_date(today).strftime(
+                        DuetDatePickerWidget.INPUT_DATE_FORMAT
+                    ),
+                    "answer": "",
+                    "address_line_1": job_application.job_seeker.address_line_1,
+                    "post_code": job_application.job_seeker.post_code,
+                    "city": city.name,
+                    "city_slug": city.slug,
+                },
+                follow=True,
+            )
+
+        create_test_cities(["54"], num_per_department=1)
+        city = City.objects.first()
+
+        siae = SiaeWithMembershipFactory()
+        job_seeker = JobSeekerWithAddressFactory(city=city.name)
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING, job_seeker=job_seeker, to_siae=siae
+        )
+
+        # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
+        pole_emploi_approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
+        )
+
+        # Accept the job application for the first job seeker.
+        self.client.login(username=siae.members.first().email, password=DEFAULT_PASSWORD)
+        response = accept_job_application(job_application, city)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(
+            "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. ",
+            str(list(response.context["messages"])[0]),
+        )
+
+        # This approval is found thanks to the PE Approval number
+        approval = Approval.objects.get(number=pole_emploi_approval.number)
+        self.assertEqual(approval.user, job_seeker)
+
+        # Now generate a job seeker that is "almost the same"
+        almost_same_job_seeker = JobSeekerWithAddressFactory(
+            city=city.name, pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
+        )
+        another_job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING, job_seeker=almost_same_job_seeker, to_siae=siae
+        )
+
+        # Gracefully display a message instead of just plain crashing
+        response = accept_job_application(another_job_application, city)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. ",
+            str(list(response.context["messages"])[0]),
+        )
+
     def test_eligibility(self, *args, **kwargs):
         """Test eligibility."""
 
@@ -548,10 +609,10 @@ class ProcessViewsTest(TestCase):
 
         post_data = {
             # Administrative criteria level 1.
-            f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "true",
+            f"{criterion1.key}": "true",
             # Administrative criteria level 2.
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true",
-            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion3.pk}": "true",
+            f"{criterion2.key}": "true",
+            f"{criterion3.key}": "true",
             # Confirm.
             "confirm": "true",
         }
@@ -641,7 +702,7 @@ class ProcessViewsTest(TestCase):
         )
         siae_user = job_application.to_siae.members.first()
         # Add a blocking employee record
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.PROCESSED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})

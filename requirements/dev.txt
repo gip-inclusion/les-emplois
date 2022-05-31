@@ -37,6 +37,8 @@ django-admin-logs==1.0.2  # https://pypi.org/project/django-admin-logs/
 # ------------------------------------------------------------------------------
 requests-mock==1.9.3  # https://github.com/jamielennox/requests-mock
 respx==0.19.0  # https://lundberg.github.io/respx/
+pytest==7.1.2  # https://github.com/pytest-dev/pytest
+pytest-django== 4.5.2 # https://github.com/pytest-dev/pytest-django/
 
 # Data extracts
 # ------------------------------------------------------------------------------

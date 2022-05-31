@@ -3,7 +3,9 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.institutions.factories import InstitutionFactory
+from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siae_evaluations import models
+from itou.siaes.factories import SiaeFactory
 
 
 class EvaluationCampaignFactory(factory.django.DjangoModelFactory):
@@ -14,3 +16,19 @@ class EvaluationCampaignFactory(factory.django.DjangoModelFactory):
     institution = factory.SubFactory(InstitutionFactory, department="14")
     evaluated_period_start_at = (timezone.now() - relativedelta(months=3)).date()
     evaluated_period_end_at = timezone.now().date()
+
+
+class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.EvaluatedSiae
+
+    evaluation_campaign = factory.SubFactory(EvaluationCampaignFactory)
+    siae = factory.SubFactory(SiaeFactory, department="14")
+
+
+class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.EvaluatedJobApplication
+
+    evaluated_siae = factory.SubFactory(EvaluatedSiaeFactory)
+    job_application = factory.SubFactory(JobApplicationWithApprovalFactory)

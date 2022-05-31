@@ -1,4 +1,5 @@
 import datetime
+import io
 import os
 import unittest
 from dataclasses import dataclass
@@ -6,6 +7,7 @@ from dataclasses import dataclass
 import pandas
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.test import TestCase
 
@@ -842,3 +844,26 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         output_df = None
         output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=input_df)
         self.assertEqual(len(output_df), 2)
+
+
+class TestSyncPermsTestCase(TestCase):
+    def test_sync_perms(self):
+        stdout = io.StringIO()
+        call_command("sync_group_and_perms", stdout=stdout)
+        stdout.seek(0)
+        output = stdout.readlines()
+        self.assertEqual(
+            output,
+            [
+                "group name=itou-admin created\n",
+                "group name=itou-support-externe created\n",
+                "All done!\n",
+            ],
+        )
+        self.assertEqual(Group.objects.all().count(), 2)
+        admin_group = Group.objects.all()[0]
+        self.assertEqual(admin_group.name, "itou-admin")
+        self.assertEqual(admin_group.permissions.count(), 79)
+        support_group = Group.objects.all()[1]
+        self.assertEqual(support_group.name, "itou-support-externe")
+        self.assertEqual(support_group.permissions.count(), 31)

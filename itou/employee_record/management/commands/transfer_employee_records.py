@@ -9,6 +9,7 @@ from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
+from itou.employee_record.enums import Status
 from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
@@ -128,7 +129,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             for idx, employee_record in enumerate(employee_records, 1):
                 employee_record.update_as_sent(remote_path, idx)
 
-    def _parse_feedback_file(self, feedback_file, batch, dry_run):
+    def _parse_feedback_file(self, feedback_file, batch, dry_run) -> int:
         """
         - Parse ASP response file,
         - Update status of employee records,
@@ -146,6 +147,16 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         if not records:
             self.logger.error("Could not get any employee record from file: %s", feedback_file)
 
+            return 1
+
+        # Check for notification records :
+        # Notifications are not mixed with employee records
+        notification_number = 0
+        for record in records:
+            if record.get("typeMouvement") == "M":
+                notification_number += 1
+        if notification_number == len(records):
+            self.logger.warning("File `%s` is a notification file, passing.", feedback_file)
             return 1
 
         for idx, employee_record in enumerate(records, 1):
@@ -183,7 +194,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
                 if not dry_run:
                     try:
-                        if employee_record.status != EmployeeRecord.Status.PROCESSED:
+                        if employee_record.status != Status.PROCESSED:
                             employee_record.update_as_accepted(
                                 processing_code, processing_label, renderer.render(serializer.data).decode()
                             )
@@ -204,7 +215,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                 # Employee record has already been processed : SKIP
                 # (this can happen if files are processed twice
                 # or employee record transmitted twice or more)
-                if employee_record.status == EmployeeRecord.Status.PROCESSED:
+                if employee_record.status == Status.PROCESSED:
                     # Do not update, keep it clean
                     self.logger.warning("Skipping, already accepted: %s", employee_record)
                     continue
@@ -212,7 +223,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                 # Employee record has not been processed by ASP :
                 if not dry_run:
                     # Fixes unexpected stop on multiple pass on the same file
-                    if employee_record.status != EmployeeRecord.Status.REJECTED:
+                    if employee_record.status != Status.REJECTED:
                         employee_record.update_as_rejected(processing_code, processing_label)
                     else:
                         self.logger.warning("Already rejected: %s", employee_record)

@@ -21,14 +21,20 @@ def update_existing_conventions():
     three_months_ago = timezone.now() - timezone.timedelta(days=90)
 
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=False).select_related("convention"):
+        convention = siae.convention
+        assert convention.kind == siae.kind
+        assert convention.siren_signature == siae.siren
+
+        if not convention.is_active and siae.siret not in SIRET_TO_ASP_ID:
+            # Old inactive siaes which could not deleted because they have data will stay in our database forever.
+            # At some point they no longer exist in the latest FluxIAE file thus we should leave them untouched.
+            continue
+
         assert siae.siret in SIRET_TO_ASP_ID
         asp_id = SIRET_TO_ASP_ID[siae.siret]
         siret_signature = ASP_ID_TO_SIRET_SIGNATURE[asp_id]
 
-        convention = siae.convention
-        assert convention.kind == siae.kind
         assert asp_id in ASP_ID_TO_SIRET_SIGNATURE
-        assert convention.siren_signature == siae.siren
 
         # Sometimes the same siret is attached to one asp_id in one export and to another asp_id in the next export.
         # In other words, the siae convention asp_id has changed and should be updated.

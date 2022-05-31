@@ -10,13 +10,13 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
-from itou.siae_evaluations.models import EvaluationCampaign
+from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae
-from itou.utils.password_validation import FRANCE_CONNECT_PASSWORD_EXPLANATION
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -30,7 +30,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     can_show_employee_records = False
     job_applications_categories = []
     num_rejected_employee_records = 0
-    has_active_campaign = False
+    active_campaigns = []
 
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
@@ -39,6 +39,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         current_org = get_current_siae_or_404(request)
         can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
         can_show_employee_records = current_org.can_use_employee_record
+        active_campaigns = EvaluatedSiae.objects.for_siae(current_org).in_progress()
 
         job_applications_categories = [
             {
@@ -72,7 +73,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
         num_rejected_employee_records = EmployeeRecord.objects.filter(
-            status=EmployeeRecord.Status.REJECTED,
+            status=Status.REJECTED,
             job_application__to_siae=current_org,
         ).count()
 
@@ -84,7 +85,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     if request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
-        has_active_campaign = EvaluationCampaign.objects.has_active_campaign(current_org)
+        active_campaigns = EvaluationCampaign.objects.for_institution(current_org).in_progress()
 
     context = {
         "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
@@ -93,13 +94,15 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_show_financial_annexes": can_show_financial_annexes,
         "can_show_employee_records": can_show_employee_records,
         "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(current_org=current_org),
-        "can_view_stats_siae": request.user.can_view_stats_siae(current_org=current_org),
+        "can_view_stats_siae_etp": request.user.can_view_stats_siae_etp(current_org=current_org),
+        "can_view_stats_siae_hiring": request.user.can_view_stats_siae_hiring(current_org=current_org),
         "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
+        "can_view_stats_pe": request.user.can_view_stats_pe(current_org=current_org),
         "can_view_stats_ddets": request.user.can_view_stats_ddets(current_org=current_org),
         "can_view_stats_dreets": request.user.can_view_stats_dreets(current_org=current_org),
         "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
         "num_rejected_employee_records": num_rejected_employee_records,
-        "has_active_campaign": has_active_campaign,
+        "active_campaigns": active_campaigns,
     }
 
     return render(request, template_name, context)
@@ -111,11 +114,6 @@ class ItouPasswordChangeView(PasswordChangeView):
     """
 
     success_url = reverse_lazy("dashboard:index")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["password_change_message"] = FRANCE_CONNECT_PASSWORD_EXPLANATION
-        return context
 
 
 password_change = login_required(ItouPasswordChangeView.as_view())
@@ -191,7 +189,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
-    form = EditUserInfoForm(request=request, instance=request.user, editor=request.user, data=request.POST or None)
+    form = EditUserInfoForm(instance=request.user, editor=request.user, data=request.POST or None)
     extra_data = request.user.externaldataimport_set.pe_sources().first()
 
     if request.method == "POST" and form.is_valid():
@@ -233,9 +231,7 @@ def edit_job_seeker_info(request, job_application_id, template_name="dashboard/e
 
     dashboard_url = reverse_lazy("dashboard:index")
     back_url = get_safe_url(request, "back_url", fallback_url=dashboard_url)
-    form = EditUserInfoForm(
-        request=request, instance=job_application.job_seeker, editor=request.user, data=request.POST or None
-    )
+    form = EditUserInfoForm(instance=job_application.job_seeker, editor=request.user, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         form.save()

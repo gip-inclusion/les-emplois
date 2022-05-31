@@ -59,17 +59,17 @@
                 Validation de l'échantillon des SIAE
             </p>
 
-            {% if has_active_campaign and evaluation_campaign.percent_set_at%}
+            {% if evaluation_campaign and evaluation_campaign.percent_set_at%}
                 <p>
                     <div class="alert alert-success" role="status">
-                        <p>Vous avez choisi de contrôler {{evaluation_campaign.chosen_percent}}%
-                            des SIAE pour le contrôle a posteriori sur la période du {{evaluation_campaign.evaluated_period_start_at|date:"d F Y"}}
-                            au {{evaluation_campaign.evaluated_period_end_at|date:"d F Y"}}.
+                        <p>Votre contrôle a posteriori sur la période du {{evaluation_campaign.evaluated_period_start_at|date:"d F Y"}}
+                            au {{evaluation_campaign.evaluated_period_end_at|date:"d F Y"}} concerne {{evaluation_campaign.chosen_percent}}%
+                            des SIAE.
                             Vous serez notifié lorsque l'étape de transmission des pièces justificatives commencera.
                         </p>
                     </div>
                 </p>
-            {% elif has_active_campaign %}
+            {% elif evaluation_campaign %}
                 <p>
                     Pour initier le contrôle a posteriori des auto-prescriptions, nous avons besoin de connaître le pourcentage
                     de SIAE que vous souhaitez contrôler. Vous ne pourrez choisir qu'une fois, ensuite, nous effectuerons une sélection

@@ -2,7 +2,8 @@ import string
 
 import factory
 
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.enums import NotificationStatus, NotificationType
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
@@ -20,9 +21,16 @@ class EmployeeRecordFactory(factory.django.DjangoModelFactory):
         model = EmployeeRecord
 
     job_application = factory.SubFactory(JobApplicationWithApprovalNotCancellableFactory)
-
     asp_id = factory.fuzzy.FuzzyText(length=7, chars=string.digits)
-    approval_number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix="99999")
+
+    @factory.post_generation
+    def set_job_seeker_profile(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        self.siret = self.job_application.to_siae.siret
+        self.approval_number = self.job_application.approval.number
 
 
 class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
@@ -31,3 +39,12 @@ class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
     """
 
     job_application = factory.SubFactory(JobApplicationWithCompleteJobSeekerProfileFactory)
+
+
+class EmployeeRecordUpdateNotificationFactory(factory.django.DjangoModelFactory):
+    employee_record = factory.SubFactory(EmployeeRecordWithProfileFactory)
+    notification_type = NotificationType.APPROVAL
+    status = NotificationStatus.NEW
+
+    class Meta:
+        model = EmployeeRecordUpdateNotification

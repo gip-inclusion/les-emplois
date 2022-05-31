@@ -1,9 +1,13 @@
 import logging
 
+from django.db.models import DateField
+from django.db.models.functions import Cast
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.throttling import UserRateThrottle
 
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.employee_record.serializers import EmployeeRecordUpdateNotificationSerializer
 from itou.job_applications.models import JobApplication
 
 from .perms import EmployeeRecordAPIPermission
@@ -11,6 +15,17 @@ from .serializers import DummyEmployeeRecordSerializer, EmployeeRecordAPISeriali
 
 
 logger = logging.getLogger("api_drf")
+
+
+class EmployeeRecordRateThrottle(UserRateThrottle):
+    # Pulled out for testing
+    # For the record, we suspect API calls made by GTA software (used by SIAEs)
+    # to be a bit excessive for the least.
+    # We will adapt rates if needed.
+    EMPLOYEE_RECORD_API_REQUESTS_NUMBER = 12
+
+    # For all employee record API endpoints
+    rate = f"{EMPLOYEE_RECORD_API_REQUESTS_NUMBER}/min"
 
 
 class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
@@ -37,7 +52,27 @@ class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         return JobApplication.objects.order_by("pk")[:25]
 
 
-class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
+class AbstractEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
+
+    # Every employee record endpoint is now throttled
+    throttle_classes = [EmployeeRecordRateThrottle]
+
+    # Possible authentication frameworks:
+    # - token auth: for external access / real world use case
+    # - session auth: for dev context and browseable API
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    # Additional / custom permission classes:
+    # Enforce the default one (IsAuthenticated)
+    permission_classes = [EmployeeRecordAPIPermission]
+
+
+def _annotate_convert_created_at(queryset):
+    # Add a new `creation_date` field (cast of `created_at` to a date)
+    return queryset.annotate(creation_date=Cast("created_at", output_field=DateField()))
+
+
+class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
     """
     # API fiches salarié
 
@@ -45,7 +80,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
     - dans l'état `PROCESSED` (par défaut)
     - pour toutes les embauches / candidatures des SIAE liées au token d'identification
-    - classées par date de création et date de mise à jour (plus récent au plus ancien)
+    - classées par date de création (plus récent au plus ancien)
 
     Il est également possible d'obtenir le détail d'une fiche salarié par son
     identifiant (dans les mêmes conditions d'autorisation que pour la liste complète)
@@ -61,9 +96,15 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     - si l'utilisateur connecté est membre d'une ou plusieurs SIAE éligible aux fiches salarié
 
     # Paramètres
-    Les paramètres suivants sont utilisables en paramètres de requête (query string):
+    Les paramètres suivants sont :
+    - utilisables en paramètres de requête (query string),
+    - chainables : il est possible de préciser un ou plusieurs de ces paramètres pour affiner la recherche.
 
-    ## `status` : statut des fiches salarié
+    Sans paramètre fourni, la liste de résultats contient les fiches salariés en l'état
+
+    - `PROCESSED` (integrées par l'ASP).
+
+    ## `status` : par statut des fiches salarié
     Ce paramètre est un tableau permettant de filtrer les fiches retournées par leur statut
 
     Les valeurs possibles pour ce paramètre sont :
@@ -78,6 +119,12 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     - ajouter `?status=NEW` à l'URL pour les nouvelles fiches.
     - ajouter `?status=NEW&status=READY` pour les nouvelles fiches et celles prêtes pour la transmission.
 
+    ## `created` : à date de création
+    Permet de récupérer les fiches salarié créées à la date donnée en paramètre (au format `AAAA-MM-JJ`).
+
+    ## `since` : depuis une certaine date
+    Permet de récupérer les fiches salarié créées depuis date donnée en paramètre (au format `AAAA-MM-JJ`).
+
     """
 
     # Above doc section is in french for Swagger / OAS auto doc generation
@@ -88,14 +135,30 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = EmployeeRecordAPISerializer
 
-    # Possible authentication frameworks:
-    # - token auth: for external access / real world use case
-    # - session auth: for dev context and browseable API
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    def _filter_by_query_params(self, request, queryset):
+        """
+        Register query parameters for result filtering
+        """
+        result = queryset
+        params = request.query_params
 
-    # Additional / custom permission classes:
-    # Enforce the default one (IsAuthenticated)
-    permission_classes = [EmployeeRecordAPIPermission]
+        # Query params are chainable
+
+        if status := params.getlist("status"):
+            status_filter = [s.upper() for s in status]
+            result = result.filter(status__in=status_filter)
+        else:
+            # if no status given, return employee records in PROCESSED state
+            result = result.processed()
+
+        if created := params.get("created"):
+            result = _annotate_convert_created_at(result).filter(creation_date=created)
+
+        if since := params.get("since"):
+            result = _annotate_convert_created_at(result).filter(creation_date__gte=since)
+
+        # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
+        return result.order_by("-created_at")
 
     def get_queryset(self):
         # We only get to this point if permissions are OK
@@ -109,12 +172,19 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
         # There's something similar in context processors, but:
         # - ctx processors are called AFTER this
         # - and only when rendering a template
-        siaes = self.request.user.siae_set.filter(
-            siaemembership__is_active=True, siaemembership__is_admin=True
-        ).active_or_in_grace_period()
 
+        # Query optimization:
+        # if `siaes` is not wrapped into a list,
+        # the resulting queryset will be reused as a subquery in the main query (below),
+        # leading to ghastly performance issues.
+        # Using a list gives a 20-50x speed gain on the query.
+        siaes = list(
+            self.request.user.siae_set.filter(siaemembership__is_active=True, siaemembership__is_admin=True)
+            .active_or_in_grace_period()
+            .values_list("pk", flat=True)
+        )
         try:
-            return queryset.filter(job_application__to_siae__in=siaes).order_by("-created_at", "-updated_at")
+            return queryset.filter(job_application__to_siae__id__in=siaes).order_by("-created_at", "-updated_at")
         finally:
             # Tracking is currently done via user-agent header
             logger.info(
@@ -122,20 +192,7 @@ class EmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
                 self.request.headers.get("User-Agent"),
             )
 
-    def _filter_by_query_params(self, request, queryset):
-        """
-        Register query parameters result filtering:
-        - only using employee record `status` is available for now.
-        - `status` query param can be an array of value.
-        """
-        params = request.query_params
 
-        if status := params.getlist("status", ""):
-            status_filter = [s.upper() for s in status]
-
-            return queryset.filter(status__in=status_filter).order_by("-created_at")
-
-        # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
-
-        # Default queryset without params
-        return queryset.processed()
+class EmployeeRecordUpdateNotificationViewSet(AbstractEmployeeRecordViewSet):
+    queryset = EmployeeRecordUpdateNotification.objects.all()
+    serializer_class = EmployeeRecordUpdateNotificationSerializer

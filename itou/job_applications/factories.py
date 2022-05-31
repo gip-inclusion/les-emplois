@@ -13,10 +13,10 @@ from itou.prescribers.factories import (
 )
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import SiaeJobDescription
-from itou.users.enums import Title
 from itou.users.factories import (
     JobSeekerFactory,
     JobSeekerProfileFactory,
+    JobSeekerProfileWithHexaAddressFactory,
     JobSeekerWithMockedAddressFactory,
     PrescriberFactory,
 )
@@ -55,7 +55,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             # A list of jobs were passed in, use them.
             for siae_job_description in extracted:
                 if isinstance(siae_job_description, Appellation):
-                    siae_job_description = SiaeJobDescription.objects.create(
+                    siae_job_description, _ = SiaeJobDescription.objects.get_or_create(
                         siae=self.to_siae, appellation=siae_job_description
                     )
                 self.selected_jobs.add(siae_job_description)
@@ -158,6 +158,5 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
         if not create:
             # Simple build, do nothing.
             return
-        self.job_seeker.title = Title.M
-
-        JobSeekerProfileFactory(user=self.job_seeker).save()
+        # Create a profile for current user
+        JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker).save()

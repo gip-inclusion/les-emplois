@@ -51,6 +51,16 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Siae
 
+    class Params:
+        subject_to_eligibility = factory.Trait(
+            kind=factory.fuzzy.FuzzyChoice(models.Siae.ELIGIBILITY_REQUIRED_KINDS),
+        )
+        not_subject_to_eligibility = factory.Trait(
+            kind=factory.fuzzy.FuzzyChoice(
+                [kind for kind, _ in models.Siae.KIND_CHOICES if kind not in models.Siae.ELIGIBILITY_REQUIRED_KINDS]
+            ),
+        )
+
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)

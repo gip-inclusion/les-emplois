@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.encoding import escape_uri_path
 
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.users.models import JobSeekerProfile
@@ -59,7 +60,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         raise PermissionDenied
 
     form = SelectEmployeeRecordStatusForm(data=request.GET or None)
-    status = EmployeeRecord.Status.NEW
+    status = Status.NEW
 
     # Employee records are created with a job application object
     # At this stage, new job applications / hirings do not have
@@ -89,10 +90,11 @@ def list_employee_records(request, template_name="employee_record/list.html"):
             JobApplication.objects.eligible_as_employee_record(siae).count(),
             "info",
         ),
-        (employee_record_badges.get(EmployeeRecord.Status.READY, 0), "secondary"),
-        (employee_record_badges.get(EmployeeRecord.Status.SENT, 0), "warning"),
-        (employee_record_badges.get(EmployeeRecord.Status.REJECTED, 0), "danger"),
-        (employee_record_badges.get(EmployeeRecord.Status.PROCESSED, 0), "success"),
+        (employee_record_badges.get(Status.READY, 0), "secondary"),
+        (employee_record_badges.get(Status.SENT, 0), "warning"),
+        (employee_record_badges.get(Status.REJECTED, 0), "danger"),
+        (employee_record_badges.get(Status.PROCESSED, 0), "success"),
+        (employee_record_badges.get(Status.DISABLED, 0), "emploi-lightest"),
     ]
 
     # Override defaut value (NEW status)
@@ -103,17 +105,25 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     # Not needed every time (not pulled-up), and DRY here
     base_query = EmployeeRecord.objects.full_fetch()
 
-    if status == EmployeeRecord.Status.NEW:
+    if status == Status.NEW:
         data = JobApplication.objects.eligible_as_employee_record(siae)
+        # Browse to get only the linked employee record in "new" state
+        for item in data:
+            for e in item.employee_record.all():
+                if e.status == Status.NEW:
+                    item.employee_record_new = e
+                    break
         employee_records_list = False
-    elif status == EmployeeRecord.Status.READY:
+    elif status == Status.READY:
         data = base_query.ready_for_siae(siae)
-    elif status == EmployeeRecord.Status.SENT:
+    elif status == Status.SENT:
         data = base_query.sent_for_siae(siae)
-    elif status == EmployeeRecord.Status.REJECTED:
+    elif status == Status.REJECTED:
         data = EmployeeRecord.objects.rejected_for_siae(siae)
-    elif status == EmployeeRecord.Status.PROCESSED:
+    elif status == Status.PROCESSED:
         data = base_query.processed_for_siae(siae)
+    elif status == Status.DISABLED:
+        data = base_query.disabled_for_siae(siae)
 
     if data:
         navigation_pages = pager(data, request.GET.get("page", 1), items_per_page=10)
@@ -245,10 +255,12 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         employee_record = None
 
         try:
-            if not job_application.employee_record.first():
+            if not job_application.employee_record.exclude(status=Status.DISABLED).first():
                 employee_record = EmployeeRecord.from_job_application(job_application)
             else:
-                employee_record = EmployeeRecord.objects.get(job_application=job_application)
+                employee_record = EmployeeRecord.objects.exclude(status=Status.DISABLED).get(
+                    job_application=job_application
+                )
 
             employee_record.save()
 
@@ -287,6 +299,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     step = 4
     employee_record = (
         EmployeeRecord.objects.full_fetch()
+        .exclude(status=Status.DISABLED)
         .select_related("job_application__to_siae__convention")
         .get(job_application=job_application)
     )
@@ -319,10 +332,12 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     step = 5
-    employee_record = get_object_or_404(EmployeeRecord.objects.full_fetch(), job_application=job_application)
+    employee_record = get_object_or_404(
+        EmployeeRecord.objects.full_fetch().exclude(status=Status.DISABLED), job_application=job_application
+    )
 
     if request.method == "POST":
-        if employee_record.status in [EmployeeRecord.Status.NEW, EmployeeRecord.Status.REJECTED]:
+        if employee_record.status in [Status.NEW, Status.REJECTED, Status.DISABLED]:
             employee_record.update_as_ready()
         return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.id,)))
 
@@ -346,7 +361,7 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    query_base = EmployeeRecord.objects.full_fetch()
+    query_base = EmployeeRecord.objects.full_fetch().exclude(status=Status.DISABLED)
     employee_record = get_object_or_404(query_base, pk=employee_record_id)
     job_application = employee_record.job_application
 
@@ -360,4 +375,41 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
         "status": status,
     }
 
+    return render(request, template_name, context)
+
+
+@login_required
+def disable(request, employee_record_id, template_name="employee_record/disable.html"):
+    """
+    Display the form to disable a given employee record
+    """
+    siae = get_current_siae_or_404(request)
+
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
+    query_base = EmployeeRecord.objects.full_fetch().exclude(status=Status.DISABLED)
+    employee_record = get_object_or_404(query_base, pk=employee_record_id)
+    job_application = employee_record.job_application
+
+    if not siae_is_allowed(job_application, siae):
+        raise PermissionDenied
+
+    status = request.GET.get("status")
+    list_url = reverse("employee_record_views:list")
+    back_url = f"{ list_url }?status={ status }"
+
+    if employee_record.status not in EmployeeRecord.CAN_BE_DISABLED_STATES:
+        messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+        return HttpResponseRedirect(back_url)
+
+    if request.method == "POST" and request.POST.get("confirm") == "true":
+        employee_record.update_as_disabled()
+        messages.success(request, "La fiche salarié a bien été désactivée.")
+        return HttpResponseRedirect(back_url)
+
+    context = {
+        "employee_record": employee_record,
+        "back_url": back_url,
+    }
     return render(request, template_name, context)

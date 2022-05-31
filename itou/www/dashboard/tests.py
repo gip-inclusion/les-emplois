@@ -3,9 +3,10 @@ from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
+from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord
 from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -17,7 +18,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.prescribers import factories as prescribers_factories
-from itou.siae_evaluations.factories import EvaluationCampaignFactory
+from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
@@ -95,11 +96,11 @@ class DashboardViewTest(TestCase):
 
         # create rejected job applications
         job_application = JobApplicationWithApprovalFactory(to_siae=siae)
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.REJECTED)
-        EmployeeRecordFactory(job_application=job_application, status=EmployeeRecord.Status.REJECTED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
+        EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
 
         other_job_application = JobApplicationWithApprovalFactory(to_siae=other_siae)
-        EmployeeRecordFactory(job_application=other_job_application, status=EmployeeRecord.Status.REJECTED)
+        EmployeeRecordFactory(job_application=other_job_application, status=Status.REJECTED)
 
         session = self.client.session
 
@@ -172,9 +173,22 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
 
-        EvaluationCampaignFactory(institution=institution)
+        evaluation_campaign = EvaluationCampaignFactory(institution=institution)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
+        self.assertContains(response, reverse("siae_evaluations_views:samples_selection"))
+
+        evaluation_campaign.evaluations_asked_at = timezone.now()
+        evaluation_campaign.save(update_fields=["evaluations_asked_at"])
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Contrôle a posteriori")
+        self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            ),
+        )
 
     def test_dashboard_siae_evaluations_siae_access(self):
         # preset for incoming new pages
@@ -184,6 +198,11 @@ class DashboardViewTest(TestCase):
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
+
+        fake_now = timezone.now()
+        EvaluatedSiaeFactory(siae=siae, evaluation_campaign__evaluations_asked_at=fake_now)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Contrôle a posteriori")
 
 
 class EditUserInfoViewTest(TestCase):

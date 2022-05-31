@@ -1,6 +1,7 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
+{% if job_application.to_siae.is_subject_to_eligibility_rules %}
 Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion. Vous trouverez ci-dessous votre PASS IAE (il équivaut à l'agrément Pôle emploi conformément aux articles L 5132-1 à L 5132-17 du code du travail) :
 
 PASS IAE N° : {{ job_application.approval.number_with_spaces }}
@@ -30,5 +31,10 @@ Afin de nous aider à évaluer la performance de notre service, accepteriez-vous
 Prenez 30 secondes pour nous donner votre avis ! Cliquez sur : {{ siae_survey_link }}
 
 Merci de votre participation et à très bientôt sur les emplois de l'inclusion !
+{% else %}
+Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion.
+
+Votre contact : {{ itou_assistance_url }}
+{% endif %}
 
 {% endblock body %}

@@ -5,8 +5,9 @@ import string
 import factory
 import factory.fuzzy
 
+from itou.asp.factories import CommuneFactory, CountryFranceFactory
 from itou.asp.mocks.providers import INSEECommuneProvider, INSEECountryProvider
-from itou.asp.models import AllocationDuration, EducationLevel
+from itou.asp.models import AllocationDuration, EducationLevel, LaneType
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.users import models
 from itou.users.enums import Title
@@ -28,23 +29,30 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = models.User
 
     username = factory.Sequence("user_name{0}".format)
-    first_name = factory.Sequence("first_name{0}".format)
-    last_name = factory.Sequence("last_name{0}".format)
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
     email = factory.Sequence("email{0}@domain.com".format)
     password = factory.PostGenerationMethodCall("set_password", DEFAULT_PASSWORD)
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
-    phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
+    phone = factory.Faker("phone_number", locale="fr_FR")
 
 
 class JobSeekerFactory(UserFactory):
+    title = random.choice(Title.values)
     is_job_seeker = True
     pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
+    birth_country = factory.SubFactory(CountryFranceFactory)
+    birth_place = factory.SubFactory(CommuneFactory)
 
     @factory.lazy_attribute
     def nir(self):
         gender = random.choice([1, 2])
-        year = self.birthdate.strftime("%y")
-        month = self.birthdate.strftime("%m")
+        if self.birthdate:
+            year = self.birthdate.strftime("%y")
+            month = self.birthdate.strftime("%m")
+        else:
+            year = "87"
+            month = "06"
         department = str(random.randint(1, 99)).zfill(2)
         random_1 = str(random.randint(0, 399)).zfill(3)
         random_2 = str(random.randint(0, 399)).zfill(3)
@@ -64,9 +72,6 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 
 
 class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
-    birth_country = factory.Faker("asp_country")
-    title = random.choice(Title.values)
-
     @factory.post_generation
     def set_approval_user(self, create, extracted, **kwargs):
         if not create:
@@ -88,6 +93,15 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     education_level = random.choice(EducationLevel.values)
     # JobSeeker are created with a Pôle emploi ID
     pole_emploi_since = AllocationDuration.MORE_THAN_24_MONTHS
+
+
+class JobSeekerProfileWithHexaAddressFactory(JobSeekerProfileFactory):
+    # Adding a minimum profile with all mandatory fields
+    # will avoid many mocks and convolutions during testing.
+    hexa_lane_type = random.choice(LaneType.values)
+    hexa_lane_name = factory.Faker("street_address", locale="fr_FR")
+    hexa_commune = factory.SubFactory(CommuneFactory)
+    hexa_post_code = factory.Faker("postalcode")
 
 
 class PrescriberFactory(UserFactory):

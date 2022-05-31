@@ -3,13 +3,14 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 import itou.employee_record.models as models
+from itou.employee_record.enums import Status
 
 
 @admin.register(models.EmployeeRecord)
 class EmployeeRecordAdmin(admin.ModelAdmin):
     @admin.action(description="Marquer les fiches salarié selectionnées comme COMPLETÉES")
     def update_employee_record_as_ready(self, _request, queryset):
-        queryset.update(status=models.EmployeeRecord.Status.READY)
+        queryset.update(status=Status.READY)
 
     actions = [
         update_employee_record_as_ready,
@@ -103,3 +104,28 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
     job_seeker.short_description = "Salarié"
     job_seeker_profile_link.short_description = "Profil du salarié"
+
+
+@admin.register(models.EmployeeRecordUpdateNotification)
+class EmployeeRecordUpdateNotificationAdmin(admin.ModelAdmin):
+    list_display = (
+        "pk",
+        "created_at",
+        "updated_at",
+        "notification_type",
+        "status",
+    )
+
+    list_filter = (
+        "status",
+        "notification_type",
+    )
+
+    raw_id_fields = ("employee_record",)
+
+    readonly_fields = (
+        "asp_batch_file",
+        "asp_batch_line_number",
+        "asp_processing_code",
+        "asp_processing_label",
+    )

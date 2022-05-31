@@ -1,65 +1,54 @@
-from django.core.management.base import BaseCommand
-from django.db.models import Subquery
+import datetime
 
-from itou.approvals.models import Approval
+from django.core.management.base import BaseCommand
+from django.db.models import CharField, Q
+from django.db.models.functions import Length
+
 from itou.job_applications.models import (
     JobApplication,
     JobApplicationPoleEmploiNotificationLog,
     JobApplicationWorkflow,
 )
+from itou.job_applications.tasks import notify_pole_emploi_pass
+
+
+# on this day we started notifying Pole Emploi with each new PASS IAE that would be created.
+PE_API_START_DATE = datetime.date(2021, 12, 16)
 
 
 class Command(BaseCommand):
-    """
-    Notify
-
-    To run:
-        # debug
-        django-admin send_all_approvals_to_pe --dry-run --verbosity=2
-        # prod: real notifications are sent
-        django-admin send_all_approvals_to_pe --no-dry-run
-    """
 
     help = "Notifies Pole Emploi of all the approvals that they did not already accept."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run", dest="dry_run", action="store_true", help="Only print the valid approvals that start today"
-        )
-        parser.add_argument(
-            "--no-dry-run", dest="dry_run", action="store_false", help="Send real notifications to Pole Emploi"
-        )
+        parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    def batch_notify_pole_emploi(self, dry_run: bool, verbosity: int):
-        """
-        Pole emploi wants to be notified of the existing approvals we own
-        that they did not already receive
-        """
-        # We only want to send to Pole Emploi the approvals tied to an accepted job_application
-        approvals = Approval.objects.filter().valid()
+    def handle(self, wet_run=False, **options):
         job_applications = JobApplication.objects.filter(
-            approval__pk__in=Subquery(approvals.values("pk")), state=JobApplicationWorkflow.STATE_ACCEPTED
+            approval__start_at__lte=PE_API_START_DATE, state=JobApplicationWorkflow.STATE_ACCEPTED
         )
-        # We need to discard the notifications we sent and that they alreay accepted
-        notifs_ok = JobApplicationPoleEmploiNotificationLog.objects.filter(
-            status=JobApplicationPoleEmploiNotificationLog.STATUS_OK
+        self.stdout.write(f"job_applications   count={job_applications.count()}")
+
+        CharField.register_lookup(Length)
+        with_valid_users = job_applications.exclude(Q(job_seeker__first_name="") | Q(job_seeker__last_name="")).filter(
+            job_seeker__isnull=False,
+            job_seeker__nir__length__gte=13,
+            job_seeker__birthdate__isnull=False,
         )
-        job_applications = job_applications.exclude(pk__in=Subquery(notifs_ok.values("job_application_id")))
+        self.stdout.write(f"> with valid users count={with_valid_users.count()}")
 
-        if dry_run:
-            self.stdout.write("DRY-RUN. NO NOTIFICATION WILL BE PERFORMED")
-            self.stdout.write(f"{approvals.count()} valid approvals would be sent")
-        else:
-            self.stdout.debug(f"Notifying Pole Emploi for {approvals.count()} valid approvals")
-            # Job application are added to the queue and will be dealt with later on
-            for job_application in job_applications:
-                if verbosity > 1:
-                    self.stdout.write(
-                        "{},{},{}".format(
-                            job_application.id, job_application.hiring_start_at, job_application.hiring_end_at
-                        )
-                    )
-                job_application.notify_pole_emploi_accepted()
-
-    def handle(self, dry_run=False, **options):
-        self.batch_notify_pole_emploi(dry_run, options.get("verbosity"))
+        not_already_sent = with_valid_users.exclude(
+            jobapplicationpoleemploinotificationlog__status__in=[
+                JobApplicationPoleEmploiNotificationLog.STATUS_OK,
+                JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL,
+            ]
+        )
+        self.stdout.write(f"> not already sent count={not_already_sent.count()}")
+        for job_application in not_already_sent:
+            self.stdout.write(
+                "> processing job_application id={} hiring_start_at={} hiring_end_at={}".format(
+                    job_application.id, job_application.hiring_start_at, job_application.hiring_end_at
+                )
+            )
+            if wet_run:
+                notify_pole_emploi_pass(job_application, job_application.job_seeker)

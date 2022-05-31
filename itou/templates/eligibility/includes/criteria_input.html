@@ -16,6 +16,8 @@
             {# Show written proof only to SIAE because prescribers feel they have #}
             {# to provide them when they don't have to. #}
             {% if request.user.is_siae_staff %}
+
+                {# Weird point. Should be cleanup someday. This form uses objects_dict, despite single field is already sent #}
                 {% with objects_dict|get_dict_item:field.name as criteria %}
                     {% if criteria.written_proof %}
                         <p class="small mb-0 form-text text-muted">

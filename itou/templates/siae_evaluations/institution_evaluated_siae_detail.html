@@ -1,0 +1,123 @@
+{% extends "layout/content.html" %}
+{% load format_filters %}
+{% load bootstrap4 %}
+{% load static %}
+
+{%block title%}Contrôler les pièces justificatives{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-12">
+            <div class="row mt-3">
+                <div class="col-12">
+
+                    <h1 class="h1">
+                        Contrôler les pièces justificatives
+                    </h1>
+
+                    {# messages #}
+                    {%if evaluated_siae.state == "REVIEWED" or evaluated_siae.state == "ADVERSARIAL_STAGE"%}
+                        <div class="alert alert-communaute alert-dismissible fade show" role="status">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                <i class="ri-close-line"></i>
+                            </button>
+                            <div class="row">
+                                <div class="col-auto pr-0">
+                                    <i class="ri-information-line ri-xl text-communaute"></i>
+                                </div>
+                                <div class="col">
+                                    <p class="mb-2"><strong>Résultats transmis !</strong></p>
+                                    <p class="mb-0">Merci d'avoir pris le temps de contrôler les pièces justificatives.
+                                        Nous notifions par mail l'administrateur de la Siae.</p>
+                                </div>
+                                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                                    <a href="{{ back_url }}" class="btn btn-sm btn-primary">Retour à la liste des Siae</a>
+                                </div>
+                            </div>
+                        </div>
+                    {%endif%}
+
+                    <h3 class="h3">
+                        Liste des auto-prescriptions de <span class="text-muted">{{evaluated_siae}}</span>
+                    </h3>
+                    <p>
+                        Numéro de téléphone à utiliser au besoin :
+                        <a title="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone }}">
+                            {{ evaluated_siae.siae.phone|format_phone }}
+                        </a>
+                    </p>
+                    <div class="row">
+                        <div class="col-8">
+                            <p>Lorsque vous aurez contrôlé<strong> tous vos justificatifs</strong> pour cette SIAE,
+                                veuillez valider le contrôle effectué pour la notifier de son résultat.
+                            </p>
+                        </div>
+
+                        <div class="col-4">
+                            <a class="btn {% if evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}btn-primary {% else %}btn-outline-primary disabled {% endif %}btn-sm float-right"
+                                href="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
+                                Valider
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    {% for evaluated_job_application in evaluated_siae.evaluated_job_applications.all %}
+                        <div class="card my-3"  >
+                            {# navigation : anchor to scroll to a specific card when returning to this page #}
+                            <a class="scrolldown-anchor" id="{{evaluated_job_application.pk}}"></a>
+                            <div class="card-header">
+                                {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.state%}
+                            </div>
+
+                            <div class="card-body">
+                                {%if evaluated_siae.state == "SUBMITTED"%}
+                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}"
+                                        class="btn btn-outline-primary btn-sm float-right">
+                                        Contrôler cette auto-prescription
+                                    </a>
+                                {% elif evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" or evaluated_siae.state == "REVIEWED" or evaluated_siae.state == "ADVERSARIAL_STAGE" %}
+                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}"
+                                        class="btn btn-outline-primary btn-sm float-right">
+                                        Revoir ses justificatifs
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
+                <div class="row">
+                    <div class="col-8">
+                        <p>Lorsque vous aurez contrôlé<strong> tous vos justificatifs</strong> pour cette SIAE,
+                            veuillez valider le contrôle effectué pour la notifier de son résultat.
+                        </p>
+                    </div>
+
+                    <div class="col-4">
+                        <a class="btn btn-primary btn-sm float-right"
+                            href="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
+                            Valider
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+
+
+            {% if back_url %}
+                <p class="mt-4">
+                    <a href="{{ back_url }}">Retour</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+
+{% endblock %}
+

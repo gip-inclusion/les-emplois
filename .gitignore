@@ -3,6 +3,7 @@ envs/dev.env
 envs/prod.env
 envs/secrets.env
 envs/staging.env
+.envrc
 
 # Config
 config/settings/dev.py
@@ -94,7 +95,6 @@ Pipfile*
 
 # Editors
 .tm_properties
-/.vscode/
 
 # Jetbrains / Pycharm
 *.iml

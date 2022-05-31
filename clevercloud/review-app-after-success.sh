@@ -11,7 +11,14 @@ if [ "$SKIP_FIXTURES" = true ] ; then
 fi
 
 echo "Loading cities"
-PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD pg_restore -d $POSTGRESQL_ADDON_DB -h $POSTGRESQL_ADDON_HOST -p $POSTGRESQL_ADDON_PORT -U $POSTGRESQL_ADDON_USER --if-exists --clean --no-owner --no-privileges $APP_HOME/itou/fixtures/postgres/cities.sql
+PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD \
+    psql \
+    --dbname $POSTGRESQL_ADDON_DB \
+    --host $POSTGRESQL_ADDON_HOST \
+    --port $POSTGRESQL_ADDON_PORT \
+    --username $POSTGRESQL_ADDON_USER \
+    --file $APP_HOME/itou/fixtures/postgres/cities.sql \
+    --quiet
 
 # `ls $APP_HOME` does not work as the current user
 # does not have execution rights on the $APP_HOME directory.

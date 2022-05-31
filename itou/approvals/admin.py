@@ -316,7 +316,7 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
         "is_valid",
         "created_at",
     )
-    search_fields = ("pk", "pole_emploi_id", "number", "first_name", "last_name", "birth_name")
+    search_fields = ("pk", "pole_emploi_id", "nir", "number", "first_name", "last_name", "birth_name")
     list_filter = (IsValidFilter,)
     date_hierarchy = "birthdate"
 

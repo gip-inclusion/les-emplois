@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.enums import Status
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD
@@ -62,7 +62,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.assertContains(response, job_seeker_name)
 
         # More complete tests to come with fixtures files
-        for status in [EmployeeRecord.Status.SENT, EmployeeRecord.Status.REJECTED, EmployeeRecord.Status.PROCESSED]:
+        for status in [Status.SENT, Status.REJECTED, Status.PROCESSED]:
             response = self.client.get(self.url + f"?status={status.value}")
             self.assertNotContains(response, job_seeker_name)
 

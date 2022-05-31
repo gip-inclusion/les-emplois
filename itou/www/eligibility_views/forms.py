@@ -1,5 +1,6 @@
 from django import forms
 
+from itou.eligibility import enums as eligibilty_enums
 from itou.eligibility.models import AdministrativeCriteria
 
 
@@ -23,8 +24,8 @@ class ConfirmEligibilityForm(forms.Form):
 
 class AdministrativeCriteriaForm(forms.Form):
 
-    LEVEL_1_PREFIX = "level_1_"
-    LEVEL_2_PREFIX = "level_2_"
+    LEVEL_1_PREFIX = eligibilty_enums.AdministrativeCriteriaLevelPrefix.LEVEL_1_PREFIX
+    LEVEL_2_PREFIX = eligibilty_enums.AdministrativeCriteriaLevelPrefix.LEVEL_2_PREFIX
 
     OBJECTS = {}
 
@@ -47,30 +48,22 @@ class AdministrativeCriteriaForm(forms.Form):
         f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_DETLD_24} et {NAME_DELD_12}."
     )
 
+    administrative_criteria = AdministrativeCriteria.objects.all()
+
+    def get_administrative_criteria(self):
+        return self.administrative_criteria
+
     def __init__(self, user, siae, **kwargs):
+
         self.user = user
         self.siae = siae
         super().__init__(**kwargs)
 
-        for criterion in AdministrativeCriteria.objects.all():
-
-            if criterion.level == AdministrativeCriteria.Level.LEVEL_1:
-                prefix = self.LEVEL_1_PREFIX
-            elif criterion.level == AdministrativeCriteria.Level.LEVEL_2:
-                prefix = self.LEVEL_2_PREFIX
-            else:
-                raise RuntimeError(f"Unknown level: {criterion.level}.")
-
-            key = f"{prefix}{criterion.pk}"
+        for criterion in self.get_administrative_criteria():
+            key = criterion.key
             self.fields[key] = forms.BooleanField(required=False, label=criterion.name, help_text=criterion.desc)
             self.fields[key].widget.attrs["class"] = "form-check-input"  # Bootstrap CSS class.
             self.OBJECTS[key] = criterion
-
-        # Ensure that `NAME_*` exist in DB.
-        existing_names_in_db = [obj.name for obj in self.OBJECTS.values()]
-        for name in self.NAMES:
-            if name not in existing_names_in_db:
-                raise RuntimeError(f"Unknown name: {name}.")
 
     def clean(self):
         selected_objects = [self.OBJECTS[key] for key, selected in self.cleaned_data.items() if selected]
@@ -102,3 +95,19 @@ class AdministrativeCriteriaForm(forms.Form):
                 raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER)
 
         return selected_objects
+
+
+class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
+    def get_administrative_criteria(self):
+        return AdministrativeCriteria.objects.for_job_application(self.job_application)
+
+    def __init__(self, user, siae, job_application, **kwargs):
+
+        self.job_application = job_application
+
+        self.siae = siae
+        if self.siae.kind == self.siae.KIND_ETTI or self.siae.kind == self.siae.KIND_AI:
+            self.num_level2_admin_criteria = 2
+        else:
+            self.num_level2_admin_criteria = 3
+        super().__init__(user, siae, **kwargs)

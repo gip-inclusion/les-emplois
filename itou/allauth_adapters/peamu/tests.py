@@ -11,6 +11,7 @@ from django.core import mail
 from django.test import override_settings
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
+from itou.users import enums as users_enums
 from itou.users.models import User
 
 
@@ -54,6 +55,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         self.assertEqual(email_address.user.last_name, "Doe")
         self.assertEqual(email_address.user.username, "john")
         self.assertEqual(email_address.user.is_active, True)
+        self.assertEqual(email_address.user.identity_provider, users_enums.IdentityProvider.PE_CONNECT)
         # Note that a PEAMU user is automatically set as a job seeker.
         self.assertEqual(email_address.user.is_job_seeker, True)
         self.assertEqual(email_address.user.is_prescriber, False)

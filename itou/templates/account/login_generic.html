@@ -7,7 +7,7 @@
 {% block title %}Connexion{{ block.super }}{% endblock %}
 
 {% block right_content %}
-    <div class="mt-5">
+    <div class="py-5 py-lg-7">
         <h1 class="h1-hero-c1">Connexion</h1>
 
         <form method="post" action="{{ login_url }}" class="js-prevent-multiple-submit">
@@ -31,7 +31,6 @@
 
         </form>
 
-
         {% if signup_allowed %}
             <div class="mt-5 mb-5">
                 <p>Vous n'avez pas de compte ?</p>
@@ -51,8 +50,8 @@
 
 {% block left_content %}
     <!-- Hide left column on small devices. -->
-    <div class="mt-5 d-none d-sm-block">
-        <h2 class="h1 ff-extra-01 text-center">Bienvenue !</h2>
-        <img class="img-fluid mt-5" src="{% static 'img/login.svg' %}" alt="">
+    <div class="d-none d-md-block py-md-5 py-lg-7 text-center">
+        <p class="display-1 ff-extra-01 mb-5">Bienvenue !</p>
+        <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/login.svg' %}" alt="">
     </div>
 {% endblock %}

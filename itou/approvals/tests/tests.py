@@ -339,7 +339,7 @@ class ApprovalModelTest(TestCase):
 
         user = JobSeekerFactory()
         valid_pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, number="625741810182A01"
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, number="625741810182"
         )
         approvals_wrapper = ApprovalsWrapper(user)
 
@@ -488,15 +488,8 @@ class PoleEmploiApprovalModelTest(TestCase):
         self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("N Guessan"), "N GUESSAN")
 
     def test_number_with_spaces(self):
-
-        # 12 chars.
         pole_emploi_approval = PoleEmploiApprovalFactory(number="400121910144")
         expected = "40012 19 10144"
-        self.assertEqual(pole_emploi_approval.number_with_spaces, expected)
-
-        # 15 chars.
-        pole_emploi_approval = PoleEmploiApprovalFactory(number="010331610106A01")
-        expected = "01033 16 10106 A01"
         self.assertEqual(pole_emploi_approval.number_with_spaces, expected)
 
     def test_is_valid(self):
@@ -524,18 +517,82 @@ class PoleEmploiApprovalModelTest(TestCase):
 
 
 class PoleEmploiApprovalManagerTest(TestCase):
-    """
-    Test PoleEmploiApprovalManager.
-    """
+    def test_find_for_no_queries(self):
+        user = JobSeekerFactory(pole_emploi_id="")
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 0)
 
-    def test_find_for(self):
+        user = JobSeekerFactory(birthdate=None)
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 0)
 
+    def test_find_for_user(self):
+
+        # given a User, ensure we can find a PE approval using its pole_emploi_id and not the others.
         user = JobSeekerFactory()
         pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
-        search_results = PoleEmploiApproval.objects.find_for(user)
+        # just another approval, to be sure we don't find the other one "by chance"
+        PoleEmploiApprovalFactory()
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
         self.assertEqual(search_results.count(), 1)
         self.assertEqual(search_results.first(), pe_approval)
-        PoleEmploiApproval.objects.all().delete()
+
+        # ensure we can find **all** PE approvals using their pole_emploi_id and not the others.
+        other_valid_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 2)
+        self.assertEqual(search_results[0], pe_approval)
+        self.assertEqual(search_results[1], other_valid_approval)
+
+        # ensure we **also** find PE approvals using the user's NIR.
+        nir_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 3)
+        self.assertEqual(search_results[0], pe_approval)
+        self.assertEqual(search_results[1], other_valid_approval)
+        self.assertEqual(search_results[2], nir_approval)
+
+        # since we can have multiple PE approvals with the same nir, let's fetch them all
+        other_nir_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 4)
+        self.assertEqual(search_results[0], pe_approval)
+        self.assertEqual(search_results[1], other_valid_approval)
+        self.assertEqual(search_results[2], nir_approval)
+        self.assertEqual(search_results[3], other_nir_approval)
+
+        # ensure it's not an issue if the PE approval matches both NIR, pole_emploi_id and birthdate.
+        nir_approval.birthdate = user.birthdate
+        nir_approval.pole_emploi_id = user.pole_emploi_id
+        nir_approval.save()
+
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 4)
+        self.assertEqual(search_results[0], pe_approval)
+        self.assertEqual(search_results[1], other_valid_approval)
+
+        # the order changes because now, the first WHERE clause gets `nir_approval` alone "first",
+        # and the ordering on `start_at DESC` doesn't change this as both columns are set to "today".
+        # this may depend on PostgreSQL or pysocpg behaviour though, it may be wiser to:
+        # - also order by pk or creation date
+        # - use a fixture that has a clearly different start_at
+        # in order to ensure this test does not become flaky.
+        self.assertEqual(search_results[2], other_nir_approval)
+        self.assertEqual(search_results[3], nir_approval)
+
+    def test_find_for_no_nir(self):
+        user = JobSeekerFactory(nir=None)
+        PoleEmploiApprovalFactory(nir=None)  # entirely unrelated
+        with self.assertNumQueries(0):
+            search_results = PoleEmploiApproval.objects.find_for(user)
+        self.assertEqual(search_results.count(), 0)
 
 
 class ApprovalsWrapperTest(TestCase):
@@ -1085,7 +1142,7 @@ class SuspensionModelTest(TestCase):
             self.assertEqual(len(result), 4)
 
     def test_next_min_start_date(self):
-        today = timezone.now()
+        today = timezone.localdate()
         start_at = today - relativedelta(days=10)
 
         job_application_1 = JobApplicationWithApprovalFactory(hiring_start_at=today)
@@ -1099,19 +1156,17 @@ class SuspensionModelTest(TestCase):
         # What should be the expected suspension mimimum start date ?
 
         min_start_at = Suspension.next_min_start_at(job_application_1.approval)
-        self.assertEqual(min_start_at, today.date())
+        self.assertEqual(min_start_at, today)
 
         # Same rules apply for PE approval and PASS IAE
         min_start_at = Suspension.next_min_start_at(job_application_2.approval)
-        self.assertEqual(min_start_at, start_at.date())
+        self.assertEqual(min_start_at, start_at)
         min_start_at = Suspension.next_min_start_at(job_application_3.approval)
-        self.assertEqual(min_start_at, start_at.date())
+        self.assertEqual(min_start_at, start_at)
 
         # Fix a type error when creating a suspension:
         min_start_at = Suspension.next_min_start_at(job_application_4.approval)
-        self.assertEqual(
-            min_start_at, today.date() - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
-        )
+        self.assertEqual(min_start_at, today - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS))
 
 
 class SuspensionModelTestTrigger(TestCase):

@@ -15,13 +15,14 @@ with z_candidatures as (
 	c.nom_structure,
 	c.injection_ai,
 	c.origine,
+	c.origine_détaillée,
 	c.département_structure,
 	c.nom_département_structure,
 	c.région_structure,
 	c.nom_org_prescripteur	
     from 
 	public.candidatures c 
-    where injection_ai = 0
+    where injection_ai = 0 and type_structure IN ('AI', 'ACI', 'EI', 'EITI', 'ETTI') 
     group by 
 	état,
 	c.date_candidature,
@@ -30,6 +31,7 @@ with z_candidatures as (
 	nom_structure,
 	injection_ai,
 	origine,
+	origine_détaillée,
 	département_structure,
 	nom_département_structure,
 	région_structure,
@@ -66,6 +68,7 @@ select
     z_candidatures.nom_structure,
     z_candidatures.type_structure,
     z_candidatures.origine,
+    z_candidatures.origine_détaillée,
     s.ville,
     z_candidatures.département_structure,
     z_candidatures.nom_département_structure,

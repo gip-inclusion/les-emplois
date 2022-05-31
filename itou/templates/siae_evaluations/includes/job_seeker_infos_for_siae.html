@@ -1,0 +1,24 @@
+<div class="row">
+    <div class="col-md-9">
+        <h3 class="h2">Auto-prescription pour
+            <span class="text-muted">
+                {{job_seeker.get_full_name|title}}
+            </span>
+        </h3>
+        <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ approval.number_with_spaces }}</b></p>
+    </div>
+    <div class="col-md-3 text-right">
+        <p class="small mb-0">
+            {# note vincentporte: state should be computed in view instead of in template to make this include reuseable for institution views #}
+            {% if state == "PENDING" %}
+                <p class="badge badge-pilotage float-right">à traiter</b></p>
+            {% elif state == "PROCESSING" %}
+                <p class="badge badge-pilotage float-right">en cours</b></p>
+            {% elif state == "UPLOADED" %}
+                <p class="badge badge-success float-right">traité</b></p>
+            {% elif state == "SUBMITTED" %}
+                <p class="badge badge-communaute-light float-right">transmis</b></p>
+            {% endif %}
+        </p>
+    </div>
+</div>

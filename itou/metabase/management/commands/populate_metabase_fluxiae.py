@@ -64,7 +64,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from itou.metabase.management.commands._dataframes import store_df
-from itou.metabase.management.commands._utils import build_custom_tables
+from itou.metabase.management.commands._utils import build_final_tables
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
 from itou.utils.slack import send_slack_message
 
@@ -133,7 +133,7 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_Structure")
 
         # Build custom tables by running raw SQL queries on existing tables.
-        build_custom_tables(dry_run=self.dry_run)
+        build_final_tables(dry_run=self.dry_run)
 
         send_slack_message(
             ":white_check_mark: Fin de la mise à jour hebdomadaire de Metabase avec les"

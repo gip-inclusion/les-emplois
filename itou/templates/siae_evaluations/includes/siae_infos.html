@@ -1,0 +1,22 @@
+<div class="row">
+    <div class="col-lg-9 col-md-9 col-8">
+        <h3 >
+            {{evaluated_siae}}
+        </h3>
+    </div>
+    <div class="col-lg-3 col-md-3 col-4">
+        <p class="small mb-0">
+            {% if evaluated_siae.state == "SUBMITTED"%}
+                <p class="badge badge-pilotage float-right">À traiter</p>
+            {%elif evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ACCEPTED" %}
+                <p class="badge badge-pilotage float-right">En cours</p>
+            {%elif evaluated_siae.state == "REVIEWED" %}
+                <p class="badge badge-communaute-light float-right">Résultats transmis</p>
+            {%elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
+                <p class="badge badge-marche-light float-right">Phase contradictoire</p>
+            {%else%}
+                <p class="badge badge-emploi float-right">En attente</p>
+            {%endif%}
+        </p>
+    </div>
+</div>
