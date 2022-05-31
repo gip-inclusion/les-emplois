@@ -46,11 +46,10 @@ class Command(EmployeeRecordTransferCommand):
         """
         # Ability to use ASP test serializers (using fake SIRET numbers)
         raw_batch = EmployeeRecordBatch(notifications)
-        batch = (
-            TestEmployeeRecordUpdateNotificationBatchSerializer(raw_batch)
-            if self.asp_test
-            else EmployeeRecordUpdateNotificationBatchSerializer(raw_batch)
-        )
+        if self.asp_test:
+            batch = TestEmployeeRecordUpdateNotificationBatchSerializer(raw_batch)
+        else:
+            batch = EmployeeRecordUpdateNotificationBatchSerializer(raw_batch)
 
         remote_path = self.upload_json_file(batch.data, conn, dry_run)
 
@@ -79,21 +78,25 @@ class Command(EmployeeRecordTransferCommand):
         records = batch.get("lignesTelechargement")
 
         if not records:
-            self.stdout.write(f"Could not get any employee record notification from file: {feedback_file}")
+            self.stdout.write(f"Could not get any employee record notification from file: {feedback_file=}")
             return 0
 
         for idx, employee_record in enumerate(records, 1):
 
             if employee_record.get("typeMouvement") != MovementType.UPDATE:
-                # Silent : no impact and no need to be verbose
-                continue
+                # Update notifications are sent in specific files and are not mixed
+                # with "standard" employee records (CREATE mode).
+                # If CREATE movements are found in this file, we must skip it.
+                self.stdout.write(f"This feedback file is not a notification update file: SKIPPING, {feedback_file=}")
+                # This will be marked as an error, stop loop and return
+                return 1
 
             line_number = employee_record.get("numLigne")
             processing_code = employee_record.get("codeTraitement")
             processing_label = employee_record.get("libelleTraitement")
 
             if not line_number:
-                self.stdout.write(f"No line number for employee record (index: {idx}, file: {feedback_file})")
+                self.stdout.write(f"No line number for employee record ({idx=}, {feedback_file=})")
                 record_errors += 1
                 continue
 
@@ -101,9 +104,7 @@ class Command(EmployeeRecordTransferCommand):
             notification = EmployeeRecordUpdateNotification.objects.find_by_batch(batch_filename, line_number).first()
 
             if not notification:
-                self.stdout.write(
-                    f"Could not get existing notification: BATCH_FILE={batch_filename}, LINE_NUMBER={line_number}"
-                )
+                self.stdout.write(f"Could not get existing notification: {batch_filename=}, {line_number=}")
                 record_errors += 1
                 continue
 
@@ -117,11 +118,9 @@ class Command(EmployeeRecordTransferCommand):
                         notification.update_as_processed(processing_code, processing_label)
                     except Exception as ex:
                         record_errors += 1
-                        self.stdout.write(f"Can't update notification {notification} : {ex}")
+                        self.stdout.write(f"Can't perform update: {notification=}, {ex=}")
                 else:
-                    self.stdout.write(
-                        f"DRY-RUN: Processed {notification}, code: {processing_code}, label: {processing_label}"
-                    )
+                    self.stdout.write(f"DRY-RUN: Processed {notification}, {processing_code=}, {processing_label=}")
             else:
                 # Employee record is REJECTED:
                 if not dry_run:
@@ -129,11 +128,9 @@ class Command(EmployeeRecordTransferCommand):
                     if notification.status != Status.REJECTED:
                         notification.update_as_rejected(processing_code, processing_label)
                     else:
-                        self.stdout.write(f"Already rejected: {notification}")
+                        self.stdout.write(f"Already rejected: {notification=}")
                 else:
-                    self.stdout.write(
-                        f"DRY-RUN: Rejected {notification} code: {processing_code}, label: {processing_label}"
-                    )
+                    self.stdout.write(f"DRY-RUN: Rejected {notification}: {processing_code=}, {processing_label=}")
 
         return record_errors
 
@@ -141,7 +138,7 @@ class Command(EmployeeRecordTransferCommand):
 
         parser = JSONParser()
         count = 0
-        errors = 0
+        total_errors = 0
         files_to_delete = []
 
         self.stdout.write("Starting DOWNLOAD")
@@ -154,24 +151,27 @@ class Command(EmployeeRecordTransferCommand):
                 return
 
             for result_file in result_files:
+                # Number of errors per file
+                nb_file_errors = 0
                 try:
                     with BytesIO() as result_stream:
-                        self.stdout.write(f"Fetching file '{result_file}'")
+                        self.stdout.write(f"Fetching file: {result_file}")
 
                         conn.getfo(result_file, result_stream)
                         result_stream.seek(0)
-                        errors += self._parse_feedback_file(result_file, parser.parse(result_stream), dry_run)
 
+                        nb_file_errors = self._parse_feedback_file(result_file, parser.parse(result_stream), dry_run)
                         count += 1
                 except Exception as ex:
-                    errors += 1
-                    self.stdout.write(f"Error while parsing file '{result_file}': {ex}")
+                    nb_file_errors += 1
+                    self.stdout.write(f"Error while parsing file {result_file}: {ex=}")
 
                 self.stdout.write(f"Parsed {count}/{len(result_files)} files")
 
                 # There were errors do not delete file
-                if errors > 0:
+                if nb_file_errors > 0:
                     self.stdout.write(f"Will not delete file '{result_file}' because of errors")
+                    total_errors += nb_file_errors
                     continue
 
                 # Everything was fine, will remove file after main loop
