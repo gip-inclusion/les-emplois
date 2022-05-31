@@ -7,6 +7,7 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.encoding import escape_uri_path
+from django.utils.safestring import mark_safe
 
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -163,11 +164,19 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         # Try a geo lookup of the address every time we call this form
         try:
             profile.update_hexa_address()
-        except ValidationError:
+        except ValidationError as ex:
             # cleanup address
             profile.clear_hexa_address()
-
-        return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
+            messages.error(
+                request,
+                mark_safe(
+                    f"<p>Une erreur est survenue : {ex}.</p><p>Veuillez réessayer de valider l'adresse à nouveau.</p>"
+                ),
+            )
+        except Exception as ex:
+            messages.error(request, f"Une erreur est survenue : {ex=}")
+        else:
+            return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
 
     context = {
         "job_application": job_application,
