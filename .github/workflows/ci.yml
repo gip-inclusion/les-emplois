@@ -59,7 +59,7 @@ jobs:
       run: |
         make quality_venv
     - name: 🤹‍ Django tests
-      run: django-admin test --noinput --failfast --parallel=2
+      run: django-admin test --noinput --failfast --parallel
       env:
         DJANGO_DEBUG: True
     - name: 🚧 Check pending migrations
