@@ -1,4 +1,3 @@
-import logging
 from io import BytesIO
 from os import path
 
