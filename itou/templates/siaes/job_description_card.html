@@ -53,7 +53,7 @@
                     <hr>
                     <div class="pt-4 text-left">
                         <h2 class="h1">Consulter le(s) recrutement(s) en cours dans cette structure</h2>
-                        <ul class="list-group">
+                        <ul class="list-group list-group-flush">
                             {% for other_job in others_active_jobs %}
                                 {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
                             {% endfor %}

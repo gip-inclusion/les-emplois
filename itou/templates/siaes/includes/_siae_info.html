@@ -4,7 +4,9 @@
         <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.display_kind }} </p>
         <hr>
         <p class="h2">
-            {{ siae.display_name }}
+            <a href="{% url 'siaes_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}">
+                {{ siae.display_name }}
+            </a>
         </p>
         {# Display non-user-edited name too. #}
         <adresse class="card-subtitle fs-lg font-weight-bold text-secondary">{{ siae.address_on_one_line }}</adresse>
