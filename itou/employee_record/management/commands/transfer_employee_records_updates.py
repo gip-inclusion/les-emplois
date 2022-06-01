@@ -141,7 +141,7 @@ class Command(EmployeeRecordTransferCommand):
         total_errors = 0
         files_to_delete = []
 
-        self.stdout.write("Starting DOWNLOAD")
+        self.stdout.write("Starting DOWNLOAD of employee record notifications")
 
         with conn.cd(settings.ASP_FS_REMOTE_DOWNLOAD_DIR):
             result_files = conn.listdir()
@@ -178,7 +178,7 @@ class Command(EmployeeRecordTransferCommand):
                 files_to_delete.append(result_file)
 
             for file in files_to_delete:
-                # All employee records processed, we can delete feedback file from server
+                # All employee record notifications processed , we can delete feedback file from server
                 if dry_run:
                     self.stdout.write(f"DRY-RUN: Deleting file '{file}'")
                     continue
