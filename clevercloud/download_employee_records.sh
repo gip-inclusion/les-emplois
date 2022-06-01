@@ -18,4 +18,9 @@ fi
 # $APP_HOME is set by default by clever cloud.
 cd $APP_HOME
 
+# Download employee records 
 django-admin transfer_employee_records --download
+
+# Download update notifications 
+django-admin transfer_employee_records_updates --download --wet-run
+
