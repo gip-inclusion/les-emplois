@@ -1708,3 +1708,42 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
 
         self.assertEqual(approval.number, "999990000002")
         self.assertEqual(approval2.number, "999990000003")
+
+
+class PENotificationMixinTestCase(TestCase):
+    def test_base_values(self):
+        approval = ApprovalFactory()
+        self.assertEqual(approval.pe_notification_status, "notification_pending")
+        self.assertEqual(approval.pe_notification_time, None)
+        self.assertEqual(approval.pe_notification_endpoint, None)
+        self.assertEqual(approval.pe_notification_exit_code, None)
+
+    def test_save_error(self):
+        now = timezone.now()
+        approval = ApprovalFactory()
+        approval.pe_save_error("foo", "bar", at=now)
+        approval.refresh_from_db()
+        self.assertEqual(approval.pe_notification_status, "notification_error")
+        self.assertEqual(approval.pe_notification_time, now)
+        self.assertEqual(approval.pe_notification_endpoint, "foo")
+        self.assertEqual(approval.pe_notification_exit_code, "bar")
+
+    def test_save_success(self):
+        now = timezone.now()
+        approval = ApprovalFactory()
+        approval.pe_save_success(at=now)
+        approval.refresh_from_db()
+        self.assertEqual(approval.pe_notification_status, "notification_success")
+        self.assertEqual(approval.pe_notification_time, now)
+        self.assertEqual(approval.pe_notification_endpoint, None)
+        self.assertEqual(approval.pe_notification_exit_code, None)
+
+    def test_save_should_retry(self):
+        now = timezone.now()
+        approval = ApprovalFactory()
+        approval.pe_save_should_retry(at=now)
+        approval.refresh_from_db()
+        self.assertEqual(approval.pe_notification_status, "notification_should_retry")
+        self.assertEqual(approval.pe_notification_time, now)
+        self.assertEqual(approval.pe_notification_endpoint, None)
+        self.assertEqual(approval.pe_notification_exit_code, None)

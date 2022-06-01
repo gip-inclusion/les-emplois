@@ -16,6 +16,7 @@ from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from unidecode import unidecode
 
+from itou.approvals import enums as approvals_enums
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.utils.models import DateRange
 from itou.utils.urls import get_external_link_markup
@@ -117,7 +118,63 @@ class ApprovalAlreadyExistsError(Exception):
     pass
 
 
-class Approval(CommonApprovalMixin):
+class PENotificationMixin(models.Model):
+    pe_notification_status = models.CharField(
+        verbose_name="Etat de la notification à PE",
+        max_length=32,
+        default=approvals_enums.PEApiNotificationStatus.PENDING,
+        choices=approvals_enums.PEApiNotificationStatus.choices,
+    )
+    pe_notification_time = models.DateTimeField(verbose_name="Date de notification à PE", null=True, blank=True)
+    pe_notification_endpoint = models.CharField(
+        verbose_name="Dernier endpoint de l'API PE contacté",
+        max_length=32,
+        choices=approvals_enums.PEApiEndpoint.choices,
+        blank=True,
+        null=True,
+    )
+    pe_notification_exit_code = models.CharField(
+        max_length=64,
+        # remember that those choices are mostly for documentation purposes but do not
+        # constrain the code to actually be among those, which is fortunate since
+        # we don't want the app to break if PE suddenly adds a code.
+        choices=list(approvals_enums.PEApiRechercheIndividuExitCode.choices)
+        + list(approvals_enums.PEApiMiseAJourPassExitCode.choices),
+        verbose_name="Dernier code de sortie constaté",
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        abstract = True
+
+    def _pe_notification_update(self, status, at=None, endpoint=None, exit_code=None):
+        """A helper method to update the fields of the mixin:
+        - whatever the destination class (Approval, PoleEmploiApproval)
+        - without triggering the model's save() method which usually is quite computation intensive
+
+        This will become useless when we will stop managing the PoleEmploiApproval that much.
+        """
+        update_dict = {
+            "pe_notification_status": status,
+            "pe_notification_time": at if at else timezone.now(),
+            "pe_notification_endpoint": endpoint,
+            "pe_notification_exit_code": exit_code,
+        }
+        queryset = self.__class__.objects.filter(pk=self.pk)
+        queryset.update(**{key: value for key, value in update_dict.items() if value})
+
+    def pe_save_error(self, endpoint, exit_code, at=None):
+        self._pe_notification_update(approvals_enums.PEApiNotificationStatus.ERROR, at, endpoint, exit_code)
+
+    def pe_save_should_retry(self, at=None):
+        self._pe_notification_update(approvals_enums.PEApiNotificationStatus.SHOULD_RETRY, at)
+
+    def pe_save_success(self, at=None):
+        self._pe_notification_update(approvals_enums.PEApiNotificationStatus.SUCCESS, at)
+
+
+class Approval(PENotificationMixin, CommonApprovalMixin):
     """
     Store "PASS IAE" whose former name was "approval" ("agréments" in French)
     issued by Itou.
@@ -1019,7 +1076,7 @@ class PoleEmploiApprovalManager(models.Manager):
         return self.filter(Q(nir=None) & Q(ntt_nia=None))
 
 
-class PoleEmploiApproval(CommonApprovalMixin):
+class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     """
     Store consolidated approvals (`agréments` in French) delivered by Pôle emploi.
 

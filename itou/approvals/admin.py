@@ -135,7 +135,14 @@ class ApprovalAdmin(admin.ModelAdmin):
     )
     list_display_links = ("pk", "number")
     raw_id_fields = ("user", "created_by")
-    readonly_fields = ("created_at", "created_by")
+    readonly_fields = (
+        "created_at",
+        "created_by",
+        "pe_notification_status",
+        "pe_notification_time",
+        "pe_notification_endpoint",
+        "pe_notification_exit_code",
+    )
     date_hierarchy = "start_at"
     inlines = (
         SuspensionInline,
