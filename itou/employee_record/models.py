@@ -649,6 +649,9 @@ class EmployeeRecordUpdateNotificationQuerySet(QuerySet):
     def rejected(self):
         return self.filter(status=NotificationStatus.REJECTED)
 
+    def find_by_batch(self, filename, line_number):
+        return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
+
 
 class EmployeeRecordUpdateNotification(models.Model):
     """
