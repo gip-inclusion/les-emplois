@@ -1573,6 +1573,8 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         self.assertFalse(
             JobApplicationPoleEmploiNotificationLog.objects.filter(job_application=job_application).exists()
         )
+        job_application.approval.refresh_from_db()
+        self.assertEqual(job_application.approval.pe_notification_status, "notification_pending")
 
     # Since there are multiple patch, the order matters: the parameters are injected in reverse order
     @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", return_value=True)
@@ -1598,6 +1600,8 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         maj_mock.assert_called_with(job_application, self.encrypted_nir, self.token)
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
         self.assertEqual(notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_OK)
+        job_application.approval.refresh_from_db()
+        self.assertEqual(job_application.approval.pe_notification_status, "notification_success")
 
     # Since there are multiple patch, the order matters: the parameters are injected in reverse order
     @patch("itou.job_applications.tasks.mise_a_jour_pass_iae")
@@ -1622,6 +1626,8 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         maj_mock.assert_not_called()
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.filter(job_application=job_application)
         self.assertFalse(notification_log.exists())
+        job_application.approval.refresh_from_db()
+        self.assertEqual(job_application.approval.pe_notification_status, "notification_pending")
 
     @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", return_value=True)
     @patch(
@@ -1641,6 +1647,8 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         maj_mock.assert_not_called()
         notification_log = JobApplicationPoleEmploiNotificationLog.objects.get(job_application=job_application)
         self.assertEqual(notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION)
+        job_application.approval.refresh_from_db()
+        self.assertEqual(job_application.approval.pe_notification_status, "notification_should_retry")
 
     @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", return_value=True)
     @patch(
@@ -1664,6 +1672,8 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         self.assertEqual(
             notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_SEARCH_INDIVIDUAL
         )
+        job_application.approval.refresh_from_db()
+        self.assertEqual(job_application.approval.pe_notification_status, "notification_should_retry")
 
     @patch("itou.job_applications.tasks.mise_a_jour_pass_iae", side_effect=PoleEmploiMiseAJourPassIAEException("500"))
     @patch(
@@ -1688,6 +1698,8 @@ class JobApplicationNotifyPoleEmploiIntegrationTest(TestCase):
         self.assertEqual(
             notification_log.status, JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_NOTIFY_POLE_EMPLOI
         )
+        job_application.approval.refresh_from_db()
+        self.assertEqual(job_application.approval.pe_notification_status, "notification_should_retry")
 
     @patch("itou.job_applications.models.get_access_token", return_value=token)
     def test_invalid_start_at(self, access_token_mock, _sleep_mock):
