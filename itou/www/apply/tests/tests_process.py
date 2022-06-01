@@ -28,7 +28,8 @@ from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
 
 
-@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
+# patch the one used in the `models` module, not the original one in tasks
+@patch("itou.job_applications.models.huey_notify_pole_emploi", return_value=False)
 class ProcessViewsTest(TestCase):
     """Application process"""
 

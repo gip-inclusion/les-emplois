@@ -37,20 +37,15 @@ from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberF
 from itou.users.models import User
 from itou.utils.apis import api_entreprise
 from itou.utils.apis.geocoding import process_geocoding_data
-from itou.utils.apis.pole_emploi import (
-    PoleEmploiAPIException,
-    PoleEmploiIndividu,
-    mise_a_jour_pass_iae,
-    recherche_individu_certifie_api,
-)
+from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
 from itou.utils.emails import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.pole_emploi import (
-    POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_ERROR_MOCK,
-    POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_OK_MOCK,
-    POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK,
-    POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK,
+    API_MAJPASS_RESULT_ERROR,
+    API_MAJPASS_RESULT_OK,
+    API_RECHERCHE_ERROR,
+    API_RECHERCHE_RESULT_KNOWN,
 )
 from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
@@ -954,126 +949,103 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(etablissement.department, None)
 
 
-class PoleEmploiIndividuTest(TestCase):
-    def test_name_conversion_for_special_characters(self):
-        individual = PoleEmploiIndividu(
-            "marie christine", "Bind n'qici ", datetime.date(1979, 6, 3), "152062441001270"
-        )
-        individual2 = PoleEmploiIndividu(
-            "marié%{-christine}", "Bind-n'qici ", datetime.date(1979, 6, 3), "152062441001270"
-        )
-        # After clarification from PE, names should be truncated, so here we are
-        self.assertEqual(individual.first_name, "MARIE-CHRISTI")
-        self.assertEqual(individual2.first_name, "MARIE-CHRISTI")
-        self.assertEqual(individual.last_name, "BIND N'QICI ")
-        self.assertEqual(individual2.last_name, "BIND-N'QICI ")
-
-    def test_name_conversion_for_accents(self):
-        """first name and last name should not have accents, because Pole Emploi'S API cannot handle them"""
-        individual = PoleEmploiIndividu("aéïèêë", "gh'îkñ", datetime.date(1979, 6, 3), "152062441001270")
-
-        self.assertEqual(individual.first_name, "AEIEEE")
-        self.assertEqual(individual.last_name, "GH'IKN")
-
-    def test_name_length(self):
-        """first name and last name have a maximum length (from PE’s API point of view)
-        and should be truncated if its not the case"""
-        individual = PoleEmploiIndividu("a" * 50, "b" * 50, datetime.date(1979, 6, 3), "152062441001270")
-
-        self.assertEqual(len(individual.first_name), 13)
-        self.assertEqual(len(individual.last_name), 25)
-
-
 @override_settings(
-    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
-)  # noqa
-class PoleEmploiTest(TestCase):
-    """All the test cases around function recherche_individu_certifie_api and mise_a_jour_pass_iae"""
+    API_ESD={
+        "BASE_URL": "https://some.auth.domain",
+        "AUTH_BASE_URL": "https://some-authentication-domain.fr",
+        "KEY": "foobar",
+        "SECRET": "pe-secret",
+    }
+)
+class PoleEmploiAPIClientTest(TestCase):
+    def setUp(self) -> None:
+        self.api_client = PoleEmploiApiClient()
+        respx.post(self.api_client.token_url).respond(
+            200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+        )
 
-    @mock.patch(
-        "httpx.post",
-        return_value=httpx.Response(200, json=POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK),
-    )
-    def test_recherche_individu_certifie_api_nominal(self, mock_post):
-        individual = PoleEmploiIndividu("EVARISTE", "GALOIS", datetime.date(1979, 6, 3), "152062441001270")
-        individu_result = recherche_individu_certifie_api(individual, "some_valid_token")
+    @respx.mock
+    def test_get_token_nominal(self):
+        now = timezone.now()
+        self.api_client._refresh_token(at=now)
+        self.assertEqual(self.api_client.token, "foo batman")
+        self.assertEqual(self.api_client.expires_at, now + datetime.timedelta(seconds=3600))
 
-        self.assertTrue(individu_result.is_valid)
-        self.assertEqual(individu_result.id_national_demandeur, "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ")
-        self.assertEqual(individu_result.code_sortie, "S001")
+    @respx.mock
+    def test_get_token_fails(self):
+        job_seeker = JobSeekerFactory()
+        respx.post(self.api_client.token_url).mock(side_effect=httpx.ConnectTimeout)
+        with self.assertRaises(PoleEmploiAPIException) as ctx:
+            self.api_client.recherche_individu_certifie(job_seeker)
+        self.assertEqual(ctx.exception.error_code, "http_error")
 
-    @mock.patch(
-        "httpx.post",
-        return_value=httpx.Response(200, json=POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK),
-    )
-    def test_recherche_individu_certifie_individual_not_found(self, mock_post):
-        individual = PoleEmploiIndividu("EVARISTE", "GALOIS", datetime.date(1979, 6, 3), "152062441001270")
-        individu_result = recherche_individu_certifie_api(individual, "some_valid_token")
+    @respx.mock
+    def test_recherche_individu_certifie_api_nominal(self):
+        job_seeker = JobSeekerFactory()
+        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
+        id_national = self.api_client.recherche_individu_certifie(job_seeker)
+        self.assertEqual(id_national, "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ")
 
-        self.assertEqual(individu_result.code_sortie, "R010")
-        self.assertFalse(individu_result.is_valid())
+        # now with weird payloads
+        job_seeker.first_name = "marié%{-christine}  aéïèêë " + "a" * 50
+        job_seeker.last_name = "gh'îkñ Bind-n'qici " + "b" * 50
+        id_national = self.api_client.recherche_individu_certifie(job_seeker)
+        payload = json.loads(respx.calls.last.request.content)
+        self.assertEqual(payload["nomNaissance"], "GH'IKN BIND-N'QICI BBBBBB")  # 25 chars
+        self.assertEqual(payload["prenom"], "MARIE-CHRISTI")  # 13 chars
 
-    @mock.patch(
-        "httpx.post",
-        return_value=httpx.Response(401, json=""),
-    )
-    def test_recherche_individu_certifie_invalid_token(self, mock_post):
-        individual = PoleEmploiIndividu("EVARISTE", "GALOIS", datetime.date(1979, 6, 3), "152062441001270")
-        with self.assertRaises(PoleEmploiAPIException):
-            individu_result = recherche_individu_certifie_api(individual, "broken_token")
-            self.assertIsNone(individu_result)
+    @respx.mock
+    def test_recherche_individu_certifie_individual_api_errors(self):
+        job_seeker = JobSeekerFactory()
+        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_ERROR)
+        with self.assertRaises(PoleEmploiAPIBadResponse) as ctx:
+            self.api_client.recherche_individu_certifie(job_seeker)
+        self.assertEqual(ctx.exception.response_code, "R010")
 
-    @mock.patch(
-        "httpx.post",
-        return_value=httpx.Response(200, json=POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_OK_MOCK),
-    )
-    def test_mise_a_jour_pass_iae_success_with_approval_accepted(self, mock_post):
+    @respx.mock
+    def test_recherche_individu_certifie_retryable_errors(self):
+        job_seeker = JobSeekerFactory()
+
+        respx.post(self.api_client.recherche_individu_url).respond(401, json="")
+        with self.assertRaises(PoleEmploiAPIException) as ctx:
+            self.api_client.recherche_individu_certifie(job_seeker)
+        self.assertEqual(ctx.exception.error_code, 401)
+
+        job_seeker = JobSeekerFactory()
+        respx.post(self.api_client.recherche_individu_url).mock(side_effect=httpx.ConnectTimeout)
+        with self.assertRaises(PoleEmploiAPIException) as ctx:
+            self.api_client.recherche_individu_certifie(job_seeker)
+        self.assertEqual(ctx.exception.error_code, "http_error")
+
+    @respx.mock
+    def test_mise_a_jour_pass_iae_success_with_approval_accepted(self):
         """
         Nominal scenario: an approval is **accepted**
-        HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae will return True"""
+        HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae will return True
+        """
         job_application = JobApplicationWithApprovalFactory()
-        result = mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
-        mock_post.assert_called()
-        self.assertTrue(result)
+        respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_OK)
+        self.api_client.mise_a_jour_pass_iae(job_application, "fake_identifier")
 
-    @mock.patch(
-        "httpx.post",
-        return_value=httpx.Response(200, json=POLE_EMPLOI_MISE_A_JOUR_PASS_API_RESULT_ERROR_MOCK),
-    )
-    def test_mise_a_jour_pass_iae_failure(self, mock_post):
-        """
-        If the API answers with a non-S001 codeSortie (this is something in the json output)
-        mise_a_jour_pass_iae will return false
-        """
+    @respx.mock
+    def test_mise_a_jour_pass_iae_failure(self):
         job_application = JobApplicationWithApprovalFactory()
-        with self.assertRaises(PoleEmploiAPIException):
-            mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
-            mock_post.assert_called()
+        # non-S001 codeSortie
+        respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_ERROR)
+        with self.assertRaises(PoleEmploiAPIBadResponse):
+            self.api_client.mise_a_jour_pass_iae(job_application, "fake_identifier")
 
-    @mock.patch(
-        "httpx.post",
-        raises=httpx.ConnectTimeout,
-    )
-    def test_mise_a_jour_pass_iae_timeout(self, mock_post):
-        """
-        If the API answers with a non-S001 codeSortie (this is something in the json output)
-        mise_a_jour_pass_iae will return false
-        """
-        job_application = JobApplicationWithApprovalFactory()
-        with self.assertRaises(PoleEmploiAPIException):
-            mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
-            mock_post.assert_called()
+        # timeout
+        respx.post(self.api_client.mise_a_jour_url).mock(side_effect=httpx.ConnectTimeout)
+        with self.assertRaises(PoleEmploiAPIException) as ctx:
+            self.api_client.mise_a_jour_pass_iae(job_application, "fake_identifier")
+        self.assertEqual(ctx.exception.error_code, "http_error")
 
-    @mock.patch(
-        "httpx.post",
-        return_value=httpx.Response(401, json=""),
-    )
-    def test_mise_a_jour_pass_iae_invalid_token(self, mock_post):
-        """If the API answers with a non-200 http code, mise_a_jour_pass_iae will return false"""
-        job_application = JobApplicationWithApprovalFactory()
+        # auth failed
+        respx.post(self.api_client.mise_a_jour_url).respond(401, json={})
         with self.assertRaises(PoleEmploiAPIException):
-            mise_a_jour_pass_iae(job_application, "some_valid_encrypted_identifier", "some_valid_token")
-            mock_post.assert_called()
+            self.api_client.mise_a_jour_pass_iae(job_application, "fake_identifier")
+        self.assertEqual(ctx.exception.error_code, "http_error")
 
 
 class UtilsEmailsSplitRecipientTest(TestCase):

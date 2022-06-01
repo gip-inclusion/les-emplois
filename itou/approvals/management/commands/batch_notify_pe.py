@@ -72,7 +72,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                         job_application.id, job_application.hiring_start_at, job_application.hiring_end_at
                     )
                 )
-                job_application.notify_pole_emploi_accepted()
+                job_application.notify_pole_emploi()
 
     def handle(self, start_date_str, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))

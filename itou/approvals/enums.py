@@ -19,6 +19,7 @@ class PEApiRechercheIndividuExitCode(models.TextChoices):
     R040 = "R040", "Date de naissance absente"
     R041 = "R041", "Date de naissance incorrecte"
     R042 = "R042", "Date de naissance invalide"
+    MISSING_DATA = "MISSING_DATA", "Utilisateur manquant de données, non essayé."
 
 
 class PEApiMiseAJourPassExitCode(models.TextChoices):

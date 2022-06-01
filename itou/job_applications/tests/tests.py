@@ -3,14 +3,14 @@
 import datetime
 import io
 import json
-from unittest.mock import ANY, PropertyMock, patch
+from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.forms.models import model_to_dict
 from django.template.defaultfilters import title
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -42,18 +42,9 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
-from itou.utils.apis.pole_emploi import (
-    PoleEmploiIndividu,
-    PoleEmploiIndividuResult,
-    PoleEmploiAPIException,
-)
 from itou.utils.templatetags import format_filters
 
 
-@override_settings(
-    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
-)
-@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self, *args, **kwargs):
         job_application = JobApplicationFactory(
@@ -74,6 +65,7 @@ class JobApplicationModelTest(TestCase):
         self.assertFalse(has_considered_valid_diagnoses)
         self.assertTrue(job_application.eligibility_diagnosis_by_siae_required)
 
+    @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_accepted_by(self, notification_mock):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING
@@ -526,12 +518,7 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
 
-@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationNotificationsTest(TestCase):
-    """
-    Test JobApplication notifications: emails content and receivers.
-    """
-
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase.
@@ -796,6 +783,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertNotIn("PASS IAE", email.body)
         self.assertIn(settings.ITOU_ASSISTANCE_URL, email.body)
 
+    @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_manually_deliver_approval(self, *args, **kwargs):
         staff_member = UserFactory(is_staff=True)
         job_seeker = JobSeekerFactory(
@@ -970,13 +958,8 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         self.assertEqual(len(notification.recipients_emails), 0)
 
 
-@override_settings(
-    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
-)
-@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
+@patch("itou.job_applications.models.huey_notify_pole_emploi")
 class JobApplicationWorkflowTest(TestCase):
-    """Test JobApplication workflow."""
-
     def setUp(self):
         self.sent_pass_email_subject = "PASS IAE pour"
         self.accept_email_subject_proxy = "Candidature acceptée et votre avis sur les emplois de l'inclusion"
@@ -1427,10 +1410,8 @@ class JobApplicationWorkflowTest(TestCase):
             job_application.cancel(user=cancellation_user)
 
 
-@patch("itou.job_applications.models.huey_notify_pole_employ", return_value=False)
 class JobApplicationCsvExportTest(TestCase):
-    """Test csv export of a list of job applications."""
-
+    @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_csv_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
         job_seeker = JobSeekerFactory()
