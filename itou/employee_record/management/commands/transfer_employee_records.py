@@ -9,12 +9,11 @@ from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
-from itou.employee_record.enums import Status
+from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
-from itou.utils.management_commands import DeprecatedLoggerMixin
 
 
 # Global SFTP connection options
@@ -25,7 +24,7 @@ if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
     connection_options = pysftp.CnOpts(knownhosts=settings.ASP_FS_KNOWN_HOSTS)
 
 
-class Command(DeprecatedLoggerMixin, BaseCommand):
+class Command(BaseCommand):
     """
     Employee record management command
     ---
@@ -78,7 +77,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         """
         with open(f"{local_path}/{remote_path}", "w") as f:
             f.write(content)
-        self.logger.info("Wrote '%s' to local path '%s'", remote_path, local_path)
+        self.stdout.write(f"Wrote '{remote_path}' to local path '{local_path}'")
 
     def _upload_batch_file(self, conn, employee_records, dry_run):
         """
@@ -99,11 +98,11 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         remote_path = f"RIAE_FS_{timezone.now().strftime('%Y%m%d%H%M%S')}.json"
 
         if dry_run:
-            self.logger.info("DRY-RUN: (not) sending '%s' (%d bytes)", remote_path, len(json_bytes))
-            self.logger.info("Content: \n%s", json_bytes)
+            self.stdout.write(f"DRY-RUN: (not) sending '{remote_path}' ({len(json_bytes)} bytes)")
+            self.stdout.write(f"Content: \n{json_bytes}")
             return
 
-        self.logger.info("Batch info: %s", raw_batch)
+        self.stdout.write(f"Batch info: {raw_batch}")
 
         # There are specific folders for upload and download on the SFTP server
         with conn.cd(settings.ASP_FS_REMOTE_UPLOAD_DIR):
@@ -118,9 +117,9 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             try:
                 conn.putfo(json_stream, remote_path, file_size=len(json_bytes), confirm=False)
 
-                self.logger.info("Succesfully uploaded '%s'", remote_path)
+                self.stdout.write(f"Succesfully uploaded '{remote_path}'")
             except Exception as ex:
-                self.logger.error("Could not upload file: '%s', reason: %s", remote_path, ex)
+                self.stdout.write(f"Could not upload file: {remote_path=}, {ex=}")
 
                 return
 
@@ -145,18 +144,19 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         records = batch.get("lignesTelechargement")
 
         if not records:
-            self.logger.error("Could not get any employee record from file: %s", feedback_file)
-
+            self.stdout.write(f"Could not get any employee record from file: {feedback_file}")
             return 1
 
         # Check for notification records :
         # Notifications are not mixed with employee records
         notification_number = 0
         for record in records:
-            if record.get("typeMouvement") == "M":
+            if record.get("typeMouvement") == MovementType.UPDATE:
                 notification_number += 1
         if notification_number == len(records):
-            self.logger.warning("File `%s` is a notification file, passing.", feedback_file)
+            self.stdout.write(
+                f"File `{feedback_file}` is an update notifications file, passing.",
+            )
             return 1
 
         for idx, employee_record in enumerate(records, 1):
@@ -164,23 +164,17 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             processing_code = employee_record.get("codeTraitement")
             processing_label = employee_record.get("libelleTraitement")
 
-            self.logger.debug("Line number: %s", line_number)
-            self.logger.debug("Processing code: %s", processing_code)
-            self.logger.debug("Processing label: %s", processing_label)
+            self.stdout.write(f"Record: {line_number=}, {processing_code=}, {processing_label=}")
 
             if not line_number:
-                self.logger.warning("No line number for employee record (index: %s, file: '%s')", idx, feedback_file)
+                self.stdout.write(f"No line number for employee record {idx=}, {feedback_file=}", idx, feedback_file)
                 continue
 
             # Now we must find the matching FS
             employee_record = EmployeeRecord.objects.find_by_batch(batch_filename, line_number).first()
 
             if not employee_record:
-                self.logger.warning(
-                    "Could not get existing employee record data: BATCH_FILE=%s, LINE_NUMBER=%s",
-                    batch_filename,
-                    line_number,
-                )
+                self.stdout.write(f"Could not get existing employee record data: {batch_filename=}, {line_number=}")
                 # Do not count as an error
                 continue
 
@@ -199,25 +193,20 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                                 processing_code, processing_label, renderer.render(serializer.data).decode()
                             )
                         else:
-                            self.logger.warning("Already accepted: %s", employee_record)
+                            self.stdout.write(f"Already accepted: {employee_record=}")
                     except Exception as ex:
-                        self.logger.warning(
-                            "Can't update employee record : %s, STATUS: %s, exc: %s",
-                            employee_record,
-                            employee_record.status,
-                            ex,
+                        self.stdout.write(
+                            f"Can't update employee record : {employee_record=} {employee_record.status=} {ex=}"
                         )
                 else:
-                    self.logger.info(
-                        "DRY-RUN: Accepted %s, code: %s, label: %s", employee_record, processing_code, processing_label
-                    )
+                    self.stdout.write(f"DRY-RUN: Accepted {employee_record=}, {processing_code=}, {processing_label=}")
             else:
                 # Employee record has already been processed : SKIP
                 # (this can happen if files are processed twice
                 # or employee record transmitted twice or more)
                 if employee_record.status == Status.PROCESSED:
                     # Do not update, keep it clean
-                    self.logger.warning("Skipping, already accepted: %s", employee_record)
+                    self.stdout.write(f"Skipping, already accepted: {employee_record=}")
                     continue
 
                 # Employee record has not been processed by ASP :
@@ -226,11 +215,9 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                     if employee_record.status != Status.REJECTED:
                         employee_record.update_as_rejected(processing_code, processing_label)
                     else:
-                        self.logger.warning("Already rejected: %s", employee_record)
+                        self.stdout.write(f"Already rejected: {employee_record=}")
                 else:
-                    self.logger.info(
-                        "DRY-RUN: Rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label
-                    )
+                    self.stdout.write(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
 
         return record_errors
 
@@ -239,11 +226,11 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         Fetch remote ASP file containing the results of the processing
         of a batch of employee records
         """
-        self.logger.info("Starting DOWNLOAD")
+        self.stdout.write("Starting DOWNLOAD of employee records")
 
         parser = JSONParser()
         count = 0
-        errors = 0
+        total_errors = 0
         files_to_delete = []
 
         # Get into the download folder
@@ -251,34 +238,34 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             result_files = conn.listdir()
 
             if len(result_files) == 0:
-                self.logger.info("No feedback files found")
+                self.stdout.write("No feedback files found")
                 return
 
             for result_file in result_files:
+                # Number of errors per file
+                nb_file_errors = 0
                 try:
                     with BytesIO() as result_stream:
-                        self.logger.info("Fetching file '%s'", result_file)
+                        self.stdout.write(f"Fetching file: {result_file=}")
 
                         conn.getfo(result_file, result_stream)
                         # Rewind stream
                         result_stream.seek(0)
 
                         # Parse and update employee records with feedback
-                        errors += self._parse_feedback_file(result_file, parser.parse(result_stream), dry_run)
+                        nb_file_errors = self._parse_feedback_file(result_file, parser.parse(result_stream), dry_run)
 
                         count += 1
                 except Exception as ex:
-                    errors += 1
-                    self.logger.error("Error while parsing file '%s': %s", result_file, ex)
+                    nb_file_errors += 1
+                    self.stdout.write(f"Error while parsing file {result_file=}, {ex=}")
 
-                self.logger.info("Parsed %s/%s files", count, len(result_files))
+                self.stdout.write(f"Parsed {count}/{len(result_files)} files")
 
-                # There were errors do not delete file
-                if errors > 0:
-                    self.logger.warning(
-                        "Will not delete file '%s' because of errors. Leaving it in place for another pass...",
-                        result_file,
-                    )
+                # There were errors: do not delete file
+                if nb_file_errors > 0:
+                    self.stdout.write(f"Will not delete file '{result_file}' because of errors.")
+                    total_errors += nb_file_errors
                     continue
 
                 # Everything was fine, will remove file after main loop
@@ -287,10 +274,10 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             for file in files_to_delete:
                 # All employee records processed, we can delete feedback file from server
                 if dry_run:
-                    self.logger.info("DRY-RUN: Removing file '%s'", file)
+                    self.stdout.write(f"DRY-RUN: Removing file '{file}'")
                     continue
 
-                self.logger.info("Deleting '%s' from SFTP server", file)
+                self.stdout.write(f"Deleting '{file}' from SFTP server")
 
                 conn.remove(file)
 
@@ -310,7 +297,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         #     )
         #     return
 
-        self.logger.info("Starting UPLOAD")
+        self.stdout.write("Starting UPLOAD of employee records")
 
         for batch in chunks(ready_employee_records, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
@@ -321,13 +308,13 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         records are not deleted but their `archived_json` field is erased if employee record has been
         in `PROCESSED` status for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS days
         """
-        self.logger.info(
+        self.stdout.write(
             f"Archiving employee records (more than {settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS} days old)"
         )
         archivable = EmployeeRecord.objects.archivable()
 
         if (cnt := archivable.count()) > 0:
-            self.logger.info(f"Found {cnt} archivable employee record(s)")
+            self.stdout.write(f"Found {cnt} archivable employee record(s)")
             if dry_run:
                 return
             archived_cnt = 0
@@ -342,39 +329,31 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                     er.update_as_archived(save=False)
                     archived_cnt += 1
                 except Exception as ex:
-                    self.logger.error(ex)
+                    self.stdout.write(f"Can't archive record {er=} {ex=}")
 
             # Bulk update (100 records block):
             EmployeeRecord.objects.bulk_update(archivable, ["status", "updated_at", "archived_json"], batch_size=100)
 
-            self.logger.info(f"Archived {archived_cnt}/{cnt} employee record(s)")
+            self.stdout.write(f"Archived {archived_cnt}/{cnt} employee record(s)")
         else:
-            self.logger.info("No archivable employee record found, exiting.")
+            self.stdout.write("No archivable employee record found, exiting.")
 
-    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, archive=False, **options):
-        """
-        Employee Record Management Command
-        """
-        self.set_logger(options.get("verbosity"))
-
+    def handle(self, upload=True, download=True, dry_run=False, asp_test=False, archive=False, **options):
         if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
-            self.logger.info(
+            self.stdout.write(
                 "This management command can't be used in this environment. Update Django settings if needed."
             )
             # Goodbye Marylou
             return
 
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
-
         self.asp_test = asp_test
         if self.asp_test:
-            self.logger.info("Using *TEST* JSON serializers (SIRET number mapping)")
+            self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
         with self._get_sftp_connection() as sftp:
             user = settings.ASP_FS_SFTP_USER or "django_tests"
-            self.logger.info(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}")
-            self.logger.info(f"Current dir: {sftp.pwd}")
+            self.stdout.write(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}")
+            self.stdout.write(f"Current dir: {sftp.pwd}")
 
             # Send files
             if upload:
@@ -387,4 +366,4 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         if archive:
             self.archive(dry_run)
 
-        self.logger.info("Employee records processing done")
+        self.stdout.write("Employee records processing done")
