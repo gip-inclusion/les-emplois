@@ -715,6 +715,9 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         form = LaborExplanationForm(instance=evaluated_job_application, data=form_data)
         self.assertTrue(form.is_valid())
 
+        # note vincentporte
+        # to be added : readonly conditionnal field
+
     def test_post_form(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
         evaluation_campaign = EvaluationCampaignFactory(
