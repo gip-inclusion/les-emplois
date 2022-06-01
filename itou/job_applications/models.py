@@ -1,7 +1,5 @@
 import datetime
 import logging
-import os
-import socket
 import uuid
 
 from dateutil.relativedelta import relativedelta
@@ -994,76 +992,3 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     def pretty_to_state(self):
         choices = dict(JobApplicationWorkflow.STATE_CHOICES)
         return choices[self.to_state]
-
-
-class JobApplicationPoleEmploiNotificationLog(models.Model):
-    """
-    A log used to store what happens when we notify pole emploi
-    that a JobApplication has been accepted or refused
-    """
-
-    STATUS_OK = "ok"
-    STATUS_FAIL_AUTHENTICATION = "authentication_failure"
-    STATUS_FAIL_SEARCH_INDIVIDUAL = "search individual failure"
-    STATUS_FAIL_NOTIFY_POLE_EMPLOI = "update failure"
-    STATUS_TECHNICAL_FAILURE = "technical_failure"
-
-    STATUS_CHOICES = (
-        (STATUS_OK, "La mise à jour a abouti"),
-        (STATUS_FAIL_AUTHENTICATION, "Mise à jour échouée suite à l’échec d’authentifications aux API pôle emploi"),
-        (STATUS_FAIL_SEARCH_INDIVIDUAL, "Mise à jour échouée car candidat non trouvé chez Pôle Emploi"),
-        (STATUS_FAIL_NOTIFY_POLE_EMPLOI, "Mise à jour échouée car installation du pass chez pole emploi refusée"),
-        (STATUS_TECHNICAL_FAILURE, "Mise à jour échouée suite à un problème technique"),
-    )
-
-    status = models.CharField(verbose_name="Motifs d’erreurs", max_length=30, choices=STATUS_CHOICES, blank=True)
-    details = models.TextField(verbose_name="Précisions concernant le comportement obtenu", blank=True)
-
-    env = models.JSONField(verbose_name="L’état de l’environnement", null=True)
-    hostname = models.CharField(verbose_name="La machine qui a effectué la requête", null=True, max_length=40)
-
-    job_application = models.ForeignKey(
-        "job_applications.JobApplication", verbose_name="Candidature", null=True, blank=True, on_delete=models.SET_NULL
-    )
-
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
-
-    class Meta:
-        verbose_name = "Log des notifications PoleEmploi"
-        verbose_name_plural = "Logs des notifications PoleEmploi"
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return str(self.id)
-
-    def save(self, *args, **kwargs):
-        self.clean()
-
-        self.hostname = socket.gethostname()
-        self.env = dict(os.environ)
-
-        super().save(*args, **kwargs)
-
-    API_DATE_FORMAT = "%Y-%m-%d"
-
-    @staticmethod
-    def get_token() -> str:
-        """returns the necessary token for Updating PoleEmploi, or raise exceptions"""
-        # Sandbox token value: "passIAE api_testmaj-pass-iaev1"
-        maj_pass_iae_api_scope = "passIAE api_maj-pass-iaev1"
-        token_recherche_et_maj = get_access_token(
-            f"api_rechercheindividucertifiev1 rechercherIndividuCertifie {maj_pass_iae_api_scope}"
-        )
-        return token_recherche_et_maj
-
-    @staticmethod
-    def get_encrypted_nir_from_individual(individual: PoleEmploiIndividu, api_token: str) -> str:
-        individual_pole_emploi_result = recherche_individu_certifie_api(individual, api_token)
-        if individual is not None:
-            if individual_pole_emploi_result.is_valid():
-                return individual_pole_emploi_result.id_national_demandeur
-            else:
-                raise PoleEmploiAPIException(http_code=200, message=individual_pole_emploi_result.code_sortie)
-        else:
-            raise PoleEmploiAPIException(http_code=200, message="pas d'individu")

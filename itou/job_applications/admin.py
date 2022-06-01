@@ -102,12 +102,3 @@ class JobApplicationTransitionLogAdmin(admin.ModelAdmin):
     raw_id_fields = ("job_application", "user")
     readonly_fields = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
     search_fields = ("transition", "user__username", "job_application__pk")
-
-
-@admin.register(models.JobApplicationPoleEmploiNotificationLog)
-class JobApplicationPoleEmploiNotificationLogAdmin(admin.ModelAdmin):
-    actions = None
-    list_display = ("id", "created_at", "status", "details", "job_application")
-    list_filter = ("status",)
-    readonly_fields = ("created_at", "updated_at", "status", "details")
-    raw_id_fields = ("job_application",)
