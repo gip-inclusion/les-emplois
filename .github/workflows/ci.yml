@@ -58,9 +58,9 @@ jobs:
     - name: ✨ Black, isort, flake8 & djhtml
       run: |
         make quality_venv
+    - name: 🚧 Check pending migrations
+      run: django-admin makemigrations --check --dry-run --noinput
     - name: 🤹‍ Django tests
       run: django-admin test --noinput --failfast --parallel
       env:
         DJANGO_DEBUG: True
-    - name: 🚧 Check pending migrations
-      run: django-admin makemigrations --check --dry-run --noinput
