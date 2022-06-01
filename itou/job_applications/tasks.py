@@ -63,6 +63,7 @@ def notify_pole_emploi_pass(job_application, job_seeker):
         log.status = JobApplicationPoleEmploiNotificationLog.STATUS_FAIL_AUTHENTICATION
         log.details = str(e)
         log.save()
+        job_application.approval.pe_save_should_retry()
         return False
 
     # Step 2 : we fetch the encrypted NIR
@@ -78,6 +79,10 @@ def notify_pole_emploi_pass(job_application, job_seeker):
             details=f"http_code={e.http_code} response_code={e.response_code} token={token}",  # noqa
         )
         log.save()
+        # actually the problem right now is that PoleEmploiMiseAJourPassIAEEXception does not make
+        # a difference between recoverable and non-recoverable errors. Let's mark them as "should retry"
+        # so that future implementations leveraging the Approval columns will try it and categorize it better.
+        job_application.approval.pe_save_should_retry()
         return False
 
     # Step 3: we finally notify Pole Emploi that something happened for this user
@@ -93,9 +98,12 @@ def notify_pole_emploi_pass(job_application, job_seeker):
         # This error should be fixed earlier but for some unknown reason yet, it keeps happening
         log.details = f"http_code={e.http_code} response_code={e.response_code} token={token} encrypted_nir={encrypted_nir}"  # noqa
         log.save()
+        # same thing here, we should consider that a retry is the best option for now.
+        job_application.approval.pe_save_should_retry()
         return False
     log.details += f" token={token}"
     log.save()
+    job_application.approval.pe_save_success()
     return True
 
 
