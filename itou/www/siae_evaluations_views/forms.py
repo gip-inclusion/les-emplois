@@ -58,3 +58,13 @@ class LaborExplanationForm(forms.ModelForm):
             )
         }
         labels = {"labor_inspector_explanation": "Raison d'une auto-prescription refusée"}
+
+    def __init__(self, *args, **kwargs):
+        super(LaborExplanationForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, "instance", None)
+
+        if instance.evaluated_siae.state in [
+            evaluation_enums.EvaluatedSiaeState.REVIEWED,
+            evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE,
+        ]:
+            self.fields["labor_inspector_explanation"].widget.attrs["disabled"] = "disabled"
