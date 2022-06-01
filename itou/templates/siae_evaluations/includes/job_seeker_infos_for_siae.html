@@ -9,15 +9,14 @@
     </div>
     <div class="col-md-3 text-right">
         <p class="small mb-0">
-            {# note vincentporte: state should be computed in view instead of in template to make this include reuseable for institution views #}
             {% if state == "PENDING" %}
-                <p class="badge badge-pilotage float-right">à traiter</b></p>
+                <p class="badge badge-pilotage float-right">à traiter</p>
             {% elif state == "PROCESSING" %}
-                <p class="badge badge-pilotage float-right">en cours</b></p>
+                <p class="badge badge-pilotage float-right">en cours</p>
             {% elif state == "UPLOADED" %}
-                <p class="badge badge-success float-right">traité</b></p>
-            {% elif state == "SUBMITTED" %}
-                <p class="badge badge-communaute-light float-right">transmis</b></p>
+                <p class="badge badge-success float-right">traité</p>
+            {% elif state == "SUBMITTED" or state == "ACCEPTED" or state == "REFUSED" %}
+                <p class="badge badge-communaute-light float-right">transmis</p>
             {% endif %}
         </p>
     </div>
