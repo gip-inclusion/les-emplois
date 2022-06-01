@@ -19,7 +19,11 @@ from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaOfJobApplicationForm
-from itou.www.siae_evaluations_views.forms import SetChosenPercentForm, SubmitEvaluatedAdministrativeCriteriaProofForm
+from itou.www.siae_evaluations_views.forms import (
+    LaborExplanationForm,
+    SetChosenPercentForm,
+    SubmitEvaluatedAdministrativeCriteriaProofForm,
+)
 
 
 @login_required
@@ -141,12 +145,21 @@ def institution_evaluated_job_application(
         )
         + f"#{evaluated_job_application.pk}"
     )
+
+    form = LaborExplanationForm(instance=evaluated_job_application, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        evaluated_job_application.labor_inspector_explanation = form.cleaned_data["labor_inspector_explanation"]
+        evaluated_job_application.save(update_fields=["labor_inspector_explanation"])
+        return HttpResponseRedirect(back_url)
+
     context = {
         "evaluated_job_application": evaluated_job_application,
         # note vincentporte: Can't find why additionnal queries are made to access `EvaluatedSiae` `state`
         # cached_property when iterating over `EvaluatedAdministrativeCriteria` in template.
         # Tried to push `EvaluatedSiae` instance in context without benefical results. weird.
         "evaluated_siae": evaluated_job_application.evaluated_siae,
+        "form": form,
         "back_url": back_url,
     }
     return render(request, template_name, context)
