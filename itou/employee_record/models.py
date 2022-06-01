@@ -737,7 +737,7 @@ class EmployeeRecordUpdateNotification(models.Model):
         self.asp_processing_label = label
         self.save()
 
-    def update_as_processed(self, code, label):
+    def update_as_processed(self, code, label):1
         if not self.status == Status.SENT:
             raise ValidationError(f"Invalid status to update as ACCEPTED (currently: {self.status})")
         self.status = Status.PROCESSED
