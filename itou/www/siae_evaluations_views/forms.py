@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluationCampaign
+from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
 
 
 class SetChosenPercentForm(forms.ModelForm):
@@ -46,3 +46,15 @@ class SubmitEvaluatedAdministrativeCriteriaProofForm(forms.ModelForm):
                 forms.ValidationError("Le document sélectionné ne provient pas d'une source de confiance."),
             )
         return proof_url
+
+
+class LaborExplanationForm(forms.ModelForm):
+    class Meta:
+        model = EvaluatedJobApplication
+        fields = ["labor_inspector_explanation"]
+        widgets = {
+            "labor_inspector_explanation": forms.Textarea(
+                attrs={"placeholder": "Vous pouvez indiquer ici une demande de justificatif complémentaire"}
+            )
+        }
+        labels = {"labor_inspector_explanation": "Raison d'une auto-prescription refusée"}

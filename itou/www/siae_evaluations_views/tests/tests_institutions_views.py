@@ -12,11 +12,11 @@ from itou.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluationCampaign
+from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
-from itou.www.siae_evaluations_views.forms import SetChosenPercentForm
+from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
 
 def create_evaluated_siae_consistent_datas(evaluation_campaign):
@@ -605,6 +605,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["evaluated_job_application"], evaluated_job_application)
         self.assertEqual(response.context["evaluated_siae"], evaluated_siae)
+        self.assertIsInstance(response.context["form"], LaborExplanationForm)
         self.assertEqual(
             response.context["back_url"],
             reverse(
@@ -697,6 +698,55 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertNotContains(response, refuse_url)
         self.assertNotContains(response, accepte_url)
         self.assertNotContains(response, reinit_url)
+
+    def test_form(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution, evaluations_asked_at=timezone.now()
+        )
+        evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
+        evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
+
+        # form is valid
+        form_data = {"labor_inspector_explanation": "test"}
+        form = LaborExplanationForm(instance=evaluated_job_application, data=form_data)
+        self.assertTrue(form.is_valid())
+
+        form_data = {"labor_inspector_explanation": None}
+        form = LaborExplanationForm(instance=evaluated_job_application, data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_post_form(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution, evaluations_asked_at=timezone.now()
+        )
+        evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
+        evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
+
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_job_application",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {"labor_inspector_explanation": "test"}
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+            + f"#{evaluated_job_application.pk}",
+        )
+
+        updated_evaluated_job_application = EvaluatedJobApplication.objects.get(pk=evaluated_job_application.pk)
+        self.assertEqual(
+            updated_evaluated_job_application.labor_inspector_explanation, post_data["labor_inspector_explanation"]
+        )
 
     def test_num_queries_in_view(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
