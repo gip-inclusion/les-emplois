@@ -15,17 +15,17 @@ class EvaluationSiaesKind:
 
 
 class EvaluationJobApplicationsBoundariesNumber:
-    # one SIAE can be selected in evaluation if it made
-    # at least 10 job applications with self-approval
-    # during the evaluated period
-    MIN = 10
-
-    # whenever one SIAE made more than 20 job applications with self-approval
-    # during the evaluated period, only 20 job applications maximum will be
-    # added into the evaluation campaign
-    MAX = 100
     SELECTION_PERCENTAGE = 20
-    SELECTED_MAX = int(MAX * SELECTION_PERCENTAGE / 100)
+
+    # one SIAE can be selected in evaluation if it made
+    # at least MIN job applications with self-approval
+    # during the evaluated period
+    MIN = 2
+
+    # whenever one SIAE made more than MAX job applications with self-approval
+    # during the evaluated period, only MAX job applications maximum will be
+    # added into the evaluation campaign
+    MAX = 20
 
 
 class EvaluatedJobApplicationsState(models.TextChoices):
