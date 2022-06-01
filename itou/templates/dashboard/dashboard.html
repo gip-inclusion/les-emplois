@@ -541,7 +541,9 @@
                             {% if active_campaign.evaluations_asked_at %}
                                 <li class="card-text mb-3">
                                     <i class="ri-file-copy-2-line ri-lg mr-1"></i>
-                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' active_campaign.pk %}">Contrôler les pièces justificatives</a>
+                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' active_campaign.pk %}">
+                                        {{active_campaign.name}}
+                                    </a>
                                 </li>
                             {% else %}
                                 <li class="card-text mb-3">
