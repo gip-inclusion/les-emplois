@@ -1,8 +1,6 @@
-import logging
-
 from django.utils import timezone
 
-from .base import *  # noqa: F401,F403
+from .base import *  # noqa: F401,F403, pylint: disable=wildcard-import
 
 
 # `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
