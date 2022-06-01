@@ -53,31 +53,48 @@ class EvaluationCampaignMiscMethodsTest(TestCase):
         self.assertIsInstance(qs, JobApplicationQuerySet)
         self.assertEqual(0, qs.count())
 
-        # less than mininum number of job applications made by SIAE (10)
-        JobApplicationFactory.create_batch(
-            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN - 1, to_siae=siae
+        # one job applications made by SIAE
+        job_application = JobApplicationFactory(to_siae=siae)
+        self.assertEqual(
+            job_application,
+            select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).first(),
         )
-        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
-        self.assertEqual(0, qs.count())
+        self.assertEqual(1, select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count())
 
-        # mininum number of job applications made by SIAE (10)
-        JobApplicationFactory(to_siae=siae)
-        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
-        self.assertEqual(2, qs.count())
+        # from 2 job applications to 10
+        for i in range(1, 10):
+            with self.subTest(i):
+                JobApplicationFactory(to_siae=siae)
+                self.assertEqual(
+                    evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+                    select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
+                )
 
-        # maximum number of selectionnable job applications made by SIAE (100)
-        JobApplicationFactory.create_batch(
-            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX
-            - evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-            to_siae=siae,
-        )
-        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
-        self.assertEqual(evaluation_enums.EvaluationJobApplicationsBoundariesNumber.SELECTED_MAX, qs.count())
+        self.assertEqual(10, JobApplication.objects.filter(to_siae=siae).count())
 
-        # more than maximum number of selectionnable job applications made by SIAE (100)
-        JobApplicationFactory.create_batch(20, to_siae=siae)
-        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
-        self.assertEqual(evaluation_enums.EvaluationJobApplicationsBoundariesNumber.SELECTED_MAX, qs.count())
+        # from 20 job applications to 100
+        for i in range(10, 100, 10):
+            with self.subTest(i):
+                JobApplicationFactory.create_batch(10, to_siae=siae)
+                self.assertEqual(
+                    int(
+                        JobApplication.objects.filter(to_siae=siae).count()
+                        * evaluation_enums.EvaluationJobApplicationsBoundariesNumber.SELECTION_PERCENTAGE
+                        / 100
+                    ),
+                    select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
+                )
+
+        self.assertEqual(100, JobApplication.objects.filter(to_siae=siae).count())
+
+        # more 100 job applications
+        for i in range(100, 200, 50):
+            with self.subTest(i):
+                JobApplicationFactory.create_batch(50, to_siae=siae)
+                self.assertEqual(
+                    evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX,
+                    select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
+                )
 
 
 class EvaluationCampaignQuerySetTest(TestCase):
@@ -299,6 +316,8 @@ class EvaluationCampaignManagerTest(TestCase):
     def test_eligible_siaes(self):
 
         evaluation_campaign = EvaluationCampaignFactory()
+
+        # siae1 got 1 job application
         siae1 = SiaeFactory(department="14")
         JobApplicationWithApprovalFactory(
             to_siae=siae1,
@@ -308,15 +327,58 @@ class EvaluationCampaignManagerTest(TestCase):
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
 
+        # siae2 got 2 job applications
         siae2 = SiaeFactory(department="14")
         create_batch_of_job_applications(siae2)
 
+        # test eligible_siaes without upperbound
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
         self.assertEqual(1, eligible_siaes_res.count())
         self.assertIn(
             {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN},
             eligible_siaes_res,
         )
+
+        eligible_siaes_res = evaluation_campaign.eligible_siaes(upperbound=0)
+        self.assertEqual(1, eligible_siaes_res.count())
+        self.assertIn(
+            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN},
+            eligible_siaes_res,
+        )
+
+        # test eligible_siaes with upperbound = 3
+        eligible_siaes_res = evaluation_campaign.eligible_siaes(
+            upperbound=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN + 1
+        )
+        self.assertEqual(1, eligible_siaes_res.count())
+        self.assertIn(
+            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN},
+            eligible_siaes_res,
+        )
+
+        # adding 2 more job applications to siae2
+        create_batch_of_job_applications(siae2)
+
+        # test eligible_siaes without upperbound
+        eligible_siaes_res = evaluation_campaign.eligible_siaes()
+        self.assertEqual(1, eligible_siaes_res.count())
+        self.assertIn(
+            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2},
+            eligible_siaes_res,
+        )
+
+        eligible_siaes_res = evaluation_campaign.eligible_siaes(upperbound=0)
+        self.assertEqual(1, eligible_siaes_res.count())
+        self.assertIn(
+            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2},
+            eligible_siaes_res,
+        )
+
+        # test eligible_siaes with upperbound = 3
+        eligible_siaes_res = evaluation_campaign.eligible_siaes(
+            upperbound=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN + 1
+        )
+        self.assertEqual(0, eligible_siaes_res.count())
 
     def test_number_of_siaes_to_select(self):
         evaluation_campaign = EvaluationCampaignFactory()
