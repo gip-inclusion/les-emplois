@@ -728,3 +728,19 @@ class EmployeeRecordUpdateNotification(models.Model):
         self.asp_batch_file = filename
         self.asp_batch_line_number = line_number
         self.save(update_fields=["status", "asp_batch_file", "asp_batch_line_number", "updated_at"])
+
+    def update_as_rejected(self, code, label):
+        if not self.status == Status.SENT:
+            raise ValidationError(f"Invalid status to update as REJECTED (currently: {self.status})")
+        self.status = Status.REJECTED
+        self.asp_processing_code = code
+        self.asp_processing_label = label
+        self.save()
+
+    def update_as_processed(self, code, label):
+        if not self.status == Status.SENT:
+            raise ValidationError(f"Invalid status to update as ACCEPTED (currently: {self.status})")
+        self.status = Status.PROCESSED
+        self.asp_processing_code = code
+        self.asp_processing_label = label
+        self.save()
