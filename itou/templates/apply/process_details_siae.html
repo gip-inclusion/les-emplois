@@ -34,6 +34,10 @@
 
     {% include "apply/includes/state_transition_siae.html" with job_application=job_application %}
 
+    {# Transfer ------------------------------------------------------ #}
+
+    {% include "apply/includes/transfer_job_application.html" with job_application=job_application %}
+
     {# History ------------------------------------------------------ #}
 
     {% if transition_logs %}
