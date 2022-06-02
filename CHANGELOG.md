@@ -1,5 +1,30 @@
 # Journal des modifications
 
+## [43] - 2022-06-02
+
+### Ajouté
+- Contrôle a posteriori, Pack DDETS : formulaire de saisie du commentaire
+- Contrôle a posteriori, Pack DDETS : valider les SIAE en fin de contrôle de leurs autoprescriptions
+- Contrôle a posteriori, Pack DDETS : formulaire de validation des critères administratifs sélectionnés pour une autoprescription
+- Possibilité de désactiver les fiches salarié
+- Déploiement progressif des stats PE et employeur
+- Procédure pour l'envoi des notifications de MAJ des fiches salarié à l'ASP
+- Procédure de reprise des données de l'ASP pour les notifications de changement sur les PASS IAE
+- Mécanisme d'étranglement pour l'API fiche salarié.
+### Modifié
+- Correction des carousels de bienvenue pour la version mobile
+- Nouvelle interface pour les résultats de recherche employeurs
+- Contrôle a posteriori, Pack SIAE : Rattrapage des SIAE ayant réalisé entre 2 et 9 autoprescriptions
+- Plus de mention du PASS IAE dans les emails reçus par les employeurs non soumis aux règles d’éligibilité IAE
+- Mise à jour des scripts de transfert des fiches salariés
+- Mise à jour du theme itou vers la v0.3.9
+- Pilotage : Parmi les fiches de poste en difficulté de recrutement, calculer le nombre de fiches de poste n'ayant jamais reçu de candidatures
+- Pilotage : Ajout d'informations afin d'avoir des filtres à l'échelle locale
+- Correction d'erreurs dans le parcours d'inscription candidat
+- Optimisation des performances SQL pour l'API fiches salarié
+- Optimisation des performances (dans certain cas) dans le parcours d'inscription
+- Remplacement de l'API pour la récupération des informations des entreprises
+
 ## [42] - 2022-05-13
 
 ### Ajouté
