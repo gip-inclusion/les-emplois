@@ -494,7 +494,17 @@
                         {% if can_view_stats_pe %}
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
-                                <a href="{% url 'stats:stats_pe' %}">Voir les fiches de poste en tension de mon département</a>
+                                <a href="{% url 'stats:stats_pe_delay_main' %}">Voir les données d’entrée en IAE</a>
+                                <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
+                            </li>
+                            <li class="card-text mb-3">
+                                <i class="ri-pulse-line ri-lg mr-1"></i>
+                                <a href="{% url 'stats:stats_pe_conversion_main' %}">Voir les données du taux de transformation</a>
+                                <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
+                            </li>
+                            <li class="card-text mb-3">
+                                <i class="ri-pulse-line ri-lg mr-1"></i>
+                                <a href="{% url 'stats:stats_pe_state_main' %}">Voir les données de l’état des candidatures orientées</a>
                                 <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
                             </li>
                         {% endif %}

@@ -540,7 +540,12 @@ METABASE_DASHBOARD_IDS = {
     "stats_siae_hiring": 165,
     # Prescriber stats.
     "stats_cd": 118,
-    "stats_pe": 162,
+    "stats_pe_delay_main": 168,
+    "stats_pe_delay_raw": 180,
+    "stats_pe_conversion_main": 169,
+    "stats_pe_conversion_raw": 182,
+    "stats_pe_state_main": 149,
+    "stats_pe_state_raw": 183,
     # Institution stats - DDETS - department level.
     "stats_ddets_iae": 117,
     "stats_ddets_diagnosis_control": 144,

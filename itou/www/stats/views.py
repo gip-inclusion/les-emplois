@@ -191,12 +191,14 @@ def stats_cd(request):
     return render_stats(request=request, context=context, params=params)
 
 
-@login_required
-def stats_pe(request):
+def render_stats_pe(request, page_title, matomo_custom_url_prefix):
     """
     PE ("Pôle emploi") stats shown to relevant members.
     They can view data for their whole departement, not only their agency.
     They cannot view data for other departments than their own.
+
+    `*_main` views are linked directly from the C1 dashboard.
+    `*_raw` views are not directly visible on the C1 dashboard but are linked from within their `*_main` counterpart.
     """
     current_org = get_current_org_or_404(request)
     if not request.user.can_view_stats_pe(current_org=current_org):
@@ -206,10 +208,64 @@ def stats_pe(request):
         DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
     }
     context = {
-        "page_title": f"Fiches de poste en tension de mon département : {DEPARTMENTS[department]}",
-        "matomo_custom_url": f"/stats/pe/{format_region_and_department_for_matomo(department)}",
+        "page_title": page_title,
+        "matomo_custom_url": f"{matomo_custom_url_prefix}/{format_region_and_department_for_matomo(department)}",
     }
     return render_stats(request=request, context=context, params=params)
+
+
+@login_required
+def stats_pe_delay_main(request):
+    return render_stats_pe(
+        request=request,
+        page_title="Délai d'entrée en IAE de mon agence",
+        matomo_custom_url_prefix="/stats/pe/delay/main",
+    )
+
+
+@login_required
+def stats_pe_delay_raw(request):
+    return render_stats_pe(
+        request=request,
+        page_title="Données brutes de délai d'entrée en IAE",
+        matomo_custom_url_prefix="/stats/pe/delay/raw",
+    )
+
+
+@login_required
+def stats_pe_conversion_main(request):
+    return render_stats_pe(
+        request=request,
+        page_title="Taux de transformation de mon agence",
+        matomo_custom_url_prefix="/stats/pe/conversion/main",
+    )
+
+
+@login_required
+def stats_pe_conversion_raw(request):
+    return render_stats_pe(
+        request=request,
+        page_title="Données brutes du taux de transformation",
+        matomo_custom_url_prefix="/stats/pe/conversion/raw",
+    )
+
+
+@login_required
+def stats_pe_state_main(request):
+    return render_stats_pe(
+        request=request,
+        page_title="Etat des candidatures orientées par mon agence",
+        matomo_custom_url_prefix="/stats/pe/state/main",
+    )
+
+
+@login_required
+def stats_pe_state_raw(request):
+    return render_stats_pe(
+        request=request,
+        page_title="Données brutes de l’état des candidatures orientées",
+        matomo_custom_url_prefix="/stats/pe/state/raw",
+    )
 
 
 @login_required

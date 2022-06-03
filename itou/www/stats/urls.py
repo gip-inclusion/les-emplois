@@ -14,7 +14,12 @@ urlpatterns = [
     path("siae/hiring/", views.stats_siae_hiring, name="stats_siae_hiring"),
     # Prescriber stats.
     path("cd/", views.stats_cd, name="stats_cd"),
-    path("pe/", views.stats_pe, name="stats_pe"),
+    path("pe/delay/main", views.stats_pe_delay_main, name="stats_pe_delay_main"),
+    path("pe/delay/raw", views.stats_pe_delay_raw, name="stats_pe_delay_raw"),
+    path("pe/conversion/main", views.stats_pe_conversion_main, name="stats_pe_conversion_main"),
+    path("pe/conversion/raw", views.stats_pe_conversion_raw, name="stats_pe_conversion_raw"),
+    path("pe/state/main", views.stats_pe_state_main, name="stats_pe_state_main"),
+    path("pe/state/raw", views.stats_pe_state_raw, name="stats_pe_state_raw"),
     # Institution stats - DDETS - department level.
     path("ddets/iae/", views.stats_ddets_iae, name="stats_ddets_iae"),
     path("ddets/diagnosis_control/", views.stats_ddets_diagnosis_control, name="stats_ddets_diagnosis_control"),
