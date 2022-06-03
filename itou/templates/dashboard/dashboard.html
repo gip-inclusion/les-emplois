@@ -101,14 +101,6 @@
         {% include "welcoming_tour/includes/message.html" %}
     {% endif %}
 
-    {# Message d'information temporaire pour les fiches salarié #}
-    {% if can_show_employee_records %}
-        <div class="alert alert-info">
-            <p>Pour des raisons de maintenance, le traitement des fiches salarié est temporairement suspendu <b>jusqu’au 31 mai 2022 inclus</b>.</p>
-            <p class="mb-0">Vous pouvez continuer à recruter et générer vos fiches, il n'y a pas de blocage, mais l'envoi et le traitement reprendront dés <b>le 1er juin</b> au matin.</p>
-        </div>
-    {% endif %}
-
 {% endblock %}
 
 {% block content %}
