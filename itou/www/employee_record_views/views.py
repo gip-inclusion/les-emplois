@@ -440,9 +440,15 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
         return HttpResponseRedirect(back_url)
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
-        employee_record.update_as_new()
-        messages.success(request, "La fiche salarié a bien été réactivée.")
-        return HttpResponseRedirect(back_url)
+        try:
+            employee_record.update_as_new()
+            messages.success(request, "La fiche salarié a bien été réactivée.")
+            return HttpResponseRedirect(back_url)
+        except ValidationError as ex:
+            messages.error(
+                request,
+                f"Il est impossible de réactiver cette fiche salarié pour la raison suivante : {ex.message}.",
+            )
 
     context = {
         "employee_record": employee_record,

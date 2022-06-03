@@ -351,6 +351,14 @@ class EmployeeRecord(models.Model):
         if self.status != Status.DISABLED:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
+        # check if FS exists before reactivate
+        if (
+            EmployeeRecord.objects.exclude(status=Status.DISABLED)
+            .filter(asp_id=self.asp_id, approval_number=self.approval_number)
+            .exists()
+        ):
+            raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
+
         self.status = Status.NEW
         self.save()
 
