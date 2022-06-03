@@ -347,6 +347,13 @@ class EmployeeRecord(models.Model):
         self.status = Status.DISABLED
         self.save()
 
+    def update_as_new(self):
+        if self.status != Status.DISABLED:
+            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+
+        self.status = Status.NEW
+        self.save()
+
     def update_as_archived(self, save=True):
         """
         Can only archive employee record if already PROCESSED
