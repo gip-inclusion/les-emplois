@@ -108,7 +108,7 @@
     {# Mise en avant temporaire de l’assistance tehnique par téléphone. #}
     {% if user.is_prescriber or user.is_job_seeker %}
         <div class="card mb-5 bg-gray-400 text-center">
-            <p class="h4 card-header"><span class="badge badge-warning">Nouveau</span> pour les prescripteurs et les candidats</p>
+            <p class="h4 card-header"><span class="badge badge-info badge-accent-03 text-primary">Nouveau</span> pour les prescripteurs et les candidats</p>
             <div class="card-body">
                 <p>
                     Mise en place d’une assistance technique par téléphone au <strong>09 70 75 19 70</strong><br>
@@ -245,7 +245,7 @@
                                     <a href="{% url 'prescribers_views:list_accredited_organizations' %}">
                                         Voir la liste des organisations conventionnées
                                     </a>
-                                    <span class="badge badge-info">Nouveau</span>
+                                    <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
                                 </li>
                             {% endif %}
                             {% if current_prescriber_organization.is_authorized %}
@@ -409,7 +409,7 @@
 
             {% if active_campaigns %}
                 <div class="card">
-                    <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info">Nouveau</span></p>
+                    <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span></p>
                     <div class="card-body">
                         <ul class="list-unstyled">
                             <li class="card-text mb-3">
@@ -458,7 +458,7 @@
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_siae_hiring' %}">Voir les données de recrutement de ma structure (Plateforme de l'inclusion)</a>
-                                <span class="badge badge-info">Nouveau</span>
+                                <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
                             </li>
                         {% endif %}
                         {% if can_view_stats_cd %}
@@ -471,7 +471,7 @@
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_pe' %}">Voir les fiches de poste en tension de mon département</a>
-                                <span class="badge badge-info">Nouveau</span>
+                                <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
                             </li>
                         {% endif %}
                         {% if can_view_stats_ddets %}
@@ -482,7 +482,7 @@
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_ddets_hiring' %}">Voir les données facilitation de l'embauche</a>
-                                <span class="badge badge-info">Nouveau</span>
+                                <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
                             </li>
                         {% endif %}
                         {% if can_view_stats_dreets %}
@@ -493,7 +493,7 @@
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_dreets_hiring' %}">Voir les données facilitation de l'embauche</a>
-                                <span class="badge badge-info">Nouveau</span>
+                                <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
                             </li>
                         {% endif %}
                         {% if can_view_stats_dgefp %}
@@ -504,12 +504,12 @@
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_dgefp_diagnosis_control' %}">Voir les données 2021 du contrôle a posteriori (version bêta)</a>
-                                <span class="badge badge-info">Nouveau</span>
+                                <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
                             </li>
                             <li class="card-text mb-3">
                                 <i class="ri-pulse-line ri-lg mr-1"></i>
                                 <a href="{% url 'stats:stats_dgefp_af' %}">Voir les données des annexes financières actives</a>
-                                <span class="badge badge-info">Nouveau</span>
+                                <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span>
                             </li>
                         {% endif %}
                         <li class="card-text mb-3">
@@ -526,7 +526,7 @@
 
         {% if can_view_stats_ddets and active_campaigns %}
             <div class="card">
-                <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info">Nouveau</span></p>
+                <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-info badge-accent-03 text-primary">Nouveau</span></p>
                 <div class="card-body">
                     <ul class="list-unstyled">
                         {% for active_campaign in active_campaigns %}
