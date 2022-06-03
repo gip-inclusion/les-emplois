@@ -731,30 +731,30 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return is_application_valid and not self.candidate_has_employee_record and self.to_siae.can_use_employee_record
 
     @property
-    def is_transferable(self):
+    def is_in_transferable_state(self):
         return self.state not in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW]
 
     def can_be_transferred(self, user, target_siae):
+        # User must be member of both origin and target SIAE to make a transfer
+        if not (self.to_siae.has_member(user) and target_siae.has_member(user)):
+            return False
         # Can't transfer to same structure
         if target_siae == self.to_siae:
             return False
         # User must be SIAE user / employee
         if not user.is_siae_staff:
             return False
-        # User must be member of both origin and target SIAE to make a transfer
-        if not (self.to_siae.has_member(user) and target_siae.has_member(user)):
-            return False
-        return self.is_transferable
+        return self.is_in_transferable_state
 
     def transfer_to(self, transferred_by, target_siae):
-        if not (self.is_transferable and self.can_be_transferred(transferred_by, target_siae)):
+        if not (self.is_in_transferable_state and self.can_be_transferred(transferred_by, target_siae)):
             raise ValidationError(
                 f"Cette candidature n'est pas transferable ({transferred_by=}, {target_siae=}, {self.to_siae=})"
             )
 
         self.transferred_from = self.to_siae
         self.transferred_by = transferred_by
-        self.transferred_at = timezone.localtime()
+        self.transferred_at = timezone.now()
         self.to_siae = target_siae
         self.state = JobApplicationWorkflow.STATE_NEW
 
@@ -763,7 +763,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         is_eligibility_diagnosis_made_by_siae = (
             eligibility_diagnosis and eligibility_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
         )
-        self.eligibility_diagnosis = None if is_eligibility_diagnosis_made_by_siae else eligibility_diagnosis
+        if is_eligibility_diagnosis_made_by_siae:
+            self.eligibility_diagnosis = None
 
         self.save(
             update_fields=[
@@ -783,13 +784,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Always send an email to job seeker and origin SIAE
         emails = [
-            self.email_transfer_origin_siae(transferred_by, self.transferred_from, target_siae),
-            self.email_transfer_job_seeker(transferred_by, self.transferred_from, target_siae),
+            self.get_email_transfer_origin_siae(transferred_by, self.transferred_from, target_siae),
+            self.get_email_transfer_job_seeker(transferred_by, self.transferred_from, target_siae),
         ]
 
         # Send email to prescriber or orienter if any
         if self.sender_kind == self.SENDER_KIND_PRESCRIBER:
-            emails.append(self.email_transfer_prescriber(transferred_by, self.transferred_from, target_siae))
+            emails.append(self.get_email_transfer_prescriber(transferred_by, self.transferred_from, target_siae))
 
         connection = mail.get_connection()
         connection.send_messages(emails)
@@ -1026,45 +1027,36 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "approvals/email/refuse_manually_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def email_transfer_origin_siae(self, transferred_by, origin_siae, target_siae):
-        # Send email to every active member of the origin SIAE
-        to = list(origin_siae.active_members.values_list("email", flat=True))
+    def _get_transfer_email(self, to, subject, body, transferred_by, origin_siae, target_siae):
         context = {
             "job_application": self,
             "transferred_by": transferred_by,
             "origin_siae": origin_siae,
             "target_siae": target_siae,
         }
+        return get_email_message(to, context, subject, body)
+
+    def get_email_transfer_origin_siae(self, transferred_by, origin_siae, target_siae):
+        # Send email to every active member of the origin SIAE
+        to = list(origin_siae.active_members.values_list("email", flat=True))
         subject = "apply/email/transfer_origin_siae_subject.txt"
         body = "apply/email/transfer_origin_siae_body.txt"
 
-        return get_email_message(to, context, subject, body)
+        return self._get_transfer_email(to, subject, body, transferred_by, origin_siae, target_siae)
 
-    def email_transfer_job_seeker(self, transferred_by, origin_siae, target_siae):
+    def get_email_transfer_job_seeker(self, transferred_by, origin_siae, target_siae):
         to = [self.job_seeker.email]
-        context = {
-            "job_application": self,
-            "transferred_by": transferred_by,
-            "origin_siae": origin_siae,
-            "target_siae": target_siae,
-        }
         subject = "apply/email/transfer_job_seeker_subject.txt"
         body = "apply/email/transfer_job_seeker_body.txt"
 
-        return get_email_message(to, context, subject, body)
+        return self._get_transfer_email(to, subject, body, transferred_by, origin_siae, target_siae)
 
-    def email_transfer_prescriber(self, transferred_by, origin_siae, target_siae):
+    def get_email_transfer_prescriber(self, transferred_by, origin_siae, target_siae):
         to = [self.sender.email]
-        context = {
-            "job_application": self,
-            "transferred_by": transferred_by,
-            "origin_siae": origin_siae,
-            "target_siae": target_siae,
-        }
         subject = "apply/email/transfer_prescriber_subject.txt"
         body = "apply/email/transfer_prescriber_body.txt"
 
-        return get_email_message(to, context, subject, body)
+        return self._get_transfer_email(to, subject, body, transferred_by, origin_siae, target_siae)
 
     def manually_deliver_approval(self, delivered_by):
         """

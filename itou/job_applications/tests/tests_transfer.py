@@ -17,7 +17,7 @@ from itou.users.factories import UserFactory
 
 
 class JobApplicationTransferModelTest(TestCase):
-    def test_is_transferable(self):
+    def test_is_in_transferable_state(self):
         # If job application is in NEW or ACCEPTED state
         # it can't be transfered
         evil_states = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_ACCEPTED]
@@ -32,12 +32,12 @@ class JobApplicationTransferModelTest(TestCase):
         for evil_state in evil_states:
             with self.subTest(evil_state):
                 job_application = JobApplicationFactory(state=evil_state)
-                self.assertFalse(job_application.is_transferable)
+                self.assertFalse(job_application.is_in_transferable_state)
 
         for good_state in good_states:
             with self.subTest(good_state):
                 job_application = JobApplicationFactory(state=good_state)
-                self.assertTrue(job_application.is_transferable)
+                self.assertTrue(job_application.is_in_transferable_state)
 
     def test_can_be_transferred(self):
         # Only users in both origin and target SIAE
@@ -136,7 +136,6 @@ class JobApplicationTransferModelTest(TestCase):
         self.assertIsNone(job_application.transferred_from)
         self.assertIsNone(job_application.transferred_at)
 
-        # TODO : optimization
         with self.assertNumQueries(7):
             job_application.transfer_to(origin_user, target_siae)
 
