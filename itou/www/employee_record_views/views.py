@@ -413,3 +413,39 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
         "back_url": back_url,
     }
     return render(request, template_name, context)
+
+
+@login_required
+def reactivate(request, employee_record_id, template_name="employee_record/reactivate.html"):
+    """
+    Display the form to reactivate a given employee record
+    """
+    siae = get_current_siae_or_404(request)
+
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
+    query_base = EmployeeRecord.objects.full_fetch()
+    employee_record = get_object_or_404(query_base, pk=employee_record_id)
+    job_application = employee_record.job_application
+
+    if not siae_is_allowed(job_application, siae):
+        raise PermissionDenied
+
+    list_url = reverse("employee_record_views:list")
+    back_url = f"{ list_url }?status={ Status.DISABLED }"
+
+    if employee_record.status != Status.DISABLED:
+        messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+        return HttpResponseRedirect(back_url)
+
+    if request.method == "POST" and request.POST.get("confirm") == "true":
+        employee_record.update_as_new()
+        messages.success(request, "La fiche salarié a bien été réactivée.")
+        return HttpResponseRedirect(back_url)
+
+    context = {
+        "employee_record": employee_record,
+        "back_url": back_url,
+    }
+    return render(request, template_name, context)
