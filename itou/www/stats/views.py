@@ -103,8 +103,17 @@ def render_stats(request, context, params={}, template_name="stats/stats.html"):
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "stats_base_url": settings.METABASE_SITE_URL,
     }
+
     # Key value pairs in context override preexisting pairs in base_context.
     base_context.update(context)
+
+    matomo_custom_url_prefix = request.resolver_match.route  # e.g. "stats/pe/delay/main"
+    base_context["matomo_custom_url"] = f"/{matomo_custom_url_prefix}"
+    if "matomo_custom_url_suffix" in base_context:
+        matomo_custom_url_suffix = base_context["matomo_custom_url_suffix"]
+        del base_context["matomo_custom_url_suffix"]
+        base_context["matomo_custom_url"] += f"/{matomo_custom_url_suffix}"
+
     return render(request, template_name, base_context)
 
 
@@ -145,7 +154,7 @@ def stats_siae_etp(request):
     current_org = get_stats_siae_etp_current_org(request)
     context = {
         "page_title": "Données de ma structure (extranet ASP)",
-        "matomo_custom_url": f"/stats/siae/etp/{format_region_and_department_for_matomo(current_org.department)}",
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
     return render_stats(
         request=request,
@@ -164,7 +173,7 @@ def stats_siae_hiring(request):
     current_org = get_stats_siae_hiring_current_org(request)
     context = {
         "page_title": "Données de recrutement de ma structure (Plateforme de l'inclusion)",
-        "matomo_custom_url": f"/stats/siae/hiring/{format_region_and_department_for_matomo(current_org.department)}",
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
     return render_stats(
         request=request,
@@ -186,12 +195,12 @@ def stats_cd(request):
     params = get_params_for_departement(department)
     context = {
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
-        "matomo_custom_url": f"/stats/cd/{format_region_and_department_for_matomo(department)}",
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     return render_stats(request=request, context=context, params=params)
 
 
-def render_stats_pe(request, page_title, matomo_custom_url_prefix):
+def render_stats_pe(request, page_title):
     """
     PE ("Pôle emploi") stats shown to relevant members.
     They can view data for their whole departement, not only their agency.
@@ -209,7 +218,7 @@ def render_stats_pe(request, page_title, matomo_custom_url_prefix):
     }
     context = {
         "page_title": page_title,
-        "matomo_custom_url": f"{matomo_custom_url_prefix}/{format_region_and_department_for_matomo(department)}",
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     return render_stats(request=request, context=context, params=params)
 
@@ -219,7 +228,6 @@ def stats_pe_delay_main(request):
     return render_stats_pe(
         request=request,
         page_title="Délai d'entrée en IAE de mon agence",
-        matomo_custom_url_prefix="/stats/pe/delay/main",
     )
 
 
@@ -228,7 +236,6 @@ def stats_pe_delay_raw(request):
     return render_stats_pe(
         request=request,
         page_title="Données brutes de délai d'entrée en IAE",
-        matomo_custom_url_prefix="/stats/pe/delay/raw",
     )
 
 
@@ -237,7 +244,6 @@ def stats_pe_conversion_main(request):
     return render_stats_pe(
         request=request,
         page_title="Taux de transformation de mon agence",
-        matomo_custom_url_prefix="/stats/pe/conversion/main",
     )
 
 
@@ -246,7 +252,6 @@ def stats_pe_conversion_raw(request):
     return render_stats_pe(
         request=request,
         page_title="Données brutes du taux de transformation",
-        matomo_custom_url_prefix="/stats/pe/conversion/raw",
     )
 
 
@@ -255,7 +260,6 @@ def stats_pe_state_main(request):
     return render_stats_pe(
         request=request,
         page_title="Etat des candidatures orientées par mon agence",
-        matomo_custom_url_prefix="/stats/pe/state/main",
     )
 
 
@@ -264,7 +268,6 @@ def stats_pe_state_raw(request):
     return render_stats_pe(
         request=request,
         page_title="Données brutes de l’état des candidatures orientées",
-        matomo_custom_url_prefix="/stats/pe/state/raw",
     )
 
 
@@ -279,7 +282,7 @@ def stats_ddets_iae(request):
     params = get_params_for_departement(department)
     context = {
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
-        "matomo_custom_url": f"/stats/ddets/iae/{format_region_and_department_for_matomo(department)}",
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     return render_stats(request=request, context=context, params=params)
 
@@ -297,7 +300,7 @@ def stats_ddets_diagnosis_control(request):
         "page_title": "Données 2021 du contrôle a posteriori",
         "back_url": reverse("siae_evaluations_views:samples_selection"),
         "show_diagnosis_control_message": True,
-        "matomo_custom_url": f"/stats/ddets/diagnosis_control/{format_region_and_department_for_matomo(department)}",
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     return render_stats(request=request, context=context, params=params)
 
@@ -313,7 +316,7 @@ def stats_ddets_hiring(request):
     params = get_params_for_departement(department)
     context = {
         "page_title": f"Données facilitation de l'embauche de mon département : {DEPARTMENTS[department]}",
-        "matomo_custom_url": f"/stats/ddets/hiring/{format_region_and_department_for_matomo(department)}",
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     return render_stats(request=request, context=context, params=params)
 
@@ -329,7 +332,7 @@ def stats_dreets_iae(request):
     params = get_params_for_region(region)
     context = {
         "page_title": f"Données de ma région : {region}",
-        "matomo_custom_url": f"/stats/dreets/iae/{format_region_for_matomo(region)}",
+        "matomo_custom_url_suffix": format_region_for_matomo(region),
     }
     return render_stats(request=request, context=context, params=params)
 
@@ -345,7 +348,7 @@ def stats_dreets_hiring(request):
     params = get_params_for_region(region)
     context = {
         "page_title": f"Données facilitation de l'embauche de ma région : {region}",
-        "matomo_custom_url": f"/stats/dreets/hiring/{format_region_for_matomo(region)}",
+        "matomo_custom_url_suffix": format_region_for_matomo(region),
     }
     return render_stats(request=request, context=context, params=params)
 
