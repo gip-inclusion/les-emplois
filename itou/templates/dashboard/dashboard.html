@@ -105,7 +105,7 @@
 
 {% block content %}
 
-    {# Mise en avant temporaire de l’assistance tehnique par téléphone. #}
+    {# Mise en avant temporaire de l’assistance technique par téléphone. #}
     {% if user.is_prescriber or user.is_job_seeker %}
         <div class="card mb-5 bg-gray-400 text-center">
             <p class="h4 card-header"><span class="badge badge-info badge-accent-03 text-primary">Nouveau</span> pour les prescripteurs et les candidats</p>
@@ -113,6 +113,30 @@
                 <p>
                     Mise en place d’une assistance technique par téléphone au <strong>09 70 75 19 70</strong><br>
                     Ouverte du Lundi au Vendredi , de 09h00 à 17h00 (hors jours fériés)
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
+    {# Mise en avant temporaire des stats employeur le temps de leur déploiement. #}
+    {% if can_view_stats_siae_hiring %}
+        <div class="card mb-5 bg-gray-400 text-center">
+            <p class="h4 card-header"><span class="badge badge-info badge-accent-03 text-primary">Nouveau</span> Vous avez maintenant accès à un espace <strong>Statistiques et pilotage 🎉</strong></p>
+            <div class="card-body">
+                <p>
+                    Vous trouverez votre <a href="{% url 'stats:stats_siae_hiring' %}">nouveau tableau de bord dédié à votre structure</a>. Il vous permettra de suivre l’état de vos candidatures et vos réalisations avec vos prescripteurs partenaires.
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
+    {# Mise en avant temporaire des stats PE le temps de leur déploiement. #}
+    {% if can_view_stats_pe %}
+        <div class="card mb-5 bg-gray-400 text-center">
+            <p class="h4 card-header"><span class="badge badge-info badge-accent-03 text-primary">Nouveau</span> Vous avez maintenant accès à un espace <strong>Statistiques et pilotage 🎉</strong></p>
+            <div class="card-body">
+                <p>
+                    Vous trouverez ci-dessous vos <strong>nouveaux tableaux de bord dédiés</strong> pour suivre et analyser vos réalisations avec vos structures partenaires.
                 </p>
             </div>
         </div>
