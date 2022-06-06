@@ -1,5 +1,10 @@
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.metabase.management.commands._utils import anonymize, get_choice, get_department_and_region_columns
+from itou.metabase.management.commands._utils import (
+    AI_STOCK_APPROVAL_PKS,
+    anonymize,
+    get_choice,
+    get_department_and_region_columns,
+)
 
 
 JOB_APPLICATION_PK_ANONYMIZATION_SALT = "job_application.id"
@@ -222,6 +227,6 @@ TABLE_COLUMNS += [
         "name": "injection_ai",
         "type": "boolean",
         "comment": "Provient des injections AI",
-        "fn": lambda o: o.approval.is_from_ai_stock if o.approval else False,
+        "fn": lambda o: o.approval.pk in AI_STOCK_APPROVAL_PKS if o.approval else False,
     },
 ]
