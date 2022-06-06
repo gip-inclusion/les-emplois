@@ -10,7 +10,7 @@ on:
   workflow_dispatch: # allows us to run this action manually
   schedule:
     # Run this workflow every night.
-    # 19:00 here means 22:00 or 23:00 in France depending on winter/summer time.
+    # 19:00 here means 21:00 or 22:00 in France depending on winter/summer time.
     - cron: '0 19 * * *'
 
 # How to run this:
@@ -36,14 +36,18 @@ jobs:
   populate_metabase_itou:
     runs-on: ubuntu-latest
 
-    # Default github action workflow timeout is 6 hours (360 minutes). If the script lasts longer than this for any reason,
-    # the github action will be killed but the clever instance will keep running forever as the last job supposed to
-    # delete it was never runned. This is why we set a very large timer here (24 hours == 1440 minutes) because
-    # clever instances are expensive but github actions are not. Cutting financial costs is the reponsibility of the
-    # last job, not of github.
-    # Unfortunately this does not work, the new timeout value is silently ignored and github keeps killing the job
-    # after the default 6 hours. This will need to be investigated further.
-    timeout-minutes: 1440
+    # Default github action workflow timeout is 6 hours (360 minutes). If the script lasts longer than this for any
+    # reason, the github action will be killed but the clever instance will keep running forever as the last job
+    # supposed to delete it was never runned. This is why we want a very large timer here because clever instances
+    # are expensive but github actions are not.
+    # Unfortunately this does not work as any new timeout value above 6 hours is silently ignored and github keeps
+    # killing the job after the default 6 hours. This is due to the fact that there is also a maximum job execution
+    # time limit of 6 hours for Github-hosted runners. Thus we cannot push through 6 hours unless we one day use
+    # self-hoster runners. ¯\_(ツ)_/¯
+    # Another possible solution would be, as recommended by Clever support, to end the github action immediately
+    # after launching the clever instance with its worker, and add a "harakiri" script at the end of
+    # `CC_WORKER_COMMAND` to make the clever instance connect by itself to the clever API, and order its own deletion.
+    timeout-minutes: 360
 
     steps:
     - name: 📥 Checkout to the latest version on $DEPLOY_BRANCH
@@ -98,11 +102,11 @@ jobs:
     - name: 🚀 Deploy app to Clever Cloud
       run: $CLEVER_CLI deploy --alias $CRON_TASK_APP_NAME --branch $DEPLOY_BRANCH --force
 
-    # This script was taking less than 3h (10800s) until https://github.com/betagouv/itou/pull/1154 introduced
-    # significant performance degradation due to several additional joins. The script now takes 5h instead of 3h
-    # even after some optimization. We set the timeout at 5h45 (20700s), just below 6h, because there is
-    # an unresolved issue with a different timeout system, see `timeout-minutes` above.
-    - name: 🕒 Wait a reasonable amount of time for the script to complete
+    # Here we should wait an amount of time after which we are sure the script has completed.
+    # This waiting time should never be increased above 5h45 (20700s), just below 6h, because otherwise
+    # the github action will be killed at 6 hours but the clever instance will keep running forever,
+    # see `timeout-minutes` above for more details.
+    - name: 🕒 Wait a reasonable amount of time after which we are sure the script has completed
       run: sleep 20700
 
     - name: 🔪 Delete the app once the work is done
