@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from psycopg2 import sql
 
+from itou.approvals.models import Approval
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
@@ -167,6 +168,20 @@ def get_establishment_is_active_column():
             else False,
         },
     ]
+
+
+def _get_ai_stock_approvals():
+    return Approval.objects.select_related("created_by").filter(
+        created_by__email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL,
+        created_at__date=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date(),
+    )
+
+
+# As of June 2022 we have exactly 71205 approvals from the AI stock and exactly the same number of job seekers.
+# This number is supposed to stay constant over time, there is no reason for it to grow.
+# We load all 71k pks once and for all in memory for performance reasons.
+AI_STOCK_APPROVAL_PKS = set(_get_ai_stock_approvals().values_list("pk", flat=True))
+AI_STOCK_JOB_SEEKER_PKS = set(_get_ai_stock_approvals().values_list("user_id", flat=True))
 
 
 def chunked_queryset(queryset, chunk_size=10000):
