@@ -349,6 +349,31 @@ class EmployeeRecordLifeCycleTest(TestCase):
         "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
+    def test_reactivate(self, _mock):
+
+        filename = "RIAE_FS_20210410130001.json"
+        self.employee_record.update_as_sent(filename, 1)
+        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_disabled()
+
+        self.assertIn(
+            self.employee_record.job_application,
+            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
+        )
+
+        # Employee record in DISABLE state can be reactivate (set state NEW)
+        self.employee_record.update_as_new()
+        self.assertEqual(self.employee_record.status, Status.NEW)
+
+        # Employee record can now be changed to the ready state
+        self.employee_record.update_as_ready()
+        self.assertEqual(self.employee_record.status, Status.READY)
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
     def test_state_archived(self, _mock):
         filename = "RIAE_FS_20210816130001.json"
         self.employee_record.update_as_sent(filename, 1)
