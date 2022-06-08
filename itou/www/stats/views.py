@@ -227,7 +227,7 @@ def render_stats_pe(request, page_title):
 def stats_pe_delay_main(request):
     return render_stats_pe(
         request=request,
-        page_title="Délai d'entrée en IAE de mon agence",
+        page_title="Délai d'entrée en IAE",
     )
 
 
@@ -243,7 +243,7 @@ def stats_pe_delay_raw(request):
 def stats_pe_conversion_main(request):
     return render_stats_pe(
         request=request,
-        page_title="Taux de transformation de mon agence",
+        page_title="Taux de transformation",
     )
 
 
@@ -259,7 +259,7 @@ def stats_pe_conversion_raw(request):
 def stats_pe_state_main(request):
     return render_stats_pe(
         request=request,
-        page_title="Etat des candidatures orientées par mon agence",
+        page_title="Etat des candidatures orientées",
     )
 
 
