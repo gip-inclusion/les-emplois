@@ -248,6 +248,8 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
                         logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
                     else:
                         return HttpResponseRedirect(next_url)
+                else:
+                    return HttpResponseRedirect(next_url)
 
             # Display a modal containing more information.
             if request.POST.get("preview"):
