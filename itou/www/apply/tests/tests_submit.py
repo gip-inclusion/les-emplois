@@ -917,6 +917,43 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         job_seeker.refresh_from_db()
         self.assertEqual(job_seeker.nir, nir)
 
+    def test_one_account_no_nir_without_rights(self):
+        job_seeker = JobSeekerFactory(nir="")
+        PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
+        siae, user = self.create_test_data()
+
+        user.is_prescriber = False
+        user.is_siae_staff = False  # now, can_add_nir is False
+        user.save(update_fields=["is_prescriber", "is_siae_staff"])
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+
+        # Follow all redirections…
+        response = self.client.get(url, follow=True)
+
+        # …until a job seeker has to be determined.
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
+
+        # Enter an a non-existing NIR.
+        # ----------------------------------------------------------------------
+        nir = "141068078200557"
+        post_data = {"nir": nir, "confirm": 1}
+        response = self.client.post(last_url, data=post_data)
+        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        self.assertRedirects(response, next_url)
+
+        # Enter an existing email.
+        # ----------------------------------------------------------------------
+        post_data = {"email": job_seeker.email, "save": "1"}
+        response = self.client.post(next_url, data=post_data)
+        self.assertRedirects(
+            response, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}), target_status_code=302
+        )
+
 
 class ApplyAsSiaeTest(TestCase):
     def setUp(self):
