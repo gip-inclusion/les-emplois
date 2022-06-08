@@ -39,7 +39,7 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: 🌍 Install spatial libraries
       run: sudo apt-get update && sudo apt-get install binutils build-essential libproj-dev gdal-bin
     - name: 💾 Create a database to check migrations
@@ -48,7 +48,7 @@ jobs:
             CREATE DATABASE itou;
         SQL
     - name: 💂 Install Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
     - name: 📥 Install dependencies
