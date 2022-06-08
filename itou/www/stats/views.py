@@ -272,6 +272,14 @@ def stats_pe_state_raw(request):
 
 
 @login_required
+def stats_pe_tension(request):
+    return render_stats_pe(
+        request=request,
+        page_title="Fiches de poste en tension",
+    )
+
+
+@login_required
 def stats_ddets_iae(request):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.

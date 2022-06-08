@@ -20,6 +20,7 @@ urlpatterns = [
     path("pe/conversion/raw", views.stats_pe_conversion_raw, name="stats_pe_conversion_raw"),
     path("pe/state/main", views.stats_pe_state_main, name="stats_pe_state_main"),
     path("pe/state/raw", views.stats_pe_state_raw, name="stats_pe_state_raw"),
+    path("pe/tension", views.stats_pe_tension, name="stats_pe_tension"),
     # Institution stats - DDETS - department level.
     path("ddets/iae/", views.stats_ddets_iae, name="stats_ddets_iae"),
     path("ddets/diagnosis_control/", views.stats_ddets_diagnosis_control, name="stats_ddets_diagnosis_control"),

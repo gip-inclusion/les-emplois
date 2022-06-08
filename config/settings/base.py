@@ -546,6 +546,7 @@ METABASE_DASHBOARD_IDS = {
     "stats_pe_conversion_raw": 182,
     "stats_pe_state_main": 149,
     "stats_pe_state_raw": 183,
+    "stats_pe_tension": 162,
     # Institution stats - DDETS - department level.
     "stats_ddets_iae": 117,
     "stats_ddets_diagnosis_control": 144,

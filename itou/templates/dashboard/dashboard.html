@@ -507,6 +507,11 @@
                                 <a href="{% url 'stats:stats_pe_state_main' %}">Voir les données de l’état des candidatures orientées</a>
                                 <span class="badge badge-accent-03 text-primary">Nouveau</span>
                             </li>
+                            <li class="card-text mb-3">
+                                <i class="ri-pulse-line ri-lg mr-1"></i>
+                                <a href="{% url 'stats:stats_pe_tension' %}">Voir les données des fiches de poste en tension</a>
+                                <span class="badge badge-accent-03 text-primary">Nouveau</span>
+                            </li>
                         {% endif %}
                         {% if can_view_stats_ddets %}
                             <li class="card-text mb-3">
