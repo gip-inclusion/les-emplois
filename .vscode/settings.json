@@ -1,7 +1,6 @@
 {
     "python.analysis.autoImportCompletions": true,
     "python.analysis.completeFunctionParens": true,
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python3.9",
     "python.envFile": "${workspaceFolder}/.envrc",
     "python.formatting.provider": "black",
     "python.languageServer": "Pylance",
