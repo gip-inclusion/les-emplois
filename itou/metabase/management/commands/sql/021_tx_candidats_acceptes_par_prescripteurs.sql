@@ -15,4 +15,3 @@ where
 group by 
     origine_détaillée, 
     date_candidature
-   
