@@ -5,12 +5,10 @@ django-settings-module = config.settings.dev
 [MESSAGES CONTROL]
 disable =
 	arguments-differ,
-	bad-continuation,
 	duplicate-code,
 	invalid-name,
 	missing-docstring,
 	no-member,
-	no-self-use,
 	too-few-public-methods,
 	too-many-lines
 
