@@ -264,7 +264,6 @@ class AcceptForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["hiring_without_approval"].widget = forms.HiddenInput()
         self.fields["hiring_start_at"].required = True
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].widget = DuetDatePickerWidget()
@@ -277,7 +276,7 @@ class AcceptForm(forms.ModelForm):
 
     class Meta:
         model = JobApplication
-        fields = ["hiring_start_at", "hiring_end_at", "answer", "hiring_without_approval"]
+        fields = ["hiring_start_at", "hiring_end_at", "answer"]
         help_texts = {
             # Make it clear to employers that `hiring_start_at` has an impact on the start of the
             # "parcours IAE" and the payment of the "aide au poste".
@@ -311,9 +310,6 @@ class AcceptForm(forms.ModelForm):
 
         if self.errors:
             return cleaned_data
-
-        # True if is it the second button that submitted the form
-        self.cleaned_data["hiring_without_approval"] = "without_approval" in self.data
 
         hiring_start_at = self.cleaned_data["hiring_start_at"]
         hiring_end_at = self.cleaned_data["hiring_end_at"]
