@@ -1,13 +1,12 @@
 <div class="row">
-    <div class="col-md-9">
+    <div class="col-lg-8 col-md-7 col-12">
         <h3 class="h2">Auto-prescription pour
             <span class="text-muted">
                 {{job_seeker.get_full_name|title}}
             </span>
         </h3>
-        <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ approval.number_with_spaces }}</b></p>
     </div>
-    <div class="col-md-3 text-right">
+    <div class="col-lg-4 col-md-5 col-12 text-right">
         <p class="small mb-0">
             {% if state == "PENDING" %}
                 <p class="badge badge-pilotage float-right">à traiter</p>
@@ -19,5 +18,10 @@
                 <p class="badge badge-communaute-light float-right">transmis</p>
             {% endif %}
         </p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ approval.number_with_spaces }}</b></p>
     </div>
 </div>
