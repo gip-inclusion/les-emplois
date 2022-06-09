@@ -69,10 +69,8 @@ ALLOW_POPULATING_METABASE = True
 
 # Log raw SQL to the console in Django.
 # https://www.neilwithdata.com/django-sql-logging
-LOGGING.setdefault("filters", {}).setdefault("require_debug_true", {})["()"] = "django.utils.log.RequireDebugTrue"
-LOGGING.setdefault("loggers", {})["django.db.backends"] = {
+LOGGING["loggers"]["django.db.backends"] = {
     "level": os.getenv("SQL_LOG_LEVEL", "DEBUG"),
-    "handlers": ["console"],
 }
 
 # ITOU.
