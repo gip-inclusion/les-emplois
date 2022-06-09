@@ -9,14 +9,10 @@
     <div class="card-body">
 
         {%for evaluated_administrative_criteria in item.evaluated_administrative_criteria.all %}
-            <div class="row mt-3">
-                <div class="col-md-8">
-                    {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria %}
-                </div>
+            <div class="row mt-1">
                 <div class="col-md-12">
-                    {% if evaluated_administrative_criteria.submitted_at %}
-                        <a href="{{evaluated_administrative_criteria.proof_url}}" target="_blank" class="btn btn-outline-primary float-right">Visualiser le justificatif soumis</a>
-                    {% else %}
+                </div>
+                <div class="col-md-12 mt-3">
                         <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}"
                             class="btn {% if evaluated_administrative_criteria.proof_url %}btn-outline-primary {%else%}btn-primary {%endif%}float-right">
                             {# check later if this conditional display could be factorized with similar code in `siae_upload_doc.html`#}
@@ -32,7 +28,7 @@
 
         {%endfor%}
 
-        <div class="row mt-5">
+        <div class="row mt-1">
             <div class="col-md-12">
                 {% if item.should_select_criteria == "PENDING"%}
                     <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}"
