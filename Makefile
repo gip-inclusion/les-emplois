@@ -2,7 +2,13 @@
 # =============================================================================
 PYTHON_VERSION := python3.9
 
-.PHONY: run clean cdsitepackages quality quality_venv fix fix_venv pylint pylint_venv
+ifeq ($(USE_VENV),1)
+	EXEC_CMD :=
+else
+	EXEC_CMD := docker exec -ti itou_django
+endif
+
+.PHONY: run clean cdsitepackages quality fix pylint
 
 # Run Docker images
 run:
@@ -15,39 +21,18 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality:
-	docker exec -ti itou_django black --check itou
-	docker exec -ti itou_django isort --check itou
-	docker exec -ti itou_django djhtml --check $(shell find itou/templates -name "*.html")
-	docker exec -ti itou_django flake8 itou --count --show-source --statistics
-
-quality_venv:
-	black --check itou
-	isort --check itou
-	djhtml --check $(shell find itou/templates -name "*.html")
-	flake8 itou --count --show-source --statistics
+	$(EXEC_CMD) black --check itou
+	$(EXEC_CMD) isort --check itou
+	$(EXEC_CMD) djhtml --check $(shell find itou/templates -name "*.html")
+	$(EXEC_CMD) flake8 itou --count --show-source --statistics
 
 fix:
-	docker exec -ti itou_django black itou
-	docker exec -ti itou_django isort itou
-	docker exec -ti itou_django djhtml --in-place $(shell find itou/templates -name "*.html")
-
-fix_venv:
-	black itou
-	isort itou
-	djhtml --in-place $(shell find itou/templates -name "*.html")
+	$(EXEC_CMD) black itou
+	$(EXEC_CMD) isort itou
+	$(EXEC_CMD) djhtml --in-place $(shell find itou/templates -name "*.html")
 
 pylint:
-	docker exec -ti itou_django pylint itou
-
-pylint_venv:
-	pylint itou
-
-coverage:
-	docker exec -ti itou_django coverage run ./manage.py test itou --settings=config.settings.test
-	docker exec -ti itou_django coverage html
-
-coverage_venv:
-	coverage run ./manage.py test itou --settings=config.settings.test && coverage html
+	$(EXEC_CMD) pylint itou
 
 # Django.
 # =============================================================================
@@ -59,17 +44,20 @@ coverage_venv:
 # make django_admin COMMAND=createsuperuser
 # make --silent django_admin COMMAND="dumpdata siaes.Siae --indent=3" > itou/fixtures/django/02_siaes.json
 django_admin:
-	docker exec -ti itou_django django-admin $(COMMAND)
+	$(EXEC_CMD) django-admin $(COMMAND)
 
 # After migrate
-populate_db:
+ifeq ($(USE_VENV),1)
+populate_db_with_cities:
+	psql -d itou --quiet --file itou/fixtures/postgres/cities.sql
+else
+populate_db_with_cities:
 	docker cp itou/fixtures/postgres/* itou_postgres:/backups/
 	docker exec -ti itou_postgres bash -c "psql -d itou --quiet --file backups/cities.sql"
-	docker exec -ti itou_django bash -c "ls -d itou/fixtures/django/* | xargs django-admin loaddata"
+endif
 
-populate_db_venv:
-	psql -d itou --quiet --file itou/fixtures/postgres/cities.sql
-	ls -d itou/fixtures/django/* | xargs ./manage.py loaddata
+populate_db: populate_db_with_cities
+	$(EXEC_CMD) bash -c "ls -d itou/fixtures/django/* | xargs ./manage.py loaddata"
 
 COMMAND_GRAPH_MODELS := graph_models --group-models \
 	approvals \
@@ -91,25 +79,25 @@ COMMAND_GRAPH_MODELS := graph_models --group-models \
 # apt-get install gcc graphviz graphviz-dev
 # pip install pygraphviz
 graph_models_itou:
-	docker exec -ti itou_django django-admin $(COMMAND_GRAPH_MODELS)
-
-graph_models_itou_venv:
-	./manage.py $(COMMAND_GRAPH_MODELS)
+	$(EXEC_CMD) ./manage.py $(COMMAND_GRAPH_MODELS)
 
 # Tests.
 # =============================================================================
 
 .PHONY: test
 
+TEST_OPTS += --force-color --timing --no-input
+
 test:
-	docker exec -ti itou_django django-admin test --settings=config.settings.test $(TARGET) --noinput --failfast --parallel
+	$(EXEC_CMD) ./manage.py test --settings=config.settings.test $(TEST_OPTS) --parallel $(TARGET)
 
 # Lets you add a debugger.
 test-interactive:
-	docker exec -ti itou_django django-admin test --settings=config.settings.test --failfast $(TARGET)
+	$(EXEC_CMD) ./manage.py test --settings=config.settings.test $(TEST_OPTS) --keepdb $(TARGET)
 
-test_venv:
-	./manage.py test --settings=config.settings.test --verbosity 1 --force-color --timing $(TARGET)
+coverage:
+	$(EXEC_CMD) coverage run ./manage.py test itou --settings=config.settings.test --no-input
+	$(EXEC_CMD) coverage html
 
 # Docker shell.
 # =============================================================================

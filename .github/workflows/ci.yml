@@ -56,8 +56,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements/dev.txt
     - name: ✨ Black, isort, flake8 & djhtml
-      run: |
-        make quality_venv
+      run: USE_VENV=1 make quality
     - name: 🚧 Check pending migrations
       run: django-admin makemigrations --check --dry-run --noinput
     - name: 🤹‍ Django tests

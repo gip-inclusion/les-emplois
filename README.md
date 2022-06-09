@@ -71,8 +71,10 @@ Une fois votre serveur de développement lancé, vous pouvez accéder au fronten
 l'adresse http://localhost:8080/.
 
 Dans un Virtualenv, vous pouvez utiliser les commandes Django habituelles
-(`./manage.py`), des commandes spécifiques au Virtualenv sont disponibles dans
-le Makefile. Elles sont suffixées par `_venv`.
+(`./manage.py`) mais également certaines recettes du Makefile, celles-ci 
+seront lancées directement dans votre venv si `USE_VENV=1` est utilisé.
+Cette variable devrait _normalement_ pouvoir être définie en global dans
+votre environnement shell (`export`, `.env`, ...). 
 
 ### Peupler la base de données
 
