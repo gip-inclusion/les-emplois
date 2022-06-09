@@ -52,15 +52,6 @@ que le fichier `README.md`.
 Créez votre environnement avec vos commandes habituelles, par exemple
 `python -m venv <votrevenv itou>` ou `mkvirtualenv itou`.
 
-Pour charger automatiquement les variables d'environnement à l'activation de
-votre Virtualenv, ajoutez les lignes suivantes au script `bin/activate` du venv
-en adaptant le chemin :
-
-    set -a
-    . $HOME/itou/envs/dev.env
-    . $HOME/itou/envs/secrets.env
-    set +a
-
 Les dépendances peuvent êtres installées via `pip install -r requirements/dev.txt`.
 
 ### Lancer le serveur de développement
