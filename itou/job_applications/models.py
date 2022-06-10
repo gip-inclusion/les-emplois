@@ -890,7 +890,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_at = timezone.now()
             self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_AUTOMATIC
             self.approval.unsuspend(self.hiring_start_at)
-            huey_notify_pole_emploi(self)
+            # FIXME(vperron): This is an unelegant method to avoid using huey
+            # in local development, thus needing Redis. Maybe some development
+            # settings involving a local, in-memory huey in immediate mode would
+            # be better, but this is a fast fix.
+            if settings.API_ESD["BASE_URL"]:
+                huey_notify_pole_emploi(self)
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):

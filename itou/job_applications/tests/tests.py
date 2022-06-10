@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core import mail
 from django.forms.models import model_to_dict
 from django.template.defaultfilters import title
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -45,6 +45,14 @@ from itou.users.models import User
 from itou.utils.templatetags import format_filters
 
 
+@override_settings(
+    API_ESD={
+        "BASE_URL": "https://base.domain",
+        "AUTH_BASE_URL": "https://authentication-domain.fr",
+        "KEY": "foobar",
+        "SECRET": "pe-secret",
+    }
+)
 class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self, *args, **kwargs):
         job_application = JobApplicationFactory(
@@ -958,6 +966,14 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         self.assertEqual(len(notification.recipients_emails), 0)
 
 
+@override_settings(
+    API_ESD={
+        "BASE_URL": "https://base.domain",
+        "AUTH_BASE_URL": "https://authentication-domain.fr",
+        "KEY": "foobar",
+        "SECRET": "pe-secret",
+    }
+)
 @patch("itou.job_applications.models.huey_notify_pole_emploi")
 class JobApplicationWorkflowTest(TestCase):
     def setUp(self):
