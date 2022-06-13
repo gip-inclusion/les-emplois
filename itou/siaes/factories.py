@@ -47,7 +47,13 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
 
 
 class SiaeFactory(factory.django.DjangoModelFactory):
-    """Generate an Siae() object for unit tests."""
+    """Generate a Siae() object for unit tests.
+
+    Usage:
+        SiaeFactory(subject_to_eligibility=True, ...)
+        SiaeFactory(not_subject_to_eligibility=True, ...)
+        SiaeFactory(with_membership=True, ...)
+    """
 
     class Meta:
         model = models.Siae
@@ -60,6 +66,9 @@ class SiaeFactory(factory.django.DjangoModelFactory):
             kind=factory.fuzzy.FuzzyChoice(
                 [kind for kind, _ in SiaeKind.choices if kind not in models.Siae.ELIGIBILITY_REQUIRED_KINDS]
             ),
+        )
+        with_membership = factory.Trait(
+            membership=factory.RelatedFactory("itou.siaes.factories.SiaeMembershipFactory", "siae"),
         )
 
     # Don't start a SIRET with 0.
