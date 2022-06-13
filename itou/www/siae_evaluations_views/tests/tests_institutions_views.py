@@ -898,6 +898,21 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, redirect_url)
         eval_admin_crit = EvaluatedAdministrativeCriteria.objects.get(pk=evaluated_administrative_criteria.pk)
+        self.assertEqual(evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED, eval_admin_crit.review_state)
+
+        # action reinit
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_administrative_criteria",
+                kwargs={
+                    "evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk,
+                    "action": "reinit",
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, redirect_url)
+        eval_admin_crit.refresh_from_db()
         self.assertEqual(evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING, eval_admin_crit.review_state)
 
         # action = accept
@@ -930,20 +945,24 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         eval_admin_crit.refresh_from_db()
         self.assertEqual(evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED, eval_admin_crit.review_state)
 
-        # action reinit
+        # action = refuse after review
+        evsiae = evaluated_administrative_criteria.evaluated_job_application.evaluated_siae
+        evsiae.reviewed_at = timezone.now()
+        evsiae.save(update_fields=["reviewed_at"])
+
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
                     "evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk,
-                    "action": "reinit",
+                    "action": "refuse",
                 },
             )
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, redirect_url)
         eval_admin_crit.refresh_from_db()
-        self.assertEqual(evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING, eval_admin_crit.review_state)
+        self.assertEqual(evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2, eval_admin_crit.review_state)
 
 
 class InstitutionEvaluatedSiaeValidationViewTest(TestCase):

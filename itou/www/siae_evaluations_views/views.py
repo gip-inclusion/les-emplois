@@ -178,7 +178,11 @@ def institution_evaluated_administrative_criteria(request, evaluated_administrat
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
     elif action == "accept":
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
-    elif action == "refuse":
+    elif action == "refuse" and evaluated_administrative_criteria.evaluated_job_application.evaluated_siae.reviewed_at:
+        evaluated_administrative_criteria.review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
+        )
+    else:
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
 
     evaluated_administrative_criteria.save(update_fields=["review_state"])

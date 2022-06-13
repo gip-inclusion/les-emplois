@@ -70,7 +70,7 @@
                             {# navigation : anchor to scroll to a specific card when returning to this page #}
                             <a class="scrolldown-anchor" id="{{evaluated_job_application.pk}}"></a>
                             <div class="card-header">
-                                {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.state%}
+                                {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.state reviewed_at=evaluated_job_application.evaluated_siae.reviewed_at%}
                             </div>
 
                             <div class="card-body">
