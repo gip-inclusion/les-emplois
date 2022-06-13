@@ -9,9 +9,11 @@
     </div>
     <div class="col-md-3 text-right">
         <p class="small mb-0">
-            {%if state == "SUBMITTED" %}
+            {% if state == "SUBMITTED" and reviewed_at%}
+                <p class="badge badge-pilotage float-right">Nouveaux justificatifs à traiter</p>
+            {%elif state == "SUBMITTED" %}
                 <p class="badge badge-pilotage float-right">À traiter</p>
-            {%elif state == "REFUSED" %}
+            {%elif state == "REFUSED" or state == "REFUSED_2" %}
                 <p class="badge badge-danger float-right">Problème constaté</p>
             {%elif state == "ACCEPTED" %}
                 <p class="badge badge-success float-right">Validé</p>
