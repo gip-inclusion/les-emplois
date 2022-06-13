@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.siaes import enums as siaes_enums
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
@@ -359,3 +360,27 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         siae_job_description = SiaeJobDescription.objects.with_job_applications_count().get(pk=job_description.pk)
         self.assertTrue(hasattr(siae_job_description, "job_applications_count"))
         self.assertEqual(siae_job_description.job_applications_count, 1)
+
+
+class SiaeContractTypeTest(TestCase):
+    def test_choices_from_siae_kind(self):
+        # Test only for GEIQ as the logic is the same for other Siae kind.
+        expected = [
+            ("APPRENTICESHIP", "Contrat d'apprentissage"),
+            ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
+            ("OTHER", "Autre type de contrat"),
+        ]
+        result = siaes_enums.ContractType.choices_from_siae_kind(kind=Siae.KIND_GEIQ)
+        self.assertEqual(result, expected)
+
+        result = ContractType.choices_from_siae_kind(kind=str(SiaeKind.GEIQ))
+        self.assertEqual(result, expected)
+
+    def test_choices_from_siae_kind_new_siae_kind(self):
+        """
+        A new SIAE kind has been added but it does not require specific contract types.
+        This method should return all every contract.
+        """
+        expected = ContractType.choices
+        result = ContractType.choices_from_siae_kind(kind="Destination unknown")
+        self.assertEqual(result, expected)

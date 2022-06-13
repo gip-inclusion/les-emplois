@@ -316,10 +316,6 @@ class Siae(AddressMixin, OrganizationAbstract):
         return self.name.capitalize()
 
     @property
-    def display_kind(self):
-        return dict(self.KIND_CHOICES)[self.kind]
-
-    @property
     def is_active(self):
         if not self.is_asp_managed:
             # GEIQ, EA, EATT, OPCS, ACIPHC... have no convention logic and thus are always active.
