@@ -8,9 +8,9 @@ from itou.cities.models import City
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.enums import ContractType
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeWithMembershipFactory
-from itou.siaes.models import Siae, SiaeJobDescription
+from itou.siaes.models import SiaeJobDescription
 from itou.users.factories import DEFAULT_PASSWORD
 
 
@@ -205,7 +205,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             department="75",
             coords=self.paris_city.coords,
             post_code="75001",
-            kind=Siae.KIND_OPCS,
+            kind=SiaeKind.OPCS,
         )
         user_opcs = opcs.members.first()
         opcs.jobs.add(*self.appellations)

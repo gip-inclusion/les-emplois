@@ -18,6 +18,7 @@ from unidecode import unidecode
 
 from itou.approvals import enums as approvals_enums
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
+from itou.siaes.enums import SiaeKind
 from itou.utils.models import DateRange
 from itou.utils.urls import get_external_link_markup
 from itou.utils.validators import alphanumeric
@@ -517,7 +518,7 @@ class Suspension(models.Model):
                 Suspension.Reason.FINISHED_CONTRACT,
                 Suspension.Reason.APPROVAL_BETWEEN_CTA_MEMBERS,
             ]
-            if siae.kind in [siae.KIND_ACI, siae.KIND_EI]:
+            if siae.kind in [SiaeKind.ACI, SiaeKind.EI]:
                 reasons.append(Suspension.Reason.CONTRAT_PASSERELLE)
             return [(reason.value, reason.label) for reason in reasons]
 
@@ -925,9 +926,9 @@ class Prolongation(models.Model):
 
         if self.reason == self.Reason.PARTICULAR_DIFFICULTIES.value:
             if not self.declared_by_siae or self.declared_by_siae.kind not in [
-                self.declared_by_siae.KIND_AI,
-                self.declared_by_siae.KIND_ACI,
-                self.declared_by_siae.KIND_ACIPHC,
+                SiaeKind.AI,
+                SiaeKind.ACI,
+                SiaeKind.ACIPHC,
             ]:
                 raise ValidationError(f"Le motif « {self.get_reason_display()} » est réservé aux AI et ACI.")
 

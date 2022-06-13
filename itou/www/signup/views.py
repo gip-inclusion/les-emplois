@@ -19,6 +19,7 @@ from django.views.decorators.http import require_GET
 
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
+from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.urls import get_safe_url
@@ -336,7 +337,7 @@ class FacilitatorSignupView(SignupView):
         if not hasattr(self, "siae"):
             org_data = self.request.session[settings.ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
             self.siae = Siae(
-                kind=Siae.KIND_OPCS,
+                kind=SiaeKind.OPCS,
                 source=Siae.SOURCE_USER_CREATED,
                 siret=org_data["siret"],
                 name=org_data["name"],

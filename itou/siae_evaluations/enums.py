@@ -1,6 +1,6 @@
 from django.db import models
 
-from itou.siaes.models import Siae
+from itou.siaes.enums import SiaeKind
 
 
 class EvaluationChosenPercent:
@@ -10,8 +10,8 @@ class EvaluationChosenPercent:
 
 
 class EvaluationSiaesKind:
-    # Siae.KIND_AI will be eligible for Evaluation from 2022
-    Evaluable = [Siae.KIND_EI, Siae.KIND_ACI, Siae.KIND_ETTI]
+    # SiaeKind.AI will be eligible for Evaluation from 2022
+    Evaluable = [SiaeKind.EI, SiaeKind.ACI, SiaeKind.ETTI]
 
 
 class EvaluationJobApplicationsBoundariesNumber:

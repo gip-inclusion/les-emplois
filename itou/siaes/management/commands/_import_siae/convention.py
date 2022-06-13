@@ -5,6 +5,7 @@ SiaeConvention object logic used by the import_siae.py script is gathered here.
 """
 from django.utils import timezone
 
+from itou.siaes.enums import SiaeKind
 from itou.siaes.management.commands._import_siae.siae import does_siae_have_an_active_convention
 from itou.siaes.management.commands._import_siae.vue_af import INACTIVE_SIAE_LIST
 from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIRET_SIGNATURE, SIRET_TO_ASP_ID
@@ -170,7 +171,7 @@ def check_convention_data_consistency():
         # Additional data consistency checks.
         for siae in convention.siaes.all():
             assert siae.siren == convention.siren_signature
-            if siae.kind == Siae.KIND_ACIPHC and convention.kind == SiaeConvention.KIND_ACI:
+            if siae.kind == SiaeKind.ACIPHC and convention.kind == SiaeConvention.KIND_ACI:
                 assert siae.source == Siae.SOURCE_USER_CREATED
                 # Sometimes our staff manually changes an existing ACI antenna's kind from ACI to ACIPHC and forgets
                 # to detach the ACI convention.

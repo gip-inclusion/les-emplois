@@ -4,7 +4,7 @@ from django.utils.datastructures import MultiValueDict
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
-from itou.siaes.models import Siae
+from itou.siaes.enums import SiaeKind
 
 
 class SiaeSearchForm(forms.Form):
@@ -15,7 +15,7 @@ class SiaeSearchForm(forms.Form):
 
     CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
-    KIND_CHOICES = [(k, f"{k} - {v}") for k, v in Siae.KIND_CHOICES]
+    KIND_CHOICES = [(k, f"{k} - {v}") for k, v in SiaeKind.choices]
 
     distance = forms.ChoiceField(
         label="Distance",

@@ -6,8 +6,8 @@ from itou.cities.factories import create_city_guerande, create_city_saint_andre,
 from itou.cities.models import City
 from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithJobsFactory
-from itou.siaes.models import Siae
 
 
 class SearchSiaeTest(TestCase):
@@ -40,27 +40,27 @@ class SearchSiaeTest(TestCase):
 
     def test_kind(self):
         city = create_city_saint_andre()
-        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=Siae.KIND_AI)
+        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.AI)
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [Siae.KIND_AI]})
+        response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.AI]})
         self.assertContains(response, "1 résultat sur 1")
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [Siae.KIND_EI]})
+        response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.EI]})
         self.assertContains(response, "Aucun résultat")
 
     def test_distance(self):
         # 3 SIAEs in two departments to test distance and department filtering
         vannes = create_city_vannes()
         SIAE_VANNES = "SIAE Vannes"
-        SiaeFactory(name=SIAE_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=Siae.KIND_AI)
+        SiaeFactory(name=SIAE_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=SiaeKind.AI)
 
         guerande = create_city_guerande()
         SIAE_GUERANDE = "SIAE Guérande"
-        SiaeFactory(name=SIAE_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=Siae.KIND_AI)
+        SiaeFactory(name=SIAE_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=SiaeKind.AI)
         saint_andre = create_city_saint_andre()
         SIAE_SAINT_ANDRE = "SIAE Saint André des Eaux"
         SiaeFactory(
-            name=SIAE_SAINT_ANDRE, department="44", coords=saint_andre.coords, post_code="44117", kind=Siae.KIND_AI
+            name=SIAE_SAINT_ANDRE, department="44", coords=saint_andre.coords, post_code="44117", kind=SiaeKind.AI
         )
 
         # 100 km
@@ -131,7 +131,7 @@ class SearchSiaeTest(TestCase):
 
     def test_opcs_displays_card_differently(self):
         city = create_city_saint_andre()
-        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=Siae.KIND_OPCS)
+        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.OPCS)
 
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(response, "1 résultat sur 1")

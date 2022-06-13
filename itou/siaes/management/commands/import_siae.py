@@ -17,6 +17,7 @@ name instead of hardcoding column numbers as in `field = row[42]`.
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from itou.siaes.enums import SiaeKind
 from itou.siaes.management.commands._import_siae.convention import (
     check_convention_data_consistency,
     get_creatable_conventions,
@@ -313,7 +314,7 @@ class Command(BaseCommand):
         ACIPHC is a tricky siae kind, part of ELIBILIGITY_REQUIRED_KINDS but not of ASP_MANAGED_KINDS.
         Let's keep an eye on it.
         """
-        aciphc_query = Siae.objects.filter(kind=Siae.KIND_ACIPHC).select_related("convention")
+        aciphc_query = Siae.objects.filter(kind=SiaeKind.ACIPHC).select_related("convention")
         for siae in aciphc_query:
             assert siae.source in [Siae.SOURCE_STAFF_CREATED, Siae.SOURCE_USER_CREATED]
             assert siae.convention is None

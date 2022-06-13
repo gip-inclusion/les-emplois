@@ -30,6 +30,7 @@ from itou.job_applications.factories import (
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory, PrescriberOrganizationFactory
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
@@ -782,21 +783,22 @@ class ApprovalsWrapperTest(TestCase):
         # Waiting period cannot be bypassed for SIAE if no prescriber.
         self.assertTrue(
             approvals_wrapper.cannot_bypass_waiting_period(
-                siae=SiaeFactory(kind=Siae.KIND_ETTI), sender_prescriber_organization=None
+                siae=SiaeFactory(kind=SiaeKind.ETTI), sender_prescriber_organization=None
             )
         )
 
         # Waiting period cannot be bypassed for SIAE if unauthorized prescriber.
         self.assertTrue(
             approvals_wrapper.cannot_bypass_waiting_period(
-                siae=SiaeFactory(kind=Siae.KIND_ETTI), sender_prescriber_organization=PrescriberOrganizationFactory()
+                siae=SiaeFactory(kind=SiaeKind.ETTI),
+                sender_prescriber_organization=PrescriberOrganizationFactory(),
             )
         )
 
         # Waiting period is bypassed for SIAE if authorized prescriber.
         self.assertFalse(
             approvals_wrapper.cannot_bypass_waiting_period(
-                siae=SiaeFactory(kind=Siae.KIND_ETTI),
+                siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=AuthorizedPrescriberOrganizationFactory(),
             )
         )
@@ -804,14 +806,15 @@ class ApprovalsWrapperTest(TestCase):
         # Waiting period is bypassed for GEIQ even if no prescriber.
         self.assertFalse(
             approvals_wrapper.cannot_bypass_waiting_period(
-                siae=SiaeFactory(kind=Siae.KIND_GEIQ), sender_prescriber_organization=None
+                siae=SiaeFactory(kind=SiaeKind.GEIQ), sender_prescriber_organization=None
             )
         )
 
         # Waiting period is bypassed for GEIQ even if unauthorized prescriber.
         self.assertFalse(
             approvals_wrapper.cannot_bypass_waiting_period(
-                siae=SiaeFactory(kind=Siae.KIND_GEIQ), sender_prescriber_organization=PrescriberOrganizationFactory()
+                siae=SiaeFactory(kind=SiaeKind.GEIQ),
+                sender_prescriber_organization=PrescriberOrganizationFactory(),
             )
         )
 
@@ -819,7 +822,7 @@ class ApprovalsWrapperTest(TestCase):
         diag = EligibilityDiagnosisFactory(job_seeker=approvals_wrapper.user)
         self.assertFalse(
             approvals_wrapper.cannot_bypass_waiting_period(
-                siae=SiaeFactory(kind=Siae.KIND_ETTI),
+                siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=None,
             )
         )
@@ -830,7 +833,7 @@ class ApprovalsWrapperTest(TestCase):
         diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=approvals_wrapper.user)
         self.assertTrue(
             approvals_wrapper.cannot_bypass_waiting_period(
-                siae=SiaeFactory(kind=Siae.KIND_ETTI),
+                siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=None,
             )
         )
@@ -985,7 +988,7 @@ class CustomApprovalAdminViewsTest(TestCase):
 
         ## can_use_employee_record
         for siae_kind in [
-            siae_kind for siae_kind, _ in Siae.KIND_CHOICES if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS
+            siae_kind for siae_kind, _ in SiaeKind.choices if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS
         ]:
             not_eligible_siae = SiaeFactory(kind=siae_kind)
             job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
@@ -1129,14 +1132,14 @@ class SuspensionModelTest(TestCase):
 
     def test_displayed_choices_for_siae(self):
         # EI and ACI kind have one more choice
-        for kind in [Siae.KIND_EI, Siae.KIND_ACI]:
+        for kind in [SiaeKind.EI, SiaeKind.ACI]:
             siae = SiaeFactory(kind=kind)
             result = Suspension.Reason.displayed_choices_for_siae(siae)
             self.assertEqual(len(result), 5)
             self.assertEqual(result[-1][0], Suspension.Reason.CONTRAT_PASSERELLE.value)
 
         # Some other cases
-        for kind in [Siae.KIND_ETTI, Siae.KIND_AI]:
+        for kind in [SiaeKind.ETTI, SiaeKind.AI]:
             siae = SiaeFactory(kind=kind)
             result = Suspension.Reason.displayed_choices_for_siae(siae)
             self.assertEqual(len(result), 4)

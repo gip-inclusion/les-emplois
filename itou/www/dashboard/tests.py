@@ -19,6 +19,7 @@ from itou.job_applications.notifications import (
 )
 from itou.prescribers import factories as prescribers_factories
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
@@ -26,7 +27,6 @@ from itou.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
 )
-from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.www.dashboard.forms import EditUserEmailForm
@@ -68,7 +68,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, expected_message)
 
     def test_dashboard_eiti(self):
-        siae = SiaeWithMembershipFactory(kind=Siae.KIND_EITI)
+        siae = SiaeWithMembershipFactory(kind=SiaeKind.EITI)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -77,9 +77,9 @@ class DashboardViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_dashboard_displays_asp_badge(self):
-        siae = SiaeWithMembershipFactory(kind=Siae.KIND_EI)
-        other_siae = SiaeWithMembershipFactory(kind=Siae.KIND_ETTI)
-        last_siae = SiaeWithMembershipFactory(kind=Siae.KIND_ETTI)
+        siae = SiaeWithMembershipFactory(kind=SiaeKind.EI)
+        other_siae = SiaeWithMembershipFactory(kind=SiaeKind.ETTI)
+        last_siae = SiaeWithMembershipFactory(kind=SiaeKind.ETTI)
 
         user = siae.members.first()
         user.siae_set.add(other_siae)
@@ -128,7 +128,14 @@ class DashboardViewTest(TestCase):
         self.assertEqual(response.context["num_rejected_employee_records"], 0)
 
     def test_dashboard_agreements_and_job_postings(self):
-        for kind in [Siae.KIND_AI, Siae.KIND_EI, Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EITI, Siae.KIND_ACIPHC]:
+        for kind in [
+            SiaeKind.AI,
+            SiaeKind.EI,
+            SiaeKind.EITI,
+            SiaeKind.ACI,
+            SiaeKind.ETTI,
+            SiaeKind.ACIPHC,
+        ]:
             with self.subTest(f"should display when siae_kind={kind}"):
                 siae = SiaeWithMembershipFactory(kind=kind)
                 user = siae.members.first()
@@ -138,7 +145,7 @@ class DashboardViewTest(TestCase):
                 self.assertContains(response, "Prolonger ou suspendre un agrément émis par Pôle emploi")
                 self.assertContains(response, "Déclarer une embauche")
 
-        for kind in [Siae.KIND_EA, Siae.KIND_EATT, Siae.KIND_GEIQ, Siae.KIND_OPCS]:
+        for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS]:
             with self.subTest(f"should not display when siae_kind={kind}"):
                 siae = SiaeWithMembershipFactory(kind=kind)
                 user = siae.members.first()
@@ -149,7 +156,7 @@ class DashboardViewTest(TestCase):
                 self.assertNotContains(response, "Déclarer une embauche")
 
     def test_dashboard_can_create_siae_antenna(self):
-        for kind in [Siae.KIND_EA, Siae.KIND_EATT, Siae.KIND_GEIQ]:
+        for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ]:
             with self.subTest(f"antennas freely created without a convention siae_kind={kind}"):
                 siae = SiaeWithMembershipFactory(kind=kind, convention=None)
                 user = siae.members.first()
@@ -158,7 +165,7 @@ class DashboardViewTest(TestCase):
                 self.assertContains(response, "Créer/rejoindre une autre structure")
 
         # but disabled specifically for OPCS
-        siae = SiaeWithMembershipFactory(kind=Siae.KIND_OPCS)
+        siae = SiaeWithMembershipFactory(kind=SiaeKind.OPCS)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         response = self.client.get(reverse("dashboard:index"))

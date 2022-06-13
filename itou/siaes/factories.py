@@ -7,6 +7,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
+from itou.siaes.enums import SiaeKind
 from itou.users.factories import SiaeStaffFactory
 
 
@@ -39,7 +40,7 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
 
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
-    kind = models.Siae.KIND_EI
+    kind = SiaeKind.EI
     asp_id = factory.Sequence(int)
     is_active = True
     financial_annex = factory.RelatedFactory(SiaeFinancialAnnexFactory, "convention")
@@ -57,14 +58,14 @@ class SiaeFactory(factory.django.DjangoModelFactory):
         )
         not_subject_to_eligibility = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice(
-                [kind for kind, _ in models.Siae.KIND_CHOICES if kind not in models.Siae.ELIGIBILITY_REQUIRED_KINDS]
+                [kind for kind, _ in SiaeKind.choices if kind not in models.Siae.ELIGIBILITY_REQUIRED_KINDS]
             ),
         )
 
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
-    kind = models.Siae.KIND_EI
+    kind = SiaeKind.EI
     name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")

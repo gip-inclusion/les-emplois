@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes import enums as siaes_enums
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
@@ -57,7 +57,7 @@ class SiaeFactoriesTest(TestCase):
 class SiaeModelTest(TestCase):
     def test_accept_survey_url(self):
 
-        siae = SiaeFactory(kind=Siae.KIND_EI, department="57")
+        siae = SiaeFactory(kind=SiaeKind.EI, department="57")
         url = siae.accept_survey_url
         self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/nUjfDnrA?"))
         self.assertIn(f"id_siae={siae.pk}", url)
@@ -66,7 +66,7 @@ class SiaeModelTest(TestCase):
         self.assertIn("departement=57", url)
 
         # Ensure that the URL does not break when there is no department.
-        siae = SiaeFactory(kind=Siae.KIND_AI, department="")
+        siae = SiaeFactory(kind=SiaeKind.AI, department="")
         self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/nUjfDnrA?"))
         url = siae.accept_survey_url
         self.assertIn(f"id_siae={siae.pk}", url)
@@ -80,17 +80,17 @@ class SiaeModelTest(TestCase):
         self.assertEqual(siae.siret_nic, "00001")
 
     def test_is_subject_to_eligibility_rules(self):
-        siae = SiaeFactory(kind=Siae.KIND_GEIQ)
+        siae = SiaeFactory(kind=SiaeKind.GEIQ)
         self.assertFalse(siae.is_subject_to_eligibility_rules)
 
-        siae = SiaeFactory(kind=Siae.KIND_EI)
+        siae = SiaeFactory(kind=SiaeKind.EI)
         self.assertTrue(siae.is_subject_to_eligibility_rules)
 
     def test_is_asp_managed(self):
-        siae = SiaeFactory(kind=Siae.KIND_ACIPHC)
+        siae = SiaeFactory(kind=SiaeKind.ACIPHC)
         self.assertFalse(siae.is_asp_managed)
 
-        siae = SiaeFactory(kind=Siae.KIND_EI)
+        siae = SiaeFactory(kind=SiaeKind.EI)
         self.assertTrue(siae.is_asp_managed)
 
     def test_has_members(self):
@@ -218,9 +218,9 @@ class SiaeModelTest(TestCase):
         self.assertEqual(siae2.active_members.count(), 3)
 
     def test_is_opcs(self):
-        siae = SiaeFactory(kind=Siae.KIND_ACI)
+        siae = SiaeFactory(kind=SiaeKind.ACI)
         self.assertFalse(siae.is_opcs)
-        siae.kind = Siae.KIND_OPCS
+        siae.kind = SiaeKind.OPCS
         self.assertTrue(siae.is_opcs)
 
 
@@ -370,7 +370,7 @@ class SiaeContractTypeTest(TestCase):
             ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
             ("OTHER", "Autre type de contrat"),
         ]
-        result = siaes_enums.ContractType.choices_from_siae_kind(kind=Siae.KIND_GEIQ)
+        result = ContractType.choices_from_siae_kind(kind=SiaeKind.GEIQ)
         self.assertEqual(result, expected)
 
         result = ContractType.choices_from_siae_kind(kind=str(SiaeKind.GEIQ))

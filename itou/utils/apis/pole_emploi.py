@@ -7,6 +7,8 @@ from django.conf import settings
 from django.utils import timezone
 from unidecode import unidecode
 
+from itou.siaes.enums import SiaeKind
+
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +62,6 @@ def _sender_kind_to_origine_candidature(sender_kind):
 
 
 def _siae_kind_to_type_siae(siae_kind):
-    from itou.siaes.models import Siae
-
     # Possible values on Pole Emploi's side:
     # « 836 – IAE ITOU ACI »
     # « 837 – IAE ITOU AI »
@@ -71,15 +71,15 @@ def _siae_kind_to_type_siae(siae_kind):
     # We also assume that the default would be 838: EI/GEIQ/EA.
     # I am just the refactorer, I don't have the history of this choice.
     return {
-        Siae.KIND_EI: 838,
-        Siae.KIND_AI: 837,
-        Siae.KIND_ACI: 836,
-        Siae.KIND_ACIPHC: 837,
-        Siae.KIND_ETTI: 839,
-        Siae.KIND_EITI: 840,
-        Siae.KIND_GEIQ: 838,
-        Siae.KIND_EA: 838,
-        Siae.KIND_EATT: 840,
+        SiaeKind.EI: 838,
+        SiaeKind.AI: 837,
+        SiaeKind.ACI: 836,
+        SiaeKind.ACIPHC: 837,
+        SiaeKind.ETTI: 839,
+        SiaeKind.EITI: 840,
+        SiaeKind.GEIQ: 838,
+        SiaeKind.EA: 838,
+        SiaeKind.EATT: 840,
     }.get(siae_kind, 838)
 
 

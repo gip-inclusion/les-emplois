@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeJobDescription
 
 
@@ -27,7 +28,7 @@ class _JobDescriptionSerializer(serializers.ModelSerializer):
 class SiaeSerializer(serializers.ModelSerializer):
     cree_le = serializers.DateTimeField(source="created_at", label="Date de création")
     mis_a_jour_le = serializers.DateTimeField(source="updated_at", label="Date de mise à jour")
-    type = serializers.ChoiceField(source="kind", label="Type de SIAE", choices=Siae.KIND_CHOICES)
+    type = serializers.ChoiceField(source="kind", label="Type de SIAE", choices=SiaeKind.choices)
     ville = serializers.CharField(source="city", label="Ville où se trouve la SIAE")
     code_postal = serializers.CharField(source="post_code", label="Code postal de la SIAE")
     site_web = serializers.CharField(source="website", label="URL du site web de la SIAE")

@@ -5,6 +5,7 @@ from django.shortcuts import render
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
 from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
@@ -99,7 +100,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
     context = {
         "city": city,
         "distance": distance,
-        "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT],
+        "ea_eatt_kinds": [SiaeKind.EA, SiaeKind.EATT],
         "form": form,
         "siaes_page": siaes_page,
         "siaes_step_1": siaes_step_1,

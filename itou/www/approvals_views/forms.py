@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from itou.approvals.models import Prolongation, Suspension
+from itou.siaes.enums import SiaeKind
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -42,7 +43,7 @@ class DeclareProlongationForm(forms.ModelForm):
         ]
 
         # `PARTICULAR_DIFFICULTIES` is allowed only for AI, ACI and ACIPHC.
-        if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI, self.siae.KIND_ACIPHC]:
+        if self.siae.kind not in [SiaeKind.AI, SiaeKind.ACI, SiaeKind.ACIPHC]:
             self.fields["reason"].choices = [
                 item
                 for item in self.fields["reason"].choices

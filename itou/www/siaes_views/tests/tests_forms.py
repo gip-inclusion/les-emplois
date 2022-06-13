@@ -2,9 +2,8 @@ from django.test import TestCase
 
 from itou.cities.factories import create_city_guerande
 from itou.jobs.factories import create_test_romes_and_appellations
-from itou.siaes.enums import ContractType
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeFactory
-from itou.siaes.models import Siae
 from itou.www.siaes_views.forms import EditJobDescriptionDetailsForm, EditJobDescriptionForm
 
 
@@ -148,7 +147,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         self.assertFalse(cleaned_data.get("is_resume_mandatory"))
 
     def test_opcs_errors(self):
-        opcs = SiaeFactory(kind=Siae.KIND_OPCS)
+        opcs = SiaeFactory(kind=SiaeKind.OPCS)
         post_data = {
             "job_appellation_code": "10357",
             "job_appellation": "Whatever",
@@ -178,7 +177,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_opcs_fields(self):
-        siae = SiaeFactory(kind=Siae.KIND_OPCS)
+        siae = SiaeFactory(kind=SiaeKind.OPCS)
         post_data = {
             "job_appellation_code": "10357",
             "job_appellation": "Whatever",
@@ -264,7 +263,7 @@ class EditJobDescriptionDetailsFormTest(TestCase):
         self.assertFalse(cleaned_data.get("is_resume_mandatory"))
 
     def test_opcs_fields(self):
-        siae = SiaeFactory(kind=Siae.KIND_OPCS)
+        siae = SiaeFactory(kind=SiaeKind.OPCS)
 
         post_data = {
             "description": "description",
