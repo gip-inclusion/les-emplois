@@ -47,6 +47,18 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
     financial_annex = factory.RelatedFactory(SiaeFinancialAnnexFactory, "convention")
 
 
+def _create_job_from_rome_code(self, create, extracted, **kwargs):
+    if not create:
+        # Simple build, do nothing.
+        return
+
+    romes = extracted or ("N1101", "N1105", "N1103", "N4105")
+    create_test_romes_and_appellations(romes)
+    # Pick random results.
+    appellations = Appellation.objects.order_by("?")[: len(romes)]
+    self.jobs.add(*appellations)
+
+
 class SiaeFactory(factory.django.DjangoModelFactory):
     """Generate a Siae() object for unit tests.
 
@@ -54,6 +66,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
         SiaeFactory(subject_to_eligibility=True, ...)
         SiaeFactory(not_subject_to_eligibility=True, ...)
         SiaeFactory(with_membership=True, ...)
+        SiaeFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), ...)
     """
 
     class Meta:
@@ -71,6 +84,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
         with_membership = factory.Trait(
             membership=factory.RelatedFactory("itou.siaes.factories.SiaeMembershipFactory", "siae"),
         )
+        with_jobs = factory.Trait(romes=factory.PostGeneration(_create_job_from_rome_code))
 
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
