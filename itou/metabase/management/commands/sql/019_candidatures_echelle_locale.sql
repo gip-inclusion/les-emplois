@@ -39,6 +39,7 @@ select
     motif_de_refus,
     candidatures_p.nom_département_structure,
     nom_structure,
+    type_structure,
     origine,
     origine_détaillée,
     candidatures_p.région_structure,
