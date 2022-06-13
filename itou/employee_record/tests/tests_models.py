@@ -293,11 +293,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         self.employee_record.update_as_accepted(process_code, process_message, "{}")
         self.employee_record.update_as_disabled()
-
-        self.assertIn(
-            self.employee_record.job_application,
-            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
-        )
+        self.assertEqual(self.employee_record.status, Status.DISABLED)
 
         # Now, can create new employee record on same job_application
         new_employee_record = EmployeeRecord.from_job_application(self.employee_record.job_application)
@@ -305,10 +301,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         # Employee record in NEW state can be disable
         new_employee_record.update_as_disabled()
-        self.assertIn(
-            new_employee_record.job_application,
-            JobApplication.objects.eligible_as_employee_record(new_employee_record.job_application.to_siae),
-        )
+        self.assertEqual(new_employee_record.status, Status.DISABLED)
 
         # Now, can create another one employee record on same job_application
         new_employee_record = EmployeeRecord.from_job_application(new_employee_record.job_application)
@@ -333,11 +326,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         err_code, err_message = "12", "JSON Invalide"
         self.employee_record.update_as_rejected(err_code, err_message)
         self.employee_record.update_as_disabled()
-
-        self.assertIn(
-            self.employee_record.job_application,
-            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
-        )
+        self.assertEqual(self.employee_record.status, Status.DISABLED)
 
         # Now, can create new employee record on same job_application
         new_employee_record = EmployeeRecord.from_job_application(self.employee_record.job_application)
@@ -356,11 +345,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         self.employee_record.update_as_accepted(process_code, process_message, "{}")
         self.employee_record.update_as_disabled()
-
-        self.assertIn(
-            self.employee_record.job_application,
-            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
-        )
+        self.assertEqual(self.employee_record.status, Status.DISABLED)
 
         # Employee record in DISABLE state can be reactivate (set state NEW)
         self.employee_record.update_as_new()
