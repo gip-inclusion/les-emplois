@@ -31,7 +31,7 @@ from itou.siae_evaluations.models import (
     validate_institution,
 )
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
 
@@ -411,7 +411,7 @@ class EvaluationCampaignManagerTest(TestCase):
     def test_populate(self):
         # integration tests
         evaluation_campaign = EvaluationCampaignFactory()
-        siae = SiaeWithMembershipFactory(department=evaluation_campaign.institution.department)
+        siae = SiaeFactory(department=evaluation_campaign.institution.department, with_membership=True)
         job_seeker = JobSeekerFactory()
         user = siae.members.first()
         user_info = UserInfo(

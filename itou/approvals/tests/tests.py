@@ -31,7 +31,7 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory, PrescriberOrganizationFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
@@ -1442,7 +1442,7 @@ class ProlongationModelTest(TestCase):
         """
 
         approval = ApprovalFactory()
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
 
         start_at = approval.end_at - relativedelta(days=2)
         end_at = start_at + relativedelta(months=1)

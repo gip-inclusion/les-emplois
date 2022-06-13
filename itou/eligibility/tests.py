@@ -14,7 +14,7 @@ from itou.eligibility.factories import (
 from itou.eligibility.models import AdministrativeCriteria, AdministrativeCriteriaQuerySet, EligibilityDiagnosis
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import KIND_PRESCRIBER, KIND_SIAE_STAFF, UserInfo
 
@@ -131,8 +131,8 @@ class EligibilityDiagnosisManagerTest(TestCase):
         self.assertIsNone(last_expired)
 
         # Has Itou diagnosis made by an SIAE.
-        siae1 = SiaeWithMembershipFactory()
-        siae2 = SiaeWithMembershipFactory()
+        siae1 = SiaeFactory(with_membership=True)
+        siae2 = SiaeFactory(with_membership=True)
         diagnosis = EligibilityDiagnosisMadeBySiaeFactory(author_siae=siae1)
         # From `siae1` perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
@@ -158,7 +158,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         self.assertIsNone(last_expired)
 
         # Has Itou diagnosis made by a prescriber.
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         prescriber_diagnosis = EligibilityDiagnosisFactory()
         # From siae perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
@@ -176,7 +176,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
 
         # Has 2 Itou diagnoses: 1 made by an SIAE prior to another one by a prescriber.
         job_seeker = JobSeekerFactory()
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         prescriber_diagnosis = EligibilityDiagnosisFactory(job_seeker=job_seeker)
         # From `siae` perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_seeker, for_siae=siae)
@@ -191,8 +191,8 @@ class EligibilityDiagnosisManagerTest(TestCase):
 
         # Has an expired Itou diagnoses made by another SIAE.
         job_seeker = JobSeekerFactory()
-        siae1 = SiaeWithMembershipFactory()
-        siae2 = SiaeWithMembershipFactory()
+        siae1 = SiaeFactory(with_membership=True)
+        siae2 = SiaeFactory(with_membership=True)
         expired_diagnosis = ExpiredEligibilityDiagnosisMadeBySiaeFactory(job_seeker=job_seeker, author_siae=siae1)
 
         # From `siae` perspective.
@@ -232,7 +232,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
 class EligibilityDiagnosisModelTest(TestCase):
     def test_create_diagnosis(self):
         job_seeker = JobSeekerFactory()
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         user_info = UserInfo(
             user=user, kind=KIND_SIAE_STAFF, prescriber_organization=None, is_authorized_prescriber=False, siae=siae
@@ -321,7 +321,7 @@ class AdministrativeCriteriaModelTest(TestCase):
         self.assertNotIn(level1_criterion, qs)
 
     def test_for_job_application(self):
-        siae = SiaeWithMembershipFactory(department="14")
+        siae = SiaeFactory(department="14", with_membership=True)
 
         job_seeker = JobSeekerFactory()
         user = siae.members.first()

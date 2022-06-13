@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from itou.api.employee_record_api.viewsets import EmployeeRecordRateThrottle
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD
 
 
@@ -20,7 +20,7 @@ class EmployeeRecordThrottleTest(APITestCase):
 
     def test_basic_ko_throttling(self):
         client = APIClient()
-        user = SiaeWithMembershipFactory().members.first()
+        user = SiaeFactory(with_membership=True).members.first()
 
         client.login(username=user.username, password=DEFAULT_PASSWORD)
 
@@ -35,7 +35,7 @@ class EmployeeRecordThrottleTest(APITestCase):
 
     def test_basic_ok_throttling(self):
         client = APIClient()
-        user = SiaeWithMembershipFactory().members.first()
+        user = SiaeFactory(with_membership=True).members.first()
 
         client.login(username=user.username, password=DEFAULT_PASSWORD)
 

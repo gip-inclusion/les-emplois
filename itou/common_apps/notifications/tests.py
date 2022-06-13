@@ -3,14 +3,14 @@ from django.test import TestCase
 
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNotification
-from itou.siaes.factories import SiaeMembershipFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 
 
 class NotificationsBaseClassTest(TestCase):
     # Use a child class to test parent class. Maybe refactor that later.
 
     def setUp(self):
-        self.siae = SiaeWithMembershipFactory()
+        self.siae = SiaeFactory(with_membership=True)
         self.job_application = JobApplicationFactory(to_siae=self.siae)
         self.notification = NewSpontaneousJobAppEmployersNotification(job_application=self.job_application)
 
@@ -84,7 +84,7 @@ class NotificationsBaseClassTest(TestCase):
 
 class NewSpontaneousJobAppEmployersNotificationTest(TestCase):
     def test_mail_content_when_subject_to_eligibility_rules(self):
-        siae = SiaeWithMembershipFactory(subject_to_eligibility=True)
+        siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
         notification = NewSpontaneousJobAppEmployersNotification(
             job_application=JobApplicationFactory(to_siae=siae),
         )
@@ -92,7 +92,7 @@ class NewSpontaneousJobAppEmployersNotificationTest(TestCase):
         self.assertIn("PASS IAE", notification.email.body)
 
     def test_mail_content_when_not_subject_to_eligibility_rules(self):
-        siae = SiaeWithMembershipFactory(not_subject_to_eligibility=True)
+        siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)
         notification = NewSpontaneousJobAppEmployersNotification(
             job_application=JobApplicationFactory(to_siae=siae),
         )

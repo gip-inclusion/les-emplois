@@ -25,7 +25,6 @@ from itou.siaes.factories import (
     SiaeFactory,
     SiaePendingGracePeriodFactory,
     SiaeWithMembershipAndJobsFactory,
-    SiaeWithMembershipFactory,
 )
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
@@ -34,7 +33,7 @@ from itou.www.dashboard.forms import EditUserEmailForm
 
 class DashboardViewTest(TestCase):
     def test_dashboard(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -68,7 +67,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, expected_message)
 
     def test_dashboard_eiti(self):
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.EITI)
+        siae = SiaeFactory(kind=SiaeKind.EITI, with_membership=True)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -77,9 +76,9 @@ class DashboardViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_dashboard_displays_asp_badge(self):
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.EI)
-        other_siae = SiaeWithMembershipFactory(kind=SiaeKind.ETTI)
-        last_siae = SiaeWithMembershipFactory(kind=SiaeKind.ETTI)
+        siae = SiaeFactory(kind=SiaeKind.EI, with_membership=True)
+        other_siae = SiaeFactory(kind=SiaeKind.ETTI, with_membership=True)
+        last_siae = SiaeFactory(kind=SiaeKind.ETTI, with_membership=True)
 
         user = siae.members.first()
         user.siae_set.add(other_siae)
@@ -137,7 +136,7 @@ class DashboardViewTest(TestCase):
             SiaeKind.ACIPHC,
         ]:
             with self.subTest(f"should display when siae_kind={kind}"):
-                siae = SiaeWithMembershipFactory(kind=kind)
+                siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
                 self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -147,7 +146,7 @@ class DashboardViewTest(TestCase):
 
         for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS]:
             with self.subTest(f"should not display when siae_kind={kind}"):
-                siae = SiaeWithMembershipFactory(kind=kind)
+                siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
                 self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -158,7 +157,7 @@ class DashboardViewTest(TestCase):
     def test_dashboard_can_create_siae_antenna(self):
         for kind in SiaeKind:
             with self.subTest(kind=kind):
-                siae = SiaeWithMembershipFactory(kind=kind, membership__is_admin=True)
+                siae = SiaeFactory(kind=kind, with_membership=True, membership__is_admin=True)
                 user = siae.members.get()
 
                 self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -197,7 +196,7 @@ class DashboardViewTest(TestCase):
 
     def test_dashboard_siae_evaluations_siae_access(self):
         # preset for incoming new pages
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -335,7 +334,7 @@ class EditJobSeekerInfo(TestCase):
         The SIAE can edit the email of a jobseeker it works with, provided he did not confirm its email.
         """
         new_email = "bidou@yopmail.com"
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         job_application = JobApplicationSentByPrescriberFactory(to_siae=siae, job_seeker__created_by=user)
 
@@ -499,7 +498,7 @@ class EditUserEmailFormTest(TestCase):
 
 class SwitchSiaeTest(TestCase):
     def test_switch_siae(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -543,7 +542,7 @@ class SwitchSiaeTest(TestCase):
         self.assertEqual(response.context["current_siae"], related_siae)
 
     def test_can_still_switch_to_inactive_siae_during_grace_period(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -566,7 +565,7 @@ class SwitchSiaeTest(TestCase):
         self.assertEqual(response.context["current_siae"], related_siae)
 
     def test_cannot_switch_to_inactive_siae_after_grace_period(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -593,7 +592,7 @@ class SwitchSiaeTest(TestCase):
 
 class EditUserPreferencesTest(TestCase):
     def test_employer_opt_in_siae_no_job_description(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         recipient = user.siaemembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"
@@ -652,7 +651,7 @@ class EditUserPreferencesTest(TestCase):
             )
 
     def test_employer_opt_out_siae_no_job_descriptions(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         recipient = user.siaemembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"

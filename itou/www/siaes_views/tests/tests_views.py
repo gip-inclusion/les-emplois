@@ -15,7 +15,6 @@ from itou.siaes.factories import (
     SiaeFactory,
     SiaeWith2MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
-    SiaeWithMembershipFactory,
 )
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
@@ -24,7 +23,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
 class CardViewTest(TestCase):
     def test_card(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -52,7 +51,7 @@ class JobDescriptionCardViewTest(TestCase):
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
     def test_asp_source_siae_admin_can_see_but_cannot_select_af(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
         self.assertTrue(siae.is_asp_managed)
@@ -70,8 +69,9 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_user_created_siae_admin_can_see_and_select_af(self):
-        siae = SiaeWithMembershipFactory(
+        siae = SiaeFactory(
             source=Siae.SOURCE_USER_CREATED,
+            with_membership=True,
         )
         user = siae.members.first()
         old_convention = siae.convention
@@ -107,7 +107,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertEqual(siae.convention, new_convention)
 
     def test_staff_created_siae_admin_cannot_see_nor_select_af(self):
-        siae = SiaeWithMembershipFactory(source=Siae.SOURCE_STAFF_CREATED)
+        siae = SiaeFactory(source=Siae.SOURCE_STAFF_CREATED, with_membership=True)
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
         self.assertTrue(siae.is_asp_managed)
@@ -125,7 +125,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_asp_source_siae_non_admin_cannot_see_nor_select_af(self):
-        siae = SiaeWithMembershipFactory(membership__is_admin=False)
+        siae = SiaeFactory(membership__is_admin=False, with_membership=True)
         user = siae.members.first()
         self.assertFalse(siae.has_admin(user))
         self.assertTrue(siae.is_asp_managed)
@@ -143,7 +143,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_import_created_geiq_admin_cannot_see_nor_select_af(self):
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_GEIQ)
+        siae = SiaeFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_GEIQ, with_membership=True)
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
         self.assertFalse(siae.is_asp_managed)
@@ -161,7 +161,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_user_created_geiq_admin_cannot_see_nor_select_af(self):
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_USER_CREATED)
+        siae = SiaeFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_USER_CREATED, with_membership=True)
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
         self.assertFalse(siae.is_asp_managed)
@@ -182,7 +182,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
 class CreateSiaeViewTest(TestCase):
     def test_create_non_preexisting_siae_outside_of_siren_fails(self):
 
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -222,7 +222,7 @@ class CreateSiaeViewTest(TestCase):
 
     def test_create_preexisting_siae_outside_of_siren_fails(self):
 
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -262,7 +262,7 @@ class CreateSiaeViewTest(TestCase):
 
     def test_cannot_create_siae_with_same_siret_and_same_kind(self):
 
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -298,7 +298,7 @@ class CreateSiaeViewTest(TestCase):
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siret_and_different_kind(self, _mock_call_ban_geocoding_api):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         siae.kind = SiaeKind.ETTI
         siae.save()
         user = siae.members.first()
@@ -330,7 +330,7 @@ class CreateSiaeViewTest(TestCase):
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siren_and_different_kind(self, _mock_call_ban_geocoding_api):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         siae.kind = SiaeKind.ETTI
         siae.save()
         user = siae.members.first()
@@ -366,7 +366,7 @@ class CreateSiaeViewTest(TestCase):
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_create_siae_with_same_siren_and_same_kind(self, mock_call_ban_geocoding_api):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -429,7 +429,7 @@ class EditSiaeViewTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_edit(self, _unused_mock):
 
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -531,7 +531,7 @@ class EditSiaeViewTest(TestCase):
         self.assertEqual(siae.geocoding_score, 0.587663373207207)
 
     def test_permission(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -547,7 +547,7 @@ class EditSiaeViewTest(TestCase):
 
 class MembersTest(TestCase):
     def test_members(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:members")
@@ -561,7 +561,7 @@ class UserMembershipDeactivationTest(TestCase):
         A user, even if admin, can't self-deactivate
         (must be done by another admin)
         """
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         admin = siae.members.filter(siaemembership__is_admin=True).first()
         memberships = admin.siaemembership_set.all()
         membership = memberships.first()
@@ -649,7 +649,7 @@ class UserMembershipDeactivationTest(TestCase):
         Check that a deactivated member can't access the structure
         from the dashboard selector
         """
-        siae2 = SiaeWithMembershipFactory()
+        siae2 = SiaeFactory(with_membership=True)
         guest = siae2.members.first()
 
         siae = SiaeWith2MembershipsFactory()

@@ -24,7 +24,7 @@ from itou.prescribers.factories import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider, Title
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
@@ -400,7 +400,7 @@ class ModelTest(TestCase):
         self.assertFalse(user.can_edit_email(job_seeker))
 
     def test_can_add_nir(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         siae_staff = siae.members.first()
         prescriber_org = AuthorizedPrescriberOrganizationWithMembershipFactory()
         authorized_prescriber = prescriber_org.members.first()
@@ -437,31 +437,31 @@ class ModelTest(TestCase):
         self.assertTrue(user.has_verified_email)
 
     def test_siae_admin_can_create_siae_antenna(self):
-        siae = SiaeWithMembershipFactory(membership__is_admin=True)
+        siae = SiaeFactory(with_membership=True, membership__is_admin=True)
         user = siae.members.get()
         self.assertTrue(user.can_create_siae_antenna(siae))
 
     def test_siae_normal_member_cannot_create_siae_antenna(self):
-        siae = SiaeWithMembershipFactory(membership__is_admin=False)
+        siae = SiaeFactory(with_membership=True, membership__is_admin=False)
         user = siae.members.get()
         self.assertFalse(user.can_create_siae_antenna(siae))
 
     def test_siae_admin_without_convention_cannot_create_siae_antenna(self):
-        siae = SiaeWithMembershipFactory(convention=None)
+        siae = SiaeFactory(with_membership=True, convention=None)
         user = siae.members.get()
         self.assertFalse(user.can_create_siae_antenna(siae))
 
     def test_admin_ability_to_create_siae_antenna(self):
         for kind in SiaeKind:
             with self.subTest(kind=kind):
-                siae = SiaeWithMembershipFactory(kind=kind, membership__is_admin=True)
+                siae = SiaeFactory(kind=kind, with_membership=True, membership__is_admin=True)
                 user = siae.members.get()
                 self.assertEqual(user.can_create_siae_antenna(siae), siae.is_asp_managed)
 
     def test_can_view_stats_siae_hiring(self):
         # An employer can only view hiring stats of their own SIAE.
         deployed_department = settings.STATS_SIAE_DEPARTMENT_WHITELIST[0]
-        siae1 = SiaeWithMembershipFactory(department=deployed_department)
+        siae1 = SiaeFactory(with_membership=True, department=deployed_department)
         user1 = siae1.members.get()
         siae2 = SiaeFactory(department=deployed_department)
 
@@ -471,14 +471,14 @@ class ModelTest(TestCase):
         self.assertFalse(user1.can_view_stats_siae_hiring(current_org=siae2))
 
         # Even non admin members can view their SIAE stats.
-        siae3 = SiaeWithMembershipFactory(department=deployed_department, membership__is_admin=False)
+        siae3 = SiaeFactory(department=deployed_department, with_membership=True, membership__is_admin=False)
         user3 = siae3.members.get()
         self.assertTrue(user3.can_view_stats_siae_hiring(current_org=siae3))
 
         # Non deployed department cannot be accessed.
         non_deployed_departments = [dpt for dpt in DEPARTMENTS if dpt not in settings.STATS_SIAE_DEPARTMENT_WHITELIST]
         non_deployed_department = non_deployed_departments[0]
-        siae4 = SiaeWithMembershipFactory(department=non_deployed_department)
+        siae4 = SiaeFactory(department=non_deployed_department, with_membership=True)
         user4 = siae4.members.get()
         self.assertFalse(user4.can_view_stats_siae_hiring(current_org=siae4))
 

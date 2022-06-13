@@ -8,7 +8,7 @@ from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.factories import SiaeMembershipFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
 
@@ -21,7 +21,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         # pylint: disable=attribute-defined-outside-init
         self.pe_approval = PoleEmploiApprovalFactory()
 
-        self.siae = SiaeWithMembershipFactory()
+        self.siae = SiaeFactory(with_membership=True)
         self.siae_user = self.siae.members.first()
         if with_job_application:
             self.job_application = JobApplicationWithApprovalFactory(

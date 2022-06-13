@@ -11,7 +11,7 @@ from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import SiaeJobDescription
 from itou.users.factories import (
     JobSeekerFactory,
@@ -29,7 +29,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         model = models.JobApplication
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
-    to_siae = factory.SubFactory(SiaeWithMembershipFactory)
+    to_siae = factory.SubFactory(SiaeFactory, with_membership=True)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
     hiring_start_at = timezone.localdate()

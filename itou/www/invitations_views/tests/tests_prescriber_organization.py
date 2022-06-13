@@ -11,7 +11,7 @@ from itou.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from itou.invitations.models import PrescriberWithOrgInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -106,7 +106,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.assertFalse(PrescriberWithOrgInvitation.objects.exists())
 
     def test_invite_existing_user_is_employer(self):
-        guest = SiaeWithMembershipFactory().members.first()
+        guest = SiaeFactory(with_membership=True).members.first()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
@@ -279,7 +279,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.sender = self.organization.members.first()
 
     def test_existing_user_is_not_prescriber(self):
-        user = SiaeWithMembershipFactory().members.first()
+        user = SiaeFactory(with_membership=True).members.first()
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.organization,

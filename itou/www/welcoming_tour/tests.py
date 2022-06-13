@@ -5,7 +5,7 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 
@@ -89,7 +89,7 @@ class WelcomingTourTest(TestCase):
 
     def test_new_employer_sees_welcoming_tour(self):
         employer = SiaeStaffFactory.build()
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
 
         url = reverse("signup:siae", kwargs={"encoded_siae_id": siae.get_encoded_siae_id(), "token": siae.get_token()})
         post_data = {
@@ -128,7 +128,7 @@ class WelcomingTourExceptions(TestCase):
         return response
 
     def test_new_job_seeker_is_redirected_after_welcoming_tour_test(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         job_seeker = JobSeekerFactory.build()
 
         # First signup step: job seeker NIR.

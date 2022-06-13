@@ -31,7 +31,7 @@ from itou.institutions.factories import InstitutionFactory, InstitutionWithMembe
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
@@ -110,7 +110,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         return request
 
     def test_siae_one_membership(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
 
@@ -132,7 +132,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
     def test_siae_multiple_memberships(self):
         # Specify name to ensure alphabetical sorting order.
-        siae1 = SiaeWithMembershipFactory(name="1")
+        siae1 = SiaeFactory(name="1", with_membership=True)
         user = siae1.members.first()
         self.assertTrue(siae1.has_admin(user))
 
@@ -481,7 +481,7 @@ class UtilsTemplateTagsTestCase(TestCase):
 
     def test_call_method(self):
         """Test `call_method` template tag."""
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         context = {"siae": siae, "user": user}
         template = Template("{% load call_method %}{% call_method siae 'has_member' user %}")
@@ -577,7 +577,7 @@ class UtilsEmailsTestCase(TestCase):
 
 class PermsUserTest(TestCase):
     def test_get_user_info_for_siae_staff(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         factory = RequestFactory()

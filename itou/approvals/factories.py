@@ -8,7 +8,7 @@ from faker import Faker
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
 
 
@@ -51,7 +51,7 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     reason = Prolongation.Reason.COMPLETE_TRAINING.value
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
-    declared_by_siae = factory.SubFactory(SiaeWithMembershipFactory)
+    declared_by_siae = factory.SubFactory(SiaeFactory, with_membership=True)
     created_by = factory.LazyAttribute(lambda obj: obj.declared_by)
 
     @factory.post_generation

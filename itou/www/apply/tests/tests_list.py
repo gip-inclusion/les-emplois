@@ -19,7 +19,7 @@ from itou.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -58,7 +58,7 @@ class ProcessListTest(TestCase):
         audrey_envol = l_envol.members.get(first_name="Audrey")
 
         # Hit Pit
-        hit_pit = SiaeWithMembershipFactory(name="Hit Pit", membership__user__first_name="Eddie")
+        hit_pit = SiaeFactory(name="Hit Pit", with_membership=True, membership__user__first_name="Eddie")
         eddie_hit_pit = hit_pit.members.get(first_name="Eddie")
 
         # Now send applications

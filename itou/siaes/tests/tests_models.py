@@ -17,14 +17,13 @@ from itou.siaes.factories import (
     SiaeWith4MembershipsFactory,
     SiaeWithJobsFactory,
     SiaeWithMembershipAndJobsFactory,
-    SiaeWithMembershipFactory,
 )
 from itou.siaes.models import Siae, SiaeJobDescription
 
 
 class SiaeFactoriesTest(TestCase):
     def test_siae_with_membership_factory(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         self.assertEqual(siae.members.count(), 1)
         user = siae.members.get()
         self.assertTrue(siae.has_admin(user))
@@ -95,14 +94,14 @@ class SiaeModelTest(TestCase):
 
     def test_has_members(self):
         siae1 = SiaeFactory()
-        siae2 = SiaeWithMembershipFactory()
+        siae2 = SiaeFactory(with_membership=True)
 
         self.assertFalse(siae1.has_members)
         self.assertTrue(siae2.has_members)
 
     def test_has_member(self):
-        siae1 = SiaeWithMembershipFactory()
-        siae2 = SiaeWithMembershipFactory()
+        siae1 = SiaeFactory(with_membership=True)
+        siae2 = SiaeFactory(with_membership=True)
 
         user1 = siae1.members.get()
         user2 = siae2.members.get()
@@ -132,9 +131,9 @@ class SiaeModelTest(TestCase):
         Test that if a user is admin of siae_1 and regular user
         of siae_2 he is not considered as admin of siae_2.
         """
-        siae_1 = SiaeWithMembershipFactory()
+        siae_1 = SiaeFactory(with_membership=True)
         siae_1_admin_user = siae_1.members.first()
-        siae_2 = SiaeWithMembershipFactory()
+        siae_2 = SiaeFactory(with_membership=True)
         siae_2.members.add(siae_1_admin_user)
 
         self.assertIn(siae_1_admin_user, siae_1.active_admin_members)
@@ -157,7 +156,7 @@ class SiaeModelTest(TestCase):
 
     def test_new_signup_activation_email_to_official_contact(self):
 
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         token = siae.get_token()
         with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
 
@@ -297,7 +296,7 @@ class SiaeQuerySetTest(TestCase):
         self.assertEqual(1, result.count_active_job_descriptions)
 
     def test_with_has_active_members(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         result = Siae.objects.with_has_active_members().get(pk=siae.pk)
         self.assertTrue(result.has_active_members)
 

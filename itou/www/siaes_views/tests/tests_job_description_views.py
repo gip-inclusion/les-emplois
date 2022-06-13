@@ -9,7 +9,7 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import SiaeJobDescription
 from itou.users.factories import DEFAULT_PASSWORD
 
@@ -21,10 +21,11 @@ class JobDescriptionAbstractTest(TestCase):
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
         )
 
-        siae = SiaeWithMembershipFactory(
+        siae = SiaeFactory(
             department="75",
             coords=self.paris_city.coords,
             post_code="75001",
+            with_membership=True,
         )
         user = siae.members.first()
 
@@ -201,11 +202,12 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         self.assertEqual(self.siae.job_description_through.count(), 5)
 
     def test_edit_job_description_opcs(self):
-        opcs = SiaeWithMembershipFactory(
+        opcs = SiaeFactory(
             department="75",
             coords=self.paris_city.coords,
             post_code="75001",
             kind=SiaeKind.OPCS,
+            with_membership=True,
         )
         user_opcs = opcs.members.first()
         opcs.jobs.add(*self.appellations)

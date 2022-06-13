@@ -24,7 +24,7 @@ from itou.job_applications.factories import (
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.management.commands.import_ai_employees import (
     APPROVAL_COL,
@@ -559,7 +559,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # PASS created after November 30th with a job application:
         # the employer tried to get a PASS IAE quicker.
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         job_seeker = previous_approval.user
         job_application = JobApplicationSentBySiaeFactory(
@@ -583,7 +583,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_seeker.delete()
 
         # PASS created after November 30th with a job application but not sent by this employer.
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         job_seeker = previous_approval.user
         job_application = JobApplicationSentBySiaeFactory(
@@ -606,7 +606,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_seeker.delete()
 
         # Multiple accepted job applications linked to this approval. Raise an error if dry run is not set.
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         previous_approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         job_seeker = previous_approval.user
         job_application = JobApplicationSentBySiaeFactory(

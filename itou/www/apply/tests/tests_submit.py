@@ -16,7 +16,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.storage.s3 import S3Upload
@@ -976,8 +976,8 @@ class ApplyAsSiaeTest(TestCase):
 
     def test_perms_for_siae(self):
         """An SIAE can postulate only for itself."""
-        siae1 = SiaeWithMembershipFactory()
-        siae2 = SiaeWithMembershipFactory()
+        siae1 = SiaeFactory(with_membership=True)
+        siae2 = SiaeFactory(with_membership=True)
 
         user = siae1.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)

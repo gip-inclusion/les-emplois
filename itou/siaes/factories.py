@@ -1,3 +1,4 @@
+import functools
 import string
 
 import factory.fuzzy
@@ -101,15 +102,6 @@ class SiaeMembershipFactory(factory.django.DjangoModelFactory):
     is_admin = True
 
 
-class SiaeWithMembershipFactory(SiaeFactory):
-    """
-    Generates an Siae() object with a member for unit tests.
-    https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
-    """
-
-    membership = factory.RelatedFactory(SiaeMembershipFactory, "siae")
-
-
 class SiaeWith2MembershipsFactory(SiaeFactory):
     """
     Generates an Siae() object with 2 members for unit tests.
@@ -158,14 +150,7 @@ class SiaeWithJobsFactory(SiaeFactory):
         self.jobs.add(*appellations)
 
 
-class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory, SiaeWithJobsFactory):
-    """
-    Generates an Siae() object with a member and random jobs (based on given ROME codes) for unit tests.
-    https://factoryboy.readthedocs.io/en/latest/recipes.html#simple-many-to-many-relationship
-
-    Usage:
-        SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
-    """
+SiaeWithMembershipAndJobsFactory = functools.partial(SiaeWithJobsFactory, with_membership=True)
 
 
 class SiaeConventionPendingGracePeriodFactory(SiaeConventionFactory):

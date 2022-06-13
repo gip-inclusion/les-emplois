@@ -12,7 +12,7 @@ from itou.job_applications.factories import (
     JobApplicationWithEligibilityDiagnosis,
 )
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.factories import SiaeWith2MembershipsFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from itou.users.factories import UserFactory
 
 
@@ -43,8 +43,8 @@ class JobApplicationTransferModelTest(TestCase):
         # Only users in both origin and target SIAE
         # can transfer a job_application
         # (provided it is in correct state)
-        origin_siae = SiaeWithMembershipFactory()
-        target_siae = SiaeWithMembershipFactory()
+        origin_siae = SiaeFactory(with_membership=True)
+        target_siae = SiaeFactory(with_membership=True)
 
         origin_user = origin_siae.members.first()
         target_user = target_siae.members.first()
@@ -70,8 +70,8 @@ class JobApplicationTransferModelTest(TestCase):
         # After transfer:
         # - job application is not linked to origin SIAE anymore (only to target SIAE)
         # - eligibility diagnosis is deleted if not created by an authorized prescriber
-        origin_siae = SiaeWithMembershipFactory()
-        target_siae = SiaeWithMembershipFactory()
+        origin_siae = SiaeFactory(with_membership=True)
+        target_siae = SiaeFactory(with_membership=True)
 
         origin_user = origin_siae.members.first()
         target_user = target_siae.members.first()
@@ -116,8 +116,8 @@ class JobApplicationTransferModelTest(TestCase):
 
     def test_model_fields(self):
         # Check new fields in model
-        origin_siae = SiaeWithMembershipFactory()
-        target_siae = SiaeWithMembershipFactory()
+        origin_siae = SiaeFactory(with_membership=True)
+        target_siae = SiaeFactory(with_membership=True)
 
         origin_user = origin_siae.members.first()
         target_user = target_siae.members.first()
@@ -161,8 +161,8 @@ class JobApplicationTransferModelTest(TestCase):
         # - origin SIAE
         # - job seeker
         # - Prescriber (if any linked eligibility diagnosis was not sent by a SIAE)
-        origin_siae = SiaeWithMembershipFactory()
-        target_siae = SiaeWithMembershipFactory()
+        origin_siae = SiaeFactory(with_membership=True)
+        target_siae = SiaeFactory(with_membership=True)
 
         origin_user = origin_siae.members.first()
         target_siae.members.add(origin_user)
@@ -195,8 +195,8 @@ class JobApplicationTransferModelTest(TestCase):
     def test_transfer_must_notify_prescriber(self):
         # Same test and conditions as above, but this time prescriber
         # at the origin of the eligibility disgnosis must be notified
-        origin_siae = SiaeWithMembershipFactory()
-        target_siae = SiaeWithMembershipFactory()
+        origin_siae = SiaeFactory(with_membership=True)
+        target_siae = SiaeFactory(with_membership=True)
 
         origin_user = origin_siae.members.first()
         target_siae.members.add(origin_user)
@@ -227,7 +227,7 @@ class JobApplicationTransferModelTest(TestCase):
         # Same as test_transfer_must_notify_siae_and_job_seeker
         # but with to recipients for SIAE transfer notification
         origin_siae = SiaeWith2MembershipsFactory()
-        target_siae = SiaeWithMembershipFactory()
+        target_siae = SiaeFactory(with_membership=True)
 
         origin_user_1 = origin_siae.members.all()[0]
         origin_user_2 = origin_siae.members.all()[1]

@@ -5,7 +5,7 @@ from django.utils import timezone
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
@@ -26,7 +26,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         self.assertEqual(form.cleaned_data, expected_cleaned_data)
 
     def test_valid_for_siae(self):
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.ACI)
+        siae = SiaeFactory(kind=SiaeKind.ACI, with_membership=True)
         user = siae.members.first()
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
@@ -53,7 +53,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         self.assertEqual(form.cleaned_data, expected_cleaned_data)
 
     def test_criteria_fields(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         form = AdministrativeCriteriaForm(user, siae)
@@ -63,7 +63,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         """
         Test errors for SIAEs.
         """
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.ACI)
+        siae = SiaeFactory(kind=SiaeKind.ACI, with_membership=True)
         user = siae.members.first()
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
@@ -84,7 +84,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         self.assertIn(form.ERROR_CRITERIA_NUMBER, form.errors["__all__"])
 
     def test_valid_for_siae_of_kind_etti(self):
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.ETTI)
+        siae = SiaeFactory(kind=SiaeKind.ETTI, with_membership=True)
         user = siae.members.first()
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
@@ -112,7 +112,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         """
         Test errors for SIAEs of kind ETTI.
         """
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.ETTI)
+        siae = SiaeFactory(kind=SiaeKind.ETTI, with_membership=True)
         user = siae.members.first()
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
@@ -169,7 +169,7 @@ class AdministrativeCriteriaFormTest(TestCase):
 
 class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
     def test_job_application(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         job_seeker = JobSeekerFactory()
@@ -208,7 +208,7 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
     def test_num_level2_admin_criteria(self):
         for kind, _ in SiaeKind.choices:
             with self.subTest(kind):
-                siae = SiaeWithMembershipFactory(kind=kind)
+                siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
 
                 job_application = JobApplicationWithApprovalFactory(

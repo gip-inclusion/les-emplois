@@ -22,7 +22,7 @@ from itou.job_applications.factories import (
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
@@ -198,7 +198,7 @@ class ProcessViewsTest(TestCase):
             "city": city.name,
             "city_slug": city.slug,
         }
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         siae_user = siae.members.first()
 
         hiring_end_dates = [
@@ -332,7 +332,7 @@ class ProcessViewsTest(TestCase):
         )
 
         # Now, another Siae wants to hire the job seeker
-        other_siae = SiaeWithMembershipFactory()
+        other_siae = SiaeFactory(with_membership=True)
         job_application = JobApplicationSentByJobSeekerFactory(
             approval=approval_job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -541,7 +541,7 @@ class ProcessViewsTest(TestCase):
         create_test_cities(["54"], num_per_department=1)
         city = City.objects.first()
 
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, job_seeker=job_seeker, to_siae=siae
@@ -655,7 +655,7 @@ class ProcessViewsTest(TestCase):
     def test_eligibility_state_for_job_application(self, *args, **kwargs):
         """The eligibility diagnosis page must only be accessible
         in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         siae_user = siae.members.first()
         job_application = JobApplicationSentByJobSeekerFactory(to_siae=siae)
 
@@ -960,7 +960,7 @@ class ProcessTransferJobApplicationTest(TestCase):
     def test_job_application_transfer_disabled_for_lone_users(self):
         # A user member of only one SIAE
         # must not be able to transfer a job application to another SIAE
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             to_siae=siae, state=JobApplicationWorkflow.STATE_PROCESSING
@@ -976,7 +976,7 @@ class ProcessTransferJobApplicationTest(TestCase):
     def test_job_application_transfer_disabled_for_bad_state(self):
         # A user member of only one SIAE must not be able to transfert
         # to another SIAE
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         job_application_1 = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             to_siae=siae, state=JobApplicationWorkflow.STATE_NEW
@@ -999,8 +999,8 @@ class ProcessTransferJobApplicationTest(TestCase):
 
     def test_job_application_transfer_enabled(self):
         # A user member of several SIAE can transfer a job application
-        siae = SiaeWithMembershipFactory()
-        other_siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
+        other_siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         other_siae.members.add(user)
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -1019,8 +1019,8 @@ class ProcessTransferJobApplicationTest(TestCase):
         # After transfering a job application,
         # user must be redirected to job application list
         # with a nice message
-        siae = SiaeWithMembershipFactory()
-        other_siae = SiaeWithMembershipFactory()
+        siae = SiaeFactory(with_membership=True)
+        other_siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         other_siae.members.add(user)
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
