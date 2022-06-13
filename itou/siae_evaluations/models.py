@@ -360,15 +360,23 @@ class EvaluatedSiae(models.Model):
             for eval_job_app in self.evaluated_job_applications.all()
             for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
         ):
-            if self.reviewed_at is None:
-                return evaluation_enums.EvaluatedSiaeState.REFUSED
-            else:
+            if self.reviewed_at and all(
+                eval_admin_crit.submitted_at < self.reviewed_at
+                for eval_job_app in self.evaluated_job_applications.all()
+                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+            ):
                 return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+            else:
+                return evaluation_enums.EvaluatedSiaeState.REFUSED
 
-        if self.reviewed_at is None:
-            return evaluation_enums.EvaluatedSiaeState.ACCEPTED
-        else:
+        if self.reviewed_at and all(
+            eval_admin_crit.submitted_at < self.reviewed_at
+            for eval_job_app in self.evaluated_job_applications.all()
+            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+        ):
             return evaluation_enums.EvaluatedSiaeState.REVIEWED
+        else:
+            return evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
 
 class EvaluatedJobApplication(models.Model):
@@ -401,9 +409,26 @@ class EvaluatedJobApplication(models.Model):
         # assuming the EvaluatedJobApplication instance is fully hydrated
         # with its evaluated_administrative_criteria before being called,
         # to prevent tons of additionnal queries in db.
-
         if len(self.evaluated_administrative_criteria.all()) == 0:
             return evaluation_enums.EvaluatedJobApplicationsState.PENDING
+
+        if any(
+            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
+            for eval_admin_crit in self.evaluated_administrative_criteria.all()
+        ):
+            return evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2
+
+        if any(
+            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+            for eval_admin_crit in self.evaluated_administrative_criteria.all()
+        ):
+            return evaluation_enums.EvaluatedJobApplicationsState.REFUSED
+
+        if all(
+            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+            for eval_admin_crit in self.evaluated_administrative_criteria.all()
+        ):
+            return evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
 
         if any(eval_admin_crit.proof_url == "" for eval_admin_crit in self.evaluated_administrative_criteria.all()):
             return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
@@ -419,18 +444,13 @@ class EvaluatedJobApplication(models.Model):
         ):
             return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
 
-        if any(
-            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
-            for eval_admin_crit in self.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedJobApplicationsState.REFUSED
-
-        return evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
-
     @cached_property
     def should_select_criteria(self):
         if self.state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
             return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
+
+        if self.evaluated_siae.reviewed_at:
+            return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
 
         if self.state in [
             evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
@@ -501,3 +521,15 @@ class EvaluatedAdministrativeCriteria(models.Model):
 
     def __str__(self):
         return f"{self.evaluated_job_application} - {self.administrative_criteria}"
+
+    def can_upload(self):
+        if self.submitted_at is None:
+            return True
+
+        if (
+            self.evaluated_job_application.evaluated_siae.reviewed_at
+            and self.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        ):
+            return True
+
+        return False
