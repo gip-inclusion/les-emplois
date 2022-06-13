@@ -8,6 +8,7 @@ from pathlib import Path
 from django.conf import settings
 from django.test import TransactionTestCase
 
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2MembershipsFactory
 from itou.siaes.models import Siae
 
@@ -83,7 +84,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET = SIRET_SIGNATURE = "21540323900019"
         ASP_ID = 112
 
-        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=Siae.KIND_ACI, convention=None)
+        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.ACI, convention=None)
         results = self.mod.get_creatable_conventions()
 
         self.assertEqual(len(results), 1)
@@ -99,14 +100,14 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             ),
             (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None),
         )
-        self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, Siae.KIND_ACI))
+        self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI))
 
     def test_creatable_conventions_for_active_siae_where_siret_not_equals_siret_signature(self):
         SIRET = "34950857200055"
         SIRET_SIGNATURE = "34950857200048"
         ASP_ID = 768
 
-        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=Siae.KIND_AI, convention=None)
+        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.AI, convention=None)
         results = self.mod.get_creatable_conventions()
 
         self.assertEqual(len(results), 1)
@@ -122,12 +123,12 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             ),
             (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None),
         )
-        self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, Siae.KIND_AI))
+        self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, SiaeKind.AI))
 
     def test_creatable_conventions_inactive_siae(self):
         SIRET = SIRET_SIGNATURE = "41294123900011"
         ASP_ID = 1780
-        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=Siae.KIND_ACI, convention=None)
+        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.ACI, convention=None)
         results = self.mod.get_creatable_conventions()
 
         self.assertEqual(len(results), 1)
@@ -143,7 +144,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             ),
             (ASP_ID, siae.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 2, 29, 0, 0)),
         )
-        self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, Siae.KIND_ACI))
+        self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI))
 
     def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
         instance = lazy_import_siae_command()

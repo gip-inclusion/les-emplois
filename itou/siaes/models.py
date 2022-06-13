@@ -12,7 +12,7 @@ from django.utils.http import urlencode, urlsafe_base64_encode
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
-from itou.siaes.enums import ContractType
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
@@ -176,35 +176,6 @@ class Siae(AddressMixin, OrganizationAbstract):
         self.job_description_through.all()     <QuerySet [<SiaeJobDescription>, ...]>
     """
 
-    KIND_EI = "EI"
-    KIND_AI = "AI"
-    KIND_ACI = "ACI"
-
-    # When an ACI does PHC ("Premières Heures en Chantier"), we have both an ACI created by
-    # the SIAE ASP import (plus its ACI antenna) and an ACIPHC created by our staff (plus its ACIPHC antenna).
-    # The first one is managed by ASP data, the second one is managed by our staff.
-    KIND_ACIPHC = "ACIPHC"
-
-    KIND_ETTI = "ETTI"
-    KIND_EITI = "EITI"
-    KIND_GEIQ = "GEIQ"
-    KIND_EA = "EA"
-    KIND_EATT = "EATT"
-    KIND_OPCS = "OPCS"
-
-    KIND_CHOICES = (
-        (KIND_EI, "Entreprise d'insertion"),  # Regroupées au sein de la fédération des entreprises d'insertion.
-        (KIND_AI, "Association intermédiaire"),
-        (KIND_ACI, "Atelier chantier d'insertion"),
-        (KIND_ACIPHC, "Atelier chantier d'insertion premières heures en chantier"),
-        (KIND_ETTI, "Entreprise de travail temporaire d'insertion"),
-        (KIND_EITI, "Entreprise d'insertion par le travail indépendant"),
-        (KIND_GEIQ, "Groupement d'employeurs pour l'insertion et la qualification"),
-        (KIND_EA, "Entreprise adaptée"),
-        (KIND_EATT, "Entreprise adaptée de travail temporaire"),
-        (KIND_OPCS, "Organisation porteuse de la clause sociale"),
-    )
-
     SOURCE_ASP = "ASP"
     SOURCE_GEIQ = "GEIQ"
     SOURCE_EA_EATT = "EA_EATT"
@@ -221,14 +192,14 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     # ASP data is used to keep the siae data of these kinds in sync.
     # These kinds and only these kinds thus have convention/AF logic.
-    ASP_MANAGED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI, KIND_EITI]
+    ASP_MANAGED_KINDS = [SiaeKind.EI, SiaeKind.AI, SiaeKind.ACI, SiaeKind.ETTI, SiaeKind.EITI]
 
     # These kinds of SIAE can use employee record app to send data to ASP
-    ASP_EMPLOYEE_RECORD_KINDS = [KIND_EI, KIND_ACI, KIND_AI, KIND_ETTI]
+    ASP_EMPLOYEE_RECORD_KINDS = [SiaeKind.EI, SiaeKind.ACI, SiaeKind.AI, SiaeKind.ETTI]
 
     # https://code.travail.gouv.fr/code-du-travail/l5132-4
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
-    ELIGIBILITY_REQUIRED_KINDS = ASP_MANAGED_KINDS + [KIND_ACIPHC]
+    ELIGIBILITY_REQUIRED_KINDS = ASP_MANAGED_KINDS + [SiaeKind.ACIPHC]
 
     # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently
@@ -238,7 +209,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     # Both SIRET numbers are kept up to date by the weekly `import_siae.py` script.
     siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name="Naf", max_length=5, validators=[validate_naf], blank=True)
-    kind = models.CharField(verbose_name="Type", max_length=6, choices=KIND_CHOICES, default=KIND_EI)
+    kind = models.CharField(verbose_name="Type", max_length=6, choices=SiaeKind.choices, default=SiaeKind.EI)
     # `brand` (or `enseigne` in French) is used to override `name` if needed.
     brand = models.CharField(verbose_name="Enseigne", max_length=255, blank=True)
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
@@ -338,7 +309,7 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     @property
     def is_opcs(self):
-        return self.kind == Siae.KIND_OPCS
+        return self.kind == SiaeKind.OPCS
 
     @property
     def obfuscated_auth_email(self):

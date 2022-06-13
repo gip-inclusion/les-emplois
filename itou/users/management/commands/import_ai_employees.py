@@ -19,6 +19,7 @@ from itou.approvals.models import Approval
 from itou.asp.models import Commune
 from itou.common_apps.address.departments import department_from_postcode
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.management_commands import DeprecatedLoggerMixin
@@ -171,7 +172,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         ]
         if domain in generic_domains:
             return email
-        siae_qs = Siae.objects.filter(kind=Siae.KIND_AI, siret=siret)
+        siae_qs = Siae.objects.filter(kind=SiaeKind.AI, siret=siret)
         if not siae_qs.exists():
             return email
         siae = siae_qs.get()
@@ -221,7 +222,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
     def get_inexistent_structures(self, df):
         unique_ai = set(df[SIRET_COL])  # Between 600 and 700.
-        existing_structures = Siae.objects.filter(siret__in=unique_ai, kind=Siae.KIND_AI).values_list(
+        existing_structures = Siae.objects.filter(siret__in=unique_ai, kind=SiaeKind.AI).values_list(
             "siret", flat=True
         )
         not_existing_structures = unique_ai.difference(existing_structures)
@@ -368,7 +369,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         """
         created = False
         cancelled_job_app_deleted = False
-        siae = Siae.objects.prefetch_related("memberships").get(kind=Siae.KIND_AI, siret=row[SIRET_COL])
+        siae = Siae.objects.prefetch_related("memberships").get(kind=SiaeKind.AI, siret=row[SIRET_COL])
         job_application_qs = JobApplication.objects.filter(
             to_siae=siae,
             approval_manually_delivered_by=approval_manually_delivered_by,

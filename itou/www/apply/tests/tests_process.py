@@ -21,8 +21,8 @@ from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeWithMembershipFactory
-from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
@@ -643,7 +643,7 @@ class ProcessViewsTest(TestCase):
         """Test eligibility for an Siae not subject to eligibility rules."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
+            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=SiaeKind.GEIQ
         )
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)

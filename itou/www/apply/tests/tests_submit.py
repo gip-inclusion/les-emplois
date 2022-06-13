@@ -15,8 +15,8 @@ from itou.cities.models import City
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
-from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.storage.s3 import S3Upload
@@ -497,7 +497,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
     def test_apply_to_a_geiq_as_authorized_prescriber(self):
         """Apply to a GEIQ as authorized prescriber."""
 
-        siae = SiaeWithMembershipAndJobsFactory(kind=Siae.KIND_GEIQ, romes=("N1101", "N1105"))
+        siae = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ, romes=("N1101", "N1105"))
 
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
         user = prescriber_organization.members.first()

@@ -38,6 +38,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
@@ -56,7 +57,7 @@ from itou.utils.templatetags import format_filters
 class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self, *args, **kwargs):
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
+            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=SiaeKind.GEIQ
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
@@ -65,7 +66,7 @@ class JobApplicationModelTest(TestCase):
         self.assertFalse(job_application.eligibility_diagnosis_by_siae_required)
 
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_EI
+            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=SiaeKind.EI
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
@@ -113,7 +114,7 @@ class JobApplicationModelTest(TestCase):
 
         # SIAE not subject to eligibility rules.
         not_eligible_kinds = [
-            choice[0] for choice in Siae.KIND_CHOICES if choice[0] not in Siae.ELIGIBILITY_REQUIRED_KINDS
+            choice[0] for choice in SiaeKind.choices if choice[0] not in Siae.ELIGIBILITY_REQUIRED_KINDS
         ]
         not_eligible_siae = SiaeFactory(kind=not_eligible_kinds[0])
         job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
@@ -311,7 +312,7 @@ class JobApplicationModelTest(TestCase):
         # test SIAE cannot use Employee_Record
         job_application.hiring_start_at = today
         for siae_kind in [
-            siae_kind for siae_kind, _ in Siae.KIND_CHOICES if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS
+            siae_kind for siae_kind, _ in SiaeKind.choices if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS
         ]:
             not_eligible_siae = SiaeFactory(kind=siae_kind)
             job_application.to_siae = not_eligible_siae
@@ -1312,7 +1313,7 @@ class JobApplicationWorkflowTest(TestCase):
         No approval should be delivered for an employer not subject to eligibility rules.
         """
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
+            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=SiaeKind.GEIQ
         )
         job_application.accept(user=job_application.to_siae.members.first())
         self.assertFalse(job_application.to_siae.is_subject_to_eligibility_rules)
@@ -1335,7 +1336,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_application = JobApplicationSentBySiaeFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=Siae.KIND_EI,
+            to_siae__kind=SiaeKind.EI,
         )
 
         to_siae = job_application.to_siae

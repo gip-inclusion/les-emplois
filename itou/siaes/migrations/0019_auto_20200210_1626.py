@@ -5,14 +5,10 @@ import os
 from django.conf import settings
 from django.db import migrations
 
+from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
 
 
-<<<<<<< HEAD
-KINDS = dict(Siae.KIND_CHOICES).keys()
-
-=======
->>>>>>> 0ba853e92 (refactor)
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 ASP_CSV_FILE = f"{settings.APPS_DIR}/siaes/management/commands/data/2019_07_liste_siae.csv"
@@ -46,7 +42,7 @@ def get_siret_kind_to_email_map():
                 continue
             siret = row[8].strip()
             assert len(siret) == 14
-            kind = Siae.KIND_GEIQ
+            kind = SiaeKind.GEIQ
             email = row[5].strip()
             assert " " not in email
             key = (siret, kind)

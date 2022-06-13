@@ -1,6 +1,25 @@
 from django.db import models
 
 
+class SiaeKind(models.TextChoices):
+
+    EI = "EI", "Entreprise d'insertion"  # Regroupées au sein de la fédération des entreprises d'insertion.
+    AI = "AI", "Association intermédiaire"
+    ACI = "ACI", "Atelier chantier d'insertion"
+
+    # When an ACI does PHC ("Premières Heures en Chantier"), we have both an ACI created by
+    # the SIAE ASP import (plus its ACI antenna) and an ACIPHC created by our staff (plus its ACIPHC antenna).
+    # The first one is managed by ASP data, the second one is managed by our staff.
+    ACIPHC = "ACIPHC", "Atelier chantier d'insertion premières heures en chantier"
+
+    ETTI = "ETTI", "Entreprise de travail temporaire d'insertion"
+    EITI = "EITI", "Entreprise d'insertion par le travail indépendant"
+    GEIQ = "GEIQ", "Groupement d'employeurs pour l'insertion et la qualification"
+    EA = "EA", "Entreprise adaptée"
+    EATT = "EATT", "Entreprise adaptée de travail temporaire"
+    OPCS = "OPCS", "Organisation porteuse de la clause sociale"
+
+
 class ContractType(models.TextChoices):
     """
     A list of possible work contract types for SIAE.
@@ -29,14 +48,11 @@ class ContractType(models.TextChoices):
 
     @classmethod
     def choices_from_siae_kind(cls, kind):
-        # TODO(celinems): move KIND_* to a dedicated enums module.
-        from itou.siaes.models import Siae
-
         choices = None
         # TODO(celinems): Use Python 3.10 match / case syntax when this version will be available on our project.
-        if kind == Siae.KIND_GEIQ:
+        if kind == SiaeKind.GEIQ:
             choices = [cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        elif kind in [Siae.KIND_EA, Siae.KIND_EATT]:
+        elif kind in [SiaeKind.EA, SiaeKind.EATT]:
             choices = [
                 cls.PERMANENT,
                 cls.FIXED_TERM,
@@ -46,11 +62,11 @@ class ContractType(models.TextChoices):
                 cls.PROFESSIONAL_TRAINING,
                 cls.OTHER,
             ]
-        elif kind == Siae.KIND_EITI:
+        elif kind == SiaeKind.EITI:
             choices = [cls.BUSINESS_CREATION, cls.OTHER]
-        elif kind == Siae.KIND_OPCS:
+        elif kind == SiaeKind.OPCS:
             choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        elif kind in [Siae.KIND_ACI, Siae.KIND_ACIPHC, Siae.KIND_EI, Siae.KIND_AI, Siae.KIND_ETTI]:
+        elif kind in [SiaeKind.ACI, SiaeKind.ACIPHC, SiaeKind.EI, SiaeKind.AI, SiaeKind.ETTI]:
             # Siae.ELIGIBILITY_REQUIRED_KINDS but without EITI.
             choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
         else:

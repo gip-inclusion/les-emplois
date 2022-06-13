@@ -27,8 +27,8 @@ from itou.siae_evaluations.models import (
     select_min_max_job_applications,
     validate_institution,
 )
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory, SiaeWithMembershipFactory
-from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
 
@@ -240,7 +240,7 @@ class EvaluationCampaignManagerTest(TestCase):
         self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
 
         # Job Application not eligible kind
-        for kind in [k for (k, _) in Siae.KIND_CHOICES if k not in evaluation_enums.EvaluationSiaesKind.Evaluable]:
+        for kind in [k for (k, _) in SiaeKind.choices if k not in evaluation_enums.EvaluationSiaesKind.Evaluable]:
             with self.subTest(kind=kind):
                 siae_wrong_kind = SiaeFactory(department="14", kind=kind)
                 JobApplicationWithApprovalFactory(

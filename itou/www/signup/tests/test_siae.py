@@ -10,8 +10,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
 
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
-from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
@@ -31,7 +31,7 @@ class SiaeSignupTest(TestCase):
         user_email = "jacques.doe@siae.com"
         user_secondary_email = "jacques.doe@hotmail.com"
 
-        siae = SiaeFactory(kind=Siae.KIND_ETTI)
+        siae = SiaeFactory(kind=SiaeKind.ETTI)
         self.assertEqual(0, siae.members.count())
 
         token = siae.get_token()

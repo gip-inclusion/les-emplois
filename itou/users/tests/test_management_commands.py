@@ -23,8 +23,8 @@ from itou.job_applications.factories import (
     JobApplicationWithEligibilityDiagnosis,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
-from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.management.commands.import_ai_employees import (
     APPROVAL_COL,
@@ -274,7 +274,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # Employer email.
         domain = "unenouvellechance.fr"
-        siae = SiaeFactory(auth_email=f"accueil@{domain}", kind=Siae.KIND_AI)
+        siae = SiaeFactory(auth_email=f"accueil@{domain}", kind=SiaeKind.AI)
         df = pandas.DataFrame([AiCSVFileMock(**{EMAIL_COL: f"colette@{domain}", SIRET_COL: siae.siret})])
         df = command.clean_df(df)
         row = df.iloc[0]
@@ -282,7 +282,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         # Generic email.
         domain = "gmail.fr"
-        siae = SiaeFactory(auth_email=f"accueil@{domain}", kind=Siae.KIND_AI)
+        siae = SiaeFactory(auth_email=f"accueil@{domain}", kind=SiaeKind.AI)
         df = pandas.DataFrame([AiCSVFileMock(**{EMAIL_COL: f"colette@{domain}"})])
         df = command.clean_df(df)
         row = df.iloc[0]
@@ -309,7 +309,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
     def test_remove_ignored_rows(self):
         command = self.command
-        SiaeFactory(kind=Siae.KIND_AI, siret=getattr(CleanedAiCsvFileMock(), SIRET_COL))
+        SiaeFactory(kind=SiaeKind.AI, siret=getattr(CleanedAiCsvFileMock(), SIRET_COL))
 
         # Ended contracts are removed.
         df = pandas.DataFrame([CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{CONTRACT_ENDDATE_COL: "2020-11-30"})])
@@ -639,7 +639,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # An approval is mandatory to test employee records creation (FS).
         approval = ApprovalFactory(user__nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         expected_job_app = JobApplicationSentBySiaeFactory(
-            to_siae__kind=Siae.KIND_AI,
+            to_siae__kind=SiaeKind.AI,
             state=JobApplicationWorkflow.STATE_ACCEPTED,  # Mandatory for FS.
             job_seeker=approval.user,
             approval=approval,
@@ -674,7 +674,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         approval = ApprovalFactory(user__nir=nir)
         df = pandas.DataFrame([CleanedAiCsvFileMock(**{SIRET_COL: siret})])
         job_application = JobApplicationSentBySiaeFactory(
-            to_siae__kind=Siae.KIND_AI,
+            to_siae__kind=SiaeKind.AI,
             to_siae__siret=siret,
             state=JobApplicationWorkflow.STATE_CANCELLED,
             job_seeker=approval.user,
@@ -706,7 +706,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # Different contract starting date.
         nir = getattr(CleanedAiCsvFileMock(), NIR_COL)
         approval = ApprovalFactory(user__nir=nir)
-        siae = SiaeFactory(kind=Siae.KIND_AI)
+        siae = SiaeFactory(kind=SiaeKind.AI)
         job_application = JobApplicationFactory(
             to_siae=siae,
             sender_siae=siae,
@@ -735,7 +735,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
         command = self.command
         base_data = CleanedAiCsvFileMock()
-        siae = SiaeFactory(siret=getattr(base_data, SIRET_COL), kind=Siae.KIND_AI)
+        siae = SiaeFactory(siret=getattr(base_data, SIRET_COL), kind=SiaeKind.AI)
 
         # User, approval and job application creation.
         input_df = pandas.DataFrame([base_data])

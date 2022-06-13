@@ -23,8 +23,8 @@ from itou.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
-from itou.siaes.models import Siae
 from itou.users.enums import IdentityProvider, Title
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
@@ -453,13 +453,13 @@ class ModelTest(TestCase):
 
     def test_geiq_admin_can_create_siae_antenna(self):
         # A GEIQ never has a convention.
-        siae = SiaeWithMembershipFactory(kind=Siae.KIND_GEIQ, convention=None)
+        siae = SiaeWithMembershipFactory(kind=SiaeKind.GEIQ, convention=None)
         user = siae.members.get()
         self.assertTrue(user.can_create_siae_antenna(siae))
 
     def test_ea_admin_can_create_siae_antenna(self):
         # An EA never has a convention.
-        siae = SiaeWithMembershipFactory(kind=Siae.KIND_EA, convention=None)
+        siae = SiaeWithMembershipFactory(kind=SiaeKind.EA, convention=None)
         user = siae.members.get()
         self.assertTrue(user.can_create_siae_antenna(siae))
 
