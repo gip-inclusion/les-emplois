@@ -218,6 +218,7 @@ class ProcessViewsTest(TestCase):
                 url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
+                self.assertContains(response, "Confirmation de l’embauche")
 
                 # Good duration.
                 hiring_start_at = today
