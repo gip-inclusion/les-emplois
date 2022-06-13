@@ -35,6 +35,7 @@ class EvaluatedJobApplicationsState(models.TextChoices):
     SUBMITTED = "SUBMITTED"
     ACCEPTED = "ACCEPTED"
     REFUSED = "REFUSED"
+    REFUSED_2 = "REFUSED_2"
 
 
 class EvaluatedJobApplicationsSelectCriteriaState(models.TextChoices):
@@ -57,3 +58,4 @@ class EvaluatedAdministrativeCriteriaState(models.TextChoices):
     PENDING = ("PENDING", "En attente")
     ACCEPTED = ("ACCEPTED", "Validé")
     REFUSED = ("REFUSED", "Problème constaté")
+    REFUSED_2 = ("REFUSED_2", "Problème constaté (x2)")

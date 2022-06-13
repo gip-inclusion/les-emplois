@@ -5,7 +5,12 @@ from django.utils import dateformat, timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.siae_evaluations.factories import EvaluatedJobApplicationFactory, EvaluatedSiaeFactory
+from itou.siae_evaluations import enums as evaluation_enums
+from itou.siae_evaluations.factories import (
+    EvaluatedAdministrativeCriteriaFactory,
+    EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory,
+)
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
@@ -117,9 +122,9 @@ class SiaeJobApplicationListViewTest(TestCase):
         )
 
         # at least one criterion selected
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application,
-            administrative_criteria=AdministrativeCriteria.objects.first(),
+            proof_url="",
         )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -133,12 +138,8 @@ class SiaeJobApplicationListViewTest(TestCase):
 
     def test_content_with_selected_criteria(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
-        criterion = (
-            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
-        )
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application,
-            administrative_criteria=criterion.administrative_criteria,
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application, proof_url=""
         )
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
         response = self.client.get(self.url)
@@ -150,7 +151,7 @@ class SiaeJobApplicationListViewTest(TestCase):
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             ),
         )
-        self.assertContains(response, criterion.administrative_criteria.name)
+        self.assertContains(response, evaluated_administrative_criteria.administrative_criteria.name)
         self.assertContains(
             response,
             reverse(
@@ -162,7 +163,6 @@ class SiaeJobApplicationListViewTest(TestCase):
     def test_links_mechanism(self):
         fake_now = timezone.now()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
-        criterion = AdministrativeCriteria.objects.first()
 
         submit_disabled = (
             '<a class="btn btn-outline-primary disabled float-right" href="'
@@ -187,8 +187,8 @@ class SiaeJobApplicationListViewTest(TestCase):
         self.assertContains(response, select_criteria)
 
         # criterion selected
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application, proof_url=""
         )
         upload_proof = reverse(
             "siae_evaluations_views:siae_upload_doc",
@@ -499,11 +499,8 @@ class SiaeSubmitProofsViewTest(TestCase):
 
     def test_is_submittable(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
-        criterion = AdministrativeCriteria.objects.first()
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application,
-            administrative_criteria=criterion,
-            proof_url="https://server.com/rocky-balboa.pdf",
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application
         )
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
@@ -526,12 +523,41 @@ class SiaeSubmitProofsViewTest(TestCase):
 
     def test_is_not_submittable(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
-        criterion = AdministrativeCriteria.objects.first()
-        EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
-        )
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application, proof_url="")
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("siae_evaluations_views:siae_job_applications_list"))
+
+    def test_is_submittable_with_accepted(self):
+        fake_now = timezone.now()
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+
+        evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application
+        )
+        evaluated_administrative_criteria1 = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            submitted_at=fake_now - relativedelta(days=1),
+        )
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+
+        evaluated_administrative_criteria0.refresh_from_db()
+        self.assertEqual(
+            evaluated_administrative_criteria0.review_state,
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+        )
+
+        evaluated_administrative_criteria1.refresh_from_db()
+        self.assertEqual(
+            evaluated_administrative_criteria1.review_state,
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        self.assertLess(
+            evaluated_administrative_criteria1.submitted_at, evaluated_administrative_criteria0.submitted_at
+        )

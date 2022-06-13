@@ -1,3 +1,5 @@
+from unittest import mock
+
 from dateutil.relativedelta import relativedelta
 from django.core import mail
 from django.core.exceptions import ValidationError
@@ -13,6 +15,7 @@ from itou.job_applications.factories import JobApplicationFactory, JobApplicatio
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import (
+    EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
@@ -451,6 +454,18 @@ class EvaluationCampaignManagerTest(TestCase):
         with self.assertRaises(CampaignAlreadyPopulatedException):
             evaluation_campaign.populate(fake_now)
 
+    def test_transition_to_adversarial_phase(self):
+        evaluation_campaign = EvaluationCampaignFactory()
+        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+
+        evaluation_campaign = EvaluationCampaignFactory()
+        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+
+        self.assertEqual(2, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
+
+        evaluation_campaign.transition_to_adversarial_phase()
+        self.assertEqual(1, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
+
 
 class EvaluationCampaignEmailMethodsTest(TestCase):
     def test_get_email_institution_notification(self):
@@ -540,9 +555,8 @@ class EvaluatedSiaeModelTest(TestCase):
 
         # one evaluated_administrative_criterion
         # empty : proof_url and submitted_at empty)
-        criteria = AdministrativeCriteria.objects.first()
-        evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application, administrative_criteria=criteria
+        evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application, proof_url=""
         )
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
         del evaluated_siae.state
@@ -559,13 +573,29 @@ class EvaluatedSiaeModelTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
         del evaluated_siae.state
 
-        # with review_state REFUSED
+        # with review_state REFUSED, not reviewed
         evaluated_administrative_criteria0.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria0.save(update_fields=["review_state"])
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
         del evaluated_siae.state
 
-        # with review_state ACCEPTED
+        # with review_state REFUSED, reviewed, submitted_at before reviewed_at
+        evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
+        evaluated_siae.save(update_fields=["reviewed_at"])
+        self.assertLessEqual(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # with review_state REFUSED, reviewed, submitted_at after reviewed_at
+        evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
+        evaluated_siae.save(update_fields=["reviewed_at"])
+        self.assertGreater(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # with review_state ACCEPTED not reviewed
+        evaluated_siae.reviewed_at = None
+        evaluated_siae.save(update_fields=["reviewed_at"])
         evaluated_administrative_criteria0.review_state = (
             evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         )
@@ -573,41 +603,104 @@ class EvaluatedSiaeModelTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
         del evaluated_siae.state
 
-        # ADVERSARIAL_STAGE : REVIEWED with review_state REFUSED
-        evaluated_administrative_criteria0.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
-        evaluated_administrative_criteria0.save(update_fields=["review_state"])
-        evaluated_siae.reviewed_at = fake_now
+        # with review_state ACCEPTED reviewed, submitted_at before reviewed_at
+        evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        self.assertLessEqual(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REVIEWED, evaluated_siae.state)
         del evaluated_siae.state
 
-        # REVIEWED with review_state ACCEPTED
-        evaluated_administrative_criteria0.review_state = (
-            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
-        )
-        evaluated_administrative_criteria0.save(update_fields=["review_state"])
-        evaluated_siae.reviewed_at = fake_now
+        # with review_state ACCEPTED reviewed, submitted_at after reviewed_at
+        evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REVIEWED, evaluated_siae.state)
+        self.assertGreater(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
+        del evaluated_siae.state
 
     def test_state_integration(self):
         fake_now = timezone.now()
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        criteria = AdministrativeCriteria.objects.all()[:3]
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory.create_batch(
+            3,
+            evaluated_job_application=evaluated_job_application,
+            submitted_at=fake_now,
+        )
 
-        evaluated_administrative_criteria = []
-        for i in range(3):
-            evaluated_administrative_criteria.append(
-                EvaluatedAdministrativeCriteria.objects.create(
-                    evaluated_job_application=evaluated_job_application,
-                    administrative_criteria=criteria[i],
-                    proof_url="https://server.com/rocky-balboa.pdf",
-                    submitted_at=fake_now,
-                )
-            )
+        # NOT REVIEWED
+        # one Pending, one Refused, one Accepted
+        evaluated_administrative_criteria[
+            1
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        evaluated_administrative_criteria[1].save(update_fields=["review_state"])
+        evaluated_administrative_criteria[
+            2
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[2].save(update_fields=["review_state"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # one Refused, two Accepted
+        evaluated_administrative_criteria[
+            0
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[0].save(update_fields=["review_state"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # three Accepted
+        evaluated_administrative_criteria[
+            1
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[1].save(update_fields=["review_state"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # REVIEWED, submitted_at less than reviewed_at
+        evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
+        evaluated_siae.save(update_fields=["reviewed_at"])
 
         # one Pending, one Refused, one Accepted
+        evaluated_administrative_criteria[
+            0
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        evaluated_administrative_criteria[0].save(update_fields=["review_state"])
+        evaluated_administrative_criteria[
+            1
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        evaluated_administrative_criteria[1].save(update_fields=["review_state"])
+        evaluated_administrative_criteria[
+            2
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[2].save(update_fields=["review_state"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # one Refused, two Accepted
+        evaluated_administrative_criteria[
+            0
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[0].save(update_fields=["review_state"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # three Accepted
+        evaluated_administrative_criteria[
+            1
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[1].save(update_fields=["review_state"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REVIEWED, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # REVIEWED, submitted_at greater than reviewed_at
+        evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
+        evaluated_siae.save(update_fields=["reviewed_at"])
+
+        # one Pending, one Refused, one Accepted
+        evaluated_administrative_criteria[
+            0
+        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         evaluated_administrative_criteria[
             1
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
@@ -639,14 +732,11 @@ class EvaluatedSiaeModelTest(TestCase):
         fake_now = timezone.now()
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        criteria = AdministrativeCriteria.objects.first()
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application, administrative_criteria=criteria
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            submitted_at=fake_now,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
-        evaluated_administrative_criteria.submitted_at = fake_now
-        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
-        evaluated_administrative_criteria.save(update_fields=["proof_url", "submitted_at", "review_state"])
 
         evaluated_siae.review()
         evaluated_siae.refresh_from_db()
@@ -680,9 +770,8 @@ class EvaluatedJobApplicationModelTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PENDING, evaluated_job_application.state)
         del evaluated_job_application.state  # clear cached_property stored value
 
-        criterion = AdministrativeCriteria.objects.first()
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application, proof_url=""
         )
         self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PROCESSING, evaluated_job_application.state)
         del evaluated_job_application.state
@@ -707,11 +796,18 @@ class EvaluatedJobApplicationModelTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.REFUSED, evaluated_job_application.state)
         del evaluated_job_application.state
 
+        evaluated_administrative_criteria.review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
+        )
+        evaluated_administrative_criteria.save(update_fields=["review_state"])
+        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2, evaluated_job_application.state)
+        del evaluated_job_application.state
+
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
         self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED, evaluated_job_application.state)
 
-    def test_should_select_criteria(self):
+    def test_should_select_criteria_with_mock(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
         self.assertEqual(
             evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING,
@@ -720,32 +816,59 @@ class EvaluatedJobApplicationModelTest(TestCase):
         del evaluated_job_application.state
         del evaluated_job_application.should_select_criteria
 
-        criterion = AdministrativeCriteria.objects.first()
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
-        )
+        editable_status = [
+            evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
+            evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
+        ]
+
+        for state in editable_status:
+            with mock.patch.object(EvaluatedJobApplication, "state", state):
+                with self.subTest(state=state):
+                    self.assertEqual(
+                        evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
+                        evaluated_job_application.should_select_criteria,
+                    )
+                    del evaluated_job_application.should_select_criteria
+
+        not_editable_status = [
+            state
+            for state in evaluation_enums.EvaluatedJobApplicationsState.choices
+            if state != evaluation_enums.EvaluatedJobApplicationsState.PENDING and state not in editable_status
+        ]
+
+        for state in not_editable_status:
+            with mock.patch.object(EvaluatedJobApplication, "state", state):
+                with self.subTest(state=state):
+                    self.assertEqual(
+                        evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
+                        evaluated_job_application.should_select_criteria,
+                    )
+                    del evaluated_job_application.should_select_criteria
+
+        # REVIEWED
+        evaluated_siae = evaluated_job_application.evaluated_siae
+        evaluated_siae.reviewed_at = timezone.now()
+        evaluated_siae.save(update_fields=["reviewed_at"])
+
         self.assertEqual(
-            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
+            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING,
             evaluated_job_application.should_select_criteria,
         )
         del evaluated_job_application.state
         del evaluated_job_application.should_select_criteria
 
-        evaluated_administrative_criteria.proof_url = "https://www.test.com"
-        evaluated_administrative_criteria.save(update_fields=["proof_url"])
-        self.assertEqual(
-            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
-            evaluated_job_application.should_select_criteria,
-        )
-        del evaluated_job_application.state
-        del evaluated_job_application.should_select_criteria
-
-        evaluated_administrative_criteria.submitted_at = timezone.now()
-        evaluated_administrative_criteria.save(update_fields=["submitted_at"])
-        self.assertEqual(
-            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
-            evaluated_job_application.should_select_criteria,
-        )
+        for state in [
+            state
+            for state in evaluation_enums.EvaluatedJobApplicationsState.choices
+            if state != evaluation_enums.EvaluatedJobApplicationsState.PENDING
+        ]:
+            with mock.patch.object(EvaluatedJobApplication, "state", state):
+                with self.subTest(state=state):
+                    self.assertEqual(
+                        evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
+                        evaluated_job_application.should_select_criteria,
+                    )
+                    del evaluated_job_application.should_select_criteria
 
     def test_save_selected_criteria(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
@@ -791,3 +914,33 @@ class EvaluatedJobApplicationModelTest(TestCase):
                 changed_keys=[criterion1.key, criterion2.key], cleaned_keys=[criterion2.key]
             )
         self.assertEqual(2, EvaluatedAdministrativeCriteria.objects.count())
+
+
+class EvaluatedAdministrativeCriteriaModelTest(TestCase):
+    def test_can_upload(self):
+        fake_now = timezone.now()
+
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=EvaluatedJobApplicationFactory(),
+            proof_url="",
+        )
+        self.assertTrue(evaluated_administrative_criteria.can_upload())
+
+        evaluated_siae = evaluated_administrative_criteria.evaluated_job_application.evaluated_siae
+        evaluated_siae.reviewed_at = fake_now
+        evaluated_siae.save(update_fields=["reviewed_at"])
+
+        evaluated_administrative_criteria.submitted_at = fake_now
+        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        evaluated_administrative_criteria.save(update_fields=["submitted_at", "review_state"])
+        self.assertTrue(evaluated_administrative_criteria.can_upload())
+
+        for state in [
+            state
+            for state, _ in evaluation_enums.EvaluatedAdministrativeCriteriaState.choices
+            if state != evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        ]:
+            with self.subTest(state=state):
+                evaluated_administrative_criteria.review_state = state
+                evaluated_administrative_criteria.save(update_fields=["review_state"])
+                self.assertFalse(evaluated_administrative_criteria.can_upload())
