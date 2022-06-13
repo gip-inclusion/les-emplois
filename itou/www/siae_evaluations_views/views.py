@@ -226,8 +226,18 @@ def siae_job_applications_list(request, template_name="siae_evaluations/siae_job
         .prefetch_related("evaluated_administrative_criteria")
     )
 
+    # note vincentporte : is_submittable should be a method of EvaluatedSiae model
+    # when `siae_job_applications_list` will collect EvaluatedJobApplication of ONE
+    # EvaluatedSiae instead of all EvaluatedJobApplication of all active EvaluatedSiae
+    # of one Siae (misconception here)
     if evaluated_job_applications:
         is_submittable = all(
+            (
+                evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
+                or evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+            )
+            for evaluated_job_application in evaluated_job_applications
+        ) and any(
             evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
             for evaluated_job_application in evaluated_job_applications
         )
@@ -338,9 +348,6 @@ def siae_upload_doc(
     back_url = get_safe_url(request, "back_url", fallback_url=url)
 
     context = {
-        "job_seeker": evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker,
-        "approval": evaluated_administrative_criteria.evaluated_job_application.job_application.approval,
-        "state": evaluated_administrative_criteria.evaluated_job_application.state,
         "evaluated_administrative_criteria": evaluated_administrative_criteria,
         "s3_form_values": s3_upload.form_values,
         "s3_upload_config": s3_upload.config,
@@ -375,12 +382,16 @@ def siae_submit_proofs(request):
     )
 
     if all(
-        evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
+        (
+            evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
+            or evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+        )
         for evaluated_job_application in evaluated_job_applications
     ):
 
         EvaluatedAdministrativeCriteria.objects.filter(
-            evaluated_job_application__in=evaluated_job_applications
+            evaluated_job_application__in=evaluated_job_applications,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
         ).update(submitted_at=timezone.now())
 
         back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
