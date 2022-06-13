@@ -82,6 +82,7 @@ class SiaeJobApplicationListViewTest(TestCase):
             + 2  # fetch evaluatedjobapplication and its prefetched evaluatedadministrativecriteria
             + 1  # aggregate min evaluation_campaign notification date
             + 2  # weird fetch siae membership and social account
+            + 1  # fetch evaluatedsiae
         ):
             response = self.client.get(self.url)
 
@@ -424,16 +425,8 @@ class SiaeUploadDocsViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(
-            evaluated_job_application.job_application.job_seeker,
-            response.context["job_seeker"],
-        )
-        self.assertEqual(
-            evaluated_job_application.job_application.approval,
-            response.context["approval"],
-        )
-        self.assertEqual(
-            evaluated_job_application.state,
-            response.context["state"],
+            evaluated_administrative_criteria,
+            response.context["evaluated_administrative_criteria"],
         )
         self.assertEqual(
             reverse("siae_evaluations_views:siae_job_applications_list") + f"#{evaluated_job_application.pk}",
@@ -450,6 +443,7 @@ class SiaeUploadDocsViewTest(TestCase):
                 self.assertEqual(v, response.context["s3_upload_config"][k])
 
     def test_post(self):
+        fake_now = timezone.now()
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
@@ -459,6 +453,9 @@ class SiaeUploadDocsViewTest(TestCase):
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application,
             administrative_criteria=criterion.administrative_criteria,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            submitted_at=fake_now - relativedelta(days=1),
+            uploaded_at=fake_now - relativedelta(days=1),
         )
         url = reverse(
             "siae_evaluations_views:siae_upload_doc",
@@ -488,6 +485,15 @@ class SiaeUploadDocsViewTest(TestCase):
 
         next_url = reverse("siae_evaluations_views:siae_job_applications_list") + f"#{evaluated_job_application.pk}"
         self.assertEqual(response.url, next_url)
+
+        # using already setup test data to control save method of the form
+        evaluated_administrative_criteria.refresh_from_db()
+        self.assertIsNone(evaluated_administrative_criteria.submitted_at)
+        self.assertGreater(evaluated_administrative_criteria.uploaded_at, fake_now - relativedelta(days=1))
+        self.assertEqual(
+            evaluated_administrative_criteria.review_state,
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+        )
 
 
 class SiaeSubmitProofsViewTest(TestCase):
