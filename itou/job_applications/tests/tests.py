@@ -524,7 +524,7 @@ class JobApplicationQuerySetTest(TestCase):
 
         # After employee record is disabled
         employee_record.update_as_disabled()
-        self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+        self.assertEqual(employee_record.status, Status.DISABLED)
 
 
 class JobApplicationNotificationsTest(TestCase):

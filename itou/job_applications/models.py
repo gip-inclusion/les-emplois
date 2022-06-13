@@ -289,7 +289,7 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
-        # Exclude processed employee record (only disabled ones are not excluded)
+        # Exclude processed employee record
         subquery_in_tunnel = Subquery(
             self.filter(
                 to_siae=siae,
@@ -301,6 +301,7 @@ class JobApplicationQuerySet(models.QuerySet):
                     employeerecord_enums.Status.SENT,
                     employeerecord_enums.Status.REJECTED,
                     employeerecord_enums.Status.PROCESSED,
+                    employeerecord_enums.Status.DISABLED,
                 ],
             )
         )
