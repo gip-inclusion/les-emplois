@@ -128,7 +128,7 @@ class DashboardViewTest(TestCase):
         self.assertEqual(response.context["num_rejected_employee_records"], 0)
 
     def test_dashboard_agreements_and_job_postings(self):
-        for kind in [Siae.KIND_AI, Siae.KIND_EI, Siae.KIND_EITI, Siae.KIND_ACI, Siae.KIND_EITI, Siae.KIND_ACIPHC]:
+        for kind in [Siae.KIND_AI, Siae.KIND_EI, Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EITI, Siae.KIND_ACIPHC]:
             with self.subTest(f"should display when siae_kind={kind}"):
                 siae = SiaeWithMembershipFactory(kind=kind)
                 user = siae.members.first()

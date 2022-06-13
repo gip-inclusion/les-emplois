@@ -308,7 +308,7 @@ class EditJobDescriptionForm(forms.ModelForm):
                 "",
                 "---------",
             )
-        ] + ContractType.choices
+        ] + ContractType.choices_from_siae_kind(kind=current_siae.kind)
 
     class Meta:
         model = SiaeJobDescription
