@@ -15,7 +15,6 @@ from itou.siaes.factories import (
     SiaePendingGracePeriodFactory,
     SiaeWith2MembershipsFactory,
     SiaeWith4MembershipsFactory,
-    SiaeWithJobsFactory,
     SiaeWithMembershipAndJobsFactory,
 )
 from itou.siaes.models import Siae, SiaeJobDescription
@@ -225,7 +224,7 @@ class SiaeModelTest(TestCase):
 
 class SiaeQuerySetTest(TestCase):
     def test_prefetch_job_description_through(self):
-        siae = SiaeWithJobsFactory()
+        siae = SiaeFactory(with_jobs=True)
 
         siae_result = Siae.objects.prefetch_job_description_through().get(pk=siae.pk)
         self.assertTrue(hasattr(siae_result, "job_description_through"))
@@ -257,7 +256,7 @@ class SiaeQuerySetTest(TestCase):
         self.assertEqual(expected, result.count_recent_received_job_apps)
 
     def test_with_job_app_score(self):
-        siae = SiaeWithJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
+        siae = SiaeFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"))
         siae.job_description_through.first()
         JobApplicationFactory(to_siae=siae)
         JobApplicationFactory(to_siae=siae)
@@ -286,7 +285,7 @@ class SiaeQuerySetTest(TestCase):
         self.assertEqual(expected_score, result.job_app_score)
 
     def test_with_count_active_job_descriptions(self):
-        siae = SiaeWithJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
+        siae = SiaeFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"))
         job_descriptions = siae.job_description_through.all()[:3]
         for job_description in job_descriptions:
             job_description.is_active = False
@@ -313,7 +312,7 @@ class SiaeQuerySetTest(TestCase):
 
 class SiaeJobDescriptionQuerySetTest(TestCase):
     def setUp(self):
-        self.siae = SiaeWithJobsFactory()
+        self.siae = SiaeFactory(with_jobs=True)
 
     def test_with_annotation_is_popular(self):
         siae_job_descriptions = self.siae.job_description_through.all()

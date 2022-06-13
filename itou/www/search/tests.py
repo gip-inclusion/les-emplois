@@ -7,7 +7,7 @@ from itou.cities.models import City
 from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeWithJobsFactory
+from itou.siaes.factories import SiaeFactory
 
 
 class SearchSiaeTest(TestCase):
@@ -96,16 +96,16 @@ class SearchSiaeTest(TestCase):
         created_siaes = []
 
         # Several job descriptions but no job application.
-        siae = SiaeWithJobsFactory(department="44", coords=guerande.coords, post_code="44350")
+        siae = SiaeFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
         created_siaes.append(siae)
 
         # Many job descriptions and job applications.
-        siae = SiaeWithJobsFactory(department="44", coords=guerande.coords, post_code="44350")
+        siae = SiaeFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
         JobApplicationFactory(to_siae=siae)
         created_siaes.append(siae)
 
         # Many job descriptions and more job applications than the first one.
-        siae = SiaeWithJobsFactory(department="44", coords=guerande.coords, post_code="44350")
+        siae = SiaeFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
         JobApplicationFactory(to_siae=siae)
         JobApplicationFactory(to_siae=siae)
         created_siaes.append(siae)
