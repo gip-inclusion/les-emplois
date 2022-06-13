@@ -4,6 +4,7 @@ import string
 
 import factory
 import factory.fuzzy
+from allauth.account import models as allauth_models
 
 from itou.asp.factories import CommuneFactory, CountryFranceFactory
 from itou.asp.mocks.providers import INSEECommuneProvider, INSEECountryProvider
@@ -22,11 +23,30 @@ factory.Faker.add_provider(INSEECommuneProvider)
 factory.Faker.add_provider(INSEECountryProvider)
 
 
+def _verify_emails_for_user(self, create, extracted, **kwargs):
+    if not create:
+        # Simple build, do nothing.
+        return
+
+    emails = extracted or [self.email]
+    for email in emails:
+        email_address, _ = allauth_models.EmailAddress.objects.get_or_create(user=self, email=email)
+        email_address.verified = True
+        email_address.save()
+        self.emailaddress_set.add(email_address)
+
+
 class UserFactory(factory.django.DjangoModelFactory):
     """Generates User() objects for unit tests."""
 
     class Meta:
         model = models.User
+
+    class Params:
+        with_verified_email = factory.Trait(
+            is_active=True,
+            emails=factory.PostGeneration(_verify_emails_for_user),
+        )
 
     username = factory.Sequence("user_name{0}".format)
     first_name = factory.Faker("first_name")
