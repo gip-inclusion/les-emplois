@@ -1,10 +1,12 @@
 import datetime
+import json
 import uuid
 from unittest import mock
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.test import TestCase
 from django.utils import timezone
 
@@ -219,68 +221,84 @@ class ModelTest(TestCase):
         # keep a history of changes but only the last one.
         # Field name don't reflect actual behaviour.
         # Also, keeping a trace of old data is interesting in a debug purpose.
+        # Maybe split this test in smaller tests at the same time.
         user = UserFactory()
         self.assertFalse(user.external_data_source_history)
 
-        provider_name = IdentityProvider.FRANCE_CONNECT
-        expected_field = "first_name"
-        expected_value = "Lola"
-        has_performed_update = user.update_external_data_source_history_field(
-            provider_name=provider_name, field=expected_field, value=expected_value
-        )
+        provider = IdentityProvider.FRANCE_CONNECT
+        now = timezone.now()
+        # Because external_data_source_history is a JSONField
+        # dates are actually stored as strings in the database
+        now_str = json.loads(DjangoJSONEncoder().encode(now))
+        with mock.patch("django.utils.timezone.now", return_value=now):
+            has_performed_update = user.update_external_data_source_history_field(
+                provider=provider, field="first_name", value="Lola"
+            )
         user.save()
         user.refresh_from_db()  # Retrieve object as stored in DB to get raw JSON values and avoid surprises.
         self.assertTrue(has_performed_update)
-        self.assertTrue(user.external_data_source_history)
-        self.assertEqual(len(user.external_data_source_history.keys()), 1)
-        self.assertTrue(user.external_data_source_history.get(expected_field))
-        self.assertEqual(user.external_data_source_history[expected_field]["value"], expected_value)
-        # Enums are stored as strings.
-        self.assertEqual(user.external_data_source_history[expected_field]["source"], provider_name.value)
-        # Because external_data_source_history is a JSONField,
-        # dates are actually stored as strings in the database.
-        created_at = user.external_data_source_history[expected_field]["created_at"]
-        created_at = datetime.datetime.fromisoformat(created_at[:19])
-        self.assertEqual(created_at.date(), datetime.date.today())
+        self.assertEqual(
+            user.external_data_source_history,
+            {"first_name": {"value": "Lola", "source": provider.value, "created_at": now_str}},
+        )
 
         # Update history.
-        expected_value = "Jeanne"
-        has_performed_update = user.update_external_data_source_history_field(
-            provider_name=provider_name, field=expected_field, value=expected_value
-        )
+        with mock.patch("django.utils.timezone.now", return_value=now):
+            has_performed_update = user.update_external_data_source_history_field(
+                provider=provider, field="first_name", value="Jeanne"
+            )
         user.save()
+        user.refresh_from_db()
         self.assertTrue(has_performed_update)
-        self.assertEqual(len(user.external_data_source_history.keys()), 1)
-        self.assertEqual(user.external_data_source_history[expected_field]["value"], expected_value)
+        self.assertEqual(
+            user.external_data_source_history,
+            {"first_name": {"value": "Jeanne", "source": provider.value, "created_at": now_str}},
+        )
 
         # Don't update the history if value is the same.
         has_performed_update = user.update_external_data_source_history_field(
-            provider_name=provider_name, field=expected_field, value=expected_value
+            provider=provider, field="first_name", value="Jeanne"
         )
         user.save()
+        user.refresh_from_db()
         self.assertFalse(has_performed_update)
-        self.assertEqual(len(user.external_data_source_history.keys()), 1)
-        self.assertEqual(user.external_data_source_history[expected_field]["value"], expected_value)
+        self.assertEqual(
+            user.external_data_source_history,
+            # NB: created_at would have changed if has_performed_update had been True since we did not use mock.patch
+            {"first_name": {"value": "Jeanne", "source": provider.value, "created_at": now_str}},
+        )
 
         # Allow storing empty values.
-        expected_field = "last_name"
-        has_performed_update = user.update_external_data_source_history_field(
-            provider_name=provider_name, field=expected_field, value=""
-        )
+        with mock.patch("django.utils.timezone.now", return_value=now):
+            has_performed_update = user.update_external_data_source_history_field(
+                provider=provider, field="last_name", value=""
+            )
         user.save()
+        user.refresh_from_db()
         self.assertTrue(has_performed_update)
-        self.assertEqual(len(user.external_data_source_history.keys()), 2)
-        self.assertEqual(user.external_data_source_history[expected_field]["value"], "")
+        self.assertEqual(
+            user.external_data_source_history,
+            {
+                "first_name": {"value": "Jeanne", "source": provider.value, "created_at": now_str},
+                "last_name": {"value": "", "source": provider.value, "created_at": now_str},
+            },
+        )
 
         # Allow replacing empty values.
-        expected_value = "Trombignard"
-        has_performed_update = user.update_external_data_source_history_field(
-            provider_name=provider_name, field=expected_field, value=expected_value
-        )
+        with mock.patch("django.utils.timezone.now", return_value=now):
+            has_performed_update = user.update_external_data_source_history_field(
+                provider=provider, field="last_name", value="Trombignard"
+            )
         user.save()
+        user.refresh_from_db()
         self.assertTrue(has_performed_update)
-        self.assertEqual(len(user.external_data_source_history.keys()), 2)
-        self.assertEqual(user.external_data_source_history[expected_field]["value"], expected_value)
+        self.assertEqual(
+            user.external_data_source_history,
+            {
+                "first_name": {"value": "Jeanne", "source": provider.value, "created_at": now_str},
+                "last_name": {"value": "Trombignard", "source": provider.value, "created_at": now_str},
+            },
+        )
 
     def test_last_hire_was_made_by_siae(self):
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)

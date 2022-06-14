@@ -5,6 +5,7 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 
 import itou.external_data.apis.pe_connect as pec
+from itou.users.enums import IdentityProvider
 from itou.users.factories import JobSeekerFactory
 
 from .apis.pe_connect import import_user_pe_data
@@ -184,6 +185,9 @@ class JobSeekerExternalDataTest(TestCase):
 
         self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
         self.assertEqual(birthdate, user.birthdate)
+        self.assertEqual(
+            user.external_data_source_history["address_line_1"]["source"], IdentityProvider.PE_CONNECT.value
+        )
 
     def test_import_partial(self, m):
         _status_partial(m)
@@ -201,6 +205,9 @@ class JobSeekerExternalDataTest(TestCase):
         self.assertEqual(user.address_line_1, "4, Privet Drive")
         self.assertEqual(user.address_line_2, "The cupboard under the stairs")
         self.assertNotEqual(str(user.birthdate), "1970-01-01")
+        self.assertEqual(
+            user.external_data_source_history["address_line_1"]["source"], IdentityProvider.PE_CONNECT.value
+        )
 
     def test_import_failed(self, m):
         _status_failed(m)
