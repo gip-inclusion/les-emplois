@@ -1,5 +1,6 @@
 import dataclasses
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -65,11 +66,15 @@ class InclusionConnectModelTest(TestCase):
 
     def test_create_user_from_user_info_with_already_existing_id(self):
         """
-        If there already is an existing user with this FranceConnectId, we do not create it again,
+        If there already is an existing user with this InclusionConnect id, we do not create it again,
         we use it and we update it.
         """
         ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
-        UserFactory(username=ic_user_data.username, last_name="will_be_forgotten")
+        UserFactory(
+            username=ic_user_data.username,
+            last_name="will_be_forgotten",
+            identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT,
+        )
         user, created = ic_user_data.create_or_update_user()
         self.assertFalse(created)
         self.assertEqual(user.last_name, OIDC_USERINFO["family_name"])
@@ -78,6 +83,21 @@ class InclusionConnectModelTest(TestCase):
             user.external_data_source_history["last_name"]["source"],
             users_enums.IdentityProvider.INCLUSION_CONNECT.value,
         )
+
+    def test_create_user_from_user_info_with_already_existing_id_but_from_other_sso(self):
+        """
+        If there already is an existing user with this InclusionConnect id, but it comes from another SSO.
+        The email is also different, so it will crash while trying to create a new user.
+        """
+        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+        UserFactory(
+            username=ic_user_data.username,
+            last_name="will_be_forgotten",
+            identity_provider=users_enums.IdentityProvider.DJANGO,
+            email="random@email.com",
+        )
+        with self.assertRaises(ValidationError):
+            ic_user_data.create_or_update_user()
 
     def test_create_user_from_user_info_with_already_existing_email(self):
         """
