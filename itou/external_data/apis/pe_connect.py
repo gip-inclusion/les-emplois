@@ -203,7 +203,7 @@ def set_pe_data_import_from_user_data(pe_data_import, user, status, user_data):
     initial_user = model_to_dict(user)
 
     for k in fields_fetched:
-        pe_connect_provider = users_enums.IdentityProvider.PE_CONNECT.name
+        pe_connect_provider = users_enums.IdentityProvider.PE_CONNECT
         v = user_data.get(k)
 
         # User part:

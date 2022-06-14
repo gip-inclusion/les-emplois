@@ -269,6 +269,8 @@ class User(AbstractUser, AddressMixin):
         verbose_name="Information sur la source des champs",
         blank=True,
         null=True,
+        # TODO(alaurent) We could create a custom encode/decoder to store and read enums instead of strings.
+        # It would also allow to have real datetimes when reading the field value.
         encoder=DjangoJSONEncoder,
     )
 
@@ -545,7 +547,7 @@ class User(AbstractUser, AddressMixin):
             and current_org.kind == current_org.Kind.DGEFP
         )
 
-    def update_external_data_source_history_field(self, provider_name, field, value) -> bool:
+    def update_external_data_source_history_field(self, provider, field, value) -> bool:
         """
         Attempts to update the history json data for a field inside
         `external_data_source_history`, and returns a boolean if the user data was modified,
@@ -565,12 +567,13 @@ class User(AbstractUser, AddressMixin):
         if not self.external_data_source_history:
             self.external_data_source_history = {}
 
-        if (
-            not self.external_data_source_history.get(field)
-            or self.external_data_source_history[field]["value"] != value
-        ):
+        try:
+            current_value = self.external_data_source_history[field]["value"]
+        except KeyError:
+            current_value = None
+        if current_value != value:
             self.external_data_source_history[field] = {
-                "source": provider_name,
+                "source": provider.value,
                 "created_at": now,
                 "value": value,
             }

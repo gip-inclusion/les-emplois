@@ -76,9 +76,7 @@ class OIDConnectUserData:
                 created = True
 
         for key, value in user_data_dict.items():
-            user.update_external_data_source_history_field(
-                provider_name=self.identity_provider, field=key, value=value
-            )
+            user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
         user.save()
         return user, created
 
