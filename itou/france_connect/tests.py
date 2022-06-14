@@ -3,6 +3,7 @@ import datetime
 import httpx
 import respx
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -150,7 +151,11 @@ class FranceConnectTest(TestCase):
         we use it and we update it
         """
         fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(FC_USERINFO)
-        UserFactory(username=fc_user_data.username, last_name="will_be_forgotten")
+        UserFactory(
+            username=fc_user_data.username,
+            last_name="will_be_forgotten",
+            identity_provider=IdentityProvider.FRANCE_CONNECT.value,
+        )
         user, created = fc_user_data.create_or_update_user()
         self.assertFalse(created)
         self.assertEqual(user.last_name, FC_USERINFO["family_name"])
@@ -159,6 +164,21 @@ class FranceConnectTest(TestCase):
             user.external_data_source_history["last_name"]["source"], IdentityProvider.FRANCE_CONNECT.value
         )
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+
+    def test_create_django_user_with_already_existing_fc_id_but_from_other_sso(self):
+        """
+        If there already is an existing user with this FranceConnectId, but it comes from another SSO.
+        The email is also different, so it will crash while trying to create a new user.
+        """
+        fc_user_data = france_connect_models.FranceConnectUserData.from_user_info(FC_USERINFO)
+        UserFactory(
+            username=fc_user_data.username,
+            last_name="will_be_forgotten",
+            identity_provider=IdentityProvider.DJANGO.value,
+            email="random@email.com",
+        )
+        with self.assertRaises(ValidationError):
+            fc_user_data.create_or_update_user()
 
     def test_create_django_user_with_already_existing_fc_email(self):
         """

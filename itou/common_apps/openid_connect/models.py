@@ -43,15 +43,18 @@ class OIDConnectUserData:
     def create_or_update_user(self):
         """
         Create or update a user managed by another identity provider.
-         - If there is already a user with this username (user_info_dict["sub"]), we update and return it.
+         - If there is already a user with this username (user_info_dict["sub"])
+           and from the same identity provider, we update and return it.
          - If there is already a user with the email, we return this user.
          - otherwise, we create a new user based on the data we received.
         """
         user_data_dict = dataclasses.asdict(self)
         user_data_dict = {key: value for key, value in user_data_dict.items() if value}
         try:
+            # If the same username exists with another identity_provider, it may not be the same user
+            # so don't update and return if !
             # We can't use a get_or_create here because we have to set the provider data for each field.
-            user = User.objects.get(username=self.username)
+            user = User.objects.get(username=self.username, identity_provider=self.identity_provider.value)
             for key, value in user_data_dict.items():
                 setattr(user, key, value)
             created = False
@@ -66,6 +69,9 @@ class OIDConnectUserData:
                 # - set User.is_active to true,
                 # - call User.set_unusable_password() if no password is given.
                 # https://docs.djangoproject.com/fr/4.0/ref/contrib/auth/#django.contrib.auth.models.UserManager.create_user
+                # NB: if we already have a user with the same username but with a different email and a different
+                # provider the code will break here. We know it but since it's highly unlikely we just added a test
+                # on this behaviour. No need to do a fancy bypass if it's never used.
                 user = User.objects.create_user(**user_data_dict)
                 created = True
 
