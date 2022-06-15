@@ -8,9 +8,7 @@ select
 from 
     candidatures
 where 
-    (origine <> 'Candidat' or origine is null)
-    and (origine <> 'Employeur' or origine is null) 
-    and (lower(origine_détaillée) like 'prescripteur%')
+    lower(origine_détaillée) like 'prescripteur%'
     and injection_ai = 0
 group by 
     origine_détaillée, 
