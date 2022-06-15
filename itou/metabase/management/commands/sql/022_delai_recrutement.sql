@@ -8,7 +8,7 @@ with premiere_candidature as (
         id_candidat_anonymisé,
         min(date_candidature) as min_date_candidature 
     from 
-        Candidatures 
+        candidatures 
     group by 
         id_candidat_anonymisé  ) 
 select     
@@ -17,7 +17,7 @@ select
     min(date_embauche) as min_date_embauche,
     min(date_embauche) - pc.min_date_candidature as delai_recrutement_jours
 from 
-    Candidatures c
+    candidatures c
 left join 
     premiere_candidature pc
     on c.id_candidat_anonymisé = pc.id_candidat_anonymisé
