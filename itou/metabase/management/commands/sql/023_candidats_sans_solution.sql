@@ -6,23 +6,22 @@ ou
     - avec candidatures dont l’état est différent de “acceptée”
 
 */
-
 with candidature as ( 
     select  
         distinct (id_candidat_anonymisé) identifiant_candidat, 
 	    date_candidature,
-	    count(distinct (Candidatures.id_anonymisé)) nombre_candidature,
+	    count(distinct (candidatures.id_anonymisé)) nombre_candidature,
 	    état, 
 	    date_inscription
    from 
-       Candidatures 
+       candidatures 
    left join 
-       Candidats on id_candidat_anonymisé =  public.Candidats.id_anonymisé 
+       Candidats on id_candidat_anonymisé =  public.candidats.id_anonymisé 
    where 
        date_candidature <= date_trunc('month', date_inscription) + interval '1 month'
        and date_candidature >= date_inscription 
-       and Candidatures.injection_ai = 0 
-       and Candidats.injection_ai = 0
+       and candidatures.injection_ai = 0 
+       and candidats.injection_ai = 0
     group by 
         identifiant_candidat,
         date_candidature,
@@ -31,9 +30,9 @@ with candidature as (
 order by 
         identifiant_candidat ),
 /* Nb candidats qui 30 jours après leur inscription restent sans candidatures */
-candidats_0_candidatures as (
+candidats_sans_candidatures as (
     select 
-        distinct(identifiant_candidat ),
+        distinct(identifiant_candidat),
         date_inscription
     from 
         candidature
@@ -61,7 +60,7 @@ union_table as (
     select 
         * 
     from 
-        candidats_0_candidatures 
+        candidats_sans_candidatures 
     union (
         select 
             identifiant_candidat,
@@ -79,15 +78,15 @@ from (
         count(distinct (identifiant_candidat) )  as nombre_candidats_ss_solution,
         date_inscription
     from 
-        sa_union_table
+        union_table
     group by 
         date_inscription ) as a 
 left join (
     select 
         count(distinct(id_anonymisé)) as nombre_candidats,
         date_inscription
-    from Candidats 
-    where Candidats.injection_ai = 0
+    from candidats 
+    where candidats.injection_ai = 0
     group by date_inscription 
     ) as b 
     on a.date_inscription = b.date_inscription
