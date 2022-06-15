@@ -1,5 +1,6 @@
 import logging
 
+from allauth.account.adapter import get_adapter
 from allauth.socialaccount.helpers import complete_social_login, render_authentication_error
 from allauth.socialaccount.models import SocialLogin
 from allauth.socialaccount.providers.base import AuthError, ProviderException
@@ -7,6 +8,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Error
 from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView, OAuth2LoginView
 from allauth.utils import get_request_param
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 from requests import RequestException
 
 from itou.allauth_adapters.peamu.adapter import PEAMUOAuth2Adapter
@@ -82,6 +84,11 @@ class PEAMUOAuth2CallbackView(OAuth2CallbackView):
         except (PermissionDenied, OAuth2Error, RequestException, ProviderException) as e:
             logger.error("Unknown error in PEAMU dispatch with exception '%s'.", e)
             return render_authentication_error(request, self.adapter.provider_id, exception=e)
+
+
+def redirect_to_dashboard_view(request):
+    redirect_url = get_adapter().get_login_redirect_url(request)
+    return HttpResponseRedirect(redirect_url)
 
 
 oauth2_login = OAuth2LoginView.adapter_view(PEAMUOAuth2Adapter)

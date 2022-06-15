@@ -9,9 +9,11 @@ from allauth.socialaccount.tests import OAuth2TestsMixin
 from allauth.tests import MockedResponse, TestCase
 from django.core import mail
 from django.test import override_settings
+from django.urls import reverse
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
 from itou.users import enums as users_enums
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
 
 
@@ -128,3 +130,19 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         self.login(self.get_mocked_response())
         self.assertEqual(mock_login_signal.call_count, 1)
         self.assertTrue(len(sent_signals) > 0)
+
+    def test_redirect_to_dashboard_after_signup(self):
+        """
+        Curiously, this allauth adapter does not take into account the User account
+        adapter configured in settings.ACCOUNT_ADAPTER.
+        Successful signups are redirected to settings.LOGIN_REDIRECT_URL
+        (default Allauth behavior) even if we specified another URL in our
+        own account adapter.
+        I was not able to test a login locally because PE does not allow us to
+        specify the callback domains in its interface.
+        The most secure option was to simply redirect the default path to our own.
+        """
+        user = JobSeekerFactory(has_completed_welcoming_tour=True)
+        self.client.login(username=user.username, password=DEFAULT_PASSWORD)
+        response = self.client.get("/accounts/profile/")
+        self.assertRedirects(response, reverse("dashboard:index"))
