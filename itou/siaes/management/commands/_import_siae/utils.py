@@ -181,18 +181,23 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
     deletable_sirets = db_sirets - df_sirets
     print(f"{len(deletable_sirets)} {source} will be deleted when possible.")
 
+    not_created_because_of_missing_email = 0
+    structures_created = 0
     # Create structures which do not exist in database yet.
     for _, row in df[df.siret.isin(creatable_sirets)].iterrows():
         if not row.auth_email:
             print(f"{source} siret={row.siret} will not been created as it has no email.")
+            not_created_because_of_missing_email += 1
             continue
 
         print(f"{source} siret={row.siret} will be created.")
         siae = build_structure(row)
         if not dry_run:
             siae.save()
+            structures_created += 1
             print(f"{source} siret={row.siret} has been created with siae.id={siae.id}.")
 
+    structures_updated = 0
     # Update structures which already exist in database.
     for siret in updatable_sirets:
         siae = Siae.objects.get(siret=siret, kind__in=kinds)
@@ -203,16 +208,19 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
             if not dry_run:
                 siae.source = source
                 siae.save()
+                structures_updated += 1
 
     # Delete structures which no longer exist in the latest export.
     deleted_count = 0
     undeletable_count = 0
+    deletable_skipped_count = 0
     for siret in deletable_sirets:
         siae = Siae.objects.get(siret=siret, kind__in=kinds)
 
         one_week_ago = timezone.now() - timezone.timedelta(days=7)
         if siae.source == Siae.SOURCE_STAFF_CREATED and siae.created_at >= one_week_ago:
             # When our staff creates a structure, let's give the user sufficient time to join it before deleting it.
+            deletable_skipped_count += 1
             continue
 
         if could_siae_be_deleted(siae):
@@ -225,6 +233,7 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
         if siae.source == Siae.SOURCE_USER_CREATED:
             # When an employer creates an antenna, it is normal that this antenna cannot be found in official exports.
             # Thus we never attempt to delete it, as long as it has data.
+            deletable_skipped_count += 1
             continue
 
         # As of 2021/04/15, 2 GEIQ are undeletable.
@@ -234,6 +243,18 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
 
     print(f"{deleted_count} {source} can and will be deleted.")
     print(f"{undeletable_count} {source} cannot be deleted as they have data.")
+
+    return {
+        "creatable_sirets": len(creatable_sirets),
+        "updatable_sirets": len(deletable_sirets),
+        "deletable_sirets": len(deletable_sirets),
+        "not_created_because_of_missing_email": not_created_because_of_missing_email,
+        "structures_created": structures_created,
+        "structures_updated": structures_updated,
+        "structures_deleted": deleted_count,
+        "structures_undeletable": undeletable_count,
+        "structures_deletable_skipped": deletable_skipped_count,
+    }
 
 
 def anonymize_fluxiae_df(df):

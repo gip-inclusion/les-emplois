@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 from django.core.management.base import BaseCommand
@@ -18,9 +20,11 @@ from itou.utils.validators import validate_siret
 
 @timeit
 def get_geiq_df():
+    info_stats = {}
     filename = get_filename(filename_prefix="Liste_Geiq", filename_extension=".xls", description="Export GEIQ")
 
     df = pd.read_excel(filename, converters={"siret": str, "zip": str})
+    info_stats["rows_in_file"] = len(df)
 
     column_mapping = {
         "name": "name",
@@ -52,8 +56,17 @@ def get_geiq_df():
 
     # Drop rows without siret.
     df = df[~df.siret.isnull()]
+    info_stats["rows_with_a_siret"] = len(df)
+
+    df.drop_duplicates(
+        subset=["siret"],
+        keep="first",
+        inplace=True,
+    )
+    info_stats["rows_after_deduplication"] = len(df)
 
     # Drop rows without auth_email.
+    info_stats["rows_with_empty_email"] = len(df[df.auth_email.isnull()])
     df = df[~df.auth_email.isnull()]
 
     for _, row in df.iterrows():
@@ -62,7 +75,7 @@ def get_geiq_df():
     assert df.siret.is_unique
     assert len(df) >= 150  # Export usually has 180+ geiq structures.
 
-    return df
+    return df, info_stats
 
 
 def build_geiq(row):
@@ -108,8 +121,8 @@ class Command(BaseCommand):
 
     @timeit
     def handle(self, dry_run=False, **options):
-        geiq_df = get_geiq_df()
-        sync_structures(
+        geiq_df, info_stats = get_geiq_df()
+        info_stats |= sync_structures(
             df=geiq_df,
             source=Siae.SOURCE_GEIQ,
             kinds=[SiaeKind.GEIQ],
@@ -117,5 +130,30 @@ class Command(BaseCommand):
             dry_run=dry_run,
         )
 
+        # Display some "stats" about the dataset
+        self.stdout.write("-" * 80)
+        self.stdout.write(f"Rows in file: {info_stats['rows_in_file']}")
+        self.stdout.write(f"Rows with a SIRET: {info_stats['rows_with_a_siret']}")
+        self.stdout.write(f"Rows with an empty email: {info_stats['rows_with_empty_email']}")
+        self.stdout.write(f"Rows used: {len(geiq_df)}")
+        self.stdout.write(f" > Creatable: {info_stats['creatable_sirets']}")
+        self.stdout.write(f" >> Created: {info_stats['structures_created']}")
+        self.stdout.write(
+            f" >> Not created because of missing email: {info_stats['not_created_because_of_missing_email']}"
+        )
+        self.stdout.write(f" > Updatable: {info_stats['updatable_sirets']}")
+        self.stdout.write(f" >> Updated: {info_stats['structures_updated']}")
+        self.stdout.write(f" > Deletable: {info_stats['deletable_sirets']}")
+        self.stdout.write(f" >> Deleted: {info_stats['structures_deleted']}")
+        self.stdout.write(f" >> Undeletable: {info_stats['structures_undeletable']}")
+        self.stdout.write(f" >> Skipped: {info_stats['structures_deletable_skipped']}")
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
+
+        if info_stats["rows_with_empty_email"] > 20:
+            warnings.warn(f"Too many missing emails: {info_stats['rows_with_empty_email']}")
+        if info_stats["not_created_because_of_missing_email"]:
+            warnings.warn(
+                f"Structure(s) not created because of a missing email: "
+                f"{info_stats['not_created_because_of_missing_email']}"
+            )
