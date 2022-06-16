@@ -2,6 +2,7 @@ import factory
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
+from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.factories import InstitutionFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siae_evaluations import models
@@ -32,3 +33,11 @@ class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
 
     evaluated_siae = factory.SubFactory(EvaluatedSiaeFactory)
     job_application = factory.SubFactory(JobApplicationWithApprovalFactory)
+
+
+class EvaluatedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.EvaluatedAdministrativeCriteria
+
+    administrative_criteria = factory.Iterator(AdministrativeCriteria.objects.all())
+    proof_url = "https://server.com/rocky-balboa.pdf"

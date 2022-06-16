@@ -15,6 +15,7 @@ from itou.job_applications.factories import JobApplicationFactory, JobApplicatio
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import (
+    EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
@@ -554,9 +555,8 @@ class EvaluatedSiaeModelTest(TestCase):
 
         # one evaluated_administrative_criterion
         # empty : proof_url and submitted_at empty)
-        criteria = AdministrativeCriteria.objects.first()
-        evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application, administrative_criteria=criteria
+        evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application, proof_url=""
         )
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
         del evaluated_siae.state
@@ -621,18 +621,11 @@ class EvaluatedSiaeModelTest(TestCase):
         fake_now = timezone.now()
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        criteria = AdministrativeCriteria.objects.all()[:3]
-
-        evaluated_administrative_criteria = []
-        for i in range(3):
-            evaluated_administrative_criteria.append(
-                EvaluatedAdministrativeCriteria.objects.create(
-                    evaluated_job_application=evaluated_job_application,
-                    administrative_criteria=criteria[i],
-                    proof_url="https://server.com/rocky-balboa.pdf",
-                    submitted_at=fake_now,
-                )
-            )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory.create_batch(
+            3,
+            evaluated_job_application=evaluated_job_application,
+            submitted_at=fake_now,
+        )
 
         # NOT REVIEWED
         # one Pending, one Refused, one Accepted
@@ -739,14 +732,11 @@ class EvaluatedSiaeModelTest(TestCase):
         fake_now = timezone.now()
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        criteria = AdministrativeCriteria.objects.first()
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application, administrative_criteria=criteria
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            submitted_at=fake_now,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
-        evaluated_administrative_criteria.submitted_at = fake_now
-        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
-        evaluated_administrative_criteria.save(update_fields=["proof_url", "submitted_at", "review_state"])
 
         evaluated_siae.review()
         evaluated_siae.refresh_from_db()
@@ -780,9 +770,8 @@ class EvaluatedJobApplicationModelTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PENDING, evaluated_job_application.state)
         del evaluated_job_application.state  # clear cached_property stored value
 
-        criterion = AdministrativeCriteria.objects.first()
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
-            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application, proof_url=""
         )
         self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PROCESSING, evaluated_job_application.state)
         del evaluated_job_application.state
@@ -931,10 +920,9 @@ class EvaluatedAdministrativeCriteriaModelTest(TestCase):
     def test_can_upload(self):
         fake_now = timezone.now()
 
-        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=EvaluatedJobApplicationFactory(),
-            administrative_criteria=AdministrativeCriteria.objects.first(),
-            submitted_at=None,
+            proof_url="",
         )
         self.assertTrue(evaluated_administrative_criteria.can_upload())
 
