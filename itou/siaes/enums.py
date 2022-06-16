@@ -66,7 +66,17 @@ class ContractType(models.TextChoices):
             choices = [cls.BUSINESS_CREATION, cls.OTHER]
         elif kind == SiaeKind.OPCS:
             choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        elif kind in [SiaeKind.ACI, SiaeKind.ACIPHC, SiaeKind.EI, SiaeKind.AI, SiaeKind.ETTI]:
+        elif kind == SiaeKind.ACI:
+            choices = [
+                cls.FIXED_TERM_I,
+                cls.FIXED_TERM_USAGE,
+                cls.TEMPORARY,
+                cls.PROFESSIONAL_TRAINING,
+                cls.FIXED_TERM_I_PHC,
+                cls.FIXED_TERM_I_CVG,
+                cls.OTHER,
+            ]
+        elif kind in [SiaeKind.ACIPHC, SiaeKind.EI, SiaeKind.AI, SiaeKind.ETTI]:
             # Siae.ELIGIBILITY_REQUIRED_KINDS but without EITI.
             choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
         else:
