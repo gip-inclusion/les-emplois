@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
 from django.db.models import OuterRef, Prefetch, Q, Subquery
@@ -31,6 +33,13 @@ class OrganizationAbstract(models.Model):
     name = models.CharField(verbose_name="Nom", max_length=255)
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
+
+    # This unique ID is supposed to used as a globally unique reference and should never be changed,
+    # if the organization is supposed to be the same (even in the case of a change of address or SIRET)
+    # It is meant to be the exposed ID of our organizations for external clients, such as in our APIs.
+    # This enables us to keep our internal primary key opaque and independent from any external logic.
+    uid = models.UUIDField(db_index=True, default=uuid.uuid4)
+
     # Child class should have a "members" attribute, for example:
     # members = models.ManyToManyField(
     #     settings.AUTH_USER_MODEL,
