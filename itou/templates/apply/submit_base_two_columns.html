@@ -1,46 +1,63 @@
-{# The application process step is sometimes split in two columns. #}
-{# This should not last but, in the meantime, two base templates exist. #}
-
-{% extends "layout/content_two_columns.html" %}
+{% extends "layout/base.html" %}
+{% load static %}
 
 {% block title %}Postuler{{ block.super }}{% endblock %}
 
-{% block right_content %}
-    {{ block.super }}
-    <div>
-        <!-- SAME AS submit_base.html. -->
-        <!-- Not possible to extend from it as we need a full layout (layout/base.html) -->
-        <!-- instead of the tiny layout/content_small.html. -->
-        <h1 class="h1-hero-c1">
-            {% if request.user.is_siae_staff %}
-                Déclarer une embauche
-            {% else %}
-                Postuler chez <span class="text-muted">{{ siae.display_name }}</span>
-            {% endif %}
-        </h1>
-        {% if request.user.is_siae_staff and job_seeker %}
-            <h2 class="h1">{{ job_seeker.get_full_name|title }}</h2>
-        {% endif %}
+{% block content_full_viewport %}
 
-        {% if approvals_wrapper.latest_approval %}
-            {# Approval status. #}
-            <div class="card my-3">
-                <div class="card-body">
-                    <div class="card-text">
-                        {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+    {% block pre_content %}{% endblock %}
+
+    <section class="s-section-twocolumns {% block content_container_css_classes %}{% endblock %}">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6 order-md-1 pr-lg-5 mt-4">
+                    <h1 class="h1-hero-c1">
+                        {% if request.user.is_siae_staff %}
+                            Déclarer une embauche
+                        {% else %}
+                            Postuler</span>
+                        {% endif %}
+                    </h1>
+                    {% if request.user.is_siae_staff and job_seeker %}
+                        <h2 class="h1">{{ job_seeker.get_full_name|title }}</h2>
+                    {% endif %}
+
+                    {% if approvals_wrapper.latest_approval %}
+                        {# Approval status. #}
+                        <div class="card my-3">
+                            <div class="card-body">
+                                <div class="card-text">
+                                    {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="card c-card c-card--emploi mb-3 mb-lg-5">
+                        <div class="card-body">
+                            <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.display_kind }} </p>
+                            <hr>
+                            <p class="h2">
+                                <a href="{% url 'siaes_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}">
+                                    {{ siae.display_name }}
+                                </a>
+                            </p>
+                            {# Display non-user-edited name too. #}
+                            <adresse class="card-subtitle fs-lg font-weight-bold text-secondary">{{ siae.address_on_one_line }}</adresse>
+                        </div>
                     </div>
                 </div>
             </div>
-        {% endif %}
-        <!-- End of duplicated code. -->
-
-        {% block right_column %}{% endblock %}
-    </div>
-{% endblock %}
-
-{% block left_content %}
-    {{ block.super }}
-    <div class="text-center">
-        {% block left_column %}{% endblock %}
-    </div>
+            <div class="row">
+                <div class="col-12 col-lg-6 order-md-2 pl-lg-5 d-none d-lg-block d-xl-block">
+                    <h2 class="h1 ff-extra-01">Où trouver {% if request.user.is_job_seeker %}mon{% else %}le{% endif %} numéro de sécurité sociale ?</h2>
+                    <img class="mt-5 img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
+                    <p class="ff-extra-01 mt-0">Il est présent à cet endroit sur {% if request.user.is_job_seeker %}votre{% else %}la{% endif %} carte Vitale.</p>
+                </div>
+                <div class="col-12 col-lg-6 order-md-1 pr-lg-5">
+                    {% block left_column %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
