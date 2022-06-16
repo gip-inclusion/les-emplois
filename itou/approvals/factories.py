@@ -15,11 +15,24 @@ from itou.users.factories import JobSeekerFactory
 fake = Faker("fr_FR")
 
 
-class ApprovalFactory(factory.django.DjangoModelFactory):
-    """Generate an Approval() object for unit tests."""
+def _create_job_application(self, create, extracted, **kwargs):
+    if not create:
+        return
+    if extracted:
+        for job_application in extracted:
+            self.jobapplication_set.add(job_application)
+    else:
+        from itou.job_applications.factories import JobApplicationFactory  # pylint: disable=import-outside-toplevel
 
+        self.jobapplication_set.add(JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED))
+
+
+class ApprovalFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Approval
+
+    class Params:
+        with_jobapplication = factory.Trait(jobapplication_set=factory.PostGeneration(_create_job_application))
 
     user = factory.SubFactory(JobSeekerFactory)
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
