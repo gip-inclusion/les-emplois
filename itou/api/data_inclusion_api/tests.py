@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
 from itou.siaes.factories import SiaeConventionFactory, SiaeFactory
@@ -21,6 +22,9 @@ class DataInclusionStructureTest(APITestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_list_structures(self):
+        def _str_with_tz(dt):
+            return dt.astimezone(timezone.get_current_timezone()).isoformat()
+
         siae = SiaeFactory()
         antenne = SiaeFactory(source=Siae.SOURCE_USER_CREATED, convention=siae.convention)
 
@@ -30,8 +34,8 @@ class DataInclusionStructureTest(APITestCase):
             response.json()["results"],
             [
                 {
-                    "id": siae.public_id,
-                    "typologie": siae.kind,
+                    "id": str(siae.uid),
+                    "typologie": siae.kind.value,
                     "nom": siae.display_name,
                     "siret": siae.siret,
                     "rna": "",
@@ -48,12 +52,12 @@ class DataInclusionStructureTest(APITestCase):
                     "longitude": siae.longitude,
                     "latitude": siae.latitude,
                     "source": siae.source,
-                    "date_maj": siae.updated_at,
+                    "date_maj": _str_with_tz(siae.updated_at),
                     "structure_parente": None,
                 },
                 {
-                    "id": antenne.public_id,
-                    "typologie": antenne.kind,
+                    "id": str(antenne.uid),
+                    "typologie": antenne.kind.value,
                     "nom": antenne.display_name,
                     "siret": antenne.siret,
                     "rna": "",
@@ -70,9 +74,9 @@ class DataInclusionStructureTest(APITestCase):
                     "longitude": antenne.longitude,
                     "latitude": antenne.latitude,
                     "source": antenne.source,
-                    "date_maj": antenne.updated_at,
+                    "date_maj": _str_with_tz(antenne.updated_at),
                     # Antenne references parent structure
-                    "structure_parente": siae.public_id,
+                    "structure_parente": str(siae.uid),
                 },
             ],
         )

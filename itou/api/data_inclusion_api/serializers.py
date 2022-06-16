@@ -3,6 +3,7 @@ from typing import Optional
 from django.utils import text
 from rest_framework import serializers
 
+from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
 
 
@@ -12,8 +13,8 @@ class DataInclusionStructureSerializer(serializers.ModelSerializer):
     Fields are based on https://github.com/betagouv/data-inclusion-schema.
     """
 
-    id = serializers.CharField(source="public_id")
-    typologie = serializers.ChoiceField(source="kind", choices=Siae.KIND_CHOICES)
+    id = serializers.UUIDField(source="uid")
+    typologie = serializers.ChoiceField(source="kind", choices=SiaeKind.choices)
     nom = serializers.CharField(source="display_name")
     rna = serializers.ReadOnlyField(default="")
     presentation_resume = serializers.SerializerMethodField()
@@ -74,4 +75,4 @@ class DataInclusionStructureSerializer(serializers.ModelSerializer):
         except (Siae.DoesNotExist, Siae.MultipleObjectsReturned):
             return None
 
-        return structure_parente.public_id
+        return structure_parente.uid
