@@ -182,13 +182,16 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
     print(f"{len(deletable_sirets)} {source} will be deleted when possible.")
 
     # Create structures which do not exist in database yet.
-    siret_to_row = {row.siret: row for _, row in df.iterrows()}
-    for siret in creatable_sirets:
-        row = siret_to_row[siret]
+    for _, row in df[df.siret.isin(creatable_sirets)].iterrows():
+        if not row.auth_email:
+            print(f"{source} siret={row.siret} will not been created as it has no email.")
+            continue
+
+        print(f"{source} siret={row.siret} will be created.")
         siae = build_structure(row)
         if not dry_run:
             siae.save()
-            print(f"siae.id={siae.id} has been created.")
+            print(f"{source} siret={row.siret} has been created with siae.id={siae.id}.")
 
     # Update structures which already exist in database.
     for siret in updatable_sirets:
@@ -196,7 +199,7 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
         if siae.source != source:
             # If a user/staff created structure already exists in db and its siret is later found in an export,
             # it makes sense to convert it.
-            print(f"siae.id={siae.id} will be converted to source={source}.")
+            print(f"siae.id={siae.id} siret={siae.siret} source={siae.source} will be converted to source={source}.")
             if not dry_run:
                 siae.source = source
                 siae.save()
@@ -213,7 +216,7 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
             continue
 
         if could_siae_be_deleted(siae):
-            print(f"siae.id={siae.id} will be deleted.")
+            print(f"siae.id={siae.id} siret={siae.siret} will be deleted.")
             deleted_count += 1
             if not dry_run:
                 siae.delete()
