@@ -1,38 +1,49 @@
-{% extends "apply/submit_base.html" %}
+{% extends "apply/submit_base_two_columns.html" %}
 {% load bootstrap4 %}
 {% load format_filters %}
 
-{% block content %}
-
-    {{ block.super }}
-
-    <div class="alert alert-info">
-        <p class="mb-0">
-            Aucun utilisateur n'est incrit avec ce numéro de sécurité sociale.
-        </p>
-        <p class="mb-0">
-            Merci de renseigner l'adresse e-mail de votre candidat.
-        </p>
-    </div>
-
+{% block left_column %}
     <form method="post" action="" class="js-prevent-multiple-submit">
+        <div class="card c-card mb-3 mb-lg-5">
+            <div class="card-body">
+                {% if nir %}
+                    <div class="form-group form-group-required">
+                        <label for="id_nir">Numéro de sécurité sociale du candidat</label>
+                        <input type="nir" name="nir" class="form-control" title="" required="" id="id_nir" disabled value="{{ nir }}">
+                    </div>
+                {% endif %}
 
-        {% csrf_token %}
+                <div class="alert alert-info mt-4 mb-4">
+                    <div class="row">
+                        <div class="col-auto pr-0">
+                            <i class="ri-information-line ri-xl"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-2"><strong>Créer un compte pour votre candidat</strong></p>
+                            <p class="mb-0">Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de rensigner l'adresse e-mail de votre candidat pour l'inscrire.</p>
+                        </div>
+                    </div>
+                </div>
 
-        {% bootstrap_form form alert_error_type="all" %}
+                {% csrf_token %}
 
-        <p>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</p>
+                {% bootstrap_form form alert_error_type="all" %}
 
-        {% buttons %}
-            {# Reload this page and show a modal containing more information about the job seeker. #}
-            <a href="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="btn btn-outline-primary">
-                Retour
-            </a>
-            <button type="submit" name="preview" value="1" class="btn btn-primary">
-                Continuer
-            </button>
-        {% endbuttons %}
+                <p>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</p>
 
+                <div class="card-footer">
+                    {% buttons %}
+                        {# Reload this page and show a modal containing more information about the job seeker. #}
+                        <a href="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="btn btn-outline-primary">
+                            Retour
+                        </a>
+                        <button type="submit" name="preview" value="1" class="btn btn-primary">
+                            Continuer
+                        </button>
+                    {% endbuttons %}
+                </div>
+            </div>
+        </div>
         {% if preview_mode %}
             <!-- Modal -->
             <div class="modal" id="email-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="email-confirmation-label" aria-modal="true">
@@ -73,7 +84,6 @@
             </div>
         {% endif %}
     </form>
-
 {% endblock %}
 
 {% block script %}
