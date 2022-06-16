@@ -12,6 +12,7 @@ from django.utils.http import urlencode
 
 from itou.utils.urls import get_absolute_url
 
+from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
 
@@ -43,12 +44,12 @@ def france_connect_authorize(request):
         "response_type": "code",
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
         "redirect_uri": redirect_uri,
-        "scope": settings.FRANCE_CONNECT_SCOPES,
+        "scope": constants.FRANCE_CONNECT_SCOPES,
         "state": signed_csrf,
         "nonce": crypto.get_random_string(length=12),
         "acr_values": "eidas1",
     }
-    url = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_AUTHORIZE
+    url = constants.FRANCE_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 
 
@@ -76,7 +77,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     }
 
     # Exceptions catched by Sentry
-    url = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_TOKEN
+    url = constants.FRANCE_CONNECT_ENDPOINT_TOKEN
     response = httpx.post(url, data=data, timeout=30)
 
     if response.status_code != 200:
@@ -93,7 +94,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
-    url = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_USERINFO
+    url = constants.FRANCE_CONNECT_ENDPOINT_USERINFO
 
     response = httpx.get(
         url,
@@ -123,8 +124,8 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     # At this step, we can update the user's fields in DB and create a session if required
     user, _ = fc_user_data.create_or_update_user()
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-    request.session[settings.FRANCE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
-    request.session[settings.FRANCE_CONNECT_SESSION_STATE] = state
+    request.session[constants.FRANCE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
+    request.session[constants.FRANCE_CONNECT_SESSION_STATE] = state
     request.session.modified = True
 
     next_url = reverse("dashboard:index")
@@ -145,6 +146,6 @@ def france_connect_logout(request):
         "state": state,
         "post_logout_redirect_uri": get_absolute_url(reverse("home:hp")),
     }
-    url = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_LOGOUT
+    url = constants.FRANCE_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"
     return HttpResponseRedirect(complete_url)

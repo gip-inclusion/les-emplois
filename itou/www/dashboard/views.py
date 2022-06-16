@@ -14,6 +14,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae
@@ -129,8 +130,8 @@ class ItouLogoutView(LogoutView):
         """
 
         peamu_id_token = self.request.user.peamu_id_token
-        fc_token = self.request.session.get(settings.FRANCE_CONNECT_SESSION_TOKEN)
-        fc_state = self.request.session.get(settings.FRANCE_CONNECT_SESSION_STATE)
+        fc_token = self.request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
+        fc_state = self.request.session.get(FRANCE_CONNECT_SESSION_STATE)
         # Note: if you need session data, fetch them BEFORE calling super() ;)
         ajax_response = super().post(*args, **kwargs)
 
@@ -163,8 +164,8 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
                 request.user.emailaddress_set.first().delete()
         # we perform the redirection like this in order to ensure every logout
         # route performs the same operations
-        fc_token = request.session.get(settings.FRANCE_CONNECT_SESSION_TOKEN)
-        fc_state = request.session.get(settings.FRANCE_CONNECT_SESSION_STATE)
+        fc_token = request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
+        fc_state = request.session.get(FRANCE_CONNECT_SESSION_STATE)
 
         auth.logout(request)
         # Logouts user from the app and from France Connect (FC).

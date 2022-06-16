@@ -409,19 +409,9 @@ SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountA
 # Disabled in the DEMO environment.
 FRANCE_CONNECT_ENABLED = os.environ.get("FRANCE_CONNECT_ENABLED", "True") == "True"
 FRANCE_CONNECT_BASE_URL = "https://app.franceconnect.gouv.fr/api/v1/"
-FRANCE_CONNECT_SCOPES = "openid gender given_name family_name email birthdate birthplace birthcountry"
-FRANCE_CONNECT_ENDPOINT_AUTHORIZE = "authorize"
-FRANCE_CONNECT_ENDPOINT_TOKEN = "token"
-FRANCE_CONNECT_ENDPOINT_USERINFO = "userinfo"
-FRANCE_CONNECT_ENDPOINT_LOGOUT = "logout"
-
 FRANCE_CONNECT_CLIENT_ID = os.environ.get("FRANCE_CONNECT_CLIENT_ID")
 FRANCE_CONNECT_CLIENT_SECRET = os.environ.get("FRANCE_CONNECT_CLIENT_SECRET")
 
-FRANCE_CONNECT_STATE_EXPIRATION = datetime.timedelta(hours=1)
-
-FRANCE_CONNECT_SESSION_TOKEN = "FC_ID_TOKEN"
-FRANCE_CONNECT_SESSION_STATE = "FC_STATE"
 
 # Inclusion Connect
 INCLUSION_CONNECT_BASE_URL = os.environ.get("INCLUSION_CONNECT_BASE_URL")

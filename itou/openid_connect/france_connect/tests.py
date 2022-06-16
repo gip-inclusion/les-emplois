@@ -2,7 +2,6 @@ import datetime
 
 import httpx
 import respx
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -12,6 +11,7 @@ from itou.users.enums import IdentityProvider
 from itou.users.factories import UserFactory
 from itou.users.models import User
 
+from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
 
@@ -45,7 +45,7 @@ class FranceConnectTest(TestCase):
         self.assertIsNotNone(state)
 
         # Set expired creation time for the state
-        state.created_at = timezone.now() - settings.FRANCE_CONNECT_STATE_EXPIRATION * 2
+        state.created_at = timezone.now() - constants.FRANCE_CONNECT_STATE_EXPIRATION * 2
         state.save()
 
         FranceConnectState.objects.cleanup()
@@ -61,9 +61,7 @@ class FranceConnectTest(TestCase):
         url = reverse("france_connect:authorize")
         response = self.client.get(url, follow=False)
         # Don't use assertRedirects to avoid fetch
-        self.assertTrue(
-            response.url.startswith(settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_AUTHORIZE)
-        )
+        self.assertTrue(response.url.startswith(constants.FRANCE_CONNECT_ENDPOINT_AUTHORIZE))
 
     def test_create_django_user(self):
         """
@@ -213,11 +211,11 @@ class FranceConnectTest(TestCase):
 
     @respx.mock
     def test_callback(self):
-        url_fc_token = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_TOKEN
+        url_fc_token = constants.FRANCE_CONNECT_ENDPOINT_TOKEN
         token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
         respx.post(url_fc_token).mock(return_value=httpx.Response(200, json=token_json))
 
-        url_fc_userinfo = settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_USERINFO
+        url_fc_userinfo = constants.FRANCE_CONNECT_ENDPOINT_USERINFO
         respx.get(url_fc_userinfo).mock(return_value=httpx.Response(200, json=FC_USERINFO))
 
         csrf_signed = FranceConnectState.create_signed_csrf_token()
@@ -235,6 +233,6 @@ class FranceConnectTest(TestCase):
     def test_logout(self):
         url = reverse("france_connect:logout")
 
-        respx.post(url=settings.FRANCE_CONNECT_BASE_URL + settings.FRANCE_CONNECT_ENDPOINT_LOGOUT).respond(302)
+        respx.post(url=constants.FRANCE_CONNECT_ENDPOINT_LOGOUT).respond(302)
         response = self.client.get(url, data={"id_token": "123"})
         self.assertEqual(response.status_code, 302)
