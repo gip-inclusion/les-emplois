@@ -9,7 +9,7 @@ from rest_framework.authtoken.admin import User
 
 from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeKind
-from itou.job_applications.models import JobApplication
+from itou.job_applications.enums import SenderKind
 from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
@@ -476,10 +476,10 @@ class EmployeeRecord(models.Model):
 
         sender_kind = self.job_application.sender_kind
 
-        if sender_kind == JobApplication.SENDER_KIND_JOB_SEEKER:
+        if sender_kind == SenderKind.JOB_SEEKER:
             # the job seeker applied directly
             return PrescriberType.SPONTANEOUS_APPLICATION
-        elif sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
+        elif sender_kind == SenderKind.SIAE_STAFF:
             # an SIAE applied
             # Notify ASP : UNKNOWN code does not work for SIAE
             # FIXME return PrescriberType.UNKNOWN

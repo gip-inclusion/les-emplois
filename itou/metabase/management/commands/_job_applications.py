@@ -1,3 +1,4 @@
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
     anonymize,
@@ -10,16 +11,16 @@ from itou.metabase.management.commands._utils import (
 JOB_APPLICATION_PK_ANONYMIZATION_SALT = "job_application.id"
 
 
-# Reword the original JobApplication.SENDER_KIND_CHOICES
+# Reword the original SenderKind.SENDER_KIND_CHOICES
 SENDER_KIND_CHOICES = (
-    (JobApplication.SENDER_KIND_JOB_SEEKER, "Candidat"),
-    (JobApplication.SENDER_KIND_PRESCRIBER, "Prescripteur"),
-    (JobApplication.SENDER_KIND_SIAE_STAFF, "Employeur"),
+    (SenderKind.JOB_SEEKER, "Candidat"),
+    (SenderKind.PRESCRIBER, "Prescripteur"),
+    (SenderKind.SIAE_STAFF, "Employeur"),
 )
 
 
 def get_job_application_origin(ja):
-    if ja.sender_kind == JobApplication.SENDER_KIND_PRESCRIBER:
+    if ja.sender_kind == SenderKind.PRESCRIBER:
         if ja.is_sent_by_authorized_prescriber:
             return "Prescripteur habilité"
         return "Orienteur"
@@ -40,9 +41,9 @@ def get_job_application_detailed_origin(ja):
     # Start with the regular origin.
     detailed_origin = get_job_application_origin(ja)
     # Add the relevant detailed origin depending on the origin.
-    if ja.sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
+    if ja.sender_kind == SenderKind.SIAE_STAFF:
         detailed_origin += f" {ja.sender_siae.kind}"
-    if ja.sender_kind == JobApplication.SENDER_KIND_PRESCRIBER:
+    if ja.sender_kind == SenderKind.PRESCRIBER:
         if ja.sender_prescriber_organization:
             detailed_origin += f" {ja.sender_prescriber_organization.kind}"
         else:

@@ -32,8 +32,9 @@ from itou.siae_evaluations.models import (
 )
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
+from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
-from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
+from itou.utils.perms.user import UserInfo
 
 
 def create_batch_of_job_applications(siae):

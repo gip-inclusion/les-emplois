@@ -15,8 +15,9 @@ from itou.eligibility.models import AdministrativeCriteria, AdministrativeCriter
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
-from itou.utils.perms.user import KIND_PRESCRIBER, KIND_SIAE_STAFF, UserInfo
+from itou.utils.perms.user import UserInfo
 
 
 class EligibilityDiagnosisQuerySetTest(TestCase):

@@ -18,6 +18,7 @@ from tqdm import tqdm
 from itou.approvals.models import Approval
 from itou.asp.models import Commune
 from itou.common_apps.address.departments import department_from_postcode
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
@@ -407,7 +408,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         if not job_application:
             job_app_dict = {
                 "sender": siae.active_admin_members.first(),
-                "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
+                "sender_kind": SenderKind.SIAE_STAFF,
                 "sender_siae": siae,
                 "to_siae": siae,
                 "job_seeker": job_seeker,

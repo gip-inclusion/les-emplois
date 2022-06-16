@@ -6,6 +6,7 @@ from django.utils import timezone
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications import models
+from itou.job_applications.enums import SenderKind
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
@@ -23,8 +24,6 @@ from itou.users.factories import (
 
 
 class JobApplicationFactory(factory.django.DjangoModelFactory):
-    """Generates a JobApplication() object."""
-
     class Meta:
         model = models.JobApplication
 
@@ -65,13 +64,13 @@ class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a job seeker."""
 
     sender = factory.SelfAttribute("job_seeker")
-    sender_kind = models.JobApplication.SENDER_KIND_JOB_SEEKER
+    sender_kind = SenderKind.JOB_SEEKER
 
 
 class JobApplicationSentBySiaeFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by an Siae."""
 
-    sender_kind = models.JobApplication.SENDER_KIND_SIAE_STAFF
+    sender_kind = SenderKind.SIAE_STAFF
     # Currently an Siae can only postulate for itself,
     # this is the default behavior here.
     sender_siae = factory.LazyAttribute(lambda obj: obj.to_siae)
@@ -82,7 +81,7 @@ class JobApplicationSentByPrescriberFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber."""
 
     sender = factory.SubFactory(PrescriberFactory)
-    sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
+    sender_kind = SenderKind.PRESCRIBER
 
 
 class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationSentByPrescriberFactory):

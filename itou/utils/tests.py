@@ -33,6 +33,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae, SiaeMembership
+from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.apis import api_entreprise
@@ -50,7 +51,7 @@ from itou.utils.mocks.pole_emploi import (
 from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
-from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
+from itou.utils.perms.user import get_user_info
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import get_absolute_url, get_external_link_markup, get_safe_url

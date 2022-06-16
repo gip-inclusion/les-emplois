@@ -1,14 +1,12 @@
 from collections import namedtuple
 
+from itou.users import enums as users_enums
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 
 
-KIND_JOB_SEEKER = "job_seeker"
-KIND_PRESCRIBER = "prescriber"
-KIND_SIAE_STAFF = "siae_staff"
-KIND_LABOR_INSPECTOR = "labor_inspector"
-
+# FIXME(vperron): This namedtuple seems like an intermediate object that is maybe no longer justified.
+# From afar it looks like a code smell or something we could/should get rid of. Beware.
 UserInfo = namedtuple("UserInfo", ["user", "kind", "prescriber_organization", "is_authorized_prescriber", "siae"])
 
 
@@ -22,14 +20,14 @@ def get_user_info(request):
     prescriber_organization = None
 
     if request.user.is_job_seeker:
-        kind = KIND_JOB_SEEKER
+        kind = users_enums.KIND_JOB_SEEKER
 
     if request.user.is_siae_staff:
-        kind = KIND_SIAE_STAFF
+        kind = users_enums.KIND_SIAE_STAFF
         siae = get_current_siae_or_404(request)
 
     if request.user.is_prescriber:
-        kind = KIND_PRESCRIBER
+        kind = users_enums.KIND_PRESCRIBER
         if request.user.is_prescriber_with_org:
             prescriber_organization = get_current_org_or_404(request)
 

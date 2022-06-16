@@ -1,6 +1,7 @@
 from django.utils import timezone
 
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import SenderKind
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
     get_address_columns,
     get_choice,
@@ -132,7 +133,7 @@ TABLE_COLUMNS += [
         "comment": "Nombre de candidatures de source employeur dont la structure est destinataire",
         # We have to do all this in python to benefit from prefetch_related.
         "fn": lambda o: len(
-            [ja for ja in o.job_applications_received.all() if ja.sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF]
+            [ja for ja in o.job_applications_received.all() if ja.sender_kind == SenderKind.SIAE_STAFF]
         ),
     },
     {
@@ -141,7 +142,7 @@ TABLE_COLUMNS += [
         "comment": "Nombre de candidatures de source candidat dont la structure est destinataire",
         # We have to do all this in python to benefit from prefetch_related.
         "fn": lambda o: len(
-            [ja for ja in o.job_applications_received.all() if ja.sender_kind == JobApplication.SENDER_KIND_JOB_SEEKER]
+            [ja for ja in o.job_applications_received.all() if ja.sender_kind == SenderKind.JOB_SEEKER]
         ),
     },
     {
@@ -150,7 +151,7 @@ TABLE_COLUMNS += [
         "comment": "Nombre de candidatures de source prescripteur dont la structure est destinataire",
         # We have to do all this in python to benefit from prefetch_related.
         "fn": lambda o: len(
-            [ja for ja in o.job_applications_received.all() if ja.sender_kind == JobApplication.SENDER_KIND_PRESCRIBER]
+            [ja for ja in o.job_applications_received.all() if ja.sender_kind == SenderKind.PRESCRIBER]
         ),
     },
     {

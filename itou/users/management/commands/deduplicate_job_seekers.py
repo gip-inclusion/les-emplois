@@ -7,6 +7,7 @@ from django.db.models import Case, F, Value, When
 from django.urls import reverse
 from tqdm import tqdm
 
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
 from itou.utils.management_commands import DeprecatedLoggerMixin
@@ -86,7 +87,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                 user.job_applications.update(
                     job_seeker=target,
                     sender=Case(
-                        When(sender_kind=JobApplication.SENDER_KIND_JOB_SEEKER, then=Value(target.pk)),
+                        When(sender_kind=SenderKind.JOB_SEEKER, then=Value(target.pk)),
                         default=F("sender"),
                         output_field=JobApplication._meta.get_field("sender"),
                     ),

@@ -8,9 +8,9 @@ from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
+from itou.users.enums import KIND_JOB_SEEKER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.models import User
 from itou.utils.emails import get_email_message
-from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.urls import get_absolute_url
 
 

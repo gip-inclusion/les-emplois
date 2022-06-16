@@ -18,6 +18,7 @@ from itou.approvals import enums as approvals_enums
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
 from itou.utils.emails import get_email_message
@@ -338,15 +339,19 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         - https://github.com/rbarrois/xworkflows
     """
 
-    SENDER_KIND_JOB_SEEKER = KIND_JOB_SEEKER
-    SENDER_KIND_PRESCRIBER = KIND_PRESCRIBER
-    SENDER_KIND_SIAE_STAFF = KIND_SIAE_STAFF
-
-    SENDER_KIND_CHOICES = (
-        (SENDER_KIND_JOB_SEEKER, "Demandeur d'emploi"),
-        (SENDER_KIND_PRESCRIBER, "Prescripteur"),
-        (SENDER_KIND_SIAE_STAFF, "Employeur (SIAE)"),
-    )
+    # Copy those values here, as they are used in templates ( `if self.kind == self.SENDER_KIND_XXX` )
+    # It's either this, or:
+    # - we create special properties such as `is_job_seeker()`, but this is ugly and tedious.
+    # - we inject the SenderKind constants through the context, but it needs to be passed down to includes
+    #   which makes them extra complex (template arguments) for no good reason.
+    # - we create a global context that includes those constants but it's hiding the logic somewhere and
+    #   thus creating "magic" templates.
+    # - we split the views for every kind, but it's not trivial since we would have to refactor the included
+    #   templates logic for every view.
+    # This is not very DRY, but clearly is the clearest solution. Disclaimer: I tried the others.
+    SENDER_KIND_JOB_SEEKER = SenderKind.JOB_SEEKER
+    SENDER_KIND_PRESCRIBER = SenderKind.PRESCRIBER
+    SENDER_KIND_SIAE_STAFF = SenderKind.SIAE_STAFF
 
     REFUSAL_REASON_DID_NOT_COME = "did_not_come"
     REFUSAL_REASON_UNAVAILABLE = "unavailable"
@@ -450,8 +455,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     sender_kind = models.CharField(
         verbose_name="Type de l'émetteur",
         max_length=10,
-        choices=SENDER_KIND_CHOICES,
-        default=SENDER_KIND_PRESCRIBER,
+        choices=SenderKind.choices,
+        default=SenderKind.PRESCRIBER,
     )
 
     # When the sender is an SIAE staff member, keep a track of his current SIAE.
@@ -581,7 +586,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def is_sent_by_authorized_prescriber(self):
         return bool(
-            self.sender_kind == self.SENDER_KIND_PRESCRIBER
+            self.sender_kind == SenderKind.PRESCRIBER
             and self.sender_prescriber_organization
             and self.sender_prescriber_organization.is_authorized
         )
@@ -695,9 +700,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         Converts itou internal prescriber kinds into something readable
         """
         kind = "Candidature spontanée"
-        if self.sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
+        if self.sender_kind == SenderKind.SIAE_STAFF:
             kind = "Auto-prescription"
-        elif self.sender_kind == JobApplication.SENDER_KIND_PRESCRIBER:
+        elif self.sender_kind == SenderKind.PRESCRIBER:
             kind = "Orienteur"
             if self.is_sent_by_authorized_prescriber:
                 kind = "Prescripteur habilité"

@@ -1,3 +1,4 @@
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
     get_address_columns,
@@ -37,7 +38,7 @@ def get_org_job_applications_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         # Number of job applications made by prescribers without org.
         return JobApplication.objects.filter(
-            sender_kind=JobApplication.SENDER_KIND_PRESCRIBER, sender_prescriber_organization=None
+            sender_kind=SenderKind.PRESCRIBER, sender_prescriber_organization=None
         ).count()
     return org.jobapplication_set.count()
 
@@ -45,7 +46,7 @@ def get_org_job_applications_count(org):
 def get_org_accepted_job_applications_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         return JobApplication.objects.filter(
-            sender_kind=JobApplication.SENDER_KIND_PRESCRIBER,
+            sender_kind=SenderKind.PRESCRIBER,
             sender_prescriber_organization=None,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
         ).count()

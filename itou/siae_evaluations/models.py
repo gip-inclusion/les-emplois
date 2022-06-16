@@ -14,8 +14,8 @@ from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siaes.models import Siae
+from itou.users.enums import KIND_SIAE_STAFF
 from itou.utils.emails import get_email_message
-from itou.utils.perms.user import KIND_SIAE_STAFF
 
 
 def select_min_max_job_applications(job_applications):

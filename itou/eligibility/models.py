@@ -8,7 +8,7 @@ from django.db.models import Exists, OuterRef
 from django.utils import timezone
 
 from itou.approvals.models import Approval
-from itou.utils.perms.user import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 
 
 logger = logging.getLogger(__name__)

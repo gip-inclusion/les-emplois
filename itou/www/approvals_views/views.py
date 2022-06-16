@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -335,7 +336,7 @@ def pe_approval_create(request, pe_approval_id):
             approval=approval_from_pe,
             created_from_pe_approval=True,  # This flag is specific to this process.
             sender=request.user,
-            sender_kind=JobApplication.SENDER_KIND_SIAE_STAFF,
+            sender_kind=SenderKind.SIAE_STAFF,
             sender_siae=siae,
         )
         job_application.save()

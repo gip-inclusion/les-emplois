@@ -15,6 +15,7 @@ from itou.approvals.factories import ApprovalFactory
 from itou.approvals.models import Approval
 from itou.asp.factories import CommuneFactory
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -752,7 +753,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_seeker = JobSeekerFactory(nir=getattr(base_data, NIR_COL))
         ApprovalFactory(user=job_seeker)
         JobApplicationFactory(
-            sender_kind=JobApplication.SENDER_KIND_SIAE_STAFF,
+            sender_kind=SenderKind.SIAE_STAFF,
             sender_siae=siae,
             to_siae=siae,
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,

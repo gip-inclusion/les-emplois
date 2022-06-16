@@ -22,6 +22,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.csv_export import generate_csv_export
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -563,7 +564,7 @@ class JobApplicationNotificationsTest(TestCase):
         # To.
         self.assertIn(job_application.sender.email, email.to)
         self.assertEqual(len(email.to), 1)
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
+        self.assertEqual(job_application.sender_kind, SenderKind.PRESCRIBER)
 
         # Subject
         self.assertIn(job_application.job_seeker.get_full_name(), email.subject)
@@ -598,7 +599,7 @@ class JobApplicationNotificationsTest(TestCase):
         # To.
         self.assertIn(job_application.sender.email, email.to)
         self.assertEqual(len(email.to), 1)
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_JOB_SEEKER)
+        self.assertEqual(job_application.sender_kind, SenderKind.JOB_SEEKER)
 
         # Subject
         self.assertIn(job_application.to_siae.display_name, email.subject)
@@ -986,7 +987,7 @@ class JobApplicationWorkflowTest(TestCase):
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         self.assertNotEqual(job_seeker.pole_emploi_id, "")
 
-        kwargs = {"job_seeker": job_seeker, "sender": job_seeker, "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER}
+        kwargs = {"job_seeker": job_seeker, "sender": job_seeker, "sender_kind": SenderKind.JOB_SEEKER}
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW, **kwargs)
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_POSTPONED, **kwargs)
@@ -1016,7 +1017,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_seeker = JobSeekerFactory()
 
-        kwargs = {"job_seeker": job_seeker, "sender": job_seeker, "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER}
+        kwargs = {"job_seeker": job_seeker, "sender": job_seeker, "sender_kind": SenderKind.JOB_SEEKER}
         for state in [
             JobApplicationWorkflow.STATE_NEW,
             JobApplicationWorkflow.STATE_PROCESSING,
@@ -1354,7 +1355,7 @@ class JobApplicationWorkflowTest(TestCase):
 
     def test_refuse(self, notify_mock):
         user = JobSeekerFactory()
-        kwargs = {"job_seeker": user, "sender": user, "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER}
+        kwargs = {"job_seeker": user, "sender": user, "sender_kind": SenderKind.JOB_SEEKER}
 
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_POSTPONED, **kwargs)
@@ -1467,7 +1468,7 @@ class JobApplicationCsvExportTest(TestCase):
         kwargs = {
             "job_seeker": user,
             "sender": user,
-            "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
+            "sender_kind": SenderKind.JOB_SEEKER,
             "refusal_reason": JobApplication.REFUSAL_REASON_DID_NOT_COME,
         }
 
@@ -1530,7 +1531,7 @@ class JobApplicationAdminFormTest(TestCase):
             "__all__": [{"message": "Emetteur prescripteur manquant.", "code": ""}],
         }
 
-        data = {"sender_kind": JobApplication.SENDER_KIND_PRESCRIBER}
+        data = {"sender_kind": SenderKind.PRESCRIBER}
         form = JobApplicationAdminForm(data)
         self.assertEqual(form.errors.as_json(), json.dumps(form_errors))
 
@@ -1546,7 +1547,7 @@ class JobApplicationAdminFormTest(TestCase):
         self.assertEqual(["Emetteur candidat manquant."], form.errors["__all__"])
         job_application.sender = sender
 
-        job_application.sender_kind = JobApplication.SENDER_KIND_PRESCRIBER
+        job_application.sender_kind = SenderKind.PRESCRIBER
         form = JobApplicationAdminForm(model_to_dict(job_application))
         self.assertFalse(form.is_valid())
         self.assertEqual(["Emetteur du mauvais type."], form.errors["__all__"])

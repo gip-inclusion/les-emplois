@@ -13,6 +13,7 @@ from itou.approvals.models import ApprovalsWrapper
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
@@ -73,7 +74,7 @@ class ApplyAsJobSeekerTest(TestCase):
         expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
+            "sender_kind": SenderKind.JOB_SEEKER,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -101,7 +102,7 @@ class ApplyAsJobSeekerTest(TestCase):
             "job_seeker_pk": user.pk,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
+            "sender_kind": SenderKind.JOB_SEEKER,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -178,7 +179,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=user, sender=user, to_siae=siae)
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_JOB_SEEKER)
+        self.assertEqual(job_application.sender_kind, SenderKind.JOB_SEEKER)
         self.assertEqual(job_application.sender_siae, None)
         self.assertEqual(job_application.sender_prescriber_organization, None)
         self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
@@ -328,7 +329,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
+            "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
@@ -352,7 +353,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "nir": nir,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
+            "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
         }
 
@@ -403,7 +404,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "nir": new_job_seeker.nir,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
+            "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
@@ -445,7 +446,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
+        self.assertEqual(job_application.sender_kind, SenderKind.PRESCRIBER)
         self.assertEqual(job_application.sender_siae, None)
         self.assertEqual(job_application.sender_prescriber_organization, prescriber_organization)
         self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
@@ -532,7 +533,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
+            "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
@@ -584,7 +585,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=job_seeker, sender=user, to_siae=siae)
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
+        self.assertEqual(job_application.sender_kind, SenderKind.PRESCRIBER)
         self.assertEqual(job_application.sender_siae, None)
         self.assertEqual(job_application.sender_prescriber_organization, prescriber_organization)
         self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
@@ -648,7 +649,7 @@ class ApplyAsPrescriberTest(TestCase):
         expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
+            "sender_kind": SenderKind.PRESCRIBER,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -671,7 +672,7 @@ class ApplyAsPrescriberTest(TestCase):
             "nir": nir,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
+            "sender_kind": SenderKind.PRESCRIBER,
         }
 
         next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
@@ -738,7 +739,7 @@ class ApplyAsPrescriberTest(TestCase):
             "nir": new_job_seeker.nir,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
+            "sender_kind": SenderKind.PRESCRIBER,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -772,7 +773,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
+        self.assertEqual(job_application.sender_kind, SenderKind.PRESCRIBER)
         self.assertEqual(job_application.sender_siae, None)
         self.assertEqual(job_application.sender_prescriber_organization, None)
         self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
@@ -1022,7 +1023,7 @@ class ApplyAsSiaeTest(TestCase):
         expected_session_data = self.default_session_data | {
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
+            "sender_kind": SenderKind.SIAE_STAFF,
             "sender_siae_pk": siae.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
@@ -1046,7 +1047,7 @@ class ApplyAsSiaeTest(TestCase):
             "nir": nir,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
+            "sender_kind": SenderKind.SIAE_STAFF,
             "sender_siae_pk": siae.pk,
         }
 
@@ -1097,7 +1098,7 @@ class ApplyAsSiaeTest(TestCase):
             "nir": new_job_seeker.nir,
             "to_siae_pk": siae.pk,
             "sender_pk": user.pk,
-            "sender_kind": JobApplication.SENDER_KIND_SIAE_STAFF,
+            "sender_kind": SenderKind.SIAE_STAFF,
             "sender_siae_pk": siae.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
@@ -1132,7 +1133,7 @@ class ApplyAsSiaeTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
-        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_SIAE_STAFF)
+        self.assertEqual(job_application.sender_kind, SenderKind.SIAE_STAFF)
         self.assertEqual(job_application.sender_siae, siae)
         self.assertEqual(job_application.sender_prescriber_organization, None)
         self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)

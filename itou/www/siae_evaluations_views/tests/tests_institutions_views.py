@@ -14,8 +14,9 @@ from itou.siae_evaluations.factories import (
 )
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
 from itou.siaes.factories import SiaeMembershipFactory
+from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
-from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
+from itou.utils.perms.user import UserInfo
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
 
