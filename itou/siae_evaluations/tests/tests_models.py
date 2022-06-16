@@ -453,6 +453,18 @@ class EvaluationCampaignManagerTest(TestCase):
         with self.assertRaises(CampaignAlreadyPopulatedException):
             evaluation_campaign.populate(fake_now)
 
+    def test_transition_to_adversarial_phase(self):
+        evaluation_campaign = EvaluationCampaignFactory()
+        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+
+        evaluation_campaign = EvaluationCampaignFactory()
+        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+
+        self.assertEqual(2, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
+
+        evaluation_campaign.transition_to_adversarial_phase()
+        self.assertEqual(1, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
+
 
 class EvaluationCampaignEmailMethodsTest(TestCase):
     def test_get_email_institution_notification(self):

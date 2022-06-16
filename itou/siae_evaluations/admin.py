@@ -39,9 +39,20 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
                 ),
             )
 
-    actions = [
-        populate,
-    ]
+    @admin.action(description="Passer les campagnes en phase contradictiore")
+    def transition_to_adversarial_phase(self, request, queryset):
+        for campaign in queryset:
+            campaign.transition_to_adversarial_phase()
+
+        messages.success(
+            request,
+            (
+                "Les Siaes qui n'avaient pas encore transmis leurs justificatifs, "
+                "sont passées en phase contradictoire pour les campagnes sélectionnées."
+            ),
+        )
+
+    actions = [populate, transition_to_adversarial_phase]
 
     list_display = (
         "name",

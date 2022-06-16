@@ -234,6 +234,11 @@ class EvaluationCampaign(models.Model):
             emails += [self.get_email_institution_opening_siae()]
             connection.send_messages(emails)
 
+    def transition_to_adversarial_phase(self):
+        EvaluatedSiae.objects.filter(evaluation_campaign=self, reviewed_at__isnull=True).update(
+            reviewed_at=timezone.now()
+        )
+
     def get_email_institution_notification(self, ratio_selection_end_at):
         to = self.institution.active_members
         context = {
