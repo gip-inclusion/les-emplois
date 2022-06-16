@@ -342,8 +342,10 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         filename = "RIAE_FS_20210410130001.json"
         self.employee_record.update_as_sent(filename, 1)
-        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        process_code = "0000"
+        process_message = "La ligne de la fiche salarié a été enregistrée avec succès."
+        archive_first = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [1]."}'
+        self.employee_record.update_as_accepted(process_code, process_message, archive_first)
         self.employee_record.update_as_disabled()
         self.assertEqual(self.employee_record.status, Status.DISABLED)
 
@@ -354,6 +356,16 @@ class EmployeeRecordLifeCycleTest(TestCase):
         # Employee record can now be changed to the ready state
         self.employee_record.update_as_ready()
         self.assertEqual(self.employee_record.status, Status.READY)
+
+        filename_second = "RIAE_FS_20210410130002.json"
+        self.employee_record.update_as_sent(filename_second, 1)
+        self.assertEqual(self.employee_record.archived_json, archive_first)
+
+        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        archive_second = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [2]."}'
+        self.employee_record.update_as_accepted(process_code, process_message, archive_second)
+        self.assertEqual(self.employee_record.archived_json, archive_second)
+        self.assertEqual(self.employee_record.asp_batch_file, filename_second)
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
