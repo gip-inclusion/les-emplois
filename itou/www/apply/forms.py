@@ -62,6 +62,10 @@ class CheckJobSeekerNirForm(forms.Form):
     def __init__(self, *args, job_seeker=None, **kwargs):
         self.job_seeker = job_seeker
         super().__init__(*args, **kwargs)
+        if self.job_seeker:
+            self.fields["nir"].label = "Votre numéro de sécurité sociale"
+        else:
+            self.fields["nir"].label = "Numéro de sécurité sociale du candidat"
 
     def clean_nir(self):
         nir = self.cleaned_data["nir"]
