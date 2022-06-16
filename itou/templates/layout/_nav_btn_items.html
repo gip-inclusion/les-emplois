@@ -3,7 +3,7 @@
 {% if user.is_authenticated %}
     {% if user.is_siae_staff and user_siaes|length > 1 %}
         <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+            <button type="button" class="btn {{ button_size }} btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
                 ({{ current_siae.kind }}) {{ current_siae.display_name|truncatechars:50 }}
             </button>
             <div class="dropdown-menu" id="switchUserDropdown">
@@ -13,11 +13,7 @@
                         {% for s in user_siaes %}
                             {% if s.pk != current_siae.pk %}
                                 <li>
-                                    <button
-                                        class="dropdown-item text-primary font-weight-bold"
-                                        type="submit"
-                                        name="siae_id"
-                                        value="{{ s.pk }}">
+                                    <button class="dropdown-item text-primary font-weight-bold" type="submit" name="siae_id" value="{{ s.pk }}">
                                         <span class="badge badge-sm badge-primary mr-1">{{ s.kind }}</span>
                                         {{ s.display_name|truncatechars:50 }}
                                     </button>
@@ -31,7 +27,7 @@
     {% endif %}
     {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
         <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+            <button type="button" class="btn {{ button_size }} btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
                 ({{ current_prescriber_organization.kind }}) {{ current_prescriber_organization.display_name|truncatechars:50 }}
             </button>
             <div class="dropdown-menu" id="switchUserDropdown">
@@ -41,11 +37,7 @@
                         {% for po in user_prescriberorganizations %}
                             {% if po.pk != current_prescriber_organization.pk %}
                                 <li>
-                                    <button
-                                        class="dropdown-item text-primary"
-                                        type="submit"
-                                        name="prescriber_organization_id"
-                                        value="{{ po.pk }}">
+                                    <button class="dropdown-item text-primary" type="submit" name="prescriber_organization_id" value="{{ po.pk }}">
                                         <span class="badge badge-sm badge-primary mr-1">{{ po.kind }}</span>
                                         {{ po.display_name|truncatechars:50 }}
                                     </button>
@@ -60,7 +52,7 @@
 
     {% if user.is_labor_inspector and user_institutions|length > 1 %}
         <li class="dropdown">
-            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+            <button type="button" class="btn {{ button_size }} btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
                 ({{ current_institution.kind }}) {{ current_institution.display_name|truncatechars:50 }}
             </button>
             <div class="dropdown-menu" id="switchUserDropdown">
@@ -70,11 +62,7 @@
                         {% for i in user_institutions %}
                             {% if i.pk != current_institution.pk %}
                                 <li>
-                                    <button
-                                        class="dropdown-item text-primary"
-                                        type="submit"
-                                        name="institution_id"
-                                        value="{{ i.pk }}">
+                                    <button class="dropdown-item text-primary" type="submit" name="institution_id" value="{{ i.pk }}">
                                         <span class="badge badge-sm badge-primary mr-1">{{ i.kind }}</span>
                                         {{ i.display_name|truncatechars:50 }}
                                     </button>
@@ -88,13 +76,7 @@
     {% endif %}
 
     <li class="dropdown">
-        <button
-            type="button"
-            class="btn btn-primary dropdown-toggle"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-controls="dashboardUserDropdown"
-            aria-expanded="false">
+        <button type="button" class="btn {{ button_size }} btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="dashboardUserDropdown" aria-expanded="false">
             Mon espace
         </button>
         <div class="dropdown-menu" id="dashboardUserDropdown">
@@ -161,7 +143,7 @@
     </li>
 {% else %}
     <li class="dropdown mr-2">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
+        <button type="button" class="btn {{ button_size }} btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
             S'inscrire | Se connecter
         </button>
         <div class="dropdown-menu" id="loginUserDropdown">
