@@ -19,7 +19,7 @@
 /* Spacing.
 --------------------------------------------------------------------------- */
 
-.s-main > section {
+.s-main>section {
     padding-top: 2rem;
     padding-bottom: 3rem;
 }
@@ -30,7 +30,7 @@
 }
 
 @media (min-width: 992px) {
-    .s-main > section {
+    .s-main>section {
         padding-top: 3rem;
         padding-bottom: 4rem;
     }
@@ -48,19 +48,19 @@
     justify-content: space-between;
 }
 
-.card-deck-itou > .card {
+.card-deck-itou>.card {
     /* flex: 0 0 26%; */
     position: relative;
     padding: 1.5rem;
 }
 
-.card-deck-itou > .card > .card-body {
+.card-deck-itou>.card>.card-body {
     align-items: center;
     justify-content: center;
     display: flex;
 }
 
-.card-deck-itou > .card > .card-footer {
+.card-deck-itou>.card>.card-footer {
     background: transparent;
 }
 
@@ -85,7 +85,7 @@ body:after {
 /* Forms.
 --------------------------------------------------------------------------- */
 
-.form-group-required > label:first-of-type:after {
+.form-group-required>label:first-of-type:after {
     content: " *";
     color: #d63626;
 }
@@ -104,7 +104,7 @@ See also `duet_date_picker.html`.
 https://getbootstrap.com/docs/4.6/components/forms/#server-side
 */
 
-duet-date-picker.is-invalid ~ .invalid-feedback {
+duet-date-picker.is-invalid~.invalid-feedback {
     display: block;
 }
 
@@ -131,19 +131,24 @@ Credits go to https://stackoverflow.com/a/19229738
         bottom: 0;
         z-index: 1030;
     }
+
     /* Set width depending on a breaking point. */
     .w-sm-25 {
         width: 25% !important;
     }
+
     .w-sm-33 {
         width: 33% !important;
     }
+
     .w-sm-50 {
         width: 50% !important;
     }
+
     .w-sm-75 {
         width: 75% !important;
     }
+
     /* Reset width */
     /* To be used with, for example, w-100 to have a with: 100%; only on mobile. */
     .w-sm-auto {
@@ -211,13 +216,13 @@ Usage:
     </ul>
 --------------------------------------------------------------------------- */
 
-.multi-steps > li.is-active:before,
-.multi-steps > li.is-active ~ li:before {
+.multi-steps>li.is-active:before,
+.multi-steps>li.is-active~li:before {
     content: counter(stepNum);
 }
 
-.multi-steps > li.is-active:after,
-.multi-steps > li.is-active ~ li:after {
+.multi-steps>li.is-active:after,
+.multi-steps>li.is-active~li:after {
     background-color: #ededed;
 }
 
@@ -227,7 +232,7 @@ Usage:
     width: 100%;
 }
 
-.multi-steps > li {
+.multi-steps>li {
     counter-increment: stepNum;
     text-align: center;
     display: table-cell;
@@ -236,7 +241,7 @@ Usage:
     z-index: 1;
 }
 
-.multi-steps > li:before {
+.multi-steps>li:before {
     content: "\2713";
     /* Check mark symbol. */
     display: block;
@@ -251,7 +256,7 @@ Usage:
     border-radius: 50%;
 }
 
-.multi-steps > li:after {
+.multi-steps>li:after {
     content: "";
     height: 2px;
     width: 100%;
@@ -262,20 +267,20 @@ Usage:
     z-index: -1;
 }
 
-.multi-steps > li:last-child:after {
+.multi-steps>li:last-child:after {
     display: none;
 }
 
-.multi-steps > li.is-active:before {
+.multi-steps>li.is-active:before {
     background-color: #fff;
     border-color: #28a745;
 }
 
-.multi-steps > li.is-active ~ li {
+.multi-steps>li.is-active~li {
     color: #808080;
 }
 
-.multi-steps > li.is-active ~ li:before {
+.multi-steps>li.is-active~li:before {
     background-color: #ededed;
     border-color: #ededed;
 }
@@ -332,20 +337,21 @@ Usage:
     position: relative;
     text-decoration: none !important;
 }
-.collapse-caret > *::after {
-  content: '\ea4e';
-  font-family: remixicon !important;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1;
-  vertical-align: text-bottom;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-left: 0.5rem;
+
+.collapse-caret>*::after {
+    content: '\ea4e';
+    font-family: remixicon !important;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1;
+    vertical-align: text-bottom;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-left: 0.5rem;
 }
 
-.collapse-caret[aria-expanded=true] > *::after {
+.collapse-caret[aria-expanded=true]>*::after {
     content: '\ea78';
 }
 
@@ -390,7 +396,7 @@ Usage:
 }
 
 @media (min-width: 992px) {
-    .s-section-twocolumns {
+    .s-section-twocolumns-with-bg {
         background-color: #fff;
         background: linear-gradient(to left, #fbfbfb 50%, #f2f8fd 50%);
     }
@@ -421,9 +427,9 @@ Usage:
 }
 
 #welcoming_tour .carousel-indicators li {
-  background-color: #3F3E62;
+    background-color: #3F3E62;
 }
 
 #welcoming_tour .carousel-indicators li.active {
-  background-color: #000638;
+    background-color: #000638;
 }
