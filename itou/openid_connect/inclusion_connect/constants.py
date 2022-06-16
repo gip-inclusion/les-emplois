@@ -18,3 +18,6 @@ INCLUSION_CONNECT_ENDPOINT_LOGOUT = f"{INCLUSION_CONNECT_REALM_ENDPOINT}/logout"
 INCLUSION_CONNECT_TIMEOUT = 60
 
 INCLUSION_CONNECT_SESSION_KEY = "inclusion_connect"
+
+# Display a "Les emplois" logo on the connection page.
+INCLUSION_CONNECT_FROM_APP = "emplois"

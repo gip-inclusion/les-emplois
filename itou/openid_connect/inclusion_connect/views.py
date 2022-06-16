@@ -17,16 +17,7 @@ from itou.users.models import User
 from itou.utils.perms.user import KIND_PRESCRIBER
 from itou.utils.urls import get_absolute_url
 
-from .constants import (  # INCLUSION_CONNECT_SCOPES,
-    INCLUSION_CONNECT_CLIENT_ID,
-    INCLUSION_CONNECT_CLIENT_SECRET,
-    INCLUSION_CONNECT_ENDPOINT_AUTHORIZE,
-    INCLUSION_CONNECT_ENDPOINT_LOGOUT,
-    INCLUSION_CONNECT_ENDPOINT_TOKEN,
-    INCLUSION_CONNECT_ENDPOINT_USERINFO,
-    INCLUSION_CONNECT_SESSION_KEY,
-    INCLUSION_CONNECT_TIMEOUT,
-)
+from . import constants
 from .models import InclusionConnectState, InclusionConnectUserData
 
 
@@ -42,7 +33,7 @@ class InclusionConnectSession:
     user_email: str = None
     user_kind: str = None
     request: str = None
-    key: str = INCLUSION_CONNECT_SESSION_KEY
+    key: str = constants.INCLUSION_CONNECT_SESSION_KEY
 
     def asdict(self):
         return dataclasses.asdict(self)
@@ -70,18 +61,18 @@ def inclusion_connect_authorize(request):
 
     ic_session = InclusionConnectSession(user_kind=user_kind, previous_url=previous_url, next_url=next_url)
     request = ic_session.bind_to_request(request)
-    ic_session = request.session[INCLUSION_CONNECT_SESSION_KEY]
+    ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
 
     redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
     signed_csrf = InclusionConnectState.create_signed_csrf_token()
     data = {
         "response_type": "code",
-        "client_id": INCLUSION_CONNECT_CLIENT_ID,
+        "client_id": constants.INCLUSION_CONNECT_CLIENT_ID,
         "redirect_uri": redirect_uri,
-        "scope": "openid",
+        "scope": constants.INCLUSION_CONNECT_SCOPES,
         "state": signed_csrf,
         "nonce": crypto.get_random_string(length=12),
-        "from": "emplois",  # Display a "Les emplois" logo on the connection page.
+        "from": constants.INCLUSION_CONNECT_FROM_APP,
     }
     login_hint = request.GET.get("login_hint")
     if login_hint:
@@ -89,7 +80,7 @@ def inclusion_connect_authorize(request):
         ic_session["user_email"] = login_hint
         request.session.modified = True
 
-    return HttpResponseRedirect(f"{INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
+    return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
 
 
 def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
@@ -98,18 +89,22 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     if code is None or not InclusionConnectState.is_valid(state):
         return _redirect_to_login_page_on_error(error_msg="Missing code or invalid state.", request=request)
 
-    ic_session = request.session[INCLUSION_CONNECT_SESSION_KEY]
+    ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
     token_redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
 
     data = {
-        "client_id": INCLUSION_CONNECT_CLIENT_ID,
-        "client_secret": INCLUSION_CONNECT_CLIENT_SECRET,
+        "client_id": constants.INCLUSION_CONNECT_CLIENT_ID,
+        "client_secret": constants.INCLUSION_CONNECT_CLIENT_SECRET,
         "code": code,
         "grant_type": "authorization_code",
         "redirect_uri": token_redirect_uri,
     }
 
-    response = httpx.post(INCLUSION_CONNECT_ENDPOINT_TOKEN, data=data, timeout=INCLUSION_CONNECT_TIMEOUT)
+    response = httpx.post(
+        constants.INCLUSION_CONNECT_ENDPOINT_TOKEN,
+        data=data,
+        timeout=constants.INCLUSION_CONNECT_TIMEOUT,
+    )
 
     if response.status_code != 200:
         return _redirect_to_login_page_on_error(error_msg="Impossible to get IC token.", request=request)
@@ -129,10 +124,10 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
     response = httpx.get(
-        INCLUSION_CONNECT_ENDPOINT_USERINFO,
+        constants.INCLUSION_CONNECT_ENDPOINT_USERINFO,
         params={"schema": "openid"},
         headers={"Authorization": "Bearer " + access_token},
-        timeout=INCLUSION_CONNECT_TIMEOUT,
+        timeout=constants.INCLUSION_CONNECT_TIMEOUT,
     )
     if response.status_code != 200:
         return _redirect_to_login_page_on_error(error_msg="Impossible to get user infos.", request=request)
@@ -203,7 +198,7 @@ def inclusion_connect_logout(request):
 
     # Fallback on session data.
     if not token:
-        ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
+        ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
         if not ic_session:
             raise KeyError("Missing session key.")
         token = ic_session["token"]
@@ -213,7 +208,7 @@ def inclusion_connect_logout(request):
         "id_token_hint": token,
         "state": state,
     }
-    complete_url = f"{INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
+    complete_url = f"{constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
     # Logout user from IC with HTTPX to benefit from respx in tests
     # and to handle post logout redirection more easily.
     response = httpx.get(complete_url)
