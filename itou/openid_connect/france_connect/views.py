@@ -120,10 +120,12 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
 
     fc_user_data = FranceConnectUserData.from_user_info(user_data)
 
-    # Keep token_data["id_token"] to logout from FC
     # At this step, we can update the user's fields in DB and create a session if required
     user, _ = fc_user_data.create_or_update_user()
+    # Because we have more than one Authentication backend in our settings, we need to specify
+    # the one we want to use in login
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    # Keep token_data["id_token"] to logout from FC
     request.session[constants.FRANCE_CONNECT_SESSION_TOKEN] = token_data["id_token"]
     request.session[constants.FRANCE_CONNECT_SESSION_STATE] = state
     request.session.modified = True

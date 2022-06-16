@@ -154,12 +154,10 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         messages.error(request, error)
         is_successful = False
 
-    next_url = ic_session["next_url"]
-    user_kind = ic_session["user_kind"]
     prescriber_session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 
     # User coming from the prescriber signup path.
-    if user_kind == KIND_PRESCRIBER and prescriber_session_data:
+    if ic_session["user_kind"] == KIND_PRESCRIBER and prescriber_session_data:
         # Prescriber signup path callback.
         # Only signups are allowed. If a user already exists,
         # he should contact the support team.
@@ -183,11 +181,10 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         return HttpResponseRedirect(next_url)
 
     user, _ = ic_user_data.create_or_update_user()
-    # ValueError: You have multiple authentication backends configured and therefore must provide the
-    # `backend` argument or set the `backend` attribute on the user.
+    # Because we have more than one Authentication backend in our settings, we need to specify
+    # the one we want to use in login
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-
-    next_url = next_url or get_adapter(request).get_login_redirect_url(request)
+    next_url = ic_session["next_url"] or get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(next_url)
 
 
