@@ -8,10 +8,10 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from ..users.enums import IdentityProvider
-from ..users.factories import UserFactory
-from ..users.models import User
-from . import views as france_connect_views
+from itou.users.enums import IdentityProvider
+from itou.users.factories import UserFactory
+from itou.users.models import User
+
 from .models import FranceConnectState, FranceConnectUserData
 
 

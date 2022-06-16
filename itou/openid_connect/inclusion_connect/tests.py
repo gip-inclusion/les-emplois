@@ -5,12 +5,12 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.inclusion_connect.models import InclusionConnectState, InclusionConnectUserData
 from itou.users import enums as users_enums
 from itou.users.factories import UserFactory
 from itou.users.models import User
 
-from .constants import OIDC_STATE_EXPIRATION
+from ..constants import OIDC_STATE_EXPIRATION
+from .models import InclusionConnectState, InclusionConnectUserData
 
 
 OIDC_USERINFO = {

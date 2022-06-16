@@ -2,8 +2,9 @@ import dataclasses
 import datetime
 from typing import Optional
 
-from itou.common_apps.openid_connect.models import OIDConnectState, OIDConnectUserData
 from itou.users.enums import IdentityProvider
+
+from ..models import OIDConnectState, OIDConnectUserData
 
 
 class FranceConnectState(OIDConnectState):

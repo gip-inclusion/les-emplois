@@ -1,5 +1,6 @@
 import dataclasses
 from urllib.parse import unquote
+
 from django.core import signing
 from django.db import models
 from django.utils import crypto, timezone
@@ -29,7 +30,7 @@ class OIDConnectState(models.Model):
     @classmethod
     def create_signed_csrf_token(cls):
         """
-            Create and sign a new CSRF token to protect requests to identity providers. 
+        Create and sign a new CSRF token to protect requests to identity providers.
         """
         token = crypto.get_random_string(length=12)
         cls.objects.create(csrf=token)
