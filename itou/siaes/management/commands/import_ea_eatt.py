@@ -1,3 +1,5 @@
+import datetime
+
 import numpy as np
 import pandas as pd
 from django.core.management.base import BaseCommand
@@ -33,8 +35,17 @@ def get_ea_eatt_df():
     siret_field_name = "Siret_Signataire"
     post_code_field_name = "CODE_POST_Signataire"
     phone_field_name = "TEL_CONT_Signataire"
+    convention_end_date_field_name = "Date_Fin_App_Etab_Membre"
 
-    df = pd.read_excel(filename, converters={siret_field_name: str, post_code_field_name: str, phone_field_name: str})
+    df = pd.read_excel(
+        filename,
+        converters={
+            siret_field_name: str,
+            post_code_field_name: str,
+            phone_field_name: str,
+            convention_end_date_field_name: datetime.date.fromisoformat,
+        },
+    )
 
     column_mapping = {
         "Denomination_Sociale_Signataire": "name",
@@ -48,6 +59,7 @@ def get_ea_eatt_df():
         siret_field_name: "siret",
         "CRL_CONT_Signataire": "auth_email",
         phone_field_name: "phone",
+        convention_end_date_field_name: "convention_end_date",
     }
     df = remap_columns(df, column_mapping=column_mapping)
 
@@ -64,6 +76,9 @@ def get_ea_eatt_df():
         keep="first",
         inplace=True,
     )
+
+    # Drop the rows with an expired convention
+    df = df[df["convention_end_date"] > datetime.date.today()]
 
     df["address_line_1"] = ""
 
