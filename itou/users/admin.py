@@ -183,7 +183,7 @@ class ItouUserAdmin(UserAdmin):
         "pk",
         "nir",
     )
-    readonly_fields = ("pk",)
+    readonly_fields = ("pk", "jobseeker_hash_id")
 
     fieldsets = UserAdmin.fieldsets + (
         (
@@ -191,6 +191,7 @@ class ItouUserAdmin(UserAdmin):
             {
                 "fields": (
                     "pk",
+                    "jobseeker_hash_id",
                     "title",
                     "birthdate",
                     "birth_place",
@@ -240,6 +241,10 @@ class ItouUserAdmin(UserAdmin):
     is_peamu.boolean = True
     is_peamu.admin_order_field = "_is_peamu"
     is_peamu.short_description = "pe connect"
+
+    @admin.display(description="id ITOU obfusqué")
+    def jobseeker_hash_id(self, obj):
+        return obj.jobseeker_hash_id
 
     def get_queryset(self, request):
         """
