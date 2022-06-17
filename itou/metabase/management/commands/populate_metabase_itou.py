@@ -223,6 +223,8 @@ class Command(BaseCommand):
                     # Insert rows by batch of settings.METABASE_INSERT_BATCH_SIZE.
                     for chunk_qs in chunked_queryset(queryset, chunk_size=settings.METABASE_INSERT_BATCH_SIZE):
                         injections_left = total_injections - injections
+                        if injections_left == 0:
+                            break  # During a dry run stop as soon as we have injected enough rows.
                         if chunk_qs.count() > injections_left:
                             chunk_qs = chunk_qs[:injections_left]
                         self.inject_chunk(table_columns=table_columns, chunk=chunk_qs, new_table_name=new_table_name)
