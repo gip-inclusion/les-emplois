@@ -3,7 +3,7 @@ Populate metabase with fluxIAE data and some custom tables for our needs.
 
 For itou data, see the other script `populate_metabase_itou.py`.
 
-At this time this script is only supposed to run manually on your local dev, not in production.
+This script is launched manually every week by Supportix on a fast machine, not production.
 
 It manipulates large dataframes in memory (~10M rows) and thus is not optimized for production low memory environment.
 

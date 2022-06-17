@@ -3,7 +3,7 @@ Populate metabase database with transformed data from itou database.
 
 For fluxIAE data, see the other script `populate_metabase_fluxiae.py`.
 
-This script runs every night in production via a cronjob, but can also be run from your local dev.
+This script is launched by a github action every night on a fast machine, not production.
 
 This script reads data from the itou production database,
 transforms it for the convenience of our metabase non tech-savvy,
