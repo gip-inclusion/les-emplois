@@ -166,19 +166,23 @@ def stats_siae_etp(request):
 @login_required
 def stats_siae_hiring(request):
     """
-    SIAE stats shown to their own members.
-    They can only view data for their own SIAE.
+    SIAE stats shown only to their own members.
+    Employers can see stats for all their SIAEs at once, not just the one currently being worked on.
     These stats are about hiring and are built directly from C1 data.
     """
     current_org = get_stats_siae_hiring_current_org(request)
     context = {
-        "page_title": "Données de recrutement de ma structure (Plateforme de l'inclusion)",
+        "page_title": "Données de recrutement de mes structures (Plateforme de l'inclusion)",
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
     return render_stats(
         request=request,
         context=context,
-        params={C1_SIAE_FILTER_KEY: str(current_org.id)},
+        params={
+            C1_SIAE_FILTER_KEY: [
+                str(membership.siae_id) for membership in request.user.active_or_in_grace_period_siae_memberships()
+            ]
+        },
     )
 
 

@@ -540,7 +540,7 @@ METABASE_DASHBOARD_IDS = {
     "stats_public": 119,
     # Employer stats.
     "stats_siae_etp": 128,
-    "stats_siae_hiring": 165,
+    "stats_siae_hiring": 185,
     # Prescriber stats.
     "stats_cd": 118,
     "stats_pe_delay_main": 168,
