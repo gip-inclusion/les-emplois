@@ -1,4 +1,5 @@
 import os
+from functools import lru_cache
 from operator import attrgetter
 
 from django.conf import settings
@@ -177,11 +178,19 @@ def _get_ai_stock_approvals():
     )
 
 
-# As of June 2022 we have exactly 71205 approvals from the AI stock and exactly the same number of job seekers.
-# This number is supposed to stay constant over time, there is no reason for it to grow.
-# We load all 71k pks once and for all in memory for performance reasons.
-AI_STOCK_APPROVAL_PKS = _get_ai_stock_approvals().values_list("pk", flat=True).distinct()
-AI_STOCK_JOB_SEEKER_PKS = _get_ai_stock_approvals().values_list("user_id", flat=True).distinct()
+@lru_cache(maxsize=1)
+def get_ai_stock_approval_pks():
+    """
+    As of June 2022 we have exactly 71205 approvals from the AI stock and exactly the same number of job seekers.
+    This number is supposed to stay constant over time, there is no reason for it to grow.
+    We load all 71k pks once and for all in memory for performance reasons.
+    """
+    return _get_ai_stock_approvals().values_list("pk", flat=True).distinct()
+
+
+@lru_cache(maxsize=1)
+def get_ai_stock_job_seeker_pks():
+    return _get_ai_stock_approvals().values_list("user_id", flat=True).distinct()
 
 
 def chunked_queryset(queryset, chunk_size=10000):

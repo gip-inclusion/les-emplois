@@ -4,7 +4,7 @@ from django.conf import settings
 
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.metabase.management.commands._utils import (
-    AI_STOCK_APPROVAL_PKS,
+    get_ai_stock_approval_pks,
     get_department_and_region_columns,
     get_hiring_siae,
 )
@@ -105,6 +105,6 @@ TABLE_COLUMNS += [
         "name": "injection_ai",
         "type": "boolean",
         "comment": "Provient des injections AI",
-        "fn": lambda o: o.pk in AI_STOCK_APPROVAL_PKS if isinstance(o, Approval) else False,
+        "fn": lambda o: o.pk in get_ai_stock_approval_pks() if isinstance(o, Approval) else False,
     },
 ]

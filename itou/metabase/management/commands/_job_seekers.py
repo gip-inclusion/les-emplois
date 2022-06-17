@@ -7,8 +7,8 @@ from django.utils import timezone
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
-    AI_STOCK_JOB_SEEKER_PKS,
     anonymize,
+    get_ai_stock_job_seeker_pks,
     get_choice,
     get_department_and_region_columns,
     get_hiring_siae,
@@ -283,6 +283,6 @@ TABLE_COLUMNS += [
         # but the performance becomes terrible (e.g. 120 minutes vs 30 minutes), is not easy to fix due to how
         # `approvals_wrapper.latest_approval` is implemented and gives the exact same end result anyway (71205 users),
         # most likely since most if not all of these users only have a single approval anyway.
-        "fn": lambda o: o.pk in AI_STOCK_JOB_SEEKER_PKS,
+        "fn": lambda o: o.pk in get_ai_stock_job_seeker_pks(),
     },
 ]
