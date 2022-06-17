@@ -16,15 +16,25 @@ from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from unidecode import unidecode
 
-from itou.approvals import enums as approvals_enums
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
-from itou.siaes.enums import SiaeKind
+from itou.job_applications import enums as job_application_enums
+from itou.siaes import enums as siae_enums
+from itou.utils.apis import enums as api_enums
+from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
 from itou.utils.models import DateRange
 from itou.utils.urls import get_external_link_markup
 from itou.utils.validators import alphanumeric
 
 
 logger = logging.getLogger(__name__)
+
+
+pole_emploi_api_client = PoleEmploiApiClient(
+    settings.API_ESD["BASE_URL"],
+    settings.API_ESD["AUTH_BASE_URL"],
+    settings.API_ESD["KEY"],
+    settings.API_ESD["SECRET"],
+)
 
 
 class CommonApprovalMixin(models.Model):
@@ -123,14 +133,14 @@ class PENotificationMixin(models.Model):
     pe_notification_status = models.CharField(
         verbose_name="Etat de la notification à PE",
         max_length=32,
-        default=approvals_enums.PEApiNotificationStatus.PENDING,
-        choices=approvals_enums.PEApiNotificationStatus.choices,
+        default=api_enums.PEApiNotificationStatus.PENDING,
+        choices=api_enums.PEApiNotificationStatus.choices,
     )
     pe_notification_time = models.DateTimeField(verbose_name="Date de notification à PE", null=True, blank=True)
     pe_notification_endpoint = models.CharField(
         verbose_name="Dernier endpoint de l'API PE contacté",
         max_length=32,
-        choices=approvals_enums.PEApiEndpoint.choices,
+        choices=api_enums.PEApiEndpoint.choices,
         blank=True,
         null=True,
     )
@@ -139,8 +149,8 @@ class PENotificationMixin(models.Model):
         # remember that those choices are mostly for documentation purposes but do not
         # constrain the code to actually be among those, which is fortunate since
         # we don't want the app to break if PE suddenly adds a code.
-        choices=list(approvals_enums.PEApiRechercheIndividuExitCode.choices)
-        + list(approvals_enums.PEApiMiseAJourPassExitCode.choices),
+        choices=list(api_enums.PEApiRechercheIndividuExitCode.choices)
+        + list(api_enums.PEApiMiseAJourPassExitCode.choices),
         verbose_name="Dernier code de sortie constaté",
         blank=True,
         null=True,
@@ -165,14 +175,17 @@ class PENotificationMixin(models.Model):
         queryset = self.__class__.objects.filter(pk=self.pk)
         queryset.update(**{key: value for key, value in update_dict.items() if value})
 
+    def pe_save_pending(self, reason, at=None):
+        self._pe_notification_update(api_enums.PEApiNotificationStatus.PENDING, at, None, reason)
+
     def pe_save_error(self, endpoint, exit_code, at=None):
-        self._pe_notification_update(approvals_enums.PEApiNotificationStatus.ERROR, at, endpoint, exit_code)
+        self._pe_notification_update(api_enums.PEApiNotificationStatus.ERROR, at, endpoint, exit_code)
 
     def pe_save_should_retry(self, at=None):
-        self._pe_notification_update(approvals_enums.PEApiNotificationStatus.SHOULD_RETRY, at)
+        self._pe_notification_update(api_enums.PEApiNotificationStatus.SHOULD_RETRY, at)
 
     def pe_save_success(self, at=None):
-        self._pe_notification_update(approvals_enums.PEApiNotificationStatus.SUCCESS, at)
+        self._pe_notification_update(api_enums.PEApiNotificationStatus.SUCCESS, at)
 
 
 class Approval(PENotificationMixin, CommonApprovalMixin):
@@ -437,6 +450,108 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         approval_from_pe.save()
         return approval_from_pe
 
+    def notify_pole_emploi(self, at=None):
+        # We do not send approvals that start in the future to PE, because their IS can't handle them.
+        # In this case, do not mark them as "should retry" but leave them pending. The pending ones
+        # will be caught by the second pass cron. The "should retry" then assumes:
+        # - the approval was ready to be sent (user OK, dates OK)
+        # - we had an actual issue.
+        if not at:
+            at = timezone.now()
+        if self.start_at > at.date():
+            logger.info(
+                "! notify_pole_emploi approval=%s start_at=%s starts after today=%s.",
+                self,
+                self.start_at,
+                at.date(),
+            )
+            self.pe_save_pending(
+                api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
+                at,
+            )
+            return
+
+        job_application = self.jobapplication_set.accepted().order_by("-created_at").first()
+        if not job_application:
+            logger.info("! notify_pole_emploi approval=%s had no accepted job application", self)
+            self.pe_save_pending(
+                api_enums.PEApiPreliminaryCheckFailureReason.NO_JOB_APPLICATION,
+                at,
+            )
+            return
+
+        siae = job_application.to_siae
+        type_siae = siae_enums.siae_kind_to_pe_type_siae(siae.kind)
+        if not type_siae:
+            logger.info(
+                "! notify_pole_emploi approval=%s could not find PE type for siae=%s siae_kind=%s",
+                self,
+                siae,
+                siae.kind,
+            )
+            self.pe_save_error(
+                None,
+                api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
+                at,
+            )
+            return
+
+        if not all(
+            [
+                self.user.first_name,
+                self.user.last_name,
+                self.user.nir,
+                self.user.birthdate,
+            ]
+        ):
+            logger.info(
+                "! notify_pole_emploi approval=%s had an invalid user=%s nir=%s", self, self.user, self.user.nir
+            )
+            # we save those as pending since the cron will ignore those cases anyway and thus has
+            # no chance to block itself.
+            self.pe_save_pending(
+                api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
+                at,
+            )
+            return
+
+        try:
+            encrypted_nir = pole_emploi_api_client.recherche_individu_certifie(
+                self.user.first_name, self.user.last_name, self.user.birthdate, self.user.nir
+            )
+        except PoleEmploiAPIException:
+            logger.info("! notify_pole_emploi approval=%s got a recoverable error in recherche_individu", self)
+            self.pe_save_should_retry(at)
+            return
+        except PoleEmploiAPIBadResponse as exc:
+            logger.info("! notify_pole_emploi approval=%s got an unrecoverable error in recherche_individu", self)
+            self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
+            return
+
+        try:
+            pole_emploi_api_client.mise_a_jour_pass_iae(
+                self,
+                encrypted_nir,
+                siae.siret,
+                type_siae,
+                job_application_enums.sender_kind_to_pe_origine_candidature(job_application.sender_kind),
+            )
+        except PoleEmploiAPIException:
+            logger.info("! notify_pole_emploi approval=%s got a recoverable error in maj_pass_iae", self)
+            self.pe_save_should_retry(at)
+            return
+        except PoleEmploiAPIBadResponse as exc:
+            logger.info(
+                "! notify_pole_emploi approval=%s got an unrecoverable error=%s in maj_pass_iae",
+                self,
+                exc.response_code,
+            )
+            self.pe_save_error(api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exc.response_code, at)
+            return
+        else:
+            logger.info("> notify_pole_emploi approval=%s got success in maj_pass_iae!", self)
+            self.pe_save_success(at)
+
 
 class SuspensionQuerySet(models.QuerySet):
     @property
@@ -518,7 +633,7 @@ class Suspension(models.Model):
                 Suspension.Reason.FINISHED_CONTRACT,
                 Suspension.Reason.APPROVAL_BETWEEN_CTA_MEMBERS,
             ]
-            if siae.kind in [SiaeKind.ACI, SiaeKind.EI]:
+            if siae.kind in [siae_enums.SiaeKind.ACI, siae_enums.SiaeKind.EI]:
                 reasons.append(Suspension.Reason.CONTRAT_PASSERELLE)
             return [(reason.value, reason.label) for reason in reasons]
 
@@ -926,9 +1041,9 @@ class Prolongation(models.Model):
 
         if self.reason == self.Reason.PARTICULAR_DIFFICULTIES.value:
             if not self.declared_by_siae or self.declared_by_siae.kind not in [
-                SiaeKind.AI,
-                SiaeKind.ACI,
-                SiaeKind.ACIPHC,
+                siae_enums.SiaeKind.AI,
+                siae_enums.SiaeKind.ACI,
+                siae_enums.SiaeKind.ACIPHC,
             ]:
                 raise ValidationError(f"Le motif « {self.get_reason_display()} » est réservé aux AI et ACI.")
 

@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from faker import Faker
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory

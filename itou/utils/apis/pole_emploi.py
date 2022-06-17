@@ -1,13 +1,9 @@
 import logging
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import httpx
-from django.conf import settings
-from django.utils import timezone
 from unidecode import unidecode
-
-from itou.siaes.enums import SiaeKind
 
 
 logger = logging.getLogger(__name__)
@@ -51,38 +47,6 @@ DATE_FORMAT = "%Y-%m-%d"
 MAX_NIR_CHARACTERS = 13  # Pole Emploi only cares about the first 13 characters of the NIR.
 
 
-def _sender_kind_to_origine_candidature(sender_kind):
-    from itou.job_applications.models import JobApplication
-
-    return {
-        JobApplication.SENDER_KIND_JOB_SEEKER: "DEMA",
-        JobApplication.SENDER_KIND_PRESCRIBER: "PRES",
-        JobApplication.SENDER_KIND_SIAE_STAFF: "EMPL",
-    }.get(sender_kind, "DEMA")
-
-
-def _siae_kind_to_type_siae(siae_kind):
-    # Possible values on Pole Emploi's side:
-    # « 836 – IAE ITOU ACI »
-    # « 837 – IAE ITOU AI »
-    # « 838 – IAE ITOU EI »
-    # « 839 – IAE ITOU ETT »
-    # « 840 – IAE ITOU EIT »
-    # We also assume that the default would be 838: EI/GEIQ/EA.
-    # I am just the refactorer, I don't have the history of this choice.
-    return {
-        SiaeKind.EI: 838,
-        SiaeKind.AI: 837,
-        SiaeKind.ACI: 836,
-        SiaeKind.ACIPHC: 837,
-        SiaeKind.ETTI: 839,
-        SiaeKind.EITI: 840,
-        SiaeKind.GEIQ: 838,
-        SiaeKind.EA: 838,
-        SiaeKind.EATT: 840,
-    }.get(siae_kind, 838)
-
-
 def _pole_emploi_name(name: str, hyphenate=False, max_len=25) -> str:
     """D’après les specs de l’API PE non documenté concernant la recherche individu
     simplifié, le NOM doit:
@@ -100,25 +64,29 @@ def _pole_emploi_name(name: str, hyphenate=False, max_len=25) -> str:
 
 
 class PoleEmploiApiClient:
-    def __init__(self):
+    def __init__(self, base_url, auth_base_url, key, secret):
+        self.base_url = base_url
+        self.auth_base_url = auth_base_url
+        self.key = key
+        self.secret = secret
         self.token = None
         self.expires_at = None
 
     @property
     def token_url(self):
-        return f"{settings.API_ESD['AUTH_BASE_URL']}/connexion/oauth2/access_token"
+        return f"{self.auth_base_url}/connexion/oauth2/access_token"
 
     @property
     def recherche_individu_url(self):
-        return f"{settings.API_ESD['BASE_URL']}/rechercheindividucertifie/v1/rechercheIndividuCertifie"
+        return f"{self.base_url}/rechercheindividucertifie/v1/rechercheIndividuCertifie"
 
     @property
     def mise_a_jour_url(self):
-        return f"{settings.API_ESD['BASE_URL']}/maj-pass-iae/v1/passIAE/miseAjour"
+        return f"{self.base_url}/maj-pass-iae/v1/passIAE/miseAjour"
 
     def _refresh_token(self, at=None):
         if not at:
-            at = timezone.now()
+            at = datetime.now()
         if self.expires_at and self.expires_at > at + timedelta(seconds=REFRESH_TOKEN_MARGIN_SECONDS):
             return
 
@@ -127,10 +95,10 @@ class PoleEmploiApiClient:
             self.token_url,
             params={"realm": "/partenaire"},
             data={
-                "client_id": settings.API_ESD["KEY"],
-                "client_secret": settings.API_ESD["SECRET"],
+                "client_id": self.key,
+                "client_secret": self.secret,
                 "grant_type": "client_credentials",
-                "scope": f"application_{settings.API_ESD['KEY']} {scopes}",
+                "scope": f"application_{self.key} {scopes}",
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
@@ -154,7 +122,7 @@ class PoleEmploiApiClient:
         except httpx.RequestError as exc:
             raise PoleEmploiAPIException(API_CLIENT_HTTP_ERROR_CODE) from exc
 
-    def recherche_individu_certifie(self, job_seeker):
+    def recherche_individu_certifie(self, first_name, last_name, birthdate, nir):
         """Example data:
         {
             "nirCertifie":"1800813800217",
@@ -173,10 +141,10 @@ class PoleEmploiApiClient:
         data = self._request(
             self.recherche_individu_url,
             {
-                "dateNaissance": job_seeker.birthdate.strftime(DATE_FORMAT) if job_seeker.birthdate else "",
-                "nirCertifie": job_seeker.nir[:MAX_NIR_CHARACTERS] if job_seeker.nir else "",
-                "nomNaissance": _pole_emploi_name(job_seeker.last_name),
-                "prenom": _pole_emploi_name(job_seeker.first_name, hyphenate=True, max_len=13),
+                "dateNaissance": birthdate.strftime(DATE_FORMAT) if birthdate else "",
+                "nirCertifie": nir[:MAX_NIR_CHARACTERS] if nir else "",
+                "nomNaissance": _pole_emploi_name(last_name),
+                "prenom": _pole_emploi_name(first_name, hyphenate=True, max_len=13),
             },
         )
         code_sortie = data.get("codeSortie")
@@ -187,26 +155,25 @@ class PoleEmploiApiClient:
             raise PoleEmploiAPIBadResponse(API_CLIENT_EMPTY_NIR_BAD_RESPONSE)
         return id_national
 
-    def mise_a_jour_pass_iae(self, job_application, encrypted_identifier):
+    def mise_a_jour_pass_iae(self, approval, encrypted_identifier, siae_siret, siae_type, origine_candidature):
         """Example of a JSON response:
         {'codeSortie': 'S000', 'idNational': 'some identifier', 'message': 'Pass IAE prescrit'}
         The only valid result is HTTP 200 + codeSortie = "S000".
         Anything else (other HTTP code, or different codeSortie) means that our notification has been discarded.
         """
-        approval = job_application.approval
         params = {
             "dateDebutPassIAE": approval.start_at.strftime(DATE_FORMAT) if approval.start_at else "",
             "dateFinPassIAE": approval.end_at.strftime(DATE_FORMAT) if approval.start_at else "",
             "idNational": encrypted_identifier,
             "numPassIAE": approval.number,
-            "numSIRETsiae": job_application.to_siae.siret,
-            "origineCandidature": _sender_kind_to_origine_candidature(job_application.sender_kind),
             # we force this field to be "A" for "Approved". The origin of this field is lost with
             # the first iterations of this client, but our guess is that it makes their server happy.
             # this has no impact on our side since a PASS IAE is always "approved", even though it might be suspended.
             # Maybe some day we will support this case and send them our suspended PASS IAE if needed.
             "statutReponsePassIAE": "A",
-            "typeSIAE": _siae_kind_to_type_siae(job_application.to_siae),
+            "numSIRETsiae": siae_siret,
+            "typeSIAE": siae_type,
+            "origineCandidature": origine_candidature,
         }
         data = self._request(self.mise_a_jour_url, params)
         code_sortie = data.get("codeSortie")

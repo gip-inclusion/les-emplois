@@ -1,7 +1,6 @@
 import datetime
 import logging
 import uuid
-from time import sleep
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -14,24 +13,15 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
-from itou.approvals import enums as approvals_enums
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
-from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
 from itou.utils.emails import get_email_message
-from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
 
 logger = logging.getLogger(__name__)
-
-pole_emploi_api_client = PoleEmploiApiClient()
-
-
-# 3 requests/second max. There were timeout issues so 1 second takes some margins
-SLEEP_DELAY = 1.0
 
 
 class JobApplicationWorkflow(xwf_models.Workflow):
@@ -1093,69 +1083,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Send email at the end because we can't rollback this operation
         email = self.email_manually_refuse_approval
         email.send()
-
-    def notify_pole_emploi(self, at=None, with_delay=False):
-        # We do not send approvals that start in the future to PE, because their IS can't handle them.
-        # In this case, do not mark them as "should retry" but leave them pending. The pending ones
-        # will be caught by the second pass cron.
-        if not at:
-            at = timezone.now()
-        if self.approval.start_at > at.date():
-            logger.info(
-                "! notify_pole_emploi approval=%s start_at=%s starts after today=%s.",
-                self.approval,
-                self.approval.start_at,
-                at.date(),
-            )
-            return
-
-        if not all(
-            [
-                self.job_seeker.first_name,
-                self.job_seeker.last_name,
-                self.job_seeker.nir,
-                self.job_seeker.birthdate,
-            ]
-        ):
-            logger.info("! notify_pole_emploi approval=%s had an invalid user=%s.", self.approval, self.job_seeker)
-            self.approval.pe_save_error(
-                approvals_enums.PEApiEndpoint.RECHERCHE_INDIVIDU,
-                approvals_enums.PEApiRechercheIndividuExitCode.MISSING_DATA,
-                at,
-            )
-            return
-
-        try:
-            encrypted_nir = pole_emploi_api_client.recherche_individu_certifie(self.job_seeker)
-        except PoleEmploiAPIException:
-            logger.info(
-                "! notify_pole_emploi approval=%s got a recoverable error in recherche_individu", self.approval
-            )
-            self.approval.pe_save_should_retry(at)
-            return
-        except PoleEmploiAPIBadResponse as exc:
-            logger.info(
-                "! notify_pole_emploi approval=%s got an unrecoverable error in recherche_individu", self.approval
-            )
-            self.approval.pe_save_error(approvals_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
-            return
-
-        if with_delay:
-            sleep(SLEEP_DELAY)
-
-        try:
-            pole_emploi_api_client.mise_a_jour_pass_iae(self, encrypted_nir)
-        except PoleEmploiAPIException:
-            logger.info("! notify_pole_emploi approval=%s got a recoverable error in maj_pass_iae", self.approval)
-            self.approval.pe_save_should_retry(at)
-            return
-        except PoleEmploiAPIBadResponse as exc:
-            logger.info("! notify_pole_emploi approval=%s got an unrecoverable error in maj_pass_iae", self.approval)
-            self.approval.pe_save_error(approvals_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exc.response_code, at)
-            return
-        else:
-            logger.info("> notify_pole_emploi approval=%s got success in maj_pass_iae!", self.approval)
-            self.approval.pe_save_success(at)
 
 
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):

@@ -6,6 +6,13 @@ class PEApiEndpoint(models.TextChoices):
     MISE_A_JOUR_PASS_IAE = "maj_pass"
 
 
+class PEApiPreliminaryCheckFailureReason(models.TextChoices):
+    MISSING_USER_DATA = "MISSING_USER_DATA", "Utilisateur manquant de données, non essayé."
+    NO_JOB_APPLICATION = "NO_JOB_APPLICATION", "L'agrément n'est lié à aucune candidature acceptée"
+    STARTS_IN_FUTURE = "STARTS_IN_FUTURE", "L'agrément démarre dans le futur"
+    INVALID_SIAE_KIND = "INVALID_SIAE_KIND", "Code structure invalide"
+
+
 class PEApiRechercheIndividuExitCode(models.TextChoices):
     S000 = "S000", "Aucun individu trouvé"
     S001 = "S001", "Individu trouvé"
@@ -19,7 +26,6 @@ class PEApiRechercheIndividuExitCode(models.TextChoices):
     R040 = "R040", "Date de naissance absente"
     R041 = "R041", "Date de naissance incorrecte"
     R042 = "R042", "Date de naissance invalide"
-    MISSING_DATA = "MISSING_DATA", "Utilisateur manquant de données, non essayé."
 
 
 class PEApiMiseAJourPassExitCode(models.TextChoices):
