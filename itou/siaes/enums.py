@@ -2,7 +2,6 @@ from django.db import models
 
 
 class SiaeKind(models.TextChoices):
-
     EI = "EI", "Entreprise d'insertion"  # Regroupées au sein de la fédération des entreprises d'insertion.
     AI = "AI", "Association intermédiaire"
     ACI = "ACI", "Atelier chantier d'insertion"
@@ -18,6 +17,21 @@ class SiaeKind(models.TextChoices):
     EA = "EA", "Entreprise adaptée"
     EATT = "EATT", "Entreprise adaptée de travail temporaire"
     OPCS = "OPCS", "Organisation porteuse de la clause sociale"
+
+
+# This used to be the ASP_MANAGED_KINDS list in siaes.models; but it's clearer to talk about
+# SIAEs that have a convention.
+# Ported older comment: ASP data is used to keep the siae data of these kinds in sync.
+# These kinds and only these kinds thus have convention/AF logic.
+SIAE_WITH_CONVENTION_KINDS = [
+    SiaeKind.EI.value,
+    SiaeKind.AI.value,
+    SiaeKind.ACI.value,
+    SiaeKind.ETTI.value,
+    SiaeKind.EITI.value,
+]
+
+SIAE_WITH_CONVENTION_CHOICES = [(k, v) for k, v in SiaeKind.choices if k in SIAE_WITH_CONVENTION_KINDS]
 
 
 class ContractType(models.TextChoices):

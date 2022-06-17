@@ -987,9 +987,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         )
 
         ## can_use_employee_record
-        for siae_kind in [
-            siae_kind for siae_kind, _ in SiaeKind.choices if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS
-        ]:
+        for siae_kind in [siae_kind for siae_kind in SiaeKind if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS]:
             not_eligible_siae = SiaeFactory(kind=siae_kind)
             job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
             self.assertIn(

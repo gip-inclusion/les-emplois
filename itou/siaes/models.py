@@ -12,7 +12,7 @@ from django.utils.http import urlencode, urlsafe_base64_encode
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
-from itou.siaes.enums import ContractType, SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_CHOICES, SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
@@ -27,7 +27,7 @@ class SiaeQuerySet(OrganizationQuerySet):
         return (
             # GEIQ, EA, EATT, ACIPHC... have no convention logic and thus are always active.
             # `~` means NOT, similarly to dataframes.
-            ~Q(kind__in=Siae.ASP_MANAGED_KINDS)
+            ~Q(kind__in=SIAE_WITH_CONVENTION_KINDS)
             # Staff created siaes are always active until eventually
             # converted to ASP source siaes by import_siae script.
             # Such siaes are created by our staff when ASP data is lacking
@@ -190,16 +190,12 @@ class Siae(AddressMixin, OrganizationAbstract):
         (SOURCE_STAFF_CREATED, "Staff Itou"),
     )
 
-    # ASP data is used to keep the siae data of these kinds in sync.
-    # These kinds and only these kinds thus have convention/AF logic.
-    ASP_MANAGED_KINDS = [SiaeKind.EI, SiaeKind.AI, SiaeKind.ACI, SiaeKind.ETTI, SiaeKind.EITI]
-
     # These kinds of SIAE can use employee record app to send data to ASP
     ASP_EMPLOYEE_RECORD_KINDS = [SiaeKind.EI, SiaeKind.ACI, SiaeKind.AI, SiaeKind.ETTI]
 
     # https://code.travail.gouv.fr/code-du-travail/l5132-4
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
-    ELIGIBILITY_REQUIRED_KINDS = ASP_MANAGED_KINDS + [SiaeKind.ACIPHC]
+    ELIGIBILITY_REQUIRED_KINDS = SIAE_WITH_CONVENTION_KINDS + [SiaeKind.ACIPHC]
 
     # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently
@@ -288,7 +284,7 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     @property
     def is_active(self):
-        if not self.is_asp_managed:
+        if not self.should_have_convention:
             # GEIQ, EA, EATT, OPCS, ACIPHC... have no convention logic and thus are always active.
             return True
         if self.source == Siae.SOURCE_STAFF_CREATED:
@@ -342,8 +338,10 @@ class Siae(AddressMixin, OrganizationAbstract):
         return self.kind in self.ELIGIBILITY_REQUIRED_KINDS
 
     @property
-    def is_asp_managed(self):
-        return self.kind in self.ASP_MANAGED_KINDS
+    def should_have_convention(self):
+        # .values is needed since Python considers the members of SiaeKind to be different
+        # instances than SiaeWithConventionKind
+        return self.kind in SIAE_WITH_CONVENTION_KINDS
 
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
@@ -417,7 +415,7 @@ class Siae(AddressMixin, OrganizationAbstract):
         """
         if not self.has_admin(user):
             return False
-        if not self.is_asp_managed:
+        if not self.should_have_convention:
             # AF interfaces only makes sense for SIAE, not for GEIQ EA ACIPHC etc.
             return False
         if self.source not in [self.SOURCE_ASP, self.SOURCE_USER_CREATED]:
@@ -637,21 +635,12 @@ class SiaeConvention(models.Model):
     # to the platform during this grace period.
     DEACTIVATION_GRACE_PERIOD_IN_DAYS = 30
 
-    KIND_EI = "EI"
-    KIND_AI = "AI"
-    KIND_ACI = "ACI"
-    KIND_ETTI = "ETTI"
-    KIND_EITI = "EITI"
-
-    KIND_CHOICES = (
-        (KIND_EI, "Entreprise d'insertion"),
-        (KIND_AI, "Association intermédiaire"),
-        (KIND_ACI, "Atelier chantier d'insertion"),
-        (KIND_ETTI, "Entreprise de travail temporaire d'insertion"),
-        (KIND_EITI, "Entreprise d'insertion par le travail indépendant"),
+    kind = models.CharField(
+        verbose_name="Type",
+        max_length=4,
+        choices=SIAE_WITH_CONVENTION_CHOICES,
+        default=SiaeKind.EI.value,
     )
-
-    kind = models.CharField(verbose_name="Type", max_length=4, choices=KIND_CHOICES, default=KIND_EI)
 
     # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently

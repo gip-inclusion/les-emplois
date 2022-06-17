@@ -456,7 +456,7 @@ class ModelTest(TestCase):
             with self.subTest(kind=kind):
                 siae = SiaeFactory(kind=kind, with_membership=True, membership__is_admin=True)
                 user = siae.members.get()
-                self.assertEqual(user.can_create_siae_antenna(siae), siae.is_asp_managed)
+                self.assertEqual(user.can_create_siae_antenna(siae), siae.should_have_convention)
 
     def test_can_view_stats_siae_hiring(self):
         # An employer can only view hiring stats of their own SIAE.

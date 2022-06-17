@@ -19,8 +19,9 @@ an "siae_key" throughout the import_siae.py script code.
 """
 from django.utils import timezone
 
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, remap_columns, timeit
-from itou.siaes.models import Siae, SiaeFinancialAnnex
+from itou.siaes.models import SiaeFinancialAnnex
 from itou.utils.validators import validate_af_number
 
 
@@ -76,7 +77,7 @@ def get_vue_af_df():
 
     # Ensure data quality.
     for _, row in df.iterrows():
-        assert row.kind in Siae.ASP_MANAGED_KINDS
+        assert row.kind in SIAE_WITH_CONVENTION_KINDS
         validate_af_number(row.number)
 
     df["ends_in_the_future"] = df.end_date.apply(timezone.make_aware) > timezone.now()

@@ -17,7 +17,7 @@ name instead of hardcoding column numbers as in `field = row[42]`.
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.siaes.management.commands._import_siae.convention import (
     check_convention_data_consistency,
     get_creatable_conventions,
@@ -84,7 +84,7 @@ class Command(BaseCommand):
         # Sometimes our staff creates a siae then later attaches it manually to the correct convention. In that
         # case it should be converted to a regular user created siae so that the usual convention logic applies.
         for siae in Siae.objects.filter(
-            kind__in=Siae.ASP_MANAGED_KINDS, source=Siae.SOURCE_STAFF_CREATED, convention__isnull=False
+            kind__in=SIAE_WITH_CONVENTION_KINDS, source=Siae.SOURCE_STAFF_CREATED, convention__isnull=False
         ):
             self.stdout.write(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
             siae.source = Siae.SOURCE_USER_CREATED
@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
         three_months_ago = timezone.now() - timezone.timedelta(days=90)
         staff_created_siaes = Siae.objects.filter(
-            kind__in=Siae.ASP_MANAGED_KINDS,
+            kind__in=SIAE_WITH_CONVENTION_KINDS,
             source=Siae.SOURCE_STAFF_CREATED,
         )
 
@@ -132,7 +132,7 @@ class Command(BaseCommand):
     def update_siret_and_auth_email_of_existing_siaes(self):
         auth_email_updates = 0
         for siae in Siae.objects.select_related("convention").filter(source=Siae.SOURCE_ASP, convention__isnull=False):
-            assert siae.is_asp_managed
+            assert siae.should_have_convention
 
             asp_id = siae.asp_id
             row = ASP_ID_TO_SIAE_ROW.get(asp_id)
@@ -207,7 +207,7 @@ class Command(BaseCommand):
                 # Siaes with this asp_id already exist, no need to create one more.
                 total_existing_siaes_with_asp_source = 0
                 for existing_siae in existing_siae_query.all():
-                    assert existing_siae.is_asp_managed
+                    assert existing_siae.should_have_convention
                     if existing_siae.source == Siae.SOURCE_ASP:
                         total_existing_siaes_with_asp_source += 1
                         # Siret should have been fixed by update_siret_and_auth_email_of_existing_siaes().
@@ -228,7 +228,7 @@ class Command(BaseCommand):
                     continue
                 # Siae with this siret+kind already exists but with wrong source.
                 assert existing_siae.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]
-                assert existing_siae.is_asp_managed
+                assert existing_siae.should_have_convention
                 self.stdout.write(
                     f"siae.id={existing_siae.id} already exists "
                     f"with wrong source={existing_siae.source} "
@@ -311,7 +311,7 @@ class Command(BaseCommand):
     @timeit
     def check_aciphc_data_consistency(self):
         """
-        ACIPHC is a tricky siae kind, part of ELIBILIGITY_REQUIRED_KINDS but not of ASP_MANAGED_KINDS.
+        ACIPHC is a tricky siae kind, part of ELIBILIGITY_REQUIRED_KINDS but not of SiaeWithConventionKind
         Let's keep an eye on it.
         """
         aciphc_query = Siae.objects.filter(kind=SiaeKind.ACIPHC).select_related("convention")

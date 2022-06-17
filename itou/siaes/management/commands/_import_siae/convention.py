@@ -5,7 +5,7 @@ SiaeConvention object logic used by the import_siae.py script is gathered here.
 """
 from django.utils import timezone
 
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.siaes.management.commands._import_siae.siae import does_siae_have_an_active_convention
 from itou.siaes.management.commands._import_siae.vue_af import INACTIVE_SIAE_LIST
 from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIRET_SIGNATURE, SIRET_TO_ASP_ID
@@ -181,12 +181,12 @@ def check_convention_data_consistency():
                 assert siae.kind == convention.kind
 
     asp_siaes_without_convention = Siae.objects.filter(
-        kind__in=Siae.ASP_MANAGED_KINDS, source=Siae.SOURCE_ASP, convention__isnull=True
+        kind__in=SIAE_WITH_CONVENTION_KINDS, source=Siae.SOURCE_ASP, convention__isnull=True
     ).count()
     assert asp_siaes_without_convention == 0
 
     user_created_siaes_without_convention = Siae.objects.filter(
-        kind__in=Siae.ASP_MANAGED_KINDS,
+        kind__in=SIAE_WITH_CONVENTION_KINDS,
         source=Siae.SOURCE_USER_CREATED,
         convention__isnull=True,
     ).count()

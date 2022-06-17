@@ -41,6 +41,7 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
 
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
+    # FIXME(vperron): this should be made random
     kind = SiaeKind.EI
     asp_id = factory.Sequence(int)
     is_active = True
@@ -78,7 +79,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
         )
         not_subject_to_eligibility = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice(
-                [kind for kind, _ in SiaeKind.choices if kind not in models.Siae.ELIGIBILITY_REQUIRED_KINDS]
+                [kind for kind in SiaeKind if kind not in models.Siae.ELIGIBILITY_REQUIRED_KINDS]
             ),
         )
         with_membership = factory.Trait(
@@ -89,6 +90,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
+    # FIXME(vperron): this should be made random
     kind = SiaeKind.EI
     name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)

@@ -243,7 +243,7 @@ class EvaluationCampaignManagerTest(TestCase):
         self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
 
         # Job Application not eligible kind
-        for kind in [k for (k, _) in SiaeKind.choices if k not in evaluation_enums.EvaluationSiaesKind.Evaluable]:
+        for kind in [k for k in SiaeKind if k not in evaluation_enums.EvaluationSiaesKind.Evaluable]:
             with self.subTest(kind=kind):
                 siae_wrong_kind = SiaeFactory(department="14", kind=kind)
                 JobApplicationWithApprovalFactory(

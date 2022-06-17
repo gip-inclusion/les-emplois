@@ -113,9 +113,7 @@ class JobApplicationModelTest(TestCase):
         self.assertTrue(job_application.can_display_approval)
 
         # SIAE not subject to eligibility rules.
-        not_eligible_kinds = [
-            choice[0] for choice in SiaeKind.choices if choice[0] not in Siae.ELIGIBILITY_REQUIRED_KINDS
-        ]
+        not_eligible_kinds = [kind for kind in SiaeKind if kind not in Siae.ELIGIBILITY_REQUIRED_KINDS]
         not_eligible_siae = SiaeFactory(kind=not_eligible_kinds[0])
         job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
         self.assertFalse(job_application.can_display_approval)
@@ -311,9 +309,7 @@ class JobApplicationModelTest(TestCase):
 
         # test SIAE cannot use Employee_Record
         job_application.hiring_start_at = today
-        for siae_kind in [
-            siae_kind for siae_kind, _ in SiaeKind.choices if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS
-        ]:
+        for siae_kind in [siae_kind for siae_kind in SiaeKind if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS]:
             not_eligible_siae = SiaeFactory(kind=siae_kind)
             job_application.to_siae = not_eligible_siae
             self.assertFalse(job_application.is_waiting_for_employee_record_creation)

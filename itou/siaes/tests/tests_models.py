@@ -84,12 +84,12 @@ class SiaeModelTest(TestCase):
         siae = SiaeFactory(kind=SiaeKind.EI)
         self.assertTrue(siae.is_subject_to_eligibility_rules)
 
-    def test_is_asp_managed(self):
+    def test_should_have_convention(self):
         siae = SiaeFactory(kind=SiaeKind.ACIPHC)
-        self.assertFalse(siae.is_asp_managed)
+        self.assertFalse(siae.should_have_convention)
 
         siae = SiaeFactory(kind=SiaeKind.EI)
-        self.assertTrue(siae.is_asp_managed)
+        self.assertTrue(siae.should_have_convention)
 
     def test_has_members(self):
         siae1 = SiaeFactory()

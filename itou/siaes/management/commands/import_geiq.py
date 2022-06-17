@@ -110,7 +110,11 @@ class Command(BaseCommand):
     def handle(self, dry_run=False, **options):
         geiq_df = get_geiq_df()
         sync_structures(
-            df=geiq_df, source=Siae.SOURCE_GEIQ, kinds=[SiaeKind.GEIQ], build_structure=build_geiq, dry_run=dry_run
+            df=geiq_df,
+            source=Siae.SOURCE_GEIQ,
+            kinds=[SiaeKind.GEIQ],
+            build_structure=build_geiq,
+            dry_run=dry_run,
         )
 
         self.stdout.write("-" * 80)

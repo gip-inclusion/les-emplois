@@ -206,7 +206,7 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
         )
 
     def test_num_level2_admin_criteria(self):
-        for kind, _ in SiaeKind.choices:
+        for kind in SiaeKind:
             with self.subTest(kind):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()

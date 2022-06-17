@@ -54,7 +54,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
-        self.assertTrue(siae.is_asp_managed)
+        self.assertTrue(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_ASP)
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -79,7 +79,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         new_convention = SiaeConventionFactory(siret_signature=f"{siae.siren}12345")
 
         self.assertTrue(siae.has_admin(user))
-        self.assertTrue(siae.is_asp_managed)
+        self.assertTrue(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -110,7 +110,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         siae = SiaeFactory(source=Siae.SOURCE_STAFF_CREATED, with_membership=True)
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
-        self.assertTrue(siae.is_asp_managed)
+        self.assertTrue(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_STAFF_CREATED)
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -128,7 +128,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         siae = SiaeFactory(membership__is_admin=False, with_membership=True)
         user = siae.members.first()
         self.assertFalse(siae.has_admin(user))
-        self.assertTrue(siae.is_asp_managed)
+        self.assertTrue(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_ASP)
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -146,7 +146,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         siae = SiaeFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_GEIQ, with_membership=True)
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
-        self.assertFalse(siae.is_asp_managed)
+        self.assertFalse(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_GEIQ)
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -164,7 +164,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         siae = SiaeFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_USER_CREATED, with_membership=True)
         user = siae.members.first()
         self.assertTrue(siae.has_admin(user))
-        self.assertFalse(siae.is_asp_managed)
+        self.assertFalse(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)

@@ -26,7 +26,7 @@ def get_siret_kind_to_email_map():
             siret = row[7]
             assert len(siret) == 14
             kind = row[0]
-            assert kind in SiaeKind.values
+            assert kind in SiaeKind
             email = row[14].strip()
             assert " " not in email
             key = (siret, kind)
