@@ -20,10 +20,10 @@
 - Controle a posteriori : email d'information aux siaes de la campagne 2021 partie 2
 - Gérer mes fiches salariés : rendre visible les fiches à l'état 'nouvelle'
 - Correctif pour débloquer les prescripteurs n'ayant pas la possibilité de mettre à jour le NIR
-- En tant qu’employeur je veux valider l’embauche d’un candidat dans le tableau de bord de la bonne structure : Ajout d'une modale de confirmation contenant le carte de la structure lors de l’embauche.
+- En tant qu’employeur je veux valider l’embauche d’un candidat dans le tableau de bord de la bonne structure. Ajout d'une modale de confirmation contenant la carte de la structure lors de l’embauche.
 - Contextualiser les contrats proposés lors de l’enregistrement d’une fiche de poste
 - Une SIAE doit pouvoir réactiver une fiche salarié qu'elle a désactivée
-- Technique : Accélération de la CI, Mise à jour des Github Actions et des paquets Python de dev, Éviter l'arrêt du serveur en environnement de développement Docker, Améliorations de la configuration VSCode et de la documentation, Ne pas nécessiter Redis en développement local, Amélioration de la performance du cron Metabase quotidien
+- Technique : accélération de la CI ; mise à jour des Github Actions et des paquets Python de dev ; éviter l'arrêt du serveur en environnement de développement Docker ; améliorations de la configuration VSCode et de la documentation ; ne pas nécessiter Redis en développement local ; amélioration de la performance du cron Metabase quotidien
 
 ### Supprimé
 - Retirer le message sur le tableau de bord indiquant que le transfert de fiches salarié est interrompu
