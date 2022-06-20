@@ -1,5 +1,34 @@
 # Journal des modifications
 
+## [44] - 2022-06-19
+
+### Ajouté
+- Pole Emploi API : Migration des logs (étape 1/3)
+- Pole Emploi API : Réécriture du client d'API (étape 2/3)
+- Transfert des candidatures entre SIAE
+- Ajout de stats pour les agents PE
+- Pilotage : Calculer le délai entre la première candidature et la première embauche pour les candidats orientés par PE
+- Pilotage : Ajout du type de structure pour permettre l'ajout d'un filtre associé
+- Pilotage : Suivi du taux de refus par type de structure
+- Pilotage : Suivre le délai de recrutement des candidats en IAE
+- Pilotage : Suivi du nombre de candidats sans solution à 30 jours
+- Inclusion Connect : Factorisation des modèles de FranceConnect, ajout des modèles d'Inclusion Connect et ajout de tests (étape 1/3)
+
+### Modifié
+- Contrôle a posteriori : laisser le formulaire de saisie du commentaire modifiable après la revue par les DDETS
+- Controle a posteriori : afficher la date du Pass IAE
+- Controle a posteriori : email d'information aux siaes de la campagne 2021 partie 2
+- Gérer mes fiches salariés : rendre visible les fiches à l'état 'nouvelle'
+- Correctif pour débloquer les prescripteurs n'ayant pas la possibilité de mettre à jour le NIR
+- En tant qu’employeur je veux valider l’embauche d’un candidat dans le tableau de bord de la bonne structure : Ajout d'une modale de confirmation contenant le carte de la structure lors de l’embauche.
+- Contextualiser les contrats proposés lors de l’enregistrement d’une fiche de poste
+- Une SIAE doit pouvoir réactiver une fiche salarié qu'elle a désactivée
+- Technique : Accélération de la CI, Mise à jour des Github Actions et des paquets Python de dev, Éviter l'arrêt du serveur en environnement de développement Docker, Améliorations de la configuration VSCode et de la documentation, Ne pas nécessiter Redis en développement local, Amélioration de la performance du cron Metabase quotidien
+
+### Supprimé
+- Retirer le message sur le tableau de bord indiquant que le transfert de fiches salarié est interrompu
+- Supprimer le message d’information sur les régularisations AI qui est affiché dans leur tableau de bord
+
 ## [43] - 2022-06-02
 
 ### Ajouté
