@@ -396,7 +396,8 @@ class User(AbstractUser, AddressMixin):
         in that case we must absolutely not allow any antenna to be created.
 
         For non SIAE structures (GEIQ, EA...) the convention logic is not implemented thus no convention ever exists.
-        Antennas can be freely created and technically are not rigorously linked to the parent structure.
+        Antennas cannot be freely created by the user as the EA system authorities do not allow any non official SIRET
+        to be used.
 
         Finally, for OPCS it has been decided for now to disallow it; those structures are strongly attached to
         a given territory and thus would not need to join others.
@@ -405,8 +406,8 @@ class User(AbstractUser, AddressMixin):
             self.is_siae_staff
             and parent_siae.is_active
             and parent_siae.has_admin(self)
-            and not parent_siae.is_opcs
-            and (parent_siae.convention is not None or not parent_siae.is_asp_managed)
+            and parent_siae.is_asp_managed
+            and parent_siae.convention is not None
         )
 
     def can_view_stats_dashboard_widget(self, current_org):
