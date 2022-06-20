@@ -437,7 +437,7 @@ class ModelTest(TestCase):
         self.assertTrue(user.has_verified_email)
 
     def test_siae_admin_can_create_siae_antenna(self):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeWithMembershipFactory(membership__is_admin=True)
         user = siae.members.get()
         self.assertTrue(user.can_create_siae_antenna(siae))
 
@@ -451,17 +451,12 @@ class ModelTest(TestCase):
         user = siae.members.get()
         self.assertFalse(user.can_create_siae_antenna(siae))
 
-    def test_geiq_admin_can_create_siae_antenna(self):
-        # A GEIQ never has a convention.
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.GEIQ, convention=None)
-        user = siae.members.get()
-        self.assertTrue(user.can_create_siae_antenna(siae))
-
-    def test_ea_admin_can_create_siae_antenna(self):
-        # An EA never has a convention.
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.EA, convention=None)
-        user = siae.members.get()
-        self.assertTrue(user.can_create_siae_antenna(siae))
+    def test_admin_ability_to_create_siae_antenna(self):
+        for kind in SiaeKind:
+            with self.subTest(kind=kind):
+                siae = SiaeWithMembershipFactory(kind=kind, membership__is_admin=True)
+                user = siae.members.get()
+                self.assertEqual(user.can_create_siae_antenna(siae), siae.is_asp_managed)
 
     def test_can_view_stats_siae_hiring(self):
         # An employer can only view hiring stats of their own SIAE.

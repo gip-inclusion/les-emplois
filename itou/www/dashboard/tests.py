@@ -156,20 +156,18 @@ class DashboardViewTest(TestCase):
                 self.assertNotContains(response, "Déclarer une embauche")
 
     def test_dashboard_can_create_siae_antenna(self):
-        for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ]:
-            with self.subTest(f"antennas freely created without a convention siae_kind={kind}"):
-                siae = SiaeWithMembershipFactory(kind=kind, convention=None)
-                user = siae.members.first()
+        for kind in SiaeKind:
+            with self.subTest(kind=kind):
+                siae = SiaeWithMembershipFactory(kind=kind, membership__is_admin=True)
+                user = siae.members.get()
+
                 self.client.login(username=user.email, password=DEFAULT_PASSWORD)
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertContains(response, "Créer/rejoindre une autre structure")
 
-        # but disabled specifically for OPCS
-        siae = SiaeWithMembershipFactory(kind=SiaeKind.OPCS)
-        user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Créer/rejoindre une autre structure")
+                if user.can_create_siae_antenna(siae):
+                    self.assertContains(response, "Créer/rejoindre une autre structure")
+                else:
+                    self.assertNotContains(response, "Créer/rejoindre une autre structure")
 
     def test_dashboard_siae_evaluations_institution_access(self):
         membershipfactory = InstitutionMembershipFactory()
