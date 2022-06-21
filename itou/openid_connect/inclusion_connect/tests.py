@@ -22,7 +22,6 @@ OIDC_USERINFO = {
 
 
 class InclusionConnectModelTest(TestCase):
-    # Test abstract class using one of its concrete implementation.
     def test_state_delete(self):
         state = InclusionConnectState.objects.create(csrf="foo")
 
@@ -59,10 +58,7 @@ class InclusionConnectModelTest(TestCase):
 
         for field in dataclasses.fields(ic_user_data):
             with self.subTest(field):
-                self.assertEqual(
-                    user.external_data_source_history[field.name]["source"],
-                    users_enums.IdentityProvider.INCLUSION_CONNECT.value,
-                )
+                self.assertEqual(user.external_data_source_history[field.name]["source"], "IC")
                 self.assertEqual(user.external_data_source_history[field.name]["value"], getattr(user, field.name))
 
     def test_create_user_from_user_info_with_already_existing_id(self):
@@ -80,10 +76,7 @@ class InclusionConnectModelTest(TestCase):
         self.assertFalse(created)
         self.assertEqual(user.last_name, OIDC_USERINFO["family_name"])
         self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
-        self.assertEqual(
-            user.external_data_source_history["last_name"]["source"],
-            users_enums.IdentityProvider.INCLUSION_CONNECT.value,
-        )
+        self.assertEqual(user.external_data_source_history["last_name"]["source"], "IC")
 
     def test_create_user_from_user_info_with_already_existing_id_but_from_other_sso(self):
         """
@@ -126,10 +119,7 @@ class InclusionConnectModelTest(TestCase):
 
         for field in dataclasses.fields(new_ic_user):
             with self.subTest(field):
-                self.assertEqual(
-                    user.external_data_source_history[field.name]["source"],
-                    users_enums.IdentityProvider.INCLUSION_CONNECT.value,
-                )
+                self.assertEqual(user.external_data_source_history[field.name]["source"], "IC")
                 self.assertEqual(getattr(user, field.name), getattr(new_ic_user, field.name))
 
     def test_state_is_valid(self):
@@ -139,8 +129,6 @@ class InclusionConnectModelTest(TestCase):
 
 
 class InclusionConnectViewTest(TestCase):
-    # Test abstract class using one of its concrete implementations.
-
     def test_callback_invalid_state(self):
         url = reverse("inclusion_connect:callback")
         response = self.client.get(url, data={"code": "123", "state": "000"})
