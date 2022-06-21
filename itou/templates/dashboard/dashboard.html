@@ -1,4 +1,5 @@
 {% extends "layout/content.html" %}
+{% load static %}
 {% block title %}Tableau de bord{{ block.super }}{% endblock %}
 
 {% block messages %}
@@ -91,6 +92,34 @@
         {% include "welcoming_tour/includes/message.html" %}
     {% endif %}
 
+{% endblock %}
+
+{% block pre_content %}
+    {# Mise en avant temporaire de Dora. #}
+    {% if user.is_prescriber or user.is_siae_staff %}
+        <section class="s-banner-01 pt-0">
+            <div class="s-banner-01__container container">
+                <div class="s-banner-01__row row">
+                    <div class="s-banner-01__col col-12 p-0">
+                        <div class="d-flex flex-column flex-md-row">
+                            <div class="text-center text-md-left mt-3">
+                                <a href="https://dora.fabrique.social.gouv.fr/contribuer?utm_source=lesemplois&utm_medium=banniere&utm_campaign=dashboard" target="_blank"><img src="{% static 'img/logo_dora.svg' %}" alt="DORA : recensement et mise à jour de l’offre d’insertion" width="140"></a>
+                            </div>
+                            <div class="w-100 mt-3 pl-0 pl-md-3">
+                                <p class="h3 mb-2">Participez au référencement de l’offre d’insertion de votre territoire en renseignant les services que vous utilisez au quotidien.</p>
+                                <p class="mb-0 text-right">
+                                    <a href="https://dora.fabrique.social.gouv.fr/contribuer?utm_source=lesemplois&utm_medium=banniere&utm_campaign=dashboard" rel="noopener" target="_blank" class="btn btn-sm btn-outline-primary btn-ico">
+                                        <span>Je contribue</span>
+                                        <i class="ri-arrow-right-line ri-lg"></i>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
