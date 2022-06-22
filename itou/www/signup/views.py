@@ -68,7 +68,7 @@ class JobSeekerSignupView(SignupView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["show_france_connect"] = settings.FRANCE_CONNECT_ENABLED
-        context["show_peamu"] = True
+        context["show_peamu"] = settings.PEAMU_ENABLED
         return context
 
     def get_form_kwargs(self):

@@ -391,6 +391,9 @@ API_ESD = {
 # - PEAM "Utilisateur", PEAM-U or PEAMU for short.
 # To avoid confusion between the two when contacting ESD support,
 # we get the habit to always explicitely state that we are using PEAM*U*.
+# PE Connect is enabled by default, but a feature flag allows to deactivate it.
+# Disabled in the DEMO environment.
+PEAMU_ENABLED = os.environ.get("PEAMU_ENABLED", "True") == "True"
 PEAMU_AUTH_BASE_URL = "https://authentification-candidat.pole-emploi.fr"
 SOCIALACCOUNT_PROVIDERS = {
     "peamu": {
