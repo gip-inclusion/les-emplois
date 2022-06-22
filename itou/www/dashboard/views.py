@@ -1,3 +1,4 @@
+import httpx
 from allauth.account.views import LogoutView, PasswordChangeView
 from django.conf import settings
 from django.contrib import auth, messages
@@ -10,7 +11,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
-from itou.allauth_adapters.peamu.tasks import huey_logout_from_pe_connect
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
@@ -143,12 +143,13 @@ class ItouLogoutView(LogoutView):
             return HttpResponseRedirect(fc_logout_url)
         if peamu_id_token:
             hp_url = self.request.build_absolute_uri("/")
-            # Redirecting to PEAMU_AUTH_BASE_URL causes the user to stay on Pôle emploi's website
-            # because the redirect_uri param doesn't work anymore.
-            # As a temporary work around, perform a fire and forget HTTP request
-            # to try to log out the user while staying on Itou.
-            huey_logout_from_pe_connect(peamu_id_token=peamu_id_token, hp_url=hp_url)
-
+            params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
+            peamu_logout_url = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion?{urlencode(params)}"
+            # Redirecting to PEAMU_AUTH_BASE_URL causes the user to end up there
+            # because the redirect_uri param doen't work anymore.
+            # As a temporary work around, perform a simple post to try to log out the user
+            # but stay on Itou.
+            httpx.post(peamu_logout_url)
         return ajax_response
 
 
