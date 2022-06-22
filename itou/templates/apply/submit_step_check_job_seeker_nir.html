@@ -6,7 +6,7 @@
 
 {% block left_column %}
     <form method="post" action="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="js-prevent-multiple-submit js-format-nir">
-        <div class="card c-card mb-3 mb-lg-5">
+        <div class="card c-card mb-3 mb-lg-5 p-3">
             <div class="card-body">
 
                 {% csrf_token %}
@@ -55,13 +55,18 @@
                         </div>
                     </div>
                 {% endif %}
-            </div>
-            <div class="card-footer">
                 {% buttons %}
                     {# Reload this page and show a modal containing more information about the job seeker. #}
-                    <button type="submit" name="preview" value="1" class="btn btn-primary">
-                        Continuer
-                    </button>
+                    <hr class="my-3 my-lg-5">
+
+                    <div class="row mt-3 mt-lg-5 justify-content-end">
+                        <div class="col-6 col-lg-auto">
+                            <a class="btn btn-link" title="Retourner au tableau de bord" href="{% url 'dashboard:index' %}">Retour</a>
+                        </div>
+                        <div class="col-6 col-lg-auto">
+                            <button type="submit" name="preview" value="1" class="btn float-right btn-primary">Suivant</button>
+                        </div>
+                    </div>
                 {% endbuttons %}
             </div>
         </div>
