@@ -21,13 +21,20 @@
                     <b>Ou</b>
                 </p>
             </div>
+        {% else %}
+            <p class="font-italic text-center mt-3">FranceConnect est désactivé.</p>
         {% endif %}
 
-        <div class="row mt-3">
-            <div class="col-sm">
-                <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
+        {% if show_peamu %}
+            <div class="row mt-3">
+                <div class="col-sm">
+                    <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
+                </div>
             </div>
-        </div>
+        {% else %}
+            <p class="font-italic text-center">Pôle emploi Connect est désactivé.</p>
+        {% endif %}
+
         <div class="mt-4 mb-3">
             <b>Ou utilisez votre adresse e-mail</b>
         </div>
