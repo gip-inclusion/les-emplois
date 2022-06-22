@@ -396,7 +396,7 @@ Usage:
 }
 
 @media (min-width: 992px) {
-    .s-section-twocolumns-with-bg {
+    .s-section-lg-with-background {
         background-color: #fff;
         background: linear-gradient(to left, #fbfbfb 50%, #f2f8fd 50%);
     }
