@@ -142,7 +142,7 @@ class ItouLogoutView(LogoutView):
             fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
             return HttpResponseRedirect(fc_logout_url)
         if peamu_id_token:
-            hp_url = self.request.build_absolute_uri("/")
+            hp_url = get_absolute_url(reverse("home:hp"))
             params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
             peamu_logout_url = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion?{urlencode(params)}"
             # Redirecting to PEAMU_AUTH_BASE_URL causes the user to end up there

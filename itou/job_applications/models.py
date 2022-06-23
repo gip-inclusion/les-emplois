@@ -22,6 +22,7 @@ from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.utils.urls import get_absolute_url
 
 
 logger = logging.getLogger(__name__)
@@ -946,9 +947,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/new_for_prescriber_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def email_new_for_job_seeker(self, base_url):
+    def email_new_for_job_seeker(self):
         to = [self.job_seeker.email]
-        context = {"job_application": self, "base_url": base_url}
+        context = {"job_application": self, "base_url": get_absolute_url()[:-1]}
         subject = "apply/email/new_for_job_seeker_subject.txt"
         body = "apply/email/new_for_job_seeker_body.txt"
         return get_email_message(to, context, subject, body)
