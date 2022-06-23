@@ -158,6 +158,11 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
     form = CheckJobSeekerNirForm(job_seeker=job_seeker, data=request.POST or None)
     preview_mode = False
 
+    # Clean nir in session, especially in case of using back button
+    if "nir" in session_data:
+        session_data["nir"] = None
+        request.session.modified = True
+
     if request.method == "POST" and form.is_valid():
         nir = form.cleaned_data["nir"]
 
