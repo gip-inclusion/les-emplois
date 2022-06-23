@@ -9,7 +9,7 @@
                 {% if nir %}
                     <div class="form-group form-group-required">
                         <label for="id_nir">Numéro de sécurité sociale du candidat</label>
-                        <input type="nir" name="nir" class="form-control" title="" required="" id="id_nir" disabled value="{{ nir }}">
+                        <input type="nir" name="nir" class="form-control" title="" required="" id="id_nir" disabled value="{{ nir|format_nir }}">
                     </div>
                 {% endif %}
 
