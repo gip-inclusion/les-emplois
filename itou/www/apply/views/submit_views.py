@@ -733,8 +733,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
             notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
 
         notification.send()
-        base_url = request.build_absolute_uri("/")[:-1]
-        job_application.email_new_for_job_seeker(base_url=base_url).send()
+        job_application.email_new_for_job_seeker().send()
 
         if job_application.is_sent_by_proxy:
             job_application.email_new_for_prescriber.send()

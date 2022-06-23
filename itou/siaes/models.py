@@ -15,6 +15,7 @@ from itou.common_apps.organizations.models import MembershipAbstract, Organizati
 from itou.siaes.enums import SIAE_WITH_CONVENTION_CHOICES, SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
+from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
 
@@ -361,14 +362,11 @@ class Siae(AddressMixin, OrganizationAbstract):
     def new_signup_activation_email_to_official_contact(self, request):
         """
         Send email to siae.auth_email with a magic link to continue signup.
-
-        Request object is needed to build absolute URL for magic link in email body.
-        See https://stackoverflow.com/questions/2345708/how-can-i-get-the-full-absolute-url-with-domain-in-django
         """
         if not self.auth_email:
             raise RuntimeError("Siae cannot be signed up for, this should never happen.")
         to = [self.auth_email]
-        signup_magic_link = request.build_absolute_uri(self.signup_magic_link)
+        signup_magic_link = get_absolute_url(self.signup_magic_link)
         context = {"siae": self, "signup_magic_link": signup_magic_link}
         subject = "siaes/email/new_signup_activation_email_to_official_contact_subject.txt"
         body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
