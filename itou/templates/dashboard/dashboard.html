@@ -97,10 +97,10 @@
 {% block pre_content %}
     {# Mise en avant temporaire de Dora. #}
     {% if user.is_prescriber or user.is_siae_staff %}
-        <section class="s-banner-01 pt-0">
+        <section class="s-banner-01 pb-3">
             <div class="s-banner-01__container container">
                 <div class="s-banner-01__row row">
-                    <div class="s-banner-01__col col-12 p-0">
+                    <div class="s-banner-01__col col-12">
                         <div class="d-flex flex-column flex-md-row">
                             <div class="text-center text-md-left mt-3">
                                 <a href="https://dora.fabrique.social.gouv.fr/contribuer?utm_source=lesemplois&utm_medium=banniere&utm_campaign=dashboard" target="_blank"><img src="{% static 'img/logo_dora.svg' %}" alt="DORA : recensement et mise à jour de l’offre d’insertion" width="140"></a>
