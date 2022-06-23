@@ -1,4 +1,3 @@
-import httpx
 from allauth.account.views import LogoutView, PasswordChangeView
 from django.conf import settings
 from django.contrib import auth, messages
@@ -145,12 +144,9 @@ class ItouLogoutView(LogoutView):
             hp_url = self.request.build_absolute_uri("/")
             params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
             peamu_logout_url = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion?{urlencode(params)}"
-            # Redirecting to PEAMU_AUTH_BASE_URL causes the user to end up there
-            # because the redirect_uri param doen't work anymore.
-            # As a temporary work around, perform a simple post to try to log out the user
-            # but stay on Itou.
-            httpx.post(peamu_logout_url)
-        return ajax_response
+            return HttpResponseRedirect(peamu_logout_url)
+        else:
+            return ajax_response
 
 
 logout = login_required(ItouLogoutView.as_view())
