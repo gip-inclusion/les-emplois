@@ -65,7 +65,7 @@ urlpatterns = [
     ),
     path(
         "prescriber/user",
-        views.PrescriberUserSignupView.as_view(),
+        views.prescriber_user,
         name="prescriber_user",
     ),
     # SIAE.

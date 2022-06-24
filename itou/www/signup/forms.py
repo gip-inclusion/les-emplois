@@ -7,7 +7,6 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
@@ -451,65 +450,6 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
         # The first member becomes an admin.
         membership.is_admin = membership.organization.members.count() == 0
         membership.save()
-
-        return user
-
-
-class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
-    """
-    Create a new user of type prescriber and his organization (if any).
-    """
-
-    def __init__(self, *args, **kwargs):
-        self.authorization_status = kwargs.pop("authorization_status")
-        self.kind = kwargs.pop("kind")
-        self.prescriber_org_data = kwargs.pop("prescriber_org_data")
-        super().__init__(*args, **kwargs)
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = "Utilisez une adresse e-mail professionnelle."
-
-    def save(self, request):
-        # Avoid django-allauth to call its own often failing `generate_unique_username`
-        # function by forcing a username.
-        self.cleaned_data["username"] = User.generate_unique_username()
-        # Create the user.
-        user = super().save(request)
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
-        user.is_prescriber = True
-        user.save()
-
-        # Create the organization if any: an orienteur may not belong to any organization.
-        if self.prescriber_org_data:
-
-            prescriber_org = PrescriberOrganization()
-            prescriber_org.siret = self.prescriber_org_data["siret"]
-            prescriber_org.name = self.prescriber_org_data["name"]
-            prescriber_org.address_line_1 = self.prescriber_org_data["address_line_1"] or ""
-            prescriber_org.address_line_2 = self.prescriber_org_data["address_line_2"] or ""
-            prescriber_org.post_code = self.prescriber_org_data["post_code"]
-            prescriber_org.city = self.prescriber_org_data["city"]
-            prescriber_org.department = self.prescriber_org_data["department"]
-            prescriber_org.coords = lat_lon_to_coords(
-                self.prescriber_org_data["latitude"], self.prescriber_org_data["longitude"]
-            )
-            prescriber_org.geocoding_score = self.prescriber_org_data["geocoding_score"]
-            prescriber_org.kind = self.kind
-            prescriber_org.authorization_status = self.authorization_status
-            prescriber_org.created_by = user
-            prescriber_org.save()
-
-            # The member becomes a member of the organization.
-            membership = PrescriberMembership()
-            membership.user = user
-            membership.organization = prescriber_org
-            # The first member becomes an admin.
-            membership.is_admin = membership.organization.members.count() == 0
-            membership.save()
-
-            # Notify support.
-            if prescriber_org.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET:
-                prescriber_org.must_validate_prescriber_organization_email().send()
 
         return user
 
