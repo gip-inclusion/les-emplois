@@ -188,22 +188,16 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     return HttpResponseRedirect(next_url)
 
 
-def inclusion_connect_logout(request):
-    token = request.GET.get("token")
-    state = request.GET.get("state")
-    post_logout_redirect_url = request.GET.get("redirect_url", reverse("home:hp"))
-
-    # Fallback on session data.
-    if not token:
-        ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
-        if not ic_session:
-            raise KeyError("Missing session key.")
-        token = ic_session["token"]
-        state = ic_session["state"]
-
+def get_inclusion_connect_logout_redirect(request):
+    """Perform logout from Inclusion Connect if logged in, and return a HttpResponseRedirect
+    If the user wasn't logged through Inclusion Connect, return None
+    """
+    ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
+    if not ic_session:
+        return None
     params = {
-        "id_token_hint": token,
-        "state": state,
+        "id_token_hint": ic_session["token"],
+        "state": ic_session["state"],
     }
     complete_url = f"{constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
     # Logout user from IC with HTTPX to benefit from respx in tests
@@ -211,4 +205,4 @@ def inclusion_connect_logout(request):
     response = httpx.get(complete_url)
     if response.status_code != 302:
         logger.error("Error during IC logout. Status code: %s", response.status_code)
-    return HttpResponseRedirect(post_logout_redirect_url)
+    return HttpResponseRedirect(reverse("home:hp"))

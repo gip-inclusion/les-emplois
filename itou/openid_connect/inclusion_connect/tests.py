@@ -1,17 +1,22 @@
 import dataclasses
 from urllib.parse import quote, urlencode
 
+import respx
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
+from httpx import Response
 
+from itou.openid_connect.inclusion_connect.views import get_inclusion_connect_logout_redirect
 from itou.users import enums as users_enums
 from itou.users.factories import UserFactory
 from itou.users.models import User
 from itou.utils.perms.user import KIND_PRESCRIBER
 
 from ..constants import OIDC_STATE_EXPIRATION
+from . import constants
 from .models import InclusionConnectState, InclusionConnectUserData
 
 
@@ -145,6 +150,23 @@ class InclusionConnectViewTest(TestCase):
         url = reverse("inclusion_connect:callback")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
+
+    @respx.mock
+    def test_logout(self):
+        request = RequestFactory()
+        ic_mock = respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).mock(return_value=Response(302))
+
+        # With no IC session, no call is done
+        request.session = {}
+        self.assertIsNone(get_inclusion_connect_logout_redirect(request))
+        self.assertFalse(ic_mock.called)
+
+        # With an IC session
+        request.session = {constants.INCLUSION_CONNECT_SESSION_KEY: {"token": "my_token", "state": "my_state"}}
+        logout_re = get_inclusion_connect_logout_redirect(request)
+        self.assertEqual(logout_re.url, reverse("home:hp"))
+        self.assertEqual(logout_re.status_code, 302)
+        self.assertTrue(ic_mock.called)
 
     def test_authorize_endpoint(self):
         url = reverse("inclusion_connect:authorize")
