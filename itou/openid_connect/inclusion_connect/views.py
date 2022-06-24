@@ -142,7 +142,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         return _redirect_to_login_page_on_error(error_msg="Sub parameter missing.", request=request)
 
     is_successful = True
-    ic_user_data = InclusionConnectUserData.from_user_info_dict(user_data)
+    ic_user_data = InclusionConnectUserData.from_user_info(user_data)
     ic_session_email = ic_session.get("user_email")
 
     if ic_session_email and ic_session_email != ic_user_data.email:
