@@ -10,7 +10,16 @@
 
 {% block right_content %}
     <div class="py-5 py-lg-7">
-        <h1 class="h1-hero-c1">Connexion</h1>
+        <h1 class="h1-hero-c1 text-center">Se connecter</h1>
+
+        {% if inclusion_connect_url %}
+            <p class="text-center mb-1">
+                Se connecter avec
+            </p>
+            {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
+
+            <hr class="my-5" data-text="ou">
+        {% endif %}
 
         <form method="post" action="{{ login_url }}" class="js-prevent-multiple-submit">
 
@@ -23,36 +32,32 @@
             {% bootstrap_field form.login form_group_class="form-group" %}
 
             {% bootstrap_field form.password form_group_class="form-group mb-1" %}
-            <p class="text-right small font-italic">
-                <a href="{% url 'account_reset_password' %}">Mot de passe oublié ?</a>
+            <p>
+                <a href="{% url 'account_reset_password' %}" class="font-weight-bold">Mot de passe oublié ?</a>
             </p>
 
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">Connexion</button>
-            {% endbuttons %}
+            <p class="text-center">
+                {% bootstrap_button "Se connecter" button_type="submit" button_class="btn-primary btn" %}
+            </p>
 
         </form>
-
-        {% if signup_allowed %}
-            <div class="mt-5 mb-5">
-                <p>Vous n'avez pas de compte ?</p>
-
-                <p>
-                    <a class="btn btn-outline-primary" href="{{ signup_url }}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
-                        Inscription
-                        {% if account_type_display_name %}
-                            {{ account_type_display_name|lower }}
-                        {% endif %}
-                    </a>
-                </p>
-            </div>
-        {% endif %}
     </div>
 {% endblock %}
 
 {% block left_content %}
-    <!-- Hide left column on small devices. -->
-    <div class="d-none d-md-block py-md-5 py-lg-7 text-center">
+    <div class="py-5 py-lg-7 text-center">
+        {% if signup_allowed %}
+            <h1 class="h1-hero-c1">S'inscrire</h1>
+            <p>
+                <a class="btn btn-outline-primary" href="{{ signup_url }}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                    Créer un compte
+                    {% if account_type_display_name %}
+                        {{ account_type_display_name|lower }}
+                    {% endif %}
+                </a>
+            </p>
+        {% endif %}
+
         <p class="display-1 ff-extra-01 mb-5">Bienvenue !</p>
         <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/login.svg' %}" alt="">
     </div>

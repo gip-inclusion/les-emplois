@@ -17,7 +17,7 @@ from django.utils import timezone
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.users import enums as users_enums
 from itou.users.enums import KIND_PRESCRIBER
-from itou.users.factories import DEFAULT_PASSWORD, UserFactory
+from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactory
 from itou.users.models import User
 
 from ..constants import OIDC_STATE_EXPIRATION
@@ -313,6 +313,78 @@ class InclusionConnectSessionTest(TestCase):
         request.session.save()
         request = ic_session.bind_to_request(request=request)
         self.assertTrue(request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY))
+
+
+class InclusionConnectLoginTest(TestCase):
+    @respx.mock
+    def test_normal_signin(self):
+        """
+        A user has created an account with Inclusion Connect.
+        He logs out.
+        He can log in again later.
+        """
+        # Create an account with IC.
+        _oauth_dance(self)
+
+        # Then log out.
+        response = self.client.post(reverse("account_logout"))
+
+        # Then log in again.
+        login_url = reverse("login:prescriber")
+        response = self.client.get(login_url)
+        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, reverse("inclusion_connect:authorize"))
+
+        response = _oauth_dance(self, assert_redirects=False)
+        expected_redirection = reverse("dashboard:index")
+        self.assertRedirects(response, expected_redirection)
+
+        # Make sure it was a login instead of a new signup.
+        users_count = User.objects.filter(email=OIDC_USERINFO["email"]).count()
+        self.assertEqual(users_count, 1)
+
+    @respx.mock
+    def test_old_django_account(self):
+        """
+        A user has a Django account.
+        He clicks on IC button and creates his account.
+        His old Django account should now be considered as an IC one.
+        """
+        user_info = OIDC_USERINFO
+        user = PrescriberFactory(
+            has_completed_welcoming_tour=True,
+            **InclusionConnectUserData.user_info_mapping_dict(user_info),
+        )
+
+        # Existing user connects with IC which results in:
+        # - IC side: account creation
+        # - Django side: account update.
+        # This logic is already tested here: InclusionConnectModelTest
+        response = _oauth_dance(self, assert_redirects=False)
+        # This existing user should not see the welcoming tour.
+        expected_redirection = reverse("dashboard:index")
+        self.assertRedirects(response, expected_redirection)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+        # Make sure it was a login instead of a new signup.
+        users_count = User.objects.filter(email=OIDC_USERINFO["email"]).count()
+        self.assertEqual(users_count, 1)
+
+        response = self.client.post(reverse("account_logout"))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(auth.get_user(self.client).is_authenticated)
+
+        # Try to login with Django.
+        # This is already tested in itou.www.login.tests but only at form level.
+        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
+        response = self.client.post(reverse("login:prescriber"), data=post_data)
+        self.assertEqual(response.status_code, 200)
+        error_message = "Votre compte est relié à Inclusion Connect."
+        self.assertContains(response, error_message)
+        self.assertFalse(auth.get_user(self.client).is_authenticated)
+
+        # Then login with Inclusion Connect.
+        _oauth_dance(self, assert_redirects=False)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
 
 
 class InclusionConnectLogoutTest(TestCase):

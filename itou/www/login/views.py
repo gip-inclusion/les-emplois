@@ -4,7 +4,9 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponsePermanentRedirect
 from django.urls import reverse
+from django.utils.http import urlencode
 
+from itou.users.enums import KIND_PRESCRIBER
 from itou.utils.urls import get_safe_url
 from itou.www.login.forms import ItouLoginForm
 
@@ -72,11 +74,17 @@ class PrescriberLoginView(ItouLoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": self.request.resolver_match.view_name,
+        }
+        inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         extra_context = {
             "account_type_display_name": "prescripteur",
             "login_url": reverse("login:prescriber"),
             "signup_url": reverse("signup:prescriber_check_already_exists"),
             "signup_allowed": True,
+            "inclusion_connect_url": inclusion_connect_url,
         }
         return context | extra_context
 

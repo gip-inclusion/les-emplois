@@ -74,7 +74,16 @@ class ItouLoginFormTest(TestCase):
 
 
 class PrescriberLoginTest(TestCase):
-    def test_login(self):
+    def test_login_options(self):
+        url = reverse("login:prescriber")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "S'identifier avec Inclusion Connect")
+        self.assertContains(response, reverse("inclusion_connect:authorize"))
+        self.assertContains(response, "Adresse e-mail")
+        self.assertContains(response, "Mot de passe")
+
+    def test_login_using_django(self):
         user = PrescriberFactory()
         url = reverse("login:prescriber")
         response = self.client.get(url)
@@ -86,6 +95,22 @@ class PrescriberLoginTest(TestCase):
         }
         response = self.client.post(url, data=form_data)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+    def test_login_using_django_but_has_sso_provider(self):
+        user = PrescriberFactory(identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
+        url = reverse("login:prescriber")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = self.client.post(url, data=form_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response, "Votre compte est relié à Inclusion Connect. Merci de vous connecter avec ce service."
+        )
 
 
 class SiaeStaffLoginTest(TestCase):
