@@ -13,7 +13,6 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.views.decorators.http import require_GET
 
@@ -568,56 +567,34 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
     return render(request, template_name, context)
 
 
-class PrescriberPoleEmploiUserSignupView(SignupView):
-    """
-    Create a user of type prescriber and make him join a pre-existing Pôle emploi organization.
-    """
+@valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_emploi_user.html"):
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    kind = session_data.get("kind")
+    pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
 
-    form_class = forms.PrescriberPoleEmploiUserSignupForm
-    template_name = "signup/prescriber_pole_emploi_user.html"
+    # Check session data.
+    if not pole_emploi_org_pk or kind != PrescriberOrganization.Kind.PE.value:
+        raise PermissionDenied
 
-    @transaction.atomic
-    @method_decorator(valid_prescriber_signup_session_required)
-    @method_decorator(push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY))
-    def dispatch(self, request, *args, **kwargs):
+    pole_emploi_org = get_object_or_404(
+        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
+    )
+    params = {
+        "login_hint": session_data["email"],
+        "user_kind": KIND_PRESCRIBER,
+        "previous_url": request.resolver_match.view_name,
+        "next_url": reverse("signup:prescriber_join_org"),
+    }
+    inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
 
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        kind = session_data.get("kind")
-        pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
-
-        # Check session data.
-        if not pole_emploi_org_pk or kind != PrescriberOrganization.Kind.PE.value:
-            raise PermissionDenied
-
-        self.pole_emploi_org = get_object_or_404(
-            PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
-        )
-
-        self.next = session_data.get("next")
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self, **kwargs):
-        kwargs = super().get_form_kwargs(**kwargs)
-        kwargs["pole_emploi_org"] = self.pole_emploi_org
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["pole_emploi_org"] = self.pole_emploi_org
-        context["prev_url"] = get_prev_url_from_history(self.request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-        return context
-
-    def form_valid(self, form):
-        # Drop the signup session.
-        del self.request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        # A ?next=URL param takes precedence.
-        if self.next:
-            return self.next
-        return super().get_success_url()
+    context = {
+        "inclusion_connect_url": inclusion_connect_url,
+        "pole_emploi_org": pole_emploi_org,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
+    return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required

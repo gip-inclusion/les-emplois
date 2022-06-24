@@ -16,20 +16,6 @@
         </p>
     </div>
 
-    <form method="post" action="" class="js-prevent-multiple-submit">
-
-        {% csrf_token %}
-
-        {% bootstrap_form form alert_error_type="all" %}
-
-        {% include "signup/includes/submit_rgpd.html" %}
-
-        {% buttons %}
-            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-                Retour
-            </a>
-        {% endbuttons %}
-
-    </form>
+    {% include "inclusion_connect/includes/description.html" %}
 
 {% endblock %}

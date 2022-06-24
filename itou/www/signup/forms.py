@@ -7,7 +7,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
@@ -413,45 +413,6 @@ class PrescriberPoleEmploiSafirCodeForm(forms.Form):
             error = "Ce code SAFIR est inconnu."
             raise forms.ValidationError(error)
         return safir_code
-
-
-class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
-    """
-    Create a new user of type prescriber and add it to the members of the given prescriber organization.
-    """
-
-    def __init__(self, *args, **kwargs):
-        self.pole_emploi_org = kwargs.pop("pole_emploi_org")
-        super().__init__(*args, **kwargs)
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = f"Exemple : nom.prenom{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
-
-    def clean_email(self):
-        email = super().clean_email()
-        if not email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
-            raise ValidationError("L'adresse e-mail doit être une adresse Pôle emploi.")
-        return email
-
-    def save(self, request):
-        # Avoid django-allauth to call its own often failing `generate_unique_username`
-        # function by forcing a username.
-        self.cleaned_data["username"] = User.generate_unique_username()
-        # Create the user.
-        user = super().save(request)
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
-        user.is_prescriber = True
-        user.save()
-
-        # The member becomes a member of the PE agency.
-        membership = PrescriberMembership()
-        membership.user = user
-        membership.organization = self.pole_emploi_org
-        # The first member becomes an admin.
-        membership.is_admin = membership.organization.members.count() == 0
-        membership.save()
-
-        return user
 
 
 class FacilitatorSignupForm(SignupForm, FullnameFormMixin):

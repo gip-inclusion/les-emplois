@@ -60,7 +60,7 @@ urlpatterns = [
     ),
     path(
         "prescriber/pole_emploi/user",
-        views.PrescriberPoleEmploiUserSignupView.as_view(),
+        views.prescriber_pole_emploi_user,
         name="prescriber_pole_emploi_user",
     ),
     path(
