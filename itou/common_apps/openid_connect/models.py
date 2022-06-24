@@ -48,7 +48,7 @@ class OIDConnectUserData:  # openid profile and email claims
         # User.objects.create_user does the following:
         # - set User.is_active to true,
         # - call User.set_unusable_password() if no password is given.
-        # See https://docs.djangoproject.com/fr/4.0/ref/contrib/auth/#django.contrib.auth.models.UserManager.create_user
+        # https://docs.djangoproject.com/fr/4.0/ref/contrib/auth/#django.contrib.auth.models.UserManager.create_user
         # TODO: refactor with signup forms.
         user = User.objects.create_user(**user_data_dict)
         for key, value in user_data_dict.items():
