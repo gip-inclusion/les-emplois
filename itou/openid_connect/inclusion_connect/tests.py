@@ -1,4 +1,5 @@
 import dataclasses
+from urllib.parse import quote, urlencode
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -8,6 +9,7 @@ from django.utils import timezone
 from itou.users import enums as users_enums
 from itou.users.factories import UserFactory
 from itou.users.models import User
+from itou.utils.perms.user import KIND_PRESCRIBER
 
 from ..constants import OIDC_STATE_EXPIRATION
 from .models import InclusionConnectState, InclusionConnectUserData
@@ -144,20 +146,21 @@ class InclusionConnectViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
-    # def test_authorize_endpoint(self):
-    #     url = reverse("inclusion_connect:authorize")
-    #     with self.assertRaises(KeyError):
-    #         response = self.client.get(url, follow=False)
+    def test_authorize_endpoint(self):
+        url = reverse("inclusion_connect:authorize")
+        with self.assertRaises(KeyError):
+            response = self.client.get(url, follow=False)
 
-    #     url = f"{reverse('inclusion_connect:authorize')}?user_kind={KIND_PRESCRIBER}"
-    #     # Don't use assertRedirects to avoid fetching the last URL.
-    #     response = self.client.get(url, follow=False)
-    #     self.assertTrue(response.url.startswith(INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
-    #     self.assertTrue(self.client.get(INCLUSION_CONNECT_SESSION_KEY))
+        url = f"{reverse('inclusion_connect:authorize')}?user_kind={KIND_PRESCRIBER}"
+        # Don't use assertRedirects to avoid fetching the last URL.
+        response = self.client.get(url, follow=False)
+        self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
+        self.assertIn(constants.INCLUSION_CONNECT_SESSION_KEY, self.client.session)
 
-    # def test_authorize_endpoint_with_params(self):
-    #     email = "porthos@touspourun.com"
-    #     params = {"login_hint": email, "user_kind": KIND_PRESCRIBER}
-    #     url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
-    #     response = self.client.get(url, follow=False)
-    #     self.assertIn(parse.quote(email), response.url)
+    def test_authorize_endpoint_with_params(self):
+        email = "porthos@touspourun.com"
+        params = {"login_hint": email, "user_kind": KIND_PRESCRIBER}
+        url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+        response = self.client.get(url, follow=False)
+        self.assertIn(quote(email), response.url)
+        self.assertEqual(self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["user_email"], email)
