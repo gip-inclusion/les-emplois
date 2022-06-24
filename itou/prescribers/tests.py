@@ -5,6 +5,7 @@ import respx
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import TestCase
@@ -55,6 +56,31 @@ class PrescriberOrganizationManagerTest(TestCase):
         # No orgs should be accredited by the other org.
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(other_org)
         self.assertEqual(accredited_orgs.count(), 0)
+
+    def test_create_organization(self):
+        """
+        Test `create_organization`.
+        """
+        PrescriberOrganization.objects.create_organization(
+            {
+                "siret": "11122233300000",
+                "name": "Ma petite entreprise",
+                "authorization_status": PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED,
+            },
+        )
+        self.assertEqual(1, PrescriberOrganization.objects.count())
+        self.assertEqual(len(mail.outbox), 0)
+
+        org = PrescriberOrganization.objects.create_organization(
+            {
+                "siret": "11122233300001",
+                "name": "Ma seconde entreprise",
+                "authorization_status": PrescriberOrganization.AuthorizationStatus.NOT_SET,
+            },
+        )
+        self.assertEqual(2, PrescriberOrganization.objects.count())
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(str(org.pk), mail.outbox[0].body)
 
 
 class PrescriberOrganizationModelTest(TestCase):
@@ -141,6 +167,19 @@ class PrescriberOrganizationModelTest(TestCase):
         user_with_active_membership.save()
 
         self.assertNotIn(user_with_active_membership, org.active_members)
+
+    def test_add_member(self):
+        org = PrescriberOrganizationFactory()
+        self.assertEqual(0, org.members.count())
+        admin_user = UserFactory()
+        org.add_member(admin_user)
+        self.assertEqual(1, org.memberships.count())
+        self.assertTrue(org.memberships.get(user=admin_user).is_admin)
+
+        other_user = UserFactory()
+        org.add_member(other_user)
+        self.assertEqual(2, org.memberships.count())
+        self.assertFalse(org.memberships.get(user=other_user).is_admin)
 
     def test_merge_two_organizations(self):
         job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()

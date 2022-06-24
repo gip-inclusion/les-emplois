@@ -68,6 +68,11 @@ urlpatterns = [
         views.prescriber_user,
         name="prescriber_user",
     ),
+    path(
+        "prescriber/join_org",
+        views.prescriber_join_org,
+        name="prescriber_join_org",
+    ),
     # SIAE.
     path("siae/select", views.siae_select, name="siae_select"),
     path("siae/<str:encoded_siae_id>/<str:token>", views.SiaeSignupView.as_view(), name="siae"),

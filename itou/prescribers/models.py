@@ -38,6 +38,14 @@ class PrescriberOrganizationManager(models.Manager):
             return self.filter(department=org.department, is_brsa=True)
         return self.none()
 
+    def create_organization(self, attributes):
+        organization = self.model(**attributes)
+        organization.save()
+        # Notify support.
+        if organization.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET:
+            organization.must_validate_prescriber_organization_email().send()
+        return organization
+
 
 class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     """

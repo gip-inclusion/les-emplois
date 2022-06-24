@@ -4,10 +4,12 @@ Handle multiple user types sign up with django-allauth.
 """
 import logging
 
+from allauth.account.adapter import get_adapter
 from allauth.account.views import PasswordResetView, SignupView
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
@@ -268,6 +270,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
     # of using a direct link, its state must be kept clean in each step.
     request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {
         "authorization_status": None,
+        "email": None,
         "kind": None,
         "prescriber_org_data": None,
         "pole_emploi_org_pk": None,
@@ -659,3 +662,70 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
         "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
+
+
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@valid_prescriber_signup_session_required
+@login_required
+def prescriber_join_org(request):
+    """
+    User is redirected here after a successful oauth signup.
+    This is the last step of the signup path.
+    """
+
+    # Get useful information from session.
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+
+    with transaction.atomic():
+        if session_data["kind"] == "PE":
+            # Organization creation is not allowed for PE.
+            pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
+            prescriber_org = get_object_or_404(
+                PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
+            )
+        else:
+            org_attributes = {
+                "siret": session_data["prescriber_org_data"]["siret"],
+                "name": session_data["prescriber_org_data"]["name"],
+                "address_line_1": session_data["prescriber_org_data"]["address_line_1"] or "",
+                "address_line_2": session_data["prescriber_org_data"]["address_line_2"] or "",
+                "post_code": session_data["prescriber_org_data"]["post_code"],
+                "city": session_data["prescriber_org_data"]["city"],
+                "department": session_data["prescriber_org_data"]["department"],
+                "coords": lat_lon_to_coords(
+                    session_data["prescriber_org_data"]["latitude"], session_data["prescriber_org_data"]["longitude"]
+                ),
+                "geocoding_score": session_data["prescriber_org_data"]["geocoding_score"],
+                "kind": session_data["kind"],
+                "authorization_status": session_data["authorization_status"],
+                "created_by": request.user,
+            }
+            prescriber_org = PrescriberOrganization.objects.create_organization(attributes=org_attributes)
+
+        prescriber_org.add_member(user=request.user)
+    ###
+    # TODO: handle exceptions
+    # ic_session_data = {
+    #     "token": request.session["IC_ID_TOKEN"],
+    #     "state": request.session["IC_STATE"]
+    # }
+    # if form.is_valid():
+    #     user = form.save()
+    # else:
+    #     for _, errors in form.errors.items():
+    #         for error in errors:
+    #             messages.error(request, error)
+
+    #     params = {
+    #         "token": ic_session_data["token"],
+    #         "state": ic_session_data["state"],
+    #         "redirect_url": session_data["url_history"][-1],
+    #     }
+    #     next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+    #     return HttpResponseRedirect(next_url)
+    # redirect to post login page.
+    next_url = get_adapter(request).get_login_redirect_url(request)
+    # delete session data
+    request.session.pop(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+    request.session.modified = True
+    return HttpResponseRedirect(next_url)

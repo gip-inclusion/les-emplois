@@ -71,6 +71,11 @@ class OrganizationAbstract(models.Model):
     def has_admin(self, user):
         return self.active_admin_members.filter(pk=user.pk).exists()
 
+    def add_member(self, user):
+        is_admin = self.members.count() == 0
+        membership = self.memberships.create(user=user, is_admin=is_admin)
+        membership.save()
+
     @property
     def active_members(self):
         memberships = self.memberships.active()
