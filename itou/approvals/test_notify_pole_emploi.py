@@ -10,11 +10,11 @@ from django.core import management
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory
-from itou.approvals.models import Approval
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import SiaeKind, siae_kind_to_pe_type_siae
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
 from itou.utils.apis.pole_emploi import PoleEmploiApiClient
@@ -248,3 +248,106 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
         sleep_mock.assert_called_with(3)
         self.assertEqual(sleep_mock.call_count, 2)
         self.assertEqual(notify_mock.call_count, 2)
+
+
+class PoleEmploiApprovalsSendToPeManagementTestCase(TestCase):
+    @patch.object(PoleEmploiApproval, "notify_pole_emploi")
+    @patch("itou.approvals.management.commands.oneshot-send_pe_approvals_to_pe.sleep")
+    def test_management_command(self, sleep_mock, notify_mock):
+        stdout = io.StringIO()
+        # create ignored PE Approvals, will not even be counted in the batch. the cron will wait for
+        # the database to have the necessary job application, nir, or start date to fetch them.
+        ignored_approval = PoleEmploiApprovalFactory(nir="")
+        PoleEmploiApprovalFactory(nir=None)
+        PoleEmploiApprovalFactory(siae_siret=None)
+
+        # other approvals
+        pe_approval = PoleEmploiApprovalFactory(
+            nir="FOOBAR",
+            pe_notification_status="notification_should_retry",
+        )
+        other_pe_approval = PoleEmploiApprovalFactory(
+            nir="STUFF",
+            pe_notification_status="notification_pending",
+        )
+        management.call_command(
+            "oneshot-send_pe_approvals_to_pe",
+            wet_run=True,
+            delay=3,
+            stdout=stdout,
+        )
+        self.assertEqual(
+            stdout.getvalue().split("\n"),
+            [
+                "PE approvals needing to be sent count=2",
+                f"pe_approval={other_pe_approval} start_at={other_pe_approval.start_at.isoformat()} "
+                "pe_state=notification_pending",
+                f"pe_approval={pe_approval} start_at={pe_approval.start_at.isoformat()} "
+                "pe_state=notification_should_retry",
+                "",
+            ],
+        )
+        sleep_mock.assert_called_with(3)
+        self.assertEqual(sleep_mock.call_count, 2)
+        self.assertEqual(notify_mock.call_count, 2)
+
+        ignored_approval.refresh_from_db()
+        self.assertEqual(ignored_approval.pe_notification_status, "notification_error")
+        self.assertEqual(ignored_approval.pe_notification_exit_code, "MISSING_USER_DATA")
+
+
+@override_settings(
+    API_ESD={
+        "BASE_URL": "https://base.domain",
+        "AUTH_BASE_URL": "https://authentication-domain.fr",
+        "KEY": "foobar",
+        "SECRET": "pe-secret",
+    }
+)
+class PoleEmploiApprovalNotifyPoleEmploiIntegrationTest(TestCase):
+    """FIXME(vperron): Cleanup once all the PE Approvals have been sent to Pole Emploi."""
+
+    def setUp(self):
+        self.api_client = PoleEmploiApiClient(
+            settings.API_ESD["BASE_URL"],
+            settings.API_ESD["AUTH_BASE_URL"],
+            settings.API_ESD["KEY"],
+            settings.API_ESD["SECRET"],
+        )
+        # added here in order to reset our API client between two tests; if not, it would save
+        # its token internally, which could lead to unexpected behaviour.
+        mocker = patch("itou.approvals.models.pole_emploi_api_client", self.api_client)
+        mocker.start()
+        self.addCleanup(mocker.stop)
+        respx.post(self.api_client.token_url).respond(
+            200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+        )
+
+    @respx.mock
+    def test_notification_accepted_nominal(self):
+        now = timezone.now()
+        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
+        respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_OK)
+        pe_approval = PoleEmploiApprovalFactory(
+            nir="FOOBAR2000", siae_kind=SiaeKind.ACI.value
+        )  # avoid the OPCS, not mapped yet
+        pe_approval.notify_pole_emploi(at=now)
+        pe_approval.refresh_from_db()
+        payload = json.loads(respx.calls.last.request.content)
+        self.assertEqual(
+            payload,
+            {
+                "dateDebutPassIAE": pe_approval.start_at.isoformat(),
+                "dateFinPassIAE": pe_approval.end_at.isoformat(),
+                "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
+                "numPassIAE": pe_approval.number,
+                "numSIRETsiae": pe_approval.siae_siret,
+                "origineCandidature": "PRES",
+                "statutReponsePassIAE": "A",
+                "typeSIAE": siae_kind_to_pe_type_siae(pe_approval.siae_kind),
+            },
+        )
+        self.assertEqual(pe_approval.pe_notification_status, "notification_success")
+        self.assertEqual(pe_approval.pe_notification_time, now)
+        self.assertEqual(pe_approval.pe_notification_endpoint, None)
+        self.assertEqual(pe_approval.pe_notification_exit_code, None)

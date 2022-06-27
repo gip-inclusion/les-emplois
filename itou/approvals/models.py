@@ -1271,6 +1271,66 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     def number_with_spaces(self):
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
+    def notify_pole_emploi(self, at=None):
+        """FIXME(vperron): All this code and tests can probably be removed whenever the notifications
+        have ended and we sent everything to Pole Emploi (no more pending or should retry)
+        """
+        try:
+            encrypted_nir = pole_emploi_api_client.recherche_individu_certifie(
+                self.first_name, self.last_name, self.birthdate, self.nir
+            )
+        except PoleEmploiAPIException:
+            logger.info("! notify_pole_emploi pe_approval=%s got a recoverable error in recherche_individu", self)
+            self.pe_save_should_retry(at)
+            return
+        except PoleEmploiAPIBadResponse as exc:
+            logger.info(
+                "! notify_pole_emploi pe_approval=%s got an unrecoverable error=%s in recherche_individu",
+                self,
+                exc.response_code,
+            )
+            self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
+            return
+
+        type_siae = siae_enums.siae_kind_to_pe_type_siae(self.siae_kind)
+        if not type_siae:
+            logger.info(
+                "! notify_pole_emploi pe_approval=%s could not find PE type for siae_siret=%s siae_kind=%s",
+                self,
+                self.siae_siret,
+                self.siae_kind,
+            )
+            self.pe_save_error(
+                api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE,
+                api_enums.PEApiMiseAJourPassExitCode.INVALID_SIAE_KIND,
+                at,
+            )
+            return
+
+        try:
+            pole_emploi_api_client.mise_a_jour_pass_iae(
+                self,
+                encrypted_nir,
+                self.siae_siret,
+                type_siae,
+                "PRES",  # hardcoded, PE approvals are assumed as coming from prescribers
+            )
+        except PoleEmploiAPIException:
+            logger.info("! notify_pole_emploi pe_approval=%s got a recoverable error in maj_pass_iae", self)
+            self.pe_save_should_retry(at)
+            return
+        except PoleEmploiAPIBadResponse as exc:
+            logger.info(
+                "! notify_pole_emploi pe_approval=%s got an unrecoverable error=%s in maj_pass_iae",
+                self,
+                exc.response_code,
+            )
+            self.pe_save_error(api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exc.response_code, at)
+            return
+        else:
+            logger.info("> notify_pole_emploi pe_approval=%s got success in maj_pass_iae!", self)
+            self.pe_save_success(at)
+
 
 class OriginalPoleEmploiApproval(CommonApprovalMixin):
     """
