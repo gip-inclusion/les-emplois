@@ -510,7 +510,7 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
 
         email = evaluation_campaign.get_email_to_institution_selected_siae()
         self.assertEqual(email.to, list(institution.active_members))
-        self.assertIn(dateformat.format(timezone.now() + relativedelta(weeks=6), "d E Y"), email.body)
+        self.assertIn(dateformat.format(fake_now + relativedelta(weeks=6), "d E Y"), email.body)
         self.assertIn(dateformat.format(evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body)
         self.assertIn(dateformat.format(evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body)
 
