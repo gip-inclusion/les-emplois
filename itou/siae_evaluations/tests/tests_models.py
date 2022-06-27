@@ -469,12 +469,12 @@ class EvaluationCampaignManagerTest(TestCase):
 
 
 class EvaluationCampaignEmailMethodsTest(TestCase):
-    def test_get_email_institution_notification(self):
+    def test_get_email_to_institution_ratio_to_select(self):
         institution = InstitutionWith2MembershipFactory()
         evaluation_campaign = EvaluationCampaignFactory(institution=institution)
 
         date = timezone.now().date()
-        email = evaluation_campaign.get_email_institution_notification(date)
+        email = evaluation_campaign.get_email_to_institution_ratio_to_select(date)
 
         self.assertEqual(email.to, list(institution.active_members))
         self.assertIn(reverse("dashboard:index"), email.body)
@@ -484,10 +484,10 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         )
         self.assertIn(f"avant le {dateformat.format(date, 'd E Y')}", email.subject)
 
-    def test_get_email_eligible_siae(self):
+    def test_get_email_to_siae_selected(self):
         siae = SiaeWith2MembershipsFactory()
         evaluated_siae = EvaluatedSiaeFactory(siae=siae)
-        email = evaluated_siae.get_email_eligible_siae()
+        email = evaluated_siae.get_email_to_siae_selected()
 
         self.assertEqual(email.to, list(evaluated_siae.siae.active_admin_members))
         self.assertEqual(
@@ -503,11 +503,12 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         self.assertIn(siae.convention.siret_signature, email.body)
         self.assertIn(dateformat.format(timezone.now() + relativedelta(weeks=6), "d E Y"), email.body)
 
-    def test_get_email_institution_opening_siae(self):
+    def test_get_email_to_institution_selected_siae(self):
+        fake_now = timezone.now()
         institution = InstitutionWith2MembershipFactory()
-        evaluation_campaign = EvaluationCampaignFactory(institution=institution)
+        evaluation_campaign = EvaluationCampaignFactory(institution=institution, evaluations_asked_at=fake_now)
 
-        email = evaluation_campaign.get_email_institution_opening_siae()
+        email = evaluation_campaign.get_email_to_institution_selected_siae()
         self.assertEqual(email.to, list(institution.active_members))
         self.assertIn(dateformat.format(timezone.now() + relativedelta(weeks=6), "d E Y"), email.body)
         self.assertIn(dateformat.format(evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body)
