@@ -254,7 +254,7 @@ class EvaluationCampaign(models.Model):
         to = self.institution.active_members
         context = {
             # end_date for eligible siaes to return their documents of proofs is 6 weeks after notification
-            "end_date": timezone.now() + relativedelta(weeks=6),
+            "end_date": self.evaluations_asked_at + relativedelta(weeks=6),
             "evaluated_period_start_at": self.evaluated_period_start_at,
             "evaluated_period_end_at": self.evaluated_period_end_at,
         }
