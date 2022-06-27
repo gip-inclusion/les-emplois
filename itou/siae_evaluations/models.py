@@ -1,3 +1,5 @@
+import functools
+
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
@@ -308,6 +310,21 @@ class EvaluatedSiae(models.Model):
     def review(self):
         if self.state in [evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluation_enums.EvaluatedSiaeState.REFUSED]:
             with transaction.atomic():
+
+                email = {
+                    (evaluation_enums.EvaluatedSiaeState.ACCEPTED, True): functools.partial(
+                        self.get_email_to_siae_reviewed, adversarial=True
+                    ),
+                    (evaluation_enums.EvaluatedSiaeState.ACCEPTED, False): functools.partial(
+                        self.get_email_to_siae_reviewed, adversarial=False
+                    ),
+                    (evaluation_enums.EvaluatedSiaeState.REFUSED, True): self.get_email_to_siae_adversarial_stage,
+                    (evaluation_enums.EvaluatedSiaeState.REFUSED, False): self.get_email_to_siae_refused,
+                }[(self.state, bool(self.reviewed_at))]()
+
+                connection = mail.get_connection()
+                connection.send_messages([email])
+
                 self.reviewed_at = timezone.now()
                 self.save(update_fields=["reviewed_at"])
 
@@ -327,6 +344,41 @@ class EvaluatedSiae(models.Model):
         body = "siae_evaluations/email/to_siae_selected_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def get_email_to_siae_reviewed(self, adversarial=False):
+        to = self.siae.active_admin_members
+        context = {"evaluation_campaign": self.evaluation_campaign, "siae": self.siae, "adversarial": adversarial}
+        subject = "siae_evaluations/email/to_siae_reviewed_subject.txt"
+        body = "siae_evaluations/email/to_siae_reviewed_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def get_email_to_siae_refused(self):
+        to = self.siae.active_admin_members
+        context = {
+            "evaluation_campaign": self.evaluation_campaign,
+            "siae": self.siae,
+        }
+        subject = "siae_evaluations/email/to_siae_refused_subject.txt"
+        body = "siae_evaluations/email/to_siae_refused_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def get_email_to_siae_adversarial_stage(self):
+        to = self.siae.active_admin_members
+        context = {
+            "evaluation_campaign": self.evaluation_campaign,
+            "siae": self.siae,
+        }
+        subject = "siae_evaluations/email/to_siae_adversarial_stage_subject.txt"
+        body = "siae_evaluations/email/to_siae_adversarial_stage_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def get_email_to_institution_submitted_by_siae(self):
+        to = self.evaluation_campaign.institution.active_members
+        context = {
+            "siae": self.siae,
+            "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
+        }
+        subject = "siae_evaluations/email/to_institution_submitted_by_siae_subject.txt"
+        body = "siae_evaluations/email/to_institution_submitted_by_siae_body.txt"
         return get_email_message(to, context, subject, body)
 
     @cached_property

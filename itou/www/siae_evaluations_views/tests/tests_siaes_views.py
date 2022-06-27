@@ -1,15 +1,18 @@
 from dateutil.relativedelta import relativedelta
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
+    EvaluationCampaignFactory,
 )
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 from itou.siaes.factories import SiaeMembershipFactory
@@ -19,7 +22,7 @@ from itou.utils.perms.user import UserInfo
 from itou.utils.storage.s3 import S3Upload
 
 
-def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_2=False):
+def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_2=False, institution=None):
     job_seeker = JobSeekerFactory()
 
     user_info = UserInfo(
@@ -44,7 +47,12 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
         hiring_start_at=timezone.now() - relativedelta(months=2),
     )
 
-    evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=siae)
+    if institution:
+        evaluation_campaign = EvaluationCampaignFactory(institution=institution, evaluations_asked_at=timezone.now())
+    else:
+        evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now())
+
+    evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=siae)
     evaluated_job_application = EvaluatedJobApplicationFactory(
         job_application=job_application, evaluated_siae=evaluated_siae
     )
@@ -551,8 +559,9 @@ class SiaeSubmitProofsViewTest(TestCase):
             + 1  # fetch user
             + 1  # fetch siae membership
             + 2  # fetch siae infos
-            + 2  # fetch evaluatedjobapplication and its prefetch evaluatedadministrativecriteria
+            + 3  # fetch evaluatedsiae, evaluatedjobapplication and evaluatedadministrativecriteria
             + 1  # update evaluatedadministrativecriteria
+            + 4  # fetch evaluationcampaign, institution, siae and siae members for email notification
             + 3  # savepoint, update session, release savepoint
         ):
 
@@ -602,6 +611,37 @@ class SiaeSubmitProofsViewTest(TestCase):
         )
         self.assertLess(
             evaluated_administrative_criteria1.submitted_at, evaluated_administrative_criteria0.submitted_at
+        )
+
+    def test_submitted_email(self):
+        institution_membership = InstitutionMembershipFactory()
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(
+            self.siae, self.user, institution=institution_membership.institution
+        )
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(
+            (
+                f"[Contrôle a posteriori] La structure { evaluated_job_application.evaluated_siae.siae.kind } "
+                f"{ evaluated_job_application.evaluated_siae.siae.name } a transmis ses pièces justificatives."
+            ),
+            email.subject,
+        )
+        self.assertIn(
+            (
+                f"La structure { evaluated_job_application.evaluated_siae.siae.kind } "
+                f"{ evaluated_job_application.evaluated_siae.siae.name } vient de vous transmettre ses pièces"
+            ),
+            email.body,
+        )
+        self.assertEqual(
+            email.to[0],
+            evaluated_job_application.evaluated_siae.evaluation_campaign.institution.active_members.first(),
         )
 
     def test_campaign_is_ended(self):

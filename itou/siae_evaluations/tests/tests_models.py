@@ -1,6 +1,7 @@
 from unittest import mock
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
@@ -781,6 +782,109 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.review()
         evaluated_siae.refresh_from_db()
         self.assertIsNotNone(evaluated_siae.reviewed_at)
+
+    def test_review_emails(self):
+        fake_now = timezone.now()
+        values = [
+            (evaluation_enums.EvaluatedSiaeState.ACCEPTED, None, "la conformité des justificatifs"),
+            (evaluation_enums.EvaluatedSiaeState.ACCEPTED, fake_now, "la conformité des nouveaux justificatifs"),
+            (evaluation_enums.EvaluatedSiaeState.REFUSED, None, "un ou plusieurs justificatifs sont attendus"),
+            (
+                evaluation_enums.EvaluatedSiaeState.REFUSED,
+                fake_now,
+                "plusieurs de vos justificatifs n’ont pas été validés",
+            ),
+        ]
+
+        for state, reviewed_at, txt in values:
+            with mock.patch.object(EvaluatedSiae, "state", state):
+                with self.subTest(state=state, reviewed_at=reviewed_at, txt=txt):
+                    evaluated_siae = EvaluatedSiaeFactory(reviewed_at=reviewed_at)
+                    evaluated_siae.review()
+                    email = mail.outbox[-1]
+                    self.assertIn(txt, email.body)
+
+    def test_get_email_to_institution_submitted_by_siae(self):
+        institution = InstitutionWith2MembershipFactory()
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__institution=institution)
+        email = evaluated_siae.get_email_to_institution_submitted_by_siae()
+
+        self.assertIn(evaluated_siae.siae.kind, email.subject)
+        self.assertIn(evaluated_siae.siae.name, email.subject)
+        self.assertIn(evaluated_siae.siae.kind, email.body)
+        self.assertIn(evaluated_siae.siae.name, email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), len(institution.active_members))
+
+    def test_get_email_to_siae_reviewed(self):
+        siae = SiaeFactory(with_membership=True)
+        evaluated_siae = EvaluatedSiaeFactory(siae=siae)
+        email = evaluated_siae.get_email_to_siae_reviewed()
+
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), len(evaluated_siae.siae.active_admin_members))
+        self.assertEqual(email.to[0].email, evaluated_siae.siae.active_admin_members.first().email)
+        self.assertIn(evaluated_siae.siae.kind, email.subject)
+        self.assertIn(evaluated_siae.siae.name, email.subject)
+        self.assertIn(str(evaluated_siae.siae.id), email.subject)
+        self.assertIn(evaluated_siae.siae.kind, email.body)
+        self.assertIn(evaluated_siae.siae.name, email.body)
+        self.assertIn(str(evaluated_siae.siae.id), email.body)
+        self.assertIn(evaluated_siae.evaluation_campaign.institution.name, email.body)
+        self.assertIn(
+            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body
+        )
+        self.assertIn(
+            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body
+        )
+        self.assertIn("la conformité des justificatifs que vous avez", email.body)
+
+        email = evaluated_siae.get_email_to_siae_reviewed(adversarial=True)
+        self.assertIn("la conformité des nouveaux justificatifs que vous avez", email.body)
+
+    def test_get_email_to_siae_refused(self):
+        siae = SiaeFactory(with_membership=True)
+        evaluated_siae = EvaluatedSiaeFactory(siae=siae)
+        email = evaluated_siae.get_email_to_siae_refused()
+
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), len(evaluated_siae.siae.active_admin_members))
+        self.assertEqual(email.to[0].email, evaluated_siae.siae.active_admin_members.first().email)
+        self.assertIn(evaluated_siae.siae.kind, email.subject)
+        self.assertIn(evaluated_siae.siae.name, email.subject)
+        self.assertIn(str(evaluated_siae.siae.id), email.subject)
+        self.assertIn(evaluated_siae.siae.kind, email.body)
+        self.assertIn(evaluated_siae.siae.name, email.body)
+        self.assertIn(str(evaluated_siae.siae.id), email.body)
+        self.assertIn(evaluated_siae.evaluation_campaign.institution.name, email.body)
+        self.assertIn(
+            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body
+        )
+        self.assertIn(
+            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body
+        )
+
+    def test_get_email_to_siae_adversarial_stage(self):
+        siae = SiaeFactory(with_membership=True)
+        evaluated_siae = EvaluatedSiaeFactory(siae=siae)
+        email = evaluated_siae.get_email_to_siae_adversarial_stage()
+
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), len(evaluated_siae.siae.active_admin_members))
+        self.assertEqual(email.to[0].email, evaluated_siae.siae.active_admin_members.first().email)
+        self.assertIn(evaluated_siae.siae.kind, email.subject)
+        self.assertIn(evaluated_siae.siae.name, email.subject)
+        self.assertIn(str(evaluated_siae.siae.id), email.subject)
+        self.assertIn(evaluated_siae.siae.kind, email.body)
+        self.assertIn(evaluated_siae.siae.name, email.body)
+        self.assertIn(str(evaluated_siae.siae.id), email.body)
+        self.assertIn(evaluated_siae.evaluation_campaign.institution.name, email.body)
+        self.assertIn(
+            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body
+        )
+        self.assertIn(
+            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body
+        )
 
 
 class EvaluatedJobApplicationModelTest(TestCase):
