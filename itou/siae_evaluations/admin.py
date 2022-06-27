@@ -1,44 +1,10 @@
 from django.contrib import admin, messages
-from django.utils import timezone
 
 from itou.siae_evaluations import models
 
 
 @admin.register(models.EvaluationCampaign)
 class EvaluationCampaignAdmin(admin.ModelAdmin):
-    @admin.action(description="Sélectionner les échantillons à contrôler")
-    def populate(self, request, queryset):
-        now = timezone.now()
-        populate_succeed = []
-        populate_failed = []
-
-        for campaign in queryset:
-
-            try:
-                campaign.populate(now)
-                populate_succeed.append(campaign)
-
-            except models.CampaignAlreadyPopulatedException:
-
-                populate_failed.append(campaign)
-
-        if populate_succeed:
-            messages.success(
-                request,
-                (
-                    "Les échantillons à contrôler ont été sélectionné pour les campagnes "
-                    f"{', '.join(str(campaign) for campaign in populate_succeed)}"
-                ),
-            )
-        if populate_failed:
-            messages.warning(
-                request,
-                (
-                    "Les échantillons ont déjà été sélectionné pour les campagnes "
-                    f"{', '.join(str(campaign) for campaign in populate_failed)}"
-                ),
-            )
-
     @admin.action(description="Passer les campagnes en phase contradictiore")
     def transition_to_adversarial_phase(self, request, queryset):
         for campaign in queryset:
@@ -52,7 +18,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
             ),
         )
 
-    actions = [populate, transition_to_adversarial_phase]
+    actions = [transition_to_adversarial_phase]
 
     list_display = (
         "name",
