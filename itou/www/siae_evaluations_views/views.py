@@ -224,6 +224,8 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
 @login_required
 def siae_job_applications_list(request, template_name="siae_evaluations/siae_job_applications_list.html"):
 
+    # note vincentporte : misconception. This view should be called with one evaluated_siae
+    # id, not trying to deal with any evaluated_siae of one siae. Must be fixed soon.
     siae = get_current_siae_or_404(request)
 
     evaluated_job_applications = (
@@ -372,8 +374,8 @@ def siae_upload_doc(
 def siae_submit_proofs(request):
     # notice this is a blind view, without template.
 
-    siae = get_current_siae_or_404(request)
-
+    # note vincentporte : misconception. This view should be called with one evaluated_siae
+    # move all this logic into model after fixing call with one evaluated_siae
     # info : this queryset is used to check that each EvaluatedJobApplication
     # is linked to at least one EvaluatedAdministrativeCriteria, to prevent
     # submitting orphan EvaluatedJobApplication
@@ -403,6 +405,8 @@ def siae_submit_proofs(request):
 
         back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
+        # note vincentporte : misconception. This view should be called with one evaluated_siae
+        # check this impact when calling this view with evaluated_siae.pk in params
         connection = mail.get_connection()
         connection.send_messages([evaluated_siae.get_email_to_institution_submitted_by_siae()])
 
