@@ -1,14 +1,17 @@
 import datetime
+import io
 import json
 from unittest.mock import patch
 
 import httpx
 import respx
 from django.conf import settings
+from django.core import management
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory
+from itou.approvals.models import Approval
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
@@ -203,3 +206,45 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         self.assertEqual(approval.pe_notification_time, now)
         self.assertEqual(approval.pe_notification_endpoint, None)
         self.assertEqual(approval.pe_notification_exit_code, "NO_JOB_APPLICATION")
+
+
+class ApprovalsSendToPeManagementTestCase(TestCase):
+    @patch.object(Approval, "notify_pole_emploi")
+    @patch("itou.approvals.management.commands.send_approvals_to_pe.sleep")
+    def test_invalid_job_seeker_for_pole_emploi(self, sleep_mock, notify_mock):
+        stdout = io.StringIO()
+        # create ignored Approvals, will not even be counted in the batch. the cron will wait for
+        # the database to have the necessary job application, nir, or start date to fetch them.
+        ApprovalFactory(with_jobapplication=False)
+        ApprovalFactory(user__nir="")
+        ApprovalFactory(user__nir=None)
+        ApprovalFactory(user__birthdate=None)
+        ApprovalFactory(start_at=datetime.datetime.today().date() + datetime.timedelta(days=1))
+
+        # other approvals
+        retry_approval = ApprovalFactory(
+            start_at=datetime.datetime.today().date() - datetime.timedelta(days=1),
+            with_jobapplication=True,
+            pe_notification_status="notification_should_retry",
+        )
+        pending_approval = ApprovalFactory(with_jobapplication=True)
+        management.call_command(
+            "send_approvals_to_pe",
+            wet_run=True,
+            delay=3,
+            stdout=stdout,
+        )
+        self.assertEqual(
+            stdout.getvalue().split("\n"),
+            [
+                "approvals needing to be sent count=2, batch count=100",
+                f"approvals={pending_approval} start_at={pending_approval.start_at.isoformat()} "
+                "pe_state=notification_pending",
+                f"approvals={retry_approval} start_at={retry_approval.start_at.isoformat()} "
+                "pe_state=notification_should_retry",
+                "",
+            ],
+        )
+        sleep_mock.assert_called_with(3)
+        self.assertEqual(sleep_mock.call_count, 2)
+        self.assertEqual(notify_mock.call_count, 2)
