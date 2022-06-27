@@ -23,7 +23,7 @@ from itou.utils.apis import enums as api_enums
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
 from itou.utils.models import DateRange
 from itou.utils.urls import get_external_link_markup
-from itou.utils.validators import alphanumeric
+from itou.utils.validators import alphanumeric, validate_siret
 
 
 logger = logging.getLogger(__name__)
@@ -1229,6 +1229,21 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     # https://www.net-entreprises.fr/astuces/identification-des-salaries%E2%80%AF-nir-nia-et-ntt/
     # NTT max length = 40 chars, max duration = 3 months
     ntt_nia = models.CharField(verbose_name="NTT ou NIA", max_length=40, null=True, blank=True)
+
+    siae_siret = models.CharField(
+        verbose_name="Siret de la SIAE",
+        max_length=14,
+        validators=[validate_siret],
+        null=True,
+        blank=True,
+    )
+    siae_kind = models.CharField(
+        verbose_name="Type de la SIAE",
+        max_length=6,
+        choices=siae_enums.SiaeKind.choices,
+        null=True,
+        blank=True,
+    )
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 

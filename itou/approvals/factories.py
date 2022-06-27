@@ -9,6 +9,7 @@ from faker import Faker
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
 
@@ -79,8 +80,6 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
-    """Generate an PoleEmploiApproval() object for unit tests."""
-
     class Meta:
         model = PoleEmploiApproval
 
@@ -91,6 +90,8 @@ class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     start_at = datetime.date.today()
     end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1))
+    siae_siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
+    siae_kind = factory.fuzzy.FuzzyChoice(SiaeKind.values)
 
     @factory.lazy_attribute
     def first_name(self):
