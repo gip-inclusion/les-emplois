@@ -368,7 +368,11 @@ class EvaluatedSiae(models.Model):
             return evaluation_enums.EvaluatedSiaeState.SUBMITTED
 
         if any(
-            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+            eval_admin_crit.review_state
+            in [
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+            ]
             for eval_job_app in self.evaluated_job_applications.all()
             for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
         ):
