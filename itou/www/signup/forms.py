@@ -415,6 +415,25 @@ class PrescriberPoleEmploiSafirCodeForm(forms.Form):
         return safir_code
 
 
+class PrescriberCheckPEemail(forms.Form):
+    email = forms.EmailField(
+        label="E-mail",
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "autocomplete": "off",
+            }
+        ),
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if not email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
+            raise ValidationError("L'adresse e-mail doit être une adresse Pôle emploi.")
+        return email
+
+
 class FacilitatorSignupForm(SignupForm, FullnameFormMixin):
 
     email = forms.EmailField(

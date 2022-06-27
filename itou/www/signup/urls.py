@@ -59,6 +59,11 @@ urlpatterns = [
         name="prescriber_pole_emploi_safir_code",
     ),
     path(
+        "prescriber/pole_emploi/check_email",
+        views.prescriber_check_pe_email,
+        name="prescriber_check_pe_email",
+    ),
+    path(
         "prescriber/pole_emploi/user",
         views.prescriber_pole_emploi_user,
         name="prescriber_pole_emploi_user",
