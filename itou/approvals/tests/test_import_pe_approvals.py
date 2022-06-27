@@ -4,6 +4,7 @@ import io
 from django.core import management
 from django.test import TransactionTestCase
 
+from itou.approvals.factories import PoleEmploiApprovalFactory
 from itou.approvals.models import PoleEmploiApproval
 
 
@@ -87,3 +88,30 @@ class ImportPEApprovalTestCase(TransactionTestCase):
         ]
         approvals = PoleEmploiApproval.objects.all()
         self.assertEqual(len(approvals), 1)
+
+
+class OneshotImportPEApprovalTestCase(TransactionTestCase):
+    def test_command_output(self):
+        pe_approval_1 = PoleEmploiApprovalFactory(number="592292010007")
+        pe_approval_2 = PoleEmploiApprovalFactory(number="666112110666")
+        stdout = io.StringIO()
+        management.call_command(
+            "oneshot-import_pe_approvals_siret_kind", file_path=TEST_FILE_PATH, wet_run=True, stdout=stdout
+        )
+        output = stdout.getvalue().split("\n")
+        assert output == [
+            "Ready to import up to length=4 approvals from "
+            "file=itou/approvals/tests/liste-agrements-22_03-fake.xlsx",
+            "> pe_approval=592292010007 was updated with siret=123456789 and kind=AI",
+            "! pe_approval with number=80222012208 not found",
+            "! pe_approval with number=976066666688 not found",
+            "> pe_approval=666112110666 was updated with siret=123456789 and kind=ETTI",
+            "Done.",
+            "",
+        ]
+        pe_approval_1.refresh_from_db()
+        pe_approval_2.refresh_from_db()
+        self.assertEqual(pe_approval_1.siae_kind, "AI")
+        self.assertEqual(pe_approval_1.siae_siret, "123456789")
+        self.assertEqual(pe_approval_2.siae_kind, "ETTI")
+        self.assertEqual(pe_approval_2.siae_siret, "123456789")
