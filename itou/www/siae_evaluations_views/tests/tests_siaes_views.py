@@ -446,6 +446,7 @@ class SiaeUploadDocsViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_access(self):
+        self.maxDiff = None
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
