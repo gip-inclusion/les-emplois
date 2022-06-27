@@ -76,6 +76,8 @@ def get_vue_af_df():
     df["number"] = df.number_prefix + "A" + df.renewal_number.astype(str) + "M" + df.modification_number.astype(str)
 
     # Ensure data quality.
+    # FIXME(vporte): It's bad practive to iterate over the rows. We can assert on the whole column, and
+    # then apply the validate().
     for _, row in df.iterrows():
         assert row.kind in SIAE_WITH_CONVENTION_KINDS
         validate_af_number(row.number)
