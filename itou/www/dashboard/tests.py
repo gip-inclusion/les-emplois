@@ -176,17 +176,39 @@ class DashboardViewTest(TestCase):
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
+        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
 
         evaluation_campaign = EvaluationCampaignFactory(institution=institution)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
         self.assertContains(response, reverse("siae_evaluations_views:samples_selection"))
+        self.assertNotContains(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            ),
+        )
 
         evaluation_campaign.evaluations_asked_at = timezone.now()
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
+        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
         self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            ),
+        )
+
+        evaluation_campaign.ended_at = timezone.now()
+        evaluation_campaign.save(update_fields=["ended_at"])
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Contrôle a posteriori")
+        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
+        self.assertNotContains(
             response,
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",

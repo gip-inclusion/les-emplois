@@ -69,7 +69,6 @@ def institution_evaluated_siae_list(
         .order_by("siae__name"),
         evaluation_campaign__pk=evaluation_campaign_pk,
         evaluation_campaign__institution=institution,
-        evaluation_campaign__ended_at=None,
         evaluation_campaign__evaluations_asked_at__isnull=False,
     )
 
@@ -79,6 +78,7 @@ def institution_evaluated_siae_list(
         if evaluated_siaes
         else None,
         "evaluated_siaes": evaluated_siaes,
+        "ended_at": evaluated_siaes[0].evaluation_campaign.ended_at,
         "back_url": back_url,
     }
     return render(request, template_name, context)
@@ -173,6 +173,7 @@ def institution_evaluated_administrative_criteria(request, evaluated_administrat
         pk=evaluated_administrative_criteria_pk,
         evaluated_job_application__evaluated_siae__evaluation_campaign__institution=institution,
         evaluated_job_application__evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
+        evaluated_job_application__evaluated_siae__evaluation_campaign__ended_at__isnull=True,
     )
     if action == "reinit":
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
@@ -206,6 +207,7 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
         pk=evaluated_siae_pk,
         evaluation_campaign__institution=institution,
         evaluation_campaign__evaluations_asked_at__isnull=False,
+        evaluation_campaign__ended_at__isnull=True,
     )
 
     evaluated_siae.review()
@@ -269,7 +271,10 @@ def siae_select_criteria(
 ):
     siae = get_current_siae_or_404(request)
     evaluated_job_application = get_object_or_404(
-        EvaluatedJobApplication, pk=evaluated_job_application_pk, evaluated_siae__siae=siae
+        EvaluatedJobApplication,
+        pk=evaluated_job_application_pk,
+        evaluated_siae__siae=siae,
+        evaluated_siae__evaluation_campaign__ended_at__isnull=True,
     )
     initial_data = {
         eval_criterion.administrative_criteria.key: True
@@ -332,6 +337,7 @@ def siae_upload_doc(
         EvaluatedAdministrativeCriteria,
         pk=evaluated_administrative_criteria_pk,
         evaluated_job_application__evaluated_siae__siae=get_current_siae_or_404(request),
+        evaluated_job_application__evaluated_siae__evaluation_campaign__ended_at__isnull=True,
     )
 
     form = SubmitEvaluatedAdministrativeCriteriaProofForm(
@@ -370,22 +376,18 @@ def siae_submit_proofs(request):
     # info : this queryset is used to check that each EvaluatedJobApplication
     # is linked to at least one EvaluatedAdministrativeCriteria, to prevent
     # submitting orphan EvaluatedJobApplication
-    evaluated_job_applications = (
-        EvaluatedJobApplication.objects.exclude(
-            evaluated_siae__evaluation_campaign__evaluations_asked_at=None,
-        )
-        .filter(
-            evaluated_siae__siae=siae,
-            evaluated_siae__evaluation_campaign__ended_at=None,
-        )
-        .select_related(
-            "evaluated_siae",
-            "evaluated_siae__evaluation_campaign",
-        )
-        .prefetch_related("evaluated_administrative_criteria")
+    evaluated_siae = get_object_or_404(
+        EvaluatedSiae,
+        siae=get_current_siae_or_404(request),
+        evaluation_campaign__evaluations_asked_at__isnull=False,
+        evaluation_campaign__ended_at=None,
     )
 
-    if all(
+    evaluated_job_applications = EvaluatedJobApplication.objects.filter(
+        evaluated_siae=evaluated_siae
+    ).prefetch_related("evaluated_administrative_criteria")
+
+    if evaluated_job_applications and all(
         (
             evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
             or evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED

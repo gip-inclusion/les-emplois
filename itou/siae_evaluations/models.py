@@ -239,6 +239,10 @@ class EvaluationCampaign(models.Model):
             reviewed_at=timezone.now()
         )
 
+    def close(self):
+        if not self.ended_at:
+            self.ended_at = timezone.now()
+            self.save(update_fields=["ended_at"])
 
     def get_email_to_institution_ratio_to_select(self, ratio_selection_end_at):
         to = self.institution.active_members
