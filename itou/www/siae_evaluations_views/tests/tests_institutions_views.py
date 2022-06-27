@@ -20,6 +20,7 @@ from itou.utils.perms.user import UserInfo
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
 
+# fixme vincentporte : convert this method into factory
 def create_evaluated_siae_consistent_datas(evaluation_campaign):
     membership = SiaeMembershipFactory(siae__department=evaluation_campaign.institution.department)
     user = membership.user
@@ -54,6 +55,7 @@ def create_evaluated_siae_consistent_datas(evaluation_campaign):
     return evaluated_siae
 
 
+# fixme vincentporte : remove this method. EvaluatedAdministrativeCriteria have been added yet.
 def get_evaluated_administrative_criteria(institution):
     evaluation_campaign = EvaluationCampaignFactory(institution=institution, evaluations_asked_at=timezone.now())
     evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
@@ -618,6 +620,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
     def test_criterion_validation(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
 
         refuse_url = reverse(
@@ -754,6 +758,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
     def test_num_queries_in_view(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_administrative_criteria.evaluated_job_application,
@@ -784,6 +789,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
     def test_job_application_state_labels(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         evaluated_administrative_criteria.proof_url = "https://www.test.com"
         evaluated_administrative_criteria.submitted_at = timezone.now()
@@ -881,6 +887,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
 
     def test_actions_and_redirection(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         redirect_url = reverse(
             "siae_evaluations_views:institution_evaluated_job_application",

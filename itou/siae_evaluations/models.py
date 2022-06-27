@@ -246,6 +246,8 @@ class EvaluationCampaign(models.Model):
             self.ended_at = timezone.now()
             self.save(update_fields=["ended_at"])
 
+    # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
+    # to emails.py in institution model
     def get_email_to_institution_ratio_to_select(self, ratio_selection_end_at):
         to = self.institution.active_members
         context = {
@@ -328,6 +330,7 @@ class EvaluatedSiae(models.Model):
                 self.reviewed_at = timezone.now()
                 self.save(update_fields=["reviewed_at"])
 
+    # fixme vincentporte : to refactor. move all get_email_to_siae_xxx() method to emails.py in siae model
     def get_email_to_siae_selected(self):
         to = self.siae.active_admin_members
         context = {
@@ -371,6 +374,8 @@ class EvaluatedSiae(models.Model):
         body = "siae_evaluations/email/to_siae_adversarial_stage_body.txt"
         return get_email_message(to, context, subject, body)
 
+    # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
+    # to emails.py in institution model
     def get_email_to_institution_submitted_by_siae(self):
         to = self.evaluation_campaign.institution.active_members
         context = {

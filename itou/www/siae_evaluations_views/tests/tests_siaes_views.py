@@ -22,6 +22,7 @@ from itou.utils.perms.user import UserInfo
 from itou.utils.storage.s3 import S3Upload
 
 
+# fixme vincentporte : convert this method into factory
 def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_2=False, institution=None):
     job_seeker = JobSeekerFactory()
 
@@ -646,6 +647,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         )
 
     def test_campaign_is_ended(self):
+        # fixme vincentporte : convert data preparation into factory
         institution_membership = InstitutionMembershipFactory()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(
             self.siae, self.user, institution=institution_membership.institution
