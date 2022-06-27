@@ -1,0 +1,11 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+La structure {{ siae.kind }} {{ siae.name }} vient de vous transmettre ses pièces justificatives dans le cadre du contrôle a posteriori.
+
+Pour procéder à la vérification des justificatifs :
+• RDV sur votre tableau de bord, rubrique “Contrôler les pièces justificatives”. ({{ dashboard_url }})
+
+Cordialement,
+{% endblock %}

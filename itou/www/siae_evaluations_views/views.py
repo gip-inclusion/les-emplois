@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core import mail
 from django.db.models import Min
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
@@ -401,6 +402,10 @@ def siae_submit_proofs(request):
         ).update(submitted_at=timezone.now())
 
         back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
+
+        connection = mail.get_connection()
+        connection.send_messages([evaluated_siae.get_email_to_institution_submitted_by_siae()])
+
         messages.success(
             request,
             mark_safe(

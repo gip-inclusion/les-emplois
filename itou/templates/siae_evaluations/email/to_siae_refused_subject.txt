@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+Résultat du contrôle - {{ siae.kind }} {{ siae.name }} ID-{{siae.id}}
+{% endblock %}
