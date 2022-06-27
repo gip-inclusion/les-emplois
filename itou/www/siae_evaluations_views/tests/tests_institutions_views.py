@@ -203,7 +203,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
                 kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
             )
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
 
     def test_content(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
@@ -773,6 +773,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             + 1  # fetch user
             + 3  # fetch institution membership & institution x 2 !should be fixed!
             + 6  # fetch evaluated_siae and its prefetch_related
+            + 1  # fetch evaluation_campaign
             + 1  # one again institution membership
             + 1  # social account
             + 3  # savepoint, update session, release savepoint
@@ -876,7 +877,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
                 },
             )
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 404)
 
     def test_actions_and_redirection(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
@@ -1004,7 +1005,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         self.evaluation_campaign.ended_at = timezone.now()
         self.evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 404)
 
     def test_actions_and_redirection(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)

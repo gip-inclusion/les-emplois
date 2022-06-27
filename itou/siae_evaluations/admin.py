@@ -81,7 +81,17 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
             ),
         )
 
-    actions = [transition_to_adversarial_phase]
+    @admin.action(description="Clore les campagnes")
+    def close(self, request, queryset):
+        for campaign in queryset:
+            campaign.close()
+
+        messages.success(
+            request,
+            ("Les campagnes sélectionnées sont closes."),
+        )
+
+    actions = [transition_to_adversarial_phase, close]
     list_display = (
         "name",
         "institution",

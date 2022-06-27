@@ -467,6 +467,17 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluation_campaign.transition_to_adversarial_phase()
         self.assertEqual(1, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
 
+    def test_close(self):
+        evaluation_campaign = EvaluationCampaignFactory()
+        self.assertIsNone(evaluation_campaign.ended_at)
+
+        evaluation_campaign.close()
+        self.assertIsNotNone(evaluation_campaign.ended_at)
+        ended_at = evaluation_campaign.ended_at
+
+        evaluation_campaign.close()
+        self.assertEqual(ended_at, evaluation_campaign.ended_at)
+
 
 class EvaluationCampaignEmailMethodsTest(TestCase):
     def test_get_email_to_institution_ratio_to_select(self):

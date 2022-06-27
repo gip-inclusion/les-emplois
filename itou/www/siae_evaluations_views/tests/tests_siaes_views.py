@@ -237,6 +237,23 @@ class SiaeSelectCriteriaViewTest(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_access_on_ended_campaign(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        evaluated_job_application = EvaluatedJobApplicationFactory()
+        evaluation_campaign = evaluated_job_application.evaluated_siae.evaluation_campaign
+        evaluation_campaign.ended_at = timezone.now()
+        evaluation_campaign.save(update_fields=["ended_at"])
+
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:siae_select_criteria",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
     def test_access(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
@@ -400,6 +417,24 @@ class SiaeUploadDocsViewTest(TestCase):
                 kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
             )
         )
+        self.assertEqual(response.status_code, 404)
+
+    def test_access_on_ended_campaign(self):
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application
+        )
+        evaluation_campaign = evaluated_job_application.evaluated_siae.evaluation_campaign
+        evaluation_campaign.ended_at = timezone.now()
+        evaluation_campaign.save(update_fields=["ended_at"])
+
+        url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
     def test_access(self):
@@ -568,3 +603,22 @@ class SiaeSubmitProofsViewTest(TestCase):
         self.assertLess(
             evaluated_administrative_criteria1.submitted_at, evaluated_administrative_criteria0.submitted_at
         )
+
+    def test_campaign_is_ended(self):
+        institution_membership = InstitutionMembershipFactory()
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(
+            self.siae, self.user, institution=institution_membership.institution
+        )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application
+        )
+        evaluation_campaign = evaluated_job_application.evaluated_siae.evaluation_campaign
+        evaluation_campaign.ended_at = timezone.now()
+        evaluation_campaign.save(update_fields=["ended_at"])
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 404)
+        evaluated_administrative_criteria.refresh_from_db()
+        self.assertEqual(evaluated_administrative_criteria.submitted_at, None)
