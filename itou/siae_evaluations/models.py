@@ -73,7 +73,7 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_s
     if evaluation_campaign_list:
         connection = mail.get_connection()
         emails = [
-            evaluation_campaign.get_email_institution_notification(ratio_selection_end_at)
+            evaluation_campaign.get_email_to_institution_ratio_to_select(ratio_selection_end_at)
             for evaluation_campaign in evaluation_campaign_list
         ]
         connection.send_messages(emails)
@@ -230,8 +230,8 @@ class EvaluationCampaign(models.Model):
             )
 
             connection = mail.get_connection()
-            emails = [evaluated_siae.get_email_eligible_siae() for evaluated_siae in evaluated_siaes]
-            emails += [self.get_email_institution_opening_siae()]
+            emails = [evaluated_siae.get_email_to_siae_selected() for evaluated_siae in evaluated_siaes]
+            emails += [self.get_email_to_institution_selected_siae()]
             connection.send_messages(emails)
 
     def transition_to_adversarial_phase(self):
@@ -239,17 +239,18 @@ class EvaluationCampaign(models.Model):
             reviewed_at=timezone.now()
         )
 
-    def get_email_institution_notification(self, ratio_selection_end_at):
+
+    def get_email_to_institution_ratio_to_select(self, ratio_selection_end_at):
         to = self.institution.active_members
         context = {
             "ratio_selection_end_at": ratio_selection_end_at,
             "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
         }
-        subject = "siae_evaluations/email/email_institution_notification_subject.txt"
-        body = "siae_evaluations/email/email_institution_notification_body.txt"
+        subject = "siae_evaluations/email/to_institution_ratio_to_select_subject.txt"
+        body = "siae_evaluations/email/to_institution_ratio_to_select_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def get_email_institution_opening_siae(self):
+    def get_email_to_institution_selected_siae(self):
         to = self.institution.active_members
         context = {
             # end_date for eligible siaes to return their documents of proofs is 6 weeks after notification
@@ -257,8 +258,8 @@ class EvaluationCampaign(models.Model):
             "evaluated_period_start_at": self.evaluated_period_start_at,
             "evaluated_period_end_at": self.evaluated_period_end_at,
         }
-        subject = "siae_evaluations/email/email_institution_opening_siae_subject.txt"
-        body = "siae_evaluations/email/email_institution_opening_siae_body.txt"
+        subject = "siae_evaluations/email/to_institution_selected_siae_subject.txt"
+        body = "siae_evaluations/email/to_institution_selected_siae_body.txt"
         return get_email_message(to, context, subject, body)
 
 
@@ -306,7 +307,7 @@ class EvaluatedSiae(models.Model):
                 self.reviewed_at = timezone.now()
                 self.save(update_fields=["reviewed_at"])
 
-    def get_email_eligible_siae(self):
+    def get_email_to_siae_selected(self):
         to = self.siae.active_admin_members
         context = {
             "campaign": self.evaluation_campaign,
@@ -318,8 +319,10 @@ class EvaluatedSiae(models.Model):
                 f"{reverse('siae_evaluations_views:siae_job_applications_list')}"
             ),
         }
-        subject = "siae_evaluations/email/eligible_siaes_subject.txt"
-        body = "siae_evaluations/email/eligible_siaes_body.txt"
+        subject = "siae_evaluations/email/to_siae_selected_subject.txt"
+        body = "siae_evaluations/email/to_siae_selected_body.txt"
+        return get_email_message(to, context, subject, body)
+
         return get_email_message(to, context, subject, body)
 
     @cached_property
