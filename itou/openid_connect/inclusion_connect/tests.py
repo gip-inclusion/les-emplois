@@ -93,19 +93,33 @@ class InclusionConnectModelTest(TestCase):
         with self.assertRaises(ValidationError):
             ic_user_data.create_or_update_user()
 
-    def test_create_user_from_user_info_with_already_existing_email(self):
+    def test_get_existing_user_with_same_email_django(self):
+        """
+        If there already is an existing django user with email InclusionConnect sent us, we do not create it again,
+        We user it and we update it with the data form the identity_provider.
+        """
+        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+        UserFactory(email=ic_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
+        user, created = ic_user_data.create_or_update_user()
+        self.assertFalse(created)
+        self.assertEqual(user.last_name, OIDC_USERINFO["family_name"])
+        self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
+        self.assertEqual(user.username, OIDC_USERINFO["sub"])
+        self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
+
+    def test_get_existing_user_with_same_email_other_SSO(self):
         """
         If there already is an existing user with email InclusionConnect sent us, we do not create it again,
         we use it but we do not update it.
         """
         ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
-        UserFactory(email=ic_user_data.email)
+        UserFactory(email=ic_user_data.email, identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
         user, created = ic_user_data.create_or_update_user()
         self.assertFalse(created)
         self.assertNotEqual(user.last_name, OIDC_USERINFO["family_name"])
         self.assertNotEqual(user.first_name, OIDC_USERINFO["given_name"])
-        # We did not fill this data using external data, so it is not set.
-        self.assertFalse(user.external_data_source_history)
+        self.assertNotEqual(user.username, OIDC_USERINFO["sub"])
+        self.assertNotEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
 
     def test_update_user_from_user_info(self):
         user = UserFactory(**dataclasses.asdict(InclusionConnectUserData.from_user_info(OIDC_USERINFO)))

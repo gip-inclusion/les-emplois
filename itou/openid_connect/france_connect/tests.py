@@ -173,17 +173,33 @@ class FranceConnectTest(TestCase):
         with self.assertRaises(ValidationError):
             fc_user_data.create_or_update_user()
 
-    def test_create_django_user_with_already_existing_fc_email(self):
+    def test_create_django_user_with_already_existing_fc_email_django(self):
+        """
+        If there already is an existing user from Django with email FranceConnect sent us
+        we use it and we update it
+        """
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+        UserFactory(email=fc_user_data.email, identity_provider=IdentityProvider.DJANGO)
+        user, created = fc_user_data.create_or_update_user()
+        self.assertFalse(created)
+        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
+        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
+        self.assertEqual(user.username, FC_USERINFO["sub"])
+        self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+        self.assertNotEqual(user.external_data_source_history, {})
+
+    def test_create_django_user_with_already_existing_fc_email_other_sso(self):
         """
         If there already is an existing user with email FranceConnect sent us, we do not create it again,
         we use it but we do not update it
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        UserFactory(email=fc_user_data.email)
+        UserFactory(email=fc_user_data.email, identity_provider=IdentityProvider.INCLUSION_CONNECT)
         user, created = fc_user_data.create_or_update_user()
         self.assertFalse(created)
         self.assertNotEqual(user.last_name, FC_USERINFO["family_name"])
         self.assertNotEqual(user.first_name, FC_USERINFO["given_name"])
+        self.assertNotEqual(user.username, FC_USERINFO["sub"])
         # We did not fill this data using external data, so it is not set
         self.assertFalse(user.external_data_source_history)
         self.assertNotEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)

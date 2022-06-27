@@ -92,15 +92,14 @@ class OIDConnectUserData:
             # so don't update and return it !
             # We can't use a get_or_create here because we have to set the provider data for each field.
             user = User.objects.get(username=self.username, identity_provider=self.identity_provider)
-            for key, value in user_data_dict.items():
-                setattr(user, key, value)
             created = False
         except User.DoesNotExist:
             try:
-                # Don't update a user not created by this provider.
+                # Don't update a user not created by another SSO provider.
                 user = User.objects.get(email=self.email)
                 created = False
-                return user, created
+                if user.identity_provider not in [IdentityProvider.DJANGO, self.identity_provider]:
+                    return user, created
             except User.DoesNotExist:
                 # User.objects.create_user does the following:
                 # - set User.is_active to true,
@@ -111,6 +110,10 @@ class OIDConnectUserData:
                 # on this behaviour. No need to do a fancy bypass if it's never used.
                 user = User.objects.create_user(**user_data_dict)
                 created = True
+
+        if not created:
+            for key, value in user_data_dict.items():
+                setattr(user, key, value)
 
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
