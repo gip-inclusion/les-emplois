@@ -606,6 +606,26 @@ class EvaluatedSiaeModelTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
         del evaluated_siae.state
 
+        # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at
+        evaluated_administrative_criteria0.review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
+        )
+        evaluated_administrative_criteria0.save(update_fields=["review_state"])
+        evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
+        evaluated_siae.save(update_fields=["reviewed_at"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # with review_state REFUSED_2, reviewed, submitted_at before reviewed_at
+        evaluated_administrative_criteria0.review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
+        )
+        evaluated_administrative_criteria0.save(update_fields=["review_state"])
+        evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
+        evaluated_siae.save(update_fields=["reviewed_at"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        del evaluated_siae.state
+
         # with review_state ACCEPTED not reviewed
         evaluated_siae.reviewed_at = None
         evaluated_siae.save(update_fields=["reviewed_at"])
