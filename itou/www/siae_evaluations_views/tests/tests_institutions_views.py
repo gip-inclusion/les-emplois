@@ -86,7 +86,7 @@ class SamplesSelectionViewTest(TestCase):
 
         # institution with active campaign selected
         evaluation_campaign.percent_set_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["percent_set_at"])
         response = self.client.get(self.url)
         self.assertContains(
             response, "Vous serez notifié lorsque l'étape de transmission des pièces justificatives commencera."
@@ -95,7 +95,7 @@ class SamplesSelectionViewTest(TestCase):
         # institution with ended campaign
         evaluation_campaign.percent_set_at = timezone.now()
         evaluation_campaign.ended_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["percent_set_at", "ended_at"])
         response = self.client.get(self.url)
         self.assertContains(response, "Vous n'avez pas de contrôle en cours.")
 
@@ -185,7 +185,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
         # institution with evaluation_campaign in "siae upload its proofs" phase
         evaluation_campaign.evaluations_asked_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["evaluations_asked_at"])
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -196,7 +196,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -349,13 +349,13 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         # institution with evaluation_campaign in "siae upload its proofs" phase
         evaluation_campaign.evaluations_asked_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["evaluations_asked_at"])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -570,7 +570,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
         # institution with evaluation_campaign in "siae upload its proofs" phase
         evaluation_campaign.evaluations_asked_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["evaluations_asked_at"])
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_job_application",
@@ -581,7 +581,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_job_application",
@@ -852,7 +852,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
 
         # institution with evaluation_campaign in "siae upload its proofs" phase
         evaluation_campaign.evaluations_asked_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["evaluations_asked_at"])
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
@@ -866,7 +866,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
 
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
-        evaluation_campaign.save()
+        evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
