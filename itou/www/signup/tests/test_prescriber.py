@@ -16,7 +16,6 @@ from itou.prescribers.factories import (
     PrescriberPoleEmploiFactory,
 )
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -547,21 +546,29 @@ class PrescriberSignupTest(TestCase):
         mock_call_ban_geocoding_api.assert_called_once()
         self.assertContains(response, existing_org_with_siret.display_name)
 
+        # Step 2: Select kind
         url = reverse("signup:prescriber_choose_org")
         post_data = {"kind": PrescriberOrganization.Kind.PLIE.value}
         response = self.client.post(url, data=post_data)
 
+        # Step 3: Inclusion Connect button
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe@ma-plie.fr",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = self.client.get(url)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            previous_url = reverse("signup:prescriber_user")
+            next_url = reverse("signup:prescriber_join_org")
+            response = mock_oauth_dance(
+                self,
+                assert_redirects=False,
+                previous_url=previous_url,
+                next_url=next_url,
+            )
+            # Follow the redirection.
+            response = self.client.get(response.url, follow=True)
 
         # Check new org is OK.
         same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).order_by("kind").all()
