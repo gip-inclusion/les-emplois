@@ -15,6 +15,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
+from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae
@@ -124,23 +125,30 @@ class ItouLogoutView(LogoutView):
     def post(self, *args, **kwargs):
         """
         We overload this method so that we can process the PEAMU callback
-        or notify France Connect when the user logs out.
+        or notify a SSO when the user logs out.
         Original code:
         https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L775
+        TODO(alaurent) It would be cleaner to put all SSO logouts into UserAdapter.get_logout_redirect_url
         """
 
         peamu_id_token = self.request.user.peamu_id_token
         fc_token = self.request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
         fc_state = self.request.session.get(FRANCE_CONNECT_SESSION_STATE)
+        ic_session = self.request.session.get(INCLUSION_CONNECT_SESSION_KEY)
         # Note: if you need session data, fetch them BEFORE calling super() ;)
         ajax_response = super().post(*args, **kwargs)
 
-        # Logouts user from the app and from France Connect (FC).
+        # Logout user from the app and from any SSO
         if fc_token:
             params = {"id_token": fc_token, "state": fc_state}
             fc_base_logout_url = get_absolute_url(reverse("france_connect:logout"))
             fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
             return HttpResponseRedirect(fc_logout_url)
+        if ic_session:
+            params = {"token": ic_session["token"], "state": ic_session["state"]}
+            ic_base_logout_url = reverse("inclusion_connect:logout")
+            ic_logout_url = f"{ic_base_logout_url}?{urlencode(params)}"
+            return HttpResponseRedirect(ic_logout_url)
         if peamu_id_token:
             hp_url = self.request.build_absolute_uri("/")
             params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
@@ -166,14 +174,23 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
         # route performs the same operations
         fc_token = request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
         fc_state = request.session.get(FRANCE_CONNECT_SESSION_STATE)
+        ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
 
+        # TODO(alaurent) It would be cleaner to put all SSO logouts into UserAdapter.get_logout_redirect_url
+        # and redirect to the logout view instead of using auth.logout(request)
         auth.logout(request)
-        # Logouts user from the app and from France Connect (FC).
+
+        # Logout user from the app and from any SSO
         if fc_token:
             params = {"id_token": fc_token, "state": fc_state}
             fc_base_logout_url = get_absolute_url(reverse("france_connect:logout"))
             fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
             return HttpResponseRedirect(fc_logout_url)
+        if ic_session:
+            params = {"token": ic_session["token"], "state": ic_session["state"]}
+            ic_base_logout_url = reverse("inclusion_connect:logout")
+            ic_logout_url = f"{ic_base_logout_url}?{urlencode(params)}"
+            return HttpResponseRedirect(ic_logout_url)
         return HttpResponseRedirect(reverse("account_logout"))
 
     context = {

@@ -6,6 +6,7 @@ from urllib.parse import quote, urlencode
 
 import httpx
 import respx
+from django.contrib import auth
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -16,7 +17,7 @@ from django.utils import timezone
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.users import enums as users_enums
 from itou.users.enums import KIND_PRESCRIBER
-from itou.users.factories import UserFactory
+from itou.users.factories import DEFAULT_PASSWORD, UserFactory
 from itou.users.models import User
 
 from ..constants import OIDC_STATE_EXPIRATION
@@ -312,3 +313,60 @@ class InclusionConnectSessionTest(TestCase):
         request.session.save()
         request = ic_session.bind_to_request(request=request)
         self.assertTrue(request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY))
+
+
+class InclusionConnectLogoutTest(TestCase):
+    @respx.mock
+    def test_simple_logout(self):
+        _oauth_dance(self)
+        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
+        logout_url = reverse("inclusion_connect:logout")
+        response = self.client.get(logout_url)
+        self.assertRedirects(response, reverse("home:hp"))
+
+    @respx.mock
+    def test_logout_with_redirection(self):
+        _oauth_dance(self)
+        expected_redirection = reverse("dashboard:index")
+        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
+
+        params = {"redirect_url": expected_redirection}
+        logout_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+        response = self.client.get(logout_url)
+        self.assertRedirects(response, expected_redirection)
+
+    @respx.mock
+    def test_django_account_logout_from_ic(self):
+        """
+        When ac IC user wants to log out from his local account,
+        he should be logged out too from IC.
+        """
+        response = _oauth_dance(self)
+        self.assertTrue(auth.get_user(self.client).is_authenticated)
+        # Follow the redirection.
+        response = self.client.get(response.url)
+        logout_url = reverse("account_logout")
+        self.assertContains(response, logout_url)
+        self.assertTrue(self.client.session.get(constants.INCLUSION_CONNECT_SESSION_KEY))
+
+        response = self.client.post(logout_url)
+        expected_redirection = reverse("inclusion_connect:logout")
+        # For simplicity, exclude GET params. They are tested elsewhere anyway..
+        self.assertTrue(response.url.startswith(expected_redirection))
+
+        response = self.client.get(response.url)
+        # The following redirection is tested in self.test_logout_with_redirection
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(auth.get_user(self.client).is_authenticated)
+
+    def test_django_account_logout(self):
+        """
+        When a local user wants to log out from his local account,
+        he should be logged out without inclusion connect.
+        """
+        user = UserFactory()
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.post(reverse("account_logout"))
+        expected_redirection = reverse("home:hp")
+        self.assertRedirects(response, expected_redirection)
+        self.assertFalse(auth.get_user(self.client).is_authenticated)
