@@ -35,7 +35,7 @@ OIDC_USERINFO = {
 
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
-def _oauth_dance(
+def mock_oauth_dance(
     test_class, previous_url=None, next_url=None, assert_redirects=True, login_hint=None, user_info_email=None
 ):
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE).respond(302)
@@ -265,7 +265,7 @@ class InclusionConnectViewTest(TestCase):
     @respx.mock
     def test_callback_user_created(self):
         ### User does not exist.
-        _oauth_dance(self)
+        mock_oauth_dance(self)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(email=OIDC_USERINFO["email"])
         self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
@@ -285,7 +285,7 @@ class InclusionConnectViewTest(TestCase):
             email=OIDC_USERINFO["email"],
             identity_provider=users_enums.IdentityProvider.DJANGO,
         )
-        _oauth_dance(self)
+        mock_oauth_dance(self)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(email=OIDC_USERINFO["email"])
         self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
@@ -324,7 +324,7 @@ class InclusionConnectLoginTest(TestCase):
         He can log in again later.
         """
         # Create an account with IC.
-        _oauth_dance(self)
+        mock_oauth_dance(self)
 
         # Then log out.
         response = self.client.post(reverse("account_logout"))
@@ -335,7 +335,7 @@ class InclusionConnectLoginTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
         self.assertContains(response, reverse("inclusion_connect:authorize"))
 
-        response = _oauth_dance(self, assert_redirects=False)
+        response = mock_oauth_dance(self, assert_redirects=False)
         expected_redirection = reverse("dashboard:index")
         self.assertRedirects(response, expected_redirection)
 
@@ -360,7 +360,7 @@ class InclusionConnectLoginTest(TestCase):
         # - IC side: account creation
         # - Django side: account update.
         # This logic is already tested here: InclusionConnectModelTest
-        response = _oauth_dance(self, assert_redirects=False)
+        response = mock_oauth_dance(self, assert_redirects=False)
         # This existing user should not see the welcoming tour.
         expected_redirection = reverse("dashboard:index")
         self.assertRedirects(response, expected_redirection)
@@ -383,14 +383,14 @@ class InclusionConnectLoginTest(TestCase):
         self.assertFalse(auth.get_user(self.client).is_authenticated)
 
         # Then login with Inclusion Connect.
-        _oauth_dance(self, assert_redirects=False)
+        mock_oauth_dance(self, assert_redirects=False)
         self.assertTrue(auth.get_user(self.client).is_authenticated)
 
 
 class InclusionConnectLogoutTest(TestCase):
     @respx.mock
     def test_simple_logout(self):
-        _oauth_dance(self)
+        mock_oauth_dance(self)
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
         logout_url = reverse("inclusion_connect:logout")
         response = self.client.get(logout_url)
@@ -398,7 +398,7 @@ class InclusionConnectLogoutTest(TestCase):
 
     @respx.mock
     def test_logout_with_redirection(self):
-        _oauth_dance(self)
+        mock_oauth_dance(self)
         expected_redirection = reverse("dashboard:index")
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
 
@@ -413,7 +413,7 @@ class InclusionConnectLogoutTest(TestCase):
         When ac IC user wants to log out from his local account,
         he should be logged out too from IC.
         """
-        response = _oauth_dance(self)
+        response = mock_oauth_dance(self)
         self.assertTrue(auth.get_user(self.client).is_authenticated)
         # Follow the redirection.
         response = self.client.get(response.url)

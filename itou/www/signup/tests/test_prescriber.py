@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
+from itou.openid_connect.inclusion_connect.tests import mock_oauth_dance
 from itou.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWithMembershipFactory,
@@ -21,7 +22,6 @@ from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
-from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.www.signup.forms import PrescriberChooseKindForm
 
 
@@ -33,6 +33,7 @@ class PrescriberSignupTest(TestCase):
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
         )
 
+    @respx.mock
     def test_create_user_prescriber_member_of_pole_emploi(self):
         """
         Test the creation of a user of type prescriber and his joining to a Pole emploi agency.
@@ -40,86 +41,79 @@ class PrescriberSignupTest(TestCase):
 
         organization = PrescriberPoleEmploiFactory()
 
+        # Go through each step to ensure session data is recorded properly.
         # Step 1: the user works for PE follows PE link
         url = reverse("signup:prescriber_check_already_exists")
         response = self.client.get(url)
-        url = reverse("signup:prescriber_pole_emploi_safir_code")
-        self.assertContains(response, url)
+        safir_step_url = reverse("signup:prescriber_pole_emploi_safir_code")
+        self.assertContains(response, safir_step_url)
+
+        # Step 2: find PE organization by SAFIR code.
         response = self.client.get(url)
+        post_data = {"safir_code": organization.code_safir_pole_emploi}
+        response = self.client.post(safir_step_url, data=post_data)
 
-        # Step 2: fill the SAFIR code.
-        post_data = {
-            "safir_code": organization.code_safir_pole_emploi,
-        }
-        response = self.client.post(url, data=post_data)
-
-        # Step 3: fill the user information
-        # Ensures that the parent form's clean() method is called by testing
-        # with a password that does not comply with CNIL recommendations.
-        url = reverse("signup:prescriber_pole_emploi_user")
+        # Step 3: check email
+        url = reverse("signup:prescriber_check_pe_email")
         self.assertRedirects(response, url)
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": "foofoofoo",
-            "password2": "foofoofoo",
-        }
+        post_data = {"email": "athos@lestroismousquetaires.com"}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
+        self.assertTrue(response.context["form"].errors.get("email"))
 
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-        }
+        email = f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
+        post_data = {"email": email}
         response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        self.assertRedirects(response, reverse("signup:prescriber_pole_emploi_user"))
+        session_data = self.client.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        self.assertEqual(email, session_data.get("email"))
 
-        user = User.objects.get(email=post_data["email"])
+        response = self.client.get(response.url)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        # Connect with Inclusion Connect.
+        # Skip the welcoming tour to test dashboard content.
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            previous_url = reverse("signup:prescriber_pole_emploi_user")
+            next_url = reverse("signup:prescriber_join_org")
+            response = mock_oauth_dance(
+                self,
+                assert_redirects=False,
+                login_hint=email,
+                user_info_email=email,
+                previous_url=previous_url,
+                next_url=next_url,
+            )
+            # Follow the redirection.
+            response = self.client.get(response.url, follow=True)
+
+        # Response should contain links available only to prescribers.
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
+
+        # Organization
+        self.assertEqual(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY), organization.pk)
+        self.assertContains(response, f"Code SAFIR {organization.code_safir_pole_emploi}")
+
+        user = User.objects.get(email=email)
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
-        # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
-        self.assertEqual(len(user_emails), 1)
-        user_email = user_emails[0]
-        self.assertFalse(user_email.verified)
+        # Emails are not checked in Django anymore.
+        # Make sure no confirmation email is sent.
+        self.assertEqual(len(user_emails), 0)
 
         # Check organization.
         self.assertTrue(organization.is_authorized)
         self.assertEqual(organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
 
         # Check membership.
-        self.assertIn(user, organization.members.all())
         self.assertEqual(1, user.prescriberorganization_set.count())
-
-        # Check sent email.
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertIn("Confirmez votre adresse e-mail", email.subject)
-        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], user.email)
-
-        # User cannot log in until confirmation.
-        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
-        url = reverse("login:prescriber")
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.url, reverse("account_email_verification_sent"))
-
-        # Confirm email + auto login.
-        confirmation_token = EmailConfirmationHMAC(user_email).key
-        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-        response = self.client.post(confirm_email_url)
-        self.assertRedirects(response, reverse("welcoming_tour:index"))
-        user_email = user.emailaddress_set.first()
-        self.assertTrue(user_email.verified)
+        self.assertEqual(user.prescribermembership_set.count(), 1)
+        self.assertEqual(user.prescribermembership_set.get().organization_id, organization.pk)
+        self.assertEqual(user.siae_set.count(), 0)
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
