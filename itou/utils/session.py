@@ -1,0 +1,49 @@
+import uuid
+
+
+class SessionNamespace:
+    """Class to facilitate the usage of namespaces inside the session."""
+
+    NOT_SET = object()
+
+    def __init__(self, session, namespace):
+        self._session = session
+        self.name = str(namespace)
+
+    def __repr__(self):
+        return f"<SessionNamespace({self._session[self.name]!r})>"
+
+    def __contains__(self, item):
+        return item in self._session[self.name]
+
+    def init(self, data):
+        self._session[self.name] = data
+        self._session.modified = True
+
+    def get(self, key, default=NOT_SET):
+        return self._session[self.name].get(key, default)
+
+    def set(self, key, value):
+        self._session[self.name][key] = value
+        self._session.modified = True
+
+    def update(self, data):
+        self._session[self.name].update(data)
+        self._session.modified = True
+
+    def exists(self):
+        return self.name in self._session
+
+    def delete(self):
+        if not self.exists():
+            return
+
+        del self._session[self.name]
+        self._session.modified = True
+
+    def as_dict(self):
+        return dict(self._session[self.name])
+
+    @classmethod
+    def create_temporary(cls, session):
+        return cls(session, namespace=str(uuid.uuid4()))

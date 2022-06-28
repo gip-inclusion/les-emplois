@@ -1,10 +1,13 @@
 import copy
 import datetime
+import importlib
 import json
 import logging
+import uuid
 from collections import OrderedDict
 from unittest import mock
 
+import faker
 import httpx
 import respx
 from dateutil.relativedelta import relativedelta
@@ -24,6 +27,7 @@ from django.utils.html import escape
 from factory import Faker
 from faker import Faker as fk
 
+import itou.utils.session
 from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
 from itou.common_apps.resume.forms import ResumeFormMixin
@@ -1196,3 +1200,72 @@ class SupportRemarkAdminViewsTest(TestCase):
         # Is the remark displayed in admin change form ?
         response = self.client.get(url)
         self.assertContains(response, escape(fake_remark))
+
+
+class SessionNamespaceTest(TestCase):
+    def _get_session_store(self):
+        return importlib.import_module(settings.SESSION_ENGINE).SessionStore()
+
+    def test_magic_method(self):
+        session = self._get_session_store()
+        ns_name = faker.Faker().word()
+
+        ns = itou.utils.session.SessionNamespace(session, ns_name)
+
+        # __contains__ + __repr__
+        for value_to_test in [{}, [], (), set()]:
+            session[ns_name] = value_to_test
+            self.assertFalse("unknown" in ns)
+            self.assertEqual(repr(ns), f"<SessionNamespace({value_to_test!r})>")
+
+        for value_to_test in [{"value": "42"}, ["value"], ("value",), {"value"}]:
+            session[ns_name] = value_to_test
+            self.assertTrue("value" in ns)
+            self.assertEqual(repr(ns), f"<SessionNamespace({value_to_test!r})>")
+
+    def test_api_method(self):
+        session = self._get_session_store()
+        ns_name = faker.Faker().word()
+
+        ns = itou.utils.session.SessionNamespace(session, ns_name)
+        self.assertNotIn(ns_name, session)  # The namespace doesn't yet exist in the session
+
+        # .init()
+        ns.init({"key": "value"})
+        self.assertIn(ns_name, session)
+        self.assertEqual(session[ns_name], {"key": "value"})
+
+        # .get()
+        self.assertEqual(ns.get("key"), "value")
+
+        # .set()
+        ns.set("key2", "value2")
+        self.assertEqual(ns.get("key2"), "value2")
+        self.assertEqual(session[ns_name], {"key": "value", "key2": "value2"})
+
+        # .update()
+        ns.update({"key3": "value3"})
+        self.assertEqual(ns.get("key3"), "value3")
+        self.assertEqual(session[ns_name], {"key": "value", "key2": "value2", "key3": "value3"})
+
+        ns.update({"key": "other_value"})
+        self.assertEqual(ns.get("key"), "other_value")
+        self.assertEqual(session[ns_name], {"key": "other_value", "key2": "value2", "key3": "value3"})
+
+        # .as_dict()
+        self.assertEqual(ns.as_dict(), {"key": "other_value", "key2": "value2", "key3": "value3"})
+
+        # .exists() + .delete()
+        self.assertTrue(ns.exists())
+        ns.delete()
+        self.assertNotIn(ns_name, session)
+        self.assertFalse(ns.exists())
+
+    def test_class_method(self):
+        session = self._get_session_store()
+
+        # .create_temporary()
+        ns = itou.utils.session.SessionNamespace.create_temporary(session)
+        self.assertIsInstance(ns, itou.utils.session.SessionNamespace)
+        self.assertEqual(str(uuid.UUID(ns.name)), ns.name)
+        self.assertNotIn(ns.name, session)  # .init() wasn't called

@@ -21,6 +21,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.perms.user import get_user_info
+from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -40,12 +41,12 @@ def valid_session_required(required_keys=None):
     def wrapper(function):
         @functools.wraps(function)
         def decorated(request, *args, **kwargs):
-            session_data = request.session.get(f"job_application-{kwargs['siae_pk']}")
-            if not session_data:
+            session_ns = SessionNamespace(request.session, f"job_application-{kwargs['siae_pk']}")
+            if not session_ns:
                 raise PermissionDenied("no opened session")
             if required_keys:
                 for key in required_keys:
-                    if session_data[key] != kwargs[key]:
+                    if session_ns.get(key) != kwargs[key]:
                         raise PermissionDenied("missing session data information", key)
             return function(request, *args, **kwargs)
 
@@ -103,17 +104,20 @@ def start(request, siae_pk):
     back_url = get_safe_url(request, "back_url")
 
     # Start a fresh session.
-    request.session[f"job_application-{siae_pk}"] = {
-        "back_url": back_url,
-        "job_seeker_pk": None,
-        "nir": None,
-        "siae_pk": siae.pk,
-        "sender_pk": None,
-        "sender_kind": None,
-        "sender_siae_pk": None,
-        "sender_prescriber_organization_pk": None,
-        "job_description_id": request.GET.get("job_description_id"),
-    }
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
+    session_ns.init(
+        {
+            "back_url": back_url,
+            "job_seeker_pk": None,
+            "nir": None,
+            "siae_pk": siae.pk,
+            "sender_pk": None,
+            "sender_kind": None,
+            "sender_siae_pk": None,
+            "sender_prescriber_organization_pk": None,
+            "job_description_id": request.GET.get("job_description_id"),
+        }
+    )
 
     next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
     return HttpResponseRedirect(next_url)
@@ -129,21 +133,19 @@ def step_sender(request, siae_pk):
 
     user_info = get_user_info(request)
 
-    session_data = request.session[f"job_application-{siae_pk}"]
-    session_data["sender_pk"] = user_info.user.pk
-    session_data["sender_kind"] = user_info.kind
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
+    session_ns.set("sender_pk", user_info.user.pk)
+    session_ns.set("sender_kind", user_info.kind)
 
     if user_info.prescriber_organization:
-        session_data["sender_prescriber_organization_pk"] = user_info.prescriber_organization.pk
+        session_ns.set("sender_prescriber_organization_pk", user_info.prescriber_organization.pk)
 
         # Warn message if prescriber's authorization is pending
         if user_info.prescriber_organization.has_pending_authorization():
             next_url = reverse("apply:step_pending_authorization", kwargs={"siae_pk": siae_pk})
 
     if user_info.siae:
-        session_data["sender_siae_pk"] = user_info.siae.pk
-
-    request.session.modified = True
+        session_ns.set("sender_siae_pk", user_info.siae.pk)
 
     return HttpResponseRedirect(next_url)
 
@@ -160,16 +162,15 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
     """
     Ensure the job seeker has a NIR. If not and if possible, update it.
     """
-    session_data = request.session[f"job_application-{siae_pk}"]
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
     next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
-    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
     job_seeker = None
     job_seeker_name = None
 
     # The user submits an application for himself.
     if request.user.is_job_seeker:
-        session_data["job_seeker_pk"] = request.user.pk
-        request.session.modified = True
+        session_ns.set("job_seeker_pk", request.user.pk)
         job_seeker = request.user
         if job_seeker.nir:
             return HttpResponseRedirect(next_url)
@@ -178,9 +179,8 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
     preview_mode = False
 
     # Clean nir in session, especially in case of using back button
-    if request.method == "GET" and "nir" in session_data:
-        session_data["nir"] = None
-        request.session.modified = True
+    if request.method == "GET" and "nir" in session_ns:
+        session_ns.set("nir", None)
 
     if request.method == "POST" and form.is_valid():
         nir = form.cleaned_data["nir"]
@@ -193,15 +193,13 @@ def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step
         job_seeker = form.get_job_seeker()
         if not job_seeker:
             # Redirect to search by e-mail address.
-            session_data["nir"] = nir
-            request.session.modified = True
+            session_ns.set("nir", nir)
             next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
             return HttpResponseRedirect(next_url)
 
         if form.data.get("confirm"):
             # Job seeker found for the given NIR.
-            session_data["job_seeker_pk"] = job_seeker.pk
-            request.session.modified = True
+            session_ns.set("job_seeker_pk", job_seeker.pk)
             return HttpResponseRedirect(next_url)
 
         if form.data.get("preview"):
@@ -234,7 +232,7 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
     """
     Determine the job seeker, in the cases where the application is sent by a proxy.
     """
-    session_data = request.session[f"job_application-{siae_pk}"]
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
     next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
 
     # The user submit an application for himself.
@@ -243,10 +241,10 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
 
     job_seeker_name = None
     form = UserExistsForm(data=request.POST or None)
-    nir = session_data.get("nir")
+    nir = session_ns.get("nir")
     can_add_nir = False
     preview_mode = False
-    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
 
     if request.method == "POST" and form.is_valid():
         job_seeker = form.get_user()
@@ -255,11 +253,10 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
             # Go to the next step.
             can_add_nir = nir and request.user.can_add_nir(job_seeker)
             if request.POST.get("save"):
-                session_data["job_seeker_pk"] = job_seeker.pk
-                request.session.modified = True
+                session_ns.set("job_seeker_pk", job_seeker.pk)
                 if can_add_nir:
                     try:
-                        job_seeker.nir = session_data["nir"]
+                        job_seeker.nir = session_ns.get("nir")
                         job_seeker.save(update_fields=["nir"])
                     except ValidationError:
                         msg = mark_safe(
@@ -316,9 +313,9 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
     """
     Ensure the job seeker has all required info.
     """
-    session_data = request.session[f"job_application-{siae_pk}"]
-    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
+    job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
+    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
     approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
     next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk})
 
@@ -346,11 +343,11 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
     """
     Create a job seeker if he can't be found in the DB.
     """
-    session_data = request.session[f"job_application-{siae_pk}"]
-    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
+    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
 
     email = request.GET.get("email")
-    nir = session_data["nir"]
+    nir = session_ns.get("nir")
     form = CreateJobSeekerForm(proxy_user=request.user, nir=nir, data=request.POST or None, initial={"email": email})
 
     if request.method == "POST" and form.is_valid():
@@ -368,8 +365,7 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
             messages.warning(request, msg)
             logger.exception("step_create_job_seeker: error when saving job seeker email=%s nir=%s", email, nir)
         else:
-            session_data["job_seeker_pk"] = job_seeker.pk
-            request.session.modified = True
+            session_ns.set("job_seeker_pk", job_seeker.pk)
             next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
             return HttpResponseRedirect(next_url)
 
@@ -383,9 +379,9 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
     """
     Check previous job applications to avoid duplicates.
     """
-    session_data = request.session[f"job_application-{siae_pk}"]
-    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
-    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
+    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
+    job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
     approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
     prev_applications = job_seeker.job_applications.filter(to_siae=siae)
 
@@ -424,15 +420,15 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
     """
     Check eligibility (as an authorized prescriber).
     """
-    session_data = request.session[f"job_application-{siae_pk}"]
-    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
+    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
     if not siae.is_subject_to_eligibility_rules:
         return HttpResponseRedirect(next_url)
 
     user_info = get_user_info(request)
-    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
+    job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
     approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
 
     skip = (
@@ -473,11 +469,11 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     queryset = Siae.objects.prefetch_job_description_through()
     siae = get_object_or_404(queryset, pk=siae_pk)
 
-    session_data = request.session[f"job_application-{siae_pk}"]
-    initial_data = {"selected_jobs": [session_data["job_description_id"]]}
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
+    initial_data = {"selected_jobs": [session_ns.get("job_description_id")]}
     form = SubmitJobApplicationForm(data=request.POST or None, siae=siae, initial=initial_data)
 
-    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
+    job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
     approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
 
     if request.method == "POST" and form.is_valid():
@@ -491,13 +487,13 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         job_application = form.save(commit=False)
         job_application.job_seeker = job_seeker
 
-        job_application.sender = get_object_or_404(User, pk=session_data["sender_pk"])
-        job_application.sender_kind = session_data["sender_kind"]
-        if sender_prescriber_organization_pk := session_data.get("sender_prescriber_organization_pk"):
+        job_application.sender = get_object_or_404(User, pk=session_ns.get("sender_pk"))
+        job_application.sender_kind = session_ns.get("sender_kind")
+        if sender_prescriber_organization_pk := session_ns.get("sender_prescriber_organization_pk"):
             job_application.sender_prescriber_organization = get_object_or_404(
                 PrescriberOrganization, pk=sender_prescriber_organization_pk
             )
-        if sender_siae_pk := session_data.get("sender_siae_pk"):
+        if sender_siae_pk := session_ns.get("sender_siae_pk"):
             job_application.sender_siae = get_object_or_404(Siae, pk=sender_siae_pk)
         job_application.to_siae = siae
         job_application.save()
@@ -542,10 +538,10 @@ def step_application_sent(request, siae_pk, template_name="apply/submit_step_app
         messages.success(request, "Candidature bien envoyée !")
         return HttpResponseRedirect(dashboard_url)
 
-    session_data = request.session[f"job_application-{siae_pk}"]
-    back_url = get_safe_url(request=request, url=session_data["back_url"])
-    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    siae = get_object_or_404(Siae, pk=session_data["siae_pk"])
+    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
+    back_url = get_safe_url(request=request, url=session_ns.get("back_url"))
+    job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
+    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
 
     context = {
         "back_url": back_url,
