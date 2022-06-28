@@ -3,7 +3,6 @@ from unittest import mock
 
 import httpx
 import respx
-from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.core import mail
 from django.test import TestCase
@@ -11,7 +10,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
-from itou.openid_connect.inclusion_connect.tests import mock_oauth_dance
+from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWithMembershipFactory,
@@ -144,32 +143,39 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 3: user information.
+        # Step 3: Inclusion Connect button
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = self.client.get(url)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            previous_url = reverse("signup:prescriber_user")
+            next_url = reverse("signup:prescriber_join_org")
+            response = mock_oauth_dance(
+                self,
+                assert_redirects=False,
+                previous_url=previous_url,
+                next_url=next_url,
+            )
+            # Follow the redirection.
+            response = self.client.get(response.url, follow=True)
+
+        # Response should contain links available only to prescribers.
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
 
         # Check `User` state.
-        user = User.objects.get(email=post_data["email"])
-        # `username` should be a valid UUID, see `User.generate_unique_username()`.
-        self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
+        user = User.objects.get(email=OIDC_USERINFO["email"])
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
-        self.assertEqual(len(user_emails), 1)
-        user_email = user_emails[0]
-        self.assertFalse(user_email.verified)
+        # Emails are not checked in Django anymore.
+        # Make sure no confirmation email is sent.
+        self.assertEqual(len(user_emails), 0)
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -178,37 +184,9 @@ class PrescriberSignupTest(TestCase):
 
         # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
+        self.assertEqual(user.prescribermembership_set.count(), 1)
         membership = user.prescribermembership_set.get(organization=org)
         self.assertTrue(membership.is_admin)
-
-        # Check sent email.
-        self.assertEqual(len(mail.outbox), 2)
-
-        # Check email has been sent to support (validation/refusal of authorisation needed).
-        email = mail.outbox[0]
-        self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", email.subject)
-
-        # Check email has been sent to confirm the user's email.
-        email = mail.outbox[1]
-        self.assertIn("Confirmez votre adresse e-mail", email.subject)
-        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], user.email)
-
-        # User cannot log in until confirmation.
-        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
-        url = reverse("login:prescriber")
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.url, reverse("account_email_verification_sent"))
-
-        # Confirm email + auto login.
-        confirmation_token = EmailConfirmationHMAC(user_email).key
-        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-        response = self.client.post(confirm_email_url)
-        self.assertRedirects(response, reverse("welcoming_tour:index"))
-        user_email = user.emailaddress_set.first()
-        self.assertTrue(user_email.verified)
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -255,49 +233,55 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 5: fill the user information.
+        # Step 5: Inclusion Connect button
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = self.client.get(url)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            previous_url = reverse("signup:prescriber_user")
+            next_url = reverse("signup:prescriber_join_org")
+            response = mock_oauth_dance(
+                self,
+                assert_redirects=False,
+                previous_url=previous_url,
+                next_url=next_url,
+            )
+            # Follow the redirection.
+            response = self.client.get(response.url, follow=True)
+
+        # Response should contain links available only to prescribers.
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
 
         # Check `User` state.
-        user = User.objects.get(email=post_data["email"])
-        # `username` should be a valid UUID, see `User.generate_unique_username()`.
-        self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
+        user = User.objects.get(email=OIDC_USERINFO["email"])
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
-        self.assertEqual(len(user_emails), 1)
-        self.assertFalse(user_emails[0].verified)
+        # Emails are not checked in Django anymore.
+        # Make sure no confirmation email is sent.
+        self.assertEqual(len(user_emails), 0)
 
-        # Check org.
+        # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
         self.assertFalse(org.is_authorized)
         self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
 
         # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
+        self.assertEqual(user.prescribermembership_set.count(), 1)
         membership = user.prescribermembership_set.get(organization=org)
         self.assertTrue(membership.is_admin)
 
         # Check email has been sent to support (validation/refusal of authorisation needed).
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 1)
         subject = mail.outbox[0].subject
         self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
-        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`.
-        subject = mail.outbox[1].subject
-        self.assertIn("Confirmez votre adresse e-mail", subject)
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -336,31 +320,39 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        # Step 4: user information.
+        # Step 4: Inclusion Connect button
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = self.client.get(url)
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            previous_url = reverse("signup:prescriber_user")
+            next_url = reverse("signup:prescriber_join_org")
+            response = mock_oauth_dance(
+                self,
+                assert_redirects=False,
+                previous_url=previous_url,
+                next_url=next_url,
+            )
+            # Follow the redirection.
+            response = self.client.get(response.url, follow=True)
+
+        # Response should contain links available only to prescribers.
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
 
         # Check `User` state.
-        user = User.objects.get(email=post_data["email"])
-        # `username` should be a valid UUID, see `User.generate_unique_username()`.
-        self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
+        user = User.objects.get(email=OIDC_USERINFO["email"])
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
-        # Check `EmailAddress` state
+        # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
-        self.assertEqual(len(user_emails), 1)
-        self.assertFalse(user_emails[0].verified)
+        # Emails are not checked in Django anymore.
+        # Make sure no confirmation email is sent.
+        self.assertEqual(len(user_emails), 0)
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -369,13 +361,12 @@ class PrescriberSignupTest(TestCase):
 
         # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
+        self.assertEqual(user.prescribermembership_set.count(), 1)
         membership = user.prescribermembership_set.get(organization=org)
         self.assertTrue(membership.is_admin)
 
-        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`.
-        self.assertEqual(len(mail.outbox), 1)
-        subject = mail.outbox[0].subject
-        self.assertIn("Confirmez votre adresse e-mail", subject)
+        # No email has been sent to support (validation/refusal of authorisation not needed).
+        self.assertEqual(len(mail.outbox), 0)
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
