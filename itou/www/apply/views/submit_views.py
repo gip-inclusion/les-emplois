@@ -3,6 +3,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -10,6 +11,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
+from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
@@ -85,69 +87,64 @@ def get_approvals_wrapper(request, job_seeker, siae):
     return approvals_wrapper
 
 
-@login_required
-def start(request, siae_pk):
-    """
-    Entry point.
-    """
+class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
+    def __init__(self):
+        super().__init__()
+        self.siae = None
+        self.apply_session = None
 
-    siae = get_object_or_404(Siae, pk=siae_pk)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.siae = get_object_or_404(Siae, pk=kwargs["siae_pk"])
+        self.apply_session = SessionNamespace(request.session, f"job_application-{self.siae.pk}")
 
-    if request.user.is_siae_staff and not siae.has_member(request.user):
-        raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
+    def get_back_url(self):
+        if not self.apply_session.exists():
+            return None
 
-    # Refuse all applications except those issued by the SIAE
-    if siae.block_job_applications and not siae.has_member(request.user):
-        # Message only visible in DEBUG
-        raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
+        if session_back_url := self.apply_session.get("back_url"):
+            return get_safe_url(request=self.request, url=session_back_url)
+        return None
 
-    back_url = get_safe_url(request, "back_url")
-
-    # Start a fresh session.
-    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
-    session_ns.init(
-        {
-            "back_url": back_url,
-            "job_seeker_pk": None,
-            "nir": None,
-            "siae_pk": siae.pk,
-            "sender_pk": None,
-            "sender_kind": None,
-            "sender_siae_pk": None,
-            "sender_prescriber_organization_pk": None,
-            "job_description_id": request.GET.get("job_description_id"),
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "siae": self.siae,
+            "back_url": self.get_back_url(),
         }
-    )
-
-    next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
-    return HttpResponseRedirect(next_url)
 
 
-@login_required
-@valid_session_required(["siae_pk"])
-def step_sender(request, siae_pk):
-    """
-    Determine info about the sender.
-    """
-    next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae_pk})
+class StartView(ApplyStepBaseView):
+    def get(self, request, *args, **kwargs):
+        # SIAE members can only submit a job application to their SIAE
+        if request.user.is_siae_staff and not self.siae.has_member(request.user):
+            raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
 
-    user_info = get_user_info(request)
+        # Refuse all applications except those made by an SIAE member
+        if self.siae.block_job_applications and not self.siae.has_member(request.user):
+            raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
-    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
-    session_ns.set("sender_pk", user_info.user.pk)
-    session_ns.set("sender_kind", user_info.kind)
-
-    if user_info.prescriber_organization:
-        session_ns.set("sender_prescriber_organization_pk", user_info.prescriber_organization.pk)
-
+        # Create a sub-session for this job application process
+        user_info = get_user_info(request)
+        self.apply_session.init(
+            {
+                "back_url": get_safe_url(request, "back_url"),
+                "job_seeker_pk": None,
+                "nir": None,
+                "siae_pk": self.siae.pk,
+                "sender_pk": user_info.user.pk,
+                "sender_kind": user_info.kind,
+                "sender_siae_pk": user_info.siae.pk if user_info.siae else None,
+                "sender_prescriber_organization_pk": (
+                    user_info.prescriber_organization.pk if user_info.prescriber_organization else None
+                ),
+                "job_description_id": request.GET.get("job_description_id"),
+            }
+        )
         # Warn message if prescriber's authorization is pending
-        if user_info.prescriber_organization.has_pending_authorization():
-            next_url = reverse("apply:step_pending_authorization", kwargs={"siae_pk": siae_pk})
+        if user_info.prescriber_organization and user_info.prescriber_organization.has_pending_authorization():
+            return HttpResponseRedirect(reverse("apply:step_pending_authorization", kwargs={"siae_pk": self.siae.pk}))
 
-    if user_info.siae:
-        session_ns.set("sender_siae_pk", user_info.siae.pk)
-
-    return HttpResponseRedirect(next_url)
+        return HttpResponseRedirect(reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": self.siae.pk}))
 
 
 @login_required

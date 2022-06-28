@@ -8,8 +8,7 @@ app_name = "apply"
 
 urlpatterns = [
     # Submit.
-    path("<int:siae_pk>/start", submit_views.start, name="start"),
-    path("<int:siae_pk>/step_sender", submit_views.step_sender, name="step_sender"),
+    path("<int:siae_pk>/start", submit_views.StartView.as_view(), name="start"),
     path(
         "<int:siae_pk>/step_pending_authorization",
         submit_views.step_pending_authorization,

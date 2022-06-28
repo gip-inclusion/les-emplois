@@ -55,21 +55,6 @@ class ApplyAsJobSeekerTest(TestCase):
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
-        }
-        self.assertDictEqual(session_data, expected_session_data)
-
-        next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
-
-        # Step determine the sender.
-        # ----------------------------------------------------------------------
-
-        response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 302)
-
-        session_data = self.client.session[f"job_application-{siae.pk}"]
-        expected_session_data = self.default_session_data | {
-            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.JOB_SEEKER,
         }
@@ -308,22 +293,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
-        }
-        self.assertDictEqual(session_data, expected_session_data)
-
-        next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
-
-        # Step determine the sender.
-        # ----------------------------------------------------------------------
-
-        response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 302)
-
-        session = self.client.session
-        session_data = session[f"job_application-{siae.pk}"]
-        expected_session_data = self.default_session_data | {
-            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -470,21 +439,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-
-        session_data = self.client.session[f"job_application-{siae.pk}"]
-        expected_session_data = self.default_session_data | {
-            "siae_pk": siae.pk,
-        }
-        self.assertDictEqual(session_data, expected_session_data)
-
-        next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
-
-        # Step determine the sender.
-        # ----------------------------------------------------------------------
-
-        response = self.client.get(next_url)
         self.assertEqual(response.status_code, 302)
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -676,21 +630,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
-        }
-        self.assertDictEqual(session_data, expected_session_data)
-
-        next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
-
-        # Step determine the sender.
-        # ----------------------------------------------------------------------
-
-        response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 302)
-
-        session_data = self.client.session[f"job_application-{siae.pk}"]
-        expected_session_data = self.default_session_data | {
-            "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -785,21 +724,6 @@ class ApplyAsPrescriberTest(TestCase):
 
         url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-
-        session_data = self.client.session[f"job_application-{siae.pk}"]
-        expected_session_data = self.default_session_data | {
-            "siae_pk": siae.pk,
-        }
-        self.assertDictEqual(session_data, expected_session_data)
-
-        next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
-
-        # Step determine the sender.
-        # ----------------------------------------------------------------------
-
-        response = self.client.get(next_url)
         self.assertEqual(response.status_code, 302)
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -1156,21 +1080,6 @@ class ApplyAsSiaeTest(TestCase):
 
         url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-
-        session_data = self.client.session[f"job_application-{siae.pk}"]
-        expected_session_data = self.default_session_data | {
-            "siae_pk": siae.pk,
-        }
-        self.assertDictEqual(session_data, expected_session_data)
-
-        next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
-
-        # Step determine the sender.
-        # ----------------------------------------------------------------------
-
-        response = self.client.get(next_url)
         self.assertEqual(response.status_code, 302)
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
