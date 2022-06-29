@@ -328,7 +328,7 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
                     job_seeker_name = job_seeker.get_full_name()
 
             # The email we found is correct
-            if self.form.data.get("save"):
+            if self.form.data.get("confirm"):
                 self.apply_session.set("job_seeker_pk", job_seeker.pk)
 
                 if not can_add_nir:

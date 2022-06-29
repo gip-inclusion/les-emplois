@@ -352,7 +352,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
+        post_data = {"email": "new.job.seeker@test.com", "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -493,7 +493,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
+        post_data = {"email": "new.job.seeker@test.com", "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -776,7 +776,7 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
+        post_data = {"email": "new.job.seeker@test.com", "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -977,7 +977,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
 
         # Enter an existing email.
         # ----------------------------------------------------------------------
-        post_data = {"email": job_seeker.email, "save": "1"}
+        post_data = {"email": job_seeker.email, "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertTrue(response.status_code, 200)
         self.assertIn(
@@ -1106,7 +1106,7 @@ class ApplyAsSiaeTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
+        post_data = {"email": "new.job.seeker@test.com", "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
