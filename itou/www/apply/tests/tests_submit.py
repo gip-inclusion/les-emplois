@@ -343,7 +343,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "sender_prescriber_organization_pk": prescriber_organization.pk,
         }
 
-        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step get job seeker e-mail.
@@ -484,7 +484,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step get job seeker e-mail.
@@ -767,7 +767,7 @@ class ApplyAsPrescriberTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step get job seeker e-mail.
@@ -963,12 +963,12 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(last_url, reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
 
-        # Enter an a non-existing NIR.
+        # Enter a non-existing NIR.
         # ----------------------------------------------------------------------
         nir = "141068078200557"
         post_data = {"nir": nir, "confirm": 1}
         response = self.client.post(last_url, data=post_data)
-        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertRedirects(response, next_url)
 
         # Create a job seeker with this NIR right after the check. Sorry.
@@ -1097,7 +1097,7 @@ class ApplyAsSiaeTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step get job seeker e-mail.

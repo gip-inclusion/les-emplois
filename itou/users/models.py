@@ -303,7 +303,7 @@ class User(AbstractUser, AddressMixin):
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
 
     def can_add_nir(self, job_seeker):
-        return (self.is_prescriber_with_authorized_org or self.is_siae_staff) and not job_seeker.nir
+        return (self.is_prescriber_with_authorized_org or self.is_siae_staff) and (job_seeker and not job_seeker.nir)
 
     def is_created_by(self, user):
         return bool(self.created_by_id and self.created_by_id == user.pk)

@@ -16,6 +16,11 @@ urlpatterns = [
         name="pending_authorization_for_sender",
     ),
     path("<int:siae_pk>/sender/check_nir", submit_views.CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
+    path(
+        "<int:siae_pk>/sender/check_email",
+        submit_views.CheckEmailForSenderView.as_view(),
+        name="check_email_for_sender",
+    ),
     # Submit - job seeker.
     path(
         "<int:siae_pk>/job_seeker/check_nir",
@@ -23,7 +28,6 @@ urlpatterns = [
         name="check_nir_for_job_seeker",
     ),
     # Submit - common.
-    path("<int:siae_pk>/step_job_seeker", submit_views.step_job_seeker, name="step_job_seeker"),
     path(
         "<int:siae_pk>/step_check_job_seeker_info",
         submit_views.step_check_job_seeker_info,

@@ -247,7 +247,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
     def post(self, request, *args, **kwargs):
         if self.form.data.get("skip"):
             # Redirect to search by e-mail address.
-            return HttpResponseRedirect(reverse("apply:step_job_seeker", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(reverse("apply:check_email_for_sender", kwargs={"siae_pk": self.siae.pk}))
 
         preview_mode = False
         job_seeker_name = None
@@ -258,7 +258,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
             # No user found with that NIR, save the NIR in the session and redirect to search by e-mail address.
             if not job_seeker:
                 self.apply_session.set("nir", self.form.cleaned_data["nir"])
-                return HttpResponseRedirect(reverse("apply:step_job_seeker", kwargs={"siae_pk": self.siae.pk}))
+                return HttpResponseRedirect(reverse("apply:check_email_for_sender", kwargs={"siae_pk": self.siae.pk}))
 
             # Ask the sender to confirm the NIR we found is associated to the correct user
             if self.form.data.get("preview"):
@@ -291,85 +291,83 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
         }
 
 
-@login_required
-@valid_session_required(["siae_pk"])
-def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeker.html"):
-    """
-    Determine the job seeker, in the cases where the application is sent by a proxy.
-    """
-    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
-    next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
+class CheckEmailForSenderView(ApplyStepForSenderBaseView):
+    template_name = "apply/submit_step_job_seeker.html"
 
-    # The user submit an application for himself.
-    if request.user.is_job_seeker:
-        return HttpResponseRedirect(next_url)
+    def __init__(self):
+        super().__init__()
+        self.form = None
 
-    job_seeker_name = None
-    form = UserExistsForm(data=request.POST or None)
-    nir = session_ns.get("nir")
-    can_add_nir = False
-    preview_mode = False
-    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.form = UserExistsForm(data=request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
-        job_seeker = form.get_user()
+    def post(self, request, *args, **kwargs):
+        can_add_nir = False
+        preview_mode = False
+        job_seeker_name = None
 
-        if job_seeker:
-            # Go to the next step.
-            can_add_nir = nir and request.user.can_add_nir(job_seeker)
-            if request.POST.get("save"):
-                session_ns.set("job_seeker_pk", job_seeker.pk)
-                if can_add_nir:
-                    try:
-                        job_seeker.nir = session_ns.get("nir")
-                        job_seeker.save(update_fields=["nir"])
-                    except ValidationError:
-                        msg = mark_safe(
-                            f"Le<b> numéro de sécurité sociale</b> renseigné ({ nir }) est "
-                            "déjà utilisé par un autre candidat sur la Plateforme.<br>"
-                            "Merci de renseigner <b>le numéro personnel et unique</b> "
-                            "du candidat pour lequel vous souhaitez postuler."
-                        )
-                        messages.warning(request, msg)
-                        logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
-                    else:
-                        return HttpResponseRedirect(next_url)
-                else:
-                    return HttpResponseRedirect(next_url)
+        if self.form.is_valid():
+            job_seeker = self.form.get_user()
+            nir = self.apply_session.get("nir")
+            can_add_nir = nir and self.sender.can_add_nir(job_seeker)
 
-            # Display a modal containing more information.
-            if request.POST.get("preview"):
+            # No user found with that email, redirect to create a new account.
+            if not job_seeker:
+                args = urlencode({"email": self.form.cleaned_data["email"]})
+                next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": self.siae.pk})
+                return HttpResponseRedirect(f"{next_url}?{args}")
+
+            # Ask the sender to confirm the email we found is associated to the correct user
+            if self.form.data.get("preview"):
                 preview_mode = True
-                job_seeker_name = job_seeker.get_full_name()
-                if request.user.is_prescriber and not request.user.is_prescriber_with_authorized_org:
-                    # Don't display personal information to unauthorized members.
+                # Don't display personal information to unauthorized members.
+                if self.sender.is_prescriber and not self.sender.is_prescriber_with_authorized_org:
                     job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
+                else:
+                    job_seeker_name = job_seeker.get_full_name()
 
-            # Create a new form to start from new.
-            elif request.POST.get("cancel"):
-                msg = mark_safe(
-                    f"L'email <b>{ form.data['email'] }</b> est déjà utilisé par un autre candidat "
-                    "sur la Plateforme.<br>"
-                    "Merci de renseigner <b>l'adresse email personnelle et unique</b> "
-                    "du candidat pour lequel vous souhaitez postuler."
-                )
-                form = UserExistsForm()
-                messages.warning(request, msg)
+            # The email we found is correct
+            if self.form.data.get("save"):
+                self.apply_session.set("job_seeker_pk", job_seeker.pk)
 
-        else:
-            args = urlencode({"email": form.cleaned_data["email"]})
-            next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
-            return HttpResponseRedirect(f"{next_url}?{args}")
+                if not can_add_nir:
+                    return HttpResponseRedirect(
+                        reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk})
+                    )
 
-    context = {
-        "can_add_nir": can_add_nir,
-        "form": form,
-        "job_seeker_name": job_seeker_name,
-        "nir": nir,
-        "preview_mode": preview_mode,
-        "siae": siae,
-    }
-    return render(request, template_name, context)
+                try:
+                    job_seeker.nir = self.apply_session.get("nir")
+                    job_seeker.save(update_fields=["nir"])
+                except ValidationError:
+                    msg = mark_safe(
+                        f"Le<b> numéro de sécurité sociale</b> renseigné ({ nir }) est "
+                        "déjà utilisé par un autre candidat sur la Plateforme.<br>"
+                        "Merci de renseigner <b>le numéro personnel et unique</b> "
+                        "du candidat pour lequel vous souhaitez postuler."
+                    )
+                    messages.warning(request, msg)
+                    logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
+                else:
+                    return HttpResponseRedirect(
+                        reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk})
+                    )
+
+        return self.render_to_response(
+            self.get_context_data(**kwargs)
+            | {
+                "can_add_nir": can_add_nir,
+                "preview_mode": preview_mode,
+                "job_seeker_name": job_seeker_name,
+            }
+        )
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "nir": self.apply_session.get("nir"),
+            "siae": self.siae,
+        }
 
 
 @login_required
