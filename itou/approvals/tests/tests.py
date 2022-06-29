@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, transaction
 from django.template.defaultfilters import title
 from django.test import TestCase, TransactionTestCase
@@ -470,6 +470,19 @@ class ApprovalModelTest(TestCase):
         approval.unsuspend(hiring_start_at=today)
         suspension.refresh_from_db()
         self.assertEqual(suspension.end_at, suspension_end_at)
+
+    def test_unsuspend_the_day_suspension_starts(self):
+        today = timezone.now().date()
+        approval = ApprovalFactory(start_at=today - relativedelta(months=3))
+        suspension = SuspensionFactory(
+            approval=approval,
+            start_at=today,
+            end_at=today + relativedelta(months=2),
+            reason=Suspension.Reason.BROKEN_CONTRACT.value,
+        )
+        approval.unsuspend(hiring_start_at=today)
+        with self.assertRaises(ObjectDoesNotExist):
+            suspension.refresh_from_db()
 
 
 class PoleEmploiApprovalModelTest(TestCase):
