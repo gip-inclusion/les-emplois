@@ -98,6 +98,13 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         self.siae = get_object_or_404(Siae, pk=kwargs["siae_pk"])
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.siae.pk}")
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not any(
+            [request.user.is_job_seeker, request.user.is_prescriber, request.user.is_siae_staff]
+        ):
+            raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
+        return super().dispatch(request, *args, **kwargs)
+
     def get_back_url(self):
         if not self.apply_session.exists():
             return None
