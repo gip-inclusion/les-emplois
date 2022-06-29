@@ -338,12 +338,16 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     def unsuspend(self, hiring_start_at):
         """
         When a job application is accepted, the approval is "unsuspended":
-        we do it by setting its end_date to JobApplication.hiring_start_at - 1 day.
+        we do it by setting its end_date to JobApplication.hiring_start_at - 1 day,
+        or deleting if JobApplication.hiring starts the day suspension starts.
         """
         active_suspension = self.last_in_progress_suspension
         if active_suspension and self.can_be_unsuspended:
-            active_suspension.end_at = hiring_start_at - relativedelta(days=1)
-            active_suspension.save()
+            if active_suspension.start_at == hiring_start_at:
+                active_suspension.delete()
+            else:
+                active_suspension.end_at = hiring_start_at - relativedelta(days=1)
+                active_suspension.save()
 
     # Postpone start date.
 
