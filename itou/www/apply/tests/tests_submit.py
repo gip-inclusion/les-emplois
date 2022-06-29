@@ -55,13 +55,14 @@ class ApplyAsJobSeekerTest(TestCase):
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
+            "job_seeker_pk": user.pk,
             "siae_pk": siae.pk,
             "sender_pk": user.pk,
             "sender_kind": SenderKind.JOB_SEEKER,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step check job seeker NIR.
@@ -186,7 +187,7 @@ class ApplyAsJobSeekerTest(TestCase):
         url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
-        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk})
 
         # Follow all redirections until NIR.
         # ----------------------------------------------------------------------
@@ -254,6 +255,15 @@ class ApplyAsJobSeekerTest(TestCase):
             last_url = response.redirect_chain[-1][0]
             self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
+    def test_apply_as_job_seeker_on_sender_tunnel(self):
+        siae = SiaeFactory()
+        user = JobSeekerFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+
 
 class ApplyAsAuthorizedPrescriberTest(TestCase):
     def setUp(self):
@@ -309,7 +319,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertContains(response, "Status de prescripteur habilité non vérifié")
         self.assertContains(response, next_url)
 
@@ -451,7 +461,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step determine the job seeker with a NIR.
@@ -600,7 +610,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(last_url, reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
         post_data = {"nir": job_seeker.nir, "confirm": 1}
@@ -637,7 +647,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step determine the job seeker.
@@ -735,7 +745,7 @@ class ApplyAsPrescriberTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step determine the job seeker with a NIR.
@@ -888,7 +898,7 @@ class ApplyAsPrescriberTest(TestCase):
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(last_url, reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
         post_data = {"nir": job_seeker.nir, "confirm": 1}
@@ -899,6 +909,15 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.context["exception"], ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
+
+    def test_apply_as_prescriber_on_job_seeker_tunnel(self):
+        siae = SiaeFactory()
+        user = PrescriberFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
 
 
 class ApplyAsPrescriberNirExceptionsTest(TestCase):
@@ -942,7 +961,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         # …until a job seeker has to be determined.
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(last_url, reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
 
         # Enter an a non-existing NIR.
         # ----------------------------------------------------------------------
@@ -1055,7 +1074,7 @@ class ApplyAsSiaeTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step determine the job seeker with a NIR.
@@ -1193,7 +1212,7 @@ class ApplyAsSiaeTest(TestCase):
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(last_url, reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
         post_data = {
@@ -1210,14 +1229,22 @@ class ApplyAsSiaeTest(TestCase):
 
 
 class ApplyAsOtherTest(TestCase):
+    ROUTES = [
+        "apply:start",
+        "apply:check_nir_for_job_seeker",
+        "apply:check_nir_for_sender",
+    ]
+
     def test_labor_inspectors_are_not_allowed_to_submit_application(self):
         siae = SiaeFactory()
         institution = InstitutionWithMembershipFactory()
 
         self.client.login(username=institution.members.first().email, password=DEFAULT_PASSWORD)
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
-        self.assertEqual(response.status_code, 403)
+        for route in self.ROUTES:
+            with self.subTest(route=route):
+                response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}), follow=True)
+                self.assertEqual(response.status_code, 403)
 
     def test_an_account_without_rights_is_not_allowed_to_submit_application(self):
         siae = SiaeFactory()
@@ -1225,6 +1252,7 @@ class ApplyAsOtherTest(TestCase):
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
-        self.assertEqual(response.status_code, 403)
-
+        for route in self.ROUTES:
+            with self.subTest(route=route):
+                response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}), follow=True)
+                self.assertEqual(response.status_code, 403)

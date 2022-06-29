@@ -5,7 +5,7 @@
 {% load static %}
 
 {% block left_column %}
-    <form method="post" action="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae.pk %}" class="js-prevent-multiple-submit js-format-nir">
+    <form method="post" action="{{ form_action }}" class="js-prevent-multiple-submit js-format-nir">
         <div class="card c-card mb-3 mb-lg-5 p-3">
             <div class="card-body">
 

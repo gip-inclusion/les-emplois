@@ -120,6 +120,41 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         }
 
 
+class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
+    def __init__(self):
+        super().__init__()
+        self.job_seeker = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.job_seeker = request.user
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.job_seeker.is_job_seeker:
+            return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_seeker": self.job_seeker,
+        }
+
+
+class ApplyStepForSenderBaseView(ApplyStepBaseView):
+    def __init__(self):
+        super().__init__()
+        self.sender = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.sender = request.user
+
+    def dispatch(self, request, *args, **kwargs):
+        if not any([self.sender.is_prescriber, self.sender.is_siae_staff]):
+            return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        return super().dispatch(request, *args, **kwargs)
+
+
 class StartView(ApplyStepBaseView):
     def get(self, request, *args, **kwargs):
         # SIAE members can only submit a job application to their SIAE
@@ -135,7 +170,7 @@ class StartView(ApplyStepBaseView):
         self.apply_session.init(
             {
                 "back_url": get_safe_url(request, "back_url"),
-                "job_seeker_pk": None,
+                "job_seeker_pk": user_info.user.pk if user_info.user.is_job_seeker else None,
                 "nir": None,
                 "siae_pk": self.siae.pk,
                 "sender_pk": user_info.user.pk,
@@ -151,7 +186,8 @@ class StartView(ApplyStepBaseView):
         if user_info.prescriber_organization and user_info.prescriber_organization.has_pending_authorization():
             return HttpResponseRedirect(reverse("apply:step_pending_authorization", kwargs={"siae_pk": self.siae.pk}))
 
-        return HttpResponseRedirect(reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": self.siae.pk}))
+        tunnel = "job_seeker" if user_info.user.is_job_seeker else "sender"
+        return HttpResponseRedirect(reverse(f"apply:check_nir_for_{tunnel}", kwargs={"siae_pk": self.siae.pk}))
 
 
 @login_required
@@ -160,74 +196,99 @@ def step_pending_authorization(request, siae_pk, template_name="apply/submit_ste
     return render(request, template_name, {"siae_pk": siae_pk})
 
 
-@login_required
-@valid_session_required(["siae_pk"])
-def step_check_job_seeker_nir(request, siae_pk, template_name="apply/submit_step_check_job_seeker_nir.html"):
-    """
-    Ensure the job seeker has a NIR. If not and if possible, update it.
-    """
-    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
-    next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
-    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
-    job_seeker = None
-    job_seeker_name = None
+class CheckNIRForJobSeekerView(ApplyStepForJobSeekerBaseView):
+    template_name = "apply/submit_step_check_job_seeker_nir.html"
 
-    # The user submits an application for himself.
-    if request.user.is_job_seeker:
-        session_ns.set("job_seeker_pk", request.user.pk)
-        job_seeker = request.user
-        if job_seeker.nir:
-            return HttpResponseRedirect(next_url)
+    def __init__(self):
+        super().__init__()
+        self.form = None
 
-    form = CheckJobSeekerNirForm(job_seeker=job_seeker, data=request.POST or None)
-    preview_mode = False
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.form = CheckJobSeekerNirForm(job_seeker=self.job_seeker, data=request.POST or None)
 
-    # Clean nir in session, especially in case of using back button
-    if request.method == "GET" and "nir" in session_ns:
-        session_ns.set("nir", None)
+    def get(self, request, *args, **kwargs):
+        # The NIR already exists, go to next step
+        if self.job_seeker.nir:
+            return HttpResponseRedirect(reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk}))
 
-    if request.method == "POST" and form.is_valid():
-        nir = form.cleaned_data["nir"]
+        return super().get(request, *args, **kwargs)
 
-        if request.user.is_job_seeker:
-            job_seeker.nir = nir
-            job_seeker.save()
-            return HttpResponseRedirect(next_url)
-
-        job_seeker = form.get_job_seeker()
-        if not job_seeker:
+    def post(self, request, *args, **kwargs):
+        if self.form.data.get("skip"):
             # Redirect to search by e-mail address.
-            session_ns.set("nir", nir)
-            next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
-            return HttpResponseRedirect(next_url)
+            return HttpResponseRedirect(reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk}))
 
-        if form.data.get("confirm"):
-            # Job seeker found for the given NIR.
-            session_ns.set("job_seeker_pk", job_seeker.pk)
-            return HttpResponseRedirect(next_url)
+        if self.form.is_valid():
+            self.job_seeker.nir = self.form.cleaned_data["nir"]
+            self.job_seeker.save()
+            return HttpResponseRedirect(reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk}))
 
-        if form.data.get("preview"):
-            preview_mode = True
-            job_seeker_name = job_seeker.get_full_name()
-            if request.user.is_prescriber and not request.user.is_prescriber_with_authorized_org:
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "form_action": reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": self.siae.pk}),
+        }
+
+
+class CheckNIRForSenderView(ApplyStepForSenderBaseView):
+    template_name = "apply/submit_step_check_job_seeker_nir.html"
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None)
+
+    def post(self, request, *args, **kwargs):
+        if self.form.data.get("skip"):
+            # Redirect to search by e-mail address.
+            return HttpResponseRedirect(reverse("apply:step_job_seeker", kwargs={"siae_pk": self.siae.pk}))
+
+        preview_mode = False
+        job_seeker_name = None
+
+        if self.form.is_valid():
+            job_seeker = self.form.get_job_seeker()
+
+            # No user found with that NIR, save the NIR in the session and redirect to search by e-mail address.
+            if not job_seeker:
+                self.apply_session.set("nir", self.form.cleaned_data["nir"])
+                return HttpResponseRedirect(reverse("apply:step_job_seeker", kwargs={"siae_pk": self.siae.pk}))
+
+            # Ask the sender to confirm the NIR we found is associated to the correct user
+            if self.form.data.get("preview"):
+                preview_mode = True
                 # Don't display personal information to unauthorized members.
-                job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
-        elif form.data.get("cancel"):
-            form = CheckJobSeekerNirForm()
+                if self.sender.is_prescriber and not self.sender.is_prescriber_with_authorized_org:
+                    job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
+                else:
+                    job_seeker_name = job_seeker.get_full_name()
 
-    if request.method == "POST" and form.data.get("skip"):
-        # Redirect to search by e-mail address.
-        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
-        return HttpResponseRedirect(next_url)
+            # The NIR we found is correct
+            if self.form.data.get("confirm"):
+                self.apply_session.set("job_seeker_pk", job_seeker.pk)
+                return HttpResponseRedirect(
+                    reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk})
+                )
 
-    context = {
-        "form": form,
-        "job_seeker": job_seeker,
-        "job_seeker_name": job_seeker_name,
-        "preview_mode": preview_mode,
-        "siae": siae,
-    }
-    return render(request, template_name, context)
+        return self.render_to_response(
+            self.get_context_data(**kwargs)
+            | {
+                "preview_mode": preview_mode,
+                "job_seeker_name": job_seeker_name,
+            }
+        )
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "form_action": reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.siae.pk}),
+        }
 
 
 @login_required
