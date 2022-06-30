@@ -448,7 +448,7 @@ class EvaluationCampaignManagerTest(TestCase):
         # check links between EvaluatedSiae and EvaluatedJobApplication
         evaluated_siae = EvaluatedSiae.objects.first()
         for evaluated_job_application in EvaluatedJobApplication.objects.all():
-            with self.subTest(evaluated_job_application=evaluated_job_application):
+            with self.subTest(evaluated_job_application_pk=evaluated_job_application.pk):
                 self.assertEqual(evaluated_siae, evaluated_job_application.evaluated_siae)
 
         # retry on populated campaign
@@ -823,8 +823,8 @@ class EvaluatedJobApplicationModelTest(TestCase):
         ]
 
         for state in editable_status:
-            with mock.patch.object(EvaluatedJobApplication, "state", state):
-                with self.subTest(state=state):
+            with self.subTest(state=state):
+                with mock.patch.object(EvaluatedJobApplication, "state", state):
                     self.assertEqual(
                         evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
                         evaluated_job_application.should_select_criteria,
@@ -838,8 +838,8 @@ class EvaluatedJobApplicationModelTest(TestCase):
         ]
 
         for state in not_editable_status:
-            with mock.patch.object(EvaluatedJobApplication, "state", state):
-                with self.subTest(state=state):
+            with self.subTest(state=state):
+                with mock.patch.object(EvaluatedJobApplication, "state", state):
                     self.assertEqual(
                         evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
                         evaluated_job_application.should_select_criteria,
@@ -863,8 +863,8 @@ class EvaluatedJobApplicationModelTest(TestCase):
             for state in evaluation_enums.EvaluatedJobApplicationsState.choices
             if state != evaluation_enums.EvaluatedJobApplicationsState.PENDING
         ]:
-            with mock.patch.object(EvaluatedJobApplication, "state", state):
-                with self.subTest(state=state):
+            with self.subTest(state=state):
+                with mock.patch.object(EvaluatedJobApplication, "state", state):
                     self.assertEqual(
                         evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
                         evaluated_job_application.should_select_criteria,
