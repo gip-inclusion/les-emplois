@@ -6,7 +6,9 @@ import unittest
 from pathlib import Path
 
 from django.conf import settings
+from django.core import mail
 from django.test import TransactionTestCase
+from django.urls import reverse
 
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2MembershipsFactory
@@ -188,3 +190,15 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         self.assertEqual(instance.fatal_errors, 0)
+
+    def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self):
+        instance = lazy_import_siae_command()
+        instance.create_new_siaes()
+        self.assertIn(reverse("signup:siae_select"), mail.outbox[0].body)
+        self.assertEqual(
+            [
+                f"Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
+                for (kind, name) in Siae.objects.values_list("kind", "name")
+            ],
+            [mail.subject for mail in mail.outbox],
+        )
