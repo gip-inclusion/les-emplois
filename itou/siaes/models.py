@@ -374,6 +374,15 @@ class Siae(AddressMixin, OrganizationAbstract):
         body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def activate_your_account_email(self):
+        if self.has_members or not self.auth_email:
+            raise ValidationError("Siae cannot be signed up for, this should never happen.")
+        to = [self.auth_email]
+        context = {"siae": self, "signup_url": reverse("signup:siae_select")}
+        subject = "siaes/email/activate_your_account_subject.txt"
+        body = "siaes/email/activate_your_account_body.txt"
+        return get_email_message(to, context, subject, body)
+
     @property
     def grace_period_end_date(self):
         """

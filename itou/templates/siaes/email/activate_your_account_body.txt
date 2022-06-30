@@ -1,0 +1,19 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
+{% block body %}
+Bonjour,
+
+Le compte de votre {{siae.kind}} SIRET {{siae.siret}} vient d’être créé sur les emplois de l’inclusion !
+
+Pour activer le compte de l’entreprise, pouvoir embaucher, obtenir des PASS IAE et créer vos fiches salarié, activez votre compte en cliquant ici {{ itou_protocol }}://{{ itou_fqdn }}{{ signup_url }}
+
+Vous avez déjà un compte employeur sur les emplois de l’inclusion ?
+- demandez à un de vos collègues qui n’en a pas encore d’activer le compte
+- vous recevrez l’e-mail d’authentification nécessaire à la première connexion
+- Votre collègue rejoindra le compte de la SIAE.
+- Elle pourra ensuite vous inviter à le rejoindre aussi via le bouton « gérer les collaborateurs de ma structure ».
+
+Pour en savoir plus, consultez notre mode d’emploi {{ itou_community_url }}/aide/emplois/mode-demploi-employeur-solidaire/
+
+Cordialement,
+{% endblock body%}

@@ -3,7 +3,9 @@ from unittest import mock
 
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from itou.job_applications.factories import JobApplicationFactory
@@ -178,6 +180,24 @@ class SiaeModelTest(TestCase):
             self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
             self.assertEqual(len(email.to), 1)
             self.assertEqual(email.to[0], siae.auth_email)
+
+    def test_activate_your_account_email(self):
+        siae = SiaeFactory(with_membership=True)
+        with self.assertRaises(ValidationError):
+            siae.activate_your_account_email()
+
+        siae = SiaeFactory(auth_email="")
+        with self.assertRaises(ValidationError):
+            siae.activate_your_account_email()
+
+        siae = SiaeFactory()
+        email = siae.activate_your_account_email()
+        self.assertEqual(email.to, [siae.auth_email])
+        self.assertIn(siae.kind, email.subject)
+        self.assertIn(siae.name, email.subject)
+        self.assertIn(siae.kind, email.body)
+        self.assertIn(siae.siret, email.body)
+        self.assertIn(reverse("signup:siae_select"), email.body)
 
     def test_deactivation_queryset_methods(self):
         siae = SiaeFactory()
