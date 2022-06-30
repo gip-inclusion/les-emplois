@@ -249,11 +249,9 @@ class SiaeSelectCriteriaViewTest(TestCase):
     def test_access_on_ended_campaign(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
-        evaluated_job_application = EvaluatedJobApplicationFactory()
-        evaluation_campaign = evaluated_job_application.evaluated_siae.evaluation_campaign
-        evaluation_campaign.ended_at = timezone.now()
-        evaluation_campaign.save(update_fields=["ended_at"])
-
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now()
+        )
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:siae_select_criteria",
