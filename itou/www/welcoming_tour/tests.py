@@ -1,3 +1,4 @@
+import respx
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
@@ -5,8 +6,9 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.openid_connect.inclusion_connect.tests import mock_oauth_dance
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
+from itou.users.factories import JobSeekerFactory, SiaeStaffFactory
 from itou.users.models import User
 
 
@@ -60,30 +62,21 @@ class WelcomingTourTest(TestCase):
         self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertContains(response, "Revoir le message")
 
+    @respx.mock
     def test_new_prescriber_sees_welcoming_tour_test(self):
         session = self.client.session
         session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
         session.save()
-        prescriber = PrescriberFactory.build()
-        url = reverse("signup:prescriber_user")
-        post_data = {
-            "first_name": prescriber.first_name,
-            "last_name": prescriber.last_name,
-            "email": prescriber.email,
-            "password1": PASSWORD,
-            "password2": PASSWORD,
-        }
-        response = self.client.post(url, data=post_data)
-        response = self.verify_email(response.wsgi_request, email=prescriber.email)
+        response = mock_oauth_dance(self, assert_redirects=False)
+        response = self.client.get(response.url, follow=True)
 
         # User should be redirected to the welcoming tour as he just signed up
         self.assertEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         self.client.logout()
-        response = self.client.post(
-            reverse("login:prescriber"), follow=True, data={"login": prescriber.email, "password": PASSWORD}
-        )
+        response = mock_oauth_dance(self, assert_redirects=False)
+        response = self.client.get(response.url, follow=True)
         self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertContains(response, "Revoir le message")
 
