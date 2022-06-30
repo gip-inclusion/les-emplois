@@ -14,6 +14,7 @@ and thus we need a proper tool to manage columns by their
 name instead of hardcoding column numbers as in `field = row[42]`.
 
 """
+from django.core import mail
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
@@ -253,6 +254,10 @@ class Command(BaseCommand):
             self.stdout.write(f"{siae.siret};{siae.kind};{siae.department};{siae.name};{siae.address_on_one_line}")
             siae.save()
         self.stdout.write("--- end of CSV output of all creatable_siaes ---")
+
+        activate_your_account_emails = (siae.activate_your_account_email() for siae in creatable_siaes)
+        connection = mail.get_connection()
+        connection.send_messages(activate_your_account_emails)
 
         self.stdout.write(f"{len(creatable_siaes)} structures will be created")
         self.stdout.write(f"{len([s for s in creatable_siaes if s.coords])} structures will have geolocation")
