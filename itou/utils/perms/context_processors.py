@@ -27,16 +27,7 @@ def get_current_organization_and_perms(request):
         # SIAE ?
         siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
         if siae_pk:
-            # Sorry I could not find an elegant DNRY one-query solution ¯\_(ツ)_/¯
-            user_siae_set_pks = request.user.siae_set.active_or_in_grace_period().values_list("pk", flat=True)
-            # SIAE members can be deactivated, hence filtering on `membership.is_active`
-            memberships = (
-                request.user.siaemembership_set.active()
-                .select_related("siae")
-                .filter(siae__pk__in=user_siae_set_pks)
-                .order_by("created_at")
-                .all()
-            )
+            memberships = request.user.active_or_in_grace_period_siae_memberships()
             user_siaes = [membership.siae for membership in memberships]
 
             for membership in memberships:

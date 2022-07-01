@@ -387,6 +387,19 @@ class User(AbstractUser, AddressMixin):
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
 
+    def active_or_in_grace_period_siae_memberships(self):
+        """
+        Return the siae memberships accessible to the employer, which means either active
+        or in grace period, with a minimum of database queries.
+        """
+        # Unfortunately we need two queries here, no solution was found to combine both
+        # `siae_set.active_or_in_grace_period()` and `siaemembership_set.active()` in a single query.
+        user_siae_set_pks = self.siae_set.active_or_in_grace_period().values_list("pk", flat=True)
+        memberships = (
+            self.siaemembership_set.active().select_related("siae").filter(siae__pk__in=user_siae_set_pks).all()
+        )
+        return memberships
+
     def can_create_siae_antenna(self, parent_siae):
         """
         Only admin employers can create an antenna for their SIAE.
