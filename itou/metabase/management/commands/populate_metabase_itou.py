@@ -67,10 +67,6 @@ from itou.users.models import User
 from itou.utils.slack import send_slack_message
 
 
-# Emit more verbose slack messages about every step, not just the beginning and the ending of the command.
-VERBOSE_SLACK_MESSAGES = False
-
-
 if settings.METABASE_SHOW_SQL_REQUESTS:
     # Unfortunately each SQL query log appears twice ¬_¬
     mylogger = logging.getLogger("django.db.backends")
@@ -474,27 +470,18 @@ class Command(BaseCommand):
         # and better performance.
         self.active_siae_pks = [siae_pk for siae_pk in Siae.objects.active().values_list("pk", flat=True)]
 
-        updates = [
-            self.populate_siaes,
-            self.populate_job_descriptions,
-            self.populate_organizations,
-            self.populate_job_seekers,
-            self.populate_job_applications,
-            self.populate_selected_jobs,
-            self.populate_approvals,
-            self.populate_rome_codes,
-            self.populate_insee_codes,
-            self.populate_departments,
-            self.build_final_tables,
-            self.report_data_inconsistencies,
-        ]
-
-        for update in updates:
-            if VERBOSE_SLACK_MESSAGES:
-                send_slack_message(f"Début de l'étape {update.__name__} :rocket:")
-            update()
-            if VERBOSE_SLACK_MESSAGES:
-                send_slack_message(f"Fin de l'étape {update.__name__} :white_check_mark:")
+        self.populate_siaes()
+        self.populate_job_descriptions()
+        self.populate_organizations()
+        self.populate_job_seekers()
+        self.populate_job_applications()
+        self.populate_selected_jobs()
+        self.populate_approvals()
+        self.populate_rome_codes()
+        self.populate_insee_codes()
+        self.populate_departments()
+        self.build_final_tables()
+        self.report_data_inconsistencies()
 
         if not self.dry_run:
             send_slack_message(
