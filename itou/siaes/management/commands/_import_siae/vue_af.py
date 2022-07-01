@@ -76,11 +76,13 @@ def get_vue_af_df():
     df["number"] = df.number_prefix + "A" + df.renewal_number.astype(str) + "M" + df.modification_number.astype(str)
 
     # Ensure data quality.
-    # FIXME(vporte): It's bad practive to iterate over the rows. We can assert on the whole column, and
-    # then apply the validate().
+    # A ValidationError will be raised if any number is incorrect.
+    df.number.apply(validate_af_number)
+
+    # Ensure data quality.
+    # FIXME(vporte): It's bad practive to iterate over the rows. We can assert on the whole column.
     for _, row in df.iterrows():
         assert row.kind in SIAE_WITH_CONVENTION_KINDS
-        validate_af_number(row.number)
 
     df["ends_in_the_future"] = df.end_date.apply(timezone.make_aware) > timezone.now()
     df["has_active_state"] = df.state.isin(SiaeFinancialAnnex.STATES_ACTIVE)
