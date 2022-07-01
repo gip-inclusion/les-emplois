@@ -113,9 +113,10 @@ class Command(BaseCommand):
             self.stdout.write("Populating metabase is not allowed in this environment.")
             return
 
-        send_slack_message(
-            ":rocket: Début de la mise à jour hebdomadaire de Metabase avec les dernières données FluxIAE :rocket:"
-        )
+        if not self.dry_run:
+            send_slack_message(
+                ":rocket: Début de la mise à jour hebdomadaire de Metabase avec les dernières données FluxIAE :rocket:"
+            )
 
         self.populate_fluxiae_referentials()
 
@@ -135,10 +136,11 @@ class Command(BaseCommand):
         # Build custom tables by running raw SQL queries on existing tables.
         build_final_tables(dry_run=self.dry_run)
 
-        send_slack_message(
-            ":white_check_mark: Fin de la mise à jour hebdomadaire de Metabase avec les"
-            " dernières données FluxIAE :white_check_mark:"
-        )
+        if not self.dry_run:
+            send_slack_message(
+                ":white_check_mark: Fin de la mise à jour hebdomadaire de Metabase avec les"
+                " dernières données FluxIAE :white_check_mark:"
+            )
 
     def handle(self, dry_run=False, **options):
         self.dry_run = dry_run

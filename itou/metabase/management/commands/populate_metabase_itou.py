@@ -462,9 +462,10 @@ class Command(BaseCommand):
             self.stdout.write("Populating metabase is not allowed in this environment.")
             return
 
-        send_slack_message(
-            ":rocket: Début de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"
-        )
+        if not self.dry_run:
+            send_slack_message(
+                ":rocket: Début de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"
+            )
 
         # Load once and for all the list of all active siae pks in memory and reuse them multiple times in various
         # queries to avoid additional joins of the SiaeConvention model and the non trivial use of the
@@ -495,10 +496,11 @@ class Command(BaseCommand):
             if VERBOSE_SLACK_MESSAGES:
                 send_slack_message(f"Fin de l'étape {update.__name__} :white_check_mark:")
 
-        send_slack_message(
-            ":white_check_mark: Fin de la mise à jour quotidienne de Metabase avec les"
-            " dernières données C1 :white_check_mark:"
-        )
+        if not self.dry_run:
+            send_slack_message(
+                ":white_check_mark: Fin de la mise à jour quotidienne de Metabase avec les"
+                " dernières données C1 :white_check_mark:"
+            )
 
     @timeit
     def handle(self, dry_run=False, **options):
