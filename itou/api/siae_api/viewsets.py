@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework import viewsets
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import NotFound, ValidationError
 
 from itou.cities.models import City
@@ -76,8 +77,8 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = SiaeOrderingFilter
     ordering = ["id"]
 
-    # No authentication is required on this API and everybody can query anything − it’s read-only.
-    authentication_classes = []
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    # No permission is required on this API and everybody can query anything − it’s read-only.
     permission_classes = []
 
     NOT_FOUND_RESPONSE = OpenApiExample(
