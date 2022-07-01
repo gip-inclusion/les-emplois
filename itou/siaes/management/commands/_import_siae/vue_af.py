@@ -70,7 +70,7 @@ def get_vue_af_df():
     df["kind"] = df["kind"].str.replace("_DC", "")
 
     # Filter out rows with irrelevant kind.
-    df = df[~df.kind.isin(["FDI", "EIPA"])]
+    df = df[df.kind.isin(SIAE_WITH_CONVENTION_KINDS)]
 
     # Build complete AF number.
     df["number"] = df.number_prefix + "A" + df.renewal_number.astype(str) + "M" + df.modification_number.astype(str)
@@ -78,11 +78,6 @@ def get_vue_af_df():
     # Ensure data quality.
     # A ValidationError will be raised if any number is incorrect.
     df.number.apply(validate_af_number)
-
-    # Ensure data quality.
-    # FIXME(vporte): It's bad practive to iterate over the rows. We can assert on the whole column.
-    for _, row in df.iterrows():
-        assert row.kind in SIAE_WITH_CONVENTION_KINDS
 
     df["ends_in_the_future"] = df.end_date.apply(timezone.make_aware) > timezone.now()
     df["has_active_state"] = df.state.isin(SiaeFinancialAnnex.STATES_ACTIVE)
