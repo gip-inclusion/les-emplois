@@ -52,6 +52,12 @@ TABLE_COLUMNS = [
     },
     {"name": "nom", "type": "varchar", "comment": "Nom de la structure", "fn": lambda o: o.display_name},
     {
+        "name": "nom_complet",
+        "type": "varchar",
+        "comment": "Nom complet de la structure avec type et ID",
+        "fn": lambda o: f"{o.kind} - ID {o.id} - {o.display_name}",
+    },
+    {
         "name": "description",
         "type": "varchar",
         "comment": "Description de la structure",
