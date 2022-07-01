@@ -7,11 +7,11 @@ import logging
 from allauth.account.adapter import get_adapter
 from allauth.account.views import PasswordResetView, SignupView
 from django.conf import settings
-from django.contrib import messages
+from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
+from django.db import Error, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -19,6 +19,7 @@ from django.utils.http import urlencode
 from django.views.decorators.http import require_GET
 
 from itou.common_apps.address.models import lat_lon_to_coords
+from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
@@ -705,53 +706,52 @@ def prescriber_join_org(request):
     # Get useful information from session.
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
-    with transaction.atomic():
-        if session_data["kind"] == "PE":
-            # Organization creation is not allowed for PE.
-            pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
-            prescriber_org = get_object_or_404(
-                PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
-            )
-        else:
-            org_attributes = {
-                "siret": session_data["prescriber_org_data"]["siret"],
-                "name": session_data["prescriber_org_data"]["name"],
-                "address_line_1": session_data["prescriber_org_data"]["address_line_1"] or "",
-                "address_line_2": session_data["prescriber_org_data"]["address_line_2"] or "",
-                "post_code": session_data["prescriber_org_data"]["post_code"],
-                "city": session_data["prescriber_org_data"]["city"],
-                "department": session_data["prescriber_org_data"]["department"],
-                "coords": lat_lon_to_coords(
-                    session_data["prescriber_org_data"]["latitude"], session_data["prescriber_org_data"]["longitude"]
-                ),
-                "geocoding_score": session_data["prescriber_org_data"]["geocoding_score"],
-                "kind": session_data["kind"],
-                "authorization_status": session_data["authorization_status"],
-                "created_by": request.user,
-            }
-            prescriber_org = PrescriberOrganization.objects.create_organization(attributes=org_attributes)
+    try:
+        with transaction.atomic():
+            if session_data["kind"] == "PE":
+                # Organization creation is not allowed for PE.
+                pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
+                # We should not have errors here since we have a PE organization pk from the database.
+                prescriber_org = PrescriberOrganization.objects.get(
+                    pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
+                )
+            else:
+                org_attributes = {
+                    "siret": session_data["prescriber_org_data"]["siret"],
+                    "name": session_data["prescriber_org_data"]["name"],
+                    "address_line_1": session_data["prescriber_org_data"]["address_line_1"] or "",
+                    "address_line_2": session_data["prescriber_org_data"]["address_line_2"] or "",
+                    "post_code": session_data["prescriber_org_data"]["post_code"],
+                    "city": session_data["prescriber_org_data"]["city"],
+                    "department": session_data["prescriber_org_data"]["department"],
+                    "coords": lat_lon_to_coords(
+                        session_data["prescriber_org_data"]["latitude"],
+                        session_data["prescriber_org_data"]["longitude"],
+                    ),
+                    "geocoding_score": session_data["prescriber_org_data"]["geocoding_score"],
+                    "kind": session_data["kind"],
+                    "authorization_status": session_data["authorization_status"],
+                    "created_by": request.user,
+                }
+                prescriber_org = PrescriberOrganization.objects.create_organization(attributes=org_attributes)
 
-        prescriber_org.add_member(user=request.user)
-    ###
-    # TODO: handle exceptions
-    # ic_session_data = {
-    #     "token": request.session["IC_ID_TOKEN"],
-    #     "state": request.session["IC_STATE"]
-    # }
-    # if form.is_valid():
-    #     user = form.save()
-    # else:
-    #     for _, errors in form.errors.items():
-    #         for error in errors:
-    #             messages.error(request, error)
+            prescriber_org.add_member(user=request.user)
 
-    #     params = {
-    #         "token": ic_session_data["token"],
-    #         "state": ic_session_data["state"],
-    #         "redirect_url": session_data["url_history"][-1],
-    #     }
-    #     next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
-    #     return HttpResponseRedirect(next_url)
+    except Error:
+        messages.error(request, "L'organisation n'a pas pu être créée")
+        # Logout user from django and IC and redirect to homepage
+        # TODO(alaurent) It would be cleaner to put all SSO logouts into UserAdapter.get_logout_redirect_url
+        # and redirect to the logout view instead of using auth.logout(request)
+        ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
+        # We should always have a IC session here since no prescriber should get here without going through IC,
+        # but in case we reuse this view for another user signup, it's better to handle the case where
+        # we don't have an ic_session.
+        if ic_session:
+            params = {"token": ic_session["token"], "state": ic_session["state"]}
+            next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
+            auth.logout(request)
+            return HttpResponseRedirect(next_url)
+
     # redirect to post login page.
     next_url = get_adapter(request).get_login_redirect_url(request)
     # delete session data

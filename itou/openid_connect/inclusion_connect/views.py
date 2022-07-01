@@ -159,15 +159,12 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     # User coming from the prescriber signup path.
     if ic_session["user_kind"] == KIND_PRESCRIBER and prescriber_session_data:
         # Prescriber signup path callback.
-        # Only signups are allowed. If a user already exists,
-        # he should contact the support team.
-        user_exists = User.objects.filter(email=ic_user_data.email).exists()
+        # Forbid signup for non prescribers
+        non_prescriber_user_exists = User.objects.filter(email=ic_user_data.email, is_prescriber=False).exists()
 
-        if user_exists:
+        if non_prescriber_user_exists:
             error = (
-                "Un compte existe déjà avec cette adresse e-mail. "
-                "Si vous souhaitez créer un compte pour une autre organisation "
-                "et y être rattaché avec cette adresse e-mail, "
+                "Un compte non prescripteur existe déjà avec cette adresse e-mail. "
                 f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>contactez-nous</a>."
             )
             messages.error(request, mark_safe(error))
