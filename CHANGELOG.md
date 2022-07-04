@@ -1,5 +1,32 @@
 # Journal des modifications
 
+## [45] - 2022-07-01
+
+### Ajouté
+- Affichage de l'identifiant obfusqué de l'utilisateur dans l'administration
+- Page de statut pour API externes
+- Bloquer la création d'antennes pour les EA / EATT / GEIQ
+- Pilotage : ajout du taux d'acceptation des candidats orientés par prescripteur
+- Affichage d'un message d'appel à contribution Dora
+- Ajout d'une tâche planifiée d'envoi des PASS IAE à Pôle emploi
+- Ajout d'une tâche planifiée pour envoyer les agréments Pôle emploi à Pôle emploi
+- API : ajout d'une vue pour représenter les SIAE au format data.inclusion
+- Controle a posteriori : sujet et objet d'un email d'info aux SIAE
+- Controle a posteriori : phase contradictoire
+- Envoyer un email automatique lorsqu'une une nouvelle structure est détectée après l'import de nouvelle SIAE
+
+### Modifié
+- Amélioration de l'UX de l'étape de renseignement du NIR du candidat dans le parcours de prescription
+- Déconnexion de PE Connect via une redirection et non via le serveur
+- Mise à jour des fiches de poste en difficulté de recrutement
+- Seconde refonte du client d'API Pôle emploi
+- Controle a posteriori : clôture des campagnes, amélioration de l'admin et notifications emails
+- Correction du lien « questions à la communauté » dans le pied de page
+- Mise à jour de la zone de contenu d'aide sur les pages « Stats »
+- Technique : commandes _venv du Makefile et logs SQL en double / Utilisation de factory.Trait pour SiaeFactory()
+- Mise à jour du thème ITOU vers la version 0.4.5
+- Ignorer les types exotiques comme ACIPA pendant l'import SIAE
+
 ## [44] - 2022-06-19
 
 ### Ajouté
@@ -59,9 +86,9 @@
 ### Ajouté
 - Ajout d'un champ manquant dans les fiches de postes pour les OPCS
 - Ajout de stats PE qui permettent à tout membre d'agence PE de consulter les stats de son département (fonctionnalité cachée en attente de déploiement)
-- Ajout de champs de recherche pour l'API fiches salarié 
+- Ajout de champs de recherche pour l'API fiches salarié
 - Message d'information sur la mise en place de l'assistance technique par téléphone
-- Contrôle a posteriori : phase enrichissement des données 
+- Contrôle a posteriori : phase enrichissement des données
 - Contrôle a posteriori, Pack SIAE : notification et liste des justificatifs demandés (cartes 1 à 3)
 - Contrôle a posteriori, Pack SIAE : sélection et enregistrement des critères à justifier (carte 4)
 - Ajout du champs "origine détaillée" dans l'export Metabase pour créer un filtre (TB 160)
@@ -88,19 +115,19 @@
 - Rendre plus robuste le code de l'API Pole Emploi le temps de l'envoi des PASS IAE
 - Correction de la recherche d'agréments Pôle emploi par NIR
 - Correction technique du chargement des villes en base de données
-- Correction d'un cas particulier sur les conventions dans l'import ASP des SIAE 
+- Correction d'un cas particulier sur les conventions dans l'import ASP des SIAE
 - Correction des erreurs d'accessibilité sur les tableaux et les scripts
 - Correction d'un bug lorsqu'un PASS IAE existe déjà pour le même NIR ou ID Pôle emploi
 - Résolutions d'erreurs diverses dans FranceConnect
 
 ### Supprimé
 - Champ en double dans le modèle des fiches de poste
- 
+
 ## [41] - 2022-04-22
 
 ### Ajouté
 - Refus de la connexion Django pour les utilisateurs SSO
-- Ajout du fournisseur d'identité Inclusion Connect dans IdentityProvider 
+- Ajout du fournisseur d'identité Inclusion Connect dans IdentityProvider
 - PASS IAE : retrait de PDFShift et affichage une page HTML prête à imprimer
 - Ajout d'un comportement dynamique sur le champ "Autre type de contrat" dans le formulaire des fiches de poste
 - Ajout d'une page de connexion générique reprenant les différents types de profils utilisateur
@@ -111,7 +138,7 @@
 - Ajout de custom URLs Matomo sur toutes les stats.
 
 ### Modifié
-- Mise à jour vers Django 4.0.4 
+- Mise à jour vers Django 4.0.4
 - Correction de tests unitaires instables (suspension et fiche salarié)
 - Synchronisation du groupe de permissions du support externe
 - Correction de la fixture PE Approvals
@@ -123,7 +150,7 @@
 
 ### Supprimé
 - Retrait des mentions à la DGEFP sur le dashboard
-- Retrait des imports de données `external-data` des remontées d'erreur sur Sentry 
+- Retrait des imports de données `external-data` des remontées d'erreur sur Sentry
 
 ## [40] - 2022-04-08
 
