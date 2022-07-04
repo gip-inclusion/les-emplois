@@ -417,8 +417,11 @@ class EvaluatedSiae(models.Model):
         ):
             return evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
 
+        # PENDING and reviewed_at is none !!
+        # OR PENDING with uploaded_at > reviewed_at
         if any(
             eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+            and (not self.reviewed_at or (eval_admin_crit.submitted_at > self.reviewed_at))
             for eval_job_app in self.evaluated_job_applications.all()
             for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
         ):
