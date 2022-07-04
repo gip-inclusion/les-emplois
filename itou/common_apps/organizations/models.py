@@ -38,7 +38,7 @@ class OrganizationAbstract(models.Model):
     # if the organization is supposed to be the same (even in the case of a change of address or SIRET)
     # It is meant to be the exposed ID of our organizations for external clients, such as in our APIs.
     # This enables us to keep our internal primary key opaque and independent from any external logic.
-    uid = models.UUIDField(db_index=True, default=uuid.uuid4)
+    uid = models.UUIDField(db_index=True, default=uuid.uuid4, unique=True)
 
     # Child class should have a "members" attribute, for example:
     # members = models.ManyToManyField(
