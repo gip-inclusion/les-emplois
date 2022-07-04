@@ -5,7 +5,9 @@
         </h3>
     </div>
     <div class="col-md-3 mt-1 text-right">
-        {%if review_state == "ACCEPTED" %}
+        {% if review_state == "PENDING" %}
+            <p class="text-success"><i class="ri-checkbox-circle-line"></i>En attente</p>
+        {% elif review_state == "ACCEPTED" %}
             <p class="text-success"><i class="ri-checkbox-circle-line"></i> Validé</p>
         {% elif review_state == "REFUSED" or review_state == "REFUSED_2" %}
             <p class="text-danger"><i class="ri-indeterminate-circle-line"></i> Refusé</p>
