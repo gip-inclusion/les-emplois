@@ -19,7 +19,7 @@ class DataInclusionStructureTest(APITestCase):
 
     def test_list_structures_unauthenticated(self):
         response = self.client.get(self.url, format="json")
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     def test_list_structures(self):
         def _str_with_tz(dt):
