@@ -11,6 +11,13 @@ class EvaluatedSiaesInline(admin.TabularInline):
     readonly_fields = ("id_link", "reviewed_at", "state")
     extra = 0
 
+    def get_queryset(self, request):
+        queryset = super(EvaluatedSiaesInline, self).get_queryset(request)
+        queryset = queryset.prefetch_related(
+            "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
+        )
+        return queryset
+
     def state(self, obj):
         return obj.state
 
@@ -28,6 +35,11 @@ class EvaluatedJobApplicationsInline(admin.TabularInline):
     fields = ("id_link", "approval", "job_seeker", "state")
     readonly_fields = ("id_link", "approval", "job_seeker", "state")
     extra = 0
+
+    def get_queryset(self, request):
+        queryset = super(EvaluatedJobApplicationsInline, self).get_queryset(request)
+        queryset = queryset.prefetch_related("evaluated_administrative_criteria")
+        return queryset
 
     def state(self, obj):
         return obj.state
@@ -137,6 +149,13 @@ class EvaluatedSiae(admin.ModelAdmin):
         EvaluatedJobApplicationsInline,
     ]
 
+    def get_queryset(self, request):
+        queryset = super(EvaluatedSiae, self).get_queryset(request)
+        queryset = queryset.prefetch_related(
+            "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
+        )
+        return queryset
+
     def state(self, obj):
         return obj.state
 
@@ -145,10 +164,18 @@ class EvaluatedSiae(admin.ModelAdmin):
 class EvaluatedJobApplication(admin.ModelAdmin):
     list_display = ("evaluated_siae", "job_application", "approval", "job_seeker")
     list_display_links = ("job_application",)
-    readonly_fields = ("evaluated_siae", "job_application", "approval", "job_seeker")
+    readonly_fields = ("evaluated_siae", "job_application", "approval", "job_seeker", "state")
     inlines = [
         EvaluatedAdministrativeCriteriaInline,
     ]
+
+    def get_queryset(self, request):
+        queryset = super(EvaluatedJobApplication, self).get_queryset(request)
+        queryset = queryset.prefetch_related("evaluated_administrative_criteria")
+        return queryset
+
+    def state(self, obj):
+        return obj.state
 
     def approval(self, obj):
         if obj.job_application.approval:
