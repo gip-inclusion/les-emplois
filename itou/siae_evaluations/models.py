@@ -386,6 +386,7 @@ class EvaluatedSiae(models.Model):
         body = "siae_evaluations/email/to_institution_submitted_by_siae_body.txt"
         return get_email_message(to, context, subject, body)
 
+    # fixme vincentporte : rsebille suggests to replace cached_property with prefetch_related
     @cached_property
     def state(self):
 
@@ -479,6 +480,7 @@ class EvaluatedJobApplication(models.Model):
     def __str__(self):
         return f"{self.job_application}"
 
+    # fixme vincentporte : rsebille suggests to replace cached_property with prefetch_related
     @cached_property
     def state(self):
 
