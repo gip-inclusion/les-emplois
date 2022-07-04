@@ -81,7 +81,7 @@ class FranceConnectTest(TestCase):
         self.assertEqual(user.post_code, FC_USERINFO["address"]["postal_code"])
         self.assertEqual(user.city, FC_USERINFO["address"]["locality"])
 
-        self.assertEqual(user.external_data_source_history["last_name"]["source"], "FC")
+        self.assertEqual(user.external_data_source_history[0]["source"], "FC")
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
         self.assertTrue(user.is_job_seeker)
 
@@ -134,7 +134,7 @@ class FranceConnectTest(TestCase):
         self.assertTrue(created)
         self.assertEqual(user.last_name, FC_USERINFO["family_name"])
         self.assertEqual(user.first_name, FC_USERINFO["given_name"])
-        self.assertEqual(user.external_data_source_history["last_name"]["source"], "FC")
+        self.assertEqual(user.external_data_source_history[0]["source"], "FC")
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
         self.assertEqual(user.address_line_1, "")
         self.assertEqual(user.post_code, "")
@@ -155,7 +155,7 @@ class FranceConnectTest(TestCase):
         self.assertFalse(created)
         self.assertEqual(user.last_name, FC_USERINFO["family_name"])
         self.assertEqual(user.first_name, FC_USERINFO["given_name"])
-        self.assertEqual(user.external_data_source_history["last_name"]["source"], "FC")
+        self.assertEqual(user.external_data_source_history[0]["source"], "FC")
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
 
     def test_create_django_user_with_already_existing_fc_id_but_from_other_sso(self):

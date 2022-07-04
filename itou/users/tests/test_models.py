@@ -239,7 +239,7 @@ class ModelTest(TestCase):
         self.assertTrue(has_performed_update)
         self.assertEqual(
             user.external_data_source_history,
-            {"first_name": {"value": "Lola", "source": provider.value, "created_at": now_str}},
+            [{"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str}],
         )
 
         # Update history.
@@ -252,7 +252,10 @@ class ModelTest(TestCase):
         self.assertTrue(has_performed_update)
         self.assertEqual(
             user.external_data_source_history,
-            {"first_name": {"value": "Jeanne", "source": provider.value, "created_at": now_str}},
+            [
+                {"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str},
+                {"field_name": "first_name", "value": "Jeanne", "source": provider.value, "created_at": now_str},
+            ],
         )
 
         # Don't update the history if value is the same.
@@ -265,7 +268,10 @@ class ModelTest(TestCase):
         self.assertEqual(
             user.external_data_source_history,
             # NB: created_at would have changed if has_performed_update had been True since we did not use mock.patch
-            {"first_name": {"value": "Jeanne", "source": provider.value, "created_at": now_str}},
+            [
+                {"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str},
+                {"field_name": "first_name", "value": "Jeanne", "source": provider.value, "created_at": now_str},
+            ],
         )
 
         # Allow storing empty values.
@@ -278,10 +284,11 @@ class ModelTest(TestCase):
         self.assertTrue(has_performed_update)
         self.assertEqual(
             user.external_data_source_history,
-            {
-                "first_name": {"value": "Jeanne", "source": provider.value, "created_at": now_str},
-                "last_name": {"value": "", "source": provider.value, "created_at": now_str},
-            },
+            [
+                {"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str},
+                {"field_name": "first_name", "value": "Jeanne", "source": provider.value, "created_at": now_str},
+                {"field_name": "last_name", "value": "", "source": provider.value, "created_at": now_str},
+            ],
         )
 
         # Allow replacing empty values.
@@ -294,10 +301,12 @@ class ModelTest(TestCase):
         self.assertTrue(has_performed_update)
         self.assertEqual(
             user.external_data_source_history,
-            {
-                "first_name": {"value": "Jeanne", "source": provider.value, "created_at": now_str},
-                "last_name": {"value": "Trombignard", "source": provider.value, "created_at": now_str},
-            },
+            [
+                {"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str},
+                {"field_name": "first_name", "value": "Jeanne", "source": provider.value, "created_at": now_str},
+                {"field_name": "last_name", "value": "", "source": provider.value, "created_at": now_str},
+                {"field_name": "last_name", "value": "Trombignard", "source": provider.value, "created_at": now_str},
+            ],
         )
 
     def test_last_hire_was_made_by_siae(self):

@@ -1,10 +1,14 @@
 import dataclasses
+import json
+from operator import itemgetter
+from unittest import mock
 from urllib.parse import quote, urlencode
 
 import httpx
 import respx
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -96,17 +100,32 @@ class InclusionConnectModelTest(TestCase):
         self.assertFalse(User.objects.filter(username=ic_user_data.username).exists())
         self.assertFalse(User.objects.filter(email=ic_user_data.email).exists())
 
-        user, created = ic_user_data.create_or_update_user()
+        now = timezone.now()
+        # Because external_data_source_history is a JSONField
+        # dates are actually stored as strings in the database
+        now_str = json.loads(DjangoJSONEncoder().encode(now))
+        with mock.patch("django.utils.timezone.now", return_value=now):
+            user, created = ic_user_data.create_or_update_user()
         self.assertTrue(created)
         self.assertEqual(user.email, OIDC_USERINFO["email"])
         self.assertEqual(user.last_name, OIDC_USERINFO["family_name"])
         self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
         self.assertEqual(user.username, OIDC_USERINFO["sub"])
 
-        for field in dataclasses.fields(ic_user_data):
-            with self.subTest(field):
-                self.assertEqual(user.external_data_source_history[field.name]["source"], "IC")
-                self.assertEqual(user.external_data_source_history[field.name]["value"], getattr(user, field.name))
+        user.refresh_from_db()
+        expected = [
+            {
+                "field_name": field.name,
+                "value": getattr(user, field.name),
+                "source": "IC",
+                "created_at": now_str,
+            }
+            for field in dataclasses.fields(ic_user_data)
+        ]
+        self.assertEqual(
+            sorted(user.external_data_source_history, key=itemgetter("field_name")),
+            sorted(expected, key=itemgetter("field_name")),
+        )
 
     def test_create_user_from_user_info_with_already_existing_id(self):
         """
@@ -123,7 +142,7 @@ class InclusionConnectModelTest(TestCase):
         self.assertFalse(created)
         self.assertEqual(user.last_name, OIDC_USERINFO["family_name"])
         self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
-        self.assertEqual(user.external_data_source_history["last_name"]["source"], "IC")
+        self.assertEqual(user.external_data_source_history[0]["source"], "IC")
 
     def test_create_user_from_user_info_with_already_existing_id_but_from_other_sso(self):
         """
@@ -175,13 +194,28 @@ class InclusionConnectModelTest(TestCase):
         new_ic_user = InclusionConnectUserData(
             first_name="Jean", last_name="Gabin", username=ic_user.username, email="jean@lestontons.fr"
         )
-        user, created = new_ic_user.create_or_update_user()
+        now = timezone.now()
+        # Because external_data_source_history is a JSONField
+        # dates are actually stored as strings in the database
+        now_str = json.loads(DjangoJSONEncoder().encode(now))
+        with mock.patch("django.utils.timezone.now", return_value=now):
+            user, created = new_ic_user.create_or_update_user()
         self.assertFalse(created)
 
-        for field in dataclasses.fields(new_ic_user):
-            with self.subTest(field):
-                self.assertEqual(user.external_data_source_history[field.name]["source"], "IC")
-                self.assertEqual(getattr(user, field.name), getattr(new_ic_user, field.name))
+        user.refresh_from_db()
+        expected = [
+            {
+                "field_name": field.name,
+                "value": getattr(user, field.name),
+                "source": "IC",
+                "created_at": now_str,
+            }
+            for field in dataclasses.fields(ic_user)
+        ]
+        self.assertEqual(
+            sorted(user.external_data_source_history, key=itemgetter("field_name")),
+            sorted(expected, key=itemgetter("field_name")),
+        )
 
     def test_state_is_valid(self):
         csrf_signed = InclusionConnectState.create_signed_csrf_token()

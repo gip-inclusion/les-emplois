@@ -569,28 +569,33 @@ class User(AbstractUser, AddressMixin):
 
         We store a history of the various data sources for the user information
         inside `external_data_source_history`. It can look like:
-        {
-            "first_name": {"source": "FRANCE_CONNECT", "created_at": "…", "value": "Jean-Michel"},
-            "birth_date": {"source": "PE_CONNECT", "created_at": "…", "value": "…"},
+        Since we only append data, they should all be chronologically sorted
+        [
+            {"field_name": "first_name", "source": "FRANCE_CONNECT", "created_at": "…", "value": "Jean-Michel"},
+            {"field_name": "birth_date", "source": "PE_CONNECT", "created_at": "…", "value": "…"},
             …
-        }
+
         """
         now = timezone.now()
         has_performed_update = False
 
         if not self.external_data_source_history:
-            self.external_data_source_history = {}
+            self.external_data_source_history = []
 
         try:
-            current_value = self.external_data_source_history[field]["value"]
-        except KeyError:
+            field_history = list(filter(lambda d: d["field_name"] == field, self.external_data_source_history))
+            current_value = field_history[-1]["value"]
+        except IndexError:
             current_value = None
         if current_value != value:
-            self.external_data_source_history[field] = {
-                "source": provider,
-                "created_at": now,
-                "value": value,
-            }
+            self.external_data_source_history.append(
+                {
+                    "field_name": field,
+                    "source": provider.value,
+                    "created_at": now,
+                    "value": value,
+                }
+            )
             has_performed_update = True
         return has_performed_update
 
