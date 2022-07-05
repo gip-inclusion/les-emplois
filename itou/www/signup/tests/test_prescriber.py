@@ -8,6 +8,7 @@ from django.contrib.messages import get_messages
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
@@ -19,6 +20,7 @@ from itou.prescribers.factories import (
     PrescriberPoleEmploiFactory,
 )
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
+from itou.users.enums import KIND_PRESCRIBER
 from itou.users.factories import PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
@@ -71,13 +73,22 @@ class PrescriberSignupTest(TestCase):
 
         response = self.client.get(response.url)
         self.assertContains(response, "inclusion_connect_button.svg")
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:prescriber_pole_emploi_user")
+        next_url = reverse("signup:prescriber_join_org")
+        params = {
+            "login_hint": email,
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
         # Connect with Inclusion Connect.
         # Skip the welcoming tour to test dashboard content.
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_pole_emploi_user")
-            next_url = reverse("signup:prescriber_join_org")
             response = mock_oauth_dance(
                 self,
                 assert_redirects=False,
@@ -150,11 +161,19 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, url)
         response = self.client.get(url)
         self.assertContains(response, "inclusion_connect_button.svg")
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:prescriber_user")
+        next_url = reverse("signup:prescriber_join_org")
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_user")
-            next_url = reverse("signup:prescriber_join_org")
             response = mock_oauth_dance(
                 self,
                 assert_redirects=False,
@@ -240,11 +259,20 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, url)
         response = self.client.get(url)
         self.assertContains(response, "inclusion_connect_button.svg")
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:prescriber_user")
+        next_url = reverse("signup:prescriber_join_org")
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
             previous_url = reverse("signup:prescriber_user")
-            next_url = reverse("signup:prescriber_join_org")
             response = mock_oauth_dance(
                 self,
                 assert_redirects=False,
@@ -327,11 +355,19 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, url)
         response = self.client.get(url)
         self.assertContains(response, "inclusion_connect_button.svg")
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:prescriber_user")
+        next_url = reverse("signup:prescriber_join_org")
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_user")
-            next_url = reverse("signup:prescriber_join_org")
             response = mock_oauth_dance(
                 self,
                 assert_redirects=False,
@@ -486,10 +522,17 @@ class PrescriberSignupTest(TestCase):
         self.assertContains(response, url)
         response = self.client.get(url)
         self.assertContains(response, "inclusion_connect_button.svg")
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:prescriber_user")
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_user")
             response = mock_oauth_dance(
                 self,
                 assert_redirects=False,
@@ -560,11 +603,19 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, url)
         response = self.client.get(url)
         self.assertContains(response, "inclusion_connect_button.svg")
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:prescriber_user")
+        next_url = reverse("signup:prescriber_join_org")
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_user")
-            next_url = reverse("signup:prescriber_join_org")
             response = mock_oauth_dance(
                 self,
                 assert_redirects=False,
@@ -667,12 +718,19 @@ class PrescriberSignupTest(TestCase):
         # Step 2: register as a simple prescriber (orienteur).
         response = self.client.get(reverse("signup:prescriber_user"))
         self.assertContains(response, "inclusion_connect_button.svg")
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:prescriber_user")
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
         # Connect with Inclusion Connect.
         # Skip the welcoming tour to test dashboard content.
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_user")
             response = mock_oauth_dance(
                 self,
                 assert_redirects=False,
@@ -730,12 +788,20 @@ class PrescriberSignupTest(TestCase):
 
         response = self.client.get(signup_url)
         self.assertContains(response, "inclusion_connect_button.svg")
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:prescriber_user")
+        next_url = reverse("signup:prescriber_join_org")
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
         # Connect with Inclusion Connect.
         url = reverse("dashboard:index")
         with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_user")
-            next_url = reverse("signup:prescriber_join_org")
             response = mock_oauth_dance(
                 self,
                 assert_redirects=False,

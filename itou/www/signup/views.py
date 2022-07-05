@@ -617,7 +617,7 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
     params = {
         "login_hint": session_data["email"],
         "user_kind": KIND_PRESCRIBER,
-        "previous_url": request.resolver_match.view_name,
+        "previous_url": request.path_info,
         "next_url": reverse("signup:prescriber_join_org"),
     }
     inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
@@ -674,9 +674,9 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
 
     ic_params = {
         "user_kind": KIND_PRESCRIBER,
-        "previous_url": request.resolver_match.view_name,
+        "previous_url": request.path_info,
     }
-    if join_as_orienteur_with_org:
+    if join_as_orienteur_with_org or join_authorized_org:
         # Redirect to the join organization view after login or signup.
         ic_params["next_url"] = reverse("signup:prescriber_join_org")
 
