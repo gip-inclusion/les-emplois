@@ -170,8 +170,7 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
         with transaction.atomic():
             request.user.email = form.cleaned_data["email"]
             request.user.save()
-            if request.user.emailaddress_set and request.user.emailaddress_set.first():
-                request.user.emailaddress_set.first().delete()
+            request.user.emailaddress_set.all().delete()
         auth.logout(request)
         return HttpResponseRedirect(reverse("account_logout"))
 

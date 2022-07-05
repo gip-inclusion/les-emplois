@@ -164,8 +164,8 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
 
         if non_prescriber_user_exists:
             error = (
-                "Un compte non prescripteur existe déjà avec cette adresse e-mail. "
-                f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>contactez-nous</a>."
+                "Un compte non prescripteur existe déjà avec cette adresse e-mail. Besoin d'aide ? "
+                f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>Contactez-nous</a>."
             )
             messages.error(request, mark_safe(error))
             is_successful = False

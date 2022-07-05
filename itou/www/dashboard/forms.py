@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from itou.common_apps.address.forms import OptionalAddressFormMixin
@@ -43,6 +44,11 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
             for name in self.fields.keys():
                 if name in disabled_fields:
                     self.fields[name].disabled = True
+            self.fields["email"].help_text = (
+                "Si vous souhaitez modifier votre adresse e-mail merci de "
+                f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>"
+                "contacter notre support technique</a>"
+            )
         else:
             # Noboby can edit its own email.
             # Only prescribers and employers can edit the job seeker's email here under certain conditions
