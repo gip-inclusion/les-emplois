@@ -19,7 +19,7 @@
 /* Spacing.
 --------------------------------------------------------------------------- */
 
-.s-main>section {
+.s-main > section {
     padding-top: 2rem;
     padding-bottom: 3rem;
 }
@@ -30,7 +30,7 @@
 }
 
 @media (min-width: 992px) {
-    .s-main>section {
+    .s-main > section {
         padding-top: 3rem;
         padding-bottom: 4rem;
     }
@@ -48,46 +48,49 @@
     justify-content: space-between;
 }
 
-.card-deck-itou>.card {
+.card-deck-itou > .card {
     /* flex: 0 0 26%; */
     position: relative;
     padding: 1.5rem;
 }
 
-.card-deck-itou>.card>.card-body {
+.card-deck-itou > .card > .card-body {
     align-items: center;
     justify-content: center;
     display: flex;
 }
 
-.card-deck-itou>.card>.card-footer {
+.card-deck-itou > .card > .card-footer {
     background: transparent;
 }
 
 /* BETA banner.
 --------------------------------------------------------------------------- */
-
-body:after {
+.s-preheader {
+    position: relative;
+}
+.s-preheader:after {
     content: "BETA";
     color: #fff;
-    background: #d63626;
+    background: #ff5655;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    line-height: 1;
     font-weight: bold;
-    padding: 0.2rem 1.9rem;
-    position: fixed;
-    z-index: 2;
-    top: 0.3rem;
-    left: -1.8rem;
-    transform: rotate(-45deg);
+    padding: 0.5rem 2rem;
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    left: -20px;
+    transform: rotate(-40deg);
 }
 
 /* Forms.
 --------------------------------------------------------------------------- */
 
-.form-group-required>label:first-of-type:after {
+.form-group-required > label:first-of-type:after {
     content: " *";
-    color: #d63626;
+    color: #ff5655;
 }
 
 .select2-container {
@@ -104,7 +107,7 @@ See also `duet_date_picker.html`.
 https://getbootstrap.com/docs/4.6/components/forms/#server-side
 */
 
-duet-date-picker.is-invalid~.invalid-feedback {
+duet-date-picker.is-invalid ~ .invalid-feedback {
     display: block;
 }
 
@@ -216,13 +219,13 @@ Usage:
     </ul>
 --------------------------------------------------------------------------- */
 
-.multi-steps>li.is-active:before,
-.multi-steps>li.is-active~li:before {
+.multi-steps > li.is-active:before,
+.multi-steps > li.is-active ~ li:before {
     content: counter(stepNum);
 }
 
-.multi-steps>li.is-active:after,
-.multi-steps>li.is-active~li:after {
+.multi-steps > li.is-active:after,
+.multi-steps > li.is-active ~ li:after {
     background-color: #ededed;
 }
 
@@ -232,7 +235,7 @@ Usage:
     width: 100%;
 }
 
-.multi-steps>li {
+.multi-steps > li {
     counter-increment: stepNum;
     text-align: center;
     display: table-cell;
@@ -241,7 +244,7 @@ Usage:
     z-index: 1;
 }
 
-.multi-steps>li:before {
+.multi-steps > li:before {
     content: "\2713";
     /* Check mark symbol. */
     display: block;
@@ -256,7 +259,7 @@ Usage:
     border-radius: 50%;
 }
 
-.multi-steps>li:after {
+.multi-steps > li:after {
     content: "";
     height: 2px;
     width: 100%;
@@ -267,20 +270,20 @@ Usage:
     z-index: -1;
 }
 
-.multi-steps>li:last-child:after {
+.multi-steps > li:last-child:after {
     display: none;
 }
 
-.multi-steps>li.is-active:before {
+.multi-steps > li.is-active:before {
     background-color: #fff;
     border-color: #28a745;
 }
 
-.multi-steps>li.is-active~li {
+.multi-steps > li.is-active ~ li {
     color: #808080;
 }
 
-.multi-steps>li.is-active~li:before {
+.multi-steps > li.is-active ~ li:before {
     background-color: #ededed;
     border-color: #ededed;
 }
@@ -338,8 +341,8 @@ Usage:
     text-decoration: none !important;
 }
 
-.collapse-caret>*::after {
-    content: '\ea4e';
+.collapse-caret > *::after {
+    content: "\ea4e";
     font-family: remixicon !important;
     font-style: normal;
     -webkit-font-smoothing: antialiased;
@@ -351,8 +354,8 @@ Usage:
     margin-left: 0.5rem;
 }
 
-.collapse-caret[aria-expanded=true]>*::after {
-    content: '\ea78';
+.collapse-caret[aria-expanded="true"] > *::after {
+    content: "\ea78";
 }
 
 .employee-records-list .badge {
@@ -414,7 +417,6 @@ Usage:
     visibility: hidden;
 }
 
-
 /* Welcoming tour.
 --------------------------------------------------------------------------- */
 #welcoming_tour {
@@ -427,7 +429,7 @@ Usage:
 }
 
 #welcoming_tour .carousel-indicators li {
-    background-color: #3F3E62;
+    background-color: #3f3e62;
 }
 
 #welcoming_tour .carousel-indicators li.active {
