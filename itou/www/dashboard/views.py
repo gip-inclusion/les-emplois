@@ -4,7 +4,7 @@ from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
@@ -163,6 +163,8 @@ logout = login_required(ItouLogoutView.as_view())
 
 @login_required
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
+    if request.user.has_sso_provider:
+        return HttpResponseForbidden()
     form = EditUserEmailForm(data=request.POST or None, user_email=request.user.email)
     if request.method == "POST" and form.is_valid():
         with transaction.atomic():
@@ -170,27 +172,7 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
             request.user.save()
             if request.user.emailaddress_set and request.user.emailaddress_set.first():
                 request.user.emailaddress_set.first().delete()
-        # we perform the redirection like this in order to ensure every logout
-        # route performs the same operations
-        fc_token = request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
-        fc_state = request.session.get(FRANCE_CONNECT_SESSION_STATE)
-        ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
-
-        # TODO(alaurent) It would be cleaner to put all SSO logouts into UserAdapter.get_logout_redirect_url
-        # and redirect to the logout view instead of using auth.logout(request)
         auth.logout(request)
-
-        # Logout user from the app and from any SSO
-        if fc_token:
-            params = {"id_token": fc_token, "state": fc_state}
-            fc_base_logout_url = get_absolute_url(reverse("france_connect:logout"))
-            fc_logout_url = f"{fc_base_logout_url}?{urlencode(params)}"
-            return HttpResponseRedirect(fc_logout_url)
-        if ic_session:
-            params = {"token": ic_session["token"], "state": ic_session["state"]}
-            ic_base_logout_url = reverse("inclusion_connect:logout")
-            ic_logout_url = f"{ic_base_logout_url}?{urlencode(params)}"
-            return HttpResponseRedirect(ic_logout_url)
         return HttpResponseRedirect(reverse("account_logout"))
 
     context = {

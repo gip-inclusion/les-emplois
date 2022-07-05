@@ -1,13 +1,11 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 
 from itou.common_apps.address.forms import OptionalAddressFormMixin
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
-from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
@@ -37,17 +35,14 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
                 }
             )
 
-        if self.instance.identity_provider == IdentityProvider.FRANCE_CONNECT:
-            # When a user has logged in with FranceConnect,
+        if self.instance.has_sso_provider:
+            # When a user has logged in with a SSO,
             # it should see the field but most should be disabled
             # (that’s a requirement on FranceConnect’s side).
             disabled_fields = ["first_name", "last_name", "email", "birthdate"]
             for name in self.fields.keys():
                 if name in disabled_fields:
                     self.fields[name].disabled = True
-
-            edit_email_url = reverse("dashboard:edit_user_email")
-            self.fields["email"].help_text = f'<a href="{edit_email_url}"> Modifier votre adresse email</a>'
         else:
             # Noboby can edit its own email.
             # Only prescribers and employers can edit the job seeker's email here under certain conditions

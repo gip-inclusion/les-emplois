@@ -26,6 +26,7 @@ from itou.siaes.factories import (
     SiaePendingGracePeriodFactory,
     SiaeWithMembershipAndJobsFactory,
 )
+from itou.users.enums import IdentityProvider
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.www.dashboard.forms import EditUserEmailForm
@@ -238,6 +239,8 @@ class EditUserInfoViewTest(TestCase):
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        # There's a specific view to edit the email so we don't show it here
+        self.assertNotContains(response, "Adresse électronique")
 
         post_data = {
             "email": "bob@saintclar.net",
@@ -257,6 +260,34 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
 
         # Ensure that the job seeker cannot edit email here.
+        self.assertNotEqual(user.email, post_data["email"])
+
+    def test_edit_sso(self):
+        user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Adresse électronique")
+
+        post_data = {
+            "email": "bob@saintclar.net",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = User.objects.get(id=user.id)
+        self.assertEqual(user.phone, post_data["phone"])
+
+        # Ensure that the job seeker cannot update data retreived from the SSO here.
+        self.assertNotEqual(user.first_name, post_data["first_name"])
+        self.assertNotEqual(user.last_name, post_data["last_name"])
+        self.assertNotEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
         self.assertNotEqual(user.email, post_data["email"])
 
 
@@ -486,6 +517,19 @@ class ChangeEmailViewTest(TestCase):
         new_address = user.emailaddress_set.first()
         self.assertEqual(new_address.email, new_email)
         self.assertTrue(new_address.verified)
+
+    def test_update_email_forbidden(self):
+        url = reverse("dashboard:edit_user_email")
+
+        job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
+        self.client.login(username=job_seeker.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        prescriber = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
 
 
 class EditUserEmailFormTest(TestCase):
