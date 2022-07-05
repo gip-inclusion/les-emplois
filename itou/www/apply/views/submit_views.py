@@ -593,22 +593,28 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     return render(request, template_name, context)
 
 
-@login_required
-@valid_session_required(["siae_pk"])
-def step_application_sent(request, siae_pk, template_name="apply/submit_step_application_sent.html"):
-    if request.user.is_siae_staff:
-        dashboard_url = reverse("apply:list_for_siae")
-        messages.success(request, "Candidature bien envoyée !")
-        return HttpResponseRedirect(dashboard_url)
+class ApplicationSentView(ApplyStepBaseView):
+    template_name = "apply/submit_step_application_sent.html"
 
-    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
-    back_url = get_safe_url(request=request, url=session_ns.get("back_url"))
-    job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
-    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
+    def __init__(self):
+        super().__init__()
+        self.job_seeker = None
 
-    context = {
-        "back_url": back_url,
-        "job_seeker": job_seeker,
-        "siae": siae,
-    }
-    return render(request, template_name, context)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        # Get the object early so the session is not yet deleted
+        self.job_seeker = get_object_or_404(User, pk=self.apply_session.get("job_seeker_pk"))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_seeker": self.job_seeker,
+        }
+
+    def get(self, request, *args, **kwargs):
+        self.apply_session.delete()
+
+        if request.user.is_siae_staff:  # TODO(rsebille) Check if we can avoid a redirection and do that part earlier
+            messages.success(request, "Candidature bien envoyée !")
+            return HttpResponseRedirect(reverse("apply:list_for_siae"))
+
+        return super().get(request, *args, **kwargs)

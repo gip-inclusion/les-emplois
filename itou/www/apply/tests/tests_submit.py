@@ -172,6 +172,9 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.resume_link, post_data["resume_link"])
 
+        self.client.get(next_url)
+        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
+
     def test_apply_as_job_seeker_temporary_nir(self):
         """
         Full path is tested above. See test_apply_as_job_seeker.
@@ -223,6 +226,7 @@ class ApplyAsJobSeekerTest(TestCase):
         last_url = response.redirect_chain[-1][0]
         next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
         self.assertEqual(last_url, next_url)
+        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
         user.refresh_from_db()
         self.assertFalse(user.nir)
 
@@ -583,6 +587,9 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
         self.assertEqual(job_application.resume_link, post_data["resume_link"])
 
+        self.client.get(next_url)
+        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
+
     def test_apply_as_authorized_prescriber_to_siae_for_approval_in_waiting_period(self):
         """
         Apply as authorized prescriber to a SIAE for a job seeker with an approval in waiting period.
@@ -704,6 +711,9 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
         self.assertEqual(job_application.resume_link, post_data["resume_link"])
+
+        self.client.get(next_url)
+        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
 
 
 class ApplyAsPrescriberTest(TestCase):
@@ -874,6 +884,9 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
         self.assertEqual(job_application.resume_link, post_data["resume_link"])
+
+        self.client.get(next_url)
+        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
 
     def test_apply_as_prescriber_for_approval_in_waiting_period(self):
         """Apply as prescriber for a job seeker with an approval in waiting period."""
@@ -1188,6 +1201,11 @@ class ApplyAsSiaeTest(TestCase):
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
         self.assertEqual(job_application.resume_link, post_data["resume_link"])
+
+        response = self.client.get(next_url)
+        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("apply:list_for_siae"))
 
     def test_apply_as_siae_for_approval_in_waiting_period(self):
         """Apply as SIAE for a job seeker with an approval in waiting period."""
