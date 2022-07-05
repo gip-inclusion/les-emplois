@@ -5,7 +5,6 @@ from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import urlencode
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import ApprovalsWrapper
@@ -29,6 +28,7 @@ class ApplyAsJobSeekerTest(TestCase):
         return {
             "back_url": None,
             "job_seeker_pk": None,
+            "job_seeker_email": None,
             "nir": None,
             "siae_pk": None,
             "sender_pk": None,
@@ -279,6 +279,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         return {
             "back_url": None,
             "job_seeker_pk": None,
+            "job_seeker_email": None,
             "nir": None,
             "siae_pk": None,
             "sender_pk": None,
@@ -359,10 +360,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         post_data = {"email": "new.job.seeker@test.com", "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.client.session[f"job_application-{siae.pk}"]["job_seeker_email"], post_data["email"])
 
         next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
-        args = urlencode({"email": post_data["email"]})
-        self.assertEqual(response.url, f"{next_url}?{args}")
+        self.assertEqual(response.url, next_url)
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
@@ -391,6 +392,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
+            "job_seeker_email": new_job_seeker.email,
             "nir": new_job_seeker.nir,
             "siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -500,10 +502,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         post_data = {"email": "new.job.seeker@test.com", "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.client.session[f"job_application-{siae.pk}"]["job_seeker_email"], post_data["email"])
 
         next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
-        args = urlencode({"email": post_data["email"]})
-        self.assertEqual(response.url, f"{next_url}?{args}")
+        self.assertEqual(response.url, next_url)
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
@@ -531,6 +533,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
+            "job_seeker_email": new_job_seeker.email,
             "nir": new_job_seeker.nir,
             "siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -725,6 +728,7 @@ class ApplyAsPrescriberTest(TestCase):
         return {
             "back_url": None,
             "job_seeker_pk": None,
+            "job_seeker_email": None,
             "nir": None,
             "siae_pk": None,
             "sender_pk": None,
@@ -789,10 +793,10 @@ class ApplyAsPrescriberTest(TestCase):
         post_data = {"email": "new.job.seeker@test.com", "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.client.session[f"job_application-{siae.pk}"]["job_seeker_email"], post_data["email"])
 
         next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
-        args = urlencode({"email": post_data["email"]})
-        self.assertEqual(response.url, f"{next_url}?{args}")
+        self.assertEqual(response.url, next_url)
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
@@ -837,6 +841,7 @@ class ApplyAsPrescriberTest(TestCase):
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
+            "job_seeker_email": new_job_seeker.email,
             "nir": new_job_seeker.nir,
             "siae_pk": siae.pk,
             "sender_pk": user.pk,
@@ -1042,6 +1047,7 @@ class ApplyAsSiaeTest(TestCase):
         return {
             "back_url": None,
             "job_seeker_pk": None,
+            "job_seeker_email": None,
             "nir": None,
             "siae_pk": None,
             "sender_pk": None,
@@ -1122,10 +1128,10 @@ class ApplyAsSiaeTest(TestCase):
         post_data = {"email": "new.job.seeker@test.com", "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.client.session[f"job_application-{siae.pk}"]["job_seeker_email"], post_data["email"])
 
         next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
-        args = urlencode({"email": post_data["email"]})
-        self.assertEqual(response.url, f"{next_url}?{args}")
+        self.assertEqual(response.url, next_url)
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
@@ -1153,6 +1159,7 @@ class ApplyAsSiaeTest(TestCase):
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": new_job_seeker.pk,
+            "job_seeker_email": new_job_seeker.email,
             "nir": new_job_seeker.nir,
             "siae_pk": siae.pk,
             "sender_pk": user.pk,

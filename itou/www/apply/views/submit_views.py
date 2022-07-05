@@ -9,7 +9,6 @@ from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
 
@@ -171,6 +170,7 @@ class StartView(ApplyStepBaseView):
             {
                 "back_url": get_safe_url(request, "back_url"),
                 "job_seeker_pk": user_info.user.pk if user_info.user.is_job_seeker else None,
+                "job_seeker_email": None,
                 "nir": None,
                 "siae_pk": self.siae.pk,
                 "sender_pk": user_info.user.pk,
@@ -314,9 +314,8 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
 
             # No user found with that email, redirect to create a new account.
             if not job_seeker:
-                args = urlencode({"email": self.form.cleaned_data["email"]})
-                next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": self.siae.pk})
-                return HttpResponseRedirect(f"{next_url}?{args}")
+                self.apply_session.set("job_seeker_email", self.form.cleaned_data["email"])
+                return HttpResponseRedirect(reverse("apply:step_create_job_seeker", kwargs={"siae_pk": self.siae.pk}))
 
             # Ask the sender to confirm the email we found is associated to the correct user
             if self.form.data.get("preview"):
@@ -409,7 +408,7 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
     session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
     siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
 
-    email = request.GET.get("email")
+    email = session_ns.get("job_seeker_email")
     nir = session_ns.get("nir")
     form = CreateJobSeekerForm(proxy_user=request.user, nir=nir, data=request.POST or None, initial={"email": email})
 
