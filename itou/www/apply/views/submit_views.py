@@ -369,6 +369,53 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
         }
 
 
+class CreateJobSeekerForSenderView(ApplyStepForSenderBaseView):
+    template_name = "apply/submit_step_job_seeker_create.html"
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.form = CreateJobSeekerForm(
+            proxy_user=request.user,
+            nir=self.apply_session.get("nir"),
+            data=request.POST or None,
+            initial={"email": self.apply_session.get("job_seeker_email")},
+        )
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            try:
+                job_seeker = self.form.save()
+            except ValidationError:
+                nir, email = self.form.cleaned_data["nir"], self.form.cleaned_data["email"]
+                # the e-mail is not mentioned in the error message as it may be blank and we don't want too complicated
+                # or conditional error messages for this quite rare issue.
+                messages.warning(
+                    request,
+                    mark_safe(
+                        f"Le<b> numéro de sécurité sociale</b> renseigné ({nir}) est "
+                        "déjà utilisé par un autre candidat sur la Plateforme.<br>"
+                        "Merci de renseigner <b>le numéro personnel et unique</b> "
+                        "du candidat pour lequel vous souhaitez postuler."
+                    ),
+                )
+                logger.exception("step_create_job_seeker: error when saving job seeker email=%s nir=%s", email, nir)
+            else:
+                self.apply_session.set("job_seeker_pk", job_seeker.pk)
+                return HttpResponseRedirect(reverse("apply:step_eligibility", kwargs={"siae_pk": self.siae.pk}))
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+        }
+
+
 @login_required
 @valid_session_required(["siae_pk"])
 def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_step_job_seeker_check_info.html"):
@@ -396,42 +443,6 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
         return HttpResponseRedirect(next_url)
 
     context = {"form": form, "siae": siae, "job_seeker": job_seeker, "approvals_wrapper": approvals_wrapper}
-    return render(request, template_name, context)
-
-
-@login_required
-@valid_session_required(["siae_pk"])
-def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeker_create.html"):
-    """
-    Create a job seeker if he can't be found in the DB.
-    """
-    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
-    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
-
-    email = session_ns.get("job_seeker_email")
-    nir = session_ns.get("nir")
-    form = CreateJobSeekerForm(proxy_user=request.user, nir=nir, data=request.POST or None, initial={"email": email})
-
-    if request.method == "POST" and form.is_valid():
-        try:
-            job_seeker = form.save()
-        except ValidationError:
-            # the e-mail is not mentioned in the error message as it may be blank and we don't want too complicated
-            # or conditional error messages for this quite rare issue.
-            msg = mark_safe(
-                f"Le<b> numéro de sécurité sociale</b> renseigné ({ nir }) est "
-                "déjà utilisé par un autre candidat sur la Plateforme.<br>"
-                "Merci de renseigner <b>le numéro personnel et unique</b> "
-                "du candidat pour lequel vous souhaitez postuler."
-            )
-            messages.warning(request, msg)
-            logger.exception("step_create_job_seeker: error when saving job seeker email=%s nir=%s", email, nir)
-        else:
-            session_ns.set("job_seeker_pk", job_seeker.pk)
-            next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
-            return HttpResponseRedirect(next_url)
-
-    context = {"siae": siae, "form": form}
     return render(request, template_name, context)
 
 

@@ -21,6 +21,11 @@ urlpatterns = [
         submit_views.CheckEmailForSenderView.as_view(),
         name="check_email_for_sender",
     ),
+    path(
+        "<int:siae_pk>/sender/create_job_seeker",
+        submit_views.CreateJobSeekerForSenderView.as_view(),
+        name="step_create_job_seeker",
+    ),
     # Submit - job seeker.
     path(
         "<int:siae_pk>/job_seeker/check_nir",
@@ -33,7 +38,6 @@ urlpatterns = [
         submit_views.step_check_job_seeker_info,
         name="step_check_job_seeker_info",
     ),
-    path("<int:siae_pk>/step_create_job_seeker", submit_views.step_create_job_seeker, name="step_create_job_seeker"),
     path(
         "<int:siae_pk>/step_check_prev_applications",
         submit_views.step_check_prev_applications,
