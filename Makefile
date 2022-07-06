@@ -59,6 +59,10 @@ endif
 populate_db: populate_db_with_cities
 	$(EXEC_CMD) bash -c "ls -d itou/fixtures/django/* | xargs ./manage.py loaddata"
 
+populate_db_minimal: populate_db_with_cities
+	# Load reference data used by ASP-related code
+	$(EXEC_CMD) bash -c "ls -d itou/fixtures/django/*asp_INSEE* | xargs ./manage.py loaddata"
+
 COMMAND_GRAPH_MODELS := graph_models --group-models \
 	approvals \
 	asp \
