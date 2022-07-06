@@ -1,5 +1,7 @@
 import copy
 import datetime
+import decimal
+import functools
 import importlib
 import json
 import logging
@@ -27,6 +29,7 @@ from django.utils.html import escape
 from factory import Faker
 from faker import Faker as fk
 
+import itou.utils.json
 import itou.utils.session
 from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
@@ -1269,3 +1272,55 @@ class SessionNamespaceTest(TestCase):
         self.assertIsInstance(ns, itou.utils.session.SessionNamespace)
         self.assertEqual(str(uuid.UUID(ns.name)), ns.name)
         self.assertNotIn(ns.name, session)  # .init() wasn't called
+
+
+class JSONTest(TestCase):
+
+    SYMMETRIC_CONVERSION = [
+        (None, "null"),
+        (False, "false"),
+        (True, "true"),
+        (42, "42"),
+        (3.14, "3.14"),
+        ("value", '"value"'),
+        ([1, "2", None, True, False], '[1, "2", null, true, false]'),
+        ({"key": "value"}, '{"key": "value"}'),
+        (datetime.time(), '{"__type__": "datetime.time", "value": "00:00:00"}'),
+        (datetime.date(2001, 1, 1), '{"__type__": "datetime.date", "value": "2001-01-01"}'),
+        (datetime.datetime(2001, 1, 1), '{"__type__": "datetime.datetime", "value": "2001-01-01T00:00:00"}'),
+        (
+            datetime.datetime(2001, 1, 1, tzinfo=datetime.timezone.utc),
+            '{"__type__": "datetime.datetime", "value": "2001-01-01T00:00:00+00:00"}',
+        ),
+        (datetime.timedelta(), '{"__type__": "datetime.timedelta", "value": "P0DT00H00M00S"}'),
+        (decimal.Decimal("-inf"), '{"__type__": "decimal.Decimal", "value": "-Infinity"}'),
+        (
+            uuid.UUID("fc8495d2-a7ea-44d9-b858-b88413a6f849"),
+            '{"__type__": "uuid.UUID", "value": "fc8495d2-a7ea-44d9-b858-b88413a6f849"}',
+        ),
+    ]
+
+    ASYMMETRIC_CONVERSION = [
+        ((1, "2", None, True, False), '[1, "2", null, true, false]', [1, "2", None, True, False]),
+    ]
+
+    def test_encoder(self):
+        dumps = functools.partial(json.dumps, cls=itou.utils.json.JSONEncoder)
+
+        for obj, expected in self.SYMMETRIC_CONVERSION:
+            self.assertEqual(dumps(obj), expected)
+
+        for obj, expected, *_ in self.ASYMMETRIC_CONVERSION:
+            self.assertEqual(dumps(obj), expected)
+
+        model_object = UserFactory()
+        self.assertEqual(dumps(model_object), str(model_object.pk))
+
+    def test_decode(self):
+        loads = functools.partial(json.loads, cls=itou.utils.json.JSONDecoder)
+
+        for expected, s in self.SYMMETRIC_CONVERSION:
+            self.assertEqual(loads(s), expected)
+
+        for *_, s, expected in self.ASYMMETRIC_CONVERSION:
+            self.assertEqual(loads(s), expected)
