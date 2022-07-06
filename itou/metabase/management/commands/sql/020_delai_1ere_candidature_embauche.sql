@@ -19,7 +19,9 @@ with date_1ere_candidature as (
                 when date_embauche is null then '2099-01-01'
                 else date_embauche
             end) as date_1ere_embauche,
-        candidats.nom_département as nom_département_candidat
+        candidats.nom_département as nom_département_candidat,
+        date_candidature,
+        date_embauche
     from 
         candidatures c 
     inner join candidats on c.id_candidat_anonymisé = candidats.id_anonymisé 
@@ -27,13 +29,17 @@ with date_1ere_candidature as (
         and candidats.sous_type_auteur_diagnostic = 'Prescripteur PE'
     group by 
         c."id_candidat_anonymisé",
-        candidats.nom_département
+        candidats.nom_département,
+        date_candidature,
+        date_embauche
 )
 select 
     "id_candidat_anonymisé",
-    nom_département_candidat,          
+    nom_département_candidat,
+    date_candidature,
+    date_embauche,
     case 
-        /* Division /30 poue passer du nombre de jour au mois */
+        /* Division /30 pour passer du nombre de jour au mois */
         when ((date_1ere_embauche - date_1ere_candidature) / 30) < 1 then 'a- Moins d un mois'
         when ((date_1ere_embauche - date_1ere_candidature) / 30) >= 1 and ((date_1ere_embauche - date_1ere_candidature) /30) < 2 then 'b- Entre 1 et 2 mois'
         when ((date_1ere_embauche - date_1ere_candidature) / 30) >= 2 and ((date_1ere_embauche - date_1ere_candidature) /30) < 3 then 'c- Entre 2 et 3 mois'
