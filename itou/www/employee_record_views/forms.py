@@ -84,9 +84,9 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
             {
                 "min": DuetDatePickerWidget.min_birthdate(),
                 "max": DuetDatePickerWidget.max_birthdate(),
+                "class": "js-period-date-input",
             }
         )
-        self.fields["birthdate"].widget.attrs = {"class": "js-period-date-input"}
 
         # Init ASP commune
         if self.instance.birth_place:
