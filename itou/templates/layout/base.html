@@ -43,7 +43,7 @@
         {% include "includes/test_accounts.html" %}
         {% include "layout/_header.html" %}
 
-        <main id="main" role="main" class="s-main bg-gray-400">
+        <main id="main" role="main" class="s-main {% block main_css_classes %}bg-gray-400{% endblock %}">
 
             <div class="container container-messages">
                 {% block messages %}
