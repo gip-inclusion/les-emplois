@@ -490,6 +490,20 @@ class EvaluatedJobApplication(models.Model):
         if len(self.evaluated_administrative_criteria.all()) == 0:
             return evaluation_enums.EvaluatedJobApplicationsState.PENDING
 
+        if any(eval_admin_crit.proof_url == "" for eval_admin_crit in self.evaluated_administrative_criteria.all()):
+            return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
+
+        if any(
+            eval_admin_crit.submitted_at is None for eval_admin_crit in self.evaluated_administrative_criteria.all()
+        ):
+            return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
+
+        if any(
+            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+            for eval_admin_crit in self.evaluated_administrative_criteria.all()
+        ):
+            return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
+
         if any(
             eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
             for eval_admin_crit in self.evaluated_administrative_criteria.all()
@@ -507,20 +521,6 @@ class EvaluatedJobApplication(models.Model):
             for eval_admin_crit in self.evaluated_administrative_criteria.all()
         ):
             return evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
-
-        if any(eval_admin_crit.proof_url == "" for eval_admin_crit in self.evaluated_administrative_criteria.all()):
-            return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
-
-        if any(
-            eval_admin_crit.submitted_at is None for eval_admin_crit in self.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
-
-        if any(
-            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
-            for eval_admin_crit in self.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
 
     @cached_property
     def should_select_criteria(self):
