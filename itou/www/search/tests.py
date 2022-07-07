@@ -110,11 +110,6 @@ class SearchSiaeTest(TestCase):
         JobApplicationFactory(to_siae=siae)
         created_siaes.append(siae)
 
-        # No job description and a job application
-        siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350")
-        JobApplicationFactory(to_siae=siae)
-        created_siaes.append(siae)
-
         # No job description, no job application.
         siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350")
         created_siaes.append(siae)
@@ -126,8 +121,10 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": guerande.slug})
         siaes_results = response.context["siaes_page"]
 
-        for i, siae in enumerate(siaes_results):
-            self.assertEqual(siae.pk, created_siaes[i].pk)
+        self.assertEqual(
+            [siae.pk for siae in siaes_results],
+            [siae.pk for siae in created_siaes],
+        )
 
     def test_opcs_displays_card_differently(self):
         city = create_city_saint_andre()
