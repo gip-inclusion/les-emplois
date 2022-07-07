@@ -24,3 +24,18 @@ BAN_GEOCODING_API_RESULT_MOCK = {
         "street": "Pl des Cinq Martyrs du Lycee Buffon",
     },
 }
+
+"""
+Result for a call to:
+https://api-adresse.data.gouv.fr/search/?q=10+PL+5+ANATOLE&limit=1&postcode=75010
+"""
+
+BAN_GEOCODING_API_NO_RESULT_MOCK = {
+    "type": "FeatureCollection",
+    "features": [],
+    "attribution": "BAN",
+    "licence": "ETALAB-2.0",
+    "query": "10 PL 5 ANATOLE",
+    "filters": {"postcode": "75010"},
+    "limit": 1,
+}

@@ -6,6 +6,7 @@ from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.common_apps.address.format import format_address
 from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
+from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK
 
 
 def _users_with_mock_address(idx):
@@ -18,6 +19,17 @@ def _users_with_mock_address(idx):
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):
     return RESULTS_BY_ADDRESS.get(address)
+
+
+@mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
+class FormatASPBadAdresses(TestCase):
+    def test_not_existing_address(self, _mock):
+        job_seeker = JobSeekerFactory(
+            address_line_1="9, avenue de Huet", post_code="32531", city="MalletVille", department="32"
+        )
+        result, error = format_address(job_seeker)
+        self.assertFalse(result)
+        self.assertEqual(error, "Erreur de geocoding, impossible d'obtenir un résultat")
 
 
 @mock.patch(
@@ -34,14 +46,6 @@ class FormatASPAdresses(TestCase):
         result, error = format_address(None)
         self.assertFalse(result)
         self.assertEqual(error, "Impossible de transformer cet objet en adresse HEXA")
-
-    def test_not_existing_address(self, _mock):
-        job_seeker = JobSeekerFactory(
-            address_line_1="9, avenue de Huet", post_code="32531", city="MalletVille", department="32"
-        )
-        result, error = format_address(job_seeker)
-        self.assertFalse(result)
-        self.assertEqual(error, "Erreur de geocoding, impossible d'obtenir un résultat")
 
     def test_sanity(self, _):
         """
