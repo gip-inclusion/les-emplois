@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
 from itou.siaes.models import Siae
-from itou.utils.apis.geocoding import get_geocoding_data
+from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -137,9 +137,9 @@ def geocode_siae(siae):
     if siae.geocoding_address is None:
         return siae
 
-    geocoding_data = get_geocoding_data(siae.geocoding_address, post_code=siae.post_code)
+    try:
+        geocoding_data = get_geocoding_data(siae.geocoding_address, post_code=siae.post_code)
 
-    if geocoding_data:
         siae.geocoding_score = geocoding_data["score"]
         # If the score is greater than API_BAN_RELIABLE_MIN_SCORE, coords are reliable:
         # use data returned by the BAN API because it's better written using accents etc.
@@ -152,6 +152,8 @@ def geocode_siae(siae):
         siae.city = geocoding_data["city"]
 
         siae.coords = geocoding_data["coords"]
+    except GeocodingDataException:
+        pass
 
     return siae
 

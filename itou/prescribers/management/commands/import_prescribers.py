@@ -5,7 +5,7 @@ import os
 from django.core.management.base import BaseCommand
 
 from itou.common.address.departments import DEPARTMENTS
-from itou.common_apps.apis.geocoding import get_geocoding_data
+from itou.common_apps.apis.geocoding import GeocodingDataException, get_geocoding_data
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -131,14 +131,17 @@ class Command(BaseCommand):
                     prescriber_organization.city = city
                     prescriber_organization.department = department
 
-                    geocoding_data = get_geocoding_data(
-                        "{}, {} {}".format(
-                            prescriber_organization.address_line_1,
-                            prescriber_organization.post_code,
-                            prescriber_organization.city,
+                    try:
+                        geocoding_data = get_geocoding_data(
+                            "{}, {} {}".format(
+                                prescriber_organization.address_line_1,
+                                prescriber_organization.post_code,
+                                prescriber_organization.city,
+                            )
                         )
-                    )
-                    prescriber_organization.coords = geocoding_data["coords"]
+                        prescriber_organization.coords = geocoding_data["coords"]
+                    except GeocodingDataException:
+                        prescriber_organization.coords = ""
 
                     prescriber_organization.save()
 
