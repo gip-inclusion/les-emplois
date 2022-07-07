@@ -9,6 +9,10 @@ from django.utils.http import urlencode
 logger = logging.getLogger(__name__)
 
 
+class GeocodingDataException(Exception):
+    pass
+
+
 def call_ban_geocoding_api(address, post_code=None, limit=1):
 
     api_url = f"{settings.API_BAN_BASE_URL}/search/"
@@ -44,10 +48,8 @@ def process_geocoding_data(data):
     - lane
     - address (different from address_line_1)
     """
-    if not data:
-        return None
-    if not data.get("properties"):
-        return None
+    if not data or not data.get("properties"):
+        raise GeocodingDataException()
 
     longitude = data["geometry"]["coordinates"][0]
     latitude = data["geometry"]["coordinates"][1]
