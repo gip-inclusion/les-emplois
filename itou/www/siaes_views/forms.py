@@ -160,12 +160,6 @@ class EditSiaeDescriptionForm(forms.ModelForm):
             "provided_support": "Type d'accompagnement proposé",
         }
 
-    def save(self):
-        siae = super().save(commit=False)
-        siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
-        siae.save()
-        return siae
-
 
 class BlockJobApplicationsForm(forms.ModelForm):
     """
