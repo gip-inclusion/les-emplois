@@ -18,7 +18,7 @@ from itou.siaes.factories import (
 )
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
-from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 
 
 class CardViewTest(TestCase):
@@ -543,6 +543,49 @@ class EditSiaeViewTest(TestCase):
         url = reverse("siaes_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
+
+
+class EditSiaeViewWithWrongAddressTest(TestCase):
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
+    def test_edit(self, _unused_mock):
+
+        siae = SiaeFactory(with_membership=True)
+        user = siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("siaes_views:edit_siae_step_contact_infos")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Informations générales")
+
+        post_data = {
+            "brand": "NEW FAMOUS SIAE BRAND NAME",
+            "phone": "0610203050",
+            "email": "toto@titi.fr",
+            "website": "https://famous-siae.com",
+            "address_line_1": "1 Rue Jeanne d'Arc",
+            "address_line_2": "",
+            "post_code": "62000",
+            "city": "Arras",
+        }
+        response = self.client.post(url, data=post_data, follow=True)
+
+        self.assertRedirects(response, reverse("siaes_views:edit_siae_step_description"))
+
+        # Go to next step: summary
+        url = response.redirect_chain[-1][0]
+        post_data = {
+            "description": "Le meilleur des SIAEs !",
+            "provided_support": "On est très très forts pour tout",
+        }
+        response = self.client.post(url, data=post_data, follow=True)
+        self.assertRedirects(response, reverse("siaes_views:edit_siae_step_preview"))
+
+        # Save the object for real
+        response = self.client.post(response.redirect_chain[-1][0])
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "L'adresse semble erronée")
 
 
 class MembersTest(TestCase):

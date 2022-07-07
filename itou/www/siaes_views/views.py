@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
@@ -14,6 +15,7 @@ from itou.common_apps.organizations.views import deactivate_org_member, update_o
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
+from itou.utils.apis.geocoding import GeocodingDataException
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
@@ -489,13 +491,23 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
 
     if request.method == "POST":
         siae.department = department_from_postcode(siae.post_code)
-        siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
-        siae.save()
-        # Clear the session now, so that we start fresh if we edit again.
-        del request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
-        request.session.modified = True
-        messages.success(request, "Mise à jour effectuée !")
-        return HttpResponseRedirect(reverse("dashboard:index"))
+
+        try:
+            siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
+            siae.save()
+            # Clear the session now, so that we start fresh if we edit again.
+            del request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
+            request.session.modified = True
+            messages.success(request, "Mise à jour effectuée !")
+            return HttpResponseRedirect(reverse("dashboard:index"))
+        except GeocodingDataException:
+            messages.error(
+                request,
+                mark_safe(
+                    'L\'adresse semble erronée. Veuillez la <a href="%s">corriger</a> avant de pouvoir « Publier ».'
+                    % reverse("siaes_views:edit_siae_step_contact_infos")
+                ),
+            )
 
     context = {"siae": siae, "form_data": form_data, "prev_url": reverse("siaes_views:edit_siae_step_description")}
     return render(request, template_name, context)
