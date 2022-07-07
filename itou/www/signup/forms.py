@@ -11,7 +11,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
-from itou.utils.apis.geocoding import get_geocoding_data
+from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
@@ -284,7 +284,10 @@ class APIEntrepriseSearchForm(forms.Form):
             etablissement.department,
         ]
         address_on_one_line = ", ".join([field for field in address_fields if field])
-        geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.post_code) or {}
+        try:
+            geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.post_code)
+        except GeocodingDataException:
+            geocoding_data = {}
 
         self.org_data = {
             "siret": siret,

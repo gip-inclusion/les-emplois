@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
-from itou.utils.apis.geocoding import get_geocoding_data
+from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
 from itou.utils.validators import validate_post_code
 
 
@@ -108,12 +108,15 @@ class AddressMixin(models.Model):
         return ", ".join([field for field in fields if field])
 
     def set_coords(self, address, post_code=None):
-        geocoding_data = get_geocoding_data(address, post_code=post_code)
-        if not geocoding_data:
+        try:
+            geocoding_data = get_geocoding_data(address, post_code=post_code)
+            self.coords = geocoding_data["coords"]
+            self.geocoding_score = geocoding_data["score"]
+        except GeocodingDataException as exc:
+            # The coordinates are not erased because they are used in the search engine,
+            # even if they no longer correspond to the address.
             logger.error("No geocoding data could be found for `%s - %s`", address, post_code)
-            return
-        self.coords = geocoding_data["coords"]
-        self.geocoding_score = geocoding_data["score"]
+            raise GeocodingDataException(f"L'adresse '{ address }' - { post_code } est erronée.") from exc
 
     def clean(self):
         if self.department != department_from_postcode(self.post_code):
