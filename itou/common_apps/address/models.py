@@ -115,19 +115,6 @@ class AddressMixin(models.Model):
         self.coords = geocoding_data["coords"]
         self.geocoding_score = geocoding_data["score"]
 
-    def set_coords_and_address(self, address, post_code=None):
-        geocoding_data = get_geocoding_data(address, post_code=post_code)
-        if not geocoding_data:
-            logger.error("No geocoding data could be found for `%s - %s`", address, post_code)
-            return
-        self.coords = geocoding_data["coords"]
-        self.geocoding_score = geocoding_data["score"]
-        self.address_line_1 = geocoding_data["address_line_1"]
-        self.address_line_2 = ""
-        self.post_code = geocoding_data["post_code"]
-        self.department = department_from_postcode(self.post_code)
-        self.city = geocoding_data["city"]
-
     def clean(self):
         if self.department != department_from_postcode(self.post_code):
             raise ValidationError("Le département doit correspondre au code postal.")
