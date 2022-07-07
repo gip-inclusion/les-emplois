@@ -12,7 +12,8 @@ from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
-from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.apis.geocoding import GeocodingDataException
+from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 
 
 class UtilsAddressMixinTest(TestCase):
@@ -46,6 +47,17 @@ class UtilsAddressMixinTest(TestCase):
         self.assertEqual(prescriber.geocoding_score, expected_geocoding_score)
         self.assertEqual(prescriber.latitude, expected_latitude)
         self.assertEqual(prescriber.longitude, expected_longitude)
+
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
+    def test_set_coords_with_bad_address(self, _mock_call_ban_geocoding_api):
+        """
+        Test `AddressMixin.set_coords()` with bad address.
+        Use `PrescriberOrganization` which inherits from abstract `AddressMixin`.
+        """
+        prescriber = PrescriberOrganization.objects.create(siret="12000015300011")
+
+        with self.assertRaises(GeocodingDataException):
+            prescriber.set_coords("10 PL 5 ANATOLE", post_code="75010")
 
 
 class UtilsDepartmentsTest(TestCase):

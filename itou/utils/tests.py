@@ -37,11 +37,11 @@ from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.apis import api_entreprise
-from itou.utils.apis.geocoding import process_geocoding_data
+from itou.utils.apis.geocoding import GeocodingDataException, process_geocoding_data
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
 from itou.utils.emails import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
-from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.pole_emploi import (
     API_MAJPASS_RESULT_ERROR,
     API_MAJPASS_RESULT_OK,
@@ -299,6 +299,13 @@ class UtilsGeocodingTest(TestCase):
             "coords": GEOSGeometry("POINT(2.316754 48.838411)"),
         }
         self.assertEqual(result, expected)
+
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
+    def test_process_geocoding_data_error(self, mock_call_ban_geocoding_api):
+        geocoding_data = mock_call_ban_geocoding_api()
+
+        with self.assertRaises(GeocodingDataException):
+            process_geocoding_data(geocoding_data)
 
 
 class UtilsValidatorsTest(TestCase):
