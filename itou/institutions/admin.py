@@ -1,10 +1,11 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.gis import forms as gis_forms
 from django.contrib.gis.db import models as gis_models
 
 from itou.common_apps.organizations.admin import MembersInline, OrganizationAdmin
 from itou.institutions import models
 from itou.institutions.admin_forms import InstitutionAdminForm
+from itou.utils.apis.geocoding import GeocodingDataException
 
 
 class InstitutionMembersInline(MembersInline):
@@ -83,11 +84,18 @@ class InstitutionAdmin(OrganizationAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             if not obj.geocoding_score and obj.geocoding_address:
-                # Set geocoding.
-                obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
+                try:
+                    # Set geocoding.
+                    obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
+                except GeocodingDataException:
+                    # do nothing, the user has not made any changes to the address
+                    pass
 
         if change and form.cleaned_data.get("extra_field_refresh_geocoding") and obj.geocoding_address:
-            # Refresh geocoding.
-            obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
+            try:
+                # Refresh geocoding.
+                obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
+            except GeocodingDataException:
+                messages.error(request, "L'adresse semble erronée car le geocoding n'a pas pu être recalculé.")
 
         super().save_model(request, obj, form, change)
