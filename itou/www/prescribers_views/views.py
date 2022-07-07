@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
+from itou.utils.apis.geocoding import GeocodingDataException
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
@@ -35,9 +36,14 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     form = EditPrescriberOrganizationForm(instance=organization, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Mise à jour effectuée !")
-        return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+        try:
+            form.save()
+            messages.success(request, "Mise à jour effectuée !")
+            return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+        except GeocodingDataException:
+            messages.error(
+                request, "L'adresse semble erronée. Veuillez la corriger avant de pouvoir « Enregistrer »."
+            ),
 
     context = {"form": form, "organization": organization}
     return render(request, template_name, context)
