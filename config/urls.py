@@ -36,11 +36,6 @@ urlpatterns = [
     # Avoid user enumeration via password reset page.
     re_path(r"^accounts/password/reset/$", signup_views.ItouPasswordResetView.as_view()),
     # --------------------------------------------------------------------------------------
-    # Override allauth `account_logout` URL.
-    # /accounts/logout/ <=> account_logout
-    # We need custom code to process PEAMU logout.
-    re_path(r"^accounts/logout/$", dashboard_views.logout),
-    # --------------------------------------------------------------------------------------
     # Other allauth URLs.
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------

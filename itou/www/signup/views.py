@@ -19,10 +19,10 @@ from django.utils.http import urlencode
 from django.views.decorators.http import require_GET
 
 from itou.common_apps.address.models import lat_lon_to_coords
-from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
+from itou.users.adapter import UserAdapter
 from itou.users.enums import KIND_PRESCRIBER
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.urls import get_safe_url
@@ -739,18 +739,12 @@ def prescriber_join_org(request):
 
     except Error:
         messages.error(request, "L'organisation n'a pas pu être créée")
-        # Logout user from django and IC and redirect to homepage
-        # TODO(alaurent) It would be cleaner to put all SSO logouts into UserAdapter.get_logout_redirect_url
-        # and redirect to the logout view instead of using auth.logout(request)
-        ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
-        # We should always have a IC session here since no prescriber should get here without going through IC,
-        # but in case we reuse this view for another user signup, it's better to handle the case where
-        # we don't have an ic_session.
-        if ic_session:
-            params = {"token": ic_session["token"], "state": ic_session["state"]}
-            next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
-            auth.logout(request)
-            return HttpResponseRedirect(next_url)
+        # Logout user from any SSO and redirect to homepage.
+        # As we cannot logout with GET nor redirect as POST to the logout page,
+        # we need to do it manually.
+        redirect_url = UserAdapter().get_logout_redirect_url(request)
+        auth.logout(request)
+        return HttpResponseRedirect(redirect_url)
 
     # redirect to post login page.
     next_url = get_adapter(request).get_login_redirect_url(request)

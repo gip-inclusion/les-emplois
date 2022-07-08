@@ -1,8 +1,11 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from django.conf import settings
 from django.urls import reverse
+from django.utils.http import urlencode
 
-from itou.utils.urls import get_safe_url
+from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
+from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
+from itou.utils.urls import get_absolute_url, get_safe_url
 
 
 class UserAdapter(DefaultAccountAdapter):
@@ -22,6 +25,36 @@ class UserAdapter(DefaultAccountAdapter):
         if not request.user.has_completed_welcoming_tour or settings.ITOU_ENVIRONMENT == "DEMO":
             url = reverse("welcoming_tour:index")
         return url
+
+    def get_logout_redirect_url(self, request):
+        """
+        Returns the URL to redirect to after the user logs out. Note that
+        this method is also invoked if you attempt to log out while no users
+        is logged in. Therefore, request.user is not guaranteed to be an
+        authenticated user.
+        Tests are in itou.inclusion_connect.tests.
+        """
+        redirect_url = reverse("home:hp")
+        # Inclusion Connect
+        ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
+        if ic_session:
+            params = {"token": ic_session["token"], "state": ic_session["state"]}
+            ic_base_logout_url = reverse("inclusion_connect:logout")
+            redirect_url = f"{ic_base_logout_url}?{urlencode(params)}"
+        # France Connect
+        fc_token = request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
+        fc_state = request.session.get(FRANCE_CONNECT_SESSION_STATE)
+        if fc_token:
+            params = {"id_token": fc_token, "state": fc_state}
+            fc_base_logout_url = reverse("france_connect:logout")
+            redirect_url = f"{fc_base_logout_url}?{urlencode(params)}"
+        # PE Connect
+        peamu_id_token = request.user.peamu_id_token
+        if peamu_id_token:
+            hp_url = get_absolute_url(reverse("home:hp"))
+            params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
+            redirect_url = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion?{urlencode(params)}"
+        return redirect_url
 
     def get_email_confirmation_url(self, request, emailconfirmation):
         """
