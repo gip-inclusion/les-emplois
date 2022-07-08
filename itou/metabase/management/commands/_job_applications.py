@@ -191,6 +191,12 @@ TABLE_COLUMNS = [
         "comment": "Nom de la structure destinaire de la candidature",
         "fn": lambda o: o.to_siae.display_name,
     },
+    {
+        "name": "nom_complet_structure",
+        "type": "varchar",
+        "comment": "Nom complet de la structure destinaire de la candidature",
+        "fn": lambda o: f"{o.to_siae.kind} - ID {o.to_siae.id} - {o.to_siae.display_name}",
+    },
 ]
 
 TABLE_COLUMNS += get_department_and_region_columns(
