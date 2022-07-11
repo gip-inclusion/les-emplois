@@ -55,13 +55,12 @@ def mock_oauth_dance(
     # User is logged out from IC when an error happens during the oauth dance.
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
 
-    user_info = OIDC_USERINFO.copy()
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
+    user_info = OIDC_USERINFO.copy()
     if user_info_email:
         user_info["email"] = user_info_email
-
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
     csrf_signed = InclusionConnectState.create_signed_csrf_token()
