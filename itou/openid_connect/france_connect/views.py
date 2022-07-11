@@ -122,6 +122,12 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
 
     # At this step, we can update the user's fields in DB and create a session if required
     user, _ = fc_user_data.create_or_update_user()
+
+    nir = request.session.get(settings.ITOU_SESSION_NIR_KEY)
+    if nir:
+        user.nir = nir
+        user.save(update_fields=["nir"])
+
     # Because we have more than one Authentication backend in our settings, we need to specify
     # the one we want to use in login
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")

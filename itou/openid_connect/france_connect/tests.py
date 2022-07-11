@@ -35,6 +35,24 @@ FC_USERINFO = {
 }
 
 
+# Make sure this decorator is before test definition, not here.
+# @respx.mock
+def mock_oauth_dance(test_class):
+    # No session is created with France Connect in contrary to Inclusion Connect
+    # so there's no use to go through france_connect:authorize
+
+    token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+    respx.post(constants.FRANCE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+
+    user_info = FC_USERINFO.copy()
+    respx.get(constants.FRANCE_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
+
+    csrf_signed = FranceConnectState.create_signed_csrf_token()
+    url = reverse("france_connect:callback")
+    response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
+    test_class.assertRedirects(response, reverse("dashboard:index"))
+
+
 class FranceConnectTest(TestCase):
     def test_state_delete(self):
         state = FranceConnectState.objects.create(csrf="foo")
@@ -221,17 +239,14 @@ class FranceConnectTest(TestCase):
 
     @respx.mock
     def test_callback(self):
-        url_fc_token = constants.FRANCE_CONNECT_ENDPOINT_TOKEN
-        token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
-        respx.post(url_fc_token).mock(return_value=httpx.Response(200, json=token_json))
-
-        url_fc_userinfo = constants.FRANCE_CONNECT_ENDPOINT_USERINFO
-        respx.get(url_fc_userinfo).mock(return_value=httpx.Response(200, json=FC_USERINFO))
-
-        csrf_signed = FranceConnectState.create_signed_csrf_token()
-        url = reverse("france_connect:callback")
-        response = self.client.get(url, data={"code": "123", "state": csrf_signed})
-        self.assertEqual(response.status_code, 302)
+        mock_oauth_dance(self)
+        self.assertEqual(User.objects.count(), 1)
+        user = User.objects.get(email=FC_USERINFO["email"])
+        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
+        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
+        self.assertEqual(user.username, FC_USERINFO["sub"])
+        self.assertTrue(user.has_sso_provider)
+        self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
 
     def test_logout_no_id_token(self):
         url = reverse("france_connect:logout")

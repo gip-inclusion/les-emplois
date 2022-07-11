@@ -1,5 +1,6 @@
 import uuid
 
+import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.core import mail
@@ -8,6 +9,7 @@ from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
+from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
 from itou.www.signup.forms import JobSeekerSituationForm
@@ -232,3 +234,41 @@ class JobSeekerSignupTest(TestCase):
         self.assertEqual(response.url, reverse("welcoming_tour:index"))
         user_email = user.emailaddress_set.first()
         self.assertTrue(user_email.verified)
+
+    @respx.mock
+    def test_job_seeker_nir_with_france_connect(self):
+        # NIR is set on a previous step and tested separately.
+        # See self.test_job_seeker_nir
+        nir = "141068078200557"
+        self.client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
+        self.assertIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertTrue(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+
+        url = reverse("signup:job_seeker")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        fc_url = reverse("france_connect:authorize")
+        self.assertContains(response, fc_url)
+
+        mock_oauth_dance(self)
+        job_seeker = User.objects.get(email=FC_USERINFO["email"])
+        self.assertEqual(nir, job_seeker.nir)
+
+    @respx.mock
+    def test_job_seeker_temporary_nir_with_france_connect(self):
+        # temporary NIR is discarded on a previous step and tested separately.
+        # See self.test_job_seeker_temporary_nir
+
+        self.assertNotIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+
+        # Temporary NIR is not stored with user information.
+        url = reverse("signup:job_seeker")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        fc_url = reverse("france_connect:authorize")
+        self.assertContains(response, fc_url)
+
+        mock_oauth_dance(self)
+        job_seeker = User.objects.get(email=FC_USERINFO["email"])
+        self.assertIsNone(job_seeker.nir)
