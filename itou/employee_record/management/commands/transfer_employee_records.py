@@ -1,29 +1,20 @@
 from io import BytesIO
-from os import path
 
-import pysftp
 from django.conf import settings
-from django.core.management.base import BaseCommand
-from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record.enums import MovementType, Status
+from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
 
-
-# Global SFTP connection options
-
-connection_options = None
-
-if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
-    connection_options = pysftp.CnOpts(knownhosts=settings.ASP_FS_KNOWN_HOSTS)
+from ._common import EmployeeRecordTransferCommand
 
 
-class Command(BaseCommand):
+class Command(EmployeeRecordTransferCommand):
     """
     Employee record management command
     ---
@@ -37,6 +28,8 @@ class Command(BaseCommand):
         """
         Command line arguments
         """
+        super().add_arguments(parser)
+
         parser.add_argument(
             "--dry-run", dest="dry_run", action="store_true", help="Do not perform real SFTP transfer operations"
         )
@@ -54,18 +47,6 @@ class Command(BaseCommand):
             dest="asp_test",
             action="store_true",
             help="Update employee records with test SIRET and financial annex number",
-        )
-
-    def _get_sftp_connection(self):
-        """
-        Get a new SFTP connection to remote server
-        """
-        return pysftp.Connection(
-            host=settings.ASP_FS_SFTP_HOST,
-            port=int(settings.ASP_FS_SFTP_PORT),
-            username=settings.ASP_FS_SFTP_USER,
-            private_key=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
-            cnopts=connection_options,
         )
 
     def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_REMOTE_DOWNLOAD_DIR):
@@ -88,38 +69,27 @@ class Command(BaseCommand):
             TestEmployeeRecordBatchSerializer(raw_batch) if self.asp_test else EmployeeRecordBatchSerializer(raw_batch)
         )
 
-        # JSONRenderer produces byte arrays
-        json_bytes = JSONRenderer().render(batch.data)
-
-        # Using FileIO objects allows to use them as files
-        # Cool side effect: no temporary file needed
-        json_stream = BytesIO(json_bytes)
-        remote_path = f"RIAE_FS_{timezone.now().strftime('%Y%m%d%H%M%S')}.json"
-
-        if dry_run:
-            self.stdout.write(f"DRY-RUN: (not) sending '{remote_path}' ({len(json_bytes)} bytes)")
-            self.stdout.write(f"Content: \n{json_bytes}")
+        try:
+            remote_path = self.upload_json_file(batch.data, conn, dry_run)
+        except SerializationError as ex:
+            self.stdout.write(
+                f"Employee records serialization error during upload, can't process.\n"
+                f"You may want to use --preflight option to check faulty employee record objects.\n"
+                f"Check batch details and error: {raw_batch=},\n{ex=}"
+            )
             return
+        except Exception as ex:
+            # In any other case, bounce exception
+            raise ex from Exception(f"Unhandled error during upload phase for batch: {raw_batch=}")
+        else:
+            if not remote_path:
+                self.stdout.write("Could not upload file, exiting ...")
+                return
 
-        self.stdout.write(f"Batch info: {raw_batch}")
-
-        # There are specific folders for upload and download on the SFTP server
-        with conn.cd(settings.ASP_FS_REMOTE_UPLOAD_DIR):
-            # After creating a FileIO object, internal pointer is at the end of the buffer
-            # It must be set back to 0 (rewind) otherwise an empty file is sent
-            json_stream.seek(0)
-
-            # ASP SFTP server does not return a proper list of transmitted files
-            # Whether it's a bug or a paranoid security parameter
-            # we must assert that there is no verification of the remote file existence
-            # This is the meaning of `confirm=False`
-            try:
-                conn.putfo(json_stream, remote_path, file_size=len(json_bytes), confirm=False)
-
-                self.stdout.write(f"Succesfully uploaded '{remote_path}'")
-            except Exception as ex:
-                self.stdout.write(f"Could not upload file: {remote_path=}, {ex=}")
-
+            # - update employee record notifications status (to SENT)
+            # - store in which file they have been seen
+            if dry_run:
+                self.stdout.write("DRY-RUN: Not *really* updating employee records statuses")
                 return
 
             # Now that file is transfered, update employee records status (SENT)
@@ -337,7 +307,9 @@ class Command(BaseCommand):
         else:
             self.stdout.write("No archivable employee record found, exiting.")
 
-    def handle(self, upload=True, download=True, dry_run=False, asp_test=False, archive=False, **options):
+    def handle(
+        self, upload=True, download=True, preflight=False, dry_run=False, asp_test=False, archive=False, **options
+    ):
         if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
             self.stdout.write(
                 "This management command can't be used in this environment. Update Django settings if needed."
@@ -345,11 +317,17 @@ class Command(BaseCommand):
             # Goodbye Marylou
             return
 
+        if preflight:
+            self.stdout.write("Preflight activated, checking for possible serialization errors...")
+            self.preflight(EmployeeRecord)
+            # No other operations are allowed after a preflight
+            return
+
         self.asp_test = asp_test
         if self.asp_test:
             self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
-        with self._get_sftp_connection() as sftp:
+        with self.get_sftp_connection() as sftp:
             user = settings.ASP_FS_SFTP_USER or "django_tests"
             self.stdout.write(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}")
             self.stdout.write(f"Current dir: {sftp.pwd}")

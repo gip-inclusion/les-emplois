@@ -8,6 +8,11 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from rest_framework.renderers import JSONRenderer
 
+from itou.employee_record.exceptions import SerializationError
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
+from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
+from itou.utils.iterators import chunks
+
 
 # Global SFTP connection options
 
@@ -18,6 +23,15 @@ if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
 
 
 class EmployeeRecordTransferCommand(BaseCommand):
+    def add_arguments(self, parser):
+        """Subclasses have a preflight option to check for serialization errors."""
+        parser.add_argument(
+            "--preflight",
+            dest="preflight",
+            action="store_true",
+            help="Check JSON serialisation of employee records or notifications ready for processing",
+        )
+
     def get_sftp_connection(self) -> pysftp.Connection:
         """
         Get a new SFTP connection to remote server.
@@ -73,3 +87,53 @@ class EmployeeRecordTransferCommand(BaseCommand):
     def download_json_file(self):
         # FIXME
         pass
+
+    def preflight(self, object_class):
+        """Parse new notifications or employee records and attempt to tackle serialization errors.
+        Serialization of EmployeeRecordBatch objects does not allow detailed information
+        on what specific employee record is faulty.
+        Doing a precheck will try its best to point precisely to badly formatted objects.
+        Important: preflight will crash at the first error encountered (with due details).
+        The usual suspect for serialization errors is the obsolete ASP INSEE referential file,
+        causing address lookup errors (city, birth city ...) with None values.
+        As a reminder, it's a NON-FIX (from both itou and ASP sides), we'll have to deal with it,
+        and border it as well as possible."""
+        assert object_class in [EmployeeRecord, EmployeeRecordUpdateNotification]
+
+        new_objects = (
+            EmployeeRecordUpdateNotification.objects.new()
+            if object_class == EmployeeRecordUpdateNotification
+            else EmployeeRecord.objects.ready()
+        )
+
+        object_serializer = (
+            EmployeeRecordUpdateNotificationSerializer
+            if object_class == EmployeeRecordUpdateNotification
+            else EmployeeRecordSerializer
+        )
+
+        if not new_objects:
+            self.stdout.write("No object to check. Exiting preflight.")
+            return
+
+        self.stdout.write(
+            f"Found {len(new_objects)} object(s) to check, split in chunks of "
+            f"{EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS} objects."
+        )
+
+        for idx, elements in enumerate(chunks(new_objects, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS), 1):
+            # A batch + serializer must be created with notifications for correct serialization
+            batch = EmployeeRecordBatch(elements)
+
+            self.stdout.write(f"Checking file #{idx} (chunk of {len(elements)} objects)")
+
+            for obj in batch.elements:
+                ser = object_serializer(obj)
+                try:
+                    ser.data  # Invoke DRF serialization
+                except Exception as secondary_ex:
+                    # Attach cause exception for more details
+                    raise SerializationError(f"JSON serialization of {obj=} failed.") from secondary_ex
+
+        # Good to go !
+        self.stdout.write("All serializations ok, you may skip preflight...")

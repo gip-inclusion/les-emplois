@@ -5,6 +5,7 @@ from django.conf import settings
 from rest_framework.parsers import JSONParser
 
 from itou.employee_record.enums import MovementType, Status
+from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.test_serializers import TestEmployeeRecordUpdateNotificationBatchSerializer
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordUpdateNotificationBatchSerializer
@@ -21,6 +22,8 @@ class Command(EmployeeRecordTransferCommand):
     """
 
     def add_arguments(self, parser):
+        super().add_arguments(parser)
+
         parser.add_argument(
             "--wet-run", dest="wet_run", action="store_true", help="Perform *real* SFTP transfer operations"
         )
@@ -51,20 +54,32 @@ class Command(EmployeeRecordTransferCommand):
         else:
             batch = EmployeeRecordUpdateNotificationBatchSerializer(raw_batch)
 
-        remote_path = self.upload_json_file(batch.data, conn, dry_run)
-
-        if not remote_path:
-            self.stdout.write("Could not upload file, exiting ...")
+        try:
+            # accessing .data triggers serialization
+            remote_path = self.upload_json_file(batch.data, conn, dry_run)
+        except SerializationError as ex:
+            self.stdout.write(
+                f"Employee records serialization error during upload, can't process.\n"
+                f"You may want to use --preflight option to check faulty notification objects.\n"
+                f"Check batch details and error: {raw_batch=},\n{ex=}"
+            )
             return
+        except Exception as ex:
+            # In any other case, bounce exception
+            raise ex from Exception(f"Unhandled error during upload phase for batch: {raw_batch=}")
+        else:
+            if not remote_path:
+                self.stdout.write("Could not upload file, exiting ...")
+                return
 
-        # - update employee record notifications status (to SENT)
-        # - store in which file they have been sen
-        if dry_run:
-            self.stdout.write("DRY-RUN: Not updating notification status")
-            return
+            # - update employee record notifications status (to SENT)
+            # - store in which file they have been seen
+            if dry_run:
+                self.stdout.write("DRY-RUN: Not *really* updating notification statuses")
+                return
 
-        for idx, notification in enumerate(notifications, 1):
-            notification.update_as_sent(remote_path, idx)
+            for idx, notification in enumerate(notifications, 1):
+                notification.update_as_sent(remote_path, idx)
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> int:
         """
@@ -198,7 +213,7 @@ class Command(EmployeeRecordTransferCommand):
         for batch in chunks(new_notifications, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(conn, batch, dry_run)
 
-    def handle(self, upload=True, download=True, wet_run=False, asp_test=False, **options):
+    def handle(self, upload=True, download=True, preflight=False, wet_run=False, asp_test=False, **options):
         if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
             self.stdout.write(
                 "This management command can't be used in this environment. Update Django settings if needed."
@@ -214,6 +229,12 @@ class Command(EmployeeRecordTransferCommand):
 
         if dry_run:
             self.stdout.write("DRY-RUN mode")
+
+        if preflight:
+            self.stdout.write("Preflight activated, checking for possible serialization errors...")
+            self.preflight(EmployeeRecordUpdateNotification)
+            # No other operations are allowed after a preflight
+            return
 
         with self.get_sftp_connection() as sftp:
             user = settings.ASP_FS_SFTP_USER or "django_tests"
