@@ -622,7 +622,11 @@ class EmployeeRecordBatch:
             er.asp_processing_label = None
 
     def __str__(self):
-        return f"FIL£NAME:{self.upload_filename} NB_RECORDS:{len(self.elements)}"
+        return f"FILENAME={self.upload_filename}, NB_RECORDS={len(self.elements)}"
+
+    def __repr__(self):
+        # String formating with {field_name=...} forms use __repr__ and not __str__
+        return f"{self.upload_filename=}, {len(self.elements)=}"
 
     @staticmethod
     def feedback_filename(filename):
@@ -734,6 +738,9 @@ class EmployeeRecordUpdateNotification(models.Model):
     class Meta:
         verbose_name = "Modification de changement de la fiche salarié"
         verbose_name_plural = "Modifications de changement des fiches salarié"
+
+    def __repr__(self):
+        return f"<{type(self).__name__} pk={self.pk}>"
 
     def update_as_sent(self, filename, line_number):
         if self.status not in [NotificationStatus.NEW, NotificationStatus.REJECTED]:
