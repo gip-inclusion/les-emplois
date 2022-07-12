@@ -49,7 +49,7 @@ class UserAdapter(DefaultAccountAdapter):
             fc_base_logout_url = reverse("france_connect:logout")
             redirect_url = f"{fc_base_logout_url}?{urlencode(params)}"
         # PE Connect
-        peamu_id_token = request.user.peamu_id_token
+        peamu_id_token = getattr(request.user, "peamu_id_token")
         if peamu_id_token:
             hp_url = get_absolute_url(reverse("home:hp"))
             params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
