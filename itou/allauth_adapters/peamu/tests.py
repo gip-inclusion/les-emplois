@@ -7,6 +7,7 @@ from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.tests import OAuth2TestsMixin
 from allauth.tests import MockedResponse, TestCase
+from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -146,3 +147,41 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         self.client.login(username=user.username, password=DEFAULT_PASSWORD)
         response = self.client.get("/accounts/profile/")
         self.assertRedirects(response, reverse("dashboard:index"))
+
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
+    def test_job_seeker_signup_with_nir_with_pe_connect(self, mock_login_signal):
+        # Complete signup with NIR is tested in JobSeekerSignupTest.test_job_seeker_nir
+
+        nir = "141068078200557"
+        self.client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
+        self.assertIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertTrue(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+
+        url = reverse("signup:job_seeker")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        pe_url = reverse("peamu_login")
+        self.assertContains(response, pe_url)
+
+        self.login(self.get_mocked_response())
+        job_seeker = User.objects.get(email="john.doe@example.com")
+        self.assertEqual(nir, job_seeker.nir)
+
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
+    def test_job_seeker_temporary_nir_with_pe_conect(self, mock_login_signal):
+        # Complete signup with a discarded temporary NIR is tested in
+        # JobSeekerSignupTest.test_job_seeker_temporary_nir
+
+        self.assertNotIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+
+        # Temporary NIR is not stored with user information.
+        url = reverse("signup:job_seeker")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        pe_url = reverse("peamu_login")
+        self.assertContains(response, pe_url)
+
+        self.login(self.get_mocked_response())
+        job_seeker = User.objects.get(email="john.doe@example.com")
+        self.assertIsNone(job_seeker.nir)
