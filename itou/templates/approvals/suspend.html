@@ -1,4 +1,5 @@
 {% extends "layout/content_small.html" %}
+{% load js_filters %}
 {% load bootstrap4 %}
 
 {% block title %}Suspendre le PASS IAE{{ block.super }}{% endblock %}
@@ -37,6 +38,18 @@
                 {% bootstrap_field form.set_default_end_date %}
             </div>
             {% bootstrap_field form.reason %}
+
+            <div id="js-warning-message-unsuspend" class="alert alert-warning">
+                <div class="row">
+                    <div class="col-auto pr-0">
+                        <i class="ri-information-line ri-xl text-warning"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-0">La suspension du PASS IAE pourra être levée en cas d’embauche par un autre employeur.</p>
+                    </div>
+                </div>
+            </div>
+
             {% bootstrap_field form.reason_explanation %}
 
             {% buttons %}
@@ -108,4 +121,23 @@
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
+
+    {# Clicking on a reason that can be unsuspend by other SIAE show warning message #}
+    <script type="text/javascript">
+        $(document).ready(() => {
+            var reasons_can_be_unsuspend = {{ form.reasons_can_be_unsuspend|js }};
+            $('#js-warning-message-unsuspend').css("display", "none");
+
+            function ajust_form_according_reason() {
+                const value = $('input[name="reason"]:checked').val();
+                if (reasons_can_be_unsuspend.includes(value)) {
+                    $('#js-warning-message-unsuspend').show("slidedown");
+                } else {
+                    $('#js-warning-message-unsuspend').hide("slideup");
+                }
+            }
+            $('#id_reason input').on('change', ajust_form_according_reason);
+            ajust_form_according_reason();
+        });
+    </script>
 {% endblock %}
