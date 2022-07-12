@@ -39,8 +39,9 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
         return None
 
 
-def process_geocoding_data(data):
+def get_geocoding_data(address, post_code=None, limit=1):
     """
+    Return a dict containing info about the given `address` or None if no result found.
     Contains parts of an address useful for objects like User
     but also some fields needed for ASP address formatting:
     - insee_code
@@ -48,6 +49,9 @@ def process_geocoding_data(data):
     - lane
     - address (different from address_line_1)
     """
+
+    data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
+
     if not data or not data.get("properties"):
         raise GeocodingDataException()
 
@@ -67,13 +71,3 @@ def process_geocoding_data(data):
         "latitude": latitude,
         "coords": GEOSGeometry(f"POINT({longitude} {latitude})"),
     }
-
-
-def get_geocoding_data(address, post_code=None, limit=1):
-    """
-    Return a dict containing info about the given `address` or None if no result found.
-    """
-
-    geocoding_data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
-
-    return process_geocoding_data(geocoding_data)
