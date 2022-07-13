@@ -2,12 +2,17 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
+from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.siaes.factories import SiaeConventionFactory, SiaeFactory
 from itou.siaes.models import Siae
-from itou.users.factories import SiaeStaffFactory
+from itou.users.factories import PrescriberFactory, SiaeStaffFactory
 
 
-class DataInclusionStructureTest(APITestCase):
+def _str_with_tz(dt):
+    return dt.astimezone(timezone.get_current_timezone()).isoformat()
+
+
+class DataInclusionSiaeStructureTest(APITestCase):
     url = reverse("v1:structures-list")
     maxDiff = None
 
@@ -18,17 +23,18 @@ class DataInclusionStructureTest(APITestCase):
         self.authenticated_client.force_authenticate(self.user)
 
     def test_list_structures_unauthenticated(self):
-        response = self.client.get(self.url, format="json")
+        response = self.client.get(self.url, format="json", data={"type": "siae"})
         self.assertEqual(response.status_code, 401)
 
     def test_list_structures(self):
-        def _str_with_tz(dt):
-            return dt.astimezone(timezone.get_current_timezone()).isoformat()
-
         siae = SiaeFactory()
         antenne = SiaeFactory(source=Siae.SOURCE_USER_CREATED, convention=siae.convention)
 
-        response = self.authenticated_client.get(self.url, format="json")
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "siae"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json()["results"],
@@ -84,18 +90,117 @@ class DataInclusionStructureTest(APITestCase):
     def test_list_structures_description_longer_than_280(self):
         siae = SiaeFactory(description="a" * 300)
 
-        response = self.authenticated_client.get(self.url, format="json")
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "siae"},
+        )
 
         self.assertEqual(response.status_code, 200)
-        siae_data = response.json()["results"][0]
-        self.assertEqual(siae_data["presentation_resume"], siae.description[:279] + "…")
-        self.assertEqual(siae_data["presentation_detail"], siae.description)
+        structure_data = response.json()["results"][0]
+        self.assertEqual(structure_data["presentation_resume"], siae.description[:279] + "…")
+        self.assertEqual(structure_data["presentation_detail"], siae.description)
 
     def test_list_structures_inactive_excluded(self):
         convention = SiaeConventionFactory(is_active=False)
         SiaeFactory(convention=convention)
 
-        response = self.authenticated_client.get(self.url, format="json")
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "siae"},
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["results"], [])
+
+
+class DataInclusionPrescriberStructureTest(APITestCase):
+    url = reverse("v1:structures-list")
+    maxDiff = None
+
+    def setUp(self):
+        self.user = PrescriberFactory()
+        self.client = APIClient()
+        self.authenticated_client = APIClient()
+        self.authenticated_client.force_authenticate(self.user)
+
+    def test_list_structures_unauthenticated(self):
+        response = self.client.get(self.url, format="json", data={"type": "orga"})
+        self.assertEqual(response.status_code, 401)
+
+    def test_list_structures(self):
+        orga = PrescriberOrganizationFactory()
+
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "orga"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()["results"],
+            [
+                {
+                    "id": str(orga.uid),
+                    "typologie": orga.kind.value,
+                    "nom": orga.name,
+                    "siret": orga.siret,
+                    "rna": "",
+                    "presentation_resume": "",
+                    "presentation_detail": "",
+                    "site_web": orga.website,
+                    "telephone": orga.phone,
+                    "courriel": orga.email,
+                    "code_postal": orga.post_code,
+                    "code_insee": "",
+                    "commune": orga.city,
+                    "adresse": orga.address_line_1,
+                    "complement_adresse": orga.address_line_2,
+                    "longitude": orga.longitude,
+                    "latitude": orga.latitude,
+                    "source": "",
+                    "date_maj": _str_with_tz(orga.created_at),
+                    "structure_parente": None,
+                }
+            ],
+        )
+
+    def test_list_structures_date_maj_value(self):
+        orga = PrescriberOrganizationFactory()
+
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "orga"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        structure_data = response.json()["results"][0]
+        self.assertEqual(structure_data["date_maj"], _str_with_tz(orga.created_at))
+
+        orga.description = "lorem ipsum"
+        orga.save()
+
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "orga"},
+        )
+        self.assertEqual(response.status_code, 200)
+        structure_data = response.json()["results"][0]
+        self.assertEqual(structure_data["date_maj"], _str_with_tz(orga.updated_at))
+
+    def test_list_structures_description_longer_than_280(self):
+        orga = PrescriberOrganizationFactory(description="a" * 300)
+
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "orga"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        structure_data = response.json()["results"][0]
+        self.assertEqual(structure_data["presentation_resume"], orga.description[:279] + "…")
+        self.assertEqual(structure_data["presentation_detail"], orga.description)
