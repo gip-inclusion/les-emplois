@@ -1021,3 +1021,20 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         # Organization
         self.assertFalse(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY))
         self.assertFalse(User.objects.filter(email=pe_email).exists())
+
+    def test_permission_denied_when_skiping_first_step(self):
+        urls = [
+            reverse("signup:prescriber_request_invitation", kwargs={"membership_id": 1}),
+            reverse("signup:prescriber_choose_org"),
+            reverse("signup:prescriber_choose_kind"),
+            reverse("signup:prescriber_confirm_authorization"),
+            reverse("signup:prescriber_pole_emploi_safir_code"),
+            reverse("signup:prescriber_check_pe_email"),
+            reverse("signup:prescriber_pole_emploi_user"),
+            reverse("signup:prescriber_user"),
+            reverse("signup:prescriber_join_org"),
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 403)
