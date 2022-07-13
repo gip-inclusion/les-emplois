@@ -116,7 +116,9 @@ class AddressMixin(models.Model):
             # The coordinates are not erased because they are used in the search engine,
             # even if they no longer correspond to the address.
             logger.error("No geocoding data could be found for `%s - %s`", address, post_code)
-            raise GeocodingDataException(f"L'adresse '{ address }' - { post_code } est erronée.") from exc
+            raise GeocodingDataException(
+                f"L'adresse '{ address }' - { post_code } n'a pas été trouvée dans la Base Adresse Nationale."
+            ) from exc
 
     def clean(self):
         if self.department != department_from_postcode(self.post_code):
