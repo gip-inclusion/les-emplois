@@ -378,8 +378,8 @@ class FacilitatorSignupView(SignupView):
         return super().post(request, *args, **kwargs)
 
 
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_request_invitation(request, membership_id, template_name="signup/prescriber_request_invitation.html"):
 
     prescriber_membership = get_object_or_404(
@@ -414,8 +414,8 @@ def prescriber_request_invitation(request, membership_id, template_name="signup/
     return render(request, template_name, context)
 
 
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.html"):
     """
     Ask the user to choose his organization in a pre-existing list of authorized organization.
@@ -460,8 +460,8 @@ def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.h
     return render(request, template_name, context)
 
 
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind.html"):
     """
     If the user hasn't found his organization in the pre-existing list, ask him to choose his kind.
@@ -505,8 +505,8 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
     return render(request, template_name, context)
 
 
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_confirm_authorization(request, template_name="signup/prescriber_confirm_authorization.html"):
     """
     Ask the user to confirm the "authorized" character of his organization.
@@ -539,8 +539,8 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     return render(request, template_name, context)
 
 
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_pole_emploi_safir_code.html"):
     """
     Find a pre-existing Pôle emploi organization from a given SAFIR code.
@@ -571,8 +571,8 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
     return render(request, template_name, context)
 
 
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe_email.html"):
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
     form = forms.PrescriberCheckPEemail(data=request.POST or None)
@@ -600,8 +600,8 @@ def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe
     return render(request, template_name, context)
 
 
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_emploi_user.html"):
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
     kind = session_data.get("kind")
@@ -630,8 +630,8 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
     return render(request, template_name, context)
 
 
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_user(request, template_name="signup/prescriber_user.html"):
     """
     Display Inclusion Connect button.
@@ -694,8 +694,8 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
     return render(request, template_name, context)
 
 
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @login_required
 def prescriber_join_org(request):
     """
