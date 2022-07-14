@@ -6,8 +6,10 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 import itou.employee_record.enums as er_enums
+from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.factories import EmployeeRecordUpdateNotificationFactory
 from itou.employee_record.mocks.transfer_employee_records import SFTPGoodConnectionMock
+from itou.employee_record.models import EmployeeRecordUpdateNotification
 
 
 class EmployeeRecordUpdatesManagementCommandTest(TestCase):
@@ -91,3 +93,40 @@ class EmployeeRecordUpdatesManagementCommandTest(TestCase):
         out, _ = self.call_command(upload=False, download=False, wet_run=True)
 
         self.assertIn("Update Django settings if needed.", out)
+
+    # Next part is about testing --preflight option,
+    # which is common to all `EmployeeRecordTransferCommand` subclasses.
+    # There's no need to duplicate and test all subclasses
+    # (such as the management command for employee record transfers).
+
+    def test_preflight_without_object(self):
+        # Test --preflight option if there is no object ready to be transfered.
+        EmployeeRecordUpdateNotification.objects.all().delete()
+        out, _ = self.call_command(preflight=True)
+
+        self.assertFalse(EmployeeRecordUpdateNotification.objects.new())
+        self.assertIn("Preflight activated, checking for possible serialization errors...", out)
+        self.assertIn("No object to check. Exiting preflight.", out)
+
+    def test_preflight_without_error(self):
+        # Test --preflight option if all objects ready to be transfered
+        # have a correct JSON structure.
+        out, _ = self.call_command(preflight=True)
+
+        self.assertIn("Preflight activated, checking for possible serialization errors...", out)
+        self.assertIn("All serializations ok, you may skip preflight...", out)
+
+    def test_preflight_with_error(self):
+        # Test --preflight option with an object ready to be transfered,
+        # but with an incorrect JSON structure.
+
+        # Create a notification with a bad structure : no HEXA address
+        bad_notification = EmployeeRecordUpdateNotificationFactory()
+        # Beware of 1:1 objects auto-update when not at top level
+        # (i.e. don't do: bad_notification.employee_record.job_seeker.jobseeker_profile.hexa_commune = None).
+        profile = bad_notification.employee_record.job_seeker.jobseeker_profile
+        profile.hexa_commune = None
+        profile.save()
+
+        with self.assertRaises(SerializationError):
+            self.call_command(preflight=True)
