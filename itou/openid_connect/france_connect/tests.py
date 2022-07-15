@@ -282,10 +282,11 @@ class FranceConnectTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "Le paramètre « id_token » est manquant.")
 
-    @respx.mock
     def test_logout(self):
         url = reverse("france_connect:logout")
-
-        respx.post(url=constants.FRANCE_CONNECT_ENDPOINT_LOGOUT).respond(302)
         response = self.client.get(url, data={"id_token": "123"})
-        self.assertEqual(response.status_code, 302)
+        expected_url = (
+            f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&state=&"
+            "post_logout_redirect_uri=http%3A%2F%2F127.0.0.1:8000%2F"
+        )
+        self.assertRedirects(response, expected_url, fetch_redirect_response=False)
