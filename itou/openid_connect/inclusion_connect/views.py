@@ -1,4 +1,3 @@
-import dataclasses
 import json
 import logging
 
@@ -9,7 +8,6 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils import crypto
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
@@ -19,30 +17,11 @@ from itou.utils.urls import get_absolute_url
 
 from ..models import TooManyKindsException
 from . import constants
+from .client import client
 from .models import InclusionConnectState, InclusionConnectUserData
 
 
 logger = logging.getLogger(__name__)
-
-
-@dataclasses.dataclass
-class InclusionConnectSession:
-    token: str = None
-    state: str = None
-    previous_url: str = None
-    next_url: str = None
-    user_email: str = None
-    user_kind: str = None
-    request: str = None
-    key: str = constants.INCLUSION_CONNECT_SESSION_KEY
-
-    def asdict(self):
-        return dataclasses.asdict(self)
-
-    def bind_to_request(self, request):
-        request.session[self.key] = dataclasses.asdict(self)
-        request.session.has_changed = True
-        return request
 
 
 def _redirect_to_login_page_on_error(error_msg, request=None):
@@ -53,35 +32,9 @@ def _redirect_to_login_page_on_error(error_msg, request=None):
 
 
 def inclusion_connect_authorize(request):
-    # Start a new session.
-    user_kind = request.GET.get("user_kind")
-    previous_url = request.GET.get("previous_url", reverse("home:hp"))
-    next_url = request.GET.get("next_url")
-    if not user_kind:
+    if not request.GET.get("user_kind"):
         raise KeyError("User kind missing.")
-
-    ic_session = InclusionConnectSession(user_kind=user_kind, previous_url=previous_url, next_url=next_url)
-    request = ic_session.bind_to_request(request)
-    ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
-
-    redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
-    signed_csrf = InclusionConnectState.create_signed_csrf_token()
-    data = {
-        "response_type": "code",
-        "client_id": constants.INCLUSION_CONNECT_CLIENT_ID,
-        "redirect_uri": redirect_uri,
-        "scope": constants.INCLUSION_CONNECT_SCOPES,
-        "state": signed_csrf,
-        "nonce": crypto.get_random_string(length=12),
-        "from": "emplois",  # Display a "Les emplois" logo on the connection page.
-    }
-    login_hint = request.GET.get("login_hint")
-    if login_hint:
-        data["login_hint"] = login_hint
-        ic_session["user_email"] = login_hint
-        request.session.modified = True
-
-    return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
+    return client.authorize(request)
 
 
 def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements

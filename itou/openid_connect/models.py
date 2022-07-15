@@ -23,6 +23,7 @@ class OIDConnectQuerySet(models.QuerySet):
         return self.filter(created_at__lte=at).delete()
 
 
+# TODO(alaurent) We could use the same model for all providers and maybe add a identity_provider if we want
 class OIDConnectState(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     # Length used in call to get_random_string()

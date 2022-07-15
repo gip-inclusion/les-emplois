@@ -14,7 +14,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
+from itou.openid_connect.client import OIDConnectSession
 from itou.users import enums as users_enums
 from itou.users.enums import KIND_PRESCRIBER
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactory
@@ -24,6 +24,7 @@ from itou.utils.urls import get_absolute_url
 from ..constants import OIDC_STATE_EXPIRATION
 from ..models import TooManyKindsException
 from . import constants
+from .client import client
 from .models import InclusionConnectState, InclusionConnectUserData
 
 
@@ -321,22 +322,21 @@ class InclusionConnectViewTest(TestCase):
 
 class InclusionConnectSessionTest(TestCase):
     def test_start_session(self):
-        ic_session = InclusionConnectSession()
-        self.assertEqual(ic_session.key, constants.INCLUSION_CONNECT_SESSION_KEY)
-
-        expected_keys = ["token", "state", "previous_url", "next_url", "user_email", "user_kind", "request"]
-        ic_session_dict = ic_session.asdict()
-        for key in expected_keys:
-            with self.subTest(key):
-                self.assertIn(key, ic_session_dict.keys())
-                self.assertEqual(ic_session_dict[key], None)
-
         request = RequestFactory().get("/")
         middleware = SessionMiddleware(lambda x: x)
         middleware.process_request(request)
         request.session.save()
-        request = ic_session.bind_to_request(request=request)
-        self.assertTrue(request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY))
+        client.initialize_session(request)
+        ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
+        self.assertTrue(ic_session)
+
+        expected_keys = ["token", "state", "next_url", "user_email", "user_kind", "request"]
+        for key in expected_keys:
+            with self.subTest(key):
+                self.assertIn(key, ic_session.keys())
+                self.assertEqual(ic_session[key], None)
+        self.assertIn("previous_url", ic_session.keys())
+        self.assertEqual(ic_session["previous_url"], reverse("home:hp"))
 
 
 class InclusionConnectLoginTest(TestCase):
