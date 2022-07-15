@@ -53,7 +53,7 @@ def mock_oauth_dance(
     test_class.client.get(authorize_url)
 
     # User is logged out from IC when an error happens during the oauth dance.
-    respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
+    respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
@@ -390,7 +390,7 @@ class InclusionConnectLogoutTest(TestCase):
     @respx.mock
     def test_simple_logout(self):
         mock_oauth_dance(self)
-        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
+        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
         logout_url = reverse("inclusion_connect:logout")
         response = self.client.get(logout_url)
         self.assertRedirects(response, reverse("home:hp"))
@@ -399,7 +399,7 @@ class InclusionConnectLogoutTest(TestCase):
     def test_logout_with_redirection(self):
         mock_oauth_dance(self)
         expected_redirection = reverse("dashboard:index")
-        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(302)
+        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
         params = {"redirect_url": expected_redirection}
         logout_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"

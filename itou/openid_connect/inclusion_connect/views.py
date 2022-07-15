@@ -206,6 +206,6 @@ def inclusion_connect_logout(request):
     # Logout user from IC with HTTPX to benefit from respx in tests
     # and to handle post logout redirection more easily.
     response = httpx.get(complete_url)
-    if response.status_code != 302:
+    if response.status_code != 200:
         logger.error("Error during IC logout. Status code: %s", response.status_code)
     return HttpResponseRedirect(post_logout_redirect_url)
