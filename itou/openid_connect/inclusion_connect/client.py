@@ -11,9 +11,11 @@ class inclusionConnectProvider(OIDProvider):
         "from": "emplois",  # Display a "Les emplois" logo on the connection page.
     }
     client_id = constants.INCLUSION_CONNECT_CLIENT_ID
+    client_secret = constants.INCLUSION_CONNECT_CLIENT_SECRET
     scopes = constants.INCLUSION_CONNECT_SCOPES
     url_namespace = "inclusion_connect"
     session_key: str = constants.INCLUSION_CONNECT_SESSION_KEY
+    timeout = constants.INCLUSION_CONNECT_TIMEOUT
 
 
 class InclusionConnectClient(OIDConnectClient):
