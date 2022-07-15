@@ -1,5 +1,5 @@
 # Debian Buster slim variant.
-FROM python:3.9.12-slim-buster
+FROM python:3.10.5-slim-buster
 
 ENV DOCKER_DEFAULT_PLATFORM=linux/amd64
 # Inspiration
