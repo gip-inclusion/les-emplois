@@ -24,7 +24,7 @@ env:
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   ITOU_ORGANIZATION_NAME: ${{ secrets.CLEVER_ORGANIZATION_NAME }}
   DEPLOY_BRANCH: master_clever
-  PYTHON_VERSION: 3.9
+  PYTHON_VERSION: "3.10"
 
 jobs:
   imports_asp:
