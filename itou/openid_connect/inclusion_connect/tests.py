@@ -19,6 +19,7 @@ from itou.users import enums as users_enums
 from itou.users.enums import KIND_PRESCRIBER
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactory
 from itou.users.models import User
+from itou.utils.urls import get_absolute_url
 
 from ..constants import OIDC_STATE_EXPIRATION
 from ..models import TooManyKindsException
@@ -58,9 +59,6 @@ def mock_oauth_dance(
     # Calling this view is mandatory to start a new session.
     authorize_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(authorize_params)}"
     test_class.client.get(authorize_url)
-
-    # User is logged out from IC when an error happens during the oauth dance.
-    respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
@@ -417,21 +415,30 @@ class InclusionConnectLogoutTest(TestCase):
     @respx.mock
     def test_simple_logout(self):
         mock_oauth_dance(self)
-        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
         logout_url = reverse("inclusion_connect:logout")
         response = self.client.get(logout_url)
-        self.assertRedirects(response, reverse("home:hp"))
+        expected_params = {
+            "id_token_hint": "123456",
+            "state": self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"],
+            "post_logout_redirect_uri": get_absolute_url(reverse("home:hp")),
+        }
+        expected_url = f"{constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(expected_params)}"
+        self.assertRedirects(response, expected_url, fetch_redirect_response=False)
 
     @respx.mock
     def test_logout_with_redirection(self):
         mock_oauth_dance(self)
         expected_redirection = reverse("dashboard:index")
-        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
-
         params = {"redirect_url": expected_redirection}
         logout_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
         response = self.client.get(logout_url)
-        self.assertRedirects(response, expected_redirection)
+        expected_params = {
+            "id_token_hint": "123456",
+            "state": self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"],
+            "post_logout_redirect_uri": get_absolute_url(expected_redirection),
+        }
+        expected_url = f"{constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(expected_params)}"
+        self.assertRedirects(response, expected_url, fetch_redirect_response=False)
 
     @respx.mock
     def test_django_account_logout_from_ic(self):
