@@ -22,9 +22,24 @@ urlpatterns = [
         name="check_email_for_sender",
     ),
     path(
-        "<int:siae_pk>/sender/create_job_seeker",
-        submit_views.CreateJobSeekerForSenderView.as_view(),
-        name="step_create_job_seeker",
+        "<int:siae_pk>/sender/create_job_seeker/<uuid:session_uuid>/1",
+        submit_views.CreateJobSeekerStep1ForSenderView.as_view(),
+        name="create_job_seeker_step_1_for_sender",
+    ),
+    path(
+        "<int:siae_pk>/sender/create_job_seeker/<uuid:session_uuid>/2",
+        submit_views.CreateJobSeekerStep2ForSenderView.as_view(),
+        name="create_job_seeker_step_2_for_sender",
+    ),
+    path(
+        "<int:siae_pk>/sender/create_job_seeker/<uuid:session_uuid>/3",
+        submit_views.CreateJobSeekerStep3ForSenderView.as_view(),
+        name="create_job_seeker_step_3_for_sender",
+    ),
+    path(
+        "<int:siae_pk>/sender/create_job_seeker/<uuid:session_uuid>/end",
+        submit_views.CreateJobSeekerStepEndForSenderView.as_view(),
+        name="create_job_seeker_step_end_for_sender",
     ),
     # Submit - job seeker.
     path(

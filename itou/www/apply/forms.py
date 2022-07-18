@@ -1,21 +1,25 @@
+import contextlib
 import datetime
 
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.conf import settings
+from django.core.validators import MinLengthValidator
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
-from itou.common_apps.address.departments import DEPARTMENTS
+from itou.asp import models as asp_models
+from itou.cities.models import City
+from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.users.models import User
-from itou.utils.validators import validate_nir
+from itou.users.models import JobSeekerProfile, User
+from itou.utils.validators import validate_nir, validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -117,65 +121,147 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class CreateJobSeekerForm(MandatoryAddressFormMixin, forms.ModelForm):
-    email = forms.EmailField(
-        label="E-mail personnel du candidat",
-        widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com", "readonly": True}),
-    )
+class CreateJobSeekerStep1ForSenderForm(forms.ModelForm):
 
-    def __init__(self, proxy_user, nir, *args, **kwargs):
-        self.proxy_user = proxy_user
-        self.nir = nir
+    REQUIRED_FIELDS = [
+        "title",
+        "first_name",
+        "last_name",
+        "birthdate",
+    ]
+
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["first_name"].required = True
-        self.fields["last_name"].required = True
 
-        # Birth date
-        self.fields["birthdate"].required = True
+        for field_name in self.REQUIRED_FIELDS:
+            self.fields[field_name].required = True
+
         self.fields["birthdate"].widget = DuetDatePickerWidget(
             {
                 "min": DuetDatePickerWidget.min_birthdate(),
                 "max": DuetDatePickerWidget.max_birthdate(),
+                "class": "js-period-date-input",
             }
         )
 
     class Meta:
         model = User
         fields = [
-            "email",
+            "title",
             "first_name",
             "last_name",
             "birthdate",
-            "phone",
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city_slug",
-            "city",
-            "pole_emploi_id",
-            "lack_of_pole_emploi_id_reason",
         ]
-        help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.", "phone": "Par exemple 0610203040."}
 
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        if User.email_already_exists(email):
-            raise forms.ValidationError(User.ERROR_EMAIL_ALREADY_EXISTS)
-        return email
+
+class CreateJobSeekerStep2ForSenderForm(MandatoryAddressFormMixin, forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Initial value are overridden in OptionalAddressFormMixin() because we have a model instance,
+        # but that instance is always empty in our case so force the value to the one we have.
+        with contextlib.suppress(KeyError, City.DoesNotExist):
+            city = City.objects.get(slug=kwargs["initial"]["city_slug"])
+            self.initial["city"] = city.display_name
+            self.initial["city_slug"] = city.slug
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
-    def save(self, commit=True):
-        # Exclude 'city_slug' form field (not mapped to model)
-        partial_fields = self.cleaned_data
-        partial_fields["nir"] = self.nir
-        del partial_fields["city_slug"]
+        if self.cleaned_data["post_code"]:
+            self.cleaned_data["department"] = department_from_postcode(self.cleaned_data["post_code"])
 
-        if commit:
-            return self._meta.model.create_job_seeker_by_proxy(self.proxy_user, **partial_fields)
-        return super().save(commit=False)
+    class Meta:
+        model = User
+        fields = ["address_line_1", "address_line_2", "post_code", "city_slug", "city", "phone"]
+
+
+class CreateJobSeekerStep3ForSenderForm(forms.ModelForm):
+
+    # A set of transient checkboxes used to collapse optional blocks
+    pole_emploi = forms.BooleanField(required=False, label="Inscrit à Pôle emploi")
+    unemployed = forms.BooleanField(required=False, label="Sans emploi")
+    rsa_allocation = forms.BooleanField(required=False, label="Bénéficiaire du RSA")
+    ass_allocation = forms.BooleanField(required=False, label="Bénéficiaire de l'ASS")
+    aah_allocation = forms.BooleanField(required=False, label="Bénéficiaire de l'AAH")
+
+    # Fields from the User model
+    pole_emploi_id_forgotten = forms.BooleanField(required=False, label="Identifiant Pôle emploi oublié")
+    pole_emploi_id = forms.CharField(
+        label="Identifiant Pôle emploi",
+        required=False,
+        validators=[validate_pole_emploi_id, MinLengthValidator(8)],
+    )
+
+    # This field is a subset of the possible choices of `has_rsa_allocation` model field
+    has_rsa_allocation = forms.ChoiceField(
+        required=False, label="Majoration du RSA", choices=asp_models.RSAAllocation.choices[1:]
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["education_level"].required = True
+        self.fields["education_level"].label = "Niveau de formation"
+
+    def clean(self):
+        super().clean()
+
+        # Handle the 'since' fields, which is most of them.
+        collapsible_errors = {
+            "pole_emploi": "La durée d'inscription à Pôle emploi est obligatoire",
+            "unemployed": "La période sans emploi est obligatoire",
+            "rsa_allocation": "La durée d'allocation du RSA est obligatoire",
+            "ass_allocation": "La durée d'allocation de l'ASS est obligatoire",
+            "aah_allocation": "La durée d'allocation de l'AAH est obligatoire",
+        }
+
+        for collapsible_field, error_message in collapsible_errors.items():
+            inner_field_name = collapsible_field + "_since"
+            if self.cleaned_data[collapsible_field]:
+                if not self.cleaned_data[inner_field_name]:
+                    self.add_error(inner_field_name, forms.ValidationError(error_message))
+            else:
+                # Reset "inner" model fields, if non-model field unchecked
+                self.cleaned_data[inner_field_name] = ""
+
+        # Handle Pole Emploi extra fields
+        if self.cleaned_data["pole_emploi"]:
+            if self.cleaned_data["pole_emploi_id_forgotten"]:
+                self.cleaned_data["lack_of_pole_emploi_id_reason"] = User.REASON_FORGOTTEN
+                self.cleaned_data["pole_emploi_id"] = ""
+            elif self.cleaned_data.get("pole_emploi_id"):
+                self.cleaned_data["lack_of_pole_emploi_id_reason"] = ""
+            elif not self.cleaned_data.get("pole_emploi_id") and not self.has_error("pole_emploi_id"):
+                # The 'pole_emploi_id' field is missing when its validation fails,
+                # also don't stack a 'missing field' error if an error already exists ('wrong format' in this case)
+                self.add_error("pole_emploi_id", forms.ValidationError("L'identifiant Pôle emploi est obligatoire"))
+        else:
+            self.cleaned_data["pole_emploi_id_forgotten"] = ""
+            self.cleaned_data["pole_emploi_id"] = ""
+            self.cleaned_data["lack_of_pole_emploi_id_reason"] = ""
+
+        # Handle RSA extra fields
+        if self.cleaned_data["rsa_allocation"]:
+            if not self.cleaned_data["has_rsa_allocation"]:
+                self.add_error("has_rsa_allocation", forms.ValidationError("La majoration RSA est obligatoire"))
+        else:
+            self.cleaned_data["has_rsa_allocation"] = asp_models.RSAAllocation.NO
+
+    class Meta:
+        model = JobSeekerProfile
+        fields = [
+            "education_level",
+            "resourceless",
+            "pole_emploi_since",
+            "unemployed_since",
+            "rqth_employee",
+            "oeth_employee",
+            "has_rsa_allocation",
+            "rsa_allocation_since",
+            "ass_allocation_since",
+            "aah_allocation_since",
+        ]
 
 
 class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):

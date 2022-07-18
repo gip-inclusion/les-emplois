@@ -1,0 +1,79 @@
+{% extends "layout/base.html" %}
+{% load bootstrap4 %}
+
+{% block title %}Création du compte candidat{{ block.super }}{% endblock %}
+{% block main_css_classes %}bg-emploi-lightest{% endblock %}
+{% block content_full_viewport %}
+    <section class="s-section-twocolumns">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-5 order-md-2 pl-lg-5 d-none d-lg-block mb-6"></div>
+                <div class="col-12 col-lg-7 order-md-1 pr-lg-5">
+                    <h1 class="my-5">Création du compte candidat</h1>
+                    <div class="c-stepper my-5">
+                        <div class="progress progress--emploi mb-2">
+                            <div class="progress-bar" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <span>{% block progress_title %}{% endblock %}</span>
+                    </div>
+                    <div class="c-form">
+                        <h2>{% block step_title %}{% endblock %}</h2>
+                        <hr class="mt-5">
+                        {% bootstrap_form_errors form type="all" %}
+                        <form method="post" class="js-enable-submit-when-valid js-collapsable-subfields">
+                            {% csrf_token %}
+
+                            {% block form_content %}{% endblock %}
+
+                            <hr class="my-5">
+                            {% buttons %}
+                                <div class="text-right">
+                                    {% if back_url %}<a class="btn btn-link" href="{{ back_url }}">Retour</a>{% endif %}
+                                    <button type="submit" class="btn btn-primary">Suivant</button>
+                                </div>
+                            {% endbuttons %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <!-- Needed to use the Datepicker JS widget. -->
+    {{ form.media }}
+    <script>
+        $(document).ready(() => {
+            /**
+             * JS to disable the submit button of the form when it's not valid
+             **/
+            function checkValidity(e) {
+                let submit = $(e.currentTarget).find('button[type="submit"]')
+                if (e.currentTarget.checkValidity()) {
+                    submit.removeClass("disabled")
+                } else {
+                    submit.addClass("disabled")
+                }
+            }
+
+            $(".js-enable-submit-when-valid").each(function () {
+                let form = $(this)
+                // Check everytime something change in the form
+                form.change(checkValidity)
+                form.on("duetChange", checkValidity)
+                // Check immediately
+                checkValidity({"currentTarget": this})
+            })
+            /**
+             * JS to collapse subfields
+             **/
+            $(".js-collapsable-subfields").each(function () {
+                $(this).find('input[type="checkbox"]').change(function (e) {
+                    $('#subfields_' + e.target.name).collapse("toggle")
+                })
+            })
+        })
+    </script>
+{% endblock %}

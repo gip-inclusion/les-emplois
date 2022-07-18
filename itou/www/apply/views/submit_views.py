@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -20,7 +21,7 @@ from itou.job_applications.notifications import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.perms.user import get_user_info
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
@@ -28,7 +29,9 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
-    CreateJobSeekerForm,
+    CreateJobSeekerStep1ForSenderForm,
+    CreateJobSeekerStep2ForSenderForm,
+    CreateJobSeekerStep3ForSenderForm,
     SubmitJobApplicationForm,
     UserExistsForm,
 )
@@ -314,8 +317,14 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
 
             # No user found with that email, redirect to create a new account.
             if not job_seeker:
-                self.apply_session.set("job_seeker_email", self.form.cleaned_data["email"])
-                return HttpResponseRedirect(reverse("apply:step_create_job_seeker", kwargs={"siae_pk": self.siae.pk}))
+                job_seeker_session = SessionNamespace.create_temporary(request.session)
+                job_seeker_session.init({"user": {"email": self.form.cleaned_data["email"], "nir": nir}})
+                return HttpResponseRedirect(
+                    reverse(
+                        "apply:create_job_seeker_step_1_for_sender",
+                        kwargs={"siae_pk": self.siae.pk, "session_uuid": job_seeker_session.name},
+                    )
+                )
 
             # Ask the sender to confirm the email we found is associated to the correct user
             if self.form.data.get("preview"):
@@ -369,50 +378,192 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
         }
 
 
-class CreateJobSeekerForSenderView(ApplyStepForSenderBaseView):
-    template_name = "apply/submit_step_job_seeker_create.html"
+class CreateJobSeekerStep1ForSenderView(ApplyStepForSenderBaseView):
+    template_name = "apply/submit/create_job_seeker_for_sender/step_1.html"
 
     def __init__(self):
         super().__init__()
         self.form = None
+        self.job_seeker_session = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-
-        self.form = CreateJobSeekerForm(
-            proxy_user=request.user,
-            nir=self.apply_session.get("nir"),
-            data=request.POST or None,
-            initial={"email": self.apply_session.get("job_seeker_email")},
+        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
+        self.form = CreateJobSeekerStep1ForSenderForm(
+            data=request.POST or None, initial=self.job_seeker_session.get("user", {})
         )
 
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
-            try:
-                job_seeker = self.form.save()
-            except ValidationError:
-                nir, email = self.form.cleaned_data["nir"], self.form.cleaned_data["email"]
-                # the e-mail is not mentioned in the error message as it may be blank and we don't want too complicated
-                # or conditional error messages for this quite rare issue.
-                messages.warning(
-                    request,
-                    mark_safe(
-                        f"Le<b> numéro de sécurité sociale</b> renseigné ({nir}) est "
-                        "déjà utilisé par un autre candidat sur la Plateforme.<br>"
-                        "Merci de renseigner <b>le numéro personnel et unique</b> "
-                        "du candidat pour lequel vous souhaitez postuler."
-                    ),
+            self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:create_job_seeker_step_2_for_sender",
+                    kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
                 )
-                logger.exception("step_create_job_seeker: error when saving job seeker email=%s nir=%s", email, nir)
-            else:
-                self.apply_session.set("job_seeker_pk", job_seeker.pk)
-                return HttpResponseRedirect(reverse("apply:step_eligibility", kwargs={"siae_pk": self.siae.pk}))
+            )
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
+            "progress": "20",
+        }
+
+
+class CreateJobSeekerStep2ForSenderView(ApplyStepForSenderBaseView):
+    template_name = "apply/submit/create_job_seeker_for_sender/step_2.html"
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+        self.job_seeker_session = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
+        self.form = CreateJobSeekerStep2ForSenderForm(
+            data=request.POST or None, initial=self.job_seeker_session.get("user", {})
+        )
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            self.job_seeker_session.set("user", self.job_seeker_session.get("user") | self.form.cleaned_data)
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:create_job_seeker_step_3_for_sender",
+                    kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+                )
+            )
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "progress": "40",
+            "back_url": reverse(
+                "apply:create_job_seeker_step_1_for_sender",
+                kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+            ),
+        }
+
+
+class CreateJobSeekerStep3ForSenderView(ApplyStepForSenderBaseView):
+    template_name = "apply/submit/create_job_seeker_for_sender/step_3.html"
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+        self.job_seeker_session = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
+
+        self.form = CreateJobSeekerStep3ForSenderForm(
+            data=request.POST or None,
+            initial=self.job_seeker_session.get("profile", {})
+            | {
+                "pole_emploi_id": self.job_seeker_session.get("user").get("pole_emploi_id"),
+                "lack_of_pole_emploi_id_reason": self.job_seeker_session.get("user").get(
+                    "lack_of_pole_emploi_id_reason"
+                ),
+            },
+        )
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            self.job_seeker_session.set(
+                "profile",
+                {
+                    k: v
+                    for k, v in self.form.cleaned_data.items()
+                    if k not in ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+                },
+            )
+            self.job_seeker_session.set(
+                "user",
+                self.job_seeker_session.get("user")
+                | {
+                    "pole_emploi_id": self.form.cleaned_data.get("pole_emploi_id"),
+                    "lack_of_pole_emploi_id_reason": self.form.cleaned_data.get("lack_of_pole_emploi_id_reason"),
+                },
+            )
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:create_job_seeker_step_end_for_sender",
+                    kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+                )
+            )
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "progress": "60",
+            "back_url": reverse(
+                "apply:create_job_seeker_step_2_for_sender",
+                kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+            ),
+        }
+
+
+class CreateJobSeekerStepEndForSenderView(ApplyStepForSenderBaseView):
+    template_name = "apply/submit/create_job_seeker_for_sender/step_end.html"
+
+    def __init__(self):
+        super().__init__()
+        self.job_seeker_session = None
+        self.profile = None
+
+    def _get_user_data_from_session(self):
+        return {k: v for k, v in self.job_seeker_session.get("user").items() if k not in ["city_slug"]}
+
+    def _get_profile_data_from_session(self):
+        # Dummy fields used by CreateJobSeekerStep3ForSenderForm()
+        fields_to_exclude = [
+            "pole_emploi",
+            "pole_emploi_id_forgotten",
+            "rsa_allocation",
+            "unemployed",
+            "ass_allocation",
+            "aah_allocation",
+        ]
+        return {k: v for k, v in self.job_seeker_session.get("profile").items() if k not in fields_to_exclude}
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
+
+        self.profile = JobSeekerProfile(
+            user=User(**self._get_user_data_from_session()),
+            **self._get_profile_data_from_session(),
+        )
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        profile = JobSeekerProfile(
+            user=User.create_job_seeker_by_proxy(self.sender, **self._get_user_data_from_session()),
+            **self._get_profile_data_from_session(),
+        )
+        profile.save()
+
+        self.apply_session.set("job_seeker_pk", profile.user.pk)
+        self.job_seeker_session.delete()  # Point of no return
+
+        return HttpResponseRedirect(reverse("apply:step_eligibility", kwargs={"siae_pk": self.siae.pk}))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "profile": self.profile,
+            "progress": "80",
+            "back_url": reverse(
+                "apply:create_job_seeker_step_3_for_sender",
+                kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+            ),
         }
 
 
