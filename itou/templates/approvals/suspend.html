@@ -39,7 +39,7 @@
             </div>
             {% bootstrap_field form.reason %}
 
-            <div id="js-warning-message-unsuspend" class="alert alert-warning">
+            <div id="js-warning-message-unsuspend" class="alert alert-warning" style="display: none;">
                 <div class="row">
                     <div class="col-auto pr-0">
                         <i class="ri-information-line ri-xl text-warning"></i>
@@ -126,8 +126,6 @@
     <script type="text/javascript">
         $(document).ready(() => {
             var reasons_can_be_unsuspend = {{ form.reasons_can_be_unsuspend|js }};
-            $('#js-warning-message-unsuspend').css("display", "none");
-
             function ajust_form_according_reason() {
                 const value = $('input[name="reason"]:checked').val();
                 if (reasons_can_be_unsuspend.includes(value)) {
