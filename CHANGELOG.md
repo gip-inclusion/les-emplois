@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## [46] - 2022-07-15
+
+### Ajouté
+- Lancement d'Inclusion Connect pour les prescripteurs !
+- La suspension est supprimée si la date de début de contrat est égale à la date de début de suspension du PASS IAE
+- Évolution des stats employeur : "Ensemblier" des structures
+- Ajout d'un message pour informer l'employeur lorsque l'adresse de son entreprise est erronée.
+- Conservation du NIR lors de l'inscription avec France Connect
+- Active l'authentification par jeton pour `data.inclusion`
+- Pilotage : ajout d'une colonne "Nom complet de la structure" sur les candidatures dans Metabase
+- Ajout d'un mécanisme de contrôle d'unicité des UUID des organisations (`OrganizationAbstract`)
+
+### Modifié
+- Controle a posteriori : correction de l'anomalie en phase contradictoire qui permettait à la SIAE et à la DDETS de mettre à jour en même temps.
+- Correction de l'étape de saisie du mail du candidat pour les employeurs et les prescripteurs
+- Ajustement de la taille de la bannière BETA
+- Mise à jour de Django vers la version 4.0.6
+- Amélioration de l'historisation des changements de champs d'utilisateurs via les SSO
+- Correction de la déconnexion des utilisateurs anonymes
+- Contrôle a posteriori : ajout de labels plus explicites pour les DDETS en phase contradictoire
+- Pilotage : ajout d'une requête "suivi des visiteurs"
+
 ## [45] - 2022-07-01
 
 ### Ajouté
