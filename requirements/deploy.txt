@@ -1,5 +1,5 @@
 -r ./base.txt
 
 uwsgi==2.0.20  # https://github.com/unbit/uwsgi
-sentry-sdk==1.5.12  # https://github.com/getsentry/sentry-python
-elastic-apm==6.9.1  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
+sentry-sdk==1.7.2  # https://github.com/getsentry/sentry-python
+elastic-apm==6.10.1  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
