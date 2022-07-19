@@ -1,4 +1,7 @@
+import json
 import uuid
+
+import itou.utils.json
 
 
 class SessionNamespace:
@@ -47,3 +50,15 @@ class SessionNamespace:
     @classmethod
     def create_temporary(cls, session):
         return cls(session, namespace=str(uuid.uuid4()))
+
+
+class JSONSerializer:
+    """Class to be used in SESSION_SERIALIZER, so we can serialize data using our custom JSON encoder/decoder."""
+
+    def dumps(self, obj):
+        # Using latin-1 like django.contrib.sessions.serializers.JSONSerializer
+        return json.dumps(obj, cls=itou.utils.json.JSONEncoder).encode("latin-1")
+
+    def loads(self, data):
+        # Using latin-1 like django.contrib.sessions.serializers.JSONSerializer
+        return json.loads(data.decode("latin-1"), cls=itou.utils.json.JSONDecoder)
