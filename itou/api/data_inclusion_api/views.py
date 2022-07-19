@@ -13,7 +13,7 @@ class DataInclusionStructureView(generics.ListAPIView):
     Cf https://github.com/betagouv/data-inclusion-schema
     """
 
-    queryset = Siae.objects.active().order_by("created_at").select_related("convention")
+    queryset = Siae.objects.active().order_by("created_at", "pk").select_related("convention")
     serializer_class = serializers.DataInclusionStructureSerializer
     authentication_classes = [
         authentication.TokenAuthentication,
