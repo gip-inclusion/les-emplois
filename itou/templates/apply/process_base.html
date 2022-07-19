@@ -40,14 +40,21 @@
                         {% if approval_can_be_suspended_by_siae %}
                             <a
                                 href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                class="btn btn btn-link">
+                                class="btn btn-link">
                                 Suspendre
                             </a>
+                        {% elif hire_by_other_siae %}
+                            <span class="btn btn-link disabled text-muted">Suspendre</span>
+                            <i
+                                class="ri-information-line ri-xl text-info"
+                                data-toggle="tooltip"
+                                title="La suspension n’est pas possible, un autre employeur a embauché le candidat.">
+                            </i>
                         {% endif %}
                         {% if approval_can_be_prolonged_by_siae %}
                             <a
                                 href="{% url 'approvals:declare_prolongation' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                class="btn btn btn-link">
+                                class="btn btn-link">
                                 Prolonger
                             </a>
                         {% endif %}
