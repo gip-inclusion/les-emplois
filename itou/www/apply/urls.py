@@ -10,6 +10,11 @@ urlpatterns = [
     # Submit.
     path("<int:siae_pk>/start", submit_views.start, name="start"),
     path("<int:siae_pk>/step_sender", submit_views.step_sender, name="step_sender"),
+    path(
+        "<int:siae_pk>/step_pending_authorization",
+        submit_views.step_pending_authorization,
+        name="step_pending_authorization",
+    ),
     path("<int:siae_pk>/step_job_seeker", submit_views.step_job_seeker, name="step_job_seeker"),
     path(
         "<int:siae_pk>/step_check_job_seeker_nir",

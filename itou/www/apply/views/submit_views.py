@@ -117,6 +117,8 @@ def step_sender(request, siae_pk):
     """
     Determine info about the sender.
     """
+    next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae_pk})
+
     user_info = get_user_info(request)
 
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
@@ -126,13 +128,22 @@ def step_sender(request, siae_pk):
     if user_info.prescriber_organization:
         session_data["sender_prescriber_organization_pk"] = user_info.prescriber_organization.pk
 
+        # Warn message if prescriber's authorization is pending
+        if user_info.prescriber_organization.has_pending_authorization():
+            next_url = reverse("apply:step_pending_authorization", kwargs={"siae_pk": siae_pk})
+
     if user_info.siae:
         session_data["sender_siae_pk"] = user_info.siae.pk
 
     request.session.modified = True
 
-    next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae_pk})
     return HttpResponseRedirect(next_url)
+
+
+@login_required
+@valid_session_required
+def step_pending_authorization(request, siae_pk, template_name="apply/submit_step_pending_authorization.html"):
+    return render(request, template_name, {"siae_pk": siae_pk})
 
 
 @login_required
