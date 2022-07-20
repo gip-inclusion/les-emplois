@@ -1,0 +1,36 @@
+{% extends "layout/content.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12 col-lg-7 pl-lg-5">
+            <div class="card c-card mb-3 mb-lg-5 p-3">
+                <div class="card-header">
+                    <h1 class="h2">Status de prescripteur habilité non vérifié</h1>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="status">
+                        <div class="row">
+                            <div class="col-auto pr-0">
+                                <i class="ri-information-line ri-xl text-warning"></i>
+                            </div>
+                            <div class="col">
+                                <p class="mb-2"><strong>Attention, si vous souhaitez orienter un candidat auprès d'une SIAE, vous ne pourrez pas valider son éligibilité à l'IAE.</strong></p>
+                                <p class="mb-0">Votre statut de prescripteur habilité n'a pas encore été vérifié par nos équipes. Vous devriez être notifié(e) de sa confirmation dans un délai de 72h.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <strong>Êtes-vous certain de vouloir continuer ?</strong>
+                </div>
+                <div class="row mt-3 mt-lg-5 justify-content-end">
+                    <div class="col-6 col-lg-auto">
+                        <a class="btn btn-link" title="Revenir à la recherche" href="/">Revenir à la recherche</a>
+                    </div>
+                    <div class="col-6 col-lg-auto">
+                        <a href="{% url 'apply:step_check_job_seeker_nir' siae_pk=siae_pk %}" class="btn btn-primary">Suivant</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
