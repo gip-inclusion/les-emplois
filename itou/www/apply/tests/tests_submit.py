@@ -276,6 +276,12 @@ class ApplyAsJobSeekerTest(TestCase):
         user = JobSeekerFactory()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
+        # Without a session namespace
+        response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(response.status_code, 403)
+
+        # With a session namespace
+        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Use that view to init the session
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
@@ -1162,6 +1168,12 @@ class ApplyAsPrescriberTest(TestCase):
         user = PrescriberFactory()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
+        # Without a session namespace
+        response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(response.status_code, 403)
+
+        # With a session namespace
+        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Use that view to init the session
         response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))

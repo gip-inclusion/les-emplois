@@ -23,7 +23,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.perms.user import get_user_info
-from itou.utils.session import SessionNamespace
+from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -89,16 +89,16 @@ def get_approvals_wrapper(request, job_seeker, siae):
     return approvals_wrapper
 
 
-class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
+class ApplyStepBaseView(LoginRequiredMixin, SessionNamespaceRequiredMixin, TemplateView):
     def __init__(self):
         super().__init__()
         self.siae = None
         self.apply_session = None
 
     def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
         self.siae = get_object_or_404(Siae, pk=kwargs["siae_pk"])
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.siae.pk}")
+        super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and not any(
@@ -123,6 +123,8 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
 
 
 class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
+    required_session_namespaces = ["apply_session"]
+
     def __init__(self):
         super().__init__()
         self.job_seeker = None
@@ -143,6 +145,8 @@ class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
 
 
 class ApplyStepForSenderBaseView(ApplyStepBaseView):
+    required_session_namespaces = ["apply_session"]
+
     def __init__(self):
         super().__init__()
         self.sender = None
@@ -378,17 +382,27 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
         }
 
 
-class CreateJobSeekerStep1ForSenderView(ApplyStepForSenderBaseView):
+class CreateJobSeekerForSenderBaseView(ApplyStepForSenderBaseView):
+    required_session_namespaces = ApplyStepForSenderBaseView.required_session_namespaces + ["job_seeker_session"]
+
+    def __init__(self):
+        super().__init__()
+        self.job_seeker_session = None
+
+    def setup(self, request, *args, **kwargs):
+        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
+        super().setup(request, *args, **kwargs)
+
+
+class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "apply/submit/create_job_seeker_for_sender/step_1.html"
 
     def __init__(self):
         super().__init__()
         self.form = None
-        self.job_seeker_session = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
         self.form = CreateJobSeekerStep1ForSenderForm(
             data=request.POST or None, initial=self.job_seeker_session.get("user", {})
         )
@@ -412,17 +426,15 @@ class CreateJobSeekerStep1ForSenderView(ApplyStepForSenderBaseView):
         }
 
 
-class CreateJobSeekerStep2ForSenderView(ApplyStepForSenderBaseView):
+class CreateJobSeekerStep2ForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "apply/submit/create_job_seeker_for_sender/step_2.html"
 
     def __init__(self):
         super().__init__()
         self.form = None
-        self.job_seeker_session = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
         self.form = CreateJobSeekerStep2ForSenderForm(
             data=request.POST or None, initial=self.job_seeker_session.get("user", {})
         )
@@ -450,17 +462,15 @@ class CreateJobSeekerStep2ForSenderView(ApplyStepForSenderBaseView):
         }
 
 
-class CreateJobSeekerStep3ForSenderView(ApplyStepForSenderBaseView):
+class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "apply/submit/create_job_seeker_for_sender/step_3.html"
 
     def __init__(self):
         super().__init__()
         self.form = None
-        self.job_seeker_session = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
 
         self.form = CreateJobSeekerStep3ForSenderForm(
             data=request.POST or None,
@@ -511,12 +521,11 @@ class CreateJobSeekerStep3ForSenderView(ApplyStepForSenderBaseView):
         }
 
 
-class CreateJobSeekerStepEndForSenderView(ApplyStepForSenderBaseView):
+class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "apply/submit/create_job_seeker_for_sender/step_end.html"
 
     def __init__(self):
         super().__init__()
-        self.job_seeker_session = None
         self.profile = None
 
     def _get_user_data_from_session(self):
@@ -536,7 +545,6 @@ class CreateJobSeekerStepEndForSenderView(ApplyStepForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
 
         self.profile = JobSeekerProfile(
             user=User(**self._get_user_data_from_session()),
