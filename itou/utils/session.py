@@ -1,6 +1,8 @@
 import json
 import uuid
 
+from django.core.exceptions import PermissionDenied
+
 import itou.utils.json
 
 
@@ -50,6 +52,16 @@ class SessionNamespace:
     @classmethod
     def create_temporary(cls, session):
         return cls(session, namespace=str(uuid.uuid4()))
+
+
+class SessionNamespaceRequiredMixin:
+    required_session_namespaces = []
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        if not all(getattr(self, attr_name).exists() for attr_name in self.required_session_namespaces):
+            raise PermissionDenied("A session namespace doesn't exist.")
 
 
 class JSONSerializer:
