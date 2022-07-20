@@ -17,10 +17,10 @@
             <input type="hidden" name="confirm" value="yes">
             <input type="submit" value="Oui, je confirme le refus"">
                 <a href="{% url "admin:approvals_approval_manually_add_approval" job_application.id %}" class="button cancel-link">Non, revenir à la page précédente</a>
-            </div>
+                    </div>
 
-        </form>
+                    </form>
 
-        {% include "admin/approvals/includes/job_application_details.html" %}
+                    {% include "admin/approvals/includes/job_application_details.html" %}
 
 {% endblock %}
