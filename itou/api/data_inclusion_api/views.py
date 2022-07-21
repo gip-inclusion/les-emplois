@@ -39,10 +39,10 @@ class DataInclusionStructureView(generics.ListAPIView):
 
         qs_by_structure_type_str = {
             enums.StructureTypeStr.ORGA: PrescriberOrganization.objects.all(),
-            enums.StructureTypeStr.SIAE: Siae.objects.active().order_by("created_at").select_related("convention"),
+            enums.StructureTypeStr.SIAE: Siae.objects.active().select_related("convention"),
         }
 
-        return qs_by_structure_type_str[valid_type_str]
+        return qs_by_structure_type_str[valid_type_str].order_by("created_at", "pk")
 
     def get_serializer_class(self):
         valid_type_str = self.request.query_params.get("type")
