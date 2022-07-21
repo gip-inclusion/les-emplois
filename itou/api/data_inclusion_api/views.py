@@ -42,6 +42,10 @@ class DataInclusionStructureView(generics.ListAPIView):
             enums.StructureTypeStr.SIAE: Siae.objects.active().select_related("convention"),
         }
 
+        # * ordered by ascending creation date : if any instances are added during the querying
+        # of the endpoint, they will appeared in the last page.
+        # * ordered by pk : given that some instances share the same creation date, it ensures
+        # repeatable order between page evaluation
         return qs_by_structure_type_str[valid_type_str].order_by("created_at", "pk")
 
     def get_serializer_class(self):
