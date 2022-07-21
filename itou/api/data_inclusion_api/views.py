@@ -1,15 +1,8 @@
-import enum
-
 from rest_framework import authentication, exceptions, generics
 
-from itou.api.data_inclusion_api import serializers
+from itou.api.data_inclusion_api import enums, serializers
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
-
-
-class StructureTypeStr(str, enum.Enum):
-    ORGA = "orga"
-    SIAE = "siae"
 
 
 class DataInclusionStructureView(generics.ListAPIView):
@@ -36,7 +29,7 @@ class DataInclusionStructureView(generics.ListAPIView):
 
         if unsafe_type_str is None:
             raise exceptions.ValidationError("Le paramètre `type` est obligatoire.")
-        elif unsafe_type_str not in list(StructureTypeStr):
+        elif unsafe_type_str not in list(enums.StructureTypeStr):
             raise exceptions.ValidationError("La valeur du paramètre `type` doit être `siae` ou `orga`.")
 
         return super().list(request, *args, **kwargs)
@@ -45,8 +38,8 @@ class DataInclusionStructureView(generics.ListAPIView):
         valid_type_str = self.request.query_params.get("type")
 
         qs_by_structure_type_str = {
-            StructureTypeStr.ORGA: PrescriberOrganization.objects.all(),
-            StructureTypeStr.SIAE: Siae.objects.active().order_by("created_at").select_related("convention"),
+            enums.StructureTypeStr.ORGA: PrescriberOrganization.objects.all(),
+            enums.StructureTypeStr.SIAE: Siae.objects.active().order_by("created_at").select_related("convention"),
         }
 
         return qs_by_structure_type_str[valid_type_str]
@@ -55,8 +48,8 @@ class DataInclusionStructureView(generics.ListAPIView):
         valid_type_str = self.request.query_params.get("type")
 
         serializer_class_by_structure_type_str = {
-            StructureTypeStr.ORGA: serializers.PrescriberOrgStructureSerializer,
-            StructureTypeStr.SIAE: serializers.SiaeStructureSerializer,
+            enums.StructureTypeStr.ORGA: serializers.PrescriberOrgStructureSerializer,
+            enums.StructureTypeStr.SIAE: serializers.SiaeStructureSerializer,
         }
 
         return serializer_class_by_structure_type_str[valid_type_str]
