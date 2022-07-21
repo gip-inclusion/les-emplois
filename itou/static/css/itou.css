@@ -395,7 +395,6 @@ Usage:
 .s-section-twocolumns {
     height: 100%;
     padding-top: 0 !important;
-    padding-bottom: 0 !important;
 }
 
 @media (min-width: 992px) {

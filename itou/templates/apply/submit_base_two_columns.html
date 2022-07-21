@@ -49,7 +49,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-lg-6 order-md-2 pl-lg-5 d-none d-lg-block mb-6">
+                <div class="col-12 col-lg-6 order-md-2 pl-lg-5 d-none d-lg-block">
                     <h2 class="h1 ff-extra-01">Où trouver {% if request.user.is_job_seeker %}mon{% else %}le{% endif %} numéro de sécurité sociale ?</h2>
                     <img class="mt-5 img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
                     <p class="ff-extra-01 mt-0">Il est présent à cet endroit sur {% if request.user.is_job_seeker %}votre{% else %}la{% endif %} carte Vitale.</p>
