@@ -68,7 +68,7 @@ class CheckJobSeekerNirForm(forms.Form):
             self.fields["nir"].label = "Numéro de sécurité sociale du candidat"
 
     def clean_nir(self):
-        nir = self.cleaned_data["nir"]
+        nir = self.cleaned_data["nir"].upper()
         nir = nir.replace(" ", "")
         existing_account = User.objects.filter(nir=nir).first()
 
