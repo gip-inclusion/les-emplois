@@ -12,9 +12,6 @@ Bonjour,
 - Fin de la prolongation : {{ prolongation.end_at|date:"d/m/Y" }}
 - Motif de prolongation : {{ prolongation.get_reason_display }}
 
-Pour confirmer et valider cette prolongation, merci de nous transférer
-ce message à : {{ itou_email_prolongation }}
-
-Si vous n'avez pas autorisé cette prolongation, merci de contacter notre assistance technique : {{ itou_assistance_url }}
+Pour valider ou refuser cette prolongation, merci de nous transférer ce message à l'adresse suivante : {{ itou_email_prolongation }}
 
 {% endblock body %}
