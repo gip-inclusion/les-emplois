@@ -30,7 +30,7 @@ djhtml==1.5.0  # https://github.com/rtts/djhtml
 factory-boy==3.2.1  # https://github.com/FactoryBoy/factory_boy
 
 django-debug-toolbar==3.4  # https://github.com/jazzband/django-debug-toolbar
-django-extensions==3.1.5  # https://github.com/django-extensions/django-extensions
+django-extensions==3.2.0 # https://github.com/django-extensions/django-extensions
 django-admin-logs==1.0.2  # https://pypi.org/project/django-admin-logs/
 
 # Test & Mock
