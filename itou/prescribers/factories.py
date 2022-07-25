@@ -14,6 +14,15 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.PrescriberOrganization
 
+    class Params:
+        authorized = factory.Trait(
+            is_authorized=True,
+            authorization_status=models.PrescriberOrganization.AuthorizationStatus.VALIDATED,
+        )
+        with_pending_authorization = factory.Trait(
+            authorization_status=models.PrescriberOrganization.AuthorizationStatus.NOT_SET,
+        )
+
     name = factory.Faker("name", locale="fr_FR")
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
@@ -21,13 +30,6 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("email", locale="fr_FR")
     kind = models.PrescriberOrganization.Kind.PE
     department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
-
-
-class AuthorizedPrescriberOrganizationFactory(PrescriberOrganizationFactory):
-    """Returns an authorized PrescriberOrganization() object."""
-
-    is_authorized = True
-    authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
@@ -67,17 +69,6 @@ class PrescriberOrganizationWith2MembershipFactory(PrescriberOrganizationFactory
 
     membership1 = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
     membership2 = factory.RelatedFactory(PrescriberMembershipFactory, "organization", is_admin=False)
-
-
-class AuthorizedPrescriberOrganizationWithMembershipFactory(PrescriberOrganizationWithMembershipFactory):
-    """
-    Returns a PrescriberOrganization() object with a related authorized PrescriberMembership() object.
-
-    https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
-    """
-
-    is_authorized = True
-    authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
 
 
 class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):

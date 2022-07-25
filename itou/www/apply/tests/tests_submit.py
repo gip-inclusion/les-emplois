@@ -292,12 +292,180 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "job_description_id": None,
         }
 
+    def test_apply_as_prescriber_with_pending_authorization(self):
+        """Apply as prescriber that has pending authorization."""
+
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(with_pending_authorization=True)
+        user = prescriber_organization.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        # Entry point.
+        # ----------------------------------------------------------------------
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        session = self.client.session
+        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        expected_session_data = self.default_session_data | {
+            "to_siae_pk": siae.pk,
+        }
+        self.assertDictEqual(session_data, expected_session_data)
+
+        next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        # Step determine the sender.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 302)
+
+        session = self.client.session
+        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        expected_session_data = self.default_session_data | {
+            "to_siae_pk": siae.pk,
+            "sender_pk": user.pk,
+            "sender_kind": SenderKind.PRESCRIBER,
+            "sender_prescriber_organization_pk": prescriber_organization.pk,
+        }
+        self.assertDictEqual(session_data, expected_session_data)
+
+        next_url = reverse("apply:step_pending_authorization", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        # Step show warning message about pending authorization.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        next_url = reverse("apply:step_check_job_seeker_nir", kwargs={"siae_pk": siae.pk})
+        self.assertContains(response, "Status de prescripteur habilité non vérifié")
+        self.assertContains(response, next_url)
+
+        # Step determine the job seeker with a NIR.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        nir = "141068078200557"
+        post_data = {"nir": nir, "confirm": 1}
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        session = self.client.session
+        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        expected_session_data = self.default_session_data | {
+            "nir": nir,
+            "to_siae_pk": siae.pk,
+            "sender_pk": user.pk,
+            "sender_kind": SenderKind.PRESCRIBER,
+            "sender_prescriber_organization_pk": prescriber_organization.pk,
+        }
+
+        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        # Step get job seeker e-mail.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {"email": "new.job.seeker@test.com", "save": "1"}
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
+        args = urlencode({"email": post_data["email"]})
+        self.assertEqual(response.url, f"{next_url}?{args}")
+
+        # Step create a job seeker.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "email": "new.job.seeker@test.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "birthdate": "20/12/1978",
+            "phone": "0610200305",
+            "pole_emploi_id": "12345678",
+            "address_line_1": "36, rue du 6 Mai 1956",
+            "post_code": self.city.post_codes[0],
+            "city": self.city.name,
+            "city_slug": self.city.slug,
+        }
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        new_job_seeker = User.objects.get(email=post_data["email"])
+
+        session = self.client.session
+        session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+        expected_session_data = self.default_session_data | {
+            "job_seeker_pk": new_job_seeker.pk,
+            "nir": new_job_seeker.nir,
+            "to_siae_pk": siae.pk,
+            "sender_pk": user.pk,
+            "sender_kind": SenderKind.PRESCRIBER,
+            "sender_prescriber_organization_pk": prescriber_organization.pk,
+        }
+        self.assertDictEqual(session_data, expected_session_data)
+
+        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        # Step eligibility. Prescriber is not authorized yet.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 302)
+
+        next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        # Step application.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
+            "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rockie-balboa.pdf",
+        }
+        response = self.client.post(next_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae.pk})
+        self.assertEqual(response.url, next_url)
+
+        job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
+        self.assertEqual(job_application.sender_kind, SenderKind.PRESCRIBER)
+        self.assertEqual(job_application.sender_siae, None)
+        self.assertEqual(job_application.sender_prescriber_organization, prescriber_organization)
+        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
+        self.assertEqual(job_application.message, post_data["message"])
+        self.assertEqual(job_application.answer, "")
+        self.assertEqual(job_application.selected_jobs.count(), 2)
+        self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
+        self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
+        self.assertEqual(job_application.resume_link, post_data["resume_link"])
+
     def test_apply_as_authorized_prescriber(self):
         """Apply as authorized prescriber."""
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -472,7 +640,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
 
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -500,7 +668,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         siae = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ, romes=("N1101", "N1105"))
 
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         job_seeker = JobSeekerFactory()
@@ -835,7 +1003,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         # Only authorized prescribers can add a NIR.
         # See User.can_add_nir
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
         return siae, user
 
