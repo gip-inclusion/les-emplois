@@ -17,6 +17,7 @@ from itou.common_apps.address.departments import DEPARTMENTS, department_from_po
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.eligibility.models import AdministrativeCriteria
+from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
@@ -308,30 +309,28 @@ class RefusalForm(forms.Form):
     )
 
     refusal_reason = forms.ChoiceField(
-        label="Motif du refus (ne sera pas envoyé au candidat)",
+        label="Sélectionner un motif de refus (n'est pas envoyé au candidat)",
         widget=forms.RadioSelect,
         choices=JobApplication.REFUSAL_REASON_CHOICES,
     )
     answer = forms.CharField(
-        label="Réponse envoyée au candidat",
+        label="Message à envoyer au candidat (une copie sera envoyée au prescripteur)",
         widget=forms.Textarea(),
         strip=True,
         initial=ANSWER_INITIAL,
         help_text="Vous pouvez modifier le texte proposé ou l'utiliser tel quel.",
     )
     answer_to_prescriber = forms.CharField(
-        label="Précisez",
-        widget=forms.TextInput(attrs={"placeholder": ""}),
+        label="Commentaire privé à destination du prescripteur (n'est pas envoyé au candidat)",
+        widget=forms.Textarea(attrs={"placeholder": ""}),
         strip=True,
         required=False,
-        help_text="Message privé destiné au prescripteur. Le candidat ne verra pas ce message.",
     )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        if cleaned_data.get("refusal_reason") != JobApplication.REFUSAL_REASON_OTHER:
-            cleaned_data.pop("answer_to_prescriber")
-        return cleaned_data
+    def __init__(self, job_application, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if job_application.sender_kind != job_applications_enums.SenderKind.PRESCRIBER:
+            self.fields.pop("answer_to_prescriber")
 
 
 class AnswerForm(forms.Form):

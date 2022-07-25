@@ -5,64 +5,48 @@
 
     {{ block.super }}
 
-    <div class="alert alert-warning" role="status">
-        <p class="mb-0">
-            Confirmez votre choix.
-        </p>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="h3">Renseigner le motif de refus de candidature.</h2>
+
+            <form method="post" action="" class="js-prevent-multiple-submit">
+
+                {% csrf_token %}
+
+                {% bootstrap_form_errors form type="all" %}
+
+                {# TODO: Fix incorrect rendering of form with radio buttons #}
+                {# https://github.com/zostera/django-bootstrap4/issues/126 #}
+                <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %} js-refusal-reasons">
+                    {{ form.refusal_reason.label_tag }}
+                    <ul class="list-unstyled">
+                        {% for radio in form.refusal_reason %}
+                            <li>
+                                <label for="{{ radio.id_for_label }}">{{ radio.tag }} {{ radio.choice_label }}</label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                {% bootstrap_field form.answer_to_prescriber %}
+
+                <hr class="my-5">
+
+                <h2 class="h3">Répondre au candidat</h2>
+
+                {% bootstrap_field form.answer %}
+
+                <hr class="my-5">
+
+                {% buttons %}
+                    <div class="text-right">
+                        <a class="btn btn-link" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
+                        <button type="submit" class="btn btn-danger">Décliner la candidature</button>
+                    </div>
+                {% endbuttons %}
+
+            </form>
+        </div>
     </div>
 
-    <form method="post" action="" class="js-prevent-multiple-submit">
-
-        {% csrf_token %}
-
-        {% bootstrap_form_errors form type="all" %}
-
-        {# TODO: Fix incorrect rendering of form with radio buttons #}
-        {# https://github.com/zostera/django-bootstrap4/issues/126 #}
-        <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %} js-refusal-reasons">
-            {{ form.refusal_reason.label_tag }}
-            <ul class="list-unstyled">
-                {% for radio in form.refusal_reason %}
-                    <li>
-                        <label for="{{ radio.id_for_label }}">{{ radio.tag }} {{ radio.choice_label }}</label>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div id="js-field-answer-to-prescriber">
-            {% bootstrap_field form.answer_to_prescriber %}
-        </div>
-
-        {% bootstrap_field form.answer %}
-
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
-            <button type="submit" class="btn btn-danger">Décliner la candidature</button>
-        {% endbuttons %}
-
-    </form>
-
-{% endblock %}
-
-{% block script %}
-    <script type="text/javascript">
-        // Clicking on the "other" radio button displays a hidden field.
-        $('#js-field-answer-to-prescriber').css("display", "none");
-        $('.js-refusal-reasons input')
-            .on('change', function () {
-            $('#js-field-answer-to-prescriber').hide("slide");
-            $('#js-refusal-reason-poorly').hide("up", function(){
-                $(this).remove();
-            });
-            switch ($(this).val()) {
-                case "other":
-                    $('#js-field-answer-to-prescriber').show("slide");
-                    break;
-                case "poorly_informed":
-                    $(this).parent().after('<p id="js-refusal-reason-poorly"><i>En cas de besoin, n\'hésitez pas à contacter le prescripteur pour avoir plus d\'informations</i></p>');
-                    break;
-            }
-        });
-    </script>
 {% endblock %}

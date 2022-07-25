@@ -1,5 +1,10 @@
 from django.test import TestCase
 
+from itou.job_applications.factories import (
+    JobApplicationSentByJobSeekerFactory,
+    JobApplicationSentByPrescriberFactory,
+    JobApplicationSentBySiaeFactory,
+)
 from itou.users.factories import JobSeekerFactory
 from itou.www.apply import forms as apply_forms
 
@@ -38,3 +43,19 @@ class CheckJobSeekerNirFormTest(TestCase):
         form = apply_forms.CheckJobSeekerNirForm(job_seeker=user, data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn("Ce numéro de sécurité sociale est déjà utilisé par un autre compte.", form.errors["nir"][0])
+
+
+class RefusalFormTest(TestCase):
+    def test_job_application_sent_by_prescriber(self):
+        job_application = JobApplicationSentByPrescriberFactory()
+        form = apply_forms.RefusalForm(job_application=job_application)
+        self.assertIn("answer_to_prescriber", form.fields.keys())
+
+    def test_job_application_not_sent_by_prescriber(self):
+        job_application = JobApplicationSentByJobSeekerFactory()
+        form = apply_forms.RefusalForm(job_application=job_application)
+        self.assertNotIn("answer_to_prescriber", form.fields.keys())
+
+        job_application = JobApplicationSentBySiaeFactory()
+        form = apply_forms.RefusalForm(job_application=job_application)
+        self.assertNotIn("answer_to_prescriber", form.fields.keys())

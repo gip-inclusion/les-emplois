@@ -148,11 +148,6 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"refusal_reason": job_application.REFUSAL_REASON_OTHER, "answer": ""}
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("answer", response.context["form"].errors, "Answer is mandatory with REFUSAL_REASON_OTHER.")
-
         post_data = {
             "refusal_reason": job_application.REFUSAL_REASON_OTHER,
             "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",

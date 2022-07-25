@@ -164,7 +164,7 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
 
-    form = RefusalForm(data=request.POST or None)
+    form = RefusalForm(job_application=job_application, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 

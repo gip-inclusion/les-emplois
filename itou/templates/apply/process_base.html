@@ -13,7 +13,7 @@
         Candidature de
         <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
     </h1>
-    <p class="h2">{% include "apply/includes/state_badge.html" with job_application=job_application %}</p>
+    <p class="">{% include "apply/includes/state_badge.html" with job_application=job_application %}</p>
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
