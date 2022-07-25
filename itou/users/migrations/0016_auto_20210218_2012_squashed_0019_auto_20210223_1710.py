@@ -87,8 +87,11 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("resourceless", models.BooleanField(default=False, verbose_name="Sans ressource")),
-                ("rqth_employee", models.BooleanField(default=False, verbose_name="Employé RQTH")),
-                ("oeth_employee", models.BooleanField(default=False, verbose_name="Employé OETH")),
+                ("rqth_employee", models.BooleanField(default=False, verbose_name="Titulaire de la RQTH")),
+                (
+                    "oeth_employee",
+                    models.BooleanField(default=False, verbose_name="Bénéficiaire de la loi handicap (OETH)"),
+                ),
                 (
                     "poleemploi_since",
                     models.CharField(

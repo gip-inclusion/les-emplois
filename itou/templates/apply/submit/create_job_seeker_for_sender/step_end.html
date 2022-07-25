@@ -57,10 +57,10 @@
                                 <p>Sans emploi depuis : <b>{{ profile.get_unemployed_since_display|lower }}</b></p>
                             {% endif %}
                             {% if profile.rqth_employee %}
-                                <p><b>Employé RQTH</b></p>
+                                <p><b>Titulaire de la RQTH</b></p>
                             {% endif %}
                             {% if profile.oeth_employee %}
-                                <p><b>Employé OETH</b></p>
+                                <p><b>Bénéficiaire de la loi handicap (OETH)</b></p>
                             {% endif %}
                             {% if profile.rsa_allocation_since %}
                                 <p>{{ profile.get_has_rsa_allocation_display }} depuis : <b>{{ profile.get_rsa_allocation_since_display|lower }}</b></p>

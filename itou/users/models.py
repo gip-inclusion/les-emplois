@@ -785,8 +785,8 @@ class JobSeekerProfile(models.Model):
 
     resourceless = models.BooleanField(verbose_name="Sans ressource", default=False)
 
-    rqth_employee = models.BooleanField(verbose_name="Employé RQTH", default=False)
-    oeth_employee = models.BooleanField(verbose_name="Employé OETH", default=False)
+    rqth_employee = models.BooleanField(verbose_name="Titulaire de la RQTH", default=False)
+    oeth_employee = models.BooleanField(verbose_name="Bénéficiaire de la loi handicap (OETH)", default=False)
 
     pole_emploi_since = models.CharField(
         max_length=2,
