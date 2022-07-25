@@ -1,10 +1,13 @@
 import csv
 import datetime
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Case, F, Value, When
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.http import urlencode
 from tqdm import tqdm
 
 from itou.job_applications.enums import SenderKind
@@ -112,15 +115,24 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
         We will live with this technical debt until further notice.
         """
+        job_applications_path = reverse("admin:job_applications_jobapplication_changelist")
+        freshness_threshold = timezone.now() - relativedelta(months=3)
         for duplicate in duplicates:
+            args = {"job_seeker_id": duplicate.id, "created_at__gte": freshness_threshold}
+            recent_job_applications_url = (
+                f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{job_applications_path}?{urlencode(args)}"
+            )
             log_info = {
                 "Numéro": self.HARD_DUPLICATES_COUNT,
                 "Nombre de doublons": len(duplicates),
                 "Email": duplicate.email,
+                "NIR": duplicate.nir,
+                "Date de naissance": duplicate.birthdate,
                 "Numéro PASS IAE": "",
                 "Début PASS IAE": "",
                 "Fin PASS IAE": "",
                 "Lien admin PASS IAE": "",
+                "Candidatures récentes (< 3 mois)": recent_job_applications_url,
             }
 
             approval = duplicate.approvals.last()
@@ -239,10 +251,13 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                     "Numéro",  # Lines with the same number are duplicates.
                     "Nombre de doublons",
                     "Email",
+                    "NIR",
+                    "Date de naissance",
                     "Numéro PASS IAE",
                     "Début PASS IAE",
                     "Fin PASS IAE",
                     "Lien admin PASS IAE",
+                    "Candidatures récentes (< 3 mois)",
                 ],
                 self.HARD_DUPLICATES_LOGS,
             )
