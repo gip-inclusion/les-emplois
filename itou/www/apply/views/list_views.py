@@ -51,9 +51,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
 
     # Add related data giving the criteria for adding the necessary annotations
-    job_applications = job_applications.not_archived().with_list_related_data(
-        criteria=filters_form.data.getlist("criteria", [])
-    )
+    job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
 
     filters_counter = 0
     if filters_form.is_valid():
