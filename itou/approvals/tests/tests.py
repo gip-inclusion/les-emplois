@@ -29,7 +29,7 @@ from itou.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory, PrescriberOrganizationFactory
+from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
@@ -812,7 +812,7 @@ class ApprovalsWrapperTest(TestCase):
         self.assertFalse(
             approvals_wrapper.cannot_bypass_waiting_period(
                 siae=SiaeFactory(kind=SiaeKind.ETTI),
-                sender_prescriber_organization=AuthorizedPrescriberOrganizationFactory(),
+                sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
             )
         )
 

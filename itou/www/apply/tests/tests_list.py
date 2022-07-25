@@ -14,11 +14,7 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.prescribers.factories import (
-    AuthorizedPrescriberOrganizationWithMembershipFactory,
-    PrescriberMembershipFactory,
-    PrescriberOrganizationWithMembershipFactory,
-)
+from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
@@ -45,8 +41,8 @@ class ProcessListTest(TestCase):
         """
 
         # Pole Emploi
-        pole_emploi = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            name="Pôle emploi", membership__user__first_name="Thibault"
+        pole_emploi = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, name="Pôle emploi", membership__user__first_name="Thibault"
         )
         PrescriberMembershipFactory(organization=pole_emploi, user__first_name="Laurie")
         thibault_pe = pole_emploi.members.get(first_name="Thibault")

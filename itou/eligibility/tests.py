@@ -13,7 +13,7 @@ from itou.eligibility.factories import (
 )
 from itou.eligibility.models import AdministrativeCriteria, AdministrativeCriteriaQuerySet, EligibilityDiagnosis
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
@@ -251,7 +251,7 @@ class EligibilityDiagnosisModelTest(TestCase):
     def test_create_diagnosis_with_administrative_criteria(self):
 
         job_seeker = JobSeekerFactory()
-        prescriber_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
         user_info = UserInfo(
             user=user,

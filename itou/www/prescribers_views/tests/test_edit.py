@@ -3,11 +3,7 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.prescribers.factories import (
-    AuthorizedPrescriberOrganizationWithMembershipFactory,
-    PrescriberOrganizationFactory,
-    PrescriberOrganizationWithMembershipFactory,
-)
+from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -27,8 +23,8 @@ class EditOrganizationTest(TestCase):
     def test_edit(self, mock_call_ban_geocoding_api):
         """Edit a prescriber organization."""
 
-        organization = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganization.Kind.CAP_EMPLOI
+        organization = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, kind=PrescriberOrganization.Kind.CAP_EMPLOI
         )
         user = organization.members.first()
 

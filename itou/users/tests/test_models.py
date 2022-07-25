@@ -17,11 +17,7 @@ from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.institutions.models import Institution
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.factories import (
-    AuthorizedPrescriberOrganizationWithMembershipFactory,
-    PrescriberMembershipFactory,
-    PrescriberOrganizationWithMembershipFactory,
-)
+from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
@@ -411,7 +407,7 @@ class ModelTest(TestCase):
     def test_can_add_nir(self):
         siae = SiaeFactory(with_membership=True)
         siae_staff = siae.members.first()
-        prescriber_org = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         authorized_prescriber = prescriber_org.members.first()
         unauthorized_prescriber = PrescriberFactory()
         job_seeker_no_nir = JobSeekerFactory(nir="")
@@ -496,8 +492,8 @@ class ModelTest(TestCase):
         CD as in "Conseil Départemental".
         """
         # Admin prescriber of authorized CD can access.
-        org = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganization.Kind.DEPT, department="93"
+        org = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, kind=PrescriberOrganization.Kind.DEPT, department="93"
         )
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
@@ -505,8 +501,8 @@ class ModelTest(TestCase):
         self.assertEqual(user.get_stats_cd_department(current_org=org), org.department)
 
         # Non admin prescriber can access as well.
-        org = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganization.Kind.DEPT, membership__is_admin=False, department="93"
+        org = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, kind=PrescriberOrganization.Kind.DEPT, membership__is_admin=False, department="93"
         )
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
@@ -519,7 +515,7 @@ class ModelTest(TestCase):
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Non CD organization does not give access.
-        org = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))

@@ -2,7 +2,7 @@ import factory
 from django.utils import timezone
 
 from itou.eligibility import models
-from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
 
@@ -15,7 +15,7 @@ class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
 
     author = factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first())
     author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
-    author_prescriber_organization = factory.SubFactory(AuthorizedPrescriberOrganizationWithMembershipFactory)
+    author_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory, authorized=True)
     job_seeker = factory.SubFactory(JobSeekerFactory)
 
 

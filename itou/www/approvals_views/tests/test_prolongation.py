@@ -9,7 +9,7 @@ from django.utils.http import urlencode
 from itou.approvals.models import Approval, Prolongation
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import DeclareProlongationForm
@@ -21,7 +21,7 @@ class ApprovalProlongationTest(TestCase):
         Create test objects.
         """
 
-        self.prescriber_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        self.prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         self.prescriber = self.prescriber_organization.members.first()
 
         today = timezone.now().date()

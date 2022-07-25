@@ -8,7 +8,7 @@ from faker import Faker
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
@@ -74,7 +74,7 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
         if not create:
             # Simple build, do nothing.
             return
-        authorized_prescriber_org = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        authorized_prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         self.validated_by = authorized_prescriber_org.members.first()
         self.save()
 

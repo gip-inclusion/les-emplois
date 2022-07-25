@@ -5,7 +5,7 @@ from django.urls import reverse
 from itou.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
 from itou.cities.models import City
 from itou.job_applications.factories import JobApplicationFactory
-from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory
+from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 
@@ -146,8 +146,8 @@ class SearchPrescriberTest(TestCase):
 
         vannes = create_city_vannes()
         guerande = create_city_guerande()
-        AuthorizedPrescriberOrganizationFactory(coords=guerande.coords)
-        AuthorizedPrescriberOrganizationFactory(coords=vannes.coords)
+        PrescriberOrganizationFactory(authorized=True, coords=guerande.coords)
+        PrescriberOrganizationFactory(authorized=True, coords=vannes.coords)
 
         response = self.client.get(url, {"city": guerande.slug, "distance": 100})
         self.assertContains(response, "<b>2</b> résultats")

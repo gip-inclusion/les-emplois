@@ -14,7 +14,6 @@ from django.utils.timezone import get_current_timezone
 
 from itou.job_applications import factories as job_applications_factories, models as job_applications_models
 from itou.prescribers.factories import (
-    AuthorizedPrescriberOrganizationFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
@@ -34,19 +33,24 @@ class PrescriberOrganizationManagerTest(TestCase):
         """
         Test `get_accredited_orgs_for`.
         """
-        departmental_council_org = AuthorizedPrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.DEPT)
+        departmental_council_org = PrescriberOrganizationFactory(
+            authorized=True, kind=PrescriberOrganization.Kind.DEPT
+        )
 
         # An org accredited by a departmental council:
         # - is in the same department
         # - is accredited BRSA
-        accredited_org = AuthorizedPrescriberOrganizationFactory(
+        accredited_org = PrescriberOrganizationFactory(
+            authorized=True,
             department=departmental_council_org.department,
             kind=PrescriberOrganization.Kind.OTHER,
             is_brsa=True,
         )
 
-        other_org = AuthorizedPrescriberOrganizationFactory(
-            department=departmental_council_org.department, kind=PrescriberOrganization.Kind.CAP_EMPLOI
+        other_org = PrescriberOrganizationFactory(
+            authorized=True,
+            department=departmental_council_org.department,
+            kind=PrescriberOrganization.Kind.CAP_EMPLOI,
         )
 
         # `expected_num` orgs should be accredited by the departmental council.
@@ -255,7 +259,8 @@ class PrescriberOrganizationAdminTest(TestCase):
     def test_refuse_prescriber_habilitation_by_superuser(self):
         self.client.login(username=self.superuser.email, password=DEFAULT_PASSWORD)
 
-        prescriberorganization = AuthorizedPrescriberOrganizationFactory(
+        prescriberorganization = PrescriberOrganizationFactory(
+            authorized=True,
             siret="83987278500010",
             department="14",
             post_code="14000",
@@ -299,7 +304,8 @@ class PrescriberOrganizationAdminTest(TestCase):
     def test_refuse_prescriber_habilitation_pending_status(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
-        prescriberorganization = AuthorizedPrescriberOrganizationFactory(
+        prescriberorganization = PrescriberOrganizationFactory(
+            authorized=True,
             siret="83987278500010",
             department="14",
             post_code="14000",
@@ -341,7 +347,8 @@ class PrescriberOrganizationAdminTest(TestCase):
     def test_refuse_prescriber_habilitation_not_pending_status(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
-        prescriberorganization = AuthorizedPrescriberOrganizationFactory(
+        prescriberorganization = PrescriberOrganizationFactory(
+            authorized=True,
             siret="83987278500010",
             department="14",
             post_code="14000",
@@ -384,7 +391,8 @@ class PrescriberOrganizationAdminTest(TestCase):
     def test_accept_prescriber_habilitation_by_superuser(self):
         self.client.login(username=self.superuser.email, password=DEFAULT_PASSWORD)
 
-        prescriberorganization = AuthorizedPrescriberOrganizationFactory(
+        prescriberorganization = PrescriberOrganizationFactory(
+            authorized=True,
             siret="83987278500010",
             department="14",
             post_code="14000",
@@ -428,7 +436,8 @@ class PrescriberOrganizationAdminTest(TestCase):
     def test_accept_prescriber_habilitation_pending_status(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
-        prescriberorganization = AuthorizedPrescriberOrganizationFactory(
+        prescriberorganization = PrescriberOrganizationFactory(
+            authorized=True,
             siret="83987278500010",
             department="14",
             post_code="14000",
@@ -470,7 +479,8 @@ class PrescriberOrganizationAdminTest(TestCase):
     def test_accept_prescriber_habilitation_refused_status(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
-        prescriberorganization = AuthorizedPrescriberOrganizationFactory(
+        prescriberorganization = PrescriberOrganizationFactory(
+            authorized=True,
             siret="83987278500010",
             department="14",
             post_code="14000",
@@ -512,7 +522,8 @@ class PrescriberOrganizationAdminTest(TestCase):
     def test_accept_prescriber_habilitation_other_status(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
 
-        prescriberorganization = AuthorizedPrescriberOrganizationFactory(
+        prescriberorganization = PrescriberOrganizationFactory(
+            authorized=True,
             siret="83987278500010",
             department="14",
             post_code="14000",
