@@ -13,7 +13,7 @@ with candidats_p as ( /* Ici on sélectionne les colonnes pertinentes à partir 
 	cdd.age,    
 	cdd.date_diagnostic,
 	case /* On soustrait 6 mois à la date de diagnostic pour déterminer s'il est toujours en cours ou pas */
-    	    when date_diagnostic >= CURRENT_DATE - INTERVAL '6 months' then 'Oui' 
+    	    when date_diagnostic >= date_trunc('month', CURRENT_DATE) - INTERVAL '5 months' then 'Oui' 
     	    else 'non'
 	end diagnostic_valide,
 	cdd.département as departement_candidat,
