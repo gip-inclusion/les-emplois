@@ -1,5 +1,5 @@
-from itou.job_applications.enums import SenderKind
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import RefusalReason, SenderKind
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
     anonymize,
     get_ai_stock_approval_pks,
@@ -165,7 +165,7 @@ TABLE_COLUMNS = [
         "name": "motif_de_refus",
         "type": "varchar",
         "comment": "Motif de refus de la candidature",
-        "fn": lambda o: get_choice(choices=JobApplication.REFUSAL_REASON_CHOICES, key=o.refusal_reason),
+        "fn": lambda o: get_choice(choices=RefusalReason.choices, key=o.refusal_reason),
     },
     {
         "name": "id_candidat_anonymisé",

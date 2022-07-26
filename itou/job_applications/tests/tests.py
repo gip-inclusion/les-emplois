@@ -22,7 +22,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.csv_export import generate_csv_export
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import RefusalReason, SenderKind
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -698,7 +698,7 @@ class JobApplicationNotificationsTest(TestCase):
 
         # When sent by authorized prescriber.
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            refusal_reason=JobApplication.REFUSAL_REASON_DID_NOT_COME,
+            refusal_reason=RefusalReason.DID_NOT_COME,
             answer_to_prescriber="Le candidat n'est pas venu.",
         )
         email = job_application.email_refuse_for_proxy
@@ -716,7 +716,7 @@ class JobApplicationNotificationsTest(TestCase):
 
         # When sent by jobseeker.
         job_application = JobApplicationSentByJobSeekerFactory(
-            refusal_reason=JobApplication.REFUSAL_REASON_DID_NOT_COME,
+            refusal_reason=RefusalReason.DID_NOT_COME,
             answer_to_prescriber="Le candidat n'est pas venu.",
         )
         email = job_application.email_refuse_for_job_seeker
@@ -1469,7 +1469,7 @@ class JobApplicationCsvExportTest(TestCase):
             "job_seeker": user,
             "sender": user,
             "sender_kind": SenderKind.JOB_SEEKER,
-            "refusal_reason": JobApplication.REFUSAL_REASON_DID_NOT_COME,
+            "refusal_reason": RefusalReason.DID_NOT_COME,
         }
 
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)

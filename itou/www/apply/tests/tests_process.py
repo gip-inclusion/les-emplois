@@ -15,6 +15,7 @@ from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
+from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -149,7 +150,7 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "refusal_reason": job_application.REFUSAL_REASON_OTHER,
+            "refusal_reason": job_applications_enums.RefusalReason.OTHER,
             "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)

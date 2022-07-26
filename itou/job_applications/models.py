@@ -16,7 +16,7 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import RefusalReason, SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.utils.emails import get_email_message
 
@@ -343,42 +343,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     SENDER_KIND_PRESCRIBER = SenderKind.PRESCRIBER
     SENDER_KIND_SIAE_STAFF = SenderKind.SIAE_STAFF
 
-    REFUSAL_REASON_DID_NOT_COME = "did_not_come"
-    REFUSAL_REASON_UNAVAILABLE = "unavailable"
-    REFUSAL_REASON_NON_ELIGIBLE = "non_eligible"
-    REFUSAL_REASON_ELIGIBILITY_DOUBT = "eligibility_doubt"
-    REFUSAL_REASON_INCOMPATIBLE = "incompatible"
-    REFUSAL_REASON_PREVENT_OBJECTIVES = "prevent_objectives"
-    REFUSAL_REASON_NO_POSITION = "no_position"
-    REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE = "approval_expiration_too_close"
-    REFUSAL_REASON_DEACTIVATION = "deactivation"
-    REFUSAL_REASON_NOT_MOBILE = "not_mobile"
-    REFUSAL_REASON_POORLY_INFORMED = "poorly_informed"
-    REFUSAL_REASON_OTHER = "other"
-    REFUSAL_REASON_CHOICES = (
-        (REFUSAL_REASON_DID_NOT_COME, "Candidat non venu ou non joignable"),
-        (REFUSAL_REASON_UNAVAILABLE, "Candidat indisponible ou non intéressé par le poste"),
-        (REFUSAL_REASON_NON_ELIGIBLE, "Candidat non éligible"),
-        (REFUSAL_REASON_NOT_MOBILE, "Candidat non mobile"),
-        (
-            REFUSAL_REASON_ELIGIBILITY_DOUBT,
-            "Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)",
-        ),
-        (
-            REFUSAL_REASON_INCOMPATIBLE,
-            "Un des freins à l'emploi du candidat est incompatible avec le poste proposé",
-        ),
-        (
-            REFUSAL_REASON_PREVENT_OBJECTIVES,
-            "L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion",
-        ),
-        (REFUSAL_REASON_NO_POSITION, "Pas de poste ouvert en ce moment"),
-        (REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE, "La date de fin du PASS IAE / agrément est trop proche"),
-        (REFUSAL_REASON_DEACTIVATION, "La structure n'est plus conventionnée"),
-        (REFUSAL_REASON_POORLY_INFORMED, "Candidature pas assez renseignée"),
-        (REFUSAL_REASON_OTHER, "Autre"),
-    )
-
     # SIAE have the possibility to update the hiring date if:
     # - it is before the end date of an approval created for this job application
     # - it is in the future, max. MAX_CONTRACT_POSTPONE_IN_DAYS days from today.
@@ -479,7 +443,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     answer = models.TextField(verbose_name="Message de réponse", blank=True)
     answer_to_prescriber = models.TextField(verbose_name="Message de réponse au prescripeur", blank=True)
     refusal_reason = models.CharField(
-        verbose_name="Motifs de refus", max_length=30, choices=REFUSAL_REASON_CHOICES, blank=True
+        verbose_name="Motifs de refus", max_length=30, choices=RefusalReason.choices, blank=True
     )
 
     hiring_start_at = models.DateField(verbose_name="Date de début du contrat", blank=True, null=True, db_index=True)
@@ -646,7 +610,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def is_refused_due_to_deactivation(self):
         return (
             self.state == JobApplicationWorkflow.STATE_REFUSED
-            and self.refusal_reason == self.REFUSAL_REASON_DEACTIVATION
+            and self.refusal_reason == RefusalReason.DEACTIVATION.value
         )
 
     @property

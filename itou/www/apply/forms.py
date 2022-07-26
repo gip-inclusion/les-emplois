@@ -311,7 +311,7 @@ class RefusalForm(forms.Form):
     refusal_reason = forms.ChoiceField(
         label="Sélectionner un motif de refus (n'est pas envoyé au candidat)",
         widget=forms.RadioSelect,
-        choices=JobApplication.REFUSAL_REASON_CHOICES,
+        choices=job_applications_enums.RefusalReason.choices,
     )
     answer = forms.CharField(
         label="Message à envoyer au candidat (une copie sera envoyée au prescripteur)",
@@ -331,6 +331,7 @@ class RefusalForm(forms.Form):
         super().__init__(*args, **kwargs)
         if job_application.sender_kind != job_applications_enums.SenderKind.PRESCRIBER:
             self.fields.pop("answer_to_prescriber")
+            self.fields["answer"].label = "Message à envoyer au candidat"
 
 
 class AnswerForm(forms.Form):
