@@ -4,13 +4,6 @@
 
 {% block messages %}
     {{ block.super }}
-    {% if can_show_employee_records %}
-        <div class="alert alert-danger">
-            <p class="mb-0">
-                La transmission des fiches salarié est actuellement indisponible. Veuillez nous excuser pour la gêne occasionnée.
-            </p>
-        </div>
-    {% endif %}
 
     {% if current_siae and not current_siae.jobs.exists %}
         <div class="alert alert-warning">
