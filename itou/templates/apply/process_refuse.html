@@ -28,7 +28,9 @@
                     </ul>
                 </div>
 
-                {% bootstrap_field form.answer_to_prescriber %}
+                {% if form.answer_to_prescriber %}
+                    {% bootstrap_field form.answer_to_prescriber %}
+                {% endif %}
 
                 <hr class="my-5">
 

@@ -19,7 +19,7 @@
 
         {% if job_application.state.is_accepted %}
 
-            <div class="card my-3">
+            <div class="card my-4">
                 <div class="card-body">
 
                     {# Approval status. #}
@@ -76,7 +76,7 @@
 
         {% elif not job_application.state.is_cancelled and approvals_wrapper.latest_approval %}
 
-            <div class="card my-3">
+            <div class="card my-4">
                 <div class="card-body">
                     {# Approval status. #}
                     <div class="card-text">

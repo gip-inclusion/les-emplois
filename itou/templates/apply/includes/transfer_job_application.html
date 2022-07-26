@@ -1,8 +1,8 @@
 {# Transfer job application to other SIAE #}
 {% if job_application.is_in_transferable_state %}
     {% if user_siaes|length != 1 %}
-        <hr>
-        <h3 class="h2 font-weight-normal text-muted">Transférer vers une autre structure</h3>
+        <hr class="my-4">
+        <h3>Transférer vers une autre structure</h3>
         <p>Vous avez la possibilité de transférer cette candidature vers une des autres structures dont vous êtes membre.
             <div class="mb-3">
                 <button id="transfer_to_button" class="btn btn-outline-primary dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown">

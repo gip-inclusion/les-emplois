@@ -2,14 +2,12 @@
     {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
         {% if job_application.is_sent_by_authorized_prescriber %}
             {% comment %}
-                Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière 
+                Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
                 hiérarchisée afin de ne pas induire les employeurs en erreur.
                 Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critère de niveau 2 par exemple
             {% endcomment %}
             <hr>
-            <h3 class="h2 font-weight-normal text-muted">
-                Éligibilité IAE
-            </h3>
+            <h3>Éligibilité à l'IAE</h3>
             <p>
                 Confirmée par
                 <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
@@ -48,14 +46,11 @@
             </p>
         {% else %}
             <hr>
-            <h3 class="h2 font-weight-normal text-muted">
-                Critères d'éligibilité
-            </h3>
 
             {% if eligibility_diagnosis is not None %}
-                <p>
-                    <b>Critères d'éligibilité :</b>
-                </p>
+                <h3>
+                    Critères d'éligibilité
+                </h3>
                 <p>
                     Validés par
                     <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
@@ -107,14 +102,14 @@
     {% elif approvals_wrapper.has_valid_pole_emploi_eligibility_diagnosis %}
 
         <hr>
-        <h3 class="h2 font-weight-normal text-muted">Critères d'éligibilité</h3>
+        <h3>Critères d'éligibilité</h3>
         <p>
             Validés par <b>Pôle emploi</b>.
         </p>
 
     {% elif expired_eligibility_diagnosis %}
         <hr>
-        <h3 class="h2 font-weight-normal text-muted">Éligibilité IAE</h3>
+        <h3>Éligibilité à l'IAE</h3>
         <div class="alert alert-warning" role="status">
             <p class="mb-0">
                 Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, vous devez valider les critères d'éligibilité.
