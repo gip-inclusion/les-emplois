@@ -15,7 +15,9 @@ Unidecode==1.3.4  # https://github.com/avian2/unidecode
 django==4.0.6  # https://www.djangoproject.com/
 
 # django-allauth
-django-allauth==0.51.0  # https://github.com/pennersr/django-allauth
+# Sticky to 0.47.0 until further notice
+# v0.48.0 introduced a breaking change (SSO part) : subject needs investigation and fix
+django-allauth==0.47.0  # https://github.com/pennersr/django-allauth
 
 # django-anymail
 django-anymail==8.6  # https://github.com/anymail/django-anymail
