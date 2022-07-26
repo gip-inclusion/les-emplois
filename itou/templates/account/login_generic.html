@@ -48,7 +48,7 @@
     <div class="py-5 py-lg-7 text-center">
         {% if signup_allowed %}
             <h1 class="h1-hero-c1">S'inscrire</h1>
-            <p>
+            <p class="mb-5">
                 <a class="btn btn-outline-primary" href="{{ signup_url }}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
                     Créer un compte
                     {% if account_type_display_name %}
@@ -58,7 +58,6 @@
             </p>
         {% endif %}
 
-        <p class="display-1 ff-extra-01 mb-5">Bienvenue !</p>
-        <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/login.svg' %}" alt="">
+        <img class="img-fluid img-fitcover w-50 w-md-auto mt-5" src="{% static 'img/login.svg' %}" alt="">
     </div>
 {% endblock %}

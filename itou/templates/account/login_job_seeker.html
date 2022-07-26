@@ -62,12 +62,11 @@
 {% block left_content %}
     <div class="py-5 py-lg-7 text-center">
         <h1 class="h1-hero-c1">S'inscrire</h2>
-        <p>
+        <p class="mb-5">
             <a class="btn btn-outline-primary" href="{% url 'signup:job_seeker_situation' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
                 Créer un compte candidat
             </a>
         </p>
-        <p class="display-1 ff-extra-01 mb-5">Bienvenue !</p>
-        <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/login.svg' %}" alt="">
+        <img class="img-fluid img-fitcover w-50 w-md-auto mt-5" src="{% static 'img/login.svg' %}" alt="">
     </div>
 {% endblock %}
