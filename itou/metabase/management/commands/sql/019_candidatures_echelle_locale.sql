@@ -42,6 +42,39 @@ select
     type_structure,
     origine,
     origine_détaillée,
+    case /* Ajout colonne avec des noms de prescripteurs correspondant à ceux de la table taux_transformation_prescripteurs */
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité AFPA' then 'AFPA - Agence nationale pour la formation professionnelle des adultes'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité ASE' then 'ASE - Aide sociale à l''enfance'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité Autre' then 'Autre' 
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CAARUD' then 'CAARUD - Centre d''accueil et d''accompagnement à la réduction de risques pour usagers de drogues'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CADA' then 'CADA - Centre d''accueil de demandeurs d''asile'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CAF' then 'CAF - Caisse d''allocations familiales'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CAP_EMPLOI' then 'CAP emploi'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CAVA' then 'ACAVA - Centre d''adaptation à la vie active'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CCAS' then 'CCAS - Centre communal d''action sociale ou centre intercommunal d''action sociale'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CHRS' then 'CHRS - Centre d''hébergement et de réinsertion sociale'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CHU' then 'CHU - Centre d''hébergement d''urgence'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CIDFF' then 'CIDFF - Centre d''information sur les droits des femmes et des familles'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CPH' then 'CPH - Centre provisoire d''hébergement'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité CSAPA' then 'CSAPA - Centre de soins, d''accompagnement et de prévention en addictologie'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité DEPT' then 'Service social du conseil départemental'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité E2C' then 'E2C - École de la deuxième chance'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité EPIDE' then 'EPIDE - Établissement pour l''insertion dans l''emploi'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité HUDA' then 'HUDA - Hébergement d''urgence pour demandeurs d''asile'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité ML' then 'Mission Locale'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité MSA' then 'MSA - Mutualité Sociale Agricole'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité OACAS' then 'OACAS - Structure porteuse d''un agrément national organisme d''accueil communautaire et d''activité solidaire'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité ODC' then 'Organisation délégataire d''un CD'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité OIL' then 'Opérateur d''intermédiation locative'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité PE' then 'Pôle emploi'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité PENSION' then 'Pension de famille / résidence accueil'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité PIJ_BIJ' then 'PIJ-BIJ - Point/Bureau information jeunesse'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité PJJ' then 'PJJ - Protection judiciaire de la jeunesse'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité PLIE' then 'PLIE - Plan local pour l''insertion et l''emploi'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité PREVENTION' then 'Service ou club de prévention'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité RS_FJT' then 'Résidence sociale / FJT - Foyer de Jeunes Travailleurs'
+        when candidatures_p.origine_détaillée = 'Prescripteur habilité SPIP' then 'SPIP - Service pénitentiaire d''insertion et de probation'
+    end type_auteur_diagnostic_detaille,
     candidatures_p.région_structure,
     safir_org_prescripteur,
     id_org_prescripteur,
