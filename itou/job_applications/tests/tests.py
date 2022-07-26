@@ -1479,7 +1479,7 @@ class JobApplicationCsvExportTest(TestCase):
         generate_csv_export(JobApplication.objects, csv_output)
 
         self.assertIn("Candidature déclinée", csv_output.getvalue())
-        self.assertIn("Candidat non venu ou non joignable", csv_output.getvalue())
+        self.assertIn("Candidat non joignable", csv_output.getvalue())
 
 
 class JobApplicationAdminFormTest(TestCase):
@@ -1656,3 +1656,14 @@ class JobApplicationAdminFormTest(TestCase):
         job_application.sender_prescriber_organization = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
         self.assertTrue(form.is_valid())
+
+
+class JobApplicationsEnumsTest(TestCase):
+    def test_refusal_reason(self):
+        """Some reasons are kept for history but not displayed to end users."""
+        hidden_choices = RefusalReason.hidden()
+        for choice in hidden_choices:
+            reasons = [choice[0] for choice in RefusalReason.displayed_choices()]
+            self.assertTrue(len(reasons) > 0)
+            with self.subTest(choice):
+                self.assertNotIn(choice.value, reasons)

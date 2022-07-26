@@ -311,7 +311,7 @@ class RefusalForm(forms.Form):
     refusal_reason = forms.ChoiceField(
         label="Sélectionner un motif de refus (n'est pas envoyé au candidat)",
         widget=forms.RadioSelect,
-        choices=job_applications_enums.RefusalReason.choices,
+        choices=job_applications_enums.RefusalReason.displayed_choices(),
     )
     answer = forms.CharField(
         label="Message à envoyer au candidat (une copie sera envoyée au prescripteur)",
