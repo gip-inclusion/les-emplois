@@ -26,12 +26,15 @@ def update_existing_conventions():
         assert convention.kind == siae.kind
         assert convention.siren_signature == siae.siren
 
-        if not convention.is_active and siae.siret not in SIRET_TO_ASP_ID:
-            # Old inactive siaes which could not deleted because they have data will stay in our database forever.
-            # At some point they no longer exist in the latest FluxIAE file thus we should leave them untouched.
+        if siae.siret not in SIRET_TO_ASP_ID:
+            # At some point, old C1 siaes stop existing in the latest FluxIAE file.
+            # If they still have C1 data they could not be deleted in an earlier step and thus will stay in
+            # the C1 database forever, we should leave them untouched.
+            if convention.is_active:
+                assert not does_siae_have_an_active_convention(siae)
+                conventions_to_deactivate.append(convention)
             continue
 
-        assert siae.siret in SIRET_TO_ASP_ID
         asp_id = SIRET_TO_ASP_ID[siae.siret]
         siret_signature = ASP_ID_TO_SIRET_SIGNATURE[asp_id]
 
