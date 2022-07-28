@@ -7,7 +7,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
+from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
@@ -232,21 +232,25 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
 
     if form.is_valid():
         number = form.cleaned_data["number"]
-        approvals_wrapper = ApprovalsWrapper(number=number)
-        approval = approvals_wrapper.latest_approval
+
+        # first try to get a matching PASS IAE, and guide the user towards eventual different paths
+        approval = Approval.objects.filter(number=number).first()
+        if approval:
+            job_application = approval.user.last_accepted_job_application
+            if job_application and job_application.to_siae == siae:
+                # Suspensions and prolongations links are available in the job application details page.
+                application_details_url = reverse(
+                    "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
+                )
+                return HttpResponseRedirect(application_details_url)
+            # The employer cannot handle the PASS as it's already used by another one.
+            # Suggest him to make a self-prescription. A link is offered in the template.
+
+        else:
+            # if no PASS was found, try and find a PoleEmploiApproval.
+            approval = PoleEmploiApproval.objects.filter(number=number).first()
 
         if approval:
-            if approval.is_pass_iae:
-                job_application = approval.user.last_accepted_job_application
-                if job_application and job_application.to_siae == siae:
-                    # Suspensions and prolongations links are available in the job application details page.
-                    application_details_url = reverse(
-                        "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
-                    )
-                    return HttpResponseRedirect(application_details_url)
-                # The employer cannot handle the PASS as it's already used by another one.
-                # Suggest him to make a self-prescription. A link is offered in the template.
-
             context = {
                 "approval": approval,
                 "back_url": back_url,

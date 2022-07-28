@@ -1456,18 +1456,10 @@ class ApprovalsWrapper:
         )
     )
 
-    def __init__(self, user=None, number=None):
-
+    def __init__(self, user):
         self.user = user
-        self.number = number
         self.latest_approval = None
-        if user:
-            self.merged_approvals = self._merge_approvals_for_user()
-        elif number:
-            self.merged_approvals = self._merge_approvals_for_number()
-        else:
-            raise KeyError("A user or a number is required.")
-
+        self.merged_approvals = self._merge_approvals_for_user()
         if not self.merged_approvals:
             self.status = self.NONE_FOUND
         else:
@@ -1504,26 +1496,6 @@ class ApprovalsWrapper:
             .filter(start_at__lte=today)
             .exclude(number__in=approvals_numbers)
         )
-
-        merged_approvals = list(approvals) + list(pe_approvals)
-        return self.sort_approvals(merged_approvals)
-
-    def _merge_approvals_for_number(self):
-        """
-        Returns a list of merged unique `Approval` and `PoleEmploiApproval` objects.
-        """
-        # Truncate the number to remove any 'S01' or 'P01' suffix because the
-        # number is limited to 12 digits in Approval table.
-        approvals = Approval.objects.filter(number=self.number[:12]).order_by("-start_at")
-
-        # If a PASS IAE exists, consider it's the latest approval
-        # even if a PoleEmploiApproval is more recent.
-        # Return valid and expired approvals.
-        if approvals.exists():
-            return approvals
-
-        today = datetime.date.today()
-        pe_approvals = PoleEmploiApproval.objects.filter(number__startswith=self.number, start_at__lte=today)
 
         merged_approvals = list(approvals) + list(pe_approvals)
         return self.sort_approvals(merged_approvals)

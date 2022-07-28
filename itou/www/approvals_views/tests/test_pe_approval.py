@@ -1,8 +1,6 @@
-from dateutil.relativedelta import relativedelta
 from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
-from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
@@ -76,22 +74,6 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.login(username=siae.user.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url, {"number": 123123123123})
-        self.assertNotContains(response, "Continuer")
-
-    def test_approval_in_the_future(self):
-        """
-        The search for PE approval screen should display that there is no results
-        if a PE approval number was searched for but it is in the future
-        """
-        today = timezone.now().date()
-
-        pe_approval = PoleEmploiApprovalFactory(start_at=today + relativedelta(days=10))
-
-        job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        siae_user = job_application.to_siae.members.first()
-        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
-
-        response = self.client.get(self.url, {"number": pe_approval.number})
         self.assertNotContains(response, "Continuer")
 
     def test_has_matching_pass_iae(self):
