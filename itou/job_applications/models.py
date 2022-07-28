@@ -816,6 +816,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     self.approval.update_start_date(new_start_date=self.hiring_start_at)
                 emails.append(self.email_deliver_approval(accepted_by))
             elif (
+                not self.job_seeker.pole_emploi_id
+                and self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_FORGOTTEN
+            ):
+                # Trigger a manual approval creation.
+                self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
+                emails.append(self.email_manual_approval_delivery_required_notification(accepted_by))
+            elif (approvals_wrapper.has_none and (self.job_seeker.nir or self.job_seeker.pole_emploi_id)) or (
                 self.job_seeker.pole_emploi_id
                 or self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_NOT_REGISTERED
             ):
@@ -828,10 +835,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 new_approval.save()
                 self.approval = new_approval
                 emails.append(self.email_deliver_approval(accepted_by))
-            elif self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_FORGOTTEN:
-                # Trigger a manual approval creation.
-                self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
-                emails.append(self.email_manual_approval_delivery_required_notification(accepted_by))
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
 
@@ -1026,9 +1029,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return self._get_transfer_email(to, subject, body, transferred_by, origin_siae, target_siae)
 
     def manually_deliver_approval(self, delivered_by):
-        """
-        Manually deliver an approval.
-        """
         self.approval_number_sent_by_email = True
         self.approval_number_sent_at = timezone.now()
         self.approval_manually_delivered_by = delivered_by
@@ -1038,9 +1038,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
 
     def manually_refuse_approval(self, refused_by):
-        """
-        Manually refuse an approval.
-        """
         self.approval_manually_refused_by = refused_by
         self.approval_manually_refused_at = timezone.now()
         self.save()

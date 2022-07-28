@@ -1474,6 +1474,7 @@ class ApprovalsWrapper:
                 self.status = self.IN_WAITING_PERIOD
 
         # Only one of the following attributes can be True at a time.
+        self.has_none = self.status == self.NONE_FOUND
         self.has_valid = self.status == self.VALID
         self.has_in_waiting_period = self.status == self.IN_WAITING_PERIOD
 
