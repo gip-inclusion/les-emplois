@@ -250,9 +250,6 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
             context = {
                 "approval": approval,
                 "back_url": back_url,
-                "form": form,
-                "number": number,
-                "siae": siae,
             }
             return render(request, "approvals/pe_approval_search_found.html", context)
 
