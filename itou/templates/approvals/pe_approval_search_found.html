@@ -7,49 +7,43 @@
     <h1 class="h1-hero-c1">Prolonger ou suspendre un agrément émis par Pôle emploi</h1>
 
     {% if approval.is_valid %}
-        {% if approval.originates_from_itou %}
+
+        {% if approval.is_pass_iae %}
             <div class="alert alert-danger" role="status">
-                <p class="mb-0">Le numéro <strong>{{ approval.number|slice:12 }}</strong> correspond à un PASS IAE.</p>
+                {% if approval.originates_from_itou %}
+                    <p class="mb-0">Le numéro <strong>{{ approval.number }}</strong> correspond à un PASS IAE.</p>
+                {% else %}
+                    {% comment %}
+                        The approval has been issued by Pôle emploi and transformed into an Approval.
+                        A redirection is made upstream if the current SIAE can prolong or suspend it.
+                        It means another SIAE is using it right now.
+                    {% endcomment %}
+                    <p class="mb-0">L'agrément <strong>{{ approval.number }}</strong> a déjà été converti en PASS IAE.</p>
+                {% endif %}
             </div>
             <p>
-                Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>. Il sera automatiquement importé dans votre compte.
+                Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>.
             </p>
             <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-
         {% else %}
-            {% if approval.is_pass_iae %}
-                {% comment %}
-                    The approval has been issued by Pôle emploi and transformed into an Approval.
-                    A redirection is made upstream if the current SIAE can prolong or suspend it.
-                    It means another SIAE is using it right now.
-                {% endcomment %}
-                <div class="alert alert-danger" role="status">
-                    <p class="mb-0">L'agrément <strong>{{ approval.number|slice:12 }}</strong> a déjà été converti en PASS IAE.</p>
-                </div>
-                <p>
-                    Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>.
-                </p>
-                <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-            {% else %}
-                <p>
-                    L'agrément <strong>{{ approval.number|slice:12 }}</strong> a été délivré pour <strong>{{ approval.first_name|title }} {{ approval.last_name|title }}</strong>.
-                </p>
-                <p>
-                    Nous allons l'importer dans votre compte pour vous permettre de le suspendre ou de le prolonger.
-                </p>
-                <p>
-                    Mais avant, nous avons besoin de connaître l'adresse e-mail de votre salarié(e).
-                </p>
-                <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
-                <a class="btn btn-primary" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">
-                    Continuer
-                </a>
-            {% endif %}
+            <p>
+                L'agrément <strong>{{ approval.number }}</strong> a été délivré pour <strong>{{ approval.first_name|title }} {{ approval.last_name|title }}</strong>.
+            </p>
+            <p>
+                Nous allons l'importer dans votre compte pour vous permettre de le suspendre ou de le prolonger.
+            </p>
+            <p>
+                Mais avant, nous avons besoin de connaître l'adresse e-mail de votre salarié(e).
+            </p>
+            <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
+            <a class="btn btn-primary" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">
+                Continuer
+            </a>
         {% endif %}
 
     {% else %}
         <div class="alert alert-danger" role="status">
-            <p class="mb-0">L'agrément <strong>{{ approval.number|slice:12 }}</strong> est expiré depuis le {{ approval.end_at|date:"d/m/Y" }}. Vous ne pouvez pas le prolonger ou le suspendre.</p>
+            <p class="mb-0">L'agrément <strong>{{ approval.number }}</strong> est expiré depuis le {{ approval.end_at|date:"d/m/Y" }}. Vous ne pouvez pas le prolonger ou le suspendre.</p>
         </div>
         <p>
             S'il s'agit d'un nouveau contrat, vous pouvez solliciter <a href="{% url 'search:prescribers_home' %}" title="Solliciter un prescripteur habilité">un prescripteur habilité</a> pour qu'il puisse vous orienter le candidat.
