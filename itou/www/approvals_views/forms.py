@@ -217,15 +217,12 @@ class SuspensionForm(forms.ModelForm):
 
 
 class PoleEmploiApprovalSearchForm(forms.Form):
-    """
-    Search for a PoleEmploiApproval by number
-    """
 
     number = forms.CharField(
         label="Numéro",
         required=True,
         min_length=12,
-        max_length=15,
+        max_length=12,
         strip=True,
         help_text=("Le numéro d'agrément est composé de 12 chiffres (ex. 123456789012)."),
     )
