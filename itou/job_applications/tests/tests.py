@@ -1132,7 +1132,7 @@ class JobApplicationWorkflowTest(TestCase):
         When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
         """
         job_seeker = JobSeekerFactory(
-            pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
@@ -1148,6 +1148,51 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertIn("PASS IAE requis sur Itou", mail.outbox[1].subject)
         # no approval, so no notification sent to pole emploi
         notify_mock.assert_not_called()
+
+    def test_accept_job_application_sent_by_job_seeker_with_a_nir_no_pe_approval(self, notify_mock):
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="",
+        )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertIsNotNone(job_application.approval)
+        self.assertEqual(job_application.approval_delivery_mode, JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("PASS IAE pour ", mail.outbox[1].subject)
+        notify_mock.assert_called()
+
+    def test_accept_job_application_sent_by_job_seeker_with_a_pole_emploi_id_no_pe_approval(self, notify_mock):
+        job_seeker = JobSeekerFactory(
+            nir="",
+        )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertIsNotNone(job_application.approval)
+        self.assertEqual(job_application.approval_delivery_mode, JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("PASS IAE pour ", mail.outbox[1].subject)
+        notify_mock.assert_called()
+
+    def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(self, notify_mock):
+        job_seeker = JobSeekerFactory(
+            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_NOT_REGISTERED
+        )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertIsNotNone(job_application.approval)
+        self.assertEqual(job_application.approval_delivery_mode, JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("PASS IAE pour ", mail.outbox[1].subject)
+        notify_mock.assert_called()
 
     def test_accept_job_application_sent_by_prescriber(self, notify_mock):
         """
