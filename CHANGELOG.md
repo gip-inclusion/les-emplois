@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## [47] - 2022-07-29
+
+### Ajouté
+- Affichage (puis suppression une semaine plus tard) d'un message informatif concernant l'indisponibilité des fiches salariés.
+- Ajout d'un message d'alerte lors d'une suspension pour indiquer la possibilité qu'elle soit levée.
+- Ajout d'une option de « preflight » pour les _management commands_ des fiches salarié.
+- Ajout du lien vers le formulaire de suspension pour les prescripteurs habilités.
+- Ajout de trois champs au CSV `hard_duplicates_{env}` : NIR, date de naissance et lien vers les candidatures de moins de trois mois.
+- API : ajout des données « PrescriberOrganization » à la vue d'API pour data.inclusion.
+
+
+### Modifié
+- Inclusion Connect : correction d'un bug qui empêchait la déconnexion.
+- Correction d'erreurs pickle récurrentes qui déstabilisaient la CI.
+- Montée de version de Python vers la 3.10 dans tous nos environnements et mise à jour des dépendances.
+- La vérification du NIR pendant le parcours de candidature ne prend plus en compte la casse pour éviter de créer des doublons.
+- Mise à jour du message envoyé au prescripteur quand une demande de prolongation est faite.
+- Mise à jour de la librairie `django-extensions-plus` en local pour corriger un bug apparu avec Python 3.10.
+- Correction d'un bug : affichage sur le tableau de bord des prescripteur des candidatures masquées par l'employeur.
+- Import SIAE : résolution d'un bug (structure active mais dont le conventionnement a été soudainement retiré).
+
 ## [46] - 2022-07-15
 
 ### Ajouté
