@@ -18,7 +18,7 @@
 - La vérification du NIR pendant le parcours de candidature ne prend plus en compte la casse pour éviter de créer des doublons.
 - Mise à jour du message envoyé au prescripteur quand une demande de prolongation est faite.
 - Mise à jour de la librairie `django-extensions-plus` en local pour corriger un bug apparu avec Python 3.10.
-- Correction d'un bug : affichage sur le tableau de bord des prescripteur des candidatures masquées par l'employeur.
+- Correction d'un bug : affichage sur le tableau de bord des prescripteurs des candidatures masquées par l'employeur.
 - Import SIAE : résolution d'un bug (structure active mais dont le conventionnement a été soudainement retiré).
 
 ## [46] - 2022-07-15
