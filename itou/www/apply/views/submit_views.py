@@ -184,16 +184,16 @@ class StartView(ApplyStepBaseView):
         )
         # Warn message if prescriber's authorization is pending
         if user_info.prescriber_organization and user_info.prescriber_organization.has_pending_authorization():
-            return HttpResponseRedirect(reverse("apply:step_pending_authorization", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse("apply:pending_authorization_for_sender", kwargs={"siae_pk": self.siae.pk})
+            )
 
         tunnel = "job_seeker" if user_info.user.is_job_seeker else "sender"
         return HttpResponseRedirect(reverse(f"apply:check_nir_for_{tunnel}", kwargs={"siae_pk": self.siae.pk}))
 
 
-@login_required
-@valid_session_required(["siae_pk"])
-def step_pending_authorization(request, siae_pk, template_name="apply/submit_step_pending_authorization.html"):
-    return render(request, template_name, {"siae_pk": siae_pk})
+class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
+    template_name = "apply/submit_step_pending_authorization.html"
 
 
 class CheckNIRForJobSeekerView(ApplyStepForJobSeekerBaseView):

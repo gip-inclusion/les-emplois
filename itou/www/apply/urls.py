@@ -10,12 +10,12 @@ urlpatterns = [
     # Submit.
     path("<int:siae_pk>/start", submit_views.StartView.as_view(), name="start"),
     # Submit - sender.
-    path("<int:siae_pk>/sender/check_nir", submit_views.CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
     path(
-        "<int:siae_pk>/step_pending_authorization",
-        submit_views.step_pending_authorization,
-        name="step_pending_authorization",
+        "<int:siae_pk>/sender/pending_authorization",
+        submit_views.PendingAuthorizationForSender.as_view(),
+        name="pending_authorization_for_sender",
     ),
+    path("<int:siae_pk>/sender/check_nir", submit_views.CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
     # Submit - job seeker.
     path(
         "<int:siae_pk>/job_seeker/check_nir",

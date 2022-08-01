@@ -310,7 +310,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_pending_authorization", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:pending_authorization_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step show warning message about pending authorization.
