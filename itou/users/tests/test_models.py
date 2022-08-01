@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import json
 import uuid
 from unittest import mock
@@ -601,6 +602,17 @@ class ModelTest(TestCase):
         user = institution.members.get()
         self.assertFalse(user.can_view_stats_dgefp(current_org=institution))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=institution))
+
+    def test_a_user_can_only_have_one_kind(self):
+        unique_fields = ["is_job_seeker", "is_prescriber", "is_siae_staff", "is_labor_inspector"]
+
+        for field in unique_fields:
+            UserFactory(**{field: True})
+
+        for n in range(2, 5):
+            for fields in itertools.combinations(unique_fields, n):
+                with self.assertRaises(ValidationError):
+                    UserFactory(**dict(zip(fields, itertools.repeat(True))))
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):

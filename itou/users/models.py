@@ -297,6 +297,12 @@ class User(AbstractUser, AddressMixin):
         # Update department from postal code (if possible).
         self.department = department_from_postcode(self.post_code)
         self.validate_unique()
+
+        # TODO(rsebille): Replace by a UniqueConstraint once the data have been cleaned
+        user_kinds = [self.is_job_seeker, self.is_prescriber, self.is_siae_staff, self.is_labor_inspector]
+        if user_kinds.count(True) > 1:
+            raise ValidationError("A User can not have more than one kind")
+
         super().save(*args, **kwargs)
 
     def can_edit_email(self, user):
