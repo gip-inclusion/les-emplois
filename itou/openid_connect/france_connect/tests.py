@@ -11,6 +11,7 @@ from itou.users.enums import IdentityProvider
 from itou.users.factories import UserFactory
 from itou.users.models import User
 
+from ..models import TooManyKindsException
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
@@ -37,7 +38,7 @@ FC_USERINFO = {
 
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
-def mock_oauth_dance(test_class):
+def mock_oauth_dance(test_class, expected_route="dashboard:index"):
     # No session is created with France Connect in contrary to Inclusion Connect
     # so there's no use to go through france_connect:authorize
 
@@ -50,7 +51,7 @@ def mock_oauth_dance(test_class):
     csrf_signed = FranceConnectState.create_signed_csrf_token()
     url = reverse("france_connect:callback")
     response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
-    test_class.assertRedirects(response, reverse("dashboard:index"))
+    test_class.assertRedirects(response, reverse(expected_route))
 
 
 class FranceConnectTest(TestCase):
@@ -222,6 +223,17 @@ class FranceConnectTest(TestCase):
         self.assertFalse(user.external_data_source_history)
         self.assertNotEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
 
+    def test_create_or_update_user_raise_too_many_kind_exception(self):
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+
+        for field in ["is_prescriber", "is_siae_staff", "is_labor_inspector"]:
+            user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, **{field: True})
+
+            with self.assertRaises(TooManyKindsException):
+                fc_user_data.create_or_update_user()
+
+            user.delete()
+
     def test_callback_no_code(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url)
@@ -247,6 +259,15 @@ class FranceConnectTest(TestCase):
         self.assertEqual(user.username, FC_USERINFO["sub"])
         self.assertTrue(user.has_sso_provider)
         self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+
+    @respx.mock
+    def test_callback_redirect_on_too_many_kind_exception(self):
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+
+        for field in ["is_prescriber", "is_siae_staff", "is_labor_inspector"]:
+            user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, **{field: True})
+            mock_oauth_dance(self, expected_route=f"login:{field[3:]}")
+            user.delete()
 
     def test_logout_no_id_token(self):
         url = reverse("france_connect:logout")

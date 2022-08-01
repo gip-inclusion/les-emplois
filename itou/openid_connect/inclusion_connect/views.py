@@ -17,6 +17,7 @@ from itou.users.enums import KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils.urls import get_absolute_url
 
+from ..models import TooManyKindsException
 from . import constants
 from .models import InclusionConnectState, InclusionConnectUserData
 
@@ -177,7 +178,17 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(logout_url_params)}"
         return HttpResponseRedirect(next_url)
 
-    user, _ = ic_user_data.create_or_update_user()
+    try:
+        user, _ = ic_user_data.create_or_update_user()
+    except TooManyKindsException as e:
+        messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
+        if e.user.is_job_seeker:
+            return HttpResponseRedirect(reverse("login:job_seeker"))
+        if e.user.is_siae_staff:
+            return HttpResponseRedirect(reverse("login:siae_staff"))
+        if e.user.is_labor_inspector:
+            return HttpResponseRedirect(reverse("login:labor_inspector"))
+
     # Because we have more than one Authentication backend in our settings, we need to specify
     # the one we want to use in login
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")

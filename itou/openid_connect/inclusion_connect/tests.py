@@ -21,6 +21,7 @@ from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactor
 from itou.users.models import User
 
 from ..constants import OIDC_STATE_EXPIRATION
+from ..models import TooManyKindsException
 from . import constants
 from .models import InclusionConnectState, InclusionConnectUserData
 
@@ -36,7 +37,13 @@ OIDC_USERINFO = {
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
 def mock_oauth_dance(
-    test_class, previous_url=None, next_url=None, assert_redirects=True, login_hint=None, user_info_email=None
+    test_class,
+    previous_url=None,
+    next_url=None,
+    assert_redirects=True,
+    expected_route="welcoming_tour:index",
+    login_hint=None,
+    user_info_email=None,
 ):
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE).respond(302)
     # Authorize params depend on user kind.
@@ -67,7 +74,7 @@ def mock_oauth_dance(
     url = reverse("inclusion_connect:callback")
     response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
     if assert_redirects:
-        test_class.assertRedirects(response, reverse("welcoming_tour:index"))
+        test_class.assertRedirects(response, reverse(expected_route))
 
     return response
 
@@ -222,6 +229,17 @@ class InclusionConnectModelTest(TestCase):
         self.assertTrue(isinstance(csrf_signed, str))
         self.assertTrue(InclusionConnectState.is_valid(csrf_signed))
 
+    def test_create_or_update_user_raise_too_many_kind_exception(self):
+        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+
+        for field in ["is_job_seeker", "is_siae_staff", "is_labor_inspector"]:
+            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
+
+            with self.assertRaises(TooManyKindsException):
+                ic_user_data.create_or_update_user()
+
+            user.delete()
+
 
 class InclusionConnectViewTest(TestCase):
     def test_callback_invalid_state(self):
@@ -292,6 +310,15 @@ class InclusionConnectViewTest(TestCase):
         self.assertEqual(user.username, OIDC_USERINFO["sub"])
         self.assertTrue(user.has_sso_provider)
         self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
+
+    @respx.mock
+    def test_callback_redirect_on_too_many_kind_exception(self):
+        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+
+        for field in ["is_job_seeker", "is_siae_staff", "is_labor_inspector"]:
+            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
+            mock_oauth_dance(self, expected_route=f"login:{field[3:]}")
+            user.delete()
 
 
 class InclusionConnectSessionTest(TestCase):

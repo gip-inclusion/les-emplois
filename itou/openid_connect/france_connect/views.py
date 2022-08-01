@@ -12,6 +12,7 @@ from django.utils.http import urlencode
 
 from itou.utils.urls import get_absolute_url
 
+from ..models import TooManyKindsException
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
@@ -120,8 +121,17 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
 
     fc_user_data = FranceConnectUserData.from_user_info(user_data)
 
-    # At this step, we can update the user's fields in DB and create a session if required
-    user, _ = fc_user_data.create_or_update_user()
+    try:
+        # At this step, we can update the user's fields in DB and create a session if required
+        user, _ = fc_user_data.create_or_update_user()
+    except TooManyKindsException as e:
+        messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
+        if e.user.is_prescriber:
+            return HttpResponseRedirect(reverse("login:prescriber"))
+        if e.user.is_siae_staff:
+            return HttpResponseRedirect(reverse("login:siae_staff"))
+        if e.user.is_labor_inspector:
+            return HttpResponseRedirect(reverse("login:labor_inspector"))
 
     nir = request.session.get(settings.ITOU_SESSION_NIR_KEY)
     if nir:

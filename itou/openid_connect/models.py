@@ -11,6 +11,12 @@ from itou.users.models import User
 from .constants import OIDC_STATE_EXPIRATION
 
 
+class TooManyKindsException(Exception):
+    def __init__(self, user, *args):
+        self.user = user
+        super().__init__(*args)
+
+
 class OIDConnectQuerySet(models.QuerySet):
     def cleanup(self, at=None):
         at = at if at else timezone.now() - OIDC_STATE_EXPIRATION
@@ -114,6 +120,10 @@ class OIDConnectUserData:
         if not created:
             for key, value in user_data_dict.items():
                 setattr(user, key, value)
+
+        user_kinds = [user.is_job_seeker, user.is_prescriber, user.is_siae_staff, user.is_labor_inspector]
+        if user_kinds.count(True) > 1:
+            raise TooManyKindsException(user)
 
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
