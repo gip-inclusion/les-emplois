@@ -20,18 +20,18 @@ from itou.siaes.models import Siae
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup, get_safe_url
-from itou.www.apply.views import constants as apply_view_constants
 from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm, UserAddressForm
+from itou.www.apply.views import constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, ConfirmEligibilityForm
 
 
-def check_waiting_period(approvals_wrapper, job_application):
+def check_waiting_period(job_application):
     """
     This should be an edge case.
     An approval may expire between the time an application is sent and
     the time it is accepted.
     """
-    if approvals_wrapper.cannot_bypass_waiting_period(
+    if job_application.job_seeker.cannot_bypass_approval_waiting_period(
         siae=job_application.to_siae, sender_prescriber_organization=job_application.sender_prescriber_organization
     ):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
@@ -196,8 +196,7 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
 
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
-    approvals_wrapper = job_application.job_seeker.approvals_wrapper
-    check_waiting_period(approvals_wrapper, job_application)
+    check_waiting_period(job_application)
 
     form = AnswerForm(data=request.POST or None)
 
@@ -230,9 +229,8 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
-    approvals_wrapper = job_application.job_seeker.approvals_wrapper
-    check_waiting_period(approvals_wrapper, job_application)
-    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+    check_waiting_period(job_application)
+    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
     forms = []
 
@@ -367,9 +365,8 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     """
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
-    approvals_wrapper = job_application.job_seeker.approvals_wrapper
-    check_waiting_period(approvals_wrapper, job_application)
-    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+    check_waiting_period(job_application)
+    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
     if not job_application.can_be_cancelled:
         messages.error(request, "Vous ne pouvez pas annuler cette embauche.")

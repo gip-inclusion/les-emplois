@@ -609,20 +609,15 @@ class PoleEmploiApprovalManagerTest(TestCase):
         self.assertEqual(search_results.count(), 0)
 
 
-class ApprovalsWrapperTest(TestCase):
-    def get_approval_wrapper_in_waiting_period(self):
-        """
-        Helper method used by several tests below.
-        """
-        user = JobSeekerFactory()
-        end_at = timezone.now().date() - relativedelta(days=30)
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
-        approvals_wrapper = ApprovalsWrapper(user)
-        self.assertTrue(approvals_wrapper.has_in_waiting_period)
-        self.assertEqual(approvals_wrapper.latest_approval, approval)
-        return approvals_wrapper
+def user_with_approval_in_waiting_period():
+    user = JobSeekerFactory()
+    end_at = timezone.now().date() - relativedelta(days=30)
+    start_at = end_at - relativedelta(years=2)
+    ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+    return user
 
+
+class ApprovalsWrapperTest(TestCase):
     def test_merge_approvals_timeline_case1(self):
 
         user = JobSeekerFactory()
@@ -724,8 +719,8 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_approval_in_waiting_period(self):
-        approvals_wrapper = self.get_approval_wrapper_in_waiting_period()
-        self.assertFalse(approvals_wrapper.has_valid)
+        user = user_with_approval_in_waiting_period()
+        self.assertFalse(user.has_valid_approval)
 
     def test_status_approval_with_elapsed_waiting_period(self):
         user = JobSeekerFactory()
@@ -747,18 +742,18 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_cannot_bypass_waiting_period(self):
-        approvals_wrapper = self.get_approval_wrapper_in_waiting_period()
+        user = user_with_approval_in_waiting_period()
 
         # Waiting period cannot be bypassed for SIAE if no prescriber.
         self.assertTrue(
-            approvals_wrapper.cannot_bypass_waiting_period(
+            user.cannot_bypass_approval_waiting_period(
                 siae=SiaeFactory(kind=SiaeKind.ETTI), sender_prescriber_organization=None
             )
         )
 
         # Waiting period cannot be bypassed for SIAE if unauthorized prescriber.
         self.assertTrue(
-            approvals_wrapper.cannot_bypass_waiting_period(
+            user.cannot_bypass_approval_waiting_period(
                 siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=PrescriberOrganizationFactory(),
             )
@@ -766,7 +761,7 @@ class ApprovalsWrapperTest(TestCase):
 
         # Waiting period is bypassed for SIAE if authorized prescriber.
         self.assertFalse(
-            approvals_wrapper.cannot_bypass_waiting_period(
+            user.cannot_bypass_approval_waiting_period(
                 siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
             )
@@ -774,23 +769,23 @@ class ApprovalsWrapperTest(TestCase):
 
         # Waiting period is bypassed for GEIQ even if no prescriber.
         self.assertFalse(
-            approvals_wrapper.cannot_bypass_waiting_period(
+            user.cannot_bypass_approval_waiting_period(
                 siae=SiaeFactory(kind=SiaeKind.GEIQ), sender_prescriber_organization=None
             )
         )
 
         # Waiting period is bypassed for GEIQ even if unauthorized prescriber.
         self.assertFalse(
-            approvals_wrapper.cannot_bypass_waiting_period(
+            user.cannot_bypass_approval_waiting_period(
                 siae=SiaeFactory(kind=SiaeKind.GEIQ),
                 sender_prescriber_organization=PrescriberOrganizationFactory(),
             )
         )
 
         # Waiting period is bypassed if a valid diagnosis made by an authorized prescriber exists.
-        diag = EligibilityDiagnosisFactory(job_seeker=approvals_wrapper.user)
+        diag = EligibilityDiagnosisFactory(job_seeker=user)
         self.assertFalse(
-            approvals_wrapper.cannot_bypass_waiting_period(
+            user.cannot_bypass_approval_waiting_period(
                 siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=None,
             )
@@ -799,14 +794,13 @@ class ApprovalsWrapperTest(TestCase):
 
         # Waiting period cannot be bypassed if a valid diagnosis exists
         # but was not made by an authorized prescriber.
-        diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=approvals_wrapper.user)
+        diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=user)
         self.assertTrue(
-            approvals_wrapper.cannot_bypass_waiting_period(
+            user.cannot_bypass_approval_waiting_period(
                 siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=None,
             )
         )
-        diag.delete()
 
 
 class AutomaticApprovalAdminViewsTest(TestCase):

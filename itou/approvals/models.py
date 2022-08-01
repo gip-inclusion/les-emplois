@@ -1454,6 +1454,3 @@ class ApprovalsWrapper:
     @property
     def has_valid_pole_emploi_eligibility_diagnosis(self):
         return self.user.has_valid_pe_eligibility_diagnosis
-
-    def cannot_bypass_waiting_period(self, siae, sender_prescriber_organization):
-        return self.user.cannot_bypass_approval_waiting_period(siae, sender_prescriber_organization)
