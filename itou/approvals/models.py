@@ -122,10 +122,6 @@ class CommonApprovalQuerySet(models.QuerySet):
         return self.filter(Q(start_at__gt=now))
 
 
-class ApprovalAlreadyExistsError(Exception):
-    pass
-
-
 class PENotificationMixin(models.Model):
     pe_notification_status = models.CharField(
         verbose_name="Etat de la notification à PE",
@@ -428,28 +424,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     @staticmethod
     def get_default_end_date(start_at):
         return start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS) - relativedelta(days=1)
-
-    @classmethod
-    def get_or_create_from_valid(cls, approvals_wrapper):
-        """
-        Returns an existing valid Approval or create a new entry from
-        a pre-existing valid PoleEmploiApproval by copying its data.
-        """
-        approval = approvals_wrapper.latest_approval
-        if not approval.is_valid() or not isinstance(approval, (cls, PoleEmploiApproval)):
-            raise RuntimeError("Invalid approval.")
-        if isinstance(approval, cls):
-            return approval
-        if Approval.objects.filter(number=approval.number).exists():
-            raise ApprovalAlreadyExistsError()
-        approval_from_pe = cls(
-            start_at=approval.start_at,
-            end_at=approval.end_at,
-            user=approvals_wrapper.user,
-            number=approval.number,
-        )
-        approval_from_pe.save()
-        return approval_from_pe
 
     def notify_pole_emploi(self, at=None):
         # We do not send approvals that start in the future to PE, because their IS can't handle them.

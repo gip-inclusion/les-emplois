@@ -335,6 +335,7 @@ class ApprovalModelTest(TestCase):
         self.assertFalse(approval.is_open_to_prolongation)
 
     def test_get_or_create_from_valid(self):
+        # FIXME(vperron): This test should be moved to users.tests or jobseekerprofile.tests.
 
         # With an existing valid `PoleEmploiApproval`.
 
@@ -342,9 +343,7 @@ class ApprovalModelTest(TestCase):
         valid_pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, number="625741810182"
         )
-        approvals_wrapper = ApprovalsWrapper(user)
-
-        approval = Approval.get_or_create_from_valid(approvals_wrapper)
+        approval = user.get_or_create_approval()
 
         self.assertTrue(isinstance(approval, Approval))
         self.assertEqual(approval.start_at, valid_pe_approval.start_at)
@@ -357,9 +356,7 @@ class ApprovalModelTest(TestCase):
 
         user = JobSeekerFactory()
         valid_approval = ApprovalFactory(user=user, start_at=timezone.now().date() - relativedelta(days=1))
-        approvals_wrapper = ApprovalsWrapper(user)
-
-        approval = Approval.get_or_create_from_valid(approvals_wrapper)
+        approval = user.get_or_create_approval()
         self.assertTrue(isinstance(approval, Approval))
         self.assertEqual(approval, valid_approval)
 

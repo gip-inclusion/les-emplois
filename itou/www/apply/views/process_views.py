@@ -13,10 +13,10 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django_xworkflows import models as xwf_models
 
-from itou.approvals.models import ApprovalAlreadyExistsError
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
+from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup, get_safe_url
