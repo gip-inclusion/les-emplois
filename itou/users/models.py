@@ -37,6 +37,10 @@ from itou.utils.validators import validate_birthdate, validate_nir, validate_pol
 from .enums import IdentityProvider, Title
 
 
+class ApprovalAlreadyExistsError(Exception):
+    pass
+
+
 class ItouUserManager(UserManager):
     def get_duplicated_pole_emploi_ids(self):
         """
@@ -394,6 +398,28 @@ class User(AbstractUser, AddressMixin):
             and siae.is_subject_to_eligibility_rules
             and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
         )
+
+    def get_or_create_approval(self):
+        """
+        Returns an existing valid Approval or create a new entry from
+        a pre-existing valid PoleEmploiApproval by copying its data.
+        """
+        # FIXME(vperron): move this method and all the other approval-related code to JobSeekerProfile.
+        if not self.has_valid_approval or self.has_no_approval:
+            raise RuntimeError("Invalid PE approval.")
+        if self.latest_approval and self.latest_approval.is_valid():
+            return self.latest_approval
+        pe_approval = self.latest_pe_approval
+        if Approval.objects.filter(number=pe_approval.number).exists():
+            raise ApprovalAlreadyExistsError()
+        approval_from_pe = Approval(
+            start_at=pe_approval.start_at,
+            end_at=pe_approval.end_at,
+            user=self,
+            number=pe_approval.number,
+        )
+        approval_from_pe.save()
+        return approval_from_pe
 
     @property
     def is_handled_by_proxy(self):
