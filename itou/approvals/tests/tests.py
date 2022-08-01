@@ -610,10 +610,6 @@ class PoleEmploiApprovalManagerTest(TestCase):
 
 
 class ApprovalsWrapperTest(TestCase):
-    """
-    Test ApprovalsWrapper.
-    """
-
     def get_approval_wrapper_in_waiting_period(self):
         """
         Helper method used by several tests below.
@@ -631,8 +627,7 @@ class ApprovalsWrapperTest(TestCase):
 
         user = JobSeekerFactory()
 
-        # Approval.
-        approval = ApprovalFactory(user=user, start_at=datetime.date(2016, 12, 20), end_at=datetime.date(2018, 12, 20))
+        ApprovalFactory(user=user, start_at=datetime.date(2016, 12, 20), end_at=datetime.date(2018, 12, 20))
 
         # PoleEmploiApproval 1.
         pe_approval_1 = PoleEmploiApprovalFactory(
@@ -645,7 +640,7 @@ class ApprovalsWrapperTest(TestCase):
         # PoleEmploiApproval 2.
         # Same `start_at` as PoleEmploiApproval 1.
         # But `end_at` earlier than PoleEmploiApproval 1.
-        pe_approval_2 = PoleEmploiApprovalFactory(
+        PoleEmploiApprovalFactory(
             pole_emploi_id=user.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=datetime.date(2018, 12, 20),
@@ -654,17 +649,14 @@ class ApprovalsWrapperTest(TestCase):
 
         # Check timeline.
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(len(approvals_wrapper.merged_approvals), 3)
-        self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval_1)
-        self.assertEqual(approvals_wrapper.merged_approvals[1], pe_approval_2)
-        self.assertEqual(approvals_wrapper.merged_approvals[2], approval)
+        self.assertEqual(approvals_wrapper.latest_approval, pe_approval_1)
 
     def test_merge_approvals_timeline_case2(self):
 
         user = JobSeekerFactory()
 
         # PoleEmploiApproval 1.
-        pe_approval_1 = PoleEmploiApprovalFactory(
+        PoleEmploiApprovalFactory(
             pole_emploi_id=user.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=datetime.date(2020, 3, 17),
@@ -683,14 +675,10 @@ class ApprovalsWrapperTest(TestCase):
 
         # Check timeline.
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(len(approvals_wrapper.merged_approvals), 2)
-        self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval_2)
-        self.assertEqual(approvals_wrapper.merged_approvals[1], pe_approval_1)
+        self.assertEqual(approvals_wrapper.latest_approval, pe_approval_2)
 
     def test_merge_approvals_discard_pe_approval_in_future(self):
-        """
-        We filter out the pole emploi approval with a starting date in the future
-        """
+        # FIXME(vperron): Remove this test, as pe_approvals in the future do not exist anymore
         user = JobSeekerFactory()
 
         start_at_in_the_future = timezone.now() + relativedelta(months=2)
@@ -715,8 +703,7 @@ class ApprovalsWrapperTest(TestCase):
 
         # Check that only one approval is taken into account
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(len(approvals_wrapper.merged_approvals), 1)
-        self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval_2)
+        self.assertEqual(approvals_wrapper.latest_approval, pe_approval_2)
 
     def test_merge_approvals_pass_and_pe_valid(self):
         user = JobSeekerFactory()
@@ -751,7 +738,7 @@ class ApprovalsWrapperTest(TestCase):
     def test_status_without_approval(self):
         user = JobSeekerFactory()
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
+        self.assertTrue(approvals_wrapper.has_none)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, None)
@@ -760,14 +747,12 @@ class ApprovalsWrapperTest(TestCase):
         user = JobSeekerFactory()
         approval = ApprovalFactory(user=user, start_at=timezone.now().date() - relativedelta(days=1))
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_approval_in_waiting_period(self):
         approvals_wrapper = self.get_approval_wrapper_in_waiting_period()
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.IN_WAITING_PERIOD)
         self.assertFalse(approvals_wrapper.has_valid)
 
     def test_status_approval_with_elapsed_waiting_period(self):
@@ -776,7 +761,7 @@ class ApprovalsWrapperTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
+        self.assertTrue(approvals_wrapper.has_none)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, None)
@@ -785,7 +770,6 @@ class ApprovalsWrapperTest(TestCase):
         user = JobSeekerFactory()
         approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
