@@ -10,7 +10,6 @@ from django.urls import resolve, reverse
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.approvals.models import ApprovalsWrapper
 from itou.asp.models import RSAAllocation
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City

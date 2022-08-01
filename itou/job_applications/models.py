@@ -825,16 +825,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Approval issuance logic.
         if not self.hiring_without_approval and self.to_siae.is_subject_to_eligibility_rules:
 
-            approvals_wrapper = self.job_seeker.approvals_wrapper
-
-            if approvals_wrapper.has_in_waiting_period:
-                if approvals_wrapper.cannot_bypass_waiting_period(
+            if self.job_seeker.has_approval_in_waiting_period:
+                if self.job_seeker.cannot_bypass_approval_waiting_period(
                     siae=self.to_siae, sender_prescriber_organization=self.sender_prescriber_organization
                 ):
                     # Security check: it's supposed to be blocked upstream.
                     raise xwf_models.AbortTransition("Job seeker has an approval in waiting period.")
 
-            if approvals_wrapper.has_valid:
+            if self.job_seeker.has_valid_approval:
                 # Automatically reuse an existing valid Itou or PE approval.
                 self.approval = Approval.get_or_create_from_valid(approvals_wrapper)
                 if self.approval.start_at > self.hiring_start_at:
@@ -842,7 +840,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     # the approval should start at the same time as most recent contract.
                     self.approval.update_start_date(new_start_date=self.hiring_start_at)
                 emails.append(self.email_deliver_approval(accepted_by))
-            elif (approvals_wrapper.has_none and (self.job_seeker.nir or self.job_seeker.pole_emploi_id)) or (
+            elif (self.job_seeker.has_no_approval and (self.job_seeker.nir or self.job_seeker.pole_emploi_id)) or (
                 self.job_seeker.pole_emploi_id
                 or self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_NOT_REGISTERED
             ):
