@@ -201,5 +201,5 @@ def format_region_and_department_for_matomo(department):
     formatted_department = format_department_for_matomo(department)
     region = DEPARTMENT_TO_REGION.get(department)
     formatted_region = format_region_for_matomo(region)
-    # E.g. `/stats/ddets/iae/Provence-Alpes-Cote-d-Azur/04---Alpes-de-Haute-Provence`
+    # E.g. `Provence-Alpes-Cote-d-Azur/04---Alpes-de-Haute-Provence`
     return f"{formatted_region}/{formatted_department}"
