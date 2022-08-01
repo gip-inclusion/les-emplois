@@ -1,6 +1,5 @@
 import datetime
 import logging
-import time
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -1458,86 +1457,28 @@ class ApprovalsWrapper:
 
     def __init__(self, user):
         self.user = user
-        self.latest_approval = None
-        self.merged_approvals = self._merge_approvals_for_user()
-        if not self.merged_approvals:
-            self.status = self.NONE_FOUND
-        else:
-            self.latest_approval = self.merged_approvals[0]
-            if self.latest_approval.is_valid():
-                self.status = self.VALID
-            elif self.latest_approval.waiting_period_has_elapsed:
-                # The `Période de carence` is over. A job seeker can get a new Approval.
-                self.latest_approval = None
-                self.status = self.NONE_FOUND
-            else:
-                self.status = self.IN_WAITING_PERIOD
 
-        # Only one of the following attributes can be True at a time.
-        self.has_none = self.status == self.NONE_FOUND
-        self.has_valid = self.status == self.VALID
-        self.has_in_waiting_period = self.status == self.IN_WAITING_PERIOD
+    @property
+    def latest_approval(self):
+        # this keeps the distinction since we want those functions to return either Approvals
+        # or PE Approvals, or it wouldn't be a very cool simplification...
+        return self.user.latest_approval or self.user.latest_pe_approval
 
-    def _merge_approvals_for_user(self):
-        """
-        Returns a list of merged unique `Approval` and `PoleEmploiApproval` objects.
-        """
-        approvals = Approval.objects.filter(user=self.user).order_by("-start_at")
+    @property
+    def has_valid(self):
+        return self.user.has_valid_approval
 
-        # If an ongoing PASS IAE exists, consider it's the latest valid approval
-        # even if a PoleEmploiApproval is more recent.
-        if approvals.valid().exists():
-            return approvals
+    @property
+    def has_in_waiting_period(self):
+        return self.user.has_approval_in_waiting_period
 
-        today = datetime.date.today()
-        approvals_numbers = [approval.number for approval in approvals] if approvals else []
-
-        pe_approvals = (
-            PoleEmploiApproval.objects.find_for(self.user)
-            .filter(start_at__lte=today)
-            .exclude(number__in=approvals_numbers)
-        )
-
-        merged_approvals = list(approvals) + list(pe_approvals)
-        return self.sort_approvals(merged_approvals)
+    @property
+    def has_none(self):
+        return self.user.has_no_approval
 
     @property
     def has_valid_pole_emploi_eligibility_diagnosis(self):
-        """
-        The existence of a valid `PoleEmploiApproval` implies that a diagnosis
-        has been made outside of Itou.
-        """
-        return self.has_valid and not self.latest_approval.originates_from_itou
+        return self.user.has_valid_pe_eligibility_diagnosis
 
     def cannot_bypass_waiting_period(self, siae, sender_prescriber_organization):
-        """
-        An approval in waiting period can only be bypassed if the prescriber is authorized
-        or if the structure is not a SIAE.
-        """
-        is_sent_by_authorized_prescriber = (
-            sender_prescriber_organization is not None and sender_prescriber_organization.is_authorized
-        )
-
-        # Only diagnoses made by authorized prescribers are taken into account.
-        has_valid_diagnosis = self.user.has_valid_diagnosis()
-        return (
-            self.has_in_waiting_period
-            and siae.is_subject_to_eligibility_rules
-            and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
-        )
-
-    @staticmethod
-    def sort_approvals(common_approvals):
-        """
-        Returns a list of sorted approvals. The first one is the longest and the most recent.
-        ---
-        common_approvals: Queryset or list of Approval or PoleEmploiApproval objects.
-        """
-        approvals = list(common_approvals)
-        # Sort by the most distant `end_at`, then by the earliest `start_at`.
-        # This allows to always choose the longest and most recent approval.
-        # Dates are converted to timestamp so that the subtraction operator
-        # can be used in the lambda.
-        return sorted(
-            approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
-        )
+        return self.user.cannot_bypass_approval_waiting_period(siae, sender_prescriber_organization)

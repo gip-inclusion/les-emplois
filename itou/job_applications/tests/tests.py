@@ -1099,6 +1099,7 @@ class JobApplicationWorkflowTest(TestCase):
         When a Pôle emploi approval already exists, it is reused.
         Some Pole Emploi approvals have a starting date in the future, we discard them
         """
+        # FIXME(vperron): Remove this test, as pe_approvals in the future do not exist anymore
         hiring_start_at = datetime.date.today()
         start_at = datetime.date.today() + relativedelta(months=1)
         end_at = start_at + relativedelta(months=3)

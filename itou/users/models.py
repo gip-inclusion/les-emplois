@@ -1,3 +1,5 @@
+import datetime
+import time
 import uuid
 from collections import Counter
 
@@ -14,7 +16,7 @@ from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
-from itou.approvals.models import ApprovalsWrapper
+from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
     Commune,
@@ -120,6 +122,11 @@ class ItouUserManager(UserManager):
             del result[pe_id]
 
         return result
+
+
+@staticmethod
+def sort_longest_most_recent(approvals):
+    return sorted(approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple())))
 
 
 class User(AbstractUser, AddressMixin):
@@ -318,9 +325,80 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def approvals_wrapper(self):
+        # TODO(vperron): Remove me.
         if not self.is_job_seeker:
             return None
         return ApprovalsWrapper(self)
+
+    @cached_property
+    def latest_approval(self):
+        if not self.is_job_seeker:
+            return None
+        approvals = Approval.objects.filter(user=self).order_by("-start_at")
+        if not approvals:
+            return None
+        if approvals.valid().exists():
+            return approvals[0]
+        approval = sort_longest_most_recent(approvals)[0]
+        if approval.waiting_period_has_elapsed:
+            return None
+        return approval
+
+    @cached_property
+    def latest_pe_approval(self):
+        if not self.is_job_seeker:
+            return None
+        approval_numbers = Approval.objects.filter(user=self).values_list("number", flat=True)
+        pe_approvals = (
+            PoleEmploiApproval.objects.find_for(self)
+            # FIXME(vperron): We can safely remove this date check, no PE approval is concerned now.
+            .filter(start_at__lte=datetime.date.today()).exclude(number__in=approval_numbers)
+        )
+        if not pe_approvals:
+            return None
+        pe_approval = sort_longest_most_recent(pe_approvals)[0]
+        if pe_approval.waiting_period_has_elapsed:
+            return None
+        return pe_approval
+
+    @property
+    def has_valid_approval(self):
+        return (self.latest_approval and self.latest_approval.is_valid()) or (
+            self.latest_pe_approval and self.latest_pe_approval.is_valid()
+        )
+
+    @property
+    def has_approval_in_waiting_period(self):
+        return (self.latest_approval and not self.latest_approval.is_valid()) or (
+            self.latest_pe_approval and not self.latest_pe_approval.is_valid()
+        )
+
+    @property
+    def has_no_approval(self):
+        return not self.latest_approval and not self.latest_pe_approval
+
+    @property
+    def has_valid_pe_eligibility_diagnosis(self):
+        return (
+            self.latest_approval and self.latest_approval.is_valid() and not self.latest_approval.originates_from_itou
+        )
+
+    def cannot_bypass_approval_waiting_period(self, siae, sender_prescriber_organization):
+        """
+        An approval in waiting period can only be bypassed if the prescriber is authorized
+        or if the structure is not a SIAE.
+        """
+        is_sent_by_authorized_prescriber = (
+            sender_prescriber_organization is not None and sender_prescriber_organization.is_authorized
+        )
+
+        # Only diagnoses made by authorized prescribers are taken into account.
+        has_valid_diagnosis = self.has_valid_diagnosis()
+        return (
+            self.has_approval_in_waiting_period
+            and siae.is_subject_to_eligibility_rules
+            and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
+        )
 
     @property
     def is_handled_by_proxy(self):
