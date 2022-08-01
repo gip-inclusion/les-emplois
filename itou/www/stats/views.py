@@ -112,6 +112,7 @@ def render_stats(request, context, params={}, template_name="stats/stats.html"):
     if "matomo_custom_url_suffix" in base_context:
         matomo_custom_url_suffix = base_context["matomo_custom_url_suffix"]
         del base_context["matomo_custom_url_suffix"]
+        # E.g. `/stats/ddets/iae/Provence-Alpes-Cote-d-Azur/04---Alpes-de-Haute-Provence`
         base_context["matomo_custom_url"] += f"/{matomo_custom_url_suffix}"
 
     return render(request, template_name, base_context)
