@@ -17,6 +17,7 @@ from itou.metabase.management.commands._database_tables import (
     switch_table_atomically,
 )
 from itou.siaes.management.commands._import_siae.utils import timeit
+from itou.siaes.models import Siae
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -191,6 +192,18 @@ def get_ai_stock_approval_pks():
 @lru_cache(maxsize=1)
 def get_ai_stock_job_seeker_pks():
     return _get_ai_stock_approvals().values_list("user_id", flat=True).distinct()
+
+
+@lru_cache(maxsize=1)
+def get_active_siae_pks():
+    """
+    Load once and for all the list of all active siae pks in memory and reuse them multiple times in various
+    queries to avoid additional joins of the SiaeConvention model and the non trivial use of the
+    `Siae.objects.active()` queryset on a related model of a queryset on another model. This is a list of less
+    than 10k integers thus should not use much memory. The end result being both simpler code
+    and better performance.
+    """
+    return [siae_pk for siae_pk in Siae.objects.active().values_list("pk", flat=True)]
 
 
 def chunked_queryset(queryset, chunk_size=10000):
