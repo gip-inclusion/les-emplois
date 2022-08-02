@@ -1,4 +1,3 @@
-import datetime
 import time
 import uuid
 from collections import Counter
@@ -349,11 +348,7 @@ class User(AbstractUser, AddressMixin):
         if not self.is_job_seeker:
             return None
         approval_numbers = Approval.objects.filter(user=self).values_list("number", flat=True)
-        pe_approvals = (
-            PoleEmploiApproval.objects.find_for(self)
-            # FIXME(vperron): We can safely remove this date check, no PE approval is concerned now.
-            .filter(start_at__lte=datetime.date.today()).exclude(number__in=approval_numbers)
-        )
+        pe_approvals = PoleEmploiApproval.objects.find_for(self).exclude(number__in=approval_numbers)
         if not pe_approvals:
             return None
         pe_approval = sort_longest_most_recent(pe_approvals)[0]
