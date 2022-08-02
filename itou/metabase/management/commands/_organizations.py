@@ -1,6 +1,7 @@
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
+    get_active_siae_pks,
     get_address_columns,
     get_choice,
     get_establishment_is_active_column,
@@ -34,30 +35,45 @@ def get_org_members_count(org):
     return org.members.count()
 
 
+def _get_ja_sent_by_prescribers_without_org():
+    return JobApplication.objects.filter(
+        created_from_pe_approval=False,
+        to_siae_id__in=get_active_siae_pks(),
+        sender_kind=SenderKind.PRESCRIBER,
+        sender_prescriber_organization=None,
+    )
+
+
+def _get_org_job_applications(org):
+    job_applications = list(org.jobapplication_set.all())
+    # We have to do all this in python to benefit from prefetch_related.
+    job_applications = [
+        ja
+        for ja in job_applications
+        if ja.created_from_pe_approval is False and ja.to_siae_id in get_active_siae_pks()
+    ]
+    return job_applications
+
+
 def get_org_job_applications_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         # Number of job applications made by prescribers without org.
-        return JobApplication.objects.filter(
-            sender_kind=SenderKind.PRESCRIBER, sender_prescriber_organization=None
-        ).count()
-    return org.jobapplication_set.count()
+        return _get_ja_sent_by_prescribers_without_org().count()
+    return len(_get_org_job_applications(org))
 
 
 def get_org_accepted_job_applications_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
-        return JobApplication.objects.filter(
-            sender_kind=SenderKind.PRESCRIBER,
-            sender_prescriber_organization=None,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
-        ).count()
-    job_applications = list(org.jobapplication_set.all())
-    # We have to do all this in python to benefit from prefetch_related.
-    return len([ja for ja in job_applications if ja.state == JobApplicationWorkflow.STATE_ACCEPTED])
+        return _get_ja_sent_by_prescribers_without_org().filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count()
+    job_applications = [
+        ja for ja in _get_org_job_applications(org) if ja.state == JobApplicationWorkflow.STATE_ACCEPTED
+    ]
+    return len(job_applications)
 
 
 def get_org_last_job_application_creation_date(org):
     if org != ORG_OF_PRESCRIBERS_WITHOUT_ORG:
-        job_applications = list(org.jobapplication_set.all())
+        job_applications = _get_org_job_applications(org)
         # We have to do all this in python to benefit from prefetch_related.
         if len(job_applications) >= 1:
             job_applications.sort(key=lambda o: o.created_at, reverse=True)
