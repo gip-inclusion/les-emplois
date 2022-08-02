@@ -35,6 +35,7 @@ from itou.www.apply.forms import (
     SubmitJobApplicationForm,
     UserExistsForm,
 )
+from itou.www.apply.views import constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
@@ -67,13 +68,17 @@ def get_approvals_wrapper(request, job_seeker, siae):
     """
     user_info = get_user_info(request)
     approvals_wrapper = job_seeker.approvals_wrapper
-
-    if approvals_wrapper.cannot_bypass_waiting_period(
+    if job_seeker.cannot_bypass_approval_waiting_period(
         siae=siae, sender_prescriber_organization=user_info.prescriber_organization
     ):
-        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
+        # NOTE(vperron): We're using PermissionDenied in order to display a message to the end user
+        # by reusing the 403 template and its logic. I'm not 100% sure that this is a good idea but,
+        # it's not too bad so far. I'd personnally would have raised a custom base error and caught it
+        # somewhere using a middleware to display an error page that is not linked to a 403.
         if user_info.user == job_seeker:
-            error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
+            error = apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
+        else:
+            error = apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
         raise PermissionDenied(error)
 
     if approvals_wrapper.has_valid and approvals_wrapper.latest_approval.is_pass_iae:

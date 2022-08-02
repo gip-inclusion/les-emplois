@@ -12,7 +12,6 @@ from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.safestring import mark_safe
 from unidecode import unidecode
 
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
@@ -21,7 +20,6 @@ from itou.siaes import enums as siae_enums
 from itou.utils.apis import enums as api_enums
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
 from itou.utils.models import DateRange
-from itou.utils.urls import get_external_link_markup
 from itou.utils.validators import alphanumeric, validate_siret
 
 
@@ -1431,29 +1429,6 @@ class ApprovalsWrapper:
     NONE_FOUND = "NONE_FOUND"
     VALID = "VALID"
     IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
-
-    # Error messages.
-    WAITING_PERIOD_DOC_LINK = get_external_link_markup(
-        url=f"{settings.ITOU_COMMUNITY_URL }/doc/emplois/derogation-au-delai-de-carence/",
-        text="En savoir plus sur la dérogation du délai de carence",
-    )
-    ERROR_CANNOT_OBTAIN_NEW_FOR_USER = mark_safe(
-        (
-            "Vous avez terminé un parcours il y a moins de deux ans.<br>"
-            "Pour prétendre à nouveau à un parcours en structure d'insertion "
-            "par l'activité économique vous devez rencontrer un prescripteur "
-            "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
-        )
-    )
-    ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY = mark_safe(
-        (
-            "Le candidat a terminé un parcours il y a moins de deux ans.<br>"
-            "Pour prétendre à nouveau à un parcours en structure d'insertion "
-            "par l'activité économique il doit rencontrer un prescripteur "
-            "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
-            f"<br>{WAITING_PERIOD_DOC_LINK}"  # Display doc link only for proxies.
-        )
-    )
 
     def __init__(self, user):
         self.user = user

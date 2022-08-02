@@ -20,6 +20,7 @@ from itou.siaes.models import Siae
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup, get_safe_url
+from itou.www.apply.views import constants as apply_view_constants
 from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm, UserAddressForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, ConfirmEligibilityForm
 
@@ -33,8 +34,7 @@ def check_waiting_period(approvals_wrapper, job_application):
     if approvals_wrapper.cannot_bypass_waiting_period(
         siae=job_application.to_siae, sender_prescriber_organization=job_application.sender_prescriber_organization
     ):
-        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
-        raise PermissionDenied(error)
+        raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
 
 
 @login_required

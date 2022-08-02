@@ -267,7 +267,7 @@ class ApplyAsJobSeekerTest(TestCase):
 
             # …until the expected 403.
             self.assertEqual(response.status_code, 403)
-            self.assertEqual(response.context["exception"], ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER)
+            self.assertIn("Vous avez terminé un parcours", response.context["exception"])
             last_url = response.redirect_chain[-1][0]
             self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
@@ -1159,7 +1159,7 @@ class ApplyAsPrescriberTest(TestCase):
 
         # …until the expected 403.
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.context["exception"], ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
+        self.assertIn("Le candidat a terminé un parcours", response.context["exception"])
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
@@ -1563,7 +1563,7 @@ class ApplyAsSiaeTest(TestCase):
 
         # …until the expected 403.
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.context["exception"], ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
+        self.assertIn("Le candidat a terminé un parcours", response.context["exception"])
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
