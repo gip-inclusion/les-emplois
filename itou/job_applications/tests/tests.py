@@ -1094,42 +1094,6 @@ class JobApplicationWorkflowTest(TestCase):
         # Approval delivered -> Pole Emploi is notified
         notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_in_the_future(
-        self, notify_mock
-    ):
-        """
-        When a Pôle emploi approval already exists, it is reused.
-        Some Pole Emploi approvals have a starting date in the future, we discard them
-        """
-        # FIXME(vperron): Remove this test, as pe_approvals in the future do not exist anymore
-        hiring_start_at = datetime.date.today()
-        start_at = datetime.date.today() + relativedelta(months=1)
-        end_at = start_at + relativedelta(months=3)
-
-        job_seeker = JobSeekerFactory()
-        pe_approval = PoleEmploiApprovalFactory(
-            start_at=start_at,
-            end_at=end_at,
-            pole_emploi_id=job_seeker.pole_emploi_id,
-            birthdate=job_seeker.birthdate,
-        )
-        job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING, hiring_start_at=hiring_start_at
-        )
-        # the job application can be accepted but the approval is not attached to the PE approval
-        job_application.accept(user=job_application.to_siae.members.first())
-        self.assertIsNotNone(job_application.approval)
-        self.assertNotEqual(job_application.approval.number, pe_approval.number[0:12])
-        pe_approval.refresh_from_db()
-        # The job application is accepted
-        self.assertTrue(job_application.state.is_accepted)
-        # The Pole emploi approval is not updated
-        self.assertNotEqual(hiring_start_at, pe_approval.start_at)
-        # The job application is accepted, with an approval with the requested hiring start date
-        self.assertEqual(hiring_start_at, job_application.approval.start_at)
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
-
     def test_accept_job_application_sent_by_job_seeker_with_forgotten_pole_emploi_id(self, notify_mock):
         """
         When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
