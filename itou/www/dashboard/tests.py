@@ -18,6 +18,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.prescribers import factories as prescribers_factories
+from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import (
@@ -230,6 +231,41 @@ class DashboardViewTest(TestCase):
         EvaluatedSiaeFactory(siae=siae, evaluation_campaign__evaluations_asked_at=fake_now)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
+
+    def test_dashboard_prescriber_suspend_link(self):
+
+        user = JobSeekerFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Suspendre un PASS IAE")
+
+        siae = SiaeFactory(with_membership=True)
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Suspendre un PASS IAE")
+
+        membershipfactory = InstitutionMembershipFactory()
+        user = membershipfactory.user
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Suspendre un PASS IAE")
+
+        prescriber_org = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
+            kind=PrescriberOrganization.Kind.CAP_EMPLOI
+        )
+        prescriber = prescriber_org.members.first()
+        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Suspendre un PASS IAE")
+
+        prescriber_org_pe = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
+            kind=PrescriberOrganization.Kind.PE
+        )
+        prescriber_pe = prescriber_org_pe.members.first()
+        self.client.login(username=prescriber_pe.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Suspendre un PASS IAE")
 
 
 class EditUserInfoViewTest(TestCase):
