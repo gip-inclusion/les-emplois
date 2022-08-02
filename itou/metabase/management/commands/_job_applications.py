@@ -6,6 +6,7 @@ from itou.metabase.management.commands._utils import (
     get_choice,
     get_department_and_region_columns,
 )
+from itou.prescribers.models import PrescriberOrganization
 
 
 JOB_APPLICATION_PK_ANONYMIZATION_SALT = "job_application.id"
@@ -66,6 +67,13 @@ def get_ja_sender_organization_name(ja):
 def get_ja_sender_organization_safir(ja):
     if ja.sender_prescriber_organization:
         return ja.sender_prescriber_organization.code_safir_pole_emploi
+    return None
+
+
+def get_ja_sender_full_name_if_pe(ja):
+    org = ja.sender_prescriber_organization
+    if org and org.kind == PrescriberOrganization.Kind.PE:
+        return f"{ja.sender.last_name.upper()} {ja.sender.first_name}"
     return None
 
 
@@ -225,6 +233,12 @@ TABLE_COLUMNS += [
         "fn": get_ja_sender_organization_safir,
     },
     {
+        "name": "nom_prénom_conseiller_pe",
+        "type": "varchar",
+        "comment": "Nom prénom du conseiller PE",
+        "fn": get_ja_sender_full_name_if_pe,
+    },
+    {
         "name": "date_embauche",
         "type": "date",
         "comment": "Date embauche le cas échéant",
@@ -235,5 +249,11 @@ TABLE_COLUMNS += [
         "type": "boolean",
         "comment": "Provient des injections AI",
         "fn": lambda o: o.approval.pk in get_ai_stock_approval_pks() if o.approval else False,
+    },
+    {
+        "name": "mode_attribution_pass_iae",
+        "type": "varchar",
+        "comment": "Mode d''attribution du PASS IAE",
+        "fn": lambda o: o.get_approval_delivery_mode_display(),
     },
 ]
