@@ -30,7 +30,7 @@ fi
 ORGANIZATION_NAME=Itou
 IMPORT_APP_NAME=c1-imports-$(date +%y-%m-%d-%Hh-%M)
 DEPLOY_BRANCH=master_clever
-CC_PYTHON_VERSION=3.9
+CC_PYTHON_VERSION=3.10
 
 clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
 # Create a new application on Clever Cloud.
