@@ -77,3 +77,7 @@ class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
     is_authorized = True
     kind = PrescriberOrganizationKind.PE
     authorization_status = PrescriberAuthorizationStatus.VALIDATED
+
+
+class PrescriberPoleEmploiWithMembershipFactory(PrescriberPoleEmploiFactory):
+    membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")

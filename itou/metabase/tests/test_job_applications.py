@@ -1,31 +1,51 @@
 from django.test import TestCase
 
 from itou.job_applications.enums import RefusalReason
-from itou.job_applications.factories import JobApplicationFactory
+from itou.job_applications.factories import (
+    JobApplicationFactory,
+    JobApplicationSentByPrescriberOrganizationFactory,
+    JobApplicationSentByPrescriberPoleEmploiFactory,
+)
 from itou.metabase.management.commands import _job_applications
+from itou.metabase.tests._utils import get_fn_by_name
+from itou.prescribers.models import PrescriberOrganization
+
+
+def get_result(name, value):
+    return get_fn_by_name(name, module=_job_applications)(value)
 
 
 class MetabaseJobApplicationTest(TestCase):
-    def get_fn_by_name(self, name):
-        columns = _job_applications.TABLE_COLUMNS
-        matching_columns = [c for c in columns if c["name"] == name]
-        self.assertEqual(len(matching_columns), 1)
-        fn = matching_columns[0]["fn"]
-        return fn
-
     def test_refusal_reason_old_value(self):
-        fn = self.get_fn_by_name("motif_de_refus")
         ja = JobApplicationFactory(refusal_reason=RefusalReason.ELIGIBILITY_DOUBT.value)
         self.assertIn(ja.refusal_reason, RefusalReason.hidden())
-        self.assertEqual(fn(ja), ja.get_refusal_reason_display())
+        self.assertEqual(get_result(name="motif_de_refus", value=ja), ja.get_refusal_reason_display())
 
     def test_refusal_reason_current_value(self):
-        fn = self.get_fn_by_name("motif_de_refus")
         ja = JobApplicationFactory(refusal_reason=RefusalReason.DID_NOT_COME.value)
         self.assertNotIn(ja.refusal_reason, RefusalReason.hidden())
-        self.assertEqual(fn(ja), ja.get_refusal_reason_display())
+        self.assertEqual(get_result(name="motif_de_refus", value=ja), ja.get_refusal_reason_display())
 
     def test_refusal_reason_empty_value(self):
-        fn = self.get_fn_by_name("motif_de_refus")
         ja = JobApplicationFactory(refusal_reason="")
-        self.assertEqual(fn(ja), None)
+        self.assertEqual(get_result(name="motif_de_refus", value=ja), None)
+
+    def test_ja_sent_by_pe(self):
+        ja = JobApplicationSentByPrescriberPoleEmploiFactory()
+        self.assertEqual(
+            get_result(name="nom_prénom_conseiller_pe", value=ja),
+            f"{ja.sender.last_name.upper()} {ja.sender.first_name}",
+        )
+        self.assertEqual(
+            get_result(name="safir_org_prescripteur", value=ja),
+            ja.sender_prescriber_organization.code_safir_pole_emploi,
+        )
+        self.assertEqual(len(ja.sender_prescriber_organization.code_safir_pole_emploi), 5)
+
+    def test_ja_sent_by_non_pe_prescriber_organization(self):
+        ja = JobApplicationSentByPrescriberOrganizationFactory(
+            sender_prescriber_organization__kind=PrescriberOrganization.Kind.CHRS
+        )
+        self.assertNotEqual(ja.sender_prescriber_organization.kind, PrescriberOrganization.Kind.PE)
+        self.assertEqual(get_result(name="nom_prénom_conseiller_pe", value=ja), None)
+        self.assertEqual(get_result(name="safir_org_prescripteur", value=ja), None)

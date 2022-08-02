@@ -306,7 +306,7 @@ class Command(BaseCommand):
         """
         queryset = (
             JobApplication.objects.select_related(
-                "to_siae", "sender_siae", "sender_prescriber_organization", "approval"
+                "to_siae", "sender", "sender_siae", "sender_prescriber_organization", "approval"
             )
             .prefetch_related("logs")
             .filter(created_from_pe_approval=False, to_siae_id__in=get_active_siae_pks())
