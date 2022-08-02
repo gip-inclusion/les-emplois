@@ -12,6 +12,11 @@ class PEAMUOAuth2Client(OAuth2Client):
     (╯°□°)╯︵ ┻━┻
     """
 
+    class NoAccessToken(OAuth2Error):
+        def __init__(self, response, *args: object):
+            self.response = response
+            super().__init__(*args)
+
     def get_access_token(self, code):
         """
         This whole method is unchanged except for the
@@ -49,5 +54,5 @@ class PEAMUOAuth2Client(OAuth2Client):
             else:
                 access_token = dict(parse_qsl(resp.text))
         if not access_token or "access_token" not in access_token:
-            raise OAuth2Error("Error retrieving access token: %s" % resp.content)
+            raise PEAMUOAuth2Client.NoAccessToken(resp)
         return access_token

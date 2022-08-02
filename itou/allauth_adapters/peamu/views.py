@@ -81,6 +81,13 @@ class PEAMUOAuth2CallbackView(OAuth2CallbackView):
             else:
                 login.state = SocialLogin.unstash_state(request)
             return complete_social_login(request, login)
+        except client.NoAccessToken as e:
+            logger.warning(
+                "Error retrieving access token: status=%s content=%s",
+                e.response.status_code,
+                e.response.content,
+            )
+            return render_authentication_error(request, self.adapter.provider_id, exception=e)
         except (PermissionDenied, OAuth2Error, RequestException, ProviderException) as e:
             logger.error("Unknown error in PEAMU dispatch with exception '%s'.", e)
             return render_authentication_error(request, self.adapter.provider_id, exception=e)
