@@ -464,7 +464,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": "",
+            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
         }
         self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
 
@@ -678,7 +678,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": "",
+            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
         }
         self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
 
@@ -1044,7 +1044,7 @@ class ApplyAsPrescriberTest(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": "",
+            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
         }
         self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
 
@@ -1455,7 +1455,7 @@ class ApplyAsSiaeTest(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": "",
+            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
         }
         self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
 

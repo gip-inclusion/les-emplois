@@ -239,7 +239,7 @@ class CreateJobSeekerStep3ForSenderForm(forms.ModelForm):
         else:
             self.cleaned_data["pole_emploi_id_forgotten"] = ""
             self.cleaned_data["pole_emploi_id"] = ""
-            self.cleaned_data["lack_of_pole_emploi_id_reason"] = ""
+            self.cleaned_data["lack_of_pole_emploi_id_reason"] = User.REASON_NOT_REGISTERED
 
         # Handle RSA extra fields
         if self.cleaned_data["rsa_allocation"]:
