@@ -619,44 +619,55 @@ class CheckJobSeekerInformations(ApplyStepBaseView):
         }
 
 
-@login_required
-@valid_session_required(["siae_pk"])
-def step_check_prev_applications(request, siae_pk, template_name="apply/submit_step_check_prev_applications.html"):
+class CheckPreviousApplications(ApplyStepBaseView):
     """
     Check previous job applications to avoid duplicates.
     """
-    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
-    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
-    job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
-    _check_job_seeker_approval(request, job_seeker, siae)
-    prev_applications = job_seeker.job_applications.filter(to_siae=siae)
 
-    # Limit the possibility of applying to the same SIAE for 24 hours.
-    if not request.user.is_siae_staff and prev_applications.created_in_past(hours=24).exists():
-        if request.user == job_seeker:
-            msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
-        else:
-            msg = "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
-        raise PermissionDenied(msg)
+    template_name = "apply/submit_step_check_prev_applications.html"
+    required_session_namespaces = ["apply_session"]
 
-    next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+    def __init__(self):
+        super().__init__()
 
-    if not prev_applications.exists():
-        return HttpResponseRedirect(next_url)
+        self.job_seeker = None
+        self.approvals_wrapper = None
+        self.previous_applications = None
 
-    # At this point we know that the candidate is applying to an SIAE
-    # where he or she has already applied.
-    # Allow a new job application if the user confirm it despite the
-    # duplication warning.
-    if request.method == "POST" and request.POST.get("force_new_application") == "force":
-        return HttpResponseRedirect(next_url)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
 
-    context = {
-        "job_seeker": job_seeker,
-        "siae": siae,
-        "prev_application": prev_applications.latest("created_at"),
-    }
-    return render(request, template_name, context)
+        self.job_seeker = get_object_or_404(User, pk=self.apply_session.get("job_seeker_pk"))
+        _check_job_seeker_approval(request, self.job_seeker, self.siae)
+        self.previous_applications = self.job_seeker.job_applications.filter(to_siae=self.siae)
+
+    def get(self, request, *args, **kwargs):
+        if not self.previous_applications.exists():
+            return HttpResponseRedirect(reverse("apply:step_eligibility", kwargs={"siae_pk": self.siae.pk}))
+
+        # Limit the possibility of applying to the same SIAE for 24 hours.
+        if not request.user.is_siae_staff and self.previous_applications.created_in_past(hours=24).exists():
+            if request.user == self.job_seeker:
+                msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
+            else:
+                msg = "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
+            raise PermissionDenied(msg)
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # At this point we know that the candidate is applying to an SIAE where he or she has already applied.
+        # Allow a new job application if the user confirm it despite the duplication warning.
+        if request.POST.get("force_new_application") == "force":
+            return HttpResponseRedirect(reverse("apply:step_eligibility", kwargs={"siae_pk": self.siae.pk}))
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_seeker": self.job_seeker,
+            "prev_application": self.previous_applications.latest("created_at"),
+        }
 
 
 @login_required
