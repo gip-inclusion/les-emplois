@@ -215,8 +215,8 @@ class PoleEmploiApprovalCreateTest(TestCase):
 
         new_user = User.objects.get(email=email)
 
-        self.assertTrue(new_user.approvals_wrapper.has_valid)
-        self.assertEqual(new_user.approvals_wrapper.latest_approval.number, self.pe_approval.number[:12])
+        self.assertTrue(new_user.has_valid_approval)
+        self.assertEqual(new_user.latest_approval.number, self.pe_approval.number)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(new_user.last_accepted_job_application is not None)
         next_url = reverse(
@@ -271,7 +271,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         """
         When an existing user already has a valid approval, it is not possible to import a Pole Emploi Approval
         """
-        self.assertTrue(self.job_seeker.approvals_wrapper.has_valid)
+        self.assertTrue(self.job_seeker.has_valid_approval)
 
         initial_approval_count = Approval.objects.count()
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)

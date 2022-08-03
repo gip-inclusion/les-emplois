@@ -312,7 +312,7 @@ def pe_approval_create(request, pe_approval_id):
         return HttpResponseRedirect(next_url)
 
     # It is not possible to attach an approval to a job seeker that already has a valid approval.
-    if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
+    if job_seeker.latest_approval and job_seeker.latest_approval.is_valid():
         messages.error(request, "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide.")
         next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
