@@ -60,7 +60,7 @@ def valid_session_required(required_keys=None):
     return wrapper
 
 
-def check_job_seeker_approvals(request, job_seeker, siae):
+def _check_job_seeker_approval(request, job_seeker, siae):
     user_info = get_user_info(request)
     if job_seeker.cannot_bypass_approval_waiting_period(
         siae=siae, sender_prescriber_organization=user_info.prescriber_organization
@@ -580,7 +580,7 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
     session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
     job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
     siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
-    check_job_seeker_approvals(request, job_seeker, siae)
+    _check_job_seeker_approval(request, job_seeker, siae)
     next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk})
 
     # Check required info that will allow us to find a pre-existing approval.
@@ -610,7 +610,7 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
     session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
     siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
     job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
-    check_job_seeker_approvals(request, job_seeker, siae)
+    _check_job_seeker_approval(request, job_seeker, siae)
     prev_applications = job_seeker.job_applications.filter(to_siae=siae)
 
     # Limit the possibility of applying to the same SIAE for 24 hours.
@@ -656,7 +656,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
 
     user_info = get_user_info(request)
     job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
-    check_job_seeker_approvals(request, job_seeker, siae)
+    _check_job_seeker_approval(request, job_seeker, siae)
 
     skip = (
         # Only "authorized prescribers" can perform an eligibility diagnosis.
@@ -700,7 +700,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     form = SubmitJobApplicationForm(data=request.POST or None, siae=siae, initial=initial_data)
 
     job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
-    check_job_seeker_approvals(request, job_seeker, siae)
+    _check_job_seeker_approval(request, job_seeker, siae)
 
     if request.method == "POST" and form.is_valid():
         next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae_pk})

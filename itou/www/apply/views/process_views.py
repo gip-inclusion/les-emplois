@@ -32,8 +32,9 @@ def check_waiting_period(job_application):
     the time it is accepted.
     """
     # NOTE(vperron): We need to check both PASS and PE Approvals for ongoing eligibility issues.
-    # BUT ! I really wonder whether this 2-years old code is still relevant to this day.
-    if job_application.job_seeker.cannot_bypass_approval_waiting_period(
+    # This code should still stay relevant for the 3.5 years to come to account for the PE approvals
+    # that have been delivered in December 2021 (and that may have 2 years waiting periods)
+    if job_application.job_seeker.cannot_bypass_common_approval_waiting_period(
         siae=job_application.to_siae, sender_prescriber_organization=job_application.sender_prescriber_organization
     ):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
@@ -81,7 +82,6 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
 
     context = {
-        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "approval_can_be_suspended_by_siae": approval_can_be_suspended_by_siae,
         "hire_by_other_siae": hire_by_other_siae,
         "approval_can_be_prolonged_by_siae": approval_can_be_prolonged_by_siae,
@@ -128,7 +128,6 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_prescriber"))
 
     context = {
-        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "job_application": job_application,
         "transition_logs": transition_logs,
@@ -183,7 +182,6 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
     context = {
-        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "form": form,
         "job_application": job_application,
     }
@@ -216,7 +214,6 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
         return HttpResponseRedirect(next_url)
 
     context = {
-        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "form": form,
         "job_application": job_application,
     }
@@ -351,7 +348,6 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         return HttpResponseRedirect(next_url)
 
     context = {
-        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "form_accept": form_accept,
         "form_user_address": form_user_address,
         "form_pe_status": form_pe_status,
@@ -384,7 +380,6 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
         return HttpResponseRedirect(next_url)
 
     context = {
-        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "job_application": job_application,
     }
     return render(request, template_name, context)
@@ -490,7 +485,6 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         return HttpResponseRedirect(next_url)
 
     context = {
-        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "job_application": job_application,
         "form_administrative_criteria": form_administrative_criteria,
         "form_confirm_eligibility": form_confirm_eligibility,
