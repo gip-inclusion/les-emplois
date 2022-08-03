@@ -22,16 +22,7 @@
                         <h2 class="h1">{{ job_seeker.get_full_name|title }}</h2>
                     {% endif %}
 
-                    {% if approvals_wrapper.latest_approval %}
-                        {# Approval status. #}
-                        <div class="card my-3">
-                            <div class="card-body">
-                                <div class="card-text">
-                                    {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
+                    {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
 
                     <div class="card c-card c-card--emploi mb-3 mb-lg-5">
                         <div class="card-body">

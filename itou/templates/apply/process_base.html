@@ -25,7 +25,7 @@
                     {# Approval status. #}
                     <div class="card-text">
                         {% if job_application.approval %}
-                            {% include "approvals/includes/status.html" with approval=job_application.approval %}
+                            {% include "approvals/includes/status.html" with common_approval=job_application.approval %}
                         {% elif job_application.hiring_without_approval %}
                             Vous n'avez pas demandé de PASS IAE (agrément).
                         {% elif job_application.approval_manually_refused_at %}
@@ -74,19 +74,10 @@
                 </div>
             </div>
 
-        {% elif not job_application.state.is_cancelled and approvals_wrapper.latest_approval %}
-
-            <div class="card my-4">
-                <div class="card-body">
-                    {# Approval status. #}
-                    <div class="card-text">
-                        {# Employers need to know the expiration date of an approval #}
-                        {# to decide whether they may accept a job application or not. #}
-                        {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval job_application=job_application %}
-                    </div>
-                </div>
-            </div>
-
+        {% elif not job_application.state.is_cancelled %}
+            {# Employers need to know the expiration date of an approval #}
+            {# to decide whether they may accept a job application or not. #}
+            {% include "approvals/includes/card.html" with common_approval=job_application.job_seeker.latest_common_approval job_application=job_application %}
         {% endif %}
 
     {% endif %}

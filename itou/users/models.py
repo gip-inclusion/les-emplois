@@ -368,6 +368,29 @@ class User(AbstractUser, AddressMixin):
         return pe_approval
 
     @property
+    def latest_common_approval(self):
+        """
+        Rationale:
+        - if there is a latest PASS IAE that is valid, it is returned.
+        - if there is no PASS IAE, we return the longest PE Approval whatever its state.
+        - if there is no PASS not PE Approval, or the waiting period for those is over, return nothing.
+        - if the latest PASS IAE is invalid:
+          * but still in waiting period:
+            > return a valid PE Approval if there is one
+            > else, return the PASS in waiting period.
+          * if outdated, we consider there's no PASS. Return the latest PE approval, if any.
+        """
+        if (
+            self.latest_approval
+            and self.latest_approval.is_in_waiting_period
+            and self.latest_pe_approval
+            and self.latest_pe_approval.is_valid
+        ):
+            return self.latest_pe_approval
+
+        return self.latest_approval or self.latest_pe_approval
+
+    @property
     def has_valid_approval(self):
         return (self.latest_approval and self.latest_approval.is_valid()) or (
             self.latest_pe_approval and self.latest_pe_approval.is_valid()

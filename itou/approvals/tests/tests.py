@@ -799,6 +799,47 @@ class ApprovalsWrapperTest(TestCase):
             )
         )
 
+    def test_latest_common_approval_no_approval(self):
+        user = JobSeekerFactory()
+        self.assertIsNone(user.latest_common_approval)
+
+    def test_latest_common_approval_when_only_pe_approval(self):
+        user = JobSeekerFactory()
+        pe_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        self.assertEqual(user.latest_common_approval, pe_approval)
+
+    def test_latest_common_approval_is_approval_if_valid(self):
+        user = JobSeekerFactory()
+        approval = ApprovalFactory(user=user)
+        PoleEmploiApprovalFactory(nir=user.nir)
+        self.assertEqual(user.latest_common_approval, approval)
+
+    def test_latest_common_approval_is_pe_approval_if_approval_is_expired(self):
+        user = JobSeekerFactory()
+        end_at = timezone.now().date() - relativedelta(years=3)
+        start_at = end_at - relativedelta(years=2)
+        # expired approval
+        ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        pe_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        self.assertEqual(user.latest_common_approval, pe_approval)
+
+    def test_latest_common_approval_is_pe_approval_edge_case(self):
+        user = JobSeekerFactory()
+        end_at = timezone.now().date() - relativedelta(days=10)
+        start_at = end_at - relativedelta(years=2)
+        # approval in waiting period
+        ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        pe_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        self.assertEqual(user.latest_common_approval, pe_approval)
+
+    def test_latest_common_approval_is_none_if_both_expired(self):
+        user = JobSeekerFactory()
+        end_at = timezone.now().date() - relativedelta(years=3)
+        start_at = end_at - relativedelta(years=2)
+        ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        PoleEmploiApprovalFactory(nir=user.nir, start_at=start_at, end_at=end_at)
+        self.assertIsNone(user.latest_common_approval)
+
 
 class AutomaticApprovalAdminViewsTest(TestCase):
     """

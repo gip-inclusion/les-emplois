@@ -73,8 +73,8 @@ def _job_application_as_dict(job_application):
     numero_pass_iae = ""
     approval_start_date = None
     approval_end_date = None
-    if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval is not None:
-        approval = job_seeker.approvals_wrapper.latest_approval
+    if job_seeker.has_valid_common_approval:
+        approval = job_seeker.latest_common_approval
         numero_pass_iae = approval.number
         approval_start_date = approval.start_at
         approval_end_date = approval.end_at
