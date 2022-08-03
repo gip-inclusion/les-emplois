@@ -37,7 +37,6 @@ fake = faker.Faker(locale="fr_FR")
 class ApplyTest(TestCase):
     def test_we_redirect_to_siae_on_missing_session_for_fbv(self):
         routes = {
-            "apply:step_check_job_seeker_info",
             "apply:step_check_prev_applications",
             "apply:step_eligibility",
             "apply:step_application",
@@ -56,6 +55,7 @@ class ApplyTest(TestCase):
             "apply:check_nir_for_sender",
             "apply:check_email_for_sender",
             "apply:check_nir_for_job_seeker",
+            "apply:step_check_job_seeker_info",
             "apply:step_application_sent",
         }
         user = JobSeekerFactory()
@@ -891,7 +891,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # ----------------------------------------------------------------------
 
         # Follow all redirections…
-        response = self.client.post(next_url, follow=True)
+        response = self.client.get(next_url, follow=True)
         self.assertEqual(response.status_code, 200)
 
         self.assertFalse(EligibilityDiagnosis.objects.has_considered_valid(job_seeker, for_siae=siae))

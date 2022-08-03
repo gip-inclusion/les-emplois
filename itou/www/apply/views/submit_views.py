@@ -570,34 +570,53 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         }
 
 
-@login_required
-@valid_session_required(["siae_pk"])
-def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_step_job_seeker_check_info.html"):
+class CheckJobSeekerInformations(ApplyStepBaseView):
     """
     Ensure the job seeker has all required info.
     """
-    session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
-    job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
-    siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
-    _check_job_seeker_approval(request, job_seeker, siae)
-    next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk})
 
-    # Check required info that will allow us to find a pre-existing approval.
-    has_required_info = job_seeker.birthdate and (
-        job_seeker.pole_emploi_id or job_seeker.lack_of_pole_emploi_id_reason
-    )
+    template_name = "apply/submit_step_job_seeker_check_info.html"
+    required_session_namespaces = ["apply_session"]
 
-    if has_required_info:
-        return HttpResponseRedirect(next_url)
+    def __init__(self):
+        super().__init__()
 
-    form = CheckJobSeekerInfoForm(instance=job_seeker, data=request.POST or None)
+        self.job_seeker = None
+        self.form = None
 
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        return HttpResponseRedirect(next_url)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
 
-    context = {"form": form, "siae": siae, "job_seeker": job_seeker}
-    return render(request, template_name, context)
+        self.job_seeker = get_object_or_404(User, pk=self.apply_session.get("job_seeker_pk"))
+        _check_job_seeker_approval(request, self.job_seeker, self.siae)
+        self.form = CheckJobSeekerInfoForm(instance=self.job_seeker, data=request.POST or None)
+
+    def get(self, request, *args, **kwargs):
+        # Check required info that will allow us to find a pre-existing approval.
+        has_required_info = self.job_seeker.birthdate and (
+            self.job_seeker.pole_emploi_id or self.job_seeker.lack_of_pole_emploi_id_reason
+        )
+        if has_required_info:
+            return HttpResponseRedirect(
+                reverse("apply:step_check_prev_applications", kwargs={"siae_pk": self.siae.pk})
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            self.form.save()
+            return HttpResponseRedirect(
+                reverse("apply:step_check_prev_applications", kwargs={"siae_pk": self.siae.pk})
+            )
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "job_seeker": self.job_seeker,
+        }
 
 
 @login_required

@@ -50,7 +50,7 @@ urlpatterns = [
     # Submit - common.
     path(
         "<int:siae_pk>/step_check_job_seeker_info",
-        submit_views.step_check_job_seeker_info,
+        submit_views.CheckJobSeekerInformations.as_view(),
         name="step_check_job_seeker_info",
     ),
     path(
