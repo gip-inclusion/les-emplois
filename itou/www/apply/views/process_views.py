@@ -31,6 +31,8 @@ def check_waiting_period(job_application):
     An approval may expire between the time an application is sent and
     the time it is accepted.
     """
+    # NOTE(vperron): We need to check both PASS and PE Approvals for ongoing eligibility issues.
+    # BUT ! I really wonder whether this 2-years old code is still relevant to this day.
     if job_application.job_seeker.cannot_bypass_approval_waiting_period(
         siae=job_application.to_siae, sender_prescriber_organization=job_application.sender_prescriber_organization
     ):
