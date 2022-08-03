@@ -18,7 +18,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.prescribers import factories as prescribers_factories
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import (
@@ -255,7 +255,7 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, "Suspendre un PASS IAE")
 
         prescriber_org = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganization.Kind.CAP_EMPLOI
+            kind=PrescriberOrganizationKind.CAP_EMPLOI
         )
         prescriber = prescriber_org.members.first()
         self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
@@ -263,7 +263,7 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, "Suspendre un PASS IAE")
 
         prescriber_org_pe = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganization.Kind.PE
+            kind=PrescriberOrganizationKind.PE
         )
         prescriber_pe = prescriber_org_pe.members.first()
         self.client.login(username=prescriber_pe.email, password=DEFAULT_PASSWORD)

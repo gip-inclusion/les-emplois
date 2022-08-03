@@ -5,8 +5,9 @@ from django.core.exceptions import PermissionDenied
 from django.utils.timezone import now
 
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
-from itou.prescribers import models
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
+from itou.prescribers.models import PrescriberOrganization
 from itou.utils.admin import PkSupportRemarkInline
 from itou.utils.apis.geocoding import GeocodingDataException
 
@@ -28,7 +29,7 @@ class TmpMissingSiretFilter(admin.SimpleListFilter):
         value = self.value()
         if value == "yes":
             return (
-                queryset.exclude(kind=models.PrescriberOrganization.Kind.PE.value)
+                queryset.exclude(kind=PrescriberOrganizationKind.PE.value)
                 .exclude(members=None)
                 .filter(siret__isnull=True)
             )
@@ -52,7 +53,7 @@ class TmpCanBeDeletedFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         value = self.value()
         if value == "yes":
-            return queryset.filter(members=None).exclude(kind=models.PrescriberOrganization.Kind.PE.value)
+            return queryset.filter(members=None).exclude(kind=PrescriberOrganizationKind.PE.value)
         return queryset
 
 
@@ -65,17 +66,15 @@ class AuthorizationValidationRequired(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "required":
-            return queryset.filter(
-                authorization_status=models.PrescriberOrganization.AuthorizationStatus.NOT_SET, _member_count__gt=0
-            )
+            return queryset.filter(authorization_status=PrescriberAuthorizationStatus.NOT_SET, _member_count__gt=0)
         return queryset
 
 
 class PrescriberOrganizationMembersInline(MembersInline):
-    model = models.PrescriberOrganization.members.through
+    model = PrescriberOrganization.members.through
 
 
-@admin.register(models.PrescriberOrganization)
+@admin.register(PrescriberOrganization)
 class PrescriberOrganizationAdmin(OrganizationAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
@@ -208,10 +207,10 @@ class PrescriberOrganizationAdmin(OrganizationAdmin):
             # Same checks in change_form template to display the button
             if request.user.is_superuser or obj.has_pending_authorization():
                 obj.is_authorized = False
-                obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.REFUSED
+                obj.authorization_status = PrescriberAuthorizationStatus.REFUSED
                 obj.authorization_updated_at = now()
                 obj.authorization_updated_by = request.user
-                obj.kind = models.PrescriberOrganization.Kind.OTHER
+                obj.kind = PrescriberOrganizationKind.OTHER
                 obj.save()
                 obj.refused_prescriber_organization_email().send()
             else:
@@ -221,7 +220,7 @@ class PrescriberOrganizationAdmin(OrganizationAdmin):
             # Same checks as change_form template to display the button
             if request.user.is_superuser or obj.has_pending_authorization() or obj.has_refused_authorization():
                 obj.is_authorized = True
-                obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
+                obj.authorization_status = PrescriberAuthorizationStatus.VALIDATED
                 obj.authorization_updated_at = now()
                 obj.authorization_updated_by = request.user
                 obj.save()

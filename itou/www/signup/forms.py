@@ -7,6 +7,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
@@ -337,7 +338,7 @@ class PrescriberChooseOrgKindForm(forms.Form):
     kind = forms.ChoiceField(
         label="Pour qui travaillez-vous ?",
         widget=forms.RadioSelect,
-        choices=PrescriberOrganization.Kind.choices,
+        choices=PrescriberOrganizationKind.choices,
     )
 
     def clean_kind(self):

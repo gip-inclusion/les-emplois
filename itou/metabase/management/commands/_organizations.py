@@ -8,6 +8,7 @@ from itou.metabase.management.commands._utils import (
     get_establishment_last_login_date_column,
     get_first_membership_join_date,
 )
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 
@@ -84,11 +85,11 @@ def get_org_last_job_application_creation_date(org):
 
 
 ORGANIZATION_KIND_TO_READABLE_KIND = {
-    PrescriberOrganization.Kind.PE: "Pôle emploi",
-    PrescriberOrganization.Kind.CAP_EMPLOI: "CAP emploi",
-    PrescriberOrganization.Kind.ML: "Mission locale",
-    PrescriberOrganization.Kind.DEPT: "Département",
-    PrescriberOrganization.Kind.OTHER: "Autre",
+    PrescriberOrganizationKind.PE: "Pôle emploi",
+    PrescriberOrganizationKind.CAP_EMPLOI: "CAP emploi",
+    PrescriberOrganizationKind.ML: "Mission locale",
+    PrescriberOrganizationKind.DEPT: "Département",
+    PrescriberOrganizationKind.OTHER: "Autre",
 }
 
 TABLE_COLUMNS = [
@@ -104,7 +105,7 @@ TABLE_COLUMNS = [
         "name": "type_complet",
         "type": "varchar",
         "comment": "Type organisation (détaillé)",
-        "fn": lambda o: get_choice(choices=PrescriberOrganization.Kind.choices, key=o.kind),
+        "fn": lambda o: get_choice(choices=PrescriberOrganizationKind.choices, key=o.kind),
     },
     {
         "name": "habilitée",

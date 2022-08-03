@@ -14,8 +14,8 @@ from django.utils.html import escape
 from itou.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from itou.invitations.models import PrescriberWithOrgInvitation
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
-from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_PRESCRIBER
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
@@ -35,7 +35,7 @@ INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
 
 class TestSendPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
-        self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
+        self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
         self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
         self.post_data = POST_DATA | {
@@ -102,7 +102,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
 
 class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
     def setUp(self):
-        self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
+        self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
         self.post_data = POST_DATA
 

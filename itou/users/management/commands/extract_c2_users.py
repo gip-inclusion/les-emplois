@@ -6,8 +6,10 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.institutions.models import Institution, InstitutionMembership
-from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
+from itou.institutions.enums import InstitutionKind
+from itou.institutions.models import InstitutionMembership
+from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 
 
@@ -78,10 +80,10 @@ class Command(BaseCommand):
             org = membership.institution
             row = self.get_basic_row(membership=membership, org=org)
 
-            if org.kind == Institution.Kind.DDETS:
+            if org.kind == InstitutionKind.DDETS:
                 ddets_csv_rows.append(row)
 
-            if org.kind == Institution.Kind.DREETS:
+            if org.kind == InstitutionKind.DREETS:
                 # Departement does not make sense for DREETS, as there is one per region.
                 del row["Département"]
                 dreets_csv_rows.append(row)
@@ -90,7 +92,7 @@ class Command(BaseCommand):
 
         cd_memberships = PrescriberMembership.objects.select_related("user", "organization").filter(
             is_active=True,
-            organization__kind=PrescriberOrganization.Kind.DEPT,
+            organization__kind=PrescriberOrganizationKind.DEPT,
         )
 
         for membership in cd_memberships:

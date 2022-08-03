@@ -1,6 +1,7 @@
 import factory
 
-from itou.institutions import models
+from itou.institutions.enums import InstitutionKind
+from itou.institutions.models import Institution, InstitutionMembership
 from itou.users.factories import LaborInspectorFactory
 
 
@@ -8,10 +9,10 @@ class InstitutionFactory(factory.django.DjangoModelFactory):
     """Returns an Institution() object."""
 
     class Meta:
-        model = models.Institution
+        model = Institution
 
     name = factory.Faker("name", locale="fr_FR")
-    kind = models.Institution.Kind.DDETS
+    kind = InstitutionKind.DDETS
 
 
 class InstitutionMembershipFactory(factory.django.DjangoModelFactory):
@@ -24,7 +25,7 @@ class InstitutionMembershipFactory(factory.django.DjangoModelFactory):
     """
 
     class Meta:
-        model = models.InstitutionMembership
+        model = InstitutionMembership
 
     user = factory.SubFactory(LaborInspectorFactory)
     institution = factory.SubFactory(InstitutionFactory)

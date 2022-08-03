@@ -4,6 +4,7 @@ import logging
 from django.core.management.base import BaseCommand
 
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -107,7 +108,7 @@ class Command(BaseCommand):
                     continue
 
                 if not dry_run:
-                    pe_kind = PrescriberOrganization.Kind.PE
+                    pe_kind = PrescriberOrganizationKind.PE
 
                     org, _created = PrescriberOrganization.objects.get_or_create(
                         code_safir_pole_emploi=code_safir,

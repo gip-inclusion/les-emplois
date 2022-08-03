@@ -10,8 +10,8 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
-from itou.institutions.models import Institution
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
@@ -168,7 +168,7 @@ class EvaluationCampaignManagerTest(TestCase):
         with self.assertRaises(ValidationError):
             validate_institution(0)
 
-        for kind in [k for k in Institution.Kind if k != Institution.Kind.DDETS]:
+        for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS]:
             with self.subTest(kind=kind):
                 institution = InstitutionFactory(kind=kind)
                 with self.assertRaises(ValidationError):
@@ -195,7 +195,7 @@ class EvaluationCampaignManagerTest(TestCase):
         ratio_selection_end_at = timezone.now() + relativedelta(months=1)
 
         # not DDETS
-        for kind in [k for k in Institution.Kind if k != Institution.Kind.DDETS]:
+        for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS]:
             with self.subTest(kind=kind):
                 InstitutionFactory(kind=kind)
                 self.assertEqual(
@@ -205,7 +205,7 @@ class EvaluationCampaignManagerTest(TestCase):
                 self.assertEqual(len(mail.outbox), 0)
 
         # institution DDETS
-        InstitutionWith2MembershipFactory.create_batch(2, kind=Institution.Kind.DDETS)
+        InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS)
         self.assertEqual(
             2,
             create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at),

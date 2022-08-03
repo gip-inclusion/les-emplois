@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils.timezone import get_current_timezone
 
 from itou.job_applications import factories as job_applications_factories, models as job_applications_models
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
@@ -33,9 +34,7 @@ class PrescriberOrganizationManagerTest(TestCase):
         """
         Test `get_accredited_orgs_for`.
         """
-        departmental_council_org = PrescriberOrganizationFactory(
-            authorized=True, kind=PrescriberOrganization.Kind.DEPT
-        )
+        departmental_council_org = PrescriberOrganizationFactory(authorized=True, kind=PrescriberOrganizationKind.DEPT)
 
         # An org accredited by a departmental council:
         # - is in the same department
@@ -43,14 +42,14 @@ class PrescriberOrganizationManagerTest(TestCase):
         accredited_org = PrescriberOrganizationFactory(
             authorized=True,
             department=departmental_council_org.department,
-            kind=PrescriberOrganization.Kind.OTHER,
+            kind=PrescriberOrganizationKind.OTHER,
             is_brsa=True,
         )
 
         other_org = PrescriberOrganizationFactory(
             authorized=True,
             department=departmental_council_org.department,
-            kind=PrescriberOrganization.Kind.CAP_EMPLOI,
+            kind=PrescriberOrganizationKind.CAP_EMPLOI,
         )
 
         # `expected_num` orgs should be accredited by the departmental council.
@@ -69,7 +68,7 @@ class PrescriberOrganizationManagerTest(TestCase):
             {
                 "siret": "11122233300000",
                 "name": "Ma petite entreprise",
-                "authorization_status": PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED,
+                "authorization_status": PrescriberAuthorizationStatus.NOT_REQUIRED,
             },
         )
         self.assertEqual(1, PrescriberOrganization.objects.count())
@@ -79,7 +78,7 @@ class PrescriberOrganizationManagerTest(TestCase):
             {
                 "siret": "11122233300001",
                 "name": "Ma seconde entreprise",
-                "authorization_status": PrescriberOrganization.AuthorizationStatus.NOT_SET,
+                "authorization_status": PrescriberAuthorizationStatus.NOT_SET,
             },
         )
         self.assertEqual(2, PrescriberOrganization.objects.count())
@@ -90,7 +89,7 @@ class PrescriberOrganizationManagerTest(TestCase):
 class PrescriberOrganizationModelTest(TestCase):
     def test_accept_survey_url(self):
 
-        org = PrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.PE, department="57")
+        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.PE, department="57")
         url = org.accept_survey_url
         self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/EDHZSU7p?"))
         self.assertIn(f"idorganisation={org.pk}", url)
@@ -99,7 +98,7 @@ class PrescriberOrganizationModelTest(TestCase):
         self.assertIn("departement=57", url)
 
         # Ensure that the URL does not break when there is no department.
-        org = PrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI, department="")
+        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI, department="")
         url = org.accept_survey_url
         self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/EDHZSU7p?"))
         self.assertIn(f"idorganisation={org.pk}", url)
@@ -111,36 +110,36 @@ class PrescriberOrganizationModelTest(TestCase):
         """
         Test that a SIRET number is required only for non-PE organizations.
         """
-        org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganization.Kind.PE)
+        org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganizationKind.PE)
         org.clean_siret()
         with self.assertRaises(ValidationError):
-            org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganization.Kind.CAP_EMPLOI)
+            org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganizationKind.CAP_EMPLOI)
             org.clean_siret()
 
     def test_clean_code_safir_pole_emploi(self):
         """
         Test that a code SAFIR can only be set for PE agencies.
         """
-        org = PrescriberOrganizationFactory.build(code_safir_pole_emploi="12345", kind=PrescriberOrganization.Kind.PE)
+        org = PrescriberOrganizationFactory.build(code_safir_pole_emploi="12345", kind=PrescriberOrganizationKind.PE)
         org.clean_code_safir_pole_emploi()
         with self.assertRaises(ValidationError):
             org = PrescriberOrganizationFactory.build(
-                code_safir_pole_emploi="12345", kind=PrescriberOrganization.Kind.CAP_EMPLOI
+                code_safir_pole_emploi="12345", kind=PrescriberOrganizationKind.CAP_EMPLOI
             )
             org.clean_code_safir_pole_emploi()
 
     def test_has_pending_authorization_proof(self):
 
         org = PrescriberOrganizationFactory(
-            kind=PrescriberOrganization.Kind.OTHER,
-            authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_SET,
+            kind=PrescriberOrganizationKind.OTHER,
+            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
         self.assertTrue(org.has_pending_authorization())
         self.assertTrue(org.has_pending_authorization_proof())
 
         org = PrescriberOrganizationFactory(
-            kind=PrescriberOrganization.Kind.CAP_EMPLOI,
-            authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_SET,
+            kind=PrescriberOrganizationKind.CAP_EMPLOI,
+            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
         self.assertTrue(org.has_pending_authorization())
         self.assertFalse(org.has_pending_authorization_proof())
@@ -252,8 +251,8 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         # authorization status x is_authorizedis_authorized combinations
         self.rights_list = [
-            (authorization_status, authorization_status == PrescriberOrganization.AuthorizationStatus.VALIDATED)
-            for authorization_status in list(PrescriberOrganization.AuthorizationStatus)
+            (authorization_status, authorization_status == PrescriberAuthorizationStatus.VALIDATED)
+            for authorization_status in list(PrescriberAuthorizationStatus)
         ]
 
     def test_refuse_prescriber_habilitation_by_superuser(self):
@@ -294,11 +293,11 @@ class PrescriberOrganizationAdminTest(TestCase):
 
                 updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
                 self.assertFalse(updated_prescriberorganization.is_authorized)
-                self.assertEqual(updated_prescriberorganization.kind, PrescriberOrganization.Kind.OTHER)
+                self.assertEqual(updated_prescriberorganization.kind, PrescriberOrganizationKind.OTHER)
                 self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.superuser)
                 self.assertEqual(
                     updated_prescriberorganization.authorization_status,
-                    PrescriberOrganization.AuthorizationStatus.REFUSED,
+                    PrescriberAuthorizationStatus.REFUSED,
                 )
 
     def test_refuse_prescriber_habilitation_pending_status(self):
@@ -310,7 +309,7 @@ class PrescriberOrganizationAdminTest(TestCase):
             department="14",
             post_code="14000",
             authorization_updated_at=datetime.now(tz=get_current_timezone()),
-            authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_SET,
+            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
             is_authorized=False,
         )
 
@@ -338,11 +337,9 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
         self.assertFalse(updated_prescriberorganization.is_authorized)
-        self.assertEqual(updated_prescriberorganization.kind, PrescriberOrganization.Kind.OTHER)
+        self.assertEqual(updated_prescriberorganization.kind, PrescriberOrganizationKind.OTHER)
         self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.user)
-        self.assertEqual(
-            updated_prescriberorganization.authorization_status, PrescriberOrganization.AuthorizationStatus.REFUSED
-        )
+        self.assertEqual(updated_prescriberorganization.authorization_status, PrescriberAuthorizationStatus.REFUSED)
 
     def test_refuse_prescriber_habilitation_not_pending_status(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
@@ -430,7 +427,7 @@ class PrescriberOrganizationAdminTest(TestCase):
                 self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.superuser)
                 self.assertEqual(
                     updated_prescriberorganization.authorization_status,
-                    PrescriberOrganization.AuthorizationStatus.VALIDATED,
+                    PrescriberAuthorizationStatus.VALIDATED,
                 )
 
     def test_accept_prescriber_habilitation_pending_status(self):
@@ -442,7 +439,7 @@ class PrescriberOrganizationAdminTest(TestCase):
             department="14",
             post_code="14000",
             authorization_updated_at=datetime.now(tz=get_current_timezone()),
-            authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_SET,
+            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
             is_authorized=False,
         )
 
@@ -472,9 +469,7 @@ class PrescriberOrganizationAdminTest(TestCase):
         self.assertTrue(updated_prescriberorganization.is_authorized)
         self.assertEqual(updated_prescriberorganization.kind, prescriberorganization.kind)
         self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.user)
-        self.assertEqual(
-            updated_prescriberorganization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED
-        )
+        self.assertEqual(updated_prescriberorganization.authorization_status, PrescriberAuthorizationStatus.VALIDATED)
 
     def test_accept_prescriber_habilitation_refused_status(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
@@ -485,7 +480,7 @@ class PrescriberOrganizationAdminTest(TestCase):
             department="14",
             post_code="14000",
             authorization_updated_at=datetime.now(tz=get_current_timezone()),
-            authorization_status=PrescriberOrganization.AuthorizationStatus.REFUSED,
+            authorization_status=PrescriberAuthorizationStatus.REFUSED,
             is_authorized=False,
         )
 
@@ -515,9 +510,7 @@ class PrescriberOrganizationAdminTest(TestCase):
         self.assertTrue(updated_prescriberorganization.is_authorized)
         self.assertEqual(updated_prescriberorganization.kind, prescriberorganization.kind)
         self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.user)
-        self.assertEqual(
-            updated_prescriberorganization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED
-        )
+        self.assertEqual(updated_prescriberorganization.authorization_status, PrescriberAuthorizationStatus.VALIDATED)
 
     def test_accept_prescriber_habilitation_other_status(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
@@ -539,8 +532,8 @@ class PrescriberOrganizationAdminTest(TestCase):
             for authorization_status, is_authorized in self.rights_list
             if authorization_status
             not in [
-                PrescriberOrganization.AuthorizationStatus.NOT_SET,
-                PrescriberOrganization.AuthorizationStatus.REFUSED,
+                PrescriberAuthorizationStatus.NOT_SET,
+                PrescriberAuthorizationStatus.REFUSED,
             ]
         ]
 
@@ -579,46 +572,38 @@ class UpdateRefusedPrescriberOrganizationKindManagementCommandsTest(TestCase):
         # Prescriber organization - one sample per authorization status
         # One refused prescriber organizations without duplicated siret which will be
         # updated in this subset
-        for authorization_status in list(PrescriberOrganization.AuthorizationStatus):
+        for authorization_status in list(PrescriberAuthorizationStatus):
             PrescriberOrganizationFactory(authorization_status=authorization_status)
 
         # Prescriber organization - Authorization Status = Refused - with duplicated siret
         # These Prescriber organization kind won't be updated into Other, because
         # of unicity constraint on (siret,kind)
         PrescriberOrganizationFactory(
-            authorization_status=PrescriberOrganization.AuthorizationStatus.REFUSED,
+            authorization_status=PrescriberAuthorizationStatus.REFUSED,
             siret="83987278500010",
-            kind=PrescriberOrganization.Kind.CHRS,
+            kind=PrescriberOrganizationKind.CHRS,
         )
         PrescriberOrganizationFactory(
-            authorization_status=PrescriberOrganization.AuthorizationStatus.REFUSED,
+            authorization_status=PrescriberAuthorizationStatus.REFUSED,
             siret="83987278500010",
-            kind=PrescriberOrganization.Kind.CHU,
+            kind=PrescriberOrganizationKind.CHU,
         )
 
         # Controls before execution
-        self.assertEquals(
-            len(PrescriberOrganization.AuthorizationStatus) + 2, PrescriberOrganization.objects.all().count()
-        )
+        self.assertEquals(len(PrescriberAuthorizationStatus) + 2, PrescriberOrganization.objects.all().count())
         self.assertEquals(
             3,
-            PrescriberOrganization.objects.filter(
-                authorization_status=PrescriberOrganization.AuthorizationStatus.REFUSED
-            ).count(),
+            PrescriberOrganization.objects.filter(authorization_status=PrescriberAuthorizationStatus.REFUSED).count(),
         )
-        self.assertEquals(0, PrescriberOrganization.objects.filter(kind=PrescriberOrganization.Kind.OTHER).count())
+        self.assertEquals(0, PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count())
 
         # Update refused prescriber organizations without duplicated siret
         call_command("update_refused_prescriber_organizations_kind")
 
         # Controls after execution
-        self.assertEquals(
-            len(PrescriberOrganization.AuthorizationStatus) + 2, PrescriberOrganization.objects.all().count()
-        )
+        self.assertEquals(len(PrescriberAuthorizationStatus) + 2, PrescriberOrganization.objects.all().count())
         self.assertEquals(
             3,
-            PrescriberOrganization.objects.filter(
-                authorization_status=PrescriberOrganization.AuthorizationStatus.REFUSED
-            ).count(),
+            PrescriberOrganization.objects.filter(authorization_status=PrescriberAuthorizationStatus.REFUSED).count(),
         )
-        self.assertEquals(1, PrescriberOrganization.objects.filter(kind=PrescriberOrganization.Kind.OTHER).count())
+        self.assertEquals(1, PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count())

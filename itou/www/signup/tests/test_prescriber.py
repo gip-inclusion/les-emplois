@@ -14,6 +14,7 @@ from django.utils.safestring import mark_safe
 
 from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWithMembershipFactory,
@@ -121,7 +122,7 @@ class PrescriberSignupTest(TestCase):
 
         # Check organization.
         self.assertTrue(organization.is_authorized)
-        self.assertEqual(organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
+        self.assertEqual(organization.authorization_status, PrescriberAuthorizationStatus.VALIDATED)
 
         # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
@@ -154,7 +155,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
         post_data = {
-            "kind": PrescriberOrganization.Kind.CAP_EMPLOI.value,
+            "kind": PrescriberOrganizationKind.CAP_EMPLOI.value,
         }
         response = self.client.post(url, data=post_data)
 
@@ -203,7 +204,7 @@ class PrescriberSignupTest(TestCase):
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
         self.assertFalse(org.is_authorized)
-        self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
+        self.assertEqual(org.authorization_status, PrescriberAuthorizationStatus.NOT_SET)
 
         # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
@@ -236,7 +237,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
         post_data = {
-            "kind": PrescriberOrganization.Kind.OTHER.value,
+            "kind": PrescriberOrganizationKind.OTHER.value,
         }
         response = self.client.post(url, data=post_data)
 
@@ -302,7 +303,7 @@ class PrescriberSignupTest(TestCase):
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
         self.assertFalse(org.is_authorized)
-        self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
+        self.assertEqual(org.authorization_status, PrescriberAuthorizationStatus.NOT_SET)
 
         # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
@@ -340,7 +341,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
         post_data = {
-            "kind": PrescriberOrganization.Kind.OTHER.value,
+            "kind": PrescriberOrganizationKind.OTHER.value,
         }
         response = self.client.post(url, data=post_data)
 
@@ -397,7 +398,7 @@ class PrescriberSignupTest(TestCase):
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
         self.assertFalse(org.is_authorized)
-        self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED)
+        self.assertEqual(org.authorization_status, PrescriberAuthorizationStatus.NOT_REQUIRED)
 
         # Check membership.
         self.assertEqual(1, user.prescriberorganization_set.count())
@@ -420,7 +421,7 @@ class PrescriberSignupTest(TestCase):
 
         # PrescriberOrganizationWithMembershipFactory.
         PrescriberOrganizationWithMembershipFactory(
-            siret=siret1, kind=PrescriberOrganization.Kind.SPIP, department="01"
+            siret=siret1, kind=PrescriberOrganizationKind.SPIP, department="01"
         )
 
         # Step 1: search organizations with SIRET
@@ -449,7 +450,7 @@ class PrescriberSignupTest(TestCase):
         siret2 = "26570134200148"
 
         existing_org_with_siret = PrescriberOrganizationWithMembershipFactory(
-            siret=siret1, kind=PrescriberOrganization.Kind.SPIP, department="67"
+            siret=siret1, kind=PrescriberOrganizationKind.SPIP, department="67"
         )
 
         # Search organizations with SIRET
@@ -491,7 +492,7 @@ class PrescriberSignupTest(TestCase):
         siret1 = "26570134200056"
         siret2 = "26570134200148"
 
-        PrescriberOrganizationFactory(siret=siret1, kind=PrescriberOrganization.Kind.SPIP, department="67")
+        PrescriberOrganizationFactory(siret=siret1, kind=PrescriberOrganizationKind.SPIP, department="67")
 
         # Search organizations with SIRET
         url = reverse("signup:prescriber_check_already_exists")
@@ -583,7 +584,7 @@ class PrescriberSignupTest(TestCase):
         respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
-        existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.ML)
+        existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganizationKind.ML)
 
         # Step 1: search organizations with SIRET
         url = reverse("signup:prescriber_check_already_exists")
@@ -597,7 +598,7 @@ class PrescriberSignupTest(TestCase):
 
         # Step 2: Select kind
         url = reverse("signup:prescriber_choose_org")
-        post_data = {"kind": PrescriberOrganization.Kind.PLIE.value}
+        post_data = {"kind": PrescriberOrganizationKind.PLIE.value}
         response = self.client.post(url, data=post_data)
 
         # Step 3: Inclusion Connect button
@@ -631,8 +632,8 @@ class PrescriberSignupTest(TestCase):
         same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).order_by("kind").all()
         self.assertEqual(2, len(same_siret_orgs))
         org1, org2 = same_siret_orgs
-        self.assertEqual(PrescriberOrganization.Kind.ML.value, org1.kind)
-        self.assertEqual(PrescriberOrganization.Kind.PLIE.value, org2.kind)
+        self.assertEqual(PrescriberOrganizationKind.ML.value, org1.kind)
+        self.assertEqual(PrescriberOrganizationKind.PLIE.value, org2.kind)
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -648,7 +649,7 @@ class PrescriberSignupTest(TestCase):
         respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
-        prescriber_organization = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.PLIE)
+        prescriber_organization = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganizationKind.PLIE)
 
         url = reverse("signup:prescriber_check_already_exists")
         post_data = {
@@ -662,7 +663,7 @@ class PrescriberSignupTest(TestCase):
 
         url = reverse("signup:prescriber_choose_org")
         post_data = {
-            "kind": PrescriberOrganization.Kind.PLIE.value,
+            "kind": PrescriberOrganizationKind.PLIE.value,
         }
         response = self.client.post(url, data=post_data)
         self.assertContains(response, mark_safe("utilise déjà ce type d'organisation avec le même SIRET"))
@@ -752,7 +753,7 @@ class PrescriberSignupTest(TestCase):
         User is already a prescriber.
         We should update his account and make him join this new organization.
         """
-        org = PrescriberOrganizationFactory.build(kind=PrescriberOrganization.Kind.OTHER)
+        org = PrescriberOrganizationFactory.build(kind=PrescriberOrganizationKind.OTHER)
         user = PrescriberFactory(email=OIDC_USERINFO["email"])
 
         self.client.get(reverse("signup:prescriber_check_already_exists"))
@@ -819,7 +820,7 @@ class PrescriberSignupTest(TestCase):
         # Check organization
         org = PrescriberOrganization.objects.get(siret=org.siret)
         self.assertFalse(org.is_authorized)
-        self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
+        self.assertEqual(org.authorization_status, PrescriberAuthorizationStatus.NOT_SET)
 
         # Check membership.
         self.assertEqual(user.prescribermembership_set.count(), 1)
@@ -838,7 +839,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         The organization creation didn't work.
         The user is still created and can try again.
         """
-        org = PrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.OTHER)
+        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
         user = PrescriberFactory(email=OIDC_USERINFO["email"])
 
         self.client.get(reverse("signup:prescriber_check_already_exists"))
@@ -908,7 +909,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         User is already a member of an SIAE.
         Raise an exception.
         """
-        org = PrescriberOrganizationFactory.build(kind=PrescriberOrganization.Kind.OTHER)
+        org = PrescriberOrganizationFactory.build(kind=PrescriberOrganizationKind.OTHER)
         user = SiaeStaffFactory(email=OIDC_USERINFO["email"])
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 

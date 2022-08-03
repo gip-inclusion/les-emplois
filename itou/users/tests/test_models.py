@@ -14,12 +14,12 @@ from django.utils import timezone
 import itou.asp.factories as asp
 from itou.asp.models import AllocationDuration, EmployerType
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionWithMembershipFactory
-from itou.institutions.models import Institution
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
-from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider, Title
@@ -494,7 +494,7 @@ class ModelTest(TestCase):
         """
         # Admin prescriber of authorized CD can access.
         org = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganization.Kind.DEPT, department="93"
+            authorized=True, kind=PrescriberOrganizationKind.DEPT, department="93"
         )
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
@@ -503,14 +503,14 @@ class ModelTest(TestCase):
 
         # Non admin prescriber can access as well.
         org = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganization.Kind.DEPT, membership__is_admin=False, department="93"
+            authorized=True, kind=PrescriberOrganizationKind.DEPT, membership__is_admin=False, department="93"
         )
         user = org.members.get()
         self.assertTrue(user.can_view_stats_cd(current_org=org))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Non authorized organization does not give access.
-        org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
+        org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.DEPT)
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
@@ -532,7 +532,7 @@ class ModelTest(TestCase):
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités"
         """
         # Admin member of DDETS can access.
-        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DDETS, department="93")
+        institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DDETS, department="93")
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_ddets(current_org=institution))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
@@ -540,7 +540,7 @@ class ModelTest(TestCase):
 
         # Non admin member of DDETS can access as well.
         institution = InstitutionWithMembershipFactory(
-            kind=Institution.Kind.DDETS, membership__is_admin=False, department="93"
+            kind=InstitutionKind.DDETS, membership__is_admin=False, department="93"
         )
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_ddets(current_org=institution))
@@ -548,7 +548,7 @@ class ModelTest(TestCase):
         self.assertEqual(user.get_stats_ddets_department(current_org=institution), institution.department)
 
         # Member of institution of wrong kind cannot access.
-        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.OTHER, department="93")
+        institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
         user = institution.members.get()
         self.assertFalse(user.can_view_stats_ddets(current_org=institution))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=institution))
@@ -558,7 +558,7 @@ class ModelTest(TestCase):
         DREETS as in "Directions régionales de l’économie, de l’emploi, du travail et des solidarités"
         """
         # Admin member of DREETS can access.
-        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DREETS, department="93")
+        institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DREETS, department="93")
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_dreets(current_org=institution))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
@@ -566,7 +566,7 @@ class ModelTest(TestCase):
 
         # Non admin member of DREETS can access as well.
         institution = InstitutionWithMembershipFactory(
-            kind=Institution.Kind.DREETS, membership__is_admin=False, department="93"
+            kind=InstitutionKind.DREETS, membership__is_admin=False, department="93"
         )
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_dreets(current_org=institution))
@@ -574,7 +574,7 @@ class ModelTest(TestCase):
         self.assertEqual(user.get_stats_dreets_region(current_org=institution), institution.region)
 
         # Member of institution of wrong kind cannot access.
-        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.OTHER, department="93")
+        institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
         user = institution.members.get()
         self.assertFalse(user.can_view_stats_dreets(current_org=institution))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=institution))
@@ -584,21 +584,21 @@ class ModelTest(TestCase):
         DGEFP as in "délégation générale à l'Emploi et à la Formation professionnelle"
         """
         # Admin member of DGEFP can access.
-        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.DGEFP, department="93")
+        institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DGEFP, department="93")
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_dgefp(current_org=institution))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
 
         # Non admin member of DGEFP can access as well.
         institution = InstitutionWithMembershipFactory(
-            kind=Institution.Kind.DGEFP, membership__is_admin=False, department="93"
+            kind=InstitutionKind.DGEFP, membership__is_admin=False, department="93"
         )
         user = institution.members.get()
         self.assertTrue(user.can_view_stats_dgefp(current_org=institution))
         self.assertTrue(user.can_view_stats_dashboard_widget(current_org=institution))
 
         # Member of institution of wrong kind cannot access.
-        institution = InstitutionWithMembershipFactory(kind=Institution.Kind.OTHER, department="93")
+        institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
         user = institution.members.get()
         self.assertFalse(user.can_view_stats_dgefp(current_org=institution))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=institution))
