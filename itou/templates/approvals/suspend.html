@@ -14,14 +14,7 @@
 
     {% if not preview %}{# Edit mode. #}
 
-        {# Approval status. #}
-        <div class="card my-3">
-            <div class="card-body">
-                <div class="card-text">
-                    {% include "approvals/includes/status.html" with approval=approval %}
-                </div>
-            </div>
-        </div>
+        {% include "approvals/includes/card.html" with common_approval=approval %}
 
         <form method="post" action="" class="js-prevent-multiple-submit">
 

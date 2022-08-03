@@ -360,6 +360,27 @@ class User(AbstractUser, AddressMixin):
             return None
         return pe_approval
 
+    @cached_property
+    def latest_common_approval(self):
+        """Returns the latest PASS IAE, or latest PE approval if found.
+
+        Rationale:
+        - if there is no PASS IAE, we return the longest PE Approval.
+        - if the latest PASS IAE is valid, it is returned.
+        - if the latest PASS IAE is invalid:
+          * either it's still in waiting period and it's returned, blocking anything else.
+          * or not and we return the longest PE Approval.
+        - if there is no PE Approval at all, or the waiting period is over, return nothing.
+
+        Edge case that could happen before:
+        - a PASS IAE still in waiting period, and a PE Approval that is longer, more recent, and valid;
+          the previous logic would return the PE Approval as valid. Which means... we can generate a new one ?
+        - or maybe this case can actually NOT happen (would be weird indeed)
+
+        Let's suppose this case does not exist: then our simplification holds.
+        """
+        return self.latest_approval or self.latest_pe_approval
+
     @property
     def has_valid_approval(self):
         return (self.latest_approval and self.latest_approval.is_valid()) or (
