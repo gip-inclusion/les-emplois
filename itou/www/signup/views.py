@@ -20,6 +20,7 @@ from django.views.decorators.http import require_GET
 
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
@@ -432,15 +433,15 @@ def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.h
         prescriber_kind = form.cleaned_data["kind"]
         authorization_status = None
 
-        if prescriber_kind == PrescriberOrganization.Kind.PE.value:
+        if prescriber_kind == PrescriberOrganizationKind.PE.value:
             next_url = reverse("signup:prescriber_pole_emploi_safir_code")
 
-        elif prescriber_kind == PrescriberOrganization.Kind.OTHER.value:
+        elif prescriber_kind == PrescriberOrganizationKind.OTHER.value:
             next_url = reverse("signup:prescriber_choose_kind")
 
         else:
             # A pre-existing kind of authorized organization was chosen.
-            authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
+            authorization_status = PrescriberAuthorizationStatus.NOT_SET.value
             next_url = reverse("signup:prescriber_user")
 
         session_data.update(
@@ -485,8 +486,8 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
         )
 
         if prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
-            authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
-            kind = PrescriberOrganization.Kind.OTHER.value
+            authorization_status = PrescriberAuthorizationStatus.NOT_REQUIRED.value
+            kind = PrescriberOrganizationKind.OTHER.value
 
         session_data.update(
             {
@@ -523,8 +524,8 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
         authorization_status = "NOT_SET" if form.cleaned_data["confirm_authorization"] else "NOT_REQUIRED"
         session_data.update(
             {
-                "authorization_status": PrescriberOrganization.AuthorizationStatus[authorization_status].value,
-                "kind": PrescriberOrganization.Kind.OTHER.value,
+                "authorization_status": PrescriberAuthorizationStatus[authorization_status].value,
+                "kind": PrescriberOrganizationKind.OTHER.value,
                 "pole_emploi_org_pk": None,
                 "safir_code": None,
             }
@@ -555,7 +556,7 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
         session_data.update(
             {
                 "authorization_status": None,
-                "kind": PrescriberOrganization.Kind.PE.value,
+                "kind": PrescriberOrganizationKind.PE.value,
                 "prescriber_org_data": None,
                 "pole_emploi_org_pk": form.pole_emploi_org.pk,
                 "safir_code": form.cleaned_data["safir_code"],
@@ -587,11 +588,11 @@ def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe
     pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
 
     # Check session data.
-    if not pole_emploi_org_pk or kind != PrescriberOrganization.Kind.PE.value:
+    if not pole_emploi_org_pk or kind != PrescriberOrganizationKind.PE.value:
         raise PermissionDenied
 
     pole_emploi_org = get_object_or_404(
-        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
+        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.PE.value
     )
     context = {
         "pole_emploi_org": pole_emploi_org,
@@ -609,11 +610,11 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
     pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
 
     # Check session data.
-    if not pole_emploi_org_pk or kind != PrescriberOrganization.Kind.PE.value:
+    if not pole_emploi_org_pk or kind != PrescriberOrganizationKind.PE.value:
         raise PermissionDenied
 
     pole_emploi_org = get_object_or_404(
-        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
+        PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.PE.value
     )
     params = {
         "login_hint": session_data["email"],
@@ -648,14 +649,14 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
     join_as_orienteur_without_org = kind is None and authorization_status is None and prescriber_org_data is None
 
     join_as_orienteur_with_org = (
-        authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
-        and kind == PrescriberOrganization.Kind.OTHER.value
+        authorization_status == PrescriberAuthorizationStatus.NOT_REQUIRED.value
+        and kind == PrescriberOrganizationKind.OTHER.value
         and prescriber_org_data is not None
     )
 
     join_authorized_org = (
-        authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET.value
-        and kind not in [None, PrescriberOrganization.Kind.PE.value]
+        authorization_status == PrescriberAuthorizationStatus.NOT_SET.value
+        and kind not in [None, PrescriberOrganizationKind.PE.value]
         and prescriber_org_data is not None
     )
 
@@ -663,16 +664,16 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
     if sum([join_as_orienteur_without_org, join_as_orienteur_with_org, join_authorized_org]) != 1:
         raise PermissionDenied
 
-    if kind not in PrescriberOrganization.Kind.values:
+    if kind not in PrescriberOrganizationKind.values:
         kind = None
 
     try:
-        authorization_status = PrescriberOrganization.AuthorizationStatus[authorization_status]
+        authorization_status = PrescriberAuthorizationStatus[authorization_status]
     except KeyError:
         authorization_status = None
 
     # Get kind label
-    kind_label = dict(PrescriberOrganization.Kind.choices).get(kind)
+    kind_label = dict(PrescriberOrganizationKind.choices).get(kind)
 
     ic_params = {
         "user_kind": KIND_PRESCRIBER,
@@ -689,7 +690,7 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
         "join_as_orienteur_without_org": join_as_orienteur_without_org,
         "join_authorized_org": join_authorized_org,
         "kind_label": kind_label,
-        "kind_is_other": kind == PrescriberOrganization.Kind.OTHER.value,
+        "kind_is_other": kind == PrescriberOrganizationKind.OTHER.value,
         "prescriber_org_data": prescriber_org_data,
         "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
@@ -715,7 +716,7 @@ def prescriber_join_org(request):
                 pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
                 # We should not have errors here since we have a PE organization pk from the database.
                 prescriber_org = PrescriberOrganization.objects.get(
-                    pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
+                    pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.PE.value
                 )
             else:
                 org_attributes = {

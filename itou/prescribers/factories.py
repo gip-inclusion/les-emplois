@@ -4,7 +4,8 @@ import factory
 import factory.fuzzy
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.prescribers import models
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.factories import PrescriberFactory
 
 
@@ -12,15 +13,15 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     """Returns a PrescriberOrganization() object."""
 
     class Meta:
-        model = models.PrescriberOrganization
+        model = PrescriberOrganization
 
     class Params:
         authorized = factory.Trait(
             is_authorized=True,
-            authorization_status=models.PrescriberOrganization.AuthorizationStatus.VALIDATED,
+            authorization_status=PrescriberAuthorizationStatus.VALIDATED,
         )
         with_pending_authorization = factory.Trait(
-            authorization_status=models.PrescriberOrganization.AuthorizationStatus.NOT_SET,
+            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
 
     name = factory.Faker("name", locale="fr_FR")
@@ -28,7 +29,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
-    kind = models.PrescriberOrganization.Kind.PE
+    kind = PrescriberOrganizationKind.PE
     department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
 
 
@@ -42,7 +43,7 @@ class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     """
 
     class Meta:
-        model = models.PrescriberMembership
+        model = PrescriberMembership
 
     user = factory.SubFactory(PrescriberFactory)
     organization = factory.SubFactory(PrescriberOrganizationFactory)
@@ -74,5 +75,5 @@ class PrescriberOrganizationWith2MembershipFactory(PrescriberOrganizationFactory
 class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
     code_safir_pole_emploi = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
     is_authorized = True
-    kind = models.PrescriberOrganization.Kind.PE
-    authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
+    kind = PrescriberOrganizationKind.PE
+    authorization_status = PrescriberAuthorizationStatus.VALIDATED

@@ -14,20 +14,17 @@ from django.db import models
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
+from itou.institutions.enums import InstitutionKind
 
 
 class Institution(AddressMixin, OrganizationAbstract):
-    class Kind(models.TextChoices):
-        DDETS = ("DDETS", "Direction départementale de l'emploi, du travail et des solidarités")
-        DREETS = ("DREETS", "Direction régionale de l'économie, de l'emploi, du travail et des solidarités")
-        DGEFP = ("DGEFP", "Délégation générale à l'emploi et à la formation professionnelle")
-        OTHER = "Autre", "Autre"
-
     class Meta:
         verbose_name = "Institution partenaire"
         verbose_name_plural = "Institutions partenaires"
 
-    kind = models.CharField(verbose_name="Type", max_length=20, choices=Kind.choices, default=Kind.OTHER)
+    kind = models.CharField(
+        verbose_name="Type", max_length=20, choices=InstitutionKind.choices, default=InstitutionKind.OTHER
+    )
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         verbose_name="Membres",

@@ -28,7 +28,9 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
+from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
@@ -476,7 +478,7 @@ class User(AbstractUser, AddressMixin):
 
         CD as in "Conseil Départemental".
 
-        Unfortunately the `PrescriberOrganization.Kind.DEPT` kind contains not only the real CD but also some random
+        Unfortunately the `PrescriberOrganizationKind.DEPT` kind contains not only the real CD but also some random
         organizations authorized by some CD.
         When such a random non-CD org is registered, it is not authorized yet, thus will be filtered out correctly.
         Later, our staff will authorize the random non-CD org, flag it as `is_brsa` and change its kind to `OTHER`.
@@ -487,9 +489,9 @@ class User(AbstractUser, AddressMixin):
         return (
             self.is_prescriber
             and isinstance(current_org, PrescriberOrganization)
-            and current_org.kind == current_org.Kind.DEPT
+            and current_org.kind == PrescriberOrganizationKind.DEPT
             and current_org.is_authorized
-            and current_org.authorization_status == current_org.AuthorizationStatus.VALIDATED
+            and current_org.authorization_status == PrescriberAuthorizationStatus.VALIDATED
             and not current_org.is_brsa
         )
 
@@ -506,9 +508,9 @@ class User(AbstractUser, AddressMixin):
         return (
             self.is_prescriber
             and isinstance(current_org, PrescriberOrganization)
-            and current_org.kind == current_org.Kind.PE
+            and current_org.kind == PrescriberOrganizationKind.PE
             and current_org.is_authorized
-            and current_org.authorization_status == current_org.AuthorizationStatus.VALIDATED
+            and current_org.authorization_status == PrescriberAuthorizationStatus.VALIDATED
             and current_org.department in settings.STATS_PE_DEPARTMENT_WHITELIST
         )
 
@@ -525,7 +527,7 @@ class User(AbstractUser, AddressMixin):
         return (
             self.is_labor_inspector
             and isinstance(current_org, Institution)
-            and current_org.kind == current_org.Kind.DDETS
+            and current_org.kind == InstitutionKind.DDETS
         )
 
     def get_stats_ddets_department(self, current_org):
@@ -545,7 +547,7 @@ class User(AbstractUser, AddressMixin):
         return (
             self.is_labor_inspector
             and isinstance(current_org, Institution)
-            and current_org.kind == current_org.Kind.DREETS
+            and current_org.kind == InstitutionKind.DREETS
         )
 
     def get_stats_dreets_region(self, current_org):
@@ -564,7 +566,7 @@ class User(AbstractUser, AddressMixin):
         return (
             self.is_labor_inspector
             and isinstance(current_org, Institution)
-            and current_org.kind == current_org.Kind.DGEFP
+            and current_org.kind == InstitutionKind.DGEFP
         )
 
     def update_external_data_source_history_field(self, provider, field, value) -> bool:

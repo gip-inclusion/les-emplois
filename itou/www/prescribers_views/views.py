@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from itou.utils.apis.geocoding import GeocodingDataException
@@ -114,7 +115,7 @@ def list_accredited_organizations(request, template_name="prescribers/list_accre
 
     required_permissions = [
         prescriber_org.is_authorized,
-        prescriber_org.kind == prescriber_org.Kind.DEPT,
+        prescriber_org.kind == PrescriberOrganizationKind.DEPT,
         prescriber_org.has_admin(request.user),
     ]
 

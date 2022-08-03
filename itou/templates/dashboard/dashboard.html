@@ -269,7 +269,7 @@
                                     Gérer vos collaborateurs
                                 </a>
                             </li>
-                            {% if current_prescriber_organization.kind == current_prescriber_organization.Kind.DEPT and user_is_prescriber_org_admin %}
+                            {% if current_prescriber_organization.kind == precriber_kind_dept and user_is_prescriber_org_admin %}
                                 <li class="card-text mb-3">
                                     <i class="ri-list-unordered ri-lg"></i>
                                     <a href="{% url 'prescribers_views:list_accredited_organizations' %}">
@@ -312,7 +312,7 @@
                                 Export des candidatures
                             </a>
                         </li>
-                        {% if current_prescriber_organization and current_prescriber_organization.kind == current_prescriber_organization.Kind.PE  %}
+                        {% if current_prescriber_organization and current_prescriber_organization.kind == precriber_kind_pe %}
                             <li class="card-text mb-3">
                                 <i class="ri-pause-circle-line ri-lg"></i>
                                 <a href="https://tally.so/r/w2Ex0M" title="Suspendre un PASS IAE (ouverture dans un nouvel onglet)" target="_blank">Suspendre un PASS IAE</a><i class="ri-external-link-line ml-1"></i>

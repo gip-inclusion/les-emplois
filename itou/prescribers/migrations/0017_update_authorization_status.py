@@ -12,24 +12,8 @@ from django.db import migrations
 
 
 def update_authorization_status(apps, schema_editor):
-    PrescriberOrganization = apps.get_model("prescribers", "PrescriberOrganization")
-    for org in PrescriberOrganization.objects.filter(is_authorized=False):
-        # Orgs that are not PE and with no habilitation
-        org.authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
-        org.save()
-
-    for org in PrescriberOrganization.objects.filter(is_authorized=True):
-        if org.kind == PrescriberOrganization.Kind.PE:
-            # PE always authorized and validated
-            org.authorization_status = PrescriberOrganization.AuthorizationStatus.VALIDATED
-        elif not org.has_members:
-            # Remove authorization status 'VALIDATED' for prescriber organizations without members
-            org.is_authorized = False
-            org.authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_SET
-        else:
-            org.authorization_status = PrescriberOrganization.AuthorizationStatus.VALIDATED
-
-        org.save()
+    # This migration already done on master and KIND is now in enums dedicated file
+    pass
 
 
 class Migration(migrations.Migration):

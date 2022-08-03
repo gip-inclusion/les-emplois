@@ -8,6 +8,7 @@ from django.utils.http import urlencode
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_code_safir, validate_siret
@@ -34,7 +35,7 @@ class PrescriberOrganizationManager(models.Manager):
         """
         Returns organizations accredited by the given organization.
         """
-        if org.kind == self.model.Kind.DEPT and org.is_authorized:
+        if org.kind == PrescriberOrganizationKind.DEPT and org.is_authorized:
             return self.filter(department=org.department, is_brsa=True)
         return self.none()
 
@@ -42,7 +43,7 @@ class PrescriberOrganizationManager(models.Manager):
         organization = self.model(**attributes)
         organization.save()
         # Notify support.
-        if organization.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET:
+        if organization.authorization_status == PrescriberAuthorizationStatus.NOT_SET:
             organization.must_validate_prescriber_organization_email().send()
         return organization
 
@@ -87,54 +88,6 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     In case 3, we talk about "prescripteur habilité" in French.
     """
 
-    class Kind(models.TextChoices):
-        CAP_EMPLOI = "CAP_EMPLOI", "CAP emploi"
-        ML = "ML", "Mission locale"
-        OIL = "OIL", "Opérateur d'intermédiation locative"
-        ODC = "ODC", "Organisation délégataire d'un CD"
-        PENSION = "PENSION", "Pension de famille / résidence accueil"
-        PE = "PE", "Pôle emploi"
-        RS_FJT = "RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"
-        PREVENTION = "PREVENTION", "Service ou club de prévention"
-        DEPT = "DEPT", "Service social du conseil départemental"
-        AFPA = ("AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes")
-        ASE = "ASE", "ASE - Aide sociale à l'enfance"
-        CAARUD = (
-            "CAARUD",
-            ("CAARUD - Centre d'accueil et d'accompagnement à la réduction de risques pour usagers de drogues"),
-        )
-        CADA = "CADA", "CADA - Centre d'accueil de demandeurs d'asile"
-        CAF = "CAF", "CAF - Caisse d'allocations familiales"
-        CAVA = "CAVA", "CAVA - Centre d'adaptation à la vie active"
-        CCAS = ("CCAS", "CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale")
-        CHRS = "CHRS", "CHRS - Centre d'hébergement et de réinsertion sociale"
-        CHU = "CHU", "CHU - Centre d'hébergement d'urgence"
-        CIDFF = ("CIDFF", "CIDFF - Centre d'information sur les droits des femmes et des familles")
-        CPH = "CPH", "CPH - Centre provisoire d'hébergement"
-        CSAPA = "CSAPA", "CSAPA - Centre de soins, d'accompagnement et de prévention en addictologie"
-        E2C = "E2C", "E2C - École de la deuxième chance"
-        EPIDE = "EPIDE", "EPIDE - Établissement pour l'insertion dans l'emploi"
-        HUDA = "HUDA", "HUDA - Hébergement d'urgence pour demandeurs d'asile"
-        MSA = "MSA", "MSA - Mutualité Sociale Agricole"
-        OACAS = (
-            "OACAS",
-            (
-                "OACAS - Structure porteuse d'un agrément national organisme "
-                "d'accueil communautaire et d'activité solidaire"
-            ),
-        )
-        PIJ_BIJ = "PIJ_BIJ", "PIJ-BIJ - Point/Bureau information jeunesse"
-        PJJ = "PJJ", "PJJ - Protection judiciaire de la jeunesse"
-        PLIE = "PLIE", "PLIE - Plan local pour l'insertion et l'emploi"
-        SPIP = "SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"
-        OTHER = "Autre", "Autre"
-
-    class AuthorizationStatus(models.TextChoices):
-        NOT_SET = "NOT_SET", "Habilitation en attente de validation"
-        VALIDATED = "VALIDATED", "Habilitation validée"
-        REFUSED = "REFUSED", "Validation de l'habilitation refusée"
-        NOT_REQUIRED = "NOT_REQUIRED", "Pas d'habilitation nécessaire"
-
     # Rules:
     # - a SIRET was not mandatory in the past (some entries still have a "blank" siret)
     # - a SIRET is now required for all organizations, except for Pôle emploi agencies
@@ -148,7 +101,12 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     is_head_office = models.BooleanField(
         verbose_name="Siège de l'entreprise", default=False, help_text="Information obtenue via API Entreprise."
     )
-    kind = models.CharField(verbose_name="Type", max_length=20, choices=Kind.choices, default=Kind.OTHER)
+    kind = models.CharField(
+        verbose_name="Type",
+        max_length=20,
+        choices=PrescriberOrganizationKind.choices,
+        default=PrescriberOrganizationKind.OTHER,
+    )
     is_brsa = models.BooleanField(
         verbose_name="Conventionné pour le suivi des BRSA",
         default=False,
@@ -193,8 +151,8 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     authorization_status = models.CharField(
         verbose_name="Statut de l'habilitation",
         max_length=20,
-        choices=AuthorizationStatus.choices,
-        default=AuthorizationStatus.NOT_SET,
+        choices=PrescriberAuthorizationStatus.choices,
+        default=PrescriberAuthorizationStatus.NOT_SET,
     )
     authorization_updated_at = models.DateTimeField(verbose_name="Date de MAJ du statut de l'habilitation", null=True)
     authorization_updated_by = models.ForeignKey(
@@ -228,14 +186,14 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         """
         A code SAFIR can only be set for PE agencies.
         """
-        if self.kind != self.Kind.PE and self.code_safir_pole_emploi:
+        if self.kind != PrescriberOrganizationKind.PE and self.code_safir_pole_emploi:
             raise ValidationError({"code_safir_pole_emploi": "Le Code Safir est réservé aux agences Pôle emploi."})
 
     def clean_siret(self):
         """
         SIRET is required for all organizations, except for PE agencies.
         """
-        if self.kind != self.Kind.PE:
+        if self.kind != PrescriberOrganizationKind.PE:
             if not self.siret:
                 raise ValidationError({"siret": "Le SIRET est obligatoire."})
             if self._meta.model.objects.exclude(pk=self.pk).filter(siret=self.siret, kind=self.kind).exists():
@@ -261,19 +219,22 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         return reverse("prescribers_views:card", kwargs={"org_id": self.pk})
 
     def has_refused_authorization(self):
-        return self.authorization_status == self.AuthorizationStatus.REFUSED
+        return self.authorization_status == PrescriberAuthorizationStatus.REFUSED
 
     def has_pending_authorization(self):
         """
         Pending manual verification of authorization by support staff.
         """
-        return self.authorization_status == self.AuthorizationStatus.NOT_SET
+        return self.authorization_status == PrescriberAuthorizationStatus.NOT_SET
 
     def has_pending_authorization_proof(self):
         """
         An unknown organization claiming to be authorized must provide a written proof.
         """
-        return self.kind == self.Kind.OTHER and self.authorization_status == self.AuthorizationStatus.NOT_SET
+        return (
+            self.kind == PrescriberOrganizationKind.OTHER
+            and self.authorization_status == PrescriberAuthorizationStatus.NOT_SET
+        )
 
     def validated_prescriber_organization_email(self):
         """

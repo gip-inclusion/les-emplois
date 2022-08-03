@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.forms.models import modelformset_factory
 
 from itou.invitations.models import LaborInspectorInvitation, PrescriberWithOrgInvitation, SiaeStaffInvitation
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.models import User
 
 
@@ -45,7 +45,7 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
         email = self.cleaned_data["email"]
 
         self._invited_user_exists_error(email)
-        if self.organization.kind == PrescriberOrganization.Kind.PE and not email.endswith(
+        if self.organization.kind == PrescriberOrganizationKind.PE and not email.endswith(
             settings.POLE_EMPLOI_EMAIL_SUFFIX
         ):
             error = forms.ValidationError("L'adresse e-mail doit être une adresse Pôle emploi")

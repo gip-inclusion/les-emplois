@@ -13,6 +13,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae
@@ -102,6 +103,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
         "num_rejected_employee_records": num_rejected_employee_records,
         "active_campaigns": active_campaigns,
+        "precriber_kind_pe": PrescriberOrganizationKind.PE,
+        "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
     }
 
     return render(request, template_name, context)

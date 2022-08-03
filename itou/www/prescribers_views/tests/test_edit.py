@@ -3,6 +3,7 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import DEFAULT_PASSWORD
@@ -24,7 +25,7 @@ class EditOrganizationTest(TestCase):
         """Edit a prescriber organization."""
 
         organization = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganization.Kind.CAP_EMPLOI
+            authorized=True, kind=PrescriberOrganizationKind.CAP_EMPLOI
         )
         user = organization.members.first()
 
@@ -86,11 +87,11 @@ class EditOrganizationTest(TestCase):
         when user is member of multiple orgs with the same SIRET (and different types)
         (was a regression)
         """
-        organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.ML)
+        organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.ML)
         siret = organization.siret
         user = organization.members.first()
 
-        org2 = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.PLIE, siret=siret)
+        org2 = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.PLIE, siret=siret)
         org2.members.add(user)
         org2.save()
 

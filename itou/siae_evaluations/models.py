@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from itou.eligibility.models import AdministrativeCriteria
+from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
@@ -44,8 +45,8 @@ def validate_institution(institution_id):
     except Institution.DoesNotExist as exception:
         raise ValidationError("L'institution sélectionnée n'existe pas.") from exception
 
-    if institution.kind != Institution.Kind.DDETS:
-        raise ValidationError(f"Sélectionnez une institution de type {Institution.Kind.DDETS}")
+    if institution.kind != InstitutionKind.DDETS:
+        raise ValidationError(f"Sélectionnez une institution de type {InstitutionKind.DDETS}")
 
 
 def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at):
@@ -59,7 +60,7 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_s
         f"au {evaluated_period_end_at.strftime('%d/%m/%Y')}"
     )
 
-    institutions = Institution.objects.filter(kind=Institution.Kind.DDETS)
+    institutions = Institution.objects.filter(kind=InstitutionKind.DDETS)
 
     evaluation_campaign_list = EvaluationCampaign.objects.bulk_create(
         EvaluationCampaign(

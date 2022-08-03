@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Q
 
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 
 
@@ -40,7 +41,7 @@ class Command(BaseCommand):
 
         # Collect prescriber organizations whose authorization status is "refused".
         prescriber_orgs_refused = PrescriberOrganization.objects.filter(
-            authorization_status=PrescriberOrganization.AuthorizationStatus.REFUSED
+            authorization_status=PrescriberAuthorizationStatus.REFUSED
         )
         self.show_counts(prescriber_orgs_refused, "BEFORE UPDATE")
 
@@ -58,8 +59,8 @@ class Command(BaseCommand):
             .annotate(siret_count=Count("siret"))
             .filter(siret_count__gt=1)
             .filter(
-                Q(authorization_status=PrescriberOrganization.AuthorizationStatus.REFUSED)
-                | Q(kind=PrescriberOrganization.Kind.OTHER)
+                Q(authorization_status=PrescriberAuthorizationStatus.REFUSED)
+                | Q(kind=PrescriberOrganizationKind.OTHER)
             )
         )
         self.stdout.write(
@@ -72,8 +73,8 @@ class Command(BaseCommand):
             )
             .select_related("organization", "user")
             .filter(
-                Q(organization__authorization_status=PrescriberOrganization.AuthorizationStatus.REFUSED)
-                | Q(organization__kind=PrescriberOrganization.Kind.OTHER)
+                Q(organization__authorization_status=PrescriberAuthorizationStatus.REFUSED)
+                | Q(organization__kind=PrescriberOrganizationKind.OTHER)
             )
             .values(
                 "organization__siret",
@@ -95,10 +96,10 @@ class Command(BaseCommand):
         prescriber_orgs_refused_to_update = prescriber_orgs_refused.exclude(
             siret__in=prescriber_orgs_refused_to_exclude.values("siret")
         )
-        prescriber_orgs_refused_to_update.update(kind=PrescriberOrganization.Kind.OTHER)
+        prescriber_orgs_refused_to_update.update(kind=PrescriberOrganizationKind.OTHER)
 
         # Controls after update.
         prescriber_orgs_refused = PrescriberOrganization.objects.filter(
-            authorization_status=PrescriberOrganization.AuthorizationStatus.REFUSED
+            authorization_status=PrescriberAuthorizationStatus.REFUSED
         )
         self.show_counts(prescriber_orgs_refused, "AFTER UPDATE")
