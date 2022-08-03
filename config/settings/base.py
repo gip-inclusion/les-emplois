@@ -366,23 +366,31 @@ API_INSEE_CONSUMER_SECRET = os.environ.get("API_INSEE_CONSUMER_SECRET", "")
 # https://api.gouv.fr/documentation/sirene_v3
 API_ENTREPRISE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene/V3"
 
-# Pôle emploi's Emploi Store Dev aka ESD. There is a production AND a recette environment:
-#  - Production: https://www.pole-emploi.io
-#  - Recette: https://peio.pe-qvr.fr/
-# Key and secrets are on pole-emploi.io (prod and recette) accounts, the values are not the
-# same depending on the environment
-# Please note that some of APIs have a dry run mode which is handled through (possibly undocumented) scopes
-# Recette settings:
-## API_ESD_AUTH_BASE_URL="https://entreprise.pe-qvr.fr"
-## API_ESD_BASE_URL="https://api-r.es-qvr.fr/partenaire"
-# Production settings:
-## API_ESD_AUTH_BASE_URL="https://entreprise.pole-emploi.fr"
-## API_ESD_BASE_URL="https://api.emploi-store.fr/partenaire"
+# FIXME move this to existing itoup/pe_connect.md
+# Pôle emploi's Emploi Store Dev aka ESD has two different environments:
+#  - ESD Production: https://www.pole-emploi.io (formerly https://www.emploi-store-dev.fr)
+#    - API_ESD_AUTH_BASE_URL="https://entreprise.pole-emploi.fr"
+#    - API_ESD_BASE_URL="https://api.emploi-store.fr/partenaire"
+#    - We have a single account there
+#      - Our account has a single app ("Plateforme de l'inclusion") with a dedicated key and secret
+#        - Our app can be used by and has redirection links set to
+#          - C1 prod (works)
+#          - C1 staging (works)
+#          - C1 demo (not fully set up)
+#          - C1 local dev (? - never worked so far)
+#  - ESD Recette: https://peio.pe-qvr.fr (formerly https://www-r.es-qvr-dev.fr)
+#    - API_ESD_AUTH_BASE_URL=FIXME (formerly "https://entreprise.pe-qvr.fr")
+#    - API_ESD_BASE_URL=FIXME (formerly "https://api-r.es-qvr.fr/partenaire")
+#    - We have a single account there
+#      - Our account has a single app ("Plateforme de l'inclusion") with a dedicated key and secret
+#        - Our app can be used by and has redirection links set to
+#          - C1 local dev (? - last seen working in 2020)
+# Please note that some of APIs have a dry run mode which is handled through (possibly undocumented) scopes.
 API_ESD = {
     "AUTH_BASE_URL": os.environ.get("API_ESD_AUTH_BASE_URL"),
+    "BASE_URL": os.environ.get("API_ESD_BASE_URL"),
     "KEY": os.environ.get("API_ESD_KEY", ""),
     "SECRET": os.environ.get("API_ESD_SECRET", ""),
-    "BASE_URL": os.environ.get("API_ESD_BASE_URL"),
 }
 
 
