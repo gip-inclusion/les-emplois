@@ -60,14 +60,8 @@ def valid_session_required(required_keys=None):
     return wrapper
 
 
-def get_approvals_wrapper(request, job_seeker, siae):
-    """
-    Returns an `ApprovalsWrapper` if possible or stop
-    the job application submit process.
-    This works only when the `job_seeker` is known.
-    """
+def check_job_seeker_approvals(request, job_seeker, siae):
     user_info = get_user_info(request)
-    approvals_wrapper = job_seeker.approvals_wrapper
     if job_seeker.cannot_bypass_approval_waiting_period(
         siae=siae, sender_prescriber_organization=user_info.prescriber_organization
     ):
@@ -81,17 +75,14 @@ def get_approvals_wrapper(request, job_seeker, siae):
             error = apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
         raise PermissionDenied(error)
 
-    if approvals_wrapper.has_valid and approvals_wrapper.latest_approval.is_pass_iae:
-
-        latest_approval = approvals_wrapper.latest_approval
+    if job_seeker.latest_approval and job_seeker.latest_approval.is_valid():
+        approval = job_seeker.latest_approval
         # Ensure that an existing approval can be unsuspended.
-        if latest_approval.is_suspended and not latest_approval.can_be_unsuspended:
+        if approval.is_suspended and not approval.can_be_unsuspended:
             error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY
             if user_info.user == job_seeker:
                 error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
             raise PermissionDenied(error)
-
-    return approvals_wrapper
 
 
 class ApplyStepBaseView(LoginRequiredMixin, SessionNamespaceRequiredMixin, TemplateView):
@@ -589,7 +580,7 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
     session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
     job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
     siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
-    approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
+    check_job_seeker_approvals(request, job_seeker, siae)
     next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk})
 
     # Check required info that will allow us to find a pre-existing approval.
@@ -606,7 +597,7 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
         form.save()
         return HttpResponseRedirect(next_url)
 
-    context = {"form": form, "siae": siae, "job_seeker": job_seeker, "approvals_wrapper": approvals_wrapper}
+    context = {"form": form, "siae": siae, "job_seeker": job_seeker}
     return render(request, template_name, context)
 
 
@@ -619,7 +610,7 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
     session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
     siae = get_object_or_404(Siae, pk=session_ns.get("siae_pk"))
     job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
-    approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
+    check_job_seeker_approvals(request, job_seeker, siae)
     prev_applications = job_seeker.job_applications.filter(to_siae=siae)
 
     # Limit the possibility of applying to the same SIAE for 24 hours.
@@ -646,7 +637,6 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
         "job_seeker": job_seeker,
         "siae": siae,
         "prev_application": prev_applications.latest("created_at"),
-        "approvals_wrapper": approvals_wrapper,
     }
     return render(request, template_name, context)
 
@@ -666,7 +656,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
 
     user_info = get_user_info(request)
     job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
-    approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
+    check_job_seeker_approvals(request, job_seeker, siae)
 
     skip = (
         # Only "authorized prescribers" can perform an eligibility diagnosis.
@@ -691,7 +681,6 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
     context = {
         "siae": siae,
         "job_seeker": job_seeker,
-        "approvals_wrapper": approvals_wrapper,
         "form_administrative_criteria": form_administrative_criteria,
     }
     return render(request, template_name, context)
@@ -711,7 +700,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     form = SubmitJobApplicationForm(data=request.POST or None, siae=siae, initial=initial_data)
 
     job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
-    approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
+    check_job_seeker_approvals(request, job_seeker, siae)
 
     if request.method == "POST" and form.is_valid():
         next_url = reverse("apply:step_application_sent", kwargs={"siae_pk": siae_pk})
@@ -760,7 +749,6 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         "siae": siae,
         "form": form,
         "job_seeker": job_seeker,
-        "approvals_wrapper": approvals_wrapper,
         "s3_form_values": s3_form_values,
         "s3_upload_config": s3_upload_config,
     }
