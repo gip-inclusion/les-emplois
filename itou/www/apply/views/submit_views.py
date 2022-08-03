@@ -219,7 +219,6 @@ class CheckNIRForJobSeekerView(ApplyStepForJobSeekerBaseView):
 
     def post(self, request, *args, **kwargs):
         if self.form.data.get("skip"):
-            # Redirect to search by e-mail address.
             return HttpResponseRedirect(reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk}))
 
         if self.form.is_valid():
