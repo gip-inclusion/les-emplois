@@ -118,6 +118,26 @@ class ApplyStepBaseView(LoginRequiredMixin, SessionNamespaceRequiredMixin, Templ
         }
 
 
+class ApplicationBaseView(ApplyStepBaseView):
+    required_session_namespaces = ["apply_session"]
+
+    def __init__(self):
+        super().__init__()
+
+        self.job_seeker = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.job_seeker = get_object_or_404(User, pk=self.apply_session.get("job_seeker_pk"))
+        _check_job_seeker_approval(request, self.job_seeker, self.siae)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_seeker": self.job_seeker,
+        }
+
+
 class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
     required_session_namespaces = ["apply_session"]
 
@@ -570,25 +590,21 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         }
 
 
-class CheckJobSeekerInformations(ApplyStepBaseView):
+class CheckJobSeekerInformations(ApplicationBaseView):
     """
     Ensure the job seeker has all required info.
     """
 
     template_name = "apply/submit_step_job_seeker_check_info.html"
-    required_session_namespaces = ["apply_session"]
 
     def __init__(self):
         super().__init__()
 
-        self.job_seeker = None
         self.form = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.job_seeker = get_object_or_404(User, pk=self.apply_session.get("job_seeker_pk"))
-        _check_job_seeker_approval(request, self.job_seeker, self.siae)
         self.form = CheckJobSeekerInfoForm(instance=self.job_seeker, data=request.POST or None)
 
     def get(self, request, *args, **kwargs):
@@ -615,30 +631,24 @@ class CheckJobSeekerInformations(ApplyStepBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "job_seeker": self.job_seeker,
         }
 
 
-class CheckPreviousApplications(ApplyStepBaseView):
+class CheckPreviousApplications(ApplicationBaseView):
     """
     Check previous job applications to avoid duplicates.
     """
 
     template_name = "apply/submit_step_check_prev_applications.html"
-    required_session_namespaces = ["apply_session"]
 
     def __init__(self):
         super().__init__()
 
-        self.job_seeker = None
-        self.approvals_wrapper = None
         self.previous_applications = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.job_seeker = get_object_or_404(User, pk=self.apply_session.get("job_seeker_pk"))
-        _check_job_seeker_approval(request, self.job_seeker, self.siae)
         self.previous_applications = self.job_seeker.job_applications.filter(to_siae=self.siae)
 
     def get(self, request, *args, **kwargs):
@@ -665,7 +675,6 @@ class CheckPreviousApplications(ApplyStepBaseView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "job_seeker": self.job_seeker,
             "prev_application": self.previous_applications.latest("created_at"),
         }
 
