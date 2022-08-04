@@ -202,16 +202,14 @@ class ApplyAsJobSeekerTest(TestCase):
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
-        resume_config = s3_upload.config
-        s3_form_endpoint = s3_upload.form_values["url"]
 
         # Don't test S3 form fields as it led to flaky tests and
         # it's already done by the Boto library.
-        self.assertContains(response, s3_form_endpoint)
+        self.assertContains(response, s3_upload.form_values["url"])
 
         # Config variables
-        resume_config.pop("upload_expiration")
-        for _, value in resume_config.items():
+        s3_upload.config.pop("upload_expiration")
+        for _, value in s3_upload.config.items():
             self.assertContains(response, value)
 
         post_data = {

@@ -462,8 +462,6 @@ class SiaeUploadDocsViewTest(TestCase):
         )
 
         s3_upload = S3Upload(kind="evaluations")
-        s3_form_values = s3_upload.form_values
-        s3_upload_config = s3_upload.config
 
         url = reverse(
             "siae_evaluations_views:siae_upload_doc",
@@ -482,13 +480,13 @@ class SiaeUploadDocsViewTest(TestCase):
         )
         self.assertEqual(evaluated_administrative_criteria, response.context["evaluated_administrative_criteria"])
 
-        for k, v in s3_form_values.items():
-            with self.subTest("s3_form_values", k=k):
-                self.assertEqual(v, response.context["s3_form_values"][k])
+        for k, v in s3_upload.form_values.items():
+            with self.subTest("s3_upload.form_values", k=k):
+                self.assertEqual(v, response.context["s3_upload"].form_values[k])
 
-        for k, v in s3_upload_config.items():
-            with self.subTest("s3_upload_config", k=k):
-                self.assertEqual(v, response.context["s3_upload_config"][k])
+        for k, v in s3_upload.config.items():
+            with self.subTest("s3_upload.config", k=k):
+                self.assertEqual(v, response.context["s3_upload"].config[k])
 
     def test_post(self):
         fake_now = timezone.now()
@@ -514,15 +512,13 @@ class SiaeUploadDocsViewTest(TestCase):
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="evaluations")
-        s3_upload_config = s3_upload.config
-        s3_form_endpoint = s3_upload.form_values["url"]
 
         # Don't test S3 form fields as it led to flaky tests and
         # it's already done by the Boto library.
-        self.assertContains(response, s3_form_endpoint)
+        self.assertContains(response, s3_upload.form_values["url"])
 
         # Config variables
-        for _, value in s3_upload_config.items():
+        for _, value in s3_upload.config.items():
             self.assertContains(response, value)
 
         post_data = {

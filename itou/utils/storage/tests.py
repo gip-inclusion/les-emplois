@@ -15,7 +15,6 @@ class S3Tests(SimpleTestCase):
 
     def test_get_upload_config(self):
         s3_upload = S3Upload()
-        result = s3_upload.config
         expected_keys = [
             "allowed_mime_types",
             "upload_expiration",
@@ -24,8 +23,8 @@ class S3Tests(SimpleTestCase):
             "max_file_size",
             "timeout",
         ]
-        self.assertEqual(sorted(expected_keys), sorted(result.keys()))
-        for _, value in result.items():
+        self.assertEqual(sorted(expected_keys), sorted(s3_upload.config.keys()))
+        for _, value in s3_upload.config.items():
             self.assertIsNot(value, None)
 
         # test presence of default values
@@ -33,26 +32,21 @@ class S3Tests(SimpleTestCase):
         test_resume_settings = default_settings | {"resume": {}}
         with self.settings(STORAGE_UPLOAD_KINDS=test_resume_settings):
             s3_upload_resume = S3Upload(kind="resume")
-            result = s3_upload_resume.config
-            self.assertEqual(result["allowed_mime_types"], "application/pdf")
-            self.assertEqual(result["key_path"], "")
-            self.assertEqual(result["upload_expiration"], 5400)
-            self.assertEqual(result["max_file_size"], 5)
-            self.assertEqual(result["max_files"], 1)
+            self.assertEqual(s3_upload_resume.config["allowed_mime_types"], "application/pdf")
+            self.assertEqual(s3_upload_resume.config["key_path"], "")
+            self.assertEqual(s3_upload_resume.config["upload_expiration"], 5400)
+            self.assertEqual(s3_upload_resume.config["max_file_size"], 5)
+            self.assertEqual(s3_upload_resume.config["max_files"], 1)
 
         # Test allowed mime types formatting
         file_type = "application/pdf"
         default_test_settings = default_settings["default"] | {"allowed_mime_types": [file_type]}
         with self.settings(STORAGE_UPLOAD_KINDS={"default": default_test_settings}):
-            s3_upload = S3Upload()
-            result = s3_upload.config["allowed_mime_types"]
-            self.assertEqual(result, file_type)
+            self.assertEqual(S3Upload().config["allowed_mime_types"], file_type)
 
         default_test_settings = default_settings["default"] | {"allowed_mime_types": ["application/pdf", "image/jpeg"]}
         with self.settings(STORAGE_UPLOAD_KINDS={"default": default_test_settings}):
-            s3_upload = S3Upload()
-            result = s3_upload.config["allowed_mime_types"]
-            self.assertEqual(result, "application/pdf,image/jpeg")
+            self.assertEqual(S3Upload().config["allowed_mime_types"], "application/pdf,image/jpeg")
 
         # Key path should not begin nor end with a slash.
         default_test_settings = default_settings["default"] | {"key_path": "/resume/"}

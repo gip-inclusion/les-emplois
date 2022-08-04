@@ -345,14 +345,11 @@ def siae_upload_doc(
         form.save()
         return HttpResponseRedirect(url)
 
-    s3_upload = S3Upload(kind="evaluations")
-
     back_url = get_safe_url(request, "back_url", fallback_url=url)
 
     context = {
         "evaluated_administrative_criteria": evaluated_administrative_criteria,
-        "s3_form_values": s3_upload.form_values,
-        "s3_upload_config": s3_upload.config,
+        "s3_upload": S3Upload(kind="evaluations"),
         "form": form,
         "back_url": back_url,
     }
