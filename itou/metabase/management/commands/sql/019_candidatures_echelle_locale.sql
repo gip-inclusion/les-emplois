@@ -21,11 +21,21 @@ bassin_emploi as ( /* On récupère les infos locales à partir des données inf
         be.code_commune,
         be.nom_arrondissement,
         be.nom_zone_emploi_2020 as bassin_d_emploi, /* zone d'emploi = bassin d'emploi */
-        s.id as id_structure /* on récupère que l'id des structures de la table structure */
+        s.id as id_structure, /* on récupère que l'id des structures de la table structure */
+        s.siret as siret
     from sa_zones_infradepartementales be
         left join structures s 
             on s.ville = be.libelle_commune and s.nom_département = be.nom_departement /* il faut rajouter le département car la France n'est pas originale en terme de noms de ville */
-) 
+),
+adherents_iae as ( 
+    select 
+        distinct (ria."SIRET") as siret, 
+        ria."Réseau IAE" as reseau_iae,
+        s.id as id_structure
+    from reseau_iae_adherents ria 
+        inner join structures s 
+            on s.siret = ria."SIRET"
+)
 select 
     date_candidature,
     date_embauche,
@@ -39,6 +49,7 @@ select
     motif_de_refus,
     candidatures_p.nom_département_structure,
     nom_structure,
+    adherents_iae.reseau_iae,
     type_structure,
     origine,
     origine_détaillée,
@@ -88,3 +99,5 @@ from
     candidatures_p
         left join bassin_emploi
             on bassin_emploi.id_structure = candidatures_p.id_structure  
+        left join adherents_iae
+            on adherents_iae.id_structure = candidatures_p.id_structure
