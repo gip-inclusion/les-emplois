@@ -25,15 +25,6 @@ class Command(BaseCommand):
 
     def handle(self, wet_run=False, delay=0, **options):
         today = timezone.now().date()
-
-        # TODO(vperron): verify that we send the most recent, down to the oldest.
-        # Also, note that we have **a lot** (190000) of "old" Approvals that have never
-        # been sent to PE.
-        # > count approvals pending 188256
-        # > count approvals pending no NIR 91670
-        # > count approvals pending no user 0
-        # > count approvals pending weird user 108
-        # > count approvals pending not accepted 144
         queryset = (
             approvals_models.Approval.objects.filter(
                 # we will ignore any approval that starts after today anyway.
@@ -50,9 +41,10 @@ class Command(BaseCommand):
             # those with a no-nir, no-birthdate or no-name user are also removed from the queryset
             # in order not to block the cron. They will be picked up as soon as they are set.
             .exclude(
-                Q(user__nir="")
-                | Q(user__nir=None)
+                Q(user__nir=None)
                 | Q(user__birthdate=None)
+                # there are no such cases in the database at the time of writing, but it *might* happen.
+                | Q(user__nir="")
                 | Q(user__first_name="")
                 | Q(user__last_name="")
             ).order_by("-start_at")
