@@ -1,7 +1,7 @@
 from time import sleep
 
 from django.core.management.base import BaseCommand
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.utils import timezone
 
 from itou.approvals import models as approvals_models
@@ -35,8 +35,7 @@ class Command(BaseCommand):
         # > count approvals pending weird user 108
         # > count approvals pending not accepted 144
         queryset = (
-            approvals_models.Approval.objects.annotate(ja_count=Count("jobapplication"))
-            .filter(
+            approvals_models.Approval.objects.filter(
                 # we will ignore any approval that starts after today anyway.
                 start_at__lte=today,
                 # those with no accepted job application would also fail and stay pending.
@@ -56,8 +55,7 @@ class Command(BaseCommand):
                 | Q(user__birthdate=None)
                 | Q(user__first_name="")
                 | Q(user__last_name="")
-            )
-            .order_by("-start_at")
+            ).order_by("-start_at")
         )
 
         self.stdout.write(
