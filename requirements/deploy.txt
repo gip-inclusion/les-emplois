@@ -1,10 +1,5 @@
 -r ./base.txt
 
 uwsgi==2.0.20  # https://github.com/unbit/uwsgi
-
-# FIXME(vperron): Sentry requirement has to be kept back since it makes PE connect
-# crash with a 409. Tried getting rid of the loggers, deactivating safe plugins, etc,
-# nothing helps. It seems just enabling this version of Sentry breaks PE Connect badly.
-# Investigation is ongoing about the "why".
-sentry-sdk==1.5.4  # https://github.com/getsentry/sentry-python
+sentry-sdk==1.9.0  # https://github.com/getsentry/sentry-python
 elastic-apm==6.10.1  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
