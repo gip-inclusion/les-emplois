@@ -28,4 +28,23 @@ $(document).ready(() => {
         // Check immediately
         checkValidity({"currentTarget": this})
     });
+
+  /**
+   * JS to swap elements based on CSS selectors
+   */
+  function swapElements(e) {
+    let box = $(e.currentTarget).parents(".js-swap-elements")
+    let swap_elements = $(box).find($(e.currentTarget).data("swap-element"))
+    let swap_element_with = swap_elements
+      .get()  // Convert the jQuery object to an Array
+      .flatMap(item => $(box).find($(item).data("swap-element-with")))  // Make a flat list of elements to swap with
+      .reduce($.merge)  // Convert the Array to a jQuery object
+    swap_elements.hide()
+    swap_element_with.show()
+  }
+  $(".js-swap-elements").each(function () {
+    $(this).find("[data-swap-element]").each(function () {
+      $(this).click(swapElements)
+    })
+  })
 });
