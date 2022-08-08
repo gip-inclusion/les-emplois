@@ -169,8 +169,8 @@ class CreateJobSeekerStep2ForSenderForm(MandatoryAddressFormMixin, forms.ModelFo
     def clean(self):
         super().clean()
 
-        if self.cleaned_data["post_code"]:
-            self.cleaned_data["department"] = department_from_postcode(self.cleaned_data["post_code"])
+        if post_code := self.cleaned_data.get("post_code"):
+            self.cleaned_data["department"] = department_from_postcode(post_code)
 
     class Meta:
         model = User
