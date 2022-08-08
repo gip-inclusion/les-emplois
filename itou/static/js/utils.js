@@ -19,9 +19,12 @@ $(document).ready(() => {
 
     $(".js-enable-submit-when-valid").each(function () {
         let form = $(this)
-        // Check everytime something change in the form
-        form.change(checkValidity)
-        form.on("duetChange", checkValidity)
+        // Check the validity when something (possibly) change in the form.
+        form.on("change reset duetChange", (e) => {
+          // Use setTimeout() to execute checkValidity() in the next event cycle,
+          // when events *should* have done what they need to do.
+          window.setTimeout(checkValidity, 0, e)
+        })
         // Check immediately
         checkValidity({"currentTarget": this})
     });
