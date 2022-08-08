@@ -26,6 +26,8 @@ class JSONEncoder(json.JSONEncoder):
             return {"__type__": "decimal.Decimal", "value": str(obj)}
         if isinstance(obj, uuid.UUID):
             return {"__type__": "uuid.UUID", "value": str(obj)}
+        if isinstance(obj, django.db.models.QuerySet):
+            return list(obj)
         if isinstance(obj, django.utils.functional.Promise):
             return str(obj)
         if isinstance(obj, django.db.models.Model):
