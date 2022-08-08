@@ -178,12 +178,17 @@ class DashboardViewTest(TestCase):
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
-        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
 
         evaluation_campaign = EvaluationCampaignFactory(institution=institution)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
-        self.assertContains(response, reverse("siae_evaluations_views:samples_selection"))
+        self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:samples_selection",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            ),
+        )
         self.assertNotContains(
             response,
             reverse(
@@ -196,7 +201,13 @@ class DashboardViewTest(TestCase):
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
-        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
+        self.assertNotContains(
+            response,
+            reverse(
+                "siae_evaluations_views:samples_selection",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            ),
+        )
         self.assertContains(
             response,
             reverse(
@@ -209,7 +220,13 @@ class DashboardViewTest(TestCase):
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
-        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
+        self.assertNotContains(
+            response,
+            reverse(
+                "siae_evaluations_views:samples_selection",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            ),
+        )
         self.assertNotContains(
             response,
             reverse(

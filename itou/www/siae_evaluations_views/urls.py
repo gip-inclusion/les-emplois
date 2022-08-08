@@ -7,7 +7,7 @@ from itou.www.siae_evaluations_views import views
 app_name = "siae_evaluations_views"
 
 urlpatterns = [
-    path("samples_selection", views.samples_selection, name="samples_selection"),
+    path("samples_selection/<int:evaluation_campaign_pk>/", views.samples_selection, name="samples_selection"),
     path(
         "institution_evaluated_siae_list/<int:evaluation_campaign_pk>/",
         views.institution_evaluated_siae_list,
