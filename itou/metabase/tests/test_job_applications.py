@@ -15,13 +15,13 @@ class MetabaseJobApplicationTest(TestCase):
 
     def test_refusal_reason_old_value(self):
         fn = self.get_fn_by_name("motif_de_refus")
-        ja = JobApplicationFactory(refusal_reason=RefusalReason.ELIGIBILITY_DOUBT)
+        ja = JobApplicationFactory(refusal_reason=RefusalReason.ELIGIBILITY_DOUBT.value)
         self.assertIn(ja.refusal_reason, RefusalReason.hidden())
         self.assertEqual(fn(ja), ja.refusal_reason.label)
 
     def test_refusal_reason_current_value(self):
         fn = self.get_fn_by_name("motif_de_refus")
-        ja = JobApplicationFactory(refusal_reason=RefusalReason.DID_NOT_COME)
+        ja = JobApplicationFactory(refusal_reason=RefusalReason.DID_NOT_COME.value)
         self.assertNotIn(ja.refusal_reason, RefusalReason.hidden())
         self.assertEqual(fn(ja), ja.refusal_reason.label)
 
