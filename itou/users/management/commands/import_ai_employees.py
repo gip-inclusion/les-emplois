@@ -320,8 +320,8 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         approval = None
         # If job seeker has already a valid approval: don't redeliver it.
         if job_seeker.approvals.valid().exists():
-            approval = job_seeker.approvals_wrapper.latest_approval
-            # Unless it was issued by an AI who did not want to wait for our script to run.
+            approval = job_seeker.latest_approval
+            # ...unless it was issued by an AI who did not want to wait for our script to run.
             job_app_qs = approval.jobapplication_set.filter(
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
                 to_siae=F("sender_siae"),
