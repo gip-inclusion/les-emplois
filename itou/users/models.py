@@ -406,12 +406,6 @@ class User(AbstractUser, AddressMixin):
     def has_no_approval(self):
         return not self.latest_approval and not self.latest_pe_approval
 
-    @property
-    def has_valid_pe_eligibility_diagnosis(self):
-        return (
-            self.latest_approval and self.latest_approval.is_valid() and not self.latest_approval.originates_from_itou
-        )
-
     def cannot_bypass_approval_waiting_period(self, siae, sender_prescriber_organization):
         """
         An approval in waiting period can only be bypassed if the prescriber is authorized

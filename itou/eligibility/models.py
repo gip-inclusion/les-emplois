@@ -73,9 +73,7 @@ class EligibilityDiagnosisManager(models.Manager):
         Hence the Trello #2604 decision: if a PASS IAE is valid, we do not
         check the presence of an eligibility diagnosis.
         """
-        return job_seeker.approvals_wrapper.has_valid or bool(
-            self.last_considered_valid(job_seeker, for_siae=for_siae)
-        )
+        return job_seeker.has_valid_approval or bool(self.last_considered_valid(job_seeker, for_siae=for_siae))
 
     def last_considered_valid(self, job_seeker, for_siae=None):
         """
@@ -94,7 +92,7 @@ class EligibilityDiagnosisManager(models.Manager):
 
         # A diagnosis is considered valid for the duration of an approval,
         # we just retrieve the last one no matter if it's valid or not.
-        if job_seeker.approvals_wrapper and job_seeker.approvals_wrapper.has_valid:
+        if job_seeker.has_valid_approval:
             last = query.by_author_kind_prescriber().last()
             if not last and for_siae:
                 last = query.authored_by_siae(for_siae).last()
@@ -211,16 +209,16 @@ class EligibilityDiagnosis(models.Model):
     # Methods below (whose name contain `considered`) take into account
     # the existence of an ongoing approval.
     # They must not be used "as-is" in admin's `list_display` because checking
-    # approvals_wrapper would trigger additional SQL queries for each row.
+    # the latest approvals would trigger additional SQL queries for each row.
 
     @property
     def is_considered_valid(self):
-        return self.is_valid or self.job_seeker.approvals_wrapper.has_valid
+        return self.is_valid or self.job_seeker.has_valid_approval
 
     @property
     def considered_to_expire_at(self):
-        if self.job_seeker.approvals_wrapper.has_valid:
-            return self.job_seeker.approvals_wrapper.latest_approval.end_at
+        if self.job_seeker.has_valid_approval:
+            return self.job_seeker.latest_common_approval.end_at
         return self.expires_at
 
     @classmethod

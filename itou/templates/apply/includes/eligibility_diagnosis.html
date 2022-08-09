@@ -99,7 +99,7 @@
 
         {% endif %}
 
-    {% elif job_application.job_seeker.has_valid_pe_eligibility_diagnosis %}
+    {% elif job_application.job_seeker.latest_pe_approval and job_application.job_seeker.latest_pe_approval.is_valid %}
 
         <hr>
         <h3>Critères d'éligibilité</h3>
