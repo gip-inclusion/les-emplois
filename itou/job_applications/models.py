@@ -815,13 +815,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     # the approval should start at the same time as most recent contract.
                     self.approval.update_start_date(new_start_date=self.hiring_start_at)
                 emails.append(self.email_deliver_approval(accepted_by))
-            elif (
-                not self.job_seeker.pole_emploi_id
-                and self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_FORGOTTEN
-            ):
-                # Trigger a manual approval creation.
-                self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
-                emails.append(self.email_manual_approval_delivery_required_notification(accepted_by))
             elif (approvals_wrapper.has_none and (self.job_seeker.nir or self.job_seeker.pole_emploi_id)) or (
                 self.job_seeker.pole_emploi_id
                 or self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_NOT_REGISTERED
@@ -835,6 +828,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 new_approval.save()
                 self.approval = new_approval
                 emails.append(self.email_deliver_approval(accepted_by))
+            elif not self.job_seeker.nir or (
+                not self.job_seeker.pole_emploi_id
+                and self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_FORGOTTEN
+            ):
+                # Trigger a manual approval creation.
+                self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
+                emails.append(self.email_manual_approval_delivery_required_notification(accepted_by))
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
 

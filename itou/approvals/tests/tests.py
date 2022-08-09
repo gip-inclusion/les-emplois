@@ -894,18 +894,14 @@ class AutomaticApprovalAdminViewsTest(TestCase):
 
 
 class CustomApprovalAdminViewsTest(TestCase):
-    """
-    Test Approval custom admin views.
-    """
-
     def test_manually_add_approval(self):
         user = UserFactory()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        # When a Pôle emploi ID has been forgotten, an approval must be delivered
+        # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
         job_seeker = JobSeekerFactory(
-            pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,

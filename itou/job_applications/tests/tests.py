@@ -793,7 +793,7 @@ class JobApplicationNotificationsTest(TestCase):
     def test_manually_deliver_approval(self, *args, **kwargs):
         staff_member = UserFactory(is_staff=True)
         job_seeker = JobSeekerFactory(
-            pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -815,7 +815,7 @@ class JobApplicationNotificationsTest(TestCase):
     def test_manually_refuse_approval(self, *args, **kwargs):
         staff_member = UserFactory(is_staff=True)
         job_seeker = JobSeekerFactory(
-            pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             job_seeker=job_seeker,

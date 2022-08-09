@@ -378,7 +378,8 @@ class ProcessViewsTest(TestCase):
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            # The state of the 2 `pole_emploi_*` fields will trigger a manual delivery.
+            # The state of the 3 `pole_emploi_*` fields will trigger a manual delivery.
+            job_seeker__nir="",
             job_seeker__pole_emploi_id="",
             job_seeker__lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
         )
