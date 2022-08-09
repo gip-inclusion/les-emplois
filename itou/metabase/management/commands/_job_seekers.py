@@ -279,10 +279,11 @@ TABLE_COLUMNS += [
         "type": "boolean",
         "comment": "Provient des injections AI",
         # Here we flag job seekers as soon as any of their approvals is from the AI stock.
-        # In theory we should only flag them when their latest approval `o.approvals_wrapper.latest_approval` matches,
+        # In theory we should only flag them when their latest approval `o.latest_approval` matches,
         # but the performance becomes terrible (e.g. 120 minutes vs 30 minutes), is not easy to fix due to how
-        # `approvals_wrapper.latest_approval` is implemented and gives the exact same end result anyway (71205 users),
+        # `user.latest_approval` is implemented and gives the exact same end result anyway (71205 users),
         # most likely since most if not all of these users only have a single approval anyway.
+        # FIXME(vperron): It would be interesting to test again now though.
         "fn": lambda o: o.pk in get_ai_stock_job_seeker_pks(),
     },
 ]
