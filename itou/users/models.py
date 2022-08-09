@@ -15,7 +15,7 @@ from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
-from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval
+from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
     Commune,
@@ -328,13 +328,6 @@ class User(AbstractUser, AddressMixin):
     @property
     def has_verified_email(self):
         return self.emailaddress_set.filter(email=self.email, verified=True).exists()
-
-    @cached_property
-    def approvals_wrapper(self):
-        # TODO(vperron): Remove me.
-        if not self.is_job_seeker:
-            return None
-        return ApprovalsWrapper(self)
 
     @cached_property
     def latest_approval(self):
