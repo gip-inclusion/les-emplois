@@ -152,7 +152,7 @@ class CreatedByProxyFilter(admin.SimpleListFilter):
 class ItouUserAdmin(UserAdmin):
 
     form = UserAdminForm
-    inlines = UserAdmin.inlines + [
+    inlines = [
         SiaeMembershipInline,
         PrescriberMembershipInline,
         InstitutionMembershipInline,

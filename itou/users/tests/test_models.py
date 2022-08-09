@@ -210,8 +210,15 @@ class ModelTest(TestCase):
         self.assertFalse(job_seeker.is_handled_by_proxy)
 
     def test_has_sso_provider(self):
+        # django 4.1 complains when the object has no primary key and we try to acces the `is_peamu` property
+        # (that is cached and may access sub-objects)
         job_seeker = JobSeekerFactory.build()
-        self.assertFalse(job_seeker.has_sso_provider)
+        with self.assertRaises(ValueError):
+            job_seeker.has_sso_provider()
+
+        job_seeker = JobSeekerFactory.build(identity_provider=IdentityProvider.DJANGO)
+        with self.assertRaises(ValueError):
+            job_seeker.has_sso_provider()
 
         job_seeker = JobSeekerFactory.build(identity_provider=IdentityProvider.FRANCE_CONNECT)
         self.assertTrue(job_seeker.has_sso_provider)
