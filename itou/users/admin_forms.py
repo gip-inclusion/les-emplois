@@ -21,13 +21,15 @@ class UserAdminForm(UserChangeForm):
                 "Un utilisateur ne peut avoir qu'un rôle à la fois : soit candidat, soit prescripteur, "
                 "soit employeur, soit inspecteur."
             )
-        # We may not necessarily have an approvals_wrapper during account creation
-        if self.instance.approvals_wrapper:
-            has_approval = self.instance.approvals_wrapper.latest_approval is not None
-            if has_approval and not self.cleaned_data["is_job_seeker"]:
-                raise ValidationError(
-                    "Cet utilisateur possède déjà un PASS IAE et doit donc obligatoirement être un candidat."
-                )
+
+        # According to the PR which introduced it, we only care about PASS IAE here,
+        # not common approvals. https://github.com/betagouv/itou/pull/910
+        # The goal being to prevent changing the type of an user who already has a PASS IAE,
+        # and the PE approvals being not linked to an user, we have no need to check those.
+        if self.instance.latest_approval and not self.cleaned_data["is_job_seeker"]:
+            raise ValidationError(
+                "Cet utilisateur possède déjà un PASS IAE et doit donc obligatoirement être un candidat."
+            )
 
         # smart warning if email already exist
         if self.instance.email_already_exists(self.cleaned_data["email"], exclude_pk=self.instance.pk):
