@@ -2,6 +2,7 @@
 https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 """
 from django import template
+from django.template import defaultfilters
 
 
 register = template.Library()
@@ -22,3 +23,12 @@ def pluralizefr(value, arg="s"):
         except TypeError:  # len() of unsized object.
             pass
     return ""
+
+
+@register.filter(is_safe=True)
+@defaultfilters.stringfilter
+def mask_unless(value, predicate):
+    if predicate:
+        return value
+
+    return " ".join(part[0] + "…" for part in value.split(" "))

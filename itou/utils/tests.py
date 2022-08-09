@@ -514,6 +514,18 @@ class UtilsTemplateTagsTestCase(TestCase):
         out = template.render(Context({"counter": 10}))
         self.assertEqual(out, "Résultats")
 
+    def test_mask_unless(self):
+        template = Template("""{% load str_filters %}{{ value|mask_unless:predicate }}""")
+
+        self.assertEqual(
+            template.render(Context({"value": "Firstname Lastname", "predicate": True})),
+            "Firstname Lastname",
+        )
+        self.assertEqual(
+            template.render(Context({"value": "Firstname Lastname", "predicate": False})),
+            "F… L…",
+        )
+
 
 class UtilsTemplateFiltersTestCase(TestCase):
     def test_format_phone(self):
