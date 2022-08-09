@@ -236,9 +236,11 @@ def siae_job_applications_list(request, template_name="siae_evaluations/siae_job
     )
 
     # note vincentporte : is_submittable should be a method of EvaluatedSiae model
-    # when `siae_job_applications_list` will collect EvaluatedJobApplication of ONE
-    # EvaluatedSiae instead of all EvaluatedJobApplication of all active EvaluatedSiae
-    # of one Siae (misconception here)
+
+    # vincentporte, note for victorperron
+    # POINT 2 - La SIAE évaluée ne peut pas soumettre ses docs alors qu'elle est dans l'état `SUBMITTABLE`
+    # utiliser la propriété `state` de `EvaluatedSiae` pour déterminer `is_submittable`
+    # https://www.notion.so/DDETS-15-et-09-impossible-d-ouvrir-la-carte-en-statut-nouveaux-justificatifs-traiter-analys-4bd9edda0bac4163861e952fcc1c16ee#44fe7c79632849f5b21f34b266c01b6f
     if evaluated_job_applications:
         is_submittable = all(
             (

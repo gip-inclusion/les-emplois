@@ -236,6 +236,11 @@ class EvaluationCampaign(models.Model):
             emails += [self.get_email_to_institution_selected_siae()]
             connection.send_messages(emails)
 
+    # vincentporte, note for victorperron
+    # POINT 1 - Passage forcé en phase contradictoire
+    # Le filtrage de cette méthode n'est pas assez restrictif. Il inclue les `EvaluatedSiae` qui ont soumis
+    # leurs justificatifs mais pour lesquelles la DDETS n'a pas encore revue la soumission
+    # https://www.notion.so/DDETS-15-et-09-impossible-d-ouvrir-la-carte-en-statut-nouveaux-justificatifs-traiter-analys-4bd9edda0bac4163861e952fcc1c16ee#0f31b4ffc196416a98877fb3e38b7e51
     def transition_to_adversarial_phase(self):
         EvaluatedSiae.objects.filter(evaluation_campaign=self, reviewed_at__isnull=True).update(
             reviewed_at=timezone.now()
@@ -387,6 +392,12 @@ class EvaluatedSiae(models.Model):
         return get_email_message(to, context, subject, body)
 
     # fixme vincentporte : rsebille suggests to replace cached_property with prefetch_related
+
+    # vincentporte, note for victorperron
+    # POINT 3 - la propriété `state` ne tient pas compte du cas hors norme où des autoprescriptions seraient encore à l'état `SUBMITTED`
+    # Dans ce cas, la DDETS doit pouvoir continuer son travail, `state` doit retourner `evaluation_enums.EvaluatedSiaeState.SUBMITTED` au lieu
+    # de `REFUSED`, `ADVERSARIAL_STAGE`, `ACCEPTED` ou `REVIEWED`
+    # https://www.notion.so/DDETS-38-Pi-ces-traiter-mais-aucun-moyen-de-valider-ni-refuser-analys-ff23ab05d74c462b95f975f3c03b398b#77bfc6da53c9442790530ffe54021654
     @cached_property
     def state(self):
 
