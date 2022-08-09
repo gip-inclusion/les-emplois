@@ -1,4 +1,5 @@
 {% extends "layout/content_small.html" %}
+{% load str_filters %}
 
 {% block content %}
 
@@ -7,7 +8,7 @@
     {# This template is shown only to prescribers. #}
     <h1 class="h1-hero-c1">Candidature envoyée</h1>
 
-    <p>La candidature pour <b>{{ job_seeker.get_full_name }}</b> a bien été envoyée
+    <p>La candidature pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b> a bien été envoyée
         chez <b>{{ siae.display_name }}</b>.</p>
 
     {% if back_url %}

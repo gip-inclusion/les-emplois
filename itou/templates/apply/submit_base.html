@@ -1,4 +1,5 @@
 {% extends "layout/content_small.html" %}
+{% load str_filters %}
 
 {% block title %}Postuler{{ block.super }}{% endblock %}
 
@@ -9,7 +10,7 @@
             Déclarer une embauche
         {% else %}
             Postuler
-            {% if request.user.is_prescriber and job_seeker %}pour <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>{% endif %}
+            {% if request.user.is_prescriber and job_seeker %}pour <span class="text-muted">{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>{% endif %}
             chez <span class="text-muted">{{ siae.display_name }}</span>
         {% endif %}
     </h1>

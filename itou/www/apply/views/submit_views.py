@@ -271,9 +271,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
             # Redirect to search by e-mail address.
             return HttpResponseRedirect(reverse("apply:check_email_for_sender", kwargs={"siae_pk": self.siae.pk}))
 
-        preview_mode = False
-        job_seeker_name = None
-
+        context = {}
         if self.form.is_valid():
             job_seeker = self.form.get_job_seeker()
 
@@ -282,15 +280,6 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
                 self.apply_session.set("nir", self.form.cleaned_data["nir"])
                 return HttpResponseRedirect(reverse("apply:check_email_for_sender", kwargs={"siae_pk": self.siae.pk}))
 
-            # Ask the sender to confirm the NIR we found is associated to the correct user
-            if self.form.data.get("preview"):
-                preview_mode = True
-                # Don't display personal information to unauthorized members.
-                if self.sender.is_prescriber and not self.sender.is_prescriber_with_authorized_org:
-                    job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
-                else:
-                    job_seeker_name = job_seeker.get_full_name()
-
             # The NIR we found is correct
             if self.form.data.get("confirm"):
                 self.apply_session.set("job_seeker_pk", job_seeker.pk)
@@ -298,13 +287,14 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
                     reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk})
                 )
 
-        return self.render_to_response(
-            self.get_context_data(**kwargs)
-            | {
-                "preview_mode": preview_mode,
-                "job_seeker_name": job_seeker_name,
+            context = {
+                # Ask the sender to confirm the NIR we found is associated to the correct user
+                "preview_mode": bool(self.form.data.get("preview")),
+                "job_seeker": job_seeker,
+                "can_view_personal_information": self.sender.can_view_personal_information(job_seeker),
             }
-        )
+
+        return self.render_to_response(self.get_context_data(**kwargs) | context)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -631,6 +621,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
+            "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
         }
 
 
@@ -676,6 +667,7 @@ class CheckPreviousApplications(ApplicationBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "prev_application": self.previous_applications.latest("created_at"),
+            "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
         }
 
 
@@ -720,6 +712,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         "siae": siae,
         "job_seeker": job_seeker,
         "form_administrative_criteria": form_administrative_criteria,
+        "can_view_personal_information": request.user.can_view_personal_information(job_seeker),
     }
     return render(request, template_name, context)
 
@@ -783,6 +776,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         "form": form,
         "job_seeker": job_seeker,
         "s3_upload": S3Upload(kind="resume"),
+        "can_view_personal_information": request.user.can_view_personal_information(job_seeker),
     }
     return render(request, template_name, context)
 
@@ -803,6 +797,7 @@ class ApplicationSentView(ApplyStepBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "job_seeker": self.job_seeker,
+            "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
         }
 
     def get(self, request, *args, **kwargs):

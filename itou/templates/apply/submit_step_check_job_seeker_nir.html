@@ -1,6 +1,7 @@
 {% extends "apply/submit_base_two_columns.html" %}
 {% load bootstrap4 %}
 {% load format_filters %}
+{% load str_filters %}
 {% load redirection_fields %}
 {% load static %}
 
@@ -82,9 +83,9 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p>Le numéro {{ form.nir.value|format_nir }} est associé au compte de <b>{{ job_seeker_name }}</b>.</p>
+                            <p>Le numéro {{ form.nir.value|format_nir }} est associé au compte de <b>{{  job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>.</p>
                             <p>
-                                Si cette candidature n'est pas pour <b>{{ job_seeker_name }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                                Si cette candidature n'est pas pour <b>{{  job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
                             </p>
                         </div>
                         <div class="modal-footer">
