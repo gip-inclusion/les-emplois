@@ -415,6 +415,118 @@ class ModelTest(TestCase):
         job_seeker.emailaddress_set.create(email=job_seeker.email, verified=True)
         self.assertFalse(user.can_edit_email(job_seeker))
 
+    def test_can_edit_personal_information(self):
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        unauthorized_prescriber = PrescriberFactory()
+        siae_member = SiaeFactory(with_membership=True).members.first()
+        job_seeker = JobSeekerFactory()
+        user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
+        logged_user_created_by_prescriber = JobSeekerFactory(
+            created_by=unauthorized_prescriber, last_login=timezone.now()
+        )
+        user_created_by_siae_staff = JobSeekerFactory(created_by=siae_member, last_login=None)
+        logged_user_created_by_siae_staff = JobSeekerFactory(created_by=siae_member, last_login=timezone.now())
+
+        specs = {
+            "authorized_prescriber": {
+                "authorized_prescriber": True,
+                "unauthorized_prescriber": False,
+                "siae_member": False,
+                "job_seeker": False,
+                "user_created_by_prescriber": True,
+                "logged_user_created_by_prescriber": False,
+                "user_created_by_siae_staff": True,
+                "logged_user_created_by_siae_staff": False,
+            },
+            "unauthorized_prescriber": {
+                "authorized_prescriber": False,
+                "unauthorized_prescriber": True,
+                "siae_member": False,
+                "job_seeker": False,
+                "user_created_by_prescriber": True,
+                "logged_user_created_by_prescriber": False,
+                "user_created_by_siae_staff": False,
+                "logged_user_created_by_siae_staff": False,
+            },
+            "siae_member": {
+                "authorized_prescriber": False,
+                "unauthorized_prescriber": False,
+                "siae_member": True,
+                "job_seeker": False,
+                "user_created_by_prescriber": True,
+                "logged_user_created_by_prescriber": False,
+                "user_created_by_siae_staff": True,
+                "logged_user_created_by_siae_staff": False,
+            },
+            "job_seeker": {
+                "authorized_prescriber": False,
+                "unauthorized_prescriber": False,
+                "siae_member": False,
+                "job_seeker": True,
+                "user_created_by_prescriber": False,
+                "logged_user_created_by_prescriber": False,
+                "user_created_by_siae_staff": False,
+                "logged_user_created_by_siae_staff": False,
+            },
+        }
+        for user_type, user_specs in specs.items():
+            for other_user_type, expected in user_specs.items():
+                self.assertIs(
+                    locals()[user_type].can_edit_personal_information(locals()[other_user_type]),
+                    expected,
+                    f"{user_type}.can_edit_personal_information({other_user_type})",
+                )
+
+    def test_can_view_personal_information(self):
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        unauthorized_prescriber = PrescriberFactory()
+        siae_member = SiaeFactory(with_membership=True).members.first()
+        job_seeker = JobSeekerFactory()
+        user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
+        user_created_by_siae_staff = JobSeekerFactory(created_by=siae_member, last_login=None)
+
+        specs = {
+            "authorized_prescriber": {
+                "authorized_prescriber": True,
+                "unauthorized_prescriber": False,
+                "siae_member": False,
+                "job_seeker": True,
+                "user_created_by_prescriber": True,
+                "user_created_by_siae_staff": True,
+            },
+            "unauthorized_prescriber": {
+                "authorized_prescriber": False,
+                "unauthorized_prescriber": True,
+                "siae_member": False,
+                "job_seeker": False,
+                "user_created_by_prescriber": True,
+                "user_created_by_siae_staff": False,
+            },
+            "siae_member": {
+                "authorized_prescriber": False,
+                "unauthorized_prescriber": False,
+                "siae_member": True,
+                "job_seeker": True,
+                "user_created_by_prescriber": True,
+                "user_created_by_siae_staff": True,
+            },
+            "job_seeker": {
+                "authorized_prescriber": False,
+                "unauthorized_prescriber": False,
+                "siae_member": False,
+                "job_seeker": True,
+                "user_created_by_prescriber": False,
+                "user_created_by_siae_staff": False,
+            },
+        }
+        for user_type, user_specs in specs.items():
+            for other_user_type, expected in user_specs.items():
+                self.assertIs(
+                    locals()[user_type].can_view_personal_information(locals()[other_user_type]),
+                    expected,
+                    f"{user_type}.can_view_personal_information({other_user_type})",
+                )
+
     def test_can_add_nir(self):
         siae = SiaeFactory(with_membership=True)
         siae_staff = siae.members.first()
