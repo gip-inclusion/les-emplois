@@ -112,7 +112,7 @@ class Command(BaseCommand):
             )
 
         siae_memberships = (
-            SiaeMembership.objects.select_related("user", "siae")
+            SiaeMembership.objects.select_related("user", "siae__convention")
             .filter(is_active=True)
             .filter(
                 Q(user_id__in=settings.STATS_SIAE_USER_PK_WHITELIST)
@@ -123,6 +123,9 @@ class Command(BaseCommand):
         for membership in siae_memberships:
             user = membership.user
             org = membership.siae
+
+            if not org.is_active:
+                continue
 
             row = self.get_basic_row(membership=membership, org=org)
             row["Type de la SIAE"] = org.kind
