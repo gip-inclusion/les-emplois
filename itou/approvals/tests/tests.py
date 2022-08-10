@@ -35,15 +35,7 @@ from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
 
 class CommonApprovalQuerySetTest(TestCase):
-    """
-    Test CommonApprovalQuerySet.
-    """
-
     def test_valid_for_pole_emploi_approval_model(self):
-        """
-        Test for PoleEmploiApproval model.
-        """
-
         start_at = timezone.now().date() - relativedelta(years=1)
         end_at = start_at + relativedelta(years=1)
         PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
@@ -56,10 +48,6 @@ class CommonApprovalQuerySetTest(TestCase):
         self.assertEqual(1, PoleEmploiApproval.objects.valid().count())
 
     def test_valid_for_approval_model(self):
-        """
-        Test for Approval model.
-        """
-
         start_at = timezone.now().date() - relativedelta(years=1)
         end_at = start_at + relativedelta(years=1)
         ApprovalFactory(start_at=start_at, end_at=end_at)
@@ -122,9 +110,6 @@ class CommonApprovalQuerySetTest(TestCase):
         self.assertFalse(approval.can_be_deleted)
 
     def test_starts_date_filters_for_approval_model(self):
-        """
-        tests for starts_in_the_past, starts_today and starts_in_the_future
-        """
         start_at = timezone.now().date() - relativedelta(years=1)
         end_at = start_at + relativedelta(years=1)
         approval_past = ApprovalFactory(start_at=start_at, end_at=end_at)
@@ -144,10 +129,6 @@ class CommonApprovalQuerySetTest(TestCase):
 
 
 class CommonApprovalMixinTest(TestCase):
-    """
-    Test CommonApprovalMixin.
-    """
-
     def test_waiting_period_end(self):
         end_at = datetime.date(2000, 1, 1)
         start_at = datetime.date(1998, 1, 1)
@@ -481,10 +462,6 @@ class ApprovalModelTest(TestCase):
 
 
 class PoleEmploiApprovalModelTest(TestCase):
-    """
-    Test PoleEmploiApproval model.
-    """
-
     def test_format_name_as_pole_emploi(self):
         self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi(" François"), "FRANCOIS")
         self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("M'Hammed "), "M'HAMMED")
@@ -605,10 +582,6 @@ class PoleEmploiApprovalManagerTest(TestCase):
 
 
 class AutomaticApprovalAdminViewsTest(TestCase):
-    """
-    Test Approval automatic admin views.
-    """
-
     def test_edit_approval_with_a_wrong_number(self):
         """
         Given an existing approval, when setting a different number,
@@ -757,10 +730,6 @@ class CustomApprovalAdminViewsTest(TestCase):
 
 
 class SuspensionQuerySetTest(TestCase):
-    """
-    Test SuspensionQuerySet.
-    """
-
     def test_in_progress(self):
         start_at = timezone.now().date()  # Starts today so it's in progress.
         expected_num = 5
@@ -788,10 +757,6 @@ class SuspensionQuerySetTest(TestCase):
 
 
 class SuspensionModelTest(TestCase):
-    """
-    Test Suspension model.
-    """
-
     def test_clean(self):
         today = timezone.now().date()
         start_at = today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS * 2)
@@ -931,10 +896,6 @@ class SuspensionModelTest(TestCase):
 
 
 class SuspensionModelTestTrigger(TestCase):
-    """
-    Test `trigger_update_approval_end_at`.
-    """
-
     def test_save(self):
         """
         Test `trigger_update_approval_end_at` with SQL INSERT.
@@ -1002,10 +963,6 @@ class SuspensionModelTestTrigger(TestCase):
 
 
 class ProlongationQuerySetTest(TestCase):
-    """
-    Test ProlongationQuerySet.
-    """
-
     def test_in_progress(self):
         start_at = timezone.now().date()  # Starts today so it's in progress.
         expected_num = 5
@@ -1021,10 +978,6 @@ class ProlongationQuerySetTest(TestCase):
 
 
 class ProlongationManagerTest(TestCase):
-    """
-    Test ProlongationManager.
-    """
-
     def test_get_cumulative_duration_for_any_reasons(self):
         """
         It should return the cumulative duration of all prolongations of the given approval.
@@ -1189,10 +1142,6 @@ class ProlongationModelTestConstraint(TestCase):
 
 
 class ProlongationModelTest(TestCase):
-    """
-    Test Prolongation model.
-    """
-
     def test_clean_with_wrong_start_at(self):
         """
         Given an existing prolongation, when setting a wrong `start_at`
@@ -1374,10 +1323,6 @@ class ProlongationModelTest(TestCase):
 
 
 class ProlongationNotificationsTest(TestCase):
-    """
-    Test Prolongation notifications.
-    """
-
     def test_new_prolongation_to_authorized_prescriber_notification(self):
 
         prolongation = ProlongationFactory()
