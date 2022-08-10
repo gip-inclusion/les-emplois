@@ -12,14 +12,21 @@ from django.test import TestCase
 from django.utils import timezone
 
 import itou.asp.factories as asp
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, EmployerType
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import (
+    PrescriberMembershipFactory,
+    PrescriberOrganizationFactory,
+    PrescriberOrganizationWithMembershipFactory,
+)
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider, Title
@@ -751,3 +758,241 @@ class JobSeekerProfileModelTest(TestCase):
             self.profile.unemployed_since = AllocationDuration.MORE_THAN_24_MONTHS
             self.profile.previous_employer_kind = EmployerType.ACI
             self.profile._clean_job_seeker_situation()
+
+
+def user_with_approval_in_waiting_period():
+    user = JobSeekerFactory()
+    end_at = timezone.now().date() - relativedelta(days=30)
+    start_at = end_at - relativedelta(years=2)
+    ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+    return user
+
+
+class LatestApprovalTestCase(TestCase):
+    def test_merge_approvals_timeline_case1(self):
+
+        user = JobSeekerFactory()
+
+        ApprovalFactory(user=user, start_at=datetime.date(2016, 12, 20), end_at=datetime.date(2018, 12, 20))
+
+        # PoleEmploiApproval 1.
+        pe_approval_1 = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=datetime.date(2018, 12, 20),
+            end_at=datetime.date(2020, 12, 20),
+        )
+
+        # PoleEmploiApproval 2.
+        # Same `start_at` as PoleEmploiApproval 1.
+        # But `end_at` earlier than PoleEmploiApproval 1.
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=datetime.date(2018, 12, 20),
+            end_at=datetime.date(2019, 12, 19),
+        )
+
+        # Check timeline.
+        self.assertEqual(user.latest_common_approval, pe_approval_1)
+        self.assertEqual(user.latest_approval, None)
+        self.assertEqual(user.latest_pe_approval, pe_approval_1)
+
+    def test_merge_approvals_timeline_case2(self):
+
+        user = JobSeekerFactory()
+
+        # PoleEmploiApproval 1.
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=datetime.date(2020, 3, 17),
+            end_at=datetime.date(2020, 6, 16),
+        )
+
+        # PoleEmploiApproval 2.
+        # `start_at` earlier than PoleEmploiApproval 1.
+        # `end_at` after PoleEmploiApproval 1.
+        pe_approval_2 = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=datetime.date(2020, 3, 2),
+            end_at=datetime.date(2022, 3, 2),
+        )
+
+        # Check timeline.
+        self.assertEqual(user.latest_common_approval, pe_approval_2)
+        self.assertEqual(user.latest_approval, None)
+        self.assertEqual(user.latest_pe_approval, pe_approval_2)
+
+    def test_merge_approvals_pass_and_pe_valid(self):
+        user = JobSeekerFactory()
+        start_at = timezone.now() - relativedelta(months=2)
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+
+        # PASS IAE
+        pass_iae = ApprovalFactory(
+            user=user,
+            start_at=start_at,
+            end_at=end_at,
+        )
+
+        # PoleEmploiApproval
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at,
+            end_at=end_at + relativedelta(days=1),
+        )
+
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at,
+            end_at=end_at + relativedelta(days=2),
+        )
+
+        self.assertEqual(user.latest_approval, pass_iae)
+
+    def test_status_without_approval(self):
+        user = JobSeekerFactory()
+        self.assertTrue(user.has_no_approval)
+        self.assertFalse(user.has_valid_approval)
+        self.assertFalse(user.has_approval_in_waiting_period)
+        self.assertEqual(user.latest_approval, None)
+
+    def test_status_with_valid_approval(self):
+        user = JobSeekerFactory()
+        approval = ApprovalFactory(user=user, start_at=timezone.now().date() - relativedelta(days=1))
+        self.assertFalse(user.has_no_approval)
+        self.assertTrue(user.has_valid_approval)
+        self.assertFalse(user.has_approval_in_waiting_period)
+        self.assertEqual(user.latest_approval, approval)
+
+    def test_status_approval_in_waiting_period(self):
+        user = user_with_approval_in_waiting_period()
+        self.assertFalse(user.has_no_approval)
+        self.assertFalse(user.has_valid_approval)
+        self.assertTrue(user.has_approval_in_waiting_period)
+        self.assertEqual(user.latest_approval, user.latest_approval)
+
+    def test_status_approval_with_elapsed_waiting_period(self):
+        user = JobSeekerFactory()
+        end_at = timezone.now().date() - relativedelta(years=3)
+        start_at = end_at - relativedelta(years=2)
+        ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        self.assertTrue(user.has_no_approval)
+        self.assertFalse(user.has_valid_approval)
+        self.assertFalse(user.has_approval_in_waiting_period)
+        self.assertEqual(user.latest_approval, None)
+
+    def test_status_with_valid_pole_emploi_approval(self):
+        user = JobSeekerFactory()
+        pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        self.assertFalse(user.has_no_approval)
+        self.assertTrue(user.has_valid_approval)
+        self.assertFalse(user.has_approval_in_waiting_period)
+        self.assertEqual(user.latest_approval, None)
+        self.assertEqual(user.latest_pe_approval, pe_approval)
+
+    def test_cannot_bypass_waiting_period(self):
+        user = user_with_approval_in_waiting_period()
+
+        # Waiting period cannot be bypassed for SIAE if no prescriber.
+        self.assertTrue(
+            user.cannot_bypass_approval_waiting_period(
+                siae=SiaeFactory(kind=SiaeKind.ETTI), sender_prescriber_organization=None
+            )
+        )
+
+        # Waiting period cannot be bypassed for SIAE if unauthorized prescriber.
+        self.assertTrue(
+            user.cannot_bypass_approval_waiting_period(
+                siae=SiaeFactory(kind=SiaeKind.ETTI),
+                sender_prescriber_organization=PrescriberOrganizationFactory(),
+            )
+        )
+
+        # Waiting period is bypassed for SIAE if authorized prescriber.
+        self.assertFalse(
+            user.cannot_bypass_approval_waiting_period(
+                siae=SiaeFactory(kind=SiaeKind.ETTI),
+                sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
+            )
+        )
+
+        # Waiting period is bypassed for GEIQ even if no prescriber.
+        self.assertFalse(
+            user.cannot_bypass_approval_waiting_period(
+                siae=SiaeFactory(kind=SiaeKind.GEIQ), sender_prescriber_organization=None
+            )
+        )
+
+        # Waiting period is bypassed for GEIQ even if unauthorized prescriber.
+        self.assertFalse(
+            user.cannot_bypass_approval_waiting_period(
+                siae=SiaeFactory(kind=SiaeKind.GEIQ),
+                sender_prescriber_organization=PrescriberOrganizationFactory(),
+            )
+        )
+
+        # Waiting period is bypassed if a valid diagnosis made by an authorized prescriber exists.
+        diag = EligibilityDiagnosisFactory(job_seeker=user)
+        self.assertFalse(
+            user.cannot_bypass_approval_waiting_period(
+                siae=SiaeFactory(kind=SiaeKind.ETTI),
+                sender_prescriber_organization=None,
+            )
+        )
+        diag.delete()
+
+        # Waiting period cannot be bypassed if a valid diagnosis exists
+        # but was not made by an authorized prescriber.
+        diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=user)
+        self.assertTrue(
+            user.cannot_bypass_approval_waiting_period(
+                siae=SiaeFactory(kind=SiaeKind.ETTI),
+                sender_prescriber_organization=None,
+            )
+        )
+
+    def test_latest_common_approval_no_approval(self):
+        user = JobSeekerFactory()
+        self.assertIsNone(user.latest_common_approval)
+
+    def test_latest_common_approval_when_only_pe_approval(self):
+        user = JobSeekerFactory()
+        pe_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        self.assertEqual(user.latest_common_approval, pe_approval)
+
+    def test_latest_common_approval_is_approval_if_valid(self):
+        user = JobSeekerFactory()
+        approval = ApprovalFactory(user=user)
+        PoleEmploiApprovalFactory(nir=user.nir)
+        self.assertEqual(user.latest_common_approval, approval)
+
+    def test_latest_common_approval_is_pe_approval_if_approval_is_expired(self):
+        user = JobSeekerFactory()
+        end_at = timezone.now().date() - relativedelta(years=3)
+        start_at = end_at - relativedelta(years=2)
+        # expired approval
+        ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        pe_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        self.assertEqual(user.latest_common_approval, pe_approval)
+
+    def test_latest_common_approval_is_pe_approval_edge_case(self):
+        user = JobSeekerFactory()
+        end_at = timezone.now().date() - relativedelta(days=10)
+        start_at = end_at - relativedelta(years=2)
+        # approval in waiting period
+        ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        pe_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        self.assertEqual(user.latest_common_approval, pe_approval)
+
+    def test_latest_common_approval_is_none_if_both_expired(self):
+        user = JobSeekerFactory()
+        end_at = timezone.now().date() - relativedelta(years=3)
+        start_at = end_at - relativedelta(years=2)
+        ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        PoleEmploiApprovalFactory(nir=user.nir, start_at=start_at, end_at=end_at)
+        self.assertIsNone(user.latest_common_approval)
