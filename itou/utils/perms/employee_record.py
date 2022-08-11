@@ -57,10 +57,8 @@ def can_create_employee_record(request, job_application_id=None):
                 "job_seeker__jobseeker_profile",
             ),
             pk=job_application_id,
+            to_siae=siae,
         )
-
-        if not siae_is_allowed(job_application, siae):
-            raise PermissionDenied("Cette structure ne peut pas modifier cette fiche salarié.")
 
         if not tunnel_step_is_allowed(job_application):
             raise PermissionDenied("Cette fiche salarié ne peut pas être modifiée.")
