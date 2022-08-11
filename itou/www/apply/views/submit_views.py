@@ -764,6 +764,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
 
 class ApplicationSentView(ApplyStepBaseView):
     template_name = "apply/submit_step_application_sent.html"
+    required_session_namespaces = ["apply_session"]
 
     def __init__(self):
         super().__init__()

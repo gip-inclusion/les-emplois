@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from unittest import mock
 
 import django.core.exceptions
@@ -50,6 +51,40 @@ class ApplyTest(TestCase):
             with self.subTest(route=route):
                 response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}))
                 self.assertRedirects(response, reverse("siaes_views:card", kwargs={"siae_id": siae.pk}))
+
+    def test_we_raise_a_permission_denied_on_missing_session_for_cbv(self):
+        routes = {
+            "apply:check_nir_for_sender",
+            "apply:check_email_for_sender",
+            "apply:check_nir_for_job_seeker",
+            "apply:step_application_sent",
+        }
+        user = JobSeekerFactory()
+        siae = SiaeFactory(with_jobs=True)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        for route in routes:
+            with self.subTest(route=route):
+                response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}))
+                self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.context["exception"], "A session namespace doesn't exist.")
+
+    def test_we_raise_a_permission_denied_on_missing_temporary_session_for_create_job_seeker(self):
+        routes = {
+            "apply:create_job_seeker_step_1_for_sender",
+            "apply:create_job_seeker_step_2_for_sender",
+            "apply:create_job_seeker_step_3_for_sender",
+            "apply:create_job_seeker_step_end_for_sender",
+        }
+        user = JobSeekerFactory()
+        siae = SiaeFactory(with_jobs=True)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        for route in routes:
+            with self.subTest(route=route):
+                response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk, "session_uuid": uuid.uuid4()}))
+                self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.context["exception"], "A session namespace doesn't exist.")
 
 
 class ApplyAsJobSeekerTest(TestCase):
