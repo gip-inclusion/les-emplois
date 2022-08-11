@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
@@ -8,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
 
 from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
+from itou.users.enums import KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -22,9 +25,34 @@ from itou.www.invitations_views.forms import (
 from itou.www.signup import forms as signup_forms
 
 
+def handle_default_invited_user_registration(request, invitation):
+    form = NewUserInvitationForm(data=request.POST or None, invitation=invitation)
+    if form.is_valid():
+        user = form.save(request)
+        get_adapter().login(request, user)
+        return redirect(get_safe_url(request, "redirect_to"))
+    context = {"form": form, "invitation": invitation}
+    return render(request, "invitations_views/new_user.html", context=context)
+
+
+def handle_invited_prescriber_registration(request, invitation):
+    params = {
+        "user_kind": KIND_PRESCRIBER,
+        "login_hint": invitation.email,
+        "previous_url": request.get_full_path(),
+        "next_url": get_safe_url(request, "redirect_to"),
+    }
+    inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+    context = {
+        "inclusion_connect_url": inclusion_connect_url,
+        "invitation": invitation,
+    }
+    return render(request, "invitations_views/new_prescriber.html", context=context)
+
+
 def new_user(request, invitation_type, invitation_id):
-    invitation_type = InvitationAbstract.get_model_from_string(invitation_type)
-    invitation = get_object_or_404(invitation_type, pk=invitation_id)
+    invitation_class = InvitationAbstract.get_model_from_string(invitation_type)
+    invitation = get_object_or_404(invitation_class, pk=invitation_id)
 
     if request.user.is_authenticated:
         if not request.user.email == invitation.email:
@@ -53,13 +81,10 @@ def new_user(request, invitation_type, invitation_id):
         return redirect(next_step_url)
 
     # A new user should be created before joining
-    form = NewUserInvitationForm(data=request.POST or None, invitation=invitation)
-    if form.is_valid():
-        user = form.save(request)
-        get_adapter().login(request, user)
-        return redirect(get_safe_url(request, "redirect_to"))
-
-    return render(request, "invitations_views/new_user.html", context={"form": form, "invitation": invitation})
+    handle_registration = {
+        KIND_PRESCRIBER: handle_invited_prescriber_registration,
+    }.get(invitation_type, handle_default_invited_user_registration)
+    return handle_registration(request, invitation)
 
 
 @login_required

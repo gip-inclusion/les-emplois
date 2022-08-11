@@ -1,5 +1,8 @@
 from datetime import timedelta
+from unittest import mock
+from urllib.parse import urlencode
 
+import respx
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.core import mail
@@ -9,9 +12,11 @@ from django.utils.html import escape
 
 from itou.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from itou.invitations.models import PrescriberWithOrgInvitation
+from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory
+from itou.users.enums import KIND_PRESCRIBER
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -209,16 +214,54 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         # A user can be member of one or more organizations
         self.assertTrue(current_org in user.prescriberorganization_set.all())
 
+    @respx.mock
     def test_accept_prescriber_org_invitation(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        post_data = {
-            "first_name": invitation.first_name,
-            "last_name": invitation.last_name,
-            "password1": "Erls92#32",
-            "password2": "Erls92#32",
-        }
+        response = self.client.get(invitation.acceptance_link)
+        self.assertContains(response, "inclusion_connect_button.svg")
 
-        response = self.client.post(invitation.acceptance_link, data=post_data, follow=True)
+        # We don't put the full path with the FQDN in the parameters
+        previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
+        next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "login_hint": invitation.email,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
+
+        # Singup fails on Inclusion Connect with email different than the one from the invitation
+        url = reverse("dashboard:index")
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            response = mock_oauth_dance(
+                self,
+                assert_redirects=False,
+                login_hint=invitation.email,
+                previous_url=previous_url,
+                next_url=next_url,
+            )
+            # Follow the redirection.
+            response = self.client.get(response.url, follow=True)
+        # Signup should have failed : as the email used in IC isn't the one from the invitation
+        self.assertEqual(response.wsgi_request.get_full_path(), previous_url)
+        self.assertFalse(User.objects.filter(email=invitation.email).exists())
+
+        # Singup works on Inclusion Connect with the correct email
+        invitation.email = OIDC_USERINFO["email"]
+        invitation.save()
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            response = mock_oauth_dance(
+                self,
+                assert_redirects=False,
+                login_hint=invitation.email,
+                previous_url=previous_url,
+                next_url=next_url,
+            )
+            # Follow the redirection.
+            response = self.client.get(response.url, follow=True)
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation)
 
