@@ -62,7 +62,7 @@ def valid_session_required(required_keys=None):
 
 def _check_job_seeker_approval(request, job_seeker, siae):
     user_info = get_user_info(request)
-    if job_seeker.cannot_bypass_approval_waiting_period(
+    if job_seeker.approval_can_be_renewed_by(
         siae=siae, sender_prescriber_organization=user_info.prescriber_organization
     ):
         # NOTE(vperron): We're using PermissionDenied in order to display a message to the end user

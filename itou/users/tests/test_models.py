@@ -856,24 +856,24 @@ class LatestApprovalTestCase(TestCase):
 
     def test_status_without_approval(self):
         user = JobSeekerFactory()
-        self.assertTrue(user.has_no_approval)
-        self.assertFalse(user.has_valid_approval)
-        self.assertFalse(user.has_approval_in_waiting_period)
+        self.assertTrue(user.has_no_common_approval)
+        self.assertFalse(user.has_valid_common_approval)
+        self.assertFalse(user.has_common_approval_in_waiting_period)
         self.assertEqual(user.latest_approval, None)
 
     def test_status_with_valid_approval(self):
         user = JobSeekerFactory()
         approval = ApprovalFactory(user=user, start_at=timezone.now().date() - relativedelta(days=1))
-        self.assertFalse(user.has_no_approval)
-        self.assertTrue(user.has_valid_approval)
-        self.assertFalse(user.has_approval_in_waiting_period)
+        self.assertFalse(user.has_no_common_approval)
+        self.assertTrue(user.has_valid_common_approval)
+        self.assertFalse(user.has_common_approval_in_waiting_period)
         self.assertEqual(user.latest_approval, approval)
 
     def test_status_approval_in_waiting_period(self):
         user = user_with_approval_in_waiting_period()
-        self.assertFalse(user.has_no_approval)
-        self.assertFalse(user.has_valid_approval)
-        self.assertTrue(user.has_approval_in_waiting_period)
+        self.assertFalse(user.has_no_common_approval)
+        self.assertFalse(user.has_valid_common_approval)
+        self.assertTrue(user.has_common_approval_in_waiting_period)
         self.assertEqual(user.latest_approval, user.latest_approval)
 
     def test_status_approval_with_elapsed_waiting_period(self):
@@ -881,17 +881,17 @@ class LatestApprovalTestCase(TestCase):
         end_at = timezone.now().date() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
-        self.assertTrue(user.has_no_approval)
-        self.assertFalse(user.has_valid_approval)
-        self.assertFalse(user.has_approval_in_waiting_period)
+        self.assertTrue(user.has_no_common_approval)
+        self.assertFalse(user.has_valid_common_approval)
+        self.assertFalse(user.has_common_approval_in_waiting_period)
         self.assertEqual(user.latest_approval, None)
 
     def test_status_with_valid_pole_emploi_approval(self):
         user = JobSeekerFactory()
         pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
-        self.assertFalse(user.has_no_approval)
-        self.assertTrue(user.has_valid_approval)
-        self.assertFalse(user.has_approval_in_waiting_period)
+        self.assertFalse(user.has_no_common_approval)
+        self.assertTrue(user.has_valid_common_approval)
+        self.assertFalse(user.has_common_approval_in_waiting_period)
         self.assertEqual(user.latest_approval, None)
         self.assertEqual(user.latest_pe_approval, pe_approval)
 
@@ -900,14 +900,12 @@ class LatestApprovalTestCase(TestCase):
 
         # Waiting period cannot be bypassed for SIAE if no prescriber.
         self.assertTrue(
-            user.cannot_bypass_approval_waiting_period(
-                siae=SiaeFactory(kind=SiaeKind.ETTI), sender_prescriber_organization=None
-            )
+            user.approval_can_be_renewed_by(siae=SiaeFactory(kind=SiaeKind.ETTI), sender_prescriber_organization=None)
         )
 
         # Waiting period cannot be bypassed for SIAE if unauthorized prescriber.
         self.assertTrue(
-            user.cannot_bypass_approval_waiting_period(
+            user.approval_can_be_renewed_by(
                 siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=PrescriberOrganizationFactory(),
             )
@@ -915,7 +913,7 @@ class LatestApprovalTestCase(TestCase):
 
         # Waiting period is bypassed for SIAE if authorized prescriber.
         self.assertFalse(
-            user.cannot_bypass_approval_waiting_period(
+            user.approval_can_be_renewed_by(
                 siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
             )
@@ -923,14 +921,12 @@ class LatestApprovalTestCase(TestCase):
 
         # Waiting period is bypassed for GEIQ even if no prescriber.
         self.assertFalse(
-            user.cannot_bypass_approval_waiting_period(
-                siae=SiaeFactory(kind=SiaeKind.GEIQ), sender_prescriber_organization=None
-            )
+            user.approval_can_be_renewed_by(siae=SiaeFactory(kind=SiaeKind.GEIQ), sender_prescriber_organization=None)
         )
 
         # Waiting period is bypassed for GEIQ even if unauthorized prescriber.
         self.assertFalse(
-            user.cannot_bypass_approval_waiting_period(
+            user.approval_can_be_renewed_by(
                 siae=SiaeFactory(kind=SiaeKind.GEIQ),
                 sender_prescriber_organization=PrescriberOrganizationFactory(),
             )
@@ -939,7 +935,7 @@ class LatestApprovalTestCase(TestCase):
         # Waiting period is bypassed if a valid diagnosis made by an authorized prescriber exists.
         diag = EligibilityDiagnosisFactory(job_seeker=user)
         self.assertFalse(
-            user.cannot_bypass_approval_waiting_period(
+            user.approval_can_be_renewed_by(
                 siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=None,
             )
@@ -950,7 +946,7 @@ class LatestApprovalTestCase(TestCase):
         # but was not made by an authorized prescriber.
         diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=user)
         self.assertTrue(
-            user.cannot_bypass_approval_waiting_period(
+            user.approval_can_be_renewed_by(
                 siae=SiaeFactory(kind=SiaeKind.ETTI),
                 sender_prescriber_organization=None,
             )

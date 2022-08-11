@@ -34,7 +34,7 @@ def check_waiting_period(job_application):
     # NOTE(vperron): We need to check both PASS and PE Approvals for ongoing eligibility issues.
     # This code should still stay relevant for the 3.5 years to come to account for the PE approvals
     # that have been delivered in December 2021 (and that may have 2 years waiting periods)
-    if job_application.job_seeker.cannot_bypass_common_approval_waiting_period(
+    if job_application.job_seeker.approval_can_be_renewed_by(
         siae=job_application.to_siae, sender_prescriber_organization=job_application.sender_prescriber_organization
     ):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)

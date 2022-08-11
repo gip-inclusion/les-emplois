@@ -215,7 +215,7 @@
                             <li class="card-text mb-3">
                                 {% include "approvals/includes/status.html" with approval=user.latest_common_approval %}
                             </li>
-                            {% if user.has_approval_in_waiting_period %}
+                            {% if user.has_common_approval_in_waiting_period %}
                                 <li class="card-text mb-3">
                                     {% if user.has_valid_diagnosis %}
                                         <p>Un prescripteur habilité a réalisé un diagnostic d'éligibilité. <b>Vous pouvez commencer un nouveau parcours.</b></p>

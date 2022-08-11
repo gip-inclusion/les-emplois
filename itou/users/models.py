@@ -366,7 +366,7 @@ class User(AbstractUser, AddressMixin):
         Rationale:
         - if there is a latest PASS IAE that is valid, it is returned.
         - if there is no PASS IAE, we return the longest PE Approval whatever its state.
-        - if there is no PASS not PE Approval, or the waiting period for those is over, return nothing.
+        - if there is no PASS nor PE Approval, or the waiting period for those is over, return nothing.
         - if the latest PASS IAE is invalid:
           * but still in waiting period:
             > return a valid PE Approval if there is one
@@ -384,22 +384,22 @@ class User(AbstractUser, AddressMixin):
         return self.latest_approval or self.latest_pe_approval
 
     @property
-    def has_valid_approval(self):
+    def has_valid_common_approval(self):
         return (self.latest_approval and self.latest_approval.is_valid()) or (
             self.latest_pe_approval and self.latest_pe_approval.is_valid()
         )
 
     @property
-    def has_approval_in_waiting_period(self):
+    def has_common_approval_in_waiting_period(self):
         return (self.latest_approval and not self.latest_approval.is_valid()) or (
             self.latest_pe_approval and not self.latest_pe_approval.is_valid()
         )
 
     @property
-    def has_no_approval(self):
+    def has_no_common_approval(self):
         return not self.latest_approval and not self.latest_pe_approval
 
-    def cannot_bypass_approval_waiting_period(self, siae, sender_prescriber_organization):
+    def approval_can_be_renewed_by(self, siae, sender_prescriber_organization):
         """
         An approval in waiting period can only be bypassed if the prescriber is authorized
         or if the structure is not a SIAE.
@@ -411,7 +411,7 @@ class User(AbstractUser, AddressMixin):
         # Only diagnoses made by authorized prescribers are taken into account.
         has_valid_diagnosis = self.has_valid_diagnosis()
         return (
-            self.has_approval_in_waiting_period
+            self.has_common_approval_in_waiting_period
             and siae.is_subject_to_eligibility_rules
             and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
         )
@@ -422,8 +422,8 @@ class User(AbstractUser, AddressMixin):
         a pre-existing valid PoleEmploiApproval by copying its data.
         """
         # FIXME(vperron): move this method and all the other approval-related code to JobSeekerProfile.
-        if not self.has_valid_approval or self.has_no_approval:
-            raise RuntimeError("Invalid PE approval.")
+        if not self.has_valid_common_approval:
+            raise RuntimeError("Invalid approval.")
         if self.latest_approval and self.latest_approval.is_valid():
             return self.latest_approval
         pe_approval = self.latest_pe_approval
