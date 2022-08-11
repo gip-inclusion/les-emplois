@@ -22,11 +22,9 @@ from itou.www.invitations_views.forms import (
 from itou.www.signup import forms as signup_forms
 
 
-def new_user(request, invitation_type, invitation_id, template_name="invitations_views/new_user.html"):
+def new_user(request, invitation_type, invitation_id):
     invitation_type = InvitationAbstract.get_model_from_string(invitation_type)
     invitation = get_object_or_404(invitation_type, pk=invitation_id)
-    context = {"invitation": invitation}
-    next_step = None
 
     if request.user.is_authenticated:
         if not request.user.email == invitation.email:
@@ -41,28 +39,27 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
             messages.error(request, message)
             return redirect("account_logout")
 
-    if invitation.can_be_accepted:
-        user = User.objects.filter(email__iexact=invitation.email)
-        if user:
-            # The user exists but he should log in first.
-            login_url = reverse(f"login:{invitation.SIGNIN_ACCOUNT_TYPE}")
-            next_step_url = "{url}?next={redirect_to}".format(
-                url=login_url,
-                redirect_to=get_safe_url(request, "redirect_to"),
-            )
-            next_step = redirect(next_step_url)
-        else:
-            # A new user should be created before joining
-            form = NewUserInvitationForm(data=request.POST or None, invitation=invitation)
-            context["form"] = form
-            if form.is_valid():
-                user = form.save(request)
-                get_adapter().login(request, user)
-                next_step = redirect(get_safe_url(request, "redirect_to"))
-    else:
+    if not invitation.can_be_accepted:
         messages.error(request, "Cette invitation n'est plus valide.")
+        return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
-    return next_step or render(request, template_name, context=context)
+    if User.objects.filter(email__iexact=invitation.email).exists():
+        # The user exists but he should log in first.
+        login_url = reverse(f"login:{invitation.SIGNIN_ACCOUNT_TYPE}")
+        next_step_url = "{url}?next={redirect_to}".format(
+            url=login_url,
+            redirect_to=get_safe_url(request, "redirect_to"),
+        )
+        return redirect(next_step_url)
+
+    # A new user should be created before joining
+    form = NewUserInvitationForm(data=request.POST or None, invitation=invitation)
+    if form.is_valid():
+        user = form.save(request)
+        get_adapter().login(request, user)
+        return redirect(get_safe_url(request, "redirect_to"))
+
+    return render(request, "invitations_views/new_user.html", context={"form": form, "invitation": invitation})
 
 
 @login_required

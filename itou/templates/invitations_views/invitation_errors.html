@@ -1,0 +1,21 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+
+{% block title %}Invitation{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    {% if invitation.has_expired %}
+        <h1 class="h1-hero-c1">Invitation expirée</h1>
+        <p>Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.</p>
+    {% elif invitation.accepted %}
+        <h1 class="h1-hero-c1">Invitation acceptée</h1>
+        <p>Cette invitation a déjà été acceptée.</p>
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {{ form.media }}
+{% endblock %}
