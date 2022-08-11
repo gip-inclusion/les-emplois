@@ -83,11 +83,12 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         .order_by("-status")
     )
     employee_record_badges = {row["status"]: row["cnt"] for row in employee_record_statuses}
+    eligibible_job_applications = JobApplication.objects.eligible_as_employee_record(siae)
 
     # Set count of each status for badge display
     status_badges = [
         (
-            JobApplication.objects.eligible_as_employee_record(siae).count(),
+            eligibible_job_applications.count(),
             "info",
         ),
         (employee_record_badges.get(Status.READY, 0), "secondary"),
@@ -106,8 +107,8 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     base_query = EmployeeRecord.objects.full_fetch()
 
     if status == Status.NEW:
-        data = JobApplication.objects.eligible_as_employee_record(siae)
         # Browse to get only the linked employee record in "new" state
+        data = eligibible_job_applications
         for item in data:
             for e in item.employee_record.all():
                 if e.status == Status.NEW:

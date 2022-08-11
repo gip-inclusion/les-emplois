@@ -215,7 +215,10 @@ class EmployeeRecord(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JOBSEEKER:{self.job_seeker}"
+        return (
+            f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} "
+            f"JOBSEEKER:{self.job_seeker} STATUS:{self.status}"
+        )
 
     def save(self, *args, **kwargs):
         if self.pk:

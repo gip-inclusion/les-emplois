@@ -120,7 +120,8 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.client.login(username=self.user_without_perms.username, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        # Changed to 404
+        self.assertEqual(response.status_code, 404)
 
     def test_access_denied_bad_siae_kind(self):
         # SIAE can't use employee record (not the correct kind)
