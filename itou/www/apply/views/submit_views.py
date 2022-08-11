@@ -46,8 +46,8 @@ def valid_session_required(required_keys=None):
         @functools.wraps(function)
         def decorated(request, *args, **kwargs):
             session_ns = SessionNamespace(request.session, f"job_application-{kwargs['siae_pk']}")
-            if not session_ns:
-                raise PermissionDenied("no opened session")
+            if not session_ns.exists():
+                return HttpResponseRedirect(reverse("siaes_views:card", kwargs={"siae_id": kwargs["siae_pk"]}))
             if required_keys:
                 for key in required_keys:
                     if session_ns.get(key) != kwargs[key]:
