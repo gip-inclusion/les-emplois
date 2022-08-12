@@ -7,6 +7,7 @@
     <div class="col-lg-3 col-md-3 col-4">
         <p class="small mb-0">
             {% if evaluated_siae.state == "SUBMITTED"%}
+                {# NOTE(vperron): Why do we check reviewed_at here, instead of state == ADVERSARIAL_STATE ? #}
                 <p class="badge badge-pilotage float-right">{%if evaluated_siae.reviewed_at%}Phase contradictoire - {%endif%}À traiter</p>
             {%elif evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ACCEPTED" %}
                 <p class="badge badge-pilotage float-right">{%if evaluated_siae.reviewed_at%}Phase contradictoire - {%endif%}En cours</p>
