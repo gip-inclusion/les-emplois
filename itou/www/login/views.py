@@ -43,7 +43,7 @@ class PrescriberLoginView(ItouLoginView):
         context = super().get_context_data(**kwargs)
         params = {
             "user_kind": KIND_PRESCRIBER,
-            "previous_url": self.request.resolver_match.view_name,
+            "previous_url": self.request.get_full_path(),
         }
         inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         extra_context = {
