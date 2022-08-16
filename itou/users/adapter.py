@@ -37,10 +37,13 @@ class UserAdapter(DefaultAccountAdapter):
         redirect_url = reverse("home:hp")
         # Inclusion Connect
         ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
-        if ic_session and ic_session.get("token"):
-            params = {"token": ic_session["token"], "state": ic_session["state"]}
-            ic_base_logout_url = reverse("inclusion_connect:logout")
-            redirect_url = f"{ic_base_logout_url}?{urlencode(params)}"
+        if ic_session:
+            token = ic_session["token"]
+            state = ic_session["state"]
+            if token and state:
+                params = {"token": token, "state": state}
+                ic_base_logout_url = reverse("inclusion_connect:logout")
+                redirect_url = f"{ic_base_logout_url}?{urlencode(params)}"
         # France Connect
         fc_token = request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
         fc_state = request.session.get(FRANCE_CONNECT_SESSION_STATE)

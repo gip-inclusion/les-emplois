@@ -470,3 +470,19 @@ class InclusionConnectLogoutTest(TestCase):
         expected_redirection = reverse("home:hp")
         self.assertRedirects(response, expected_redirection)
         self.assertFalse(auth.get_user(self.client).is_authenticated)
+
+    @respx.mock
+    def test_logout_with_incomplete_state(self):
+        # This happens while testing. It should never happen for real users, but it's still painful for us.
+
+        mock_oauth_dance(self)
+        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
+
+        session = self.client.session
+        session[constants.INCLUSION_CONNECT_SESSION_KEY]["token"] = None
+        session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"] = None
+        session.save()
+
+        response = self.client.post(reverse("account_logout"))
+        expected_redirection = reverse("home:hp")
+        self.assertRedirects(response, expected_redirection)
