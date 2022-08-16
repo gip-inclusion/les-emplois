@@ -85,12 +85,46 @@ class ApplyTest(TestCase):
                 self.assertEqual(response.status_code, 403)
                 self.assertEqual(response.context["exception"], "A session namespace doesn't exist.")
 
+    def test_start_coalesce_back_url(self):
+        siae = SiaeFactory(with_membership=True)
+        self.client.login(username=siae.members.first().email, password=DEFAULT_PASSWORD)
+
+        # Default / Fallback
+        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(
+            self.client.session[f"job_application-{siae.pk}"]["back_url"],
+            reverse("siaes_views:card", kwargs={"siae_id": siae.pk}),
+        )
+
+        # With a job description
+        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"job_description_id": 42})
+        self.assertEqual(
+            self.client.session[f"job_application-{siae.pk}"]["back_url"],
+            reverse("siaes_views:job_description_card", kwargs={"job_description_id": 42}),
+        )
+
+        # With an already present back url
+        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        self.assertEqual(
+            self.client.session[f"job_application-{siae.pk}"]["back_url"],
+            "/",
+        )
+
+        # With both
+        self.client.get(
+            reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"job_description_id": 42, "back_url": "/"}
+        )
+        self.assertEqual(
+            self.client.session[f"job_application-{siae.pk}"]["back_url"],
+            "/",
+        )
+
 
 class ApplyAsJobSeekerTest(TestCase):
     @property
     def default_session_data(self):
         return {
-            "back_url": None,
+            "back_url": "/",
             "job_seeker_pk": None,
             "job_seeker_email": None,
             "nir": None,
@@ -113,8 +147,7 @@ class ApplyAsJobSeekerTest(TestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-        response = self.client.get(url)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
         self.assertEqual(response.status_code, 302)
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -249,8 +282,7 @@ class ApplyAsJobSeekerTest(TestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-        response = self.client.get(url, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
         self.assertEqual(response.status_code, 200)
         next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk})
 
@@ -310,10 +342,10 @@ class ApplyAsJobSeekerTest(TestCase):
             )
             self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-            url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-
             # Follow all redirections…
-            response = self.client.get(url, follow=True)
+            response = self.client.get(
+                reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True
+            )
 
             # …until the expected 403.
             self.assertEqual(response.status_code, 403)
@@ -331,7 +363,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
         # With a session namespace
-        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Use that view to init the session
+        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})  # Init the session
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
@@ -345,7 +377,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
     @property
     def default_session_data(self):
         return {
-            "back_url": None,
+            "back_url": "/",
             "job_seeker_pk": None,
             "job_seeker_email": None,
             "nir": None,
@@ -371,8 +403,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-        response = self.client.get(url)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
         self.assertEqual(response.status_code, 302)
 
         session = self.client.session
@@ -597,8 +628,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-        response = self.client.get(url)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
         self.assertEqual(response.status_code, 302)
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -826,10 +856,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         user = prescriber_organization.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-
         # Follow all redirections…
-        response = self.client.get(url, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
 
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
@@ -858,8 +886,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-        response = self.client.get(url)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
         self.assertEqual(response.status_code, 302)
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -941,7 +968,7 @@ class ApplyAsPrescriberTest(TestCase):
     @property
     def default_session_data(self):
         return {
-            "back_url": None,
+            "back_url": "/",
             "job_seeker_pk": None,
             "job_seeker_email": None,
             "nir": None,
@@ -964,8 +991,7 @@ class ApplyAsPrescriberTest(TestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-        response = self.client.get(url)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
         self.assertEqual(response.status_code, 302)
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -1193,10 +1219,8 @@ class ApplyAsPrescriberTest(TestCase):
         user = PrescriberFactory()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-
         # Follow all redirections…
-        response = self.client.get(url, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
 
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
@@ -1223,7 +1247,9 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
         # With a session namespace
-        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Use that view to init the session
+        self.client.get(
+            reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}
+        )  # Use that view to init the session
         response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
@@ -1262,10 +1288,8 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         siae, user = self.create_test_data()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-
         # Follow all redirections…
-        response = self.client.get(url, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
 
         # …until a job seeker has to be determined.
         self.assertEqual(response.status_code, 200)
@@ -1336,7 +1360,7 @@ class ApplyAsSiaeTest(TestCase):
     @property
     def default_session_data(self):
         return {
-            "back_url": None,
+            "back_url": "/",
             "job_seeker_pk": None,
             "job_seeker_email": None,
             "nir": None,
@@ -1356,8 +1380,7 @@ class ApplyAsSiaeTest(TestCase):
         user = siae1.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae2.pk})
-        response = self.client.get(url)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae2.pk}), {"back_url": "/"})
         self.assertEqual(response.status_code, 403)
 
     def test_apply_as_siae(self):
@@ -1373,8 +1396,7 @@ class ApplyAsSiaeTest(TestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-        response = self.client.get(url)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
         self.assertEqual(response.status_code, 302)
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -1594,10 +1616,8 @@ class ApplyAsSiaeTest(TestCase):
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-
         # Follow all redirections…
-        response = self.client.get(url, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
 
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)

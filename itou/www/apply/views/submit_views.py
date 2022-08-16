@@ -178,6 +178,13 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
 
 
 class StartView(ApplyStepBaseView):
+    def _coalesce_back_url(self):
+        if "back_url" in self.request.GET:
+            return get_safe_url(self.request, "back_url")
+        if job_description_id := self.request.GET.get("job_description_id"):
+            return reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description_id})
+        return reverse("siaes_views:card", kwargs={"siae_id": self.siae.pk})
+
     def get(self, request, *args, **kwargs):
         # SIAE members can only submit a job application to their SIAE
         if request.user.is_siae_staff and not self.siae.has_member(request.user):
@@ -191,7 +198,7 @@ class StartView(ApplyStepBaseView):
         user_info = get_user_info(request)
         self.apply_session.init(
             {
-                "back_url": get_safe_url(request, "back_url"),
+                "back_url": self._coalesce_back_url(),
                 "job_seeker_pk": user_info.user.pk if user_info.user.is_job_seeker else None,
                 "job_seeker_email": None,
                 "nir": None,
