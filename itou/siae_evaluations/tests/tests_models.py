@@ -587,10 +587,10 @@ class EvaluatedSiaeModelTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
         del evaluated_siae.state
 
-        # PENDING + submitted_at before review
+        # PENDING + submitted_at before review: we still consider that the DDETS can validate the documents
         evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REVIEWED, evaluated_siae.state)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
         del evaluated_siae.state
 
         # PENDING + submitted_at after review
@@ -706,7 +706,7 @@ class EvaluatedSiaeModelTest(TestCase):
             2
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
         del evaluated_siae.state
 
         # one Refused, two Accepted

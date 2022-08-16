@@ -418,13 +418,12 @@ class EvaluatedSiae(models.Model):
         ):
             return evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
 
-        # PENDING and reviewed_at is none !!
-        # OR PENDING with uploaded_at > reviewed_at
+        # After a "bug" in production where the DDETS could not verify job applications,
+        # it has been decided that if we were in the unlikely case that any criteria was still PENDING,
+        # the DDETS should still be able to verify it.
         if any(
-            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
-            and (not self.reviewed_at or (eval_admin_crit.submitted_at > self.reviewed_at))
+            eval_job_app.state == evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
             for eval_job_app in self.evaluated_job_applications.all()
-            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
         ):
             return evaluation_enums.EvaluatedSiaeState.SUBMITTED
 
