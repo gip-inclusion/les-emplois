@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_SIAE_STAFF
@@ -166,6 +167,21 @@ class AdministrativeCriteriaFormTest(TestCase):
         form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
         form.is_valid()
         self.assertIn(form.ERROR_LONG_TERM_JOB_SEEKER, form.errors["__all__"])
+
+    def test_no_required_criteria_for_prescriber_with_authorized_organization(self):
+        prescriber = PrescriberFactory()
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        siae = SiaeFactory()
+
+        self.assertFalse(AdministrativeCriteriaForm(prescriber, siae, data={}).is_valid())
+        self.assertTrue(AdministrativeCriteriaForm(authorized_prescriber, siae, data={}).is_valid())
+
+    def test_no_required_criteria_when_no_siae(self):
+        prescriber = PrescriberFactory()
+        siae = SiaeFactory()
+
+        self.assertFalse(AdministrativeCriteriaForm(prescriber, siae, data={}).is_valid())
+        self.assertTrue(AdministrativeCriteriaForm(prescriber, None, data={}).is_valid())
 
 
 class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
