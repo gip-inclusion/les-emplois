@@ -298,7 +298,50 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assert_invitation_is_accepted(response, user, invitation)
 
-    def test_accept_existing_user_not_logged_in(self):
+    @respx.mock
+    def test_accept_existing_user_not_logged_in_using_IC(self):
+        invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
+        user = PrescriberFactory(email=OIDC_USERINFO["email"])
+        # The user verified its email
+        EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
+        invitation = PrescriberWithOrgSentInvitationFactory(
+            sender=self.sender,
+            organization=self.organization,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email=user.email,
+        )
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertIn(reverse("login:prescriber"), response.wsgi_request.get_full_path())
+        self.assertFalse(invitation.accepted)
+
+        next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
+        previous_url = f"{reverse('login:prescriber')}?{urlencode({'next': next_url})}"
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
+
+        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
+            response = mock_oauth_dance(
+                self,
+                assert_redirects=False,
+                login_hint=user.email,
+                channel="invitation",
+                previous_url=previous_url,
+                next_url=next_url,
+            )
+            # Follow the redirection.
+            response = self.client.get(response.url, follow=True)
+        self.assertContains(response, reverse("apply:list_for_prescriber"))
+
+        self.assertTrue(response.context["user"].is_authenticated)
+        self.assert_invitation_is_accepted(response, user, invitation)
+
+    def test_accept_existing_user_not_logged_in_using_django_auth(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         user = PrescriberFactory()
         # The user verified its email

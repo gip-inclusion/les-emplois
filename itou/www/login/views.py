@@ -45,6 +45,9 @@ class PrescriberLoginView(ItouLoginView):
             "user_kind": KIND_PRESCRIBER,
             "previous_url": self.request.get_full_path(),
         }
+        next_url = get_safe_url(self.request, "next")
+        if next_url:
+            params["next_url"] = next_url
         inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         extra_context = {
             "account_type_display_name": "prescripteur",
