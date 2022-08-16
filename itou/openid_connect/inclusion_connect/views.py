@@ -19,6 +19,7 @@ from itou.utils.urls import get_absolute_url
 
 from ..models import TooManyKindsException
 from . import constants
+from .enums import InclusionConnectChannel
 from .models import InclusionConnectState, InclusionConnectUserData
 
 
@@ -35,6 +36,9 @@ class InclusionConnectSession:
     user_kind: str = None
     request: str = None
     key: str = constants.INCLUSION_CONNECT_SESSION_KEY
+    channel: str = None
+    # Tells us where did the user came from so that we can adapt
+    # error messages in the callback view.
 
     def asdict(self):
         return dataclasses.asdict(self)
@@ -76,9 +80,13 @@ def inclusion_connect_authorize(request):
         "from": "emplois",  # Display a "Les emplois" logo on the connection page.
     }
     login_hint = request.GET.get("login_hint")
+    channel = request.GET.get("channel")
     if login_hint:
+        if not channel:
+            raise KeyError("channel is missing when login_hint is present.")
         data["login_hint"] = login_hint
         ic_session["user_email"] = login_hint
+        ic_session["channel"] = channel
         request.session.modified = True
 
     return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
@@ -147,11 +155,19 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     ic_session_email = ic_session.get("user_email")
 
     if ic_session_email and ic_session_email != ic_user_data.email:
-        error = (
-            "L’adresse e-mail que vous avez utilisée pour vous connecter avec Inclusion Connect "
-            f"({ic_user_data.email}) "
-            f"est différente de celle que vous avez indiquée précédemment ({ic_session_email})."
-        )
+        errors = {
+            InclusionConnectChannel.POLE_EMPLOI: (
+                "L’adresse e-mail que vous avez utilisée pour vous connecter avec Inclusion Connect "
+                f"({ic_user_data.email}) "
+                f"est différente de celle que vous avez indiquée précédemment ({ic_session_email})."
+            ),
+            InclusionConnectChannel.INVITATION: (
+                "L’adresse e-mail que vous avez utilisée pour vous connecter avec Inclusion Connect "
+                f"({ic_user_data.email}) "
+                f"ne correspond pas à l’adresse e-mail de l’invitation ({ic_session_email})."
+            ),
+        }
+        error = errors[ic_session["channel"]]
         messages.error(request, error)
         is_successful = False
 

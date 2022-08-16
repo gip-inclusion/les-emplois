@@ -19,6 +19,7 @@ from django.utils.http import urlencode
 from django.views.decorators.http import require_GET
 
 from itou.common_apps.address.models import lat_lon_to_coords
+from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
@@ -616,6 +617,7 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
     )
     params = {
         "login_hint": session_data["email"],
+        "channel": InclusionConnectChannel.POLE_EMPLOI.value,
         "user_kind": KIND_PRESCRIBER,
         "previous_url": request.get_full_path(),
         "next_url": reverse("signup:prescriber_join_org"),

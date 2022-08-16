@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 import respx
 from allauth.account.models import EmailAddress
 from django.conf import settings
+from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
@@ -226,6 +227,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         params = {
             "user_kind": KIND_PRESCRIBER,
             "login_hint": invitation.email,
+            "channel": "invitation",
             "previous_url": previous_url,
             "next_url": next_url,
         }
@@ -239,12 +241,16 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
                 self,
                 assert_redirects=False,
                 login_hint=invitation.email,
+                channel="invitation",
                 previous_url=previous_url,
                 next_url=next_url,
             )
             # Follow the redirection.
             response = self.client.get(response.url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertIn("ne correspond pas à l’adresse e-mail de l’invitation", str(messages[0]))
         self.assertEqual(response.wsgi_request.get_full_path(), previous_url)
         self.assertFalse(User.objects.filter(email=invitation.email).exists())
 
@@ -256,6 +262,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
                 self,
                 assert_redirects=False,
                 login_hint=invitation.email,
+                channel="invitation",
                 previous_url=previous_url,
                 next_url=next_url,
             )

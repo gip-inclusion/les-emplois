@@ -44,6 +44,7 @@ def mock_oauth_dance(
     expected_route="welcoming_tour:index",
     login_hint=None,
     user_info_email=None,
+    channel=None,
 ):
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE).respond(302)
     # Authorize params depend on user kind.
@@ -52,6 +53,7 @@ def mock_oauth_dance(
         "previous_url": previous_url,
         "next_url": next_url,
         "login_hint": login_hint,
+        "channel": channel,
     }
     authorize_params = {k: v for k, v in authorize_params.items() if v}
 
@@ -270,7 +272,7 @@ class InclusionConnectViewTest(TestCase):
 
     def test_authorize_endpoint_with_params(self):
         email = "porthos@touspourun.com"
-        params = {"login_hint": email, "user_kind": KIND_PRESCRIBER}
+        params = {"login_hint": email, "user_kind": KIND_PRESCRIBER, "channel": "invitation"}
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
         self.assertIn(quote(email), response.url)

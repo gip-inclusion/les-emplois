@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
 
 from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
+from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.users.enums import KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -39,6 +40,7 @@ def handle_invited_prescriber_registration(request, invitation):
     params = {
         "user_kind": KIND_PRESCRIBER,
         "login_hint": invitation.email,
+        "channel": InclusionConnectChannel.INVITATION.value,
         "previous_url": request.get_full_path(),
         "next_url": get_safe_url(request, "redirect_to"),
     }
