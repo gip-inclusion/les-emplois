@@ -89,10 +89,14 @@ class SiaeJobApplicationListViewTest(TestCase):
             1  # fetch django session
             + 1  # fetch user
             + 2  # fetch siae membership and siae infos
+            + 1  # fetch evaluated siae
             + 2  # fetch evaluatedjobapplication and its prefetched evaluatedadministrativecriteria
             + 1  # aggregate min evaluation_campaign notification date
             + 2  # weird fetch siae membership and social account
-            + 1  # fetch evaluatedsiae
+            # NOTE(vperron): the prefecth is necessary to check the SUBMITTABLE state of the evaluated siae
+            # We do those requests "two times" but at least it's now accurate information, and we get
+            # the EvaluatedJobApplication list another way so that we can select_related on them.
+            + 2  # prefetch evaluated job applications and criteria
         ):
             response = self.client.get(self.url)
 

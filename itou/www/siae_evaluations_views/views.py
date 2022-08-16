@@ -227,31 +227,20 @@ def siae_job_applications_list(request, template_name="siae_evaluations/siae_job
     # note vincentporte : misconception. This view should be called with one evaluated_siae
     # id, not trying to deal with any evaluated_siae of one siae. Must be fixed soon.
     siae = get_current_siae_or_404(request)
-
-    evaluated_job_applications = (
-        EvaluatedJobApplication.objects.exclude(evaluated_siae__evaluation_campaign__evaluations_asked_at=None)
-        .filter(evaluated_siae__siae=siae, evaluated_siae__evaluation_campaign__ended_at=None)
-        .select_related("job_application", "job_application__job_seeker", "job_application__approval")
-        .prefetch_related("evaluated_administrative_criteria")
+    evaluated_siae = (
+        EvaluatedSiae.objects.filter(siae=siae, evaluation_campaign__ended_at=None)
+        .exclude(evaluation_campaign__evaluations_asked_at=None)
+        .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
+        .first()
     )
 
-    # note vincentporte : is_submittable should be a method of EvaluatedSiae model
-    # when `siae_job_applications_list` will collect EvaluatedJobApplication of ONE
-    # EvaluatedSiae instead of all EvaluatedJobApplication of all active EvaluatedSiae
-    # of one Siae (misconception here)
-    if evaluated_job_applications:
-        is_submittable = all(
-            (
-                evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
-                or evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
-            )
-            for evaluated_job_application in evaluated_job_applications
-        ) and any(
-            evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
-            for evaluated_job_application in evaluated_job_applications
+    evaluated_job_applications = (
+        EvaluatedJobApplication.objects.filter(evaluated_siae=evaluated_siae)
+        .select_related(
+            "evaluated_siae", "job_application", "job_application__job_seeker", "job_application__approval"
         )
-    else:
-        is_submittable = False
+        .prefetch_related("evaluated_administrative_criteria")
+    )
 
     evaluations_asked_at = evaluated_job_applications.aggregate(
         date=Min("evaluated_siae__evaluation_campaign__evaluations_asked_at")
@@ -262,7 +251,7 @@ def siae_job_applications_list(request, template_name="siae_evaluations/siae_job
     context = {
         "evaluated_job_applications": evaluated_job_applications,
         "evaluations_asked_at": evaluations_asked_at,
-        "is_submittable": is_submittable,
+        "is_submittable": evaluated_siae and evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
         "back_url": back_url,
     }
     return render(request, template_name, context)
