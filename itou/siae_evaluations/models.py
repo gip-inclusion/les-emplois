@@ -604,10 +604,7 @@ class EvaluatedAdministrativeCriteria(models.Model):
         if self.submitted_at is None:
             return True
 
-        if (
-            self.evaluated_job_application.evaluated_siae.reviewed_at
-            and self.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
-        ):
-            return True
-
-        return False
+        return (
+            self.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+            and self.evaluated_job_application.evaluated_siae.reviewed_at
+        )
