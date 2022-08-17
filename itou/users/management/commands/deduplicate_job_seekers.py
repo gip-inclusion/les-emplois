@@ -39,7 +39,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
     To run the command without any change in DB and have a preview of which
     accounts will be merged:
-        django-admin deduplicate_job_seekers --dry-run --no-csv
+        django-admin deduplicate_job_seekers --wet-run --no-csv
 
     To merge duplicates job seekers in the database:
         django-admin deduplicate_job_seekers
@@ -56,7 +56,9 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
     NIR_DUPLICATES_COUNT = 0
 
     def add_arguments(self, parser):
-        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only display data to deduplicate")
+        parser.add_argument(
+            "--wet-run", dest="wet_run", action="store_true", help="Actually write information in the database"
+        )
         parser.add_argument("--no-csv", dest="no_csv", action="store_true", help="Do not export results in CSV")
 
     def handle_easy_duplicates(self, duplicates, target, nirs):
@@ -87,7 +89,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
             assert user.approvals.count() == 0
 
-            if not self.dry_run:
+            if self.wet_run:
                 user.job_applications.update(
                     job_seeker=target,
                     sender=Case(
@@ -104,7 +106,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         # uniqueness constraint.
         if len(nirs) == 1 and not target.nir:
             target.nir = nirs[0]
-            if not self.dry_run:
+            if self.wet_run:
                 target.save()
 
     def handle_hard_duplicates(self, duplicates):
@@ -175,11 +177,11 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             # We are only logging for now.
             self.NIR_DUPLICATES_LOGS.append(log_info)
 
-    def handle(self, dry_run=False, no_csv=False, **options):
+    def handle(self, wet_run=False, no_csv=False, **options):
 
         self.set_logger(options.get("verbosity"))
 
-        self.dry_run = dry_run
+        self.wet_run = wet_run
         self.no_csv = no_csv
 
         self.stdout.write("Starting. Good luck…")
