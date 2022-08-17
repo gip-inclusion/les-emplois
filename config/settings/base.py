@@ -252,7 +252,7 @@ SESSION_COOKIE_SECURE = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-SESSION_SERIALIZER = 'itou.utils.session.JSONSerializer'
+SESSION_SERIALIZER = "itou.utils.session.JSONSerializer"
 
 X_FRAME_OPTIONS = "DENY"
 
