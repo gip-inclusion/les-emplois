@@ -49,10 +49,8 @@ class AdministrativeCriteriaForm(forms.Form):
         f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_DETLD_24} et {NAME_DELD_12}."
     )
 
-    administrative_criteria = AdministrativeCriteria.objects.all()
-
     def get_administrative_criteria(self):
-        return self.administrative_criteria
+        return AdministrativeCriteria.objects.all()
 
     def __init__(self, user, siae, **kwargs):
 
@@ -60,10 +58,12 @@ class AdministrativeCriteriaForm(forms.Form):
         self.siae = siae
         super().__init__(**kwargs)
 
+        initial_administrative_criteria = self.initial.get("administrative_criteria", [])
         for criterion in self.get_administrative_criteria():
             key = criterion.key
             self.fields[key] = forms.BooleanField(required=False, label=criterion.name, help_text=criterion.desc)
             self.fields[key].widget.attrs["class"] = "form-check-input"  # Bootstrap CSS class.
+            self.initial.setdefault(key, criterion in initial_administrative_criteria)
             self.OBJECTS[key] = criterion
 
     def clean(self):
