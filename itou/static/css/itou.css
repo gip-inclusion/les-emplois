@@ -208,6 +208,25 @@ _:-ms-fullscreen,
     display: none;
 }
 
+/* CSS for js-shroud.
+---------------------------------------------------------------------------- */
+
+.js-shroud {
+    position: relative;
+    opacity: 50%;
+}
+
+.js-shroud::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /* Bootstrap components scale from 0 to 3: https://getbootstrap.com/docs/4.6/extend/approach/#z-index-scales */
+    z-index: 4;
+}
+
 /* Responsive Multi-Step Progress Bar.
 https://codepen.io/athimannil/pen/wWPYkQ
 

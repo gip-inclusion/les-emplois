@@ -47,4 +47,16 @@ $(document).ready(() => {
       $(this).click(swapElements)
     })
   })
+
+  /**
+   * JS to manage shroud
+   */
+  $("[data-shroud-input]").prop("disabled", true)
+  $(".js-shroud").find("[data-shroud-input]").prop("disabled", false)
+  $("[data-shroud-clear]").each(function () {
+    $(this).click(function() {
+      $(".js-shroud").removeClass("js-shroud")
+      $("[data-shroud-input]").prop("disabled", true)
+    })
+  })
 });
