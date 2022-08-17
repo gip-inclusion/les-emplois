@@ -1,5 +1,6 @@
 import csv
 import datetime
+import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -40,6 +41,7 @@ class Command(BaseCommand):
 
         fieldnames = data[0].keys()
         log_datetime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        os.makedirs(settings.EXPORT_DIR, exist_ok=True)
         path = f"{settings.EXPORT_DIR}/{log_datetime}-{filename}-{settings.ITOU_ENVIRONMENT.lower()}.csv"
         with open(path, "w") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)

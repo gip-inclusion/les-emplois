@@ -18,9 +18,8 @@ ROOT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "../.."))
 
 APPS_DIR = os.path.abspath(os.path.join(ROOT_DIR, "itou"))
 
-EXPORT_DIR = f"{ROOT_DIR}/exports"
-
-IMPORT_DIR = f"{ROOT_DIR}/imports"
+EXPORT_DIR = os.environ.get("SCRIPT_EXPORT_PATH", f"{ROOT_DIR}/exports")
+IMPORT_DIR = os.environ.get("SCRIPT_IMPORT_PATH", f"{ROOT_DIR}/imports")
 
 # General.
 # ------------------------------------------------------------------------------

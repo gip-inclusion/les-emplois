@@ -1,5 +1,6 @@
 import csv
 import datetime
+import os
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -283,6 +284,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
     def to_csv(self, filename, fieldnames, data):
         log_datetime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         path = f"{settings.EXPORT_DIR}/{log_datetime}-{filename}-{settings.ITOU_ENVIRONMENT.lower()}.csv"
+        os.makedirs(settings.EXPORT_DIR, exist_ok=True)
         with open(path, "w") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
             writer.writeheader()
