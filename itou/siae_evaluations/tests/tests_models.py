@@ -457,16 +457,33 @@ class EvaluationCampaignManagerTest(TestCase):
             evaluation_campaign.populate(fake_now)
 
     def test_transition_to_adversarial_phase(self):
-        evaluation_campaign = EvaluationCampaignFactory()
-        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+        fake_now = timezone.now()
+        EvaluatedSiaeFactory()  # will be ignored
+        campaign = EvaluationCampaignFactory()
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        evaluated_administrative_criterion = EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=fake_now,
+            evaluated_job_application=evaluated_job_application
+            # default review_state is PENDING
+        )
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
 
-        evaluation_campaign = EvaluationCampaignFactory()
-        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
-
+        # since we have a SIAE in SUBMITTED state, does not change anything
+        campaign.transition_to_adversarial_phase()
         self.assertEqual(2, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
 
-        evaluation_campaign.transition_to_adversarial_phase()
+        # make the SIAE in another state
+        evaluated_administrative_criterion.review_state = "FOOBAR"
+        evaluated_administrative_criterion.save(update_fields=["review_state"])
+        del evaluated_siae.state
+        self.assertNotEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+
+        # now the transition works
+        campaign.transition_to_adversarial_phase()
         self.assertEqual(1, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
+        evaluated_siae.refresh_from_db()
+        self.assertIsNotNone(evaluated_siae.reviewed_at)
 
     def test_close(self):
         evaluation_campaign = EvaluationCampaignFactory()

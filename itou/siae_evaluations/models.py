@@ -237,8 +237,14 @@ class EvaluationCampaign(models.Model):
             connection.send_messages(emails)
 
     def transition_to_adversarial_phase(self):
-        EvaluatedSiae.objects.filter(evaluation_campaign=self, reviewed_at__isnull=True).update(
-            reviewed_at=timezone.now()
+        (
+            EvaluatedSiae.objects.filter(evaluation_campaign=self, reviewed_at__isnull=True)
+            # this is equivalent to removing any EvaluatedSiae in the SUBMITTED state.
+            # it's also not DRY, but efficient.
+            .exclude(
+                # pylint-disable=line-too-long
+                evaluated_job_applications__evaluated_administrative_criteria__review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING  # noqa: E501
+            ).update(reviewed_at=timezone.now())
         )
 
     def close(self):
