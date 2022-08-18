@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.template.defaultfilters import date as date_filter
 
 from itou.eligibility import models
 from itou.utils.admin import PkSupportRemarkInline
@@ -77,11 +76,6 @@ class EligibilityDiagnosisAdmin(admin.ModelAdmin):
 
     is_valid.boolean = True
     is_valid.short_description = "En cours de validité"
-
-    def expires_at(self, obj):
-        return date_filter(obj.expires_at, "d F Y H:i")
-
-    expires_at.short_description = "Date d'expiration"
 
     def is_considered_valid(self, obj):
         """

@@ -15,15 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class EligibilityDiagnosisQuerySet(models.QuerySet):
-    @property
-    def valid_lookup(self):
-        return models.Q(created_at__gt=self.model.get_expiration_dt())
-
     def valid(self):
-        return self.filter(self.valid_lookup)
+        return self.filter(expires_at__gt=timezone.now())
 
     def expired(self):
-        return self.exclude(self.valid_lookup)
+        return self.filter(expires_at__lte=timezone.now())
 
     def authored_by_siae(self, for_siae):
         return self.filter(author_siae=for_siae)
@@ -182,6 +178,7 @@ class EligibilityDiagnosis(models.Model):
 
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
+    expires_at = models.DateTimeField(verbose_name="Date d'expiration", db_index=True)
 
     objects = EligibilityDiagnosisManager.from_queryset(EligibilityDiagnosisQuerySet)()
 
@@ -195,15 +192,13 @@ class EligibilityDiagnosis(models.Model):
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
+        if not self.expires_at:
+            self.expires_at = self.created_at + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
         return super().save(*args, **kwargs)
 
     @property
     def is_valid(self):
-        return self.created_at > self.get_expiration_dt()
-
-    @property
-    def expires_at(self):
-        return self.created_at + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
+        return self.expires_at > timezone.now()
 
     # A diagnosis is considered valid for the whole duration of an approval.
     # Methods below (whose name contain `considered`) take into account
@@ -242,11 +237,6 @@ class EligibilityDiagnosis(models.Model):
                 diagnosis.administrative_criteria.add(criteria)
             diagnosis.save()
         return diagnosis
-
-    @staticmethod
-    def get_expiration_dt():
-        # Everything created after this date is valid.
-        return timezone.now() - relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS)
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):

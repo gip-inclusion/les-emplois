@@ -13,6 +13,7 @@ class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EligibilityDiagnosis
 
+    created_at = factory.LazyAttribute(lambda obj: timezone.now())
     author = factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first())
     author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
     author_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory, authorized=True)
@@ -25,6 +26,7 @@ class EligibilityDiagnosisMadeBySiaeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EligibilityDiagnosis
 
+    created_at = factory.LazyAttribute(lambda obj: timezone.now())
     author = factory.LazyAttribute(lambda obj: obj.author_siae.members.first())
     author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
     author_siae = factory.SubFactory(SiaeFactory, with_membership=True)
@@ -33,16 +35,12 @@ class EligibilityDiagnosisMadeBySiaeFactory(factory.django.DjangoModelFactory):
 
 class ExpiredEligibilityDiagnosisFactory(EligibilityDiagnosisFactory):
 
-    created_at = factory.LazyAttribute(
-        lambda self: models.EligibilityDiagnosis.get_expiration_dt() - timezone.timedelta(days=1)
-    )
+    expires_at = factory.SelfAttribute("created_at")
 
 
 class ExpiredEligibilityDiagnosisMadeBySiaeFactory(EligibilityDiagnosisMadeBySiaeFactory):
 
-    created_at = factory.LazyAttribute(
-        lambda self: models.EligibilityDiagnosis.get_expiration_dt() - timezone.timedelta(days=1)
-    )
+    expires_at = factory.SelfAttribute("created_at")
 
 
 class AdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
