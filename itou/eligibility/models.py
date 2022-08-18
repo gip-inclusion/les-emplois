@@ -3,7 +3,7 @@ import logging
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Exists, OuterRef
 from django.utils import timezone
 
@@ -217,6 +217,7 @@ class EligibilityDiagnosis(models.Model):
         return self.expires_at
 
     @classmethod
+    @transaction.atomic()
     def create_diagnosis(cls, job_seeker, user_info, administrative_criteria=None):
         """
         Arguments:
@@ -233,9 +234,7 @@ class EligibilityDiagnosis(models.Model):
             author_prescriber_organization=user_info.prescriber_organization,
         )
         if administrative_criteria:
-            for criteria in administrative_criteria:
-                diagnosis.administrative_criteria.add(criteria)
-            diagnosis.save()
+            diagnosis.administrative_criteria.add(*administrative_criteria)
         return diagnosis
 
 
