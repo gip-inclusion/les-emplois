@@ -83,6 +83,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         .order_by("-status")
     )
     employee_record_badges = {row["status"]: row["cnt"] for row in employee_record_statuses}
+
     eligibible_job_applications = JobApplication.objects.eligible_as_employee_record(siae)
 
     # Set count of each status for badge display

@@ -199,7 +199,7 @@ class EmployeeRecord(models.Model):
     # It will only return a list of this JSON field for archived employee records.
     archived_json = models.JSONField(verbose_name="Archive JSON de la fiche salarié", null=True)
 
-    objects = models.Manager.from_queryset(EmployeeRecordQuerySet)()
+    objects = EmployeeRecordQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Fiche salarié"
@@ -216,8 +216,8 @@ class EmployeeRecord(models.Model):
 
     def __str__(self):
         return (
-            f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} "
-            f"JOBSEEKER:{self.job_seeker} STATUS:{self.status}"
+            f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application.pk} "
+            f"JOBSEEKER:{self.job_seeker} STATUS:{self.status} ASP_ID:{self.asp_id}"
         )
 
     def save(self, *args, **kwargs):
