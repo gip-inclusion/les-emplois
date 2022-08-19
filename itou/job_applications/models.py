@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, Q, Subquery, When
+from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -18,6 +18,7 @@ from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrative
 from itou.employee_record import enums as employeerecord_enums
 from itou.job_applications.enums import RefusalReason, SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
+from itou.siaes.models import Siae
 from itou.utils.emails import get_email_message
 
 
@@ -250,76 +251,100 @@ class JobApplicationQuerySet(models.QuerySet):
             .order_by("-month")
         )
 
-    def eligible_as_employee_record(self, siae):
-        """
-        List job applications that will have to be transfered to ASP
-        via the employee record app.
+    # Employee record querysets
 
-        These job applications must:
-        - be definitely accepted
-        - have no one-to-one relationship with an employee record (or it is disabled)
-        - have been created after production date
-
-        An eligible job application *may* or *may not* have an employee record object linked
-        to it.
-
-        For instance, when creating a new employee record from an eligible job application
-        and NOT finishing the entire creation process.
-        (employee record object creation occurs half-way of the "tunnel")
-        """
-
-        # Exclude existing employee records with same approval and asp_id and not disabled
-        # Rule: you can only create *one* employee record for a given asp_id / approval pair
-        exclude_same_asp_and_approval = Subquery(
-            self.exclude(
-                to_siae=siae,
-                employee_record__status__in=[employeerecord_enums.Status.DISABLED, employeerecord_enums.Status.NEW],
-            ).filter(
-                employee_record__asp_id=siae.asp_id,
-                employee_record__approval_number=OuterRef("approval__number"),
-            )
-        )
-
-        # Exclude processed employee record
-        subquery_in_tunnel = Subquery(
-            self.filter(
-                to_siae=siae,
-                hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
-                employee_record__asp_id=siae.asp_id,
-                employee_record__approval_number=OuterRef("approval__number"),
-                employee_record__status__in=[
-                    employeerecord_enums.Status.READY,
-                    employeerecord_enums.Status.SENT,
-                    employeerecord_enums.Status.REJECTED,
-                    employeerecord_enums.Status.PROCESSED,
-                    employeerecord_enums.Status.DISABLED,
-                ],
-            )
-        )
-
+    def _prefetch_employee_record_list(self):
+        """Fetch all needed data to avoid N+1 effects. Not a public API: use `eligible_as_employee_record`."""
         return (
-            # Job application without approval are out of scope
-            self.exclude(approval=None)
-            # Prevent employee records creation (batch import for example).
-            .filter(create_employee_record=True)
-            # See `subquery` above : exclude possible ASP duplicates
-            .exclude(Exists(exclude_same_asp_and_approval))
-            # Only ACCEPTED job applications can be transformed into employee records
-            .accepted()
-            # Employee record must not be in tunnel
-            .exclude(Exists(subquery_in_tunnel))
-            # Accept only job applications without linked or processed employee record
-            .exclude(Q(employee_record__isnull=False) & ~Q(employee_record__status=employeerecord_enums.Status.NEW))
-            .filter(
-                # Only for current SIAE
-                to_siae=siae,
-                # Hiring must start after production date:
-                hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
-            )
-            .select_related("job_seeker", "approval")
-            .prefetch_related("employee_record")
+            self.select_related(
+                "to_siae",
+                "to_siae__convention",
+                "approval",
+                "job_seeker",
+            ).prefetch_related("employee_record")
+            # Order by most recent hirings
             .order_by("-hiring_start_at")
         )
+
+    def _eligible_job_applications_with_employee_record(self, siae):
+        """
+        Eligible job applications for employee record query: part 1
+
+        Eligible job applications linked to an employee record,
+        provided that the employee record linked to these job applications:
+            - has the same ASP_ID of hiring structure,
+            - has the same approval,
+            - is `NEW` state.
+
+        Otherwise these employee records will be rejected by ASP as duplicates.
+
+        Not a public API: use `eligible_as_employee_record`.
+        """
+        return self._prefetch_employee_record_list().filter(
+            to_siae=siae,
+            employee_record__status=employeerecord_enums.Status.NEW,
+            employee_record__asp_id=F("to_siae__convention__asp_id"),
+            employee_record__approval_number=F("approval__number"),
+        )
+
+    def _eligible_job_applications_without_employee_record(self, siae):
+        """
+        Eligible job applications for employee record query: part 2
+
+        Eligible job applications WITHOUT any employee record linked.
+
+        See `eligible_as_employee_record` for an explanation of business and technical rules.
+
+        Not a public API: use `eligible_as_employee_record`.
+        """
+        return (
+            self._prefetch_employee_record_list()
+            .filter(to_siae=siae)
+            # Hiring must be valid
+            .accepted()
+            # Must be linked to an approval
+            .exclude(approval__isnull=True)
+            # Hiring structure must be one of those kinds
+            .filter(to_siae__kind__in=Siae.ASP_EMPLOYEE_RECORD_KINDS)
+            .filter(
+                # Admin control: can prevent creation of employee record
+                create_employee_record=True,
+                # No employee record is available before this date
+                hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+            )
+            # There must be **NO** employee record linked in this part
+            .filter(employee_record__isnull=True)
+        )
+
+    def eligible_as_employee_record(self, siae):
+        """
+        Get a list of job applications potentially "updatable" as an employee record.
+        Mainly for display concerns (list of employee records for a given SIAE).
+
+        Rules of eligibility for a job application:
+            - be in 'ACCEPTED' state (valid hiring)
+            - to be linked to an approval
+            - hiring SIAE must be one of : AI, EI, ACI, ETTI. EITI will be added as of september 2022
+            - the hiring date must be greater then 2021.09.27 (feature production date)
+            - employee record is not blocked via admin (`create_employee_record` field)
+
+        Enabling / disabling an employee record has no impact on eligilibility concerns.
+
+        Getting a correct list of eligible job applications for employee records:
+            - is not achievable in one single request (opposite conditions)
+            - is consuming a lot of resources (200-800ms per round)
+        Splitting in 2 queries, reunited by a UNION:
+            - lowers SQL query time under 20ms
+            - adds correctness to result
+        Each query is commented according to the newest Whimsical schemas.
+        """
+        eligibible_job_applications_part_1 = self._eligible_job_applications_with_employee_record(siae).only("id")
+        eligibible_job_applications_part_2 = self._eligible_job_applications_without_employee_record(siae).only("id")
+        eligibible_job_applications = eligibible_job_applications_part_1.union(eligibible_job_applications_part_2)
+
+        # TIP: you can't filter on an UNION of querysets,
+        # but you can convert it as a subquery and then order / filter it
+        return self._prefetch_employee_record_list().filter(pk__in=eligibible_job_applications.values("id"))
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
