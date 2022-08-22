@@ -98,6 +98,9 @@ class DashboardViewTest(TestCase):
         # create rejected job applications
         job_application = JobApplicationWithApprovalFactory(to_siae=siae)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
+        # You can't create 2 employee records with the same job application
+        # Factories were allowing it until a recent fix was applied
+        job_application = JobApplicationWithApprovalFactory(to_siae=siae)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
 
         other_job_application = JobApplicationWithApprovalFactory(to_siae=other_siae)

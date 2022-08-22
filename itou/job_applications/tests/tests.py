@@ -151,9 +151,11 @@ class JobApplicationModelTest(TestCase):
         EmployeeRecordFactory(job_application=job_application_ok, status=Status.NEW)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
+        job_application_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
         EmployeeRecordFactory(job_application=job_application_ok, status=Status.READY)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
+        job_application_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
         EmployeeRecordFactory(job_application=job_application_ok, status=Status.REJECTED)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
@@ -162,6 +164,7 @@ class JobApplicationModelTest(TestCase):
         EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.SENT)
         self.assertFalse(job_application_not_ok.can_be_cancelled)
 
+        job_application_not_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
         EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.PROCESSED)
         self.assertFalse(job_application_not_ok.can_be_cancelled)
 
