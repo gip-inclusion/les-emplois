@@ -274,7 +274,7 @@ class JobApplicationQuerySet(models.QuerySet):
         provided that the employee record linked to these job applications:
             - has the same ASP_ID of hiring structure,
             - has the same approval,
-            - is `NEW` state.
+            - is in `NEW` state.
 
         Otherwise these employee records will be rejected by ASP as duplicates.
 
@@ -293,7 +293,7 @@ class JobApplicationQuerySet(models.QuerySet):
 
         Eligible job applications WITHOUT any employee record linked.
 
-        See `eligible_as_employee_record` for an explanation of business and technical rules.
+        See `eligible_as_employee_record` method for an explanation of business and technical rules.
 
         Not a public API: use `eligible_as_employee_record`.
         """
@@ -319,16 +319,16 @@ class JobApplicationQuerySet(models.QuerySet):
     def eligible_as_employee_record(self, siae):
         """
         Get a list of job applications potentially "updatable" as an employee record.
-        Mainly for display concerns (list of employee records for a given SIAE).
+        For display concerns (list of employee records for a given SIAE).
 
         Rules of eligibility for a job application:
             - be in 'ACCEPTED' state (valid hiring)
             - to be linked to an approval
             - hiring SIAE must be one of : AI, EI, ACI, ETTI. EITI will be added as of september 2022
-            - the hiring date must be greater then 2021.09.27 (feature production date)
+            - the hiring date must be greater than 2021.09.27 (feature production date)
             - employee record is not blocked via admin (`create_employee_record` field)
 
-        Enabling / disabling an employee record has no impact on eligilibility concerns.
+        Enabling / disabling an employee record has no impact on job application eligilibility concerns.
 
         Getting a correct list of eligible job applications for employee records:
             - is not achievable in one single request (opposite conditions)
@@ -343,7 +343,7 @@ class JobApplicationQuerySet(models.QuerySet):
         eligibible_job_applications = eligibible_job_applications_part_1.union(eligibible_job_applications_part_2)
 
         # TIP: you can't filter on an UNION of querysets,
-        # but you can convert it as a subquery and then order / filter it
+        # but you can convert it as a subquery and then order and filter it
         return self._prefetch_employee_record_list().filter(pk__in=eligibible_job_applications.values("id"))
 
 
