@@ -11,6 +11,7 @@ from itou.approvals import models as approvals_models
 from itou.eligibility import models as eligibility_models
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
+from itou.siae_evaluations.models import EvaluatedSiae
 from itou.siaes import models as siaes_models
 from itou.users import models as users_models
 
@@ -84,6 +85,13 @@ class Command(BaseCommand):
             to_siae = to_siae_qs.get()
         except siaes_models.Siae.DoesNotExist:
             self.stderr.write("Unable to find the siae ID %s\n" % to_id)
+            return
+
+        if EvaluatedSiae.objects.filter(siae=from_siae).exists():
+            self.stderr.write(
+                "Moving the SIAE with id=%s would cause inconsistencies with the DDETS evaluation campaigns !"
+                % from_id
+            )
             return
 
         # Intermediate variable for better readability
