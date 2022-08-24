@@ -29,7 +29,7 @@ class UserAdapter(DefaultAccountAdapter):
     def get_logout_redirect_url(self, request):
         """
         Returns the URL to redirect to after the user logs out. Note that
-        this method is also invoked if you attempt to log out while no users
+        this method is also invoked if you attempt to log out while no user
         is logged in. Therefore, request.user is not guaranteed to be an
         authenticated user.
         Tests are in itou.inclusion_connect.tests.
@@ -37,7 +37,7 @@ class UserAdapter(DefaultAccountAdapter):
         redirect_url = reverse("home:hp")
         # Inclusion Connect
         ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
-        if ic_session:
+        if ic_session and ic_session.get("token"):
             params = {"token": ic_session["token"], "state": ic_session["state"]}
             ic_base_logout_url = reverse("inclusion_connect:logout")
             redirect_url = f"{ic_base_logout_url}?{urlencode(params)}"
