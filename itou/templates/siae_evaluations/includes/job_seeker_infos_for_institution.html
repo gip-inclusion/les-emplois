@@ -17,6 +17,8 @@
                 <p class="badge badge-danger float-right">Problème constaté</p>
             {%elif state == "ACCEPTED" %}
                 <p class="badge badge-success float-right">Validé</p>
+            {%elif state == "UPLOADED" %}
+                <p class="badge badge-pilotage float-right">Justificatifs téléversés</p>
             {% else %}
                 <p class="badge badge-emploi float-right">{%if evaluated_siae.reviewed_at%}Phase contradictoire - {%endif%}En attente</p>
             {%endif%}

@@ -405,16 +405,25 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, validation_url)
         self.assertNotContains(response, message)
 
-        # EvaluatedAdministrativeCriteria submitted
+        # EvaluatedAdministrativeCriteria uploaded
         evaluated_administrative_criteria = evaluated_job_application.evaluated_administrative_criteria.first()
-        evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
-        evaluated_administrative_criteria.save(update_fields=["submitted_at", "proof_url"])
+        evaluated_administrative_criteria.save(update_fields=["proof_url"])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, back_url)
+        self.assertContains(response, "Justificatifs téléversés")
 
+        # EvaluatedAdministrativeCriteria submitted
+        evaluated_administrative_criteria.submitted_at = timezone.now()
+        evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
+        self.assertNotContains(response, "Documents téléversés")
+        self.assertNotContains(response, "En attente")
+        self.assertNotContains(response, "Nouveaux justificatifs à traiter")
         self.assertContains(response, validation_url)
         self.assertNotContains(response, message)
 
