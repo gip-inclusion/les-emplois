@@ -158,7 +158,7 @@ class Command(EmployeeRecordTransferCommand):
                 if not dry_run:
                     try:
                         if employee_record.status != Status.PROCESSED:
-                            employee_record.update_as_accepted(
+                            employee_record.update_as_processed(
                                 processing_code, processing_label, renderer.render(serializer.data).decode()
                             )
                         else:

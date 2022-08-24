@@ -260,7 +260,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_sent(filename, 1)
 
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_processed(process_code, process_message, "{}")
 
         self.assertEqual(self.employee_record.status, Status.PROCESSED)
         self.assertEqual(self.employee_record.asp_processing_code, process_code)
@@ -291,7 +291,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         # Employee record in ACCEPTED state can be disabled
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_processed(process_code, process_message, "{}")
         self.employee_record.update_as_disabled()
         self.assertEqual(self.employee_record.status, Status.DISABLED)
 
@@ -345,7 +345,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         process_code = "0000"
         process_message = "La ligne de la fiche salarié a été enregistrée avec succès."
         archive_first = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [1]."}'
-        self.employee_record.update_as_accepted(process_code, process_message, archive_first)
+        self.employee_record.update_as_processed(process_code, process_message, archive_first)
         self.employee_record.update_as_disabled()
         self.assertEqual(self.employee_record.status, Status.DISABLED)
 
@@ -363,7 +363,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         archive_second = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [2]."}'
-        self.employee_record.update_as_accepted(process_code, process_message, archive_second)
+        self.employee_record.update_as_processed(process_code, process_message, archive_second)
         self.assertEqual(self.employee_record.archived_json, archive_second)
         self.assertEqual(self.employee_record.asp_batch_file, filename_second)
 
@@ -379,7 +379,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertIsNone(self.employee_record.processed_at)
 
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_processed(process_code, process_message, "{}")
 
         # Can't archive, too recent
         with self.assertRaises(ValidationError):
@@ -449,5 +449,5 @@ class JobApplicationConstraintsTest(TestCase):
         self.employee_record.update_as_ready()
         self.employee_record.update_as_sent(filename, 1)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_processed(process_code, process_message, "{}")
         self.assertFalse(self.job_application.can_be_cancelled)
