@@ -6,7 +6,7 @@ from django.utils import dateformat, timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionMembershipFactory
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
@@ -616,6 +616,29 @@ class SiaeSubmitProofsViewTest(TestCase):
         self.assertLess(
             evaluated_administrative_criteria1.submitted_at, evaluated_administrative_criteria0.submitted_at
         )
+
+    def test_is_submittable_with_a_forgotten_submitted_doc(self):
+        fake_now = timezone.now()
+        not_yet_submitted_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=not_yet_submitted_job_application,
+            proof_url="http://something.com/good",
+            submitted_at=None,
+        )
+        submitted_job_application = EvaluatedJobApplicationFactory(
+            job_application=JobApplicationFactory(to_siae=self.siae),
+            evaluated_siae=not_yet_submitted_job_application.evaluated_siae,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=submitted_job_application,
+            proof_url="http://something.com/other_good",
+            submitted_at=fake_now,
+        )
+
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/dashboard/")
 
     def test_submitted_email(self):
         institution_membership = InstitutionMembershipFactory()

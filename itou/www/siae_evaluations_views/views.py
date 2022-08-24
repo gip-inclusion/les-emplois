@@ -379,14 +379,14 @@ def siae_submit_proofs(request):
         evaluated_siae=evaluated_siae
     ).prefetch_related("evaluated_administrative_criteria")
 
-    if evaluated_job_applications and all(
+    # if at least one of those job applications is uploaded but not yet transmitted, or accepted, let's submit.
+    if evaluated_job_applications and any(
         (
             evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
             or evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
         )
         for evaluated_job_application in evaluated_job_applications
     ):
-
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__in=evaluated_job_applications,
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
