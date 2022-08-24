@@ -1,8 +1,7 @@
 {
     "python.analysis.autoImportCompletions": true,
     "python.analysis.completeFunctionParens": true,
-    "python.envFile": "${workspaceFolder}/.envrc",
-    "python.formatting.provider": "black",
+    "python.envFile": "${workspaceFolder}/.env",
     "python.languageServer": "Pylance",
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
@@ -14,7 +13,6 @@
         "**/templates/*": "django-txt",
         "**/requirements{/**,*}.{txt,in}": "pip-requirements"
     },
-    "editor.formatOnSave": true,
     "editor.wordBasedSuggestionsMode": "allDocuments",
     "editor.quickSuggestions": {
         "other": true,
@@ -25,17 +23,13 @@
     "files.trimTrailingWhitespace": true,
     "html.format.enable": true,
     "[python]": {
-        "editor.wordBasedSuggestions": true,
-        "editor.quickSuggestions": {
-            "other": true,
-            "comments": false,
-            "strings": true
-        },
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
             "source.organizeImports": true
         }
     },
-    "security.workspace.trust.untrustedFiles": "open",
+    "isort.args":["--profile", "black"],
     "emeraldwalk.runonsave": {
         "commands": [
             {

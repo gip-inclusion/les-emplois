@@ -9,6 +9,8 @@
 		"ms-vsliveshare.vsliveshare",
 		"ms-python.vscode-pylance",
 		"ms-python.python",
+		"ms-python.isort",
+		"ms-python.black-formatter",
 		"emeraldwalk.runonsave"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
