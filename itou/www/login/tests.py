@@ -28,30 +28,6 @@ class ItouLoginTest(TestCase):
         response = self.client.post(url, data=form_data)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-    def test_redirect_to_new_login_views(self):
-        # If an "account_type" URL parameter is present,
-        # redirect to the correct login view.
-        url = reverse("account_login") + "?account_type=siae"
-        response = self.client.get(url)
-        self.assertRedirects(response, reverse("login:siae_staff"), status_code=301)
-
-        url = reverse("account_login") + "?account_type=prescriber"
-        response = self.client.get(url)
-        self.assertRedirects(response, reverse("login:prescriber"), status_code=301)
-
-        url = reverse("account_login") + "?account_type=job_seeker"
-        response = self.client.get(url)
-        self.assertRedirects(response, reverse("login:job_seeker"), status_code=301)
-
-        url = reverse("account_login") + "?account_type=labor_inspector"
-        response = self.client.get(url)
-        self.assertRedirects(response, reverse("login:labor_inspector"), status_code=301)
-
-        # Wrong kind.
-        url = reverse("account_login") + "?account_type=hater"
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
-
 
 class ItouLoginFormTest(TestCase):
     def test_error_if_user_has_sso_provider(self):

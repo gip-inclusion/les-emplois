@@ -1,8 +1,6 @@
 from allauth.account.views import LoginView
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponsePermanentRedirect
 from django.urls import reverse
 from django.utils.http import urlencode
 
@@ -14,7 +12,9 @@ from itou.www.login.forms import ItouLoginForm
 class ItouLoginView(LoginView):
     """
     Generic authentication entry point.
-    It redirects to a more precise login view when a user type can be determined.
+    This view is used only in one case:
+    when a user confirms its email after updating it.
+    Allauth magic is complicated to debug.
     """
 
     form_class = ItouLoginForm
@@ -34,39 +34,6 @@ class ItouLoginView(LoginView):
             "redirect_field_value": get_safe_url(self.request, REDIRECT_FIELD_NAME),
         }
         return context | extra_context
-
-    def _redirect_to_login_type(self):
-        """
-        Historically, a generic login view was used to authenticate users.
-        The "account_type" URL parameter mapped to the correct user type.
-        We've split them into multiple classes but we should handle old urls.
-        """
-        account_type = self.request.GET.get("account_type") or self.request.POST.get("account_type")
-        if account_type:
-            if account_type == "siae":
-                account_type = "siae_staff"
-            if account_type not in ["siae_staff", "prescriber", "job_seeker", "labor_inspector"]:
-                raise PermissionDenied
-            return HttpResponsePermanentRedirect(reverse(f"login:{account_type}"))
-        return None
-
-    def get(self, *args, **kwargs):
-        """
-        If a user type cannot be found, display a generic form.
-        This should never happen except in one case:
-        when a user confirms its email after updating it.
-        Allauth magic is complicated to debug.
-        """
-        return self._redirect_to_login_type() or super(ItouLoginView, self).get(*args, **kwargs)
-
-    def post(self, *args, **kwargs):
-        """
-        If a user type cannot be found, display a generic form.
-        This should never happen except in one case:
-        when a user confirms its email after updating it.
-        Allauth magic is complicated to debug.
-        """
-        return self._redirect_to_login_type() or super(ItouLoginView, self).post(*args, **kwargs)
 
 
 class PrescriberLoginView(ItouLoginView):
