@@ -163,7 +163,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
 
         self.assertEqual(len(result.get("results")), 0)
 
-        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_processed(process_code, process_message, "{}")
         response = self.client.get(ENDPOINT_URL, format="json")
 
         self.assertEqual(response.status_code, 200)

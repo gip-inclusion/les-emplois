@@ -71,13 +71,13 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                     if processing_code == asp_success_code:
                         # Correctly processed:
                         self.logger.info("Succesfully processed : closing")
-                        employee_record.update_as_accepted(
+                        employee_record.update_as_processed(
                             processing_code, processing_label, renderer.render(serializer.data).decode()
                         )
                     elif processing_code == dup_error_code:
                         # Dups already processed by ASP:
                         self.logger.info("Already processed by ASP (dup) : closing")
-                        employee_record.update_as_accepted(
+                        employee_record.update_as_processed(
                             asp_success_code, "INTEGRATION PLATEFORME", renderer.render(serializer.data).decode()
                         )
                     else:

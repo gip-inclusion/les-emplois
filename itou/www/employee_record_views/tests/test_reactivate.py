@@ -25,7 +25,7 @@ class ReactivateEmployeeRecordsTest(TestCase):
         filename = "RIAE_FS_20210410130001.json"
         self.employee_record.update_as_sent(filename, 1)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_processed(process_code, process_message, "{}")
         self.employee_record.update_as_disabled()
 
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)

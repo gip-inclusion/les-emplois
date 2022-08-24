@@ -192,7 +192,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
         filename = "RIAE_FS_20210819100001.json"
         self.employee_record.update_as_sent(filename, 1)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_processed(process_code, process_message, "{}")
 
         # Fake a date older than archiving delay
         self.employee_record.processed_at = timezone.now() - timezone.timedelta(
@@ -255,5 +255,5 @@ class JobApplicationConstraintsTest(TestCase):
         self.employee_record.update_as_ready()
         self.employee_record.update_as_sent(filename, 1)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.update_as_accepted(process_code, process_message, "{}")
+        self.employee_record.update_as_processed(process_code, process_message, "{}")
         self.assertFalse(self.job_application.can_be_cancelled)

@@ -328,7 +328,7 @@ class EmployeeRecord(models.Model):
         self.asp_processing_label = label
         self.save()
 
-    def update_as_accepted(self, code, label, archive):
+    def update_as_processed(self, code, label, archive):
         if not self.status == Status.SENT:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
