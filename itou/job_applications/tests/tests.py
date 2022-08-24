@@ -1,5 +1,4 @@
 # pylint: disable=too-many-lines
-
 import datetime
 import io
 import json
@@ -7,7 +6,7 @@ from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core import mail
+from django.core import mail, management
 from django.forms.models import model_to_dict
 from django.template.defaultfilters import title
 from django.test import TestCase, override_settings
@@ -1715,3 +1714,22 @@ class JobApplicationsEnumsTest(TestCase):
             self.assertTrue(len(reasons) > 0)
             with self.subTest(choice):
                 self.assertNotIn(choice.value, reasons)
+
+
+class DisplayMissingEligibilityDiagnosesCommandTest(TestCase):
+    def test_nominal(self):
+        stdout = io.StringIO()
+        user = UserFactory(email="batman@batcave.org")
+        ja = JobApplicationWithApprovalFactory(
+            eligibility_diagnosis=None, state="accepted", approval__number="999991234567", approval__created_by=user
+        )
+        management.call_command("display_missing_eligibility_diagnoses", stdout=stdout)
+        self.assertEqual(
+            stdout.getvalue().split("\n"),
+            [
+                "number,created_at,started_at,end_at,created_by,job_seeker",
+                f"{ja.approval.number},{ja.approval.created_at.isoformat()},{ja.approval.start_at},"
+                f"{ja.approval.end_at},{ja.approval.created_by},{ja.approval.user}",
+                "",
+            ],
+        )
