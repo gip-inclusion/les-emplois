@@ -1,13 +1,12 @@
 import json
-from datetime import date, timedelta
 from unittest import mock
 
 from django.conf import settings
 from django.core import management
-from django.test import TestCase
 from django.utils import timezone
 
 from itou.employee_record.enums import Status
+from itou.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from itou.employee_record.mocks.transfer_employee_records import (
     SFTPBadConnectionMock,
     SFTPConnectionMock,
@@ -18,11 +17,13 @@ from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
+from ._common import ManagementCommandTestCase
+
 
 # There is no need to create 700 employee records for a single batch
 # so this class var is changed to 1 for tests, otherwise download operation is not triggered.
 @mock.patch("itou.employee_record.models.EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS", new=1)
-class EmployeeRecordManagementCommandTest(TestCase):
+class TransferManagementCommandTest(ManagementCommandTestCase):
     """
     Employee record management command, testing:
     - mocked sftp connection
@@ -31,6 +32,8 @@ class EmployeeRecordManagementCommandTest(TestCase):
     """
 
     fixtures = ["test_INSEE_communes.json", "test_asp_INSEE_countries.json"]
+
+    MANAGEMENT_COMMAND_NAME = "transfer_employee_records"
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -211,49 +214,66 @@ class EmployeeRecordManagementCommandTest(TestCase):
         self.assertIsNone(self.employee_record.archived_json)
 
 
-class JobApplicationConstraintsTest(TestCase):
-    """
-    Check constraints between job applications and employee records
-    """
+class SanitizeManagementCommandTest(ManagementCommandTestCase):
+
+    MANAGEMENT_COMMAND_NAME = "sanitize_employee_records"
 
     fixtures = ["test_INSEE_communes.json", "test_asp_INSEE_countries.json"]
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def setUp(self, _mock):
-        # Make job application cancellable
-        hiring_date = date.today() + timedelta(days=7)
+    def test_dry_run(self):
+        # Check `dry-run` switch / option
+        dry_run_msg = " - DRY-RUN mode: not fixing, just reporting"
 
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(hiring_start_at=hiring_date)
-        self.employee_record = EmployeeRecord.from_job_application(self.job_application)
-        self.employee_record.update_as_ready()
+        # On:
+        out, _ = self.call_command()
+        self.assertNotIn(out, dry_run_msg)
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_job_application_is_cancellable(self, _mock):
-        # A job application can be cancelled only if there is no
-        # linked employee records with ACCEPTED or SENT status
+        # Off:
+        out, _ = self.call_command(dry_run=True)
+        self.assertIn(dry_run_msg, out)
+        self.assertNotIn(" - done!", out)
 
-        # status is READY
-        self.assertTrue(self.job_application.can_be_cancelled)
+    def test_3436_errors_check(self):
+        # Check for 3436 errors fix (ASP duplicates)
 
-        # status is SENT
-        filename = "RIAE_FS_20210410130000.json"
-        self.employee_record.update_as_sent(filename, 1)
-        self.assertFalse(self.job_application.can_be_cancelled)
+        # Note: must be created with a valid profile, or the profile check will disable it beforehand
+        EmployeeRecordWithProfileFactory(
+            status=Status.REJECTED,
+            asp_processing_code=EmployeeRecord.DUPLICATE_ASP_ERROR_CODE,
+        )
+        self.assertEqual(1, EmployeeRecord.objects.asp_duplicates().count())
 
-        # status is REJECTED
-        err_code, err_message = "12", "JSON Invalide"
-        self.employee_record.update_as_rejected(err_code, err_message)
-        self.assertTrue(self.job_application.can_be_cancelled)
+        out, _ = self.call_command()
 
-        # status is PROCESSED
-        self.employee_record.update_as_ready()
-        self.employee_record.update_as_sent(filename, 1)
-        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.update_as_processed(process_code, process_message, "{}")
-        self.assertFalse(self.job_application.can_be_cancelled)
+        # Exterminate 3436s
+        self.assertIn(" - fixing 3436 errors: forcing status to PROCESSED", out)
+        self.assertIn(" - done!", out)
+        self.assertEqual(0, EmployeeRecord.objects.asp_duplicates().count())
+
+    def test_orphans_check(self):
+        # Check if any orphan (mismatch in `asp_id`)
+
+        # TODO: Simple way to create an orphan but would a factory be better ?
+        # Note: must be created with a valid profile, or the profile check will disable it beforehand
+        orphan_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+        orphan_employee_record.asp_id += 1
+        orphan_employee_record.save()
+
+        self.assertEqual(1, EmployeeRecord.objects.orphans().count())
+
+        out, _ = self.call_command()
+
+        self.assertIn(" - fixing orphans: switching status to DISABLED", out)
+        self.assertIn(" - done!", out)
+        self.assertEqual(0, EmployeeRecord.objects.orphans().count())
+
+    def test_profile_errors_check(self):
+        # Check for profile errors
+
+        # This factory does not define a profile
+        EmployeeRecordFactory()
+
+        out, _ = self.call_command()
+
+        self.assertIn(" - fixing missing jobseeker profiles: switching status to DISABLED", out)
+        self.assertIn(" - done!", out)

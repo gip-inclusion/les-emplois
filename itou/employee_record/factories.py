@@ -1,5 +1,3 @@
-import string
-
 import factory
 
 from itou.employee_record.enums import NotificationStatus, NotificationType
@@ -21,7 +19,7 @@ class EmployeeRecordFactory(factory.django.DjangoModelFactory):
         model = EmployeeRecord
 
     job_application = factory.SubFactory(JobApplicationWithApprovalNotCancellableFactory)
-    asp_id = factory.fuzzy.FuzzyText(length=7, chars=string.digits)
+    asp_id = factory.fuzzy.FuzzyInteger(10000)
 
     @factory.post_generation
     def set_job_seeker_profile(self, create, extracted, **kwargs):

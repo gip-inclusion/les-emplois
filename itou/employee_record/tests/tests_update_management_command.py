@@ -1,8 +1,5 @@
-from io import StringIO
 from unittest import mock
 
-from django.core import management
-from django.test import TestCase
 from django.test.utils import override_settings
 
 import itou.employee_record.enums as er_enums
@@ -11,22 +8,15 @@ from itou.employee_record.factories import EmployeeRecordUpdateNotificationFacto
 from itou.employee_record.mocks.transfer_employee_records import SFTPGoodConnectionMock
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 
+from ._common import ManagementCommandTestCase
 
-class EmployeeRecordUpdatesManagementCommandTest(TestCase):
+
+class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
+
+    MANAGEMENT_COMMAND_NAME = "transfer_employee_records_updates"
+
     def setUp(self):
         self.notification = EmployeeRecordUpdateNotificationFactory()
-
-    def call_command(self, *args, **kwargs):
-        out = StringIO()
-        err = StringIO()
-        management.call_command(
-            "transfer_employee_records_updates",
-            *args,
-            stdout=out,
-            stderr=err,
-            **kwargs,
-        )
-        return out.getvalue(), err.getvalue()
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_dry_run_upload(self):

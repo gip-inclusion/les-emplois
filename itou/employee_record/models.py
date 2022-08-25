@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, Union
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.query import Q, QuerySet
+from django.db.models.manager import Manager
+from django.db.models.query import F, Q, QuerySet
 from django.utils import timezone
 from rest_framework.authtoken.admin import User
 
@@ -15,6 +16,7 @@ from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
 
 from .enums import MovementType, NotificationStatus, NotificationType, Status
+from .exceptions import CloningError, InvalidStatusError
 
 
 # Validators
@@ -109,6 +111,28 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         return self.processed().filter(processed_at__lte=timezone.now() - ARCHIVING_DELTA)
 
+    def asp_duplicates(self):
+        """
+        Return REJECTED employee records with error code '3436'.
+        These employee records are considered as duplicates by ASP.
+        """
+        return self.rejected().filter(asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE)
+
+    def orphans(self):
+        """
+        PROCESSED employee records with an `asp_id` different from their hiring SIAE.
+        Could occur when using `siae.move_siae_data` management command.
+        """
+        return (
+            self.select_related(
+                "job_application",
+                "job_application__to_siae",
+                "job_application__to_siae__convention",
+            )
+            .processed()
+            .exclude(job_application__to_siae__convention__asp_id=F("asp_id"))
+        )
+
 
 class EmployeeRecord(models.Model):
     """
@@ -136,6 +160,9 @@ class EmployeeRecord(models.Model):
     # 'C' stands for Creation
     ASP_MOVEMENT_TYPE = "C"
 
+    ASP_DUPLICATE_ERROR_CODE = "3436"
+    ASP_PROCESSING_SUCCESS_CODE = "0000"
+
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
     processed_at = models.DateTimeField(verbose_name=("Date d'intégration"), null=True)
@@ -162,7 +189,7 @@ class EmployeeRecord(models.Model):
 
     # These fields are duplicated to act as constraint fields on DB level
     approval_number = models.CharField(max_length=12, verbose_name="Numéro d'agrément")
-    asp_id = models.IntegerField(verbose_name="Identifiant ASP de la SIAE")
+    asp_id = models.PositiveIntegerField(verbose_name="Identifiant ASP de la SIAE")
 
     # If the SIAE is an "antenna",
     # we MUST provide the SIRET of the SIAE linked to the financial annex on ASP side (i.e. "parent/mother" SIAE)
@@ -199,7 +226,19 @@ class EmployeeRecord(models.Model):
     # It will only return a list of this JSON field for archived employee records.
     archived_json = models.JSONField(verbose_name="Archive JSON de la fiche salarié", null=True)
 
-    objects = EmployeeRecordQuerySet.as_manager()
+    # When an employee record is rejected with a '3436' error code by ASP, it means that:
+    # - all the information transmitted via this employee record is already available on ASP side,
+    # - the employee record is not needed by ASP and considered as a duplicate
+    # As a result, employee records in `REJECTED` state and with a `3436` error code
+    # can safely be considered as `PROCESSED` without side-effects.
+    # This field is just a marker / reminder / track record that the status of this object
+    # was **forced** to `PROCESSED` (via admin or script) even if originally `REJECTED`.
+    # The JSON proof is in this case not available.
+    # Forcing a 'PROCESSED' status enables communication for employee record update notifications.
+    processed_as_duplicate = models.BooleanField(verbose_name="Déjà intégrée par l'ASP", default=False)
+
+    # Added typing helper: improved type checking for `objects` methods
+    objects: Union[EmployeeRecordQuerySet, Manager] = EmployeeRecordQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Fiche salarié"
@@ -216,7 +255,7 @@ class EmployeeRecord(models.Model):
 
     def __str__(self):
         return (
-            f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application.pk} "
+            f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application} "
             f"JOBSEEKER:{self.job_seeker} STATUS:{self.status} ASP_ID:{self.asp_id}"
         )
 
@@ -293,7 +332,7 @@ class EmployeeRecord(models.Model):
         Status: READY => SENT
         """
         if not self.status == Status.READY:
-            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
 
@@ -320,7 +359,7 @@ class EmployeeRecord(models.Model):
         Status: SENT => REJECTED
         """
         if not self.status == Status.SENT:
-            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
         self.status = Status.REJECTED
@@ -330,7 +369,7 @@ class EmployeeRecord(models.Model):
 
     def update_as_processed(self, code, label, archive):
         if not self.status == Status.SENT:
-            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
         self.status = Status.PROCESSED
@@ -345,14 +384,14 @@ class EmployeeRecord(models.Model):
 
     def update_as_disabled(self):
         if self.status not in self.CAN_BE_DISABLED_STATES:
-            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.status = Status.DISABLED
         self.save()
 
     def update_as_new(self):
         if self.status != Status.DISABLED:
-            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         # check if FS exists before reactivate
         if (
@@ -360,7 +399,7 @@ class EmployeeRecord(models.Model):
             .filter(asp_id=self.asp_id, approval_number=self.approval_number)
             .exists()
         ):
-            raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
+            raise InvalidStatusError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
         self.status = Status.NEW
         self.save()
@@ -371,11 +410,11 @@ class EmployeeRecord(models.Model):
         `save` parameter is for bulk updates in management command
         """
         if self.status != Status.PROCESSED:
-            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         # Check that we are past archiving delay before ... archiving
         if self.processed_at >= timezone.now() - ARCHIVING_DELTA:
-            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         # Remove proof of processing after delay
         self.status = Status.ARCHIVED
@@ -387,13 +426,68 @@ class EmployeeRecord(models.Model):
             # Override .save() update of `updated_at` when using bulk updates
             self.updated_at = timezone.now()
 
+    def update_as_processed_as_duplicate(self):
+        """
+        Force status to `PROCESSED` if the employee record has been marked
+        as duplicate by ASP (error code 3436).
+
+        Can only be done when employee record is:
+            - in `REJECTED` state,
+            - with a `3436` error code.
+        """
+        if self.status != Status.REJECTED or self.asp_processing_code != self.ASP_DUPLICATE_ERROR_CODE:
+            raise InvalidStatusError(
+                f"{self.ERROR_EMPLOYEE_RECORD_INVALID_STATE} ({self.status}, {self.asp_processing_code})"
+            )
+
+        self.clean()
+        self.status = Status.PROCESSED
+        self.processed_at = timezone.now()
+        self.processed_as_duplicate = True
+        self.asp_processing_label = "Statut forcé suite à doublon ASP"
+        self.archived_json = None
+        self.save()
+
+    def clone_orphan(self, asp_id):
+        """
+        Create and return a copy of a PROCESSED employee record object with a bad `asp_id` (orphan):
+            -`asp_id` field must be different from the original one,
+            - by default, `status` is also changed to `NEW`.
+
+        This is useful when orphans are detected (irrelevant `asp_id`):
+            - deactivation of old employee record,
+            - create a new one ready to be processed by SIAE before a new transfer to ASP.
+
+        Raises `CloningError` if cloning conditions are not met.
+        """
+        if not self.pk:
+            raise CloningError("This employee record has not been saved yet (no PK).")
+
+        if not self.is_orphan:
+            raise CloningError(f"This employee record is not an orphan {self.status=},{self.asp_id=}")
+
+        er_copy = EmployeeRecord.objects.get(pk=self.pk)
+        er_copy.pk = None
+        er_copy.asp_id = asp_id
+        er_copy.status = Status.NEW
+
+        try:
+            er_copy.save()
+        except Exception as ex:
+            raise CloningError(
+                f"Can't persist employee record clone. "
+                f"Duplicate asp_ip / approval number pair ? ({self.asp_id=}, {self.approval_number=})"
+            ) from ex
+
+        return er_copy
+
     @property
     def is_archived(self):
         """
-        Once in final state (PROCESSED), an EmployeeRecord is archived.
+        Once in final state (PROCESSED), an employee record is archived.
         See model save() and clean() method.
         """
-        return self.status == self.Status.PROCESSED and self.json is not None
+        return self.status == Status.PROCESSED and self.archived_json is not None
 
     @property
     def is_updatable(self):
@@ -410,7 +504,15 @@ class EmployeeRecord(models.Model):
 
         See model save() and clean() method.
         """
-        return self.status not in [self.Status.SENT, self.Status.READY] and not self.is_archived
+        return self.status not in [Status.SENT, Status.READY] and not self.is_archived
+
+    @property
+    def is_processed_as_duplicate(self):
+        return self.archived_json is None and self.processed_as_duplicate
+
+    @property
+    def can_be_disabled(self):
+        return self.status in self.CAN_BE_DISABLED_STATES
 
     @property
     def job_seeker(self) -> User:
@@ -531,6 +633,11 @@ class EmployeeRecord(models.Model):
             Status.SENT,
             Status.PROCESSED,
         ]
+
+    @property
+    def is_orphan(self):
+        """Orphan employee records are PROCESSED and have different stored and actual `asp_id` fields."""
+        return self.status == Status.PROCESSED and self.job_application.to_siae.convention.asp_id != self.asp_id
 
     @staticmethod
     def siret_from_asp_source(siae):
@@ -739,8 +846,8 @@ class EmployeeRecordUpdateNotification(models.Model):
     objects = models.Manager.from_queryset(EmployeeRecordUpdateNotificationQuerySet)()
 
     class Meta:
-        verbose_name = "Modification de changement de la fiche salarié"
-        verbose_name_plural = "Modifications de changement des fiches salarié"
+        verbose_name = "Notification de changement de la fiche salarié"
+        verbose_name_plural = "Notifications de changement de la fiche salarié"
 
     def __repr__(self):
         return f"<{type(self).__name__} pk={self.pk}>"
@@ -764,7 +871,7 @@ class EmployeeRecordUpdateNotification(models.Model):
 
     def update_as_processed(self, code, label):
         if not self.status == Status.SENT:
-            raise ValidationError(f"Invalid status to update as ACCEPTED (currently: {self.status})")
+            raise ValidationError(f"Invalid status to update as PROCESSED (currently: {self.status})")
         self.status = Status.PROCESSED
         self.asp_processing_code = code
         self.asp_processing_label = label

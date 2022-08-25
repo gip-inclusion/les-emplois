@@ -7,7 +7,8 @@ from django.test import TestCase
 from django.utils import timezone
 
 from itou.employee_record.enums import Status
-from itou.employee_record.factories import EmployeeRecordFactory
+from itou.employee_record.exceptions import CloningError, InvalidStatusError
+from itou.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
@@ -176,6 +177,32 @@ class EmployeeRecordModelTest(TestCase):
 
         self.assertEqual(EmployeeRecord.objects.archivable().count(), 1)
 
+    def test_clone_orphan(self):
+        # Check employee record clone features and properties
+        good_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+        previous_asp_id = good_employee_record.asp_id
+        good_employee_record.asp_id += 1
+        good_employee_record.save()
+
+        self.assertTrue(good_employee_record.is_orphan)
+
+        clone = good_employee_record.clone_orphan(previous_asp_id)
+        self.assertTrue(clone.pk != good_employee_record.pk)
+        self.assertEqual(Status.NEW, clone.status)
+        self.assertEqual(previous_asp_id, clone.asp_id)
+
+        # Check conditions are required
+        bad_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+
+        with self.assertRaises(CloningError):
+            # Not an orphan
+            bad_employee_record.clone_orphan(bad_employee_record.asp_id)
+
+        with self.assertRaises(CloningError):
+            # Not saved (no PK)
+            bad_employee_record.pk = None
+            bad_employee_record.clone_orphan(-1)
+
 
 class EmployeeRecordBatchTest(TestCase):
     """
@@ -259,7 +286,10 @@ class EmployeeRecordLifeCycleTest(TestCase):
         filename = "RIAE_FS_20210410130001.json"
         self.employee_record.update_as_sent(filename, 1)
 
-        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
         self.employee_record.update_as_processed(process_code, process_message, "{}")
 
         self.assertEqual(self.employee_record.status, Status.PROCESSED)
@@ -279,18 +309,21 @@ class EmployeeRecordLifeCycleTest(TestCase):
         )
 
         # Employee record in READY state can't be disabled
-        with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
+        with self.assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
             self.employee_record.update_as_disabled()
         self.assertEqual(self.employee_record.status, Status.READY)
 
         # Employee record in SENT state can't be disabled
         self.employee_record.update_as_sent(filename, 1)
-        with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
+        with self.assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
             self.employee_record.update_as_disabled()
         self.assertEqual(self.employee_record.status, Status.SENT)
 
         # Employee record in ACCEPTED state can be disabled
-        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
         self.employee_record.update_as_processed(process_code, process_message, "{}")
         self.employee_record.update_as_disabled()
         self.assertEqual(self.employee_record.status, Status.DISABLED)
@@ -342,7 +375,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         filename = "RIAE_FS_20210410130001.json"
         self.employee_record.update_as_sent(filename, 1)
-        process_code = "0000"
+        process_code = EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE
         process_message = "La ligne de la fiche salarié a été enregistrée avec succès."
         archive_first = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [1]."}'
         self.employee_record.update_as_processed(process_code, process_message, archive_first)
@@ -361,7 +394,10 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_sent(filename_second, 1)
         self.assertEqual(self.employee_record.archived_json, archive_first)
 
-        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
         archive_second = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [2]."}'
         self.employee_record.update_as_processed(process_code, process_message, archive_second)
         self.assertEqual(self.employee_record.archived_json, archive_second)
@@ -378,11 +414,14 @@ class EmployeeRecordLifeCycleTest(TestCase):
         # No processing date at the moment
         self.assertIsNone(self.employee_record.processed_at)
 
-        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
         self.employee_record.update_as_processed(process_code, process_message, "{}")
 
         # Can't archive, too recent
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(InvalidStatusError):
             self.employee_record.update_as_archived()
 
         # Fake old date, but not to old
@@ -390,7 +429,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
             days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS - 1
         )
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(InvalidStatusError):
             self.employee_record.update_as_archived()
 
         # Fake a date older than archiving delay
@@ -404,8 +443,38 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertEqual(self.employee_record.status, Status.ARCHIVED)
         self.assertIsNone(self.employee_record.archived_json)
 
+    def test_processed_as_duplicate(self):
+        # Check correct status when "manually" forcing status of an employee record
+        # with a 3436 error code.
+        employee_record_code_3436 = EmployeeRecordWithProfileFactory(
+            status=Status.REJECTED,
+            asp_processing_code="3436",
+            asp_processing_label="Meh",
+        )
+        employee_record_other_code = EmployeeRecordWithProfileFactory(
+            status=Status.REJECTED,
+            asp_processing_code="3437",
+            asp_processing_label="Meh Meh",
+        )
+        employee_record_other_status = EmployeeRecordWithProfileFactory(
+            status=Status.PROCESSED,
+            asp_processing_code="3437",
+            asp_processing_label="Meh Meh Meh",
+        )
+        employee_record_code_3436.update_as_processed_as_duplicate()
+        self.assertTrue(employee_record_code_3436.processed_as_duplicate)
+        self.assertEquals(Status.PROCESSED, employee_record_code_3436.status)
+        self.assertEquals("Statut forcé suite à doublon ASP", employee_record_code_3436.asp_processing_label)
+        self.assertIsNone(employee_record_code_3436.archived_json)
 
-class JobApplicationConstraintsTest(TestCase):
+        with self.assertRaises(InvalidStatusError):
+            employee_record_other_code.update_as_processed_as_duplicate()
+
+        with self.assertRaises(InvalidStatusError):
+            employee_record_other_status.update_as_processed_as_duplicate()
+
+
+class EmployeeRecordJobApplicationConstraintsTest(TestCase):
     """
     Check constraints between job applications and employee records
     """
@@ -448,6 +517,39 @@ class JobApplicationConstraintsTest(TestCase):
         # status is PROCESSED
         self.employee_record.update_as_ready()
         self.employee_record.update_as_sent(filename, 1)
-        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
         self.employee_record.update_as_processed(process_code, process_message, "{}")
         self.assertFalse(self.job_application.can_be_cancelled)
+
+
+class EmployeeRecordQuerysetTest(TestCase):
+    def test_orphans(self):
+        # Check orphans employee records
+        # (asp_id in object different from actual SIAE convention asp_id field)
+        orphan_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+
+        # Not an orphan, yet
+        self.assertFalse(orphan_employee_record.is_orphan)
+        self.assertEqual(0, EmployeeRecord.objects.orphans().count())
+
+        # Whatever int different from asp_id will do, but factory sets this field at 0
+        orphan_employee_record.asp_id += 1
+        orphan_employee_record.save()
+
+        self.assertTrue(orphan_employee_record.is_orphan)
+        self.assertEqual(1, EmployeeRecord.objects.orphans().count())
+
+    def test_asp_duplicates(self):
+        # Filter REJECTED employee records with error code 3436
+        EmployeeRecordWithProfileFactory(status=Status.REJECTED)
+
+        self.assertEqual(0, EmployeeRecord.objects.asp_duplicates().count())
+
+        EmployeeRecordWithProfileFactory(
+            status=Status.REJECTED, asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
+        )
+
+        self.assertEqual(1, EmployeeRecord.objects.asp_duplicates().count())
