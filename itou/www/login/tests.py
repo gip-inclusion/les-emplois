@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.urls import reverse
 
 from itou.users import enums as users_enums
@@ -44,7 +45,7 @@ class ItouLoginFormTest(TestCase):
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        form = ItouLoginForm(data=form_data)
+        form = ItouLoginForm(data=form_data, request=RequestFactory().get("/"))
         self.assertFalse(form.is_valid())
         self.assertIn("FranceConnect", form.errors["__all__"][0])
 

@@ -95,7 +95,7 @@ class JobSeekerSignupTest(TestCase):
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
-            "email": "john.doe@siae.com",
+            "email": "john.doe+1@siae.com",
             "password1": DEFAULT_PASSWORD,
             "password2": DEFAULT_PASSWORD,
             "address_line_1": address_line_1,
@@ -146,7 +146,7 @@ class JobSeekerSignupTest(TestCase):
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
-            "email": "john.doe@siae.com",
+            "email": "john.doe+2@siae.com",
             "password1": DEFAULT_PASSWORD,
             "password2": DEFAULT_PASSWORD,
             "address_line_1": address_line_1,
@@ -183,7 +183,7 @@ class JobSeekerSignupTest(TestCase):
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
-            "email": "john.doe@siae.com",
+            "email": "john.doe+3@siae.com",
             "password1": DEFAULT_PASSWORD,
             "password2": DEFAULT_PASSWORD,
             "address_line_1": address_line_1,
