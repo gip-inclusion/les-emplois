@@ -49,16 +49,6 @@ class Command(EmployeeRecordTransferCommand):
             help="Update employee records with test SIRET and financial annex number",
         )
 
-    def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_REMOTE_DOWNLOAD_DIR):
-        """
-        Store ASP processing results in a local file
-
-        Content is a string
-        """
-        with open(f"{local_path}/{remote_path}", "w") as f:
-            f.write(content)
-        self.stdout.write(f"Wrote '{remote_path}' to local path '{local_path}'")
-
     def _upload_batch_file(self, conn, employee_records, dry_run):
         """
         Render a list of employee records in JSON format then send it to SFTP upload folder
@@ -308,7 +298,14 @@ class Command(EmployeeRecordTransferCommand):
             self.stdout.write("No archivable employee record found, exiting.")
 
     def handle(
-        self, upload=True, download=True, preflight=False, dry_run=False, asp_test=False, archive=False, **options
+        self,
+        upload=True,
+        download=True,
+        preflight=False,
+        dry_run=False,
+        asp_test=False,
+        archive=False,
+        **_,
     ):
         if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
             self.stdout.write(
@@ -324,6 +321,7 @@ class Command(EmployeeRecordTransferCommand):
             return
 
         self.asp_test = asp_test
+
         if self.asp_test:
             self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
