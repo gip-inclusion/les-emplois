@@ -1,0 +1,15 @@
+{% comment %}
+Base template used with HTMX requests.
+
+Usage:
+```
+{% extends BASE_TEMPLATE %}
+<div>Something out of HTMX sight.</div>
+{% block htmx %}
+    <div hx-target="this" hx-swap="outerHTML">
+        <p>HTMX rocks</p>
+    </div>
+{% endblock %}
+````
+{% endcomment %}
+{% block htmx %}{% endblock %}
