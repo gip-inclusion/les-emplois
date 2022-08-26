@@ -160,6 +160,10 @@
 
         {% block script %}
             <script src="{% static "vendor/htmx/htmx.min.js" %}" defer></script>
+            {% if debug %}
+                <script src="{% static "vendor/htmx/ext/debug.js" %}" defer></script>
+                <script src="{% static "vendor/htmx/ext/event-header.js" %}" defer></script>
+            {% endif%}
             <script src="{% static "js/logout.js" %}"></script>
             <script src="{% static "js/city_autocomplete_field.js" %}"></script>
             <script src="{% static "js/commune_autocomplete_field.js" %}"></script>
