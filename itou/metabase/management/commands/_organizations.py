@@ -1,6 +1,7 @@
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
+    MetabaseTable,
     get_active_siae_pks,
     get_address_columns,
     get_choice,
@@ -92,81 +93,88 @@ ORGANIZATION_KIND_TO_READABLE_KIND = {
     PrescriberOrganizationKind.OTHER: "Autre",
 }
 
-TABLE_COLUMNS = [
-    {"name": "id", "type": "integer", "comment": "ID organisation", "fn": lambda o: o.id},
-    {"name": "nom", "type": "varchar", "comment": "Nom organisation", "fn": lambda o: o.display_name},
-    {
-        "name": "type",
-        "type": "varchar",
-        "comment": "Type organisation (abrégé)",
-        "fn": lambda o: ORGANIZATION_KIND_TO_READABLE_KIND.get(o.kind, o.kind),
-    },
-    {
-        "name": "type_complet",
-        "type": "varchar",
-        "comment": "Type organisation (détaillé)",
-        "fn": lambda o: get_choice(choices=PrescriberOrganizationKind.choices, key=o.kind),
-    },
-    {
-        "name": "habilitée",
-        "type": "boolean",
-        "comment": "Organisation habilitée par le Préfet",
-        "fn": lambda o: o.is_authorized,
-    },
-]
+TABLE = MetabaseTable(name="organisations")
+TABLE.add_columns(
+    [
+        {"name": "id", "type": "integer", "comment": "ID organisation", "fn": lambda o: o.id},
+        {"name": "nom", "type": "varchar", "comment": "Nom organisation", "fn": lambda o: o.display_name},
+        {
+            "name": "type",
+            "type": "varchar",
+            "comment": "Type organisation (abrégé)",
+            "fn": lambda o: ORGANIZATION_KIND_TO_READABLE_KIND.get(o.kind, o.kind),
+        },
+        {
+            "name": "type_complet",
+            "type": "varchar",
+            "comment": "Type organisation (détaillé)",
+            "fn": lambda o: get_choice(choices=PrescriberOrganizationKind.choices, key=o.kind),
+        },
+        {
+            "name": "habilitée",
+            "type": "boolean",
+            "comment": "Organisation habilitée par le Préfet",
+            "fn": lambda o: o.is_authorized,
+        },
+    ]
+)
 
-TABLE_COLUMNS += get_address_columns(comment_suffix=" de cette organisation")
+TABLE.add_columns(get_address_columns(comment_suffix=" de cette organisation"))
 
-TABLE_COLUMNS += [
-    {
-        "name": "date_inscription",
-        "type": "date",
-        "comment": "Date inscription du premier compte prescripteur",
-        "fn": get_org_first_join_date,
-    },
-    {
-        "name": "code_safir",
-        "type": "varchar",
-        "comment": "Code SAFIR Pôle emploi",
-        "fn": lambda o: o.code_safir_pole_emploi,
-    },
-    {
-        "name": "total_membres",
-        "type": "integer",
-        "comment": "Nombre de comptes prescripteurs rattachés à cette organisation",
-        "fn": get_org_members_count,
-    },
-    {
-        "name": "total_candidatures",
-        "type": "integer",
-        "comment": "Nombre de candidatures émises par cette organisation",
-        "fn": get_org_job_applications_count,
-    },
-    {
-        "name": "total_embauches",
-        "type": "integer",
-        "comment": "Nombre de candidatures en état accepté émises par cette organisation",
-        "fn": get_org_accepted_job_applications_count,
-    },
-    {
-        "name": "date_dernière_candidature",
-        "type": "date",
-        "comment": "Date de la dernière création de candidature",
-        "fn": get_org_last_job_application_creation_date,
-    },
-    {"name": "longitude", "type": "float", "comment": "Longitude", "fn": lambda o: o.longitude},
-    {"name": "latitude", "type": "float", "comment": "Latitude", "fn": lambda o: o.latitude},
-]
+TABLE.add_columns(
+    [
+        {
+            "name": "date_inscription",
+            "type": "date",
+            "comment": "Date inscription du premier compte prescripteur",
+            "fn": get_org_first_join_date,
+        },
+        {
+            "name": "code_safir",
+            "type": "varchar",
+            "comment": "Code SAFIR Pôle emploi",
+            "fn": lambda o: o.code_safir_pole_emploi,
+        },
+        {
+            "name": "total_membres",
+            "type": "integer",
+            "comment": "Nombre de comptes prescripteurs rattachés à cette organisation",
+            "fn": get_org_members_count,
+        },
+        {
+            "name": "total_candidatures",
+            "type": "integer",
+            "comment": "Nombre de candidatures émises par cette organisation",
+            "fn": get_org_job_applications_count,
+        },
+        {
+            "name": "total_embauches",
+            "type": "integer",
+            "comment": "Nombre de candidatures en état accepté émises par cette organisation",
+            "fn": get_org_accepted_job_applications_count,
+        },
+        {
+            "name": "date_dernière_candidature",
+            "type": "date",
+            "comment": "Date de la dernière création de candidature",
+            "fn": get_org_last_job_application_creation_date,
+        },
+        {"name": "longitude", "type": "float", "comment": "Longitude", "fn": lambda o: o.longitude},
+        {"name": "latitude", "type": "float", "comment": "Latitude", "fn": lambda o: o.latitude},
+    ]
+)
 
-TABLE_COLUMNS += get_establishment_last_login_date_column()
+TABLE.add_columns(get_establishment_last_login_date_column())
 
-TABLE_COLUMNS += get_establishment_is_active_column()
+TABLE.add_columns(get_establishment_is_active_column())
 
-TABLE_COLUMNS += [
-    {
-        "name": "brsa",
-        "type": "boolean",
-        "comment": "Organisation conventionnée pour le suivi des BRSA",
-        "fn": lambda o: o.is_brsa,
-    },
-]
+TABLE.add_columns(
+    [
+        {
+            "name": "brsa",
+            "type": "boolean",
+            "comment": "Organisation conventionnée pour le suivi des BRSA",
+            "fn": lambda o: o.is_brsa,
+        },
+    ]
+)

@@ -130,7 +130,7 @@ class Command(BaseCommand):
         psycopg2_extras.execute_values(self.cur, insert_query, dataset, template=None)
         self.commit()
 
-    def populate_table(self, table_name, table_columns, queryset=None, querysets=None, extra_object=None):
+    def populate_table(self, table, queryset=None, querysets=None, extra_object=None):
         """
         Generic method to populate each table.
         Create table with a temporary name, add column comments,
@@ -141,6 +141,7 @@ class Command(BaseCommand):
             querysets = [queryset]
             queryset = None
 
+        table_name = table.name
         if self.dry_run:
             table_name = get_dry_table_name(table_name)
         new_table_name = get_new_table_name(table_name)
@@ -159,33 +160,35 @@ class Command(BaseCommand):
             else:
                 total_rows = sum([queryset.count() for queryset in querysets])
 
-            table_columns += [
-                {
-                    "name": "date_mise_à_jour_metabase",
-                    "type": "date",
-                    "comment": "Date de dernière mise à jour de Metabase",
-                    # As metabase daily updates run typically every night after midnight, the last day with
-                    # complete data is yesterday, not today.
-                    "fn": lambda o: timezone.now() + timezone.timedelta(days=-1),
-                },
-            ]
+            table.add_columns(
+                [
+                    {
+                        "name": "date_mise_à_jour_metabase",
+                        "type": "date",
+                        "comment": "Date de dernière mise à jour de Metabase",
+                        # As metabase daily updates run typically every night after midnight, the last day with
+                        # complete data is yesterday, not today.
+                        "fn": lambda o: timezone.now() + timezone.timedelta(days=-1),
+                    },
+                ]
+            )
 
             # Transform boolean fields into 0-1 integer fields as
             # metabase cannot sum or average boolean columns ¯\_(ツ)_/¯
-            for c in table_columns:
+            for c in table.columns:
                 if c["type"] == "boolean":
                     c["type"] = "integer"
                     c["fn"] = compose(convert_boolean_to_int, c["fn"])
 
             self.stdout.write(
-                f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:"
+                f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:"
             )
 
             # Create table.
             create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields_with_type})").format(
                 new_table_name=sql.Identifier(new_table_name),
                 fields_with_type=sql.SQL(",").join(
-                    [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table_columns]
+                    [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table.columns]
                 ),
             )
             self.cur.execute(create_table_query)
@@ -193,7 +196,7 @@ class Command(BaseCommand):
             self.commit()
 
             # Add comments on table columns.
-            for c in table_columns:
+            for c in table.columns:
                 assert set(c.keys()) == set(["name", "type", "comment", "fn"])
                 column_name = c["name"]
                 column_comment = c["comment"]
@@ -208,7 +211,7 @@ class Command(BaseCommand):
 
             if extra_object:
                 # Insert extra object without counter/tqdm for simplicity.
-                self.inject_chunk(table_columns=table_columns, chunk=[extra_object], new_table_name=new_table_name)
+                self.inject_chunk(table_columns=table.columns, chunk=[extra_object], new_table_name=new_table_name)
 
             with tqdm(total=total_rows) as progress_bar:
                 for queryset in querysets:
@@ -224,7 +227,7 @@ class Command(BaseCommand):
                             break  # During a dry run stop as soon as we have injected enough rows.
                         if chunk_qs.count() > injections_left:
                             chunk_qs = chunk_qs[:injections_left]
-                        self.inject_chunk(table_columns=table_columns, chunk=chunk_qs, new_table_name=new_table_name)
+                        self.inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
                         injections += chunk_qs.count()
                         progress_bar.update(chunk_qs.count())
 
@@ -263,7 +266,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table_name="structures", table_columns=_siaes.TABLE_COLUMNS, queryset=queryset)
+        self.populate_table(table=_siaes.TABLE, queryset=queryset)
 
     def populate_job_descriptions(self):
         """
@@ -279,9 +282,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(
-            table_name="fiches_de_poste", table_columns=_job_descriptions.TABLE_COLUMNS, queryset=queryset
-        )
+        self.populate_table(table=_job_descriptions.TABLE, queryset=queryset)
 
     def populate_organizations(self):
         """
@@ -294,8 +295,7 @@ class Command(BaseCommand):
         ).all()
 
         self.populate_table(
-            table_name="organisations",
-            table_columns=_organizations.TABLE_COLUMNS,
+            table=_organizations.TABLE,
             queryset=queryset,
             extra_object=_organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
         )
@@ -313,9 +313,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(
-            table_name="candidatures", table_columns=_job_applications.TABLE_COLUMNS, queryset=queryset
-        )
+        self.populate_table(table=_job_applications.TABLE, queryset=queryset)
 
     def populate_selected_jobs(self):
         """
@@ -369,9 +367,7 @@ class Command(BaseCommand):
             start_at__gte=_approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
         ).all()
 
-        self.populate_table(
-            table_name="pass_agréments", table_columns=_approvals.TABLE_COLUMNS, querysets=[queryset1, queryset2]
-        )
+        self.populate_table(table=_approvals.TABLE, querysets=[queryset1, queryset2])
 
     def populate_job_seekers(self):
         """
@@ -396,17 +392,17 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table_name="candidats", table_columns=_job_seekers.TABLE_COLUMNS, queryset=queryset)
+        self.populate_table(table=_job_seekers.TABLE, queryset=queryset)
 
     def populate_rome_codes(self):
         queryset = Rome.objects.all()
 
-        self.populate_table(table_name="codes_rome", table_columns=_rome_codes.TABLE_COLUMNS, queryset=queryset)
+        self.populate_table(table=_rome_codes.TABLE, queryset=queryset)
 
     def populate_insee_codes(self):
         queryset = City.objects.all()
 
-        self.populate_table(table_name="communes", table_columns=_insee_codes.TABLE_COLUMNS, queryset=queryset)
+        self.populate_table(table=_insee_codes.TABLE, queryset=queryset)
 
     def populate_departments(self):
         """

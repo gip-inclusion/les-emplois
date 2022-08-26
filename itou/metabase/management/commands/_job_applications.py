@@ -1,6 +1,7 @@
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
+    MetabaseTable,
     anonymize,
     get_ai_stock_approval_pks,
     get_choice,
@@ -119,141 +120,149 @@ def get_ja_hiring_date(ja):
     return None
 
 
-TABLE_COLUMNS = [
-    {
-        "name": "id_anonymisé",
-        "type": "varchar",
-        "comment": "ID anonymisé de la candidature",
-        "fn": lambda o: anonymize(o.pk, salt=JOB_APPLICATION_PK_ANONYMIZATION_SALT),
-    },
-    {
-        "name": "date_candidature",
-        "type": "date",
-        "comment": "Date de la candidature",
-        "fn": lambda o: o.created_at,
-    },
-    {
-        "name": "état",
-        "type": "varchar",
-        "comment": "Etat de la candidature",
-        "fn": lambda o: get_choice(choices=JobApplicationWorkflow.STATE_CHOICES, key=o.state),
-    },
-    {
-        "name": "origine",
-        "type": "varchar",
-        "comment": ("Origine de la candidature (employeur, candidat, prescripteur habilité, orienteur)"),
-        "fn": get_job_application_origin,
-    },
-    {
-        "name": "origine_détaillée",
-        "type": "varchar",
-        "comment": (
-            "Origine détaillée de la candidature (employeur EI, ACI... candidat, orienteur, prescripteur PE, ML...)"
-        ),
-        "fn": get_job_application_detailed_origin,
-    },
-    {
-        "name": "délai_prise_en_compte",
-        "type": "interval",
-        "comment": (
-            "Temps écoulé rétroactivement de état nouveau à état étude si la candidature est passée par ces états"
-        ),
-        "fn": get_ja_time_spent_from_new_to_processing,
-    },
-    {
-        "name": "délai_de_réponse",
-        "type": "interval",
-        "comment": (
-            "Temps écoulé rétroactivement de état nouveau à état accepté"
-            " ou refusé si la candidature est passée par ces états"
-        ),
-        "fn": get_ja_time_spent_from_new_to_accepted_or_refused,
-    },
-    {
-        "name": "motif_de_refus",
-        "type": "varchar",
-        "comment": "Motif de refus de la candidature",
-        "fn": lambda o: o.get_refusal_reason_display() if o.refusal_reason != "" else None,
-    },
-    {
-        "name": "id_candidat_anonymisé",
-        "type": "varchar",
-        "comment": "ID anonymisé du candidat",
-        "fn": lambda o: anonymize(o.job_seeker_id, salt="job_seeker.id"),
-    },
-    {
-        "name": "id_structure",
-        "type": "integer",
-        "comment": "ID de la structure destinaire de la candidature",
-        "fn": lambda o: o.to_siae_id,
-    },
-    {
-        "name": "type_structure",
-        "type": "varchar",
-        "comment": "Type de la structure destinaire de la candidature",
-        "fn": lambda o: o.to_siae.kind,
-    },
-    {
-        "name": "nom_structure",
-        "type": "varchar",
-        "comment": "Nom de la structure destinaire de la candidature",
-        "fn": lambda o: o.to_siae.display_name,
-    },
-    {
-        "name": "nom_complet_structure",
-        "type": "varchar",
-        "comment": "Nom complet de la structure destinaire de la candidature",
-        "fn": lambda o: f"{o.to_siae.kind} - ID {o.to_siae.id} - {o.to_siae.display_name}",
-    },
-]
-
-TABLE_COLUMNS += get_department_and_region_columns(
-    name_suffix="_structure",
-    comment_suffix=" de la structure destinaire de la candidature",
-    custom_fn=lambda o: o.to_siae,
+TABLE = MetabaseTable(name="candidatures")
+TABLE.add_columns(
+    [
+        {
+            "name": "id_anonymisé",
+            "type": "varchar",
+            "comment": "ID anonymisé de la candidature",
+            "fn": lambda o: anonymize(o.pk, salt=JOB_APPLICATION_PK_ANONYMIZATION_SALT),
+        },
+        {
+            "name": "date_candidature",
+            "type": "date",
+            "comment": "Date de la candidature",
+            "fn": lambda o: o.created_at,
+        },
+        {
+            "name": "état",
+            "type": "varchar",
+            "comment": "Etat de la candidature",
+            "fn": lambda o: get_choice(choices=JobApplicationWorkflow.STATE_CHOICES, key=o.state),
+        },
+        {
+            "name": "origine",
+            "type": "varchar",
+            "comment": ("Origine de la candidature (employeur, candidat, prescripteur habilité, orienteur)"),
+            "fn": get_job_application_origin,
+        },
+        {
+            "name": "origine_détaillée",
+            "type": "varchar",
+            "comment": (
+                "Origine détaillée de la candidature "
+                "(employeur EI, ACI... candidat, orienteur, prescripteur PE, ML...)"
+            ),
+            "fn": get_job_application_detailed_origin,
+        },
+        {
+            "name": "délai_prise_en_compte",
+            "type": "interval",
+            "comment": (
+                "Temps écoulé rétroactivement de état nouveau à état étude si la candidature est passée par ces états"
+            ),
+            "fn": get_ja_time_spent_from_new_to_processing,
+        },
+        {
+            "name": "délai_de_réponse",
+            "type": "interval",
+            "comment": (
+                "Temps écoulé rétroactivement de état nouveau à état accepté"
+                " ou refusé si la candidature est passée par ces états"
+            ),
+            "fn": get_ja_time_spent_from_new_to_accepted_or_refused,
+        },
+        {
+            "name": "motif_de_refus",
+            "type": "varchar",
+            "comment": "Motif de refus de la candidature",
+            "fn": lambda o: o.get_refusal_reason_display() if o.refusal_reason != "" else None,
+        },
+        {
+            "name": "id_candidat_anonymisé",
+            "type": "varchar",
+            "comment": "ID anonymisé du candidat",
+            "fn": lambda o: anonymize(o.job_seeker_id, salt="job_seeker.id"),
+        },
+        {
+            "name": "id_structure",
+            "type": "integer",
+            "comment": "ID de la structure destinaire de la candidature",
+            "fn": lambda o: o.to_siae_id,
+        },
+        {
+            "name": "type_structure",
+            "type": "varchar",
+            "comment": "Type de la structure destinaire de la candidature",
+            "fn": lambda o: o.to_siae.kind,
+        },
+        {
+            "name": "nom_structure",
+            "type": "varchar",
+            "comment": "Nom de la structure destinaire de la candidature",
+            "fn": lambda o: o.to_siae.display_name,
+        },
+        {
+            "name": "nom_complet_structure",
+            "type": "varchar",
+            "comment": "Nom complet de la structure destinaire de la candidature",
+            "fn": lambda o: f"{o.to_siae.kind} - ID {o.to_siae.id} - {o.to_siae.display_name}",
+        },
+    ]
 )
 
-TABLE_COLUMNS += [
-    {
-        "name": "id_org_prescripteur",
-        "type": "integer",
-        "comment": "ID de l''organisation prescriptrice",
-        "fn": get_ja_sender_organization_pk,
-    },
-    {
-        "name": "nom_org_prescripteur",
-        "type": "varchar",
-        "comment": "Nom de l''organisation prescriptrice",
-        "fn": get_ja_sender_organization_name,
-    },
-    {
-        "name": "safir_org_prescripteur",
-        "type": "varchar",
-        "comment": "SAFIR de l''organisation prescriptrice",
-        "fn": get_ja_sender_organization_safir,
-    },
-    {
-        "name": "nom_prénom_conseiller_pe",
-        "type": "varchar",
-        "comment": "Nom prénom du conseiller PE",
-        "fn": get_ja_sender_full_name_if_pe,
-    },
-    {
-        "name": "date_embauche",
-        "type": "date",
-        "comment": "Date embauche le cas échéant",
-        "fn": get_ja_hiring_date,
-    },
-    {
-        "name": "injection_ai",
-        "type": "boolean",
-        "comment": "Provient des injections AI",
-        "fn": lambda o: o.approval.pk in get_ai_stock_approval_pks() if o.approval else False,
-    },
-    {
-        "name": "mode_attribution_pass_iae",
-        "type": "varchar",
-        "comment": "Mode d''attribution du PASS IAE",
-        "fn": lambda o: o.get_approval_delivery_mode_display(),
-    },
-]
+TABLE.add_columns(
+    get_department_and_region_columns(
+        name_suffix="_structure",
+        comment_suffix=" de la structure destinaire de la candidature",
+        custom_fn=lambda o: o.to_siae,
+    )
+)
+
+TABLE.add_columns(
+    [
+        {
+            "name": "id_org_prescripteur",
+            "type": "integer",
+            "comment": "ID de l''organisation prescriptrice",
+            "fn": get_ja_sender_organization_pk,
+        },
+        {
+            "name": "nom_org_prescripteur",
+            "type": "varchar",
+            "comment": "Nom de l''organisation prescriptrice",
+            "fn": get_ja_sender_organization_name,
+        },
+        {
+            "name": "safir_org_prescripteur",
+            "type": "varchar",
+            "comment": "SAFIR de l''organisation prescriptrice",
+            "fn": get_ja_sender_organization_safir,
+        },
+        {
+            "name": "nom_prénom_conseiller_pe",
+            "type": "varchar",
+            "comment": "Nom prénom du conseiller PE",
+            "fn": get_ja_sender_full_name_if_pe,
+        },
+        {
+            "name": "date_embauche",
+            "type": "date",
+            "comment": "Date embauche le cas échéant",
+            "fn": get_ja_hiring_date,
+        },
+        {
+            "name": "injection_ai",
+            "type": "boolean",
+            "comment": "Provient des injections AI",
+            "fn": lambda o: o.approval.pk in get_ai_stock_approval_pks() if o.approval else False,
+        },
+        {
+            "name": "mode_attribution_pass_iae",
+            "type": "varchar",
+            "comment": "Mode d''attribution du PASS IAE",
+            "fn": lambda o: o.get_approval_delivery_mode_display(),
+        },
+    ]
+)

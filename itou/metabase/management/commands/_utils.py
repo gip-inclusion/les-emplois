@@ -275,3 +275,18 @@ def build_final_tables(dry_run):
             sql_request = file.read()
         build_custom_table(table_name=table_name, sql_request=sql_request, dry_run=dry_run)
         print("Done.")
+
+
+class MetabaseTable:
+    def __init__(self, name):
+        self.name = name
+        self.columns = []
+
+    def add_columns(self, columns):
+        self.columns += columns
+
+    def get(self, column_name, input):
+        matching_columns = [c for c in self.columns if c["name"] == column_name]
+        assert len(matching_columns) == 1
+        fn = matching_columns[0]["fn"]
+        return fn(input)
