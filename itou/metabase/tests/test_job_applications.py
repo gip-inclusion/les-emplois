@@ -1,11 +1,7 @@
 from django.test import TestCase
 
 from itou.job_applications.enums import RefusalReason
-from itou.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationSentByPrescriberOrganizationFactory,
-    JobApplicationSentByPrescriberPoleEmploiFactory,
-)
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from itou.metabase.management.commands import _job_applications
 from itou.metabase.tests._utils import get_fn_by_name
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -31,7 +27,7 @@ class MetabaseJobApplicationTest(TestCase):
         self.assertEqual(get_result(name="motif_de_refus", value=ja), None)
 
     def test_ja_sent_by_pe(self):
-        ja = JobApplicationSentByPrescriberPoleEmploiFactory()
+        ja = JobApplicationSentByPrescriberOrganizationFactory(sent_by_pole_emploi=True)
         self.assertEqual(
             get_result(name="nom_prénom_conseiller_pe", value=ja),
             f"{ja.sender.last_name.upper()} {ja.sender.first_name}",
