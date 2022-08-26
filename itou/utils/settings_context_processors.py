@@ -18,6 +18,8 @@ def expose_settings(request):
             # On all stats pages the help button should redirect to the C2 help page instead of the C1 help page.
             assistance_url = global_constants.PILOTAGE_ASSISTANCE_URL
 
+    base_template = "layout/_partial.html" if request.META.get("HTTP_HX_REQUEST") else "layout/base.html"
+
     return {
         "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
         "ITOU_ASSISTANCE_URL": assistance_url,
@@ -30,4 +32,5 @@ def expose_settings(request):
         "ITOU_PILOTAGE_URL": global_constants.PILOTAGE_SITE_URL,
         "ITOU_PROTOCOL": settings.ITOU_PROTOCOL,
         "SHOW_TEST_ACCOUNTS_BANNER": settings.SHOW_TEST_ACCOUNTS_BANNER,
+        "BASE_TEMPLATE": base_template,
     }

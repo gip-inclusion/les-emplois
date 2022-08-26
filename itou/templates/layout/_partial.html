@@ -1,0 +1,22 @@
+{% comment %} Base template used with HTMX requests {% endcomment %}
+{% load bootstrap4 %}
+<main id="main" role="main" class="s-main {% block main_css_classes %}bg-gray-400{% endblock %}">
+
+    <div class="container container-messages">
+        {% block messages %}
+
+            {% bootstrap_messages %}
+
+            {# Display an alert for old browsers #}
+            <div class="alert alert-secondary alert-old-browser" role="status">
+                <p class="mb-0">
+                    La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
+                </p>
+            </div>
+
+        {% endblock %}
+    </div>
+
+    {% block content_full_viewport %}{% endblock %}
+
+</main>
