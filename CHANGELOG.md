@@ -1,5 +1,43 @@
 # Journal des modifications
 
+## [48] - 2022-08-29
+
+### Ajouté
+- Inclusion Connect : ajout du support de la connexion prescripteurs
+- Admin : affichage du SIRET de la SIAE d'une candidature
+- Contrôle a posteriori : ajout d'un bandeau d'information à propos de pièces manquantes
+- Contrôle a posteriori : ajout d'une mention concernant la phase de contrôle actuelle pour plus de clarté
+- Technique : ajout d'un script permettant de détecter des doublons parmi des candidats identifiés par l'ASP.
+- OpenID Connect : affichage d'un message d'erreur si l'utilisateur a plusieurs types
+- Enregistrement utilisateur : s'assurer qu'un seul type soit possible
+- Enregistrement utilisateur : demander toutes les informations nécessaires à la création
+- Enregistrement utilisateur : ajout d'une étape de retour d'information aux prescripteurs
+
+
+### Modifié
+- Inclusion Connect : corrections diverses (mise à jour keycloak, gestion du "retour", enregistrement prescripteurs, bugs lors de la déconnexion)
+- Inclusion Connect : amélioration de l'email d'inscription
+- Fiches Salarié : améliorations de stabilité et de performance
+- Contrôle a posteriori : ne pas passer en phase contradictoire les SIAE ayant transmis mais non validé leurs pièces
+- Contrôle a posteriori : les DDETS peuvent contrôler une SIAE même si toutes les pièces ne sont pas soumises
+- Contrôle a posteriori : correction d'un cas où une SIAE pouvait ne pas être en capacité de soumettre ses documents
+- Extraction des utilisateurs pour le C2 : Ignorer les SIAEs inactives
+- PASS IAE : ne pas passer en délivrance manuelle si le demandeur d'emploi a un NIR
+- PASS IAE : créer un PASS automatiquement si aucun agrément Pôle emploi n'est trouvé.
+- Candidatures : modifications cosmétiques
+- Enregistrement candidat : noter "non enregistré à Pôle emploi" si aucun ID renseigné
+- Enregistrement candidat : amélioration d'éventuelles erreurs liées aux sessions
+- Utilisateurs : modifications de wording (RQTH, OETH)
+- Technique : rendre les erreurs non retirables sur les formulaires
+- Technique : mise à jour de Sentry, de Django et du thème Itou
+- Technique : simplification de branches de code liées à la présence d'agréments ou PASS IAE
+- Technique : permettre la modifcation de la couleur de fond
+
+
+### Supprimé
+- Page de connexion : retrait du message d'accueil
+
+
 ## [47] - 2022-07-29
 
 ### Ajouté
