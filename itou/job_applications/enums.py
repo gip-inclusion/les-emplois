@@ -63,4 +63,5 @@ class RefusalReason(models.TextChoices):
         """
         Hide values in forms but don't override self.choices method to keep hidden enums visible in Django admin.
         """
-        return [(None, "")] + [(enum.value, enum.label) for enum in cls if enum not in cls.hidden()]
+        empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
+        return empty + [(enum.value, enum.label) for enum in cls if enum not in cls.hidden()]
