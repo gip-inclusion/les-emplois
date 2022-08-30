@@ -114,7 +114,7 @@ id_structures_pas_poste_ouvert as (
     where 
         date_candidature >= date_trunc('month',  current_date) - interval '1 month'
         and 
-        motif_de_refus = 'Pas de poste ouvert en ce moment'
+        motif_de_refus = 'Pas de recrutement en cours'
 ),
 /* Nombre de jours nécessaires pour qu'une fiche de poste reçoit une première candidature */
 delai_1_ere_candidature as (
