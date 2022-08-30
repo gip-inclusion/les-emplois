@@ -1,11 +1,14 @@
 {% load static %}
 
-<a id="peamu_login"
-    href="{% url 'peamu_login' %}"
-    title="Se connecter avec votre compte Pôle emploi"
-    class="matomo-event"
-    data-matomo-category="inscription-candidat"
-    data-matomo-action="clic"
-    data-matomo-option="se-connecter-avec-pe">
-    <img src="{% static 'img/peamu_btn.svg' %}" class="img-fluid" alt="">
-</a>
+<form method="post" action="{% url 'peamu_login' %}">
+    {% csrf_token %}
+    <input
+        type="image"
+        src="{% static 'img/peamu_btn.svg' %}"
+        alt="Se connecter avec votre compte Pôle emploi"
+        class="matomo-event"
+        data-matomo-category="inscription-candidat"
+        data-matomo-action="clic"
+        data-matomo-option="se-connecter-avec-pe"
+    >
+</form>
