@@ -12,46 +12,18 @@ from django.http import HttpResponseRedirect
 from requests import RequestException
 
 from itou.allauth_adapters.peamu.adapter import PEAMUOAuth2Adapter
-from itou.allauth_adapters.peamu.client import PEAMUOAuth2Client
 
 
 logger = logging.getLogger(__name__)
 
 
 class PEAMUOAuth2CallbackView(OAuth2CallbackView):
-    def get_client(self, request, app):
-        """
-        This overloading is required solely for injecting
-        the non standard realm=/individu when requesting access token.
-        (╯°□°)╯︵ ┻━┻
-
-        This whole method is unchanged except for the
-        custom `PEAMUOAuth2Client` required to load the
-        `params = {"realm": "/individu"}` hack.
-        Original code:
-        https://github.com/pennersr/django-allauth/blob/6a6d3c618ab018234dde8701173093274710ee0a/allauth/socialaccount/providers/oauth2/views.py#L78
-        """
-        callback_url = self.adapter.get_callback_url(request, app)
-        provider = self.adapter.get_provider()
-        scope = provider.get_scope(request)
-        client = PEAMUOAuth2Client(
-            self.request,
-            app.client_id,
-            app.secret,
-            self.adapter.access_token_method,
-            self.adapter.access_token_url,
-            callback_url,
-            scope,
-            scope_delimiter=self.adapter.scope_delimiter,
-            headers=self.adapter.headers,
-            basic_auth=self.adapter.basic_auth,
-        )
-        return client
-
     def dispatch(self, request, *args, **kwargs):
         """
         This overloading is necessary to manage the case
         when the user clicks on "Cancel" once on the "Mire de connexion PE Connect".
+        (╯°□°)╯︵ ┻━┻
+
         Original code:
         https://github.com/pennersr/django-allauth/blob/master/allauth/socialaccount/providers/oauth2/views.py#L113
         """
@@ -69,9 +41,9 @@ class PEAMUOAuth2CallbackView(OAuth2CallbackView):
                 logger.error("Unknown error in PEAMU dispatch.")
             return render_authentication_error(request, self.adapter.provider_id, error=error)
         app = self.adapter.get_provider().get_app(self.request)
-        client = self.get_client(request, app)
+        client = self.get_client(self.request, app)
         try:
-            access_token = client.get_access_token(request.GET["code"])
+            access_token = self.adapter.get_access_token_data(request, app, client)
             token = self.adapter.parse_token(access_token)
             token.app = app
             login = self.adapter.complete_login(request, app, token, response=access_token)

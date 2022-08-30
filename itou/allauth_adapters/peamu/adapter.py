@@ -3,6 +3,7 @@ from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 from django.conf import settings
 
+from itou.allauth_adapters.peamu.client import PEAMUOAuth2Client
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
 from itou.users import enums as users_enums
 
@@ -20,6 +21,7 @@ class PEAMUSocialAccountAdapter(DefaultSocialAccountAdapter):
 
 class PEAMUOAuth2Adapter(OAuth2Adapter):
     provider_id = PEAMUProvider.id
+    client_class = PEAMUOAuth2Client
 
     authorize_url = f"{settings.PEAMU_AUTH_BASE_URL}/connexion/oauth2/authorize"
     access_token_url = f"{settings.PEAMU_AUTH_BASE_URL}/connexion/oauth2/access_token"
