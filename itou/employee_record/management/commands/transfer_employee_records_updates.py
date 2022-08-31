@@ -129,11 +129,13 @@ class Command(EmployeeRecordTransferCommand):
                 notification.asp_processing_label = processing_label
 
                 if not dry_run:
-                    try:
-                        notification.update_as_processed(processing_code, processing_label)
-                    except Exception as ex:
-                        record_errors += 1
-                        self.stdout.write(f"Can't perform update: {notification=}, {ex=}")
+                    # Not an important issue if notification was previously processed
+                    if notification.status != Status.PROCESSED:
+                        try:
+                            notification.update_as_processed(processing_code, processing_label)
+                        except Exception as ex:
+                            record_errors += 1
+                            self.stdout.write(f"Can't perform update: {notification=}, {ex=}")
                 else:
                     self.stdout.write(f"DRY-RUN: Processed {notification}, {processing_code=}, {processing_label=}")
             else:
