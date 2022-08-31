@@ -10,29 +10,14 @@
   ==> alors toutes les fiches de poste qui ont au moins 30 jours d'ancienneté font partie du périmètre de l'analyse
 - l’employeur n'a pas refusé des candidatures dans les 30 derniers jours pour le motif “Pas de poste ouvert
 */
-with candidatures_recues_par_fiche_de_poste as (
+with fdp_structures as (
     select 
-        c.date_candidature,
-        c.date_embauche,
-        c.délai_de_réponse,
-        (current_date - c.date_candidature) as anciennete_candidature,
         (current_date - fdp.date_création) as delai_mise_en_ligne,
-        (date_embauche - date_candidature) as delai_embauche, /* nous donne un délai en jours */
-        c.délai_prise_en_compte,
         fdp.département_employeur as département_structure,
-        c.id_anonymisé as id_candidature_anonymisé,
-        c.id_candidat_anonymisé ,
         fdp.id_employeur as id_structure,
-        c.motif_de_refus,
         fdp.nom_département_employeur as nom_département_structure,
-        c.nom_org_prescripteur,
-        c.nom_structure,
-        c.origine as origine_candidature,
-        c.origine_détaillée as origine_détaillée_candidature,
-        c.région_structure,
-        c.safir_org_prescripteur,
+        s.nom as nom_structure, /* On récupère les infos via la table structure pour éviter des lignes vides lors de la recupération des infos candidatures */
         fdp.type_employeur as type_structure ,
-        c.état as état_candidature,
         fdp.recrutement_ouvert as recrutement_ouvert_fdp,
         crdp.grand_domaine,
         crdp.domaine_professionnel,
@@ -41,6 +26,7 @@ with candidatures_recues_par_fiche_de_poste as (
         fdp.date_mise_à_jour_metabase,
         fdp.id as id_fdp,
         fdp.nom_rome as nom_rome_fdp,
+        fdppc.id_anonymisé_candidature, 
         fdp.siret_employeur
     from 
         fiches_de_poste fdp 
@@ -48,11 +34,50 @@ with candidatures_recues_par_fiche_de_poste as (
         fiches_de_poste_par_candidature fdppc 
         on fdp.id = fdppc.id_fiche_de_poste
     left join 
-        candidatures c
-        on c.id_anonymisé = fdppc.id_anonymisé_candidature 
-    left join 
         code_rome_domaine_professionnel as crdp 
         on fdp.code_rome = crdp.code_rome 
+    left join 
+        structures s
+        on s.id = fdp.id_employeur 
+),
+/*ici, contrairement à avant, on ne récupère que les infos des candidatures pour éviter des lignes vides */
+candidatures_recues_par_fiche_de_poste as (
+    select 
+        c.date_candidature,
+        c.date_embauche,
+        c.délai_de_réponse,
+        (current_date - c.date_candidature) as anciennete_candidature,
+        fdp_s.delai_mise_en_ligne,
+        (date_embauche - date_candidature) as delai_embauche, /* nous donne un délai en jours */
+        c.délai_prise_en_compte,
+        fdp_s.département_structure,
+        c.id_anonymisé as id_candidature_anonymisé,
+        c.id_candidat_anonymisé ,
+        fdp_s.id_structure,
+        c.motif_de_refus,
+        fdp_s.nom_département_structure,
+        c.nom_org_prescripteur,
+        fdp_s.nom_structure,
+        c.origine as origine_candidature,
+        c.origine_détaillée as origine_détaillée_candidature,
+        c.région_structure,
+        c.safir_org_prescripteur,
+        fdp_s.type_structure ,
+        c.état as état_candidature,
+        fdp_s.recrutement_ouvert_fdp,
+        fdp_s.grand_domaine,
+        fdp_s.domaine_professionnel,
+        fdp_s.code_rome_fpd,
+        fdp_s.date_création_fdp,
+        fdp_s.date_mise_à_jour_metabase,
+        fdp_s.id_fdp,
+        fdp_s.nom_rome_fdp,
+        fdp_s.siret_employeur
+    from 
+        fdp_structures fdp_s
+    left join 
+        candidatures c
+        on c.id_anonymisé = fdp_s.id_anonymisé_candidature 
 ),
 fiche_de_poste as (
     select 
