@@ -2,7 +2,6 @@ import json
 from unittest import mock
 
 from django.conf import settings
-from django.core import management
 from django.utils import timezone
 
 from itou.employee_record.enums import Status
@@ -49,15 +48,15 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download(self):
-        management.call_command("transfer_employee_records", download=True)
+        self.call_command("transfer_employee_records", download=True)
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_upload(self):
-        management.call_command("transfer_employee_records", upload=True)
+        self.call_command("transfer_employee_records", upload=True)
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download_and_upload(self):
-        management.call_command("transfer_employee_records")
+        self.call_command("transfer_employee_records")
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
@@ -68,11 +67,11 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         employee_record = self.employee_record
 
         # Upload with dry run
-        management.call_command("transfer_employee_records", upload=True, dry_run=True)
+        self.call_command("transfer_employee_records", upload=True, dry_run=True)
 
         # Then download "for real", should work but leave
         # employee record untouched
-        management.call_command("transfer_employee_records", upload=False, download=True)
+        self.call_command("transfer_employee_records", upload=False, download=True)
 
         self.assertEqual(employee_record.status, Status.READY)
 
@@ -85,11 +84,11 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         employee_record = self.employee_record
 
         # Upload "for real"
-        management.call_command("transfer_employee_records", upload=True)
+        self.call_command("transfer_employee_records", upload=True)
 
         # Then download dry run, should work but leave
         # employee record untouched
-        management.call_command("transfer_employee_records", upload=False, download=True, dry_run=True)
+        self.call_command("transfer_employee_records", upload=False, download=True, dry_run=True)
 
         self.assertEqual(employee_record.status, Status.READY)
 
@@ -97,7 +96,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
     def test_upload_failure(self):
         employee_record = self.employee_record
         with self.assertRaises(Exception):
-            management.call_command("transfer_employee_records", upload=True)
+            self.call_command("transfer_employee_records", upload=True)
 
         self.assertEqual(employee_record.status, Status.READY)
 
@@ -105,7 +104,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
     def test_download_failure(self):
         employee_record = self.employee_record
         with self.assertRaises(Exception):
-            management.call_command("transfer_employee_records", download=True)
+            self.call_command("transfer_employee_records", download=True)
 
         self.assertEqual(employee_record.status, Status.READY)
 
@@ -123,14 +122,14 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         """
         employee_record = self.employee_record
 
-        management.call_command("transfer_employee_records", upload=True, download=False)
+        self.call_command("transfer_employee_records", upload=True, download=False)
         employee_record.refresh_from_db()
 
         self.assertEqual(employee_record.status, Status.SENT)
         self.assertEqual(employee_record.batch_line_number, 1)
         self.assertIsNotNone(employee_record.asp_batch_file)
 
-        management.call_command("transfer_employee_records", upload=False, download=True)
+        self.call_command("transfer_employee_records", upload=False, download=True)
         employee_record.refresh_from_db()
 
         self.assertEqual(employee_record.status, Status.PROCESSED)
@@ -147,7 +146,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         """
         employee_record = self.employee_record
 
-        management.call_command("transfer_employee_records", upload=True, download=True)
+        self.call_command("transfer_employee_records", upload=True, download=True)
         employee_record.refresh_from_db()
 
         self.assertEqual(Status.PROCESSED, employee_record.status)
@@ -169,7 +168,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         # Random upload failure
         for _ in range(10):
             with self.assertRaises(Exception):
-                management.call_command("transfer_employee_records", upload=True, download=False)
+                self.call_command("transfer_employee_records", upload=True, download=False)
 
         # Employee record must be in the same status
         employee_record.refresh_from_db()
@@ -177,7 +176,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
 
         for _ in range(10):
             with self.assertRaises(Exception):
-                management.call_command("transfer_employee_records", upload=False, download=True)
+                self.call_command("transfer_employee_records", upload=False, download=True)
 
         employee_record.refresh_from_db()
         self.assertEqual(employee_record.status, Status.READY)
@@ -205,7 +204,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         self.employee_record.update_as_archived()
 
         # Nicer syntax:
-        management.call_command("transfer_employee_records", archive=True)
+        self.call_command("transfer_employee_records", archive=True)
 
         self.employee_record.refresh_from_db()
 
