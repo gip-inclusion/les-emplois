@@ -98,3 +98,6 @@ django-import-export==2.8.0
 
 # To impersonate users from the admin
 django-hijack==3.2.1  # https://github.com/django-hijack/django-hijack
+
+# To automatically load .env files at the root of the project
+python-dotenv==0.21.0
