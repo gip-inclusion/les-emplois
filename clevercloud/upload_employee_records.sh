@@ -18,6 +18,9 @@ fi
 # $APP_HOME is set by default by clever cloud.
 cd $APP_HOME
 
+# Check for common blocking errors before uploads
+django-admin sanitize_employee_records
+
 # Upload employee records 
 django-admin transfer_employee_records --upload
 
