@@ -283,6 +283,77 @@ class EligibilityDiagnosisModelTest(TestCase):
         self.assertIn(criteria2, administrative_criteria)
         self.assertIn(criteria3, administrative_criteria)
 
+    def test_update_diagnosis(self):
+        siae = SiaeFactory(with_membership=True)
+        user_info = UserInfo(
+            user=siae.members.first(),
+            kind=KIND_SIAE_STAFF,
+            prescriber_organization=None,
+            is_authorized_prescriber=False,
+            siae=siae,
+        )
+
+        current_diagnosis = EligibilityDiagnosisFactory()
+        new_diagnosis = EligibilityDiagnosis.update_diagnosis(current_diagnosis, user_info, [])
+        current_diagnosis.refresh_from_db()
+
+        # Some information should be copied...
+        self.assertEqual(new_diagnosis.job_seeker, current_diagnosis.job_seeker)
+        # ... or updated.
+        self.assertEqual(new_diagnosis.author, user_info.user)
+        self.assertEqual(new_diagnosis.author_kind, KIND_SIAE_STAFF)
+        self.assertEqual(new_diagnosis.author_siae, siae)
+        self.assertEqual(new_diagnosis.author_prescriber_organization, None)
+        self.assertEqual(new_diagnosis.administrative_criteria.count(), 0)
+
+        # And the old diagnosis should now be expired (thus considered invalid)
+        self.assertEqual(current_diagnosis.expires_at, new_diagnosis.created_at)
+        self.assertFalse(current_diagnosis.is_valid)
+        self.assertTrue(new_diagnosis.is_valid)
+
+    def test_update_diagnosis_extend_the_validity_only_when_we_have_the_same_author_and_the_same_criteria(self):
+        first_diagnosis = EligibilityDiagnosisFactory()
+        user_info = UserInfo(
+            user=first_diagnosis.author,
+            kind=first_diagnosis.author_kind,
+            prescriber_organization=first_diagnosis.author_prescriber_organization,
+            is_authorized_prescriber=first_diagnosis.author_prescriber_organization.is_authorized,
+            siae=None,
+        )
+
+        # Same author, same criteria
+        previous_expires_at = first_diagnosis.expires_at
+        self.assertIs(EligibilityDiagnosis.update_diagnosis(first_diagnosis, user_info, []), first_diagnosis)
+        first_diagnosis.refresh_from_db()
+        self.assertGreater(first_diagnosis.expires_at, previous_expires_at)
+
+        criteria = [
+            AdministrativeCriteria.objects.get(level=AdministrativeCriteria.Level.LEVEL_1, name="Bénéficiaire du RSA"),
+        ]
+        # Same author, different criteria
+        second_diagnosis = EligibilityDiagnosis.update_diagnosis(first_diagnosis, user_info, criteria)
+        first_diagnosis.refresh_from_db()
+
+        self.assertIsNot(second_diagnosis, first_diagnosis)
+        self.assertEqual(first_diagnosis.expires_at, second_diagnosis.created_at)
+        self.assertGreater(second_diagnosis.expires_at, first_diagnosis.expires_at)
+
+        # Different author, same criteria
+        other_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        other_user_info = UserInfo(
+            user=other_prescriber_organization.members.first(),
+            kind=KIND_PRESCRIBER,
+            prescriber_organization=other_prescriber_organization,
+            is_authorized_prescriber=other_prescriber_organization.is_authorized,
+            siae=None,
+        )
+        third_diagnosis = EligibilityDiagnosis.update_diagnosis(second_diagnosis, other_user_info, criteria)
+        second_diagnosis.refresh_from_db()
+
+        self.assertIsNot(second_diagnosis, third_diagnosis)
+        self.assertEqual(second_diagnosis.expires_at, third_diagnosis.created_at)
+        self.assertGreater(third_diagnosis.expires_at, second_diagnosis.expires_at)
+
     def test_is_valid(self):
         # Valid diagnosis.
         diagnosis = EligibilityDiagnosisFactory()

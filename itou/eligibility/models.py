@@ -237,6 +237,30 @@ class EligibilityDiagnosis(models.Model):
             diagnosis.administrative_criteria.add(*administrative_criteria)
         return diagnosis
 
+    @classmethod
+    @transaction.atomic()
+    def update_diagnosis(cls, eligibility_diagnosis, user_info, administrative_criteria):
+        # If we have the same author and the same criteria then extend the life of the current one
+        extend_conditions = [
+            eligibility_diagnosis.author == user_info.user,
+            set(eligibility_diagnosis.administrative_criteria.all()) == set(administrative_criteria),
+        ]
+        if all(extend_conditions):
+            eligibility_diagnosis.expires_at = timezone.now() + relativedelta(
+                months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS
+            )
+            eligibility_diagnosis.save(update_fields=["expires_at"])
+            return eligibility_diagnosis
+
+        # Otherwise, we create a new one...
+        new_eligibility_diagnosis = cls.create_diagnosis(
+            eligibility_diagnosis.job_seeker, user_info, administrative_criteria
+        )
+        # and mark the current one as expired
+        eligibility_diagnosis.expires_at = new_eligibility_diagnosis.created_at
+        eligibility_diagnosis.save(update_fields=["expires_at"])
+        return new_eligibility_diagnosis
+
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
     def level1(self):
