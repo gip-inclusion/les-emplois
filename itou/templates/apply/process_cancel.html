@@ -5,9 +5,15 @@
 
     {{ block.super }}
 
-    <div class="alert alert-warning" role="status">
-        <p>En annulant l’embauche, vous renoncez à toute aide au poste pour ce salarié. Si le salarié a travaillé dans votre structure, suspendez le PASS IAE et ne validez pas cette annulation.</p>
-        <p class="mb-0">L’annulation d’embauche ne concerne que les salariés n’ayant jamais travaillé pour vous.</p>
+    <div class="alert alert-warning alert-dismissible fade show" role="status">
+        <div class="row">
+            <div class="col-auto pr-0">
+                <i class="ri-information-line ri-xl text-warning"></i>
+            </div>
+            <div class="col">
+                <p class="mb-0">En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous les jours travaillés de ce salarié. Si ce salarié a travaillé dans votre structure, il est préférable de suspendre son PASS IAE ci-dessus.</p>
+            </div>
+        </div>
     </div>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -17,8 +23,9 @@
         <input type="hidden" name="confirm" value="true">
 
         {% buttons %}
-            <a class="btn btn-outline-primary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
-            <button type="submit" class="btn btn-danger">Confirmer l'annulation de l'embauche</button>
+
+            <button type="submit" class="btn btn-danger float-right">Confirmer l'annulation de l'embauche</button>
+            <a class="btn btn-link float-right" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
         {% endbuttons %}
 
     </form>

@@ -685,7 +685,7 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Confirmer l'annulation de l'embauche")
         self.assertContains(
-            response, "L’annulation d’embauche ne concerne que les salariés n’ayant jamais travaillé pour vous."
+            response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
         )
 
         post_data = {
