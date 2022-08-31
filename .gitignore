@@ -6,7 +6,6 @@ envs/staging.env
 .envrc
 
 # Config
-config/settings/dev.py
 docker-compose-prod.yml
 docker-compose-staging.yml
 docker/prod/
