@@ -364,6 +364,9 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
+    approval_can_be_suspended_by_siae = job_application.approval and job_application.approval.can_be_suspended_by_siae(
+        job_application.to_siae
+    )
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
     if not job_application.can_be_cancelled:
@@ -381,6 +384,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
 
     context = {
         "job_application": job_application,
+        "approval_can_be_suspended_by_siae": approval_can_be_suspended_by_siae,
     }
     return render(request, template_name, context)
 
