@@ -5,11 +5,13 @@ from django.core.exceptions import PermissionDenied
 
 import itou.utils.json
 
+from . import python
+
 
 class SessionNamespace:
     """Class to facilitate the usage of namespaces inside the session."""
 
-    NOT_SET = object()
+    NOT_SET = python.Sentinel()
 
     def __init__(self, session, namespace):
         self._session = session

@@ -1252,6 +1252,9 @@ class SessionNamespaceTest(TestCase):
 
         # .get()
         self.assertEqual(ns.get("key"), "value")
+        self.assertIs(ns.get("not_existing_key", None), None)
+        self.assertIs(ns.get("not_existing_key"), ns.NOT_SET)
+        self.assertFalse(ns.get("not_existing_key"))
 
         # .set()
         ns.set("key2", "value2")
