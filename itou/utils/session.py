@@ -48,6 +48,9 @@ class SessionNamespace:
         del self._session[self.name]
         self._session.modified = True
 
+    def save(self):
+        self._session.save()
+
     def as_dict(self):
         return dict(self._session[self.name])
 

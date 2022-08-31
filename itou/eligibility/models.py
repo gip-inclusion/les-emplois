@@ -200,6 +200,10 @@ class EligibilityDiagnosis(models.Model):
     def is_valid(self):
         return self.expires_at > timezone.now()
 
+    @property
+    def author_organization(self):
+        return self.author_prescriber_organization or self.author_siae
+
     # A diagnosis is considered valid for the whole duration of an approval.
     # Methods below (whose name contain `considered`) take into account
     # the existence of an ongoing approval.

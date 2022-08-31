@@ -58,6 +58,20 @@ urlpatterns = [
         submit_views.CheckPreviousApplications.as_view(),
         name="step_check_prev_applications",
     ),
+    path("<int:siae_pk>/application/jobs", submit_views.ApplicationJobsView.as_view(), name="application_jobs"),
+    path(
+        "<int:siae_pk>/application/eligibility",
+        submit_views.ApplicationEligibilityView.as_view(),
+        name="application_eligibility",
+    ),
+    path("<int:siae_pk>/application/resume", submit_views.ApplicationResumeView.as_view(), name="application_resume"),
+    path(
+        "<int:siae_pk>/application/<uuid:application_pk>/end",
+        submit_views.ApplicationEndView.as_view(),
+        name="application_end",
+    ),
+    # Submit - legacy
+    # TODO(rsebille): Remove those 3 once we are fairly confident that no one is still inside that path
     path("<int:siae_pk>/step_eligibility", submit_views.step_eligibility, name="step_eligibility"),
     path("<int:siae_pk>/step_application", submit_views.step_application, name="step_application"),
     path(

@@ -4,7 +4,7 @@ from django.conf import settings
 
 class ResumeFormMixin(forms.Form):
     resume_link = forms.URLField(
-        label="CV (optionnel)",
+        label="Curriculum Vitae (CV)",
         required=False,
     )
 

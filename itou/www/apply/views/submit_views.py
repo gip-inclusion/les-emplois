@@ -1,6 +1,7 @@
 import functools
 import logging
 
+from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,23 +11,26 @@ from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.job_applications.models import JobApplication
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.models import Siae
+from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.perms.user import get_user_info
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
+    ApplicationJobsForm,
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
     CreateJobSeekerStep1ForSenderForm,
@@ -125,16 +129,24 @@ class ApplicationBaseView(ApplyStepBaseView):
         super().__init__()
 
         self.job_seeker = None
+        self.eligibility_diagnosis = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
         self.job_seeker = get_object_or_404(User, pk=self.apply_session.get("job_seeker_pk"))
         _check_job_seeker_approval(request, self.job_seeker, self.siae)
+        self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+            self.job_seeker, for_siae=self.siae
+        )
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "job_seeker": self.job_seeker,
+            "eligibility_diagnosis": self.eligibility_diagnosis,
+            "is_subject_to_eligibility_rules": self.siae.is_subject_to_eligibility_rules,
+            "can_edit_personal_information": self.request.user.can_edit_personal_information(self.job_seeker),
+            "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
         }
 
 
@@ -204,12 +216,7 @@ class StartView(ApplyStepBaseView):
                 "nir": None,
                 "siae_pk": self.siae.pk,
                 "sender_pk": user_info.user.pk,
-                "sender_kind": user_info.kind,
-                "sender_siae_pk": user_info.siae.pk if user_info.siae else None,
-                "sender_prescriber_organization_pk": (
-                    user_info.prescriber_organization.pk if user_info.prescriber_organization else None
-                ),
-                "job_description_id": request.GET.get("job_description_id"),
+                "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
             }
         )
         # Warn message if prescriber's authorization is pending
@@ -574,7 +581,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         self.apply_session.set("job_seeker_pk", profile.user.pk)
         self.job_seeker_session.delete()  # Point of no return
 
-        return HttpResponseRedirect(reverse("apply:step_eligibility", kwargs={"siae_pk": self.siae.pk}))
+        return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}))
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -651,7 +658,7 @@ class CheckPreviousApplications(ApplicationBaseView):
 
     def get(self, request, *args, **kwargs):
         if not self.previous_applications.exists():
-            return HttpResponseRedirect(reverse("apply:step_eligibility", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}))
 
         # Limit the possibility of applying to the same SIAE for 24 hours.
         if not request.user.is_siae_staff and self.previous_applications.created_in_past(hours=24).exists():
@@ -667,7 +674,7 @@ class CheckPreviousApplications(ApplicationBaseView):
         # At this point we know that the candidate is applying to an SIAE where he or she has already applied.
         # Allow a new job application if the user confirm it despite the duplication warning.
         if request.POST.get("force_new_application") == "force":
-            return HttpResponseRedirect(reverse("apply:step_eligibility", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}))
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -675,6 +682,240 @@ class CheckPreviousApplications(ApplicationBaseView):
         return super().get_context_data(**kwargs) | {
             "prev_application": self.previous_applications.latest("created_at"),
             "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
+        }
+
+
+class ApplicationJobsView(ApplicationBaseView):
+    template_name = "apply/submit/application/jobs.html"
+
+    def __init__(self):
+        super().__init__()
+
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.form = ApplicationJobsForm(
+            self.siae,
+            initial={"selected_jobs": self.apply_session.get("selected_jobs", [])},
+            data=request.POST or None,
+        )
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            self.apply_session.set("selected_jobs", self.form.cleaned_data.get("selected_jobs", []))
+            return HttpResponseRedirect(reverse("apply:application_eligibility", kwargs={"siae_pk": self.siae.pk}))
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        job_descriptions_by_pk = {jd.pk: jd for jd in self.form.fields["selected_jobs"].queryset}
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "job_descriptions_by_pk": job_descriptions_by_pk,
+            "progress": 25,
+            "full_content_width": True,
+        }
+
+
+class ApplicationEligibilityView(ApplicationBaseView):
+    template_name = "apply/submit/application/eligibility.html"
+
+    def __init__(self):
+        super().__init__()
+
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        initial_data = {}
+        if self.eligibility_diagnosis:
+            initial_data["administrative_criteria"] = self.eligibility_diagnosis.administrative_criteria.all()
+        self.form = AdministrativeCriteriaForm(
+            request.user,
+            siae=self.siae,
+            initial=initial_data,
+            data=request.POST or None,
+        )
+
+    def dispatch(self, request, *args, **kwargs):
+        bypass_eligibility_conditions = [
+            # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
+            not self.siae.is_subject_to_eligibility_rules,
+            # Only "authorized prescribers" can perform an eligibility diagnosis.
+            not get_user_info(request).is_authorized_prescriber,
+            # No need for eligibility diagnosis if the job seeker already have a PASS IAE
+            self.job_seeker.has_valid_common_approval,
+        ]
+        if any(bypass_eligibility_conditions):
+            return HttpResponseRedirect(reverse("apply:application_resume", kwargs={"siae_pk": self.siae.pk}))
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            user_info = get_user_info(request)
+            if not self.eligibility_diagnosis:
+                EligibilityDiagnosis.create_diagnosis(self.job_seeker, user_info, self.form.cleaned_data)
+            elif self.eligibility_diagnosis and not self.form.data.get("shrouded"):
+                EligibilityDiagnosis.update_diagnosis(self.eligibility_diagnosis, user_info, self.form.cleaned_data)
+            return HttpResponseRedirect(reverse("apply:application_resume", kwargs={"siae_pk": self.siae.pk}))
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        new_expires_at_if_updated = timezone.now() + relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS)
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "new_expires_at_if_updated": new_expires_at_if_updated,
+            "progress": 50,
+            "back_url": reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
+        }
+
+
+class ApplicationResumeView(ApplicationBaseView):
+    template_name = "apply/submit/application/resume.html"
+
+    def __init__(self):
+        super().__init__()
+
+        self.form = None
+        self.s3_upload = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.form = SubmitJobApplicationForm(
+            siae=self.siae,
+            user=request.user,
+            initial={"selected_jobs": self.apply_session.get("selected_jobs", [])},
+            data=request.POST or None,
+        )
+        self.s3_upload = S3Upload(kind="resume")
+
+    def dispatch(self, request, *args, **kwargs):
+        # Prevent multiple rapid clicks on the submit button to create multiple job applications.
+        job_application = (
+            self.job_seeker.job_applications.filter(to_siae=self.siae).created_in_past(seconds=10).first()
+        )
+        if job_application:
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:application_end", kwargs={"siae_pk": self.siae.pk, "application_pk": job_application.pk}
+                )
+            )
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            # Fill the job application with the required information
+            job_application = self.form.save(commit=False)
+            job_application.job_seeker = self.job_seeker
+            job_application.to_siae = self.siae
+
+            sender_info = get_user_info(request)
+            job_application.sender = sender_info.user
+            job_application.sender_kind = sender_info.kind
+            if sender_info.prescriber_organization:
+                job_application.sender_prescriber_organization = sender_info.prescriber_organization
+            if sender_info.siae:
+                job_application.sender_siae = sender_info.siae
+
+            # Save the job application
+            with transaction.atomic():
+                job_application.save()
+                job_application.selected_jobs.add(*self.form.cleaned_data["selected_jobs"])
+            # The job application is now saved in DB, delete the session early to avoid any problems
+            self.apply_session.delete()
+
+            try:
+                # Send email notifications
+                if job_application.is_spontaneous:
+                    notification = NewSpontaneousJobAppEmployersNotification(job_application=job_application)
+                else:
+                    notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
+
+                notification.send()
+                job_application.email_new_for_job_seeker().send()
+
+                if job_application.is_sent_by_proxy:
+                    job_application.email_new_for_prescriber.send()
+            finally:
+                # We are done, send to the (mostly) stateless final page as we now have no session.
+                # "siae_pk" is kinda useless with "application_pk" but is kept for URL consistency.
+                return HttpResponseRedirect(
+                    reverse(
+                        "apply:application_end", kwargs={"siae_pk": self.siae.pk, "application_pk": job_application.pk}
+                    )
+                )
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        bypass_eligibility_conditions = [
+            # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
+            not self.siae.is_subject_to_eligibility_rules,
+            # Only "authorized prescribers" can perform an eligibility diagnosis.
+            not get_user_info(self.request).is_authorized_prescriber,
+            # No need for eligibility diagnosis if the job seeker already have a PASS IAE
+            self.job_seeker.has_valid_common_approval,
+        ]
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "s3_upload": self.s3_upload,
+            "resume_is_recommended": any(
+                SiaeJobDescription.objects.filter(pk__in=self.apply_session.get("selected_jobs", [])).values_list(
+                    "is_resume_mandatory", flat=True
+                )
+            ),
+            "back_url": reverse(
+                f"apply:application_{'jobs' if any(bypass_eligibility_conditions) else 'eligibility'}",
+                kwargs={"siae_pk": self.siae.pk},
+            ),
+            "progress": 75,
+            "full_content_width": True,
+        }
+
+
+class ApplicationEndView(ApplyStepBaseView):
+    template_name = "apply/submit/application/end.html"
+
+    def __init__(self):
+        super().__init__()
+
+        self.job_application = None
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.job_application = get_object_or_404(
+            JobApplication.objects.select_related("job_seeker", "to_siae"),
+            pk=kwargs.get("application_pk"),
+        )
+        self.form = CreateJobSeekerStep2ForSenderForm(
+            instance=self.job_application.job_seeker, data=request.POST or None
+        )
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            self.form.save()
+            # Redirect to the same page, so we don't have a POST method
+            return HttpResponseRedirect(request.path_info)
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_application": self.job_application,
+            "form": self.form,
+            "can_edit_personal_information": self.request.user.can_edit_personal_information(
+                self.job_application.job_seeker
+            ),
+            "can_view_personal_information": self.request.user.can_view_personal_information(
+                self.job_application.job_seeker
+            ),
         }
 
 
@@ -735,7 +976,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
 
     session_ns = SessionNamespace(request.session, f"job_application-{siae_pk}")
     initial_data = {"selected_jobs": [session_ns.get("job_description_id")]}
-    form = SubmitJobApplicationForm(data=request.POST or None, siae=siae, initial=initial_data)
+    form = SubmitJobApplicationForm(data=request.POST or None, siae=siae, user=request.user, initial=initial_data)
 
     job_seeker = get_object_or_404(User, pk=session_ns.get("job_seeker_pk"))
     _check_job_seeker_approval(request, job_seeker, siae)

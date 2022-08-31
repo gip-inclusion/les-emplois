@@ -1,0 +1,83 @@
+{% extends "layout/base.html" %}
+{% load bootstrap4 %}
+{% load str_filters %}
+
+{% block title %}Postuler{{ block.super }}{% endblock %}
+{% block main_css_classes %}bg-emploi-lightest{% endblock %}
+{% block content_full_viewport %}
+    <section class="s-section-twocolumns">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-7">
+                    <div class="d-flex flex-column flex-md-row align-items-center">
+                        <h1 class="my-5 flex-grow-1">
+                            {% if request.user.is_job_seeker %}
+                                Postuler
+                            {% elif request.user.is_siae_staff %}
+                                Auto-prescription pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+                            {% else %}
+                                Postuler pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+                            {% endif %}
+                        </h1>
+                        {% if is_subject_to_eligibility_rules %}
+                            {% if job_seeker.has_valid_common_approval %}
+                                <span class="badge badge-base badge-pill badge-success"><i class="ri-check-fill"></i>Pass IAE valide</span>
+                            {% elif eligibility_diagnosis %}
+                                <span class="badge badge-base badge-pill badge-success"><i class="ri-check-fill"></i>Éligible à l’IAE</span>
+                            {% else %}
+                                <span class="badge badge-base badge-pill badge-warning"><i class="ri-error-warning-line"></i>Éligibilité IAE à valider</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="c-stepper my-5">
+                        <div class="progress progress--emploi mb-2">
+                            <div class="progress-bar" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <span>
+                            {% block progress_title %}
+                                {% if request.user.is_siae_staff %}
+                                    Auto-prescription
+                                {% else %}
+                                    Postuler
+                                {% endif %}
+                            {% endblock %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12{% if not full_content_width %} col-lg-7{% endif %}">
+                    <div class="c-form">
+                        <div class="col-12 p-0 {% if full_content_width %}col-lg-7 pr-lg-5{% endif %}">
+                            <div class="card c-card c-card--emploi c-card--noshadow mb-3 mb-lg-5">
+                                <div class="card-body">
+                                    <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }} </p>
+                                    <hr>
+                                    <p class="h2">{{ siae.display_name }}</p>
+                                    <address class="card-subtitle fs-lg font-weight-bold text-secondary">{{ siae.address_on_one_line }}</address>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 p-0 {% if full_content_width %}col-lg-7 pr-lg-5{% endif %}">{% block pre_step_title %}{% endblock %}</div>
+                        <h2>{% block step_title %}{% endblock %}</h2>
+                        <hr class="mt-5">
+                        {% bootstrap_form_errors form type="all" %}
+                        <form method="post">
+                            {% csrf_token %}
+
+                            {% block form_content %}{% endblock %}
+
+                            <hr class="my-5">
+                            {% buttons %}
+                                <div class="text-right">
+                                    {% if back_url %}<a class="btn btn-link" href="{{ back_url }}">Retour</a>{% endif %}
+                                    <button type="submit" class="btn btn-primary">Suivant</button>
+                                </div>
+                            {% endbuttons %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

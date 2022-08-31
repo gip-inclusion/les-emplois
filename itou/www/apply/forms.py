@@ -265,33 +265,70 @@ class CreateJobSeekerStep3ForSenderForm(forms.ModelForm):
         ]
 
 
+class ApplicationJobsForm(forms.ModelForm):
+    spontaneous_application = forms.BooleanField(
+        required=False,
+        label="Candidature spontanée",
+    )
+
+    class Meta:
+        model = JobApplication
+        fields = ["selected_jobs", "spontaneous_application"]
+        widgets = {
+            "selected_jobs": forms.CheckboxSelectMultiple,
+        }
+
+    def __init__(self, siae, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["selected_jobs"].queryset = (
+            siae.job_description_through.active().with_annotation_is_popular().prefetch_related("appellation")
+        )
+        if not self.initial.get("selected_jobs"):
+            self.initial["spontaneous_application"] = True
+
+    def clean(self):
+        super().clean()
+
+        if not self.cleaned_data.get("selected_jobs") and not self.cleaned_data.get("spontaneous_application"):
+            raise forms.ValidationError("Sélectionner au moins une option.")
+        if self.cleaned_data.get("selected_jobs") and self.cleaned_data.get("spontaneous_application"):
+            raise forms.ValidationError(
+                f"Vous ne pouvez pas sélectionner des métiers et '{self.fields['spontaneous_application'].label}'."
+            )
+
+
 class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):
     """
     Submit a job application to an SIAE.
     """
 
-    def __init__(self, siae, *args, **kwargs):
+    def __init__(self, siae, user, *args, **kwargs):
         self.siae = siae
         super().__init__(*args, **kwargs)
         self.fields["selected_jobs"].queryset = siae.job_description_through.filter(is_active=True)
-        self.fields["message"].required = True
+
+        self.fields["message"].required = not user.is_siae_staff
+        self.fields["message"].widget.attrs["placeholder"] = ""
+        if user.is_job_seeker:
+            self.fields["message"].label = "Message à l’employeur"
+            help_text = "Message obligatoire à destination de l’employeur et non modifiable après l’envoi."
+        elif user.is_siae_staff:
+            self.fields["message"].label = "Message d’information"
+            help_text = "Ce message ne sera plus modifiable après l’envoi et une copie sera transmise au candidat."
+        else:
+            self.fields["message"].label = "Message à l’employeur"
+            help_text = (
+                "Message obligatoire à destination de l’employeur (avec copie transmise au candidat)"
+                " et non modifiable après l’envoi."
+            )
+        self.fields["message"].help_text = help_text
 
     class Meta:
         model = JobApplication
         fields = ["selected_jobs", "message"] + ResumeFormMixin.Meta.fields
-        widgets = {
-            "selected_jobs": forms.CheckboxSelectMultiple(),
-            "message": forms.Textarea(
-                attrs={
-                    "placeholder": (
-                        "Message à destination de l’employeur (avec copie transmise au candidat)"
-                        " et non modifiable après l’envoi : motivations du candidat, motifs d’orientation, "
-                        "éléments du diagnostic socio-professionnel, ..."
-                    )
-                }
-            ),
-        }
-        labels = {"selected_jobs": "Métiers recherchés (ne rien cocher pour une candidature spontanée)"}
+        widgets = {"selected_jobs": forms.CheckboxSelectMultiple()}
+        labels = {"selected_jobs": "Métiers recherchés"}
 
 
 class RefusalForm(forms.Form):

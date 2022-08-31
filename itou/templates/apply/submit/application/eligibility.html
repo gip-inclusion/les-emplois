@@ -1,0 +1,49 @@
+{% extends "apply/submit/application/base.html" %}
+{% load bootstrap4 %}
+
+
+{% block progress_title %}{{ block.super }} - Éligibilité IAE{% endblock %}
+{% block step_title %}Préciser la situation administrative du candidat (facultatif){% endblock %}
+{% block pre_step_title %}
+    {% if is_subject_to_eligibility_rules and eligibility_diagnosis %}
+        {% if eligibility_diagnosis.author_organization %}
+            <div class="mb-5">
+                <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
+                <p class="text-tertiary font-weight-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
+            </div>
+        {% endif %}
+        <div class="alert alert-info mb-5" role="status">
+            <div class="row">
+                <div class="col-auto pr-0">
+                    <i class="ri-information-line ri-xl"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-2"><strong>Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong></p>
+                    <p class="mb-2">Tant que l’éligibilité IAE est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée jusqu'au {{ new_expires_at_if_updated|date:"d/m/Y" }}.</p>
+                    <span class="btn btn-link text-left p-0 js-display-if-javascript-enabled" data-shroud-clear>Mettre à jour l’éligibilité</span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block form_content %}
+    <div{% if eligibility_diagnosis and not form.is_bound %} class="js-shroud"{% endif %}>
+        <h3 class="h5">Critères administratifs de niveau 1</h3>
+
+        {% for field in form %}
+            {% if form.LEVEL_1_PREFIX in field.name %}
+                {% bootstrap_field field %}
+            {% endif %}
+        {% endfor %}
+
+        <h3 class="h5">Critères administratifs de niveau 2</h3>
+
+        {% for field in form %}
+            {% if form.LEVEL_2_PREFIX in field.name %}
+                {% bootstrap_field field %}
+            {% endif %}
+        {% endfor %}
+        <input type="hidden" name="shrouded" value="1" data-shroud-input />
+    </div>
+{% endblock %}
