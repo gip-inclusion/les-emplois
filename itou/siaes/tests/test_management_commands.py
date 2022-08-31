@@ -33,19 +33,13 @@ class MoveSiaeDataTest(TestCase):
         self.assertEqual(siae2.jobs.count(), 4)
         self.assertEqual(siae2.members.count(), 1)
 
-    def test_stop_if_evaluation_in_place(self):
+    def test_evaluation_data_is_moved(self):
         stderr = io.StringIO()
-        siae1 = siaes_factories.SiaeWithMembershipAndJobsFactory()
+        siae1 = siaes_factories.SiaeFactory()
         siae2 = siaes_factories.SiaeFactory()
         EvaluatedSiaeFactory(siae=siae1)
         management.call_command(
-            "move_siae_data", from_id=siae1.pk, to_id=siae2.pk, stdout=io.StringIO(), stderr=stderr
+            "move_siae_data", from_id=siae1.pk, to_id=siae2.pk, stdout=io.StringIO(), stderr=stderr, wet_run=True
         )
-        self.assertEqual(siae1.jobs.count(), 4)
-        self.assertEqual(siae1.members.count(), 1)
-        self.assertEqual(siae2.jobs.count(), 0)
-        self.assertEqual(siae2.members.count(), 0)
-        self.assertEqual(
-            stderr.getvalue(),
-            f"Moving the SIAE with id={siae1.pk} would cause inconsistencies with the DDETS evaluation campaigns !\n",
-        )
+        self.assertEqual(siae1.evaluated_siaes.count(), 0)
+        self.assertEqual(siae2.evaluated_siaes.count(), 1)

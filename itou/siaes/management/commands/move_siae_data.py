@@ -87,13 +87,6 @@ class Command(BaseCommand):
             self.stderr.write("Unable to find the siae ID %s\n" % to_id)
             return
 
-        if EvaluatedSiae.objects.filter(siae=from_siae).exists():
-            self.stderr.write(
-                "Moving the SIAE with id=%s would cause inconsistencies with the DDETS evaluation campaigns !"
-                % from_id
-            )
-            return
-
         # Intermediate variable for better readability
         move_all_data = not only_job_applications
 
@@ -150,6 +143,9 @@ class Command(BaseCommand):
                 )
             )
             self.stdout.write("| Invitations: %s\n" % invitations.count())
+
+            evaluated_siaes = EvaluatedSiae.objects.filter(siae_id=from_id)
+            self.stdout.write("| Evaluated siaes: %s\n" % evaluated_siaes.count())
 
         self.stdout.write(
             "INTO siae.id=%s - %s %s - %s\n" % (to_siae.pk, to_siae.kind, to_siae.siret, to_siae.display_name)
@@ -219,6 +215,7 @@ class Command(BaseCommand):
                 prolongations.update(declared_by_siae_id=to_id)
                 suspensions.update(siae_id=to_id)
                 invitations.update(siae_id=to_id)
+                evaluated_siaes.update(siae_id=to_id)
                 to_siae_qs.update(
                     brand=from_siae.display_name,
                     description=from_siae.description,
