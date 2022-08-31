@@ -25,7 +25,38 @@ bassin_emploi as ( /* On récupère les infos locales à partir des données inf
     from sa_zones_infradepartementales be
         left join structures s 
             on s.ville = be.libelle_commune and s.nom_département = be.nom_departement /* il faut rajouter le département car la France n'est pas originale en terme de noms de ville */
-) 
+),
+/*On créé une colonne par réseau au cas ou une même structure appartienne à différents réseaux */
+adherents_coorace as ( 
+    select 
+        distinct (ria."SIRET") as siret, 
+        ria."Réseau IAE" as reseau_coorace,
+        s.id as id_structure
+    from reseau_iae_adherents ria 
+        inner join structures s 
+            on s.siret = ria."SIRET"
+    where ria."Réseau IAE" = 'Coorace'
+),
+adherents_fei as ( 
+    select 
+        distinct (ria."SIRET") as siret, 
+        ria."Réseau IAE" as reseau_fei,
+        s.id as id_structure
+    from reseau_iae_adherents ria 
+        inner join structures s 
+            on s.siret = ria."SIRET"
+    where ria."Réseau IAE" = 'FEI'
+),
+adherents_emmaus as ( 
+    select 
+        distinct (ria."SIRET") as siret, 
+        ria."Réseau IAE" as reseau_emmaus,
+        s.id as id_structure
+    from reseau_iae_adherents ria 
+        inner join structures s 
+            on s.siret = ria."SIRET"
+    where ria."Réseau IAE" = 'Emmaus'
+)
 select 
     date_candidature,
     date_embauche,
@@ -83,8 +114,26 @@ select
     nom_epci,
     code_commune,
     nom_arrondissement,
-    bassin_d_emploi    
+    bassin_d_emploi,
+    case 
+        when adherents_emmaus.reseau_emmaus = 'Emmaus' then 'Oui'
+        else 'Non'
+    end reseau_emmaus,
+    case 
+        when adherents_coorace.reseau_coorace= 'Coorace' then 'Oui'
+        else 'Non'
+    end reseau_coorace,
+    case 
+        when adherents_fei.reseau_fei= 'FEI' then 'Oui'
+        else 'Non'
+    end reseau_fei
 from 
     candidatures_p
         left join bassin_emploi
             on bassin_emploi.id_structure = candidatures_p.id_structure  
+        left join adherents_emmaus
+            on adherents_emmaus.id_structure = candidatures_p.id_structure  
+        left join adherents_coorace
+            on adherents_coorace.id_structure = candidatures_p.id_structure  
+        left join adherents_fei
+            on adherents_fei.id_structure = candidatures_p.id_structure 
