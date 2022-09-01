@@ -8,7 +8,10 @@ from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications import models
 from itou.job_applications.enums import SenderKind
 from itou.jobs.models import Appellation
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
+from itou.prescribers.factories import (
+    PrescriberOrganizationWithMembershipFactory,
+    PrescriberPoleEmploiWithMembershipFactory,
+)
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import SiaeJobDescription
 from itou.users.factories import (
@@ -87,16 +90,18 @@ class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationSentByPres
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
-    class Params:
-        sent_by_pole_emploi = factory.Trait(
-            sender_prescriber_organization=factory.SubFactory(PrescriberPoleEmploiFactory, with_membership=True)
-        )
-
 
 class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplicationSentByPrescriberFactory):
     """Generates a JobApplication() object sent by a prescriber member of an authorized organization."""
 
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory, authorized=True)
+    sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
+
+
+class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationSentByPrescriberFactory):
+    """Generates a JobApplication() object sent by a prescriber member of Pôle emploi organization."""
+
+    sender_prescriber_organization = factory.SubFactory(PrescriberPoleEmploiWithMembershipFactory)
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
 
