@@ -354,7 +354,7 @@ class User(AbstractUser, AddressMixin):
     def has_sso_provider(self):
         return self.identity_provider != IdentityProvider.DJANGO or self.is_peamu
 
-    @property
+    @cached_property
     def has_verified_email(self):
         return self.emailaddress_set.filter(email=self.email, verified=True).exists()
 
@@ -485,11 +485,11 @@ class User(AbstractUser, AddressMixin):
             return None
         return self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
 
-    @property
+    @cached_property
     def is_prescriber_with_org(self):
         return self.is_prescriber and self.prescribermembership_set.filter(is_active=True).exists()
 
-    @property
+    @cached_property
     def is_prescriber_with_authorized_org(self):
         return (
             self.is_prescriber
@@ -522,7 +522,7 @@ class User(AbstractUser, AddressMixin):
     def has_pole_emploi_email(self):
         return self.email and self.email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX)
 
-    @property
+    @cached_property
     def is_siae_staff_with_siae(self):
         """
         Useful to identify users deactivated as member of a SIAE

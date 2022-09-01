@@ -558,10 +558,12 @@ class ModelTest(TestCase):
 
         self.assertFalse(user.has_verified_email)
         address = user.emailaddress_set.create(email=user.email, verified=False)
+        del user.has_verified_email
         self.assertFalse(user.has_verified_email)
         address.delete()
 
         user.emailaddress_set.create(email=user.email, verified=True)
+        del user.has_verified_email
         self.assertTrue(user.has_verified_email)
 
     def test_siae_admin_can_create_siae_antenna(self):
