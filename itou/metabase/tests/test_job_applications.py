@@ -8,7 +8,7 @@ from itou.job_applications.factories import (
 )
 from itou.metabase.management.commands import _job_applications
 from itou.metabase.tests._utils import get_fn_by_name
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.enums import PrescriberOrganizationKind
 
 
 def get_result(name, value):
@@ -44,8 +44,8 @@ class MetabaseJobApplicationTest(TestCase):
 
     def test_ja_sent_by_non_pe_prescriber_organization(self):
         ja = JobApplicationSentByPrescriberOrganizationFactory(
-            sender_prescriber_organization__kind=PrescriberOrganization.Kind.CHRS
+            sender_prescriber_organization__kind=PrescriberOrganizationKind.CHRS
         )
-        self.assertNotEqual(ja.sender_prescriber_organization.kind, PrescriberOrganization.Kind.PE)
+        self.assertNotEqual(ja.sender_prescriber_organization.kind, PrescriberOrganizationKind.PE)
         self.assertEqual(get_result(name="nom_prénom_conseiller_pe", value=ja), None)
         self.assertEqual(get_result(name="safir_org_prescripteur", value=ja), None)
