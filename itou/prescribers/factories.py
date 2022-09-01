@@ -23,11 +23,6 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
         with_pending_authorization = factory.Trait(
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
-        with_membership = factory.Trait(
-            membership=factory.RelatedFactory(
-                "itou.prescribers.factories.PrescriberMembershipFactory", "organization"
-            ),
-        )
 
     name = factory.Faker("name", locale="fr_FR")
     # Don't start a SIRET with 0.
