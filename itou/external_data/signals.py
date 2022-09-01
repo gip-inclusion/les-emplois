@@ -3,9 +3,9 @@ from anymail.signals import tracking
 from django.dispatch import receiver
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
+from itou.external_data.apis.pe_connect import import_user_pe_data
 
 from .models import ExternalDataImport, RejectedEmailEventData
-from .tasks import huey_import_user_pe_data
 
 
 def import_user_pe_data_on_peamu_login(sender, **kwargs):
@@ -22,8 +22,7 @@ def import_user_pe_data_on_peamu_login(sender, **kwargs):
         latest_pe_data_import = user.externaldataimport_set.pe_sources().first()
         if latest_pe_data_import is None or latest_pe_data_import.status != ExternalDataImport.STATUS_OK:
             # No data for user or the import failed last time
-            # Async via Huey
-            huey_import_user_pe_data(user, str(login.token), latest_pe_data_import)
+            import_user_pe_data(user, str(login.token), latest_pe_data_import)
 
 
 def store_rejected_email_event(event):
