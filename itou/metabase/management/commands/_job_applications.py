@@ -6,7 +6,7 @@ from itou.metabase.management.commands._utils import (
     get_choice,
     get_department_and_region_columns,
 )
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.enums import PrescriberOrganizationKind
 
 
 JOB_APPLICATION_PK_ANONYMIZATION_SALT = "job_application.id"
@@ -72,7 +72,7 @@ def get_ja_sender_organization_safir(ja):
 
 def get_ja_sender_full_name_if_pe(ja):
     org = ja.sender_prescriber_organization
-    if org and org.kind == PrescriberOrganization.Kind.PE:
+    if org and org.kind == PrescriberOrganizationKind.PE:
         return f"{ja.sender.last_name.upper()} {ja.sender.first_name}"
     return None
 
