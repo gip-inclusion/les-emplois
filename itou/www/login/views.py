@@ -48,7 +48,11 @@ class PrescriberLoginView(ItouLoginView):
         next_url = get_safe_url(self.request, "next")
         if next_url:
             params["next_url"] = next_url
-        inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+        inclusion_connect_url = (
+            f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+            if settings.INCLUSION_CONNECT_BASE_URL
+            else None
+        )
         extra_context = {
             "account_type_display_name": "prescripteur",
             "login_url": reverse("login:prescriber"),

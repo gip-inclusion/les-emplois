@@ -19,6 +19,8 @@
             {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
 
             <hr class="my-5" data-text="ou">
+        {% else %}
+            <p class="font-italic text-center mt-3">Inclusion Connect est momentanément désactivé.</p>
         {% endif %}
 
         <form method="post" action="{{ login_url }}" class="js-prevent-multiple-submit">

@@ -44,7 +44,11 @@ def handle_invited_prescriber_registration(request, invitation):
         "previous_url": request.get_full_path(),
         "next_url": get_safe_url(request, "redirect_to"),
     }
-    inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+    inclusion_connect_url = (
+        f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+        if settings.INCLUSION_CONNECT_BASE_URL
+        else None
+    )
     context = {
         "inclusion_connect_url": inclusion_connect_url,
         "invitation": invitation,

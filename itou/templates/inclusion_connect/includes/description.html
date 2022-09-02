@@ -5,7 +5,12 @@
     Inclusion Connect est une solution de connexion unique à plusieurs services publics réservée aux professionnels de l’inclusion.
 </p>
 
-{% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
+
+{% if inclusion_connect_url %}
+    {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
+{% else %}
+    <p class="font-italic text-center mt-3">Inclusion Connect est momentanément désactivé.</p>
+{% endif %}
 
 <p class="text-center font-weight-bold mt-5">
     La plateforme de l’inclusion met en place

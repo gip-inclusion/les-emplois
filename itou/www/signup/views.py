@@ -623,7 +623,11 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
         "previous_url": request.get_full_path(),
         "next_url": reverse("signup:prescriber_join_org"),
     }
-    inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+    inclusion_connect_url = (
+        f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+        if settings.INCLUSION_CONNECT_BASE_URL
+        else None
+    )
 
     context = {
         "inclusion_connect_url": inclusion_connect_url,
@@ -683,7 +687,11 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
         # Redirect to the join organization view after login or signup.
         ic_params["next_url"] = reverse("signup:prescriber_join_org")
 
-    inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(ic_params)}"
+    inclusion_connect_url = (
+        f"{reverse('inclusion_connect:authorize')}?{urlencode(ic_params)}"
+        if settings.INCLUSION_CONNECT_BASE_URL
+        else None
+    )
 
     context = {
         "inclusion_connect_url": inclusion_connect_url,
