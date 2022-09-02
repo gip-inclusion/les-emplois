@@ -1,6 +1,5 @@
 from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
-from allauth.socialaccount.models import SocialAccount
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Exists, OuterRef
@@ -166,7 +165,7 @@ class ItouUserAdmin(UserAdmin):
         "last_name",
         "birthdate",
         "is_staff",
-        "is_peamu",
+        "identity_provider",
         "is_created_by_a_proxy",
         "has_verified_email",
         "last_login",
@@ -235,13 +234,6 @@ class ItouUserAdmin(UserAdmin):
     is_created_by_a_proxy.boolean = True
     is_created_by_a_proxy.short_description = "créé par un tiers"
 
-    def is_peamu(self, obj):
-        return obj._is_peamu
-
-    is_peamu.boolean = True
-    is_peamu.admin_order_field = "_is_peamu"
-    is_peamu.short_description = "pe connect"
-
     @admin.display(description="id ITOU obfusqué")
     def jobseeker_hash_id(self, obj):
         return obj.jobseeker_hash_id
@@ -256,9 +248,7 @@ class ItouUserAdmin(UserAdmin):
             qs = qs.exclude(is_superuser=True)
         if request.resolver_match.view_name.endswith("changelist"):
             has_verified_email = EmailAddress.objects.filter(email=OuterRef("email"), verified=True)
-            is_peamu = SocialAccount.objects.filter(user_id=OuterRef("pk"), provider="peamu")
             qs = qs.annotate(_has_verified_email=Exists(has_verified_email))
-            qs = qs.annotate(_is_peamu=Exists(is_peamu))
         return qs
 
     def get_readonly_fields(self, request, obj=None):
