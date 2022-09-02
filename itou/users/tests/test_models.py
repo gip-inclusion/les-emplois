@@ -528,7 +528,7 @@ class ModelTest(TestCase):
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
 
         # Non CD organization does not give access.
-        org = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        org = PrescriberOrganizationWithMembershipFactory(authorized=True, kind=PrescriberOrganizationKind.CHRS)
         user = org.members.get()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
