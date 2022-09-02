@@ -217,13 +217,13 @@ def render_stats_pe(request, page_title):
     current_org = get_current_org_or_404(request)
     if not request.user.can_view_stats_pe(current_org=current_org):
         raise PermissionDenied
-    department = request.user.get_stats_pe_department(current_org=current_org)
+    departments = request.user.get_stats_pe_departments(current_org=current_org)
     params = {
-        DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
+        DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
     context = {
         "page_title": page_title,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(departments[0]),
     }
     return render_stats(request=request, context=context, params=params)
 

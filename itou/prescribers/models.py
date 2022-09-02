@@ -88,6 +88,29 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     In case 3, we talk about "prescripteur habilité" in French.
     """
 
+    # DRPE, as in "Direction Régionale Pôle emploi", are special PE agencies which oversee their whole region.
+    # We keep it simple by hardcoding their (short) list here to avoid the complexity of adding a field or a kind.
+    DRPE_SAFIR_CODES = [
+        "13992",
+        "20010",
+        "21069",
+        "31096",
+        "33127",
+        "35076",
+        "44116",
+        "45054",
+        "59212",
+        "67085",
+        "69188",
+        "75980",
+        "76115",
+        "97110",
+        "97210",
+        "97310",
+        "97410",
+        "97600",
+    ]
+
     # Rules:
     # - a SIRET was not mandatory in the past (some entries still have a "blank" siret)
     # - a SIRET is now required for all organizations, except for Pôle emploi agencies
@@ -269,6 +292,13 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         subject = "prescribers/email/must_validate_prescriber_organization_email_subject.txt"
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
+
+    @property
+    def is_drpe(self):
+        """
+        DRPE, as in "Direction Régionale Pôle emploi", are special PE agencies which oversee their whole region.
+        """
+        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi in self.DRPE_SAFIR_CODES
 
 
 class PrescriberMembership(MembershipAbstract):
