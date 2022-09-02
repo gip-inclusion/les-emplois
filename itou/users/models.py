@@ -619,7 +619,6 @@ class User(AbstractUser, AddressMixin):
             and current_org.kind == PrescriberOrganizationKind.PE
             and current_org.is_authorized
             and current_org.authorization_status == PrescriberAuthorizationStatus.VALIDATED
-            and current_org.department in settings.STATS_PE_DEPARTMENT_WHITELIST
         )
 
     def get_stats_pe_departments(self, current_org):

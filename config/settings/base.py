@@ -563,7 +563,6 @@ PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_W
 # Specific stats are progressively being deployed to more and more departments and specific users.
 STATS_SIAE_DEPARTMENT_WHITELIST = ["38", "62", "67", "93"]
 STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
-STATS_PE_DEPARTMENT_WHITELIST = ["38", "62", "67", "93"]
 
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
 PILOTAGE_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/pilotage"
