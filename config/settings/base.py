@@ -560,8 +560,7 @@ METABASE_DASHBOARD_IDS = {
 }
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
 
-# Specific stats are progressively being deployed to more and more departments and specific users.
-STATS_SIAE_DEPARTMENT_WHITELIST = ["38", "62", "67", "93"]
+# Some experimental stats are progressively being deployed to more and more specific beta users.
 STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"

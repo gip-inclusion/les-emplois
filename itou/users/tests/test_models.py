@@ -5,7 +5,6 @@ import uuid
 from unittest import mock
 
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import TestCase
@@ -15,7 +14,6 @@ import itou.asp.factories as asp
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, EmployerType
-from itou.common_apps.address.departments import DEPARTMENTS
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionWithMembershipFactory
@@ -478,10 +476,9 @@ class ModelTest(TestCase):
 
     def test_can_view_stats_siae_hiring(self):
         # An employer can only view hiring stats of their own SIAE.
-        deployed_department = settings.STATS_SIAE_DEPARTMENT_WHITELIST[0]
-        siae1 = SiaeFactory(with_membership=True, department=deployed_department)
+        siae1 = SiaeFactory(with_membership=True)
         user1 = siae1.members.get()
-        siae2 = SiaeFactory(department=deployed_department)
+        siae2 = SiaeFactory()
 
         self.assertTrue(siae1.has_member(user1))
         self.assertTrue(user1.can_view_stats_siae_hiring(current_org=siae1))
@@ -489,16 +486,9 @@ class ModelTest(TestCase):
         self.assertFalse(user1.can_view_stats_siae_hiring(current_org=siae2))
 
         # Even non admin members can view their SIAE stats.
-        siae3 = SiaeFactory(department=deployed_department, with_membership=True, membership__is_admin=False)
+        siae3 = SiaeFactory(with_membership=True, membership__is_admin=False)
         user3 = siae3.members.get()
         self.assertTrue(user3.can_view_stats_siae_hiring(current_org=siae3))
-
-        # Non deployed department cannot be accessed.
-        non_deployed_departments = [dpt for dpt in DEPARTMENTS if dpt not in settings.STATS_SIAE_DEPARTMENT_WHITELIST]
-        non_deployed_department = non_deployed_departments[0]
-        siae4 = SiaeFactory(department=non_deployed_department, with_membership=True)
-        user4 = siae4.members.get()
-        self.assertFalse(user4.can_view_stats_siae_hiring(current_org=siae4))
 
     def test_can_view_stats_cd(self):
         """

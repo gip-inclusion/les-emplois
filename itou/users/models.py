@@ -575,10 +575,7 @@ class User(AbstractUser, AddressMixin):
         return self._can_view_stats_siae(current_org) and self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
 
     def can_view_stats_siae_hiring(self, current_org):
-        return self._can_view_stats_siae(current_org) and (
-            current_org.department in settings.STATS_SIAE_DEPARTMENT_WHITELIST
-            or self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
-        )
+        return self._can_view_stats_siae(current_org)
 
     def can_view_stats_cd(self, current_org):
         """
