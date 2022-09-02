@@ -68,13 +68,13 @@ Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/is
     $ docker-compose run --service-ports django
 
 Une fois votre serveur de développement lancé, vous pouvez accéder au frontend à
-l'adresse http://localhost:8080/.
+l'adresse http://127.0.0.1:8000/.
 
 Dans un Virtualenv, vous pouvez utiliser les commandes Django habituelles
-(`./manage.py`) mais également certaines recettes du Makefile, celles-ci 
+(`./manage.py`) mais également certaines recettes du Makefile, celles-ci
 seront lancées directement dans votre venv si `USE_VENV=1` est utilisé.
 Cette variable devrait _normalement_ pouvoir être définie en global dans
-votre environnement shell (`export`, `.env`, ...). 
+votre environnement shell (`export`, `.env`, ...).
 
 ### Peupler la base de données
 

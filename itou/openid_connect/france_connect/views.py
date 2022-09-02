@@ -33,8 +33,7 @@ def get_callback_redirect_uri(request) -> str:
         redirect_uri += f"?next={next_url}"
 
     # The redirect_uri should be defined in the FC settings to be allowed
-    # The integration platform allows "http://localhost:8080/callback" so an associated endpoint
-    # should be set in itou.
+    # NB: the integration platform allows "http://127.0.0.1:8000/franceconnect/callback"
     return redirect_uri
 
 
