@@ -2,7 +2,9 @@
 <section class="s-preheader d-none d-xl-block">
     <div class="container s-preheader__container">
         <div class="row">
-            <div class="col-12 s-preheader__col d-flex align-items-center justify-content-end">
+            <div
+                class="col-12 s-preheader__col d-flex align-items-center justify-content-end"
+            >
                 {% include 'layout/_nav_preheader_items.html' %}
             </div>
         </div>
@@ -11,29 +13,78 @@
 <header class="s-header s-header--emploi sticky-top" role="banner" id="header">
     <section class="s-header__container container">
         <div class="s-header__row row">
-            <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center pr-0 pr-md-3">
-                <a href="/" class="s-header__logo-ministere"><img src="{% static_theme_images 'logo-ministere-emploi.svg' %}" alt="Ministère de l'emploi" /></a>
+            <div
+                class="s-header__col s-header__col--logo col-auto d-flex align-items-center pr-0 pr-md-3"
+            >
+                <a href="/" class="s-header__logo-ministere"
+                ><img
+                    src="{% static_theme_images 'logo-ministere-emploi.svg' %}"
+                    alt="Ministère du travail, du plein emploi et de l'insertion"
+                /></a>
             </div>
-            <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center px-0 px-md-3">
-                <a href="/"><img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" /></a>
+            <div
+                class="s-header__col s-header__col--logo col-auto d-flex align-items-center px-0 px-md-3"
+            >
+                <a href="/"
+                ><img
+                    src="{% static_theme_images 'logo-emploi-inclusion.svg' %}"
+                    alt="Les emplois de l'inclusion"
+                /></a>
             </div>
-            <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
-                <nav role="navigation" id="nav-primary" aria-label="Navigation principale">
+            <div
+                class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end"
+            >
+                <nav
+                    role="navigation"
+                    id="nav-primary"
+                    aria-label="Navigation principale"
+                >
                     <ul class="list-inline">
                         {% include 'layout/_nav_btn_items.html' %}
                     </ul>
                 </nav>
             </div>
-            <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none" data-toggle="burger" aria-controls="burgerNav" tabindex="0">
+            <div
+                class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none"
+                data-toggle="burger"
+                aria-controls="burgerNav"
+                tabindex="0"
+            >
                 <span id="burger">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="51" viewBox="0 0 36 51" role="img" aria-labelledby="title_burger">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="36"
+                        height="51"
+                        viewBox="0 0 36 51"
+                        role="img"
+                        aria-labelledby="title_burger"
+                    >
                         <g fill="none" fill-rule="evenodd">
-                            <g fill="#000638" fill-rule="nonzero" transform="translate(2)">
+                            <g
+                                fill="#000638"
+                                fill-rule="nonzero"
+                                transform="translate(2)"
+                            >
                                 <rect width="32" height="4" rx="2"></rect>
-                                <rect width="32" height="4" y="12" rx="2"></rect>
-                                <rect width="32" height="4" y="24" rx="2"></rect>
+                                <rect
+                                    width="32"
+                                    height="4"
+                                    y="12"
+                                    rx="2"
+                                ></rect>
+                                <rect
+                                    width="32"
+                                    height="4"
+                                    y="24"
+                                    rx="2"
+                                ></rect>
                             </g>
-                            <text fill="#000638" font-family="Roboto" font-size="13" font-weight="400">
+                            <text
+                                fill="#000638"
+                                font-family="Roboto"
+                                font-size="13"
+                                font-weight="400"
+                            >
                                 <tspan x="2" y="45" id="title_burger">
                                     Menu
                                 </tspan>
@@ -42,13 +93,47 @@
                     </svg>
                 </span>
                 <span id="close">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="45" viewBox="0 0 44 45" role="img" aria-labelledby="title_close">
-                        <g fill="none" fill-rule="evenodd" transform="translate(-1 -2)">
-                            <g fill="#000638" fill-rule="nonzero" transform="translate(10 1)">
-                                <rect width="32" height="4" x="-3" y="11" rx="2" transform="rotate(45 13 13)"></rect>
-                                <rect width="32" height="4" x="-3" y="11" rx="2" transform="rotate(-45 13 13)"></rect>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="44"
+                        height="45"
+                        viewBox="0 0 44 45"
+                        role="img"
+                        aria-labelledby="title_close"
+                    >
+                        <g
+                            fill="none"
+                            fill-rule="evenodd"
+                            transform="translate(-1 -2)"
+                        >
+                            <g
+                                fill="#000638"
+                                fill-rule="nonzero"
+                                transform="translate(10 1)"
+                            >
+                                <rect
+                                    width="32"
+                                    height="4"
+                                    x="-3"
+                                    y="11"
+                                    rx="2"
+                                    transform="rotate(45 13 13)"
+                                ></rect>
+                                <rect
+                                    width="32"
+                                    height="4"
+                                    x="-3"
+                                    y="11"
+                                    rx="2"
+                                    transform="rotate(-45 13 13)"
+                                ></rect>
                             </g>
-                            <text fill="#000638" font-family="Roboto" font-size="13" font-weight="400">
+                            <text
+                                fill="#000638"
+                                font-family="Roboto"
+                                font-size="13"
+                                font-weight="400"
+                            >
                                 <tspan x="3" y="45" id="title_close">
                                     Fermer
                                 </tspan>
@@ -62,33 +147,46 @@
                     <ul>
                         {% if user.is_authenticated %}
                             <li>
-                                <a class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}" href="{% url 'dashboard:index' %}">
+                                <a
+                                    class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}"
+                                    href="{% url 'dashboard:index' %}"
+                                >
                                     <span>Tableau de bord</span>
                                 </a>
                             </li>
                         {% endif %}
                         <li>
-                            <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="/">
+                            <a
+                                class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}"
+                                href="/"
+                            >
                                 <span>Rechercher des employeurs</span>
                             </a>
                         </li>
                         <li>
-                            <a class="{% if '/search/prescribers' in request.path %}font-weight-bold{% endif %}" href="{% url 'search:prescribers_home' %}">
+                            <a
+                                class="{% if '/search/prescribers' in request.path %}font-weight-bold{% endif %}"
+                                href="{% url 'search:prescribers_home' %}"
+                            >
                                 <span>Rechercher des prescripteurs</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">
+                            <a
+                                href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/"
+                                rel="noopener"
+                                target="_blank"
+                                aria-label="Accéder à l'espace de documentation (nouvel onglet)"
+                            >
                                 <span>Documentation</span>
                                 <i class="ri-arrow-right-up-line ri-lg"></i>
                             </a>
                         </li>
-                        {% include 'layout/_nav_btn_items.html' with button_size='btn-sm' %}
+                        {% include 'layout/_nav_btn_items.html' with
+                        button_size='btn-sm' %}
                     </ul>
                 </nav>
-                <div>
-                    {% include 'layout/_nav_preheader_items.html' %}
-                </div>
+                <div>{% include 'layout/_nav_preheader_items.html' %}</div>
             </div>
         </div>
     </section>
@@ -96,28 +194,44 @@
 <section class="s-postheader d-none d-xl-block">
     <div class="container s-postheader__container">
         <div class="row">
-            <div class="col-12 s-postheader__col s-postheader__col--nav d-flex align-items-center">
+            <div
+                class="col-12 s-postheader__col s-postheader__col--nav d-flex align-items-center"
+            >
                 <nav role="navigation">
                     <ul>
                         {% if user.is_authenticated %}
                             <li>
-                                <a class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}" href="{% url 'dashboard:index' %}">
+                                <a
+                                    class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}"
+                                    href="{% url 'dashboard:index' %}"
+                                >
                                     <span>Tableau de bord</span>
                                 </a>
                             </li>
                         {% endif %}
                         <li>
-                            <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="/">
+                            <a
+                                class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}"
+                                href="/"
+                            >
                                 <span>Rechercher des employeurs</span>
                             </a>
                         </li>
                         <li>
-                            <a class="{% if '/search/prescribers' in request.path %}font-weight-bold{% endif %}" href="{% url 'search:prescribers_home' %}">
+                            <a
+                                class="{% if '/search/prescribers' in request.path %}font-weight-bold{% endif %}"
+                                href="{% url 'search:prescribers_home' %}"
+                            >
                                 <span>Rechercher des prescripteurs</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">
+                            <a
+                                href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/"
+                                rel="noopener"
+                                target="_blank"
+                                aria-label="Accéder à l'espace de documentation (nouvel onglet)"
+                            >
                                 <span>Documentation</span>
                                 <i class="ri-arrow-right-up-line ri-lg"></i>
                             </a>
