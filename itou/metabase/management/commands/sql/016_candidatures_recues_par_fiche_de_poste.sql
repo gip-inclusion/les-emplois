@@ -20,6 +20,7 @@ select
     c.motif_de_refus,
     c.nom_département_structure,
     c.nom_org_prescripteur,
+    c.id_org_prescripteur,
     c.nom_structure,
     c.origine as origine_candidature,
     c.origine_détaillée as origine_détaillée_candidature,
