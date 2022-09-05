@@ -68,6 +68,17 @@ class EmployeeRecordAddressSerializerTest(TestCase):
         self.assertIsNotNone(data)
         self.assertEqual(good_lane_name, data["adrLibelleVoie"])
 
+    def test_null_hexa_commune_code(self):
+        employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+        job_seeker = employee_record.job_seeker
+        job_seeker.jobseeker_profile.hexa_commune = None
+        job_seeker.jobseeker_profile.save(update_fields=["hexa_commune"])
+
+        serializer = _AddressSerializer(job_seeker)
+        data = serializer.data
+
+        self.assertNotIn("codeinseecom", data.keys())
+
 
 class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
     def test_notification_serializer(self):

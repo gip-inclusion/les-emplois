@@ -89,7 +89,7 @@ class _AddressSerializer(serializers.Serializer):
     adrLibelleVoie = serializers.SerializerMethodField()
     adrCpltDistribution = serializers.SerializerMethodField()
 
-    codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code")
+    codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code", required=False)
     codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")
 
     def get_adrCpltDistribution(self, obj: User):
