@@ -49,8 +49,8 @@ class _PersonSerializer(serializers.Serializer):
     # codeComInsee is only mandatory if birth country is France
     codeComInsee = serializers.SerializerMethodField(required=False)
 
-    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="approval.start_at")
-    passDateFin = serializers.DateField(format="%d/%m/%Y", source="approval.end_at")
+    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="approval.start_at", required=False)
+    passDateFin = serializers.DateField(format="%d/%m/%Y", source="approval.end_at", required=False)
 
     def get_nomUsage(self, obj: EmployeeRecord):
         return unidecode(obj.job_seeker.last_name).upper()

@@ -246,6 +246,23 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         self.assertEqual(results.get("adresse").get("adrTelephone"), self.user.phone)
         self.assertEqual(results.get("adresse").get("adrMail"), self.user.email)
 
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_missing_approval(self, _mock):
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
+        employee_record_sent = EmployeeRecord.from_job_application(job_application=job_application)
+        employee_record_sent.update_as_ready()
+
+        job_application.approval.delete()
+
+        self.client.login(username=self.siae_member.username, password=DEFAULT_PASSWORD)
+        response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+        self.assertEqual(len(json.get("results")), 2)
+
 
 class EmployeeRecordAPIParametersTest(APITestCase):
 
