@@ -405,8 +405,8 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         post_data = {
             "first_name": invitation.first_name,
             "last_name": invitation.last_name,
-            "password1": "Erls92#32",
-            "password2": "Erls92#32",
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(invitation.acceptance_link, data=post_data, follow=True)
         self.assertContains(response, escape("Cette invitation n'est plus valide."))

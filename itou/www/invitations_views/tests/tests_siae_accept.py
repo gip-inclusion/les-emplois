@@ -48,7 +48,7 @@ class TestAcceptInvitation(TestCase):
         # Fill in the password and send
         response = self.client.post(
             invitation.acceptance_link,
-            data={**form_data, "password1": "Erls92#32", "password2": "Erls92#32"},
+            data={**form_data, "password1": DEFAULT_PASSWORD, "password2": DEFAULT_PASSWORD},
             follow=True,
         )
         self.assertRedirects(response, reverse("dashboard:index"))
@@ -83,8 +83,8 @@ class TestAcceptInvitation(TestCase):
             "first_name": invitation.first_name,
             "last_name": invitation.last_name,
             "email": "hey@you.com",
-            "password1": "Erls92#32",
-            "password2": "Erls92#32",
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
 
         # Fill in the password and send
@@ -165,8 +165,8 @@ class TestAcceptInvitation(TestCase):
             "first_name": invitation.first_name,
             "last_name": invitation.last_name,
             "email": invitation.email,
-            "password1": "Erls92#32",
-            "password2": "Erls92#32",
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(invitation.acceptance_link, data=form_data)
         self.assertContains(response, escape("La structure que vous souhaitez rejoindre n'est plus active."))

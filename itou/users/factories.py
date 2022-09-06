@@ -16,7 +16,7 @@ from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK
 from itou.utils.validators import validate_nir
 
 
-DEFAULT_PASSWORD = "P4ssw0rd!*"
+DEFAULT_PASSWORD = "P4ssw0rd!***"
 
 # Register ASP fakers
 factory.Faker.add_provider(INSEECommuneProvider)

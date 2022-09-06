@@ -8,11 +8,8 @@ from django.urls import reverse
 
 from itou.openid_connect.inclusion_connect.tests import mock_oauth_dance
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory, SiaeStaffFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
 from itou.users.models import User
-
-
-PASSWORD = "A23kf&!9jd"
 
 
 def get_confirm_email_url(request, email):
@@ -45,8 +42,8 @@ class WelcomingTourTest(TestCase):
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
             "email": job_seeker.email,
-            "password1": PASSWORD,
-            "password2": PASSWORD,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
         response = self.verify_email(response.wsgi_request, email=job_seeker.email)
@@ -57,7 +54,7 @@ class WelcomingTourTest(TestCase):
 
         self.client.logout()
         response = self.client.post(
-            reverse("login:job_seeker"), follow=True, data={"login": job_seeker.email, "password": PASSWORD}
+            reverse("login:job_seeker"), follow=True, data={"login": job_seeker.email, "password": DEFAULT_PASSWORD}
         )
         self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertContains(response, "Revoir le message")
@@ -94,8 +91,8 @@ class WelcomingTourTest(TestCase):
             "first_name": employer.first_name,
             "last_name": employer.last_name,
             "email": employer.email,
-            "password1": PASSWORD,
-            "password2": PASSWORD,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
         response = self.verify_email(response.wsgi_request, email=employer.email)
@@ -106,7 +103,7 @@ class WelcomingTourTest(TestCase):
 
         self.client.logout()
         response = self.client.post(
-            reverse("login:siae_staff"), follow=True, data={"login": employer.email, "password": PASSWORD}
+            reverse("login:siae_staff"), follow=True, data={"login": employer.email, "password": DEFAULT_PASSWORD}
         )
         self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertContains(response, "Revoir le message")
@@ -135,8 +132,8 @@ class WelcomingTourExceptions(TestCase):
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
             "email": job_seeker.email,
-            "password1": PASSWORD,
-            "password2": PASSWORD,
+            "password1": DEFAULT_PASSWORD,
+            "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
         response = self.verify_email(job_seeker.email, response.wsgi_request)

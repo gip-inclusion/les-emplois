@@ -79,7 +79,7 @@ class PasswordChangeTest(TestCase):
         url = reverse("account_change_password")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        new_password = "Mlkjhgf!sq2"
+        new_password = "Mlkjhgf!sq2a"
         post_data = {"oldpassword": DEFAULT_PASSWORD, "password1": new_password, "password2": new_password}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
