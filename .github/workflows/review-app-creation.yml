@@ -45,7 +45,10 @@ jobs:
 
     - name: 🏷 Set deploy url
       run:
-        echo "DEPLOY_URL=`echo \"$REVIEW_APP_NAME.cleverapps.io\"`" >> $GITHUB_ENV
+        # The maximum length of a domain label (part of domain name separated
+        # by dot) is 63 characters.
+        # https://datatracker.ietf.org/doc/html/rfc1035#section-2.3.4
+        echo "DEPLOY_URL=`echo \"${REVIEW_APP_NAME::63}.cleverapps.io\"`" >> $GITHUB_ENV
     # End of environment variables
 
     - name: 🧫 Create a review app on Clever Cloud
