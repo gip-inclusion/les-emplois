@@ -21,6 +21,7 @@ select
     c.nom_département_structure,
     c.nom_org_prescripteur,
     c.id_org_prescripteur,
+    o.nom_département as nom_département_prescripteur,
     c.nom_structure,
     c.origine as origine_candidature,
     c.origine_détaillée as origine_détaillée_candidature,
@@ -40,6 +41,9 @@ select
     fdp.siret_employeur
 from 
     candidatures c 
+left join
+    organisations o     
+    on o.id = c.id_org_prescripteu
 inner join 
     fiches_de_poste_par_candidature fdppc 
     on c.id_anonymisé = fdppc.id_anonymisé_candidature 
