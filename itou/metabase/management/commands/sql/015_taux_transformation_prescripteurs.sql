@@ -22,6 +22,7 @@ with candidats_p as ( /* Ici on sélectionne les colonnes pertinentes à partir 
 	cdd.type_auteur_diagnostic,
 	cdd.sous_type_auteur_diagnostic, 
 	cdd.nom_auteur_diagnostic,
+	cdd.id_auteur_diagnostic_prescripteur as id_org_prescripteur,
 	cdd.total_candidatures, 
 	cdd.total_diagnostics,
 	cdd.total_embauches,
@@ -77,6 +78,7 @@ select /* On selectionne les colonnes finales qui nous intéressent */
 	when candidats_p.sous_type_auteur_diagnostic = 'Prescripteur SPIP' then 'SPIP - Service pénitentiaire d''insertion et de probation'
     end type_auteur_diagnostic_detaille, 
     nom_auteur_diagnostic,
+    id_org_prescripteur,
     total_candidatures,
     total_diagnostics,
     total_embauches,
