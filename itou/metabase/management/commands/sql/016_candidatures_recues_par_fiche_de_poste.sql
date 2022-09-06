@@ -43,7 +43,7 @@ from
     candidatures c 
 left join
     organisations o     
-    on o.id = c.id_org_prescripteu
+    on o.id = c.id_org_prescripteur
 inner join 
     fiches_de_poste_par_candidature fdppc 
     on c.id_anonymisé = fdppc.id_anonymisé_candidature 
