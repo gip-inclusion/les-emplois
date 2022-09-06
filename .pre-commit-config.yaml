@@ -1,21 +1,23 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 22.3.0
+  - repo: local
     hooks:
       - id: black
-        language_version: python3
-  - repo: https://github.com/pycqa/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort
-  - repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
-    hooks:
+        name: Black
+        entry: black
+        types: [python]
+        language: system
       - id: flake8
-        language_version: python3
-  - repo: https://github.com/Riverside-Healthcare/djlint
-    rev: v1.17.2
-    hooks:
+        name: Flake8
+        entry: flake8
+        types: [python]
+        language: system
+      - id: isort
+        name: isort
+        entry: isort
+        types: [python]
+        language: system
       - id: djlint
-        language_version: python3
-
+        name: djlint
+        entry: djlint --reformat
+        types: [html]
+        language: system
