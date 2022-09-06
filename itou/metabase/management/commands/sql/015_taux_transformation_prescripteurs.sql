@@ -32,6 +32,12 @@ with candidats_p as ( /* Ici on sélectionne les colonnes pertinentes à partir 
     from
 	public.candidats as cdd /* cdd pour CanDiDats */
     where type_auteur_diagnostic = ('Prescripteur') and injection_ai = 0
+),
+prescripteurs as (
+    select 
+        id,
+        nom_département as nom_département_prescripteur /* Ajout du département du prescripteur pour les TBs privés */
+    from organisations o 
 )
 select /* On selectionne les colonnes finales qui nous intéressent */
     id_candidat_anonymise,
@@ -79,6 +85,7 @@ select /* On selectionne les colonnes finales qui nous intéressent */
     end type_auteur_diagnostic_detaille, 
     nom_auteur_diagnostic,
     id_org_prescripteur,
+    nom_département_prescripteur,
     total_candidatures,
     total_diagnostics,
     total_embauches,
@@ -87,3 +94,5 @@ select /* On selectionne les colonnes finales qui nous intéressent */
     injection_ai
 from 
     candidats_p
+    	left join prescripteurs
+            on prescripteurs.id = candidats_p.id_org_prescripteur
