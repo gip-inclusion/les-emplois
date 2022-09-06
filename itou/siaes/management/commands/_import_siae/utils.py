@@ -13,6 +13,7 @@ import pandas as pd
 from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
 
@@ -125,7 +126,9 @@ def remap_columns(df, column_mapping):
 
 
 def could_siae_be_deleted(siae):
-    if siae.members.count() >= 1 or siae.job_applications_received.count() >= 1:
+    if siae.evaluated_siaes.exists():
+        return False
+    if siae.job_applications_received.exclude(state=JobApplicationWorkflow.STATE_NEW).exists():
         return False
     # An ASP siae can only be deleted when all its antennas have been deleted.
     if siae.source == Siae.SOURCE_ASP:
