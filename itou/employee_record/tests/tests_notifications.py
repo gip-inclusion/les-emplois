@@ -116,9 +116,12 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.end_at = timezone.localdate() + timedelta(days=2)
         approval.save()
 
-        self.assertEqual(2, EmployeeRecordUpdateNotification.objects.new().count())
-        self.assertEqual(employee_record_1, EmployeeRecordUpdateNotification.objects.first().employee_record)
-        self.assertEqual(employee_record_2, EmployeeRecordUpdateNotification.objects.all()[1].employee_record)
+        self.assertQuerysetEqual(
+            EmployeeRecordUpdateNotification.objects.new(),
+            [employee_record_1.pk, employee_record_2.pk],
+            transform=lambda notif: notif.employee_record_id,
+            ordered=False,
+        )
 
     def test_update_with_suspension(self):
         # Creation of a suspension on an approval linked to an employee record
