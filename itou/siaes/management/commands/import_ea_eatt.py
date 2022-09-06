@@ -69,6 +69,7 @@ def get_ea_eatt_df():
     # Replace NaN elements with None.
     df = df.replace({np.nan: None})
 
+    df = df[df.kind != "Entreprise Adaptée en Milieu Pénitentiaire"]
     df["kind"] = df.kind.apply(convert_kind)
 
     # Drop rows without siret.
