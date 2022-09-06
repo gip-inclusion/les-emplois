@@ -159,13 +159,12 @@ def create(request, job_application_id, template_name="employee_record/create.ht
 
         # Create jobseeker_profile if needed
         employee = job_application.job_seeker
-        profile, _ = JobSeekerProfile.objects.get_or_create(user=employee)
+        profile, profile_was_created = JobSeekerProfile.objects.get_or_create(user=employee)
 
         # Try a geo lookup of the address every time we call this form
         try:
             profile.update_hexa_address()
         except ValidationError as ex:
-            # cleanup address
             profile.clear_hexa_address()
             messages.error(
                 request,
@@ -175,8 +174,11 @@ def create(request, job_application_id, template_name="employee_record/create.ht
             )
         except Exception as ex:
             messages.error(request, f"Une erreur est survenue : {ex=}")
+            if profile_was_created:
+                # Don't keep incomplete profiles in DB
+                profile.delete()
         else:
-            return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
+            return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.pk,)))
 
     context = {
         "job_application": job_application,
@@ -350,7 +352,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     if request.method == "POST":
         if employee_record.status in [Status.NEW, Status.REJECTED, Status.DISABLED]:
             employee_record.update_as_ready()
-        return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.id,)))
+        return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.pk,)))
 
     context = {
         "employee_record": employee_record,

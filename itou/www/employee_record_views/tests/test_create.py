@@ -38,7 +38,9 @@ class AbstractCreateEmployeeRecordTest(TestCase):
     ]
 
     def setUp(self):
-        self.siae = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
+        self.siae = SiaeWithMembershipAndJobsFactory(
+            name="Evil Corp.", membership__user__first_name="Elliot", kind="EI"
+        )
         self.siae_without_perms = SiaeWithMembershipAndJobsFactory(
             kind="EI", name="A-Team", membership__user__first_name="Hannibal"
         )
@@ -52,6 +54,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
 
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
+            job_seeker_with_address=True,
         )
         self.job_seeker = self.job_application.job_seeker
 
@@ -237,7 +240,10 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
 
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
+        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
+            to_siae=self.siae,
+            job_seeker_with_address=True,
+        )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
 
@@ -267,7 +273,10 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
     def test_invalid_address(self):
         # Was using a mock (or not using it actually), but a proper factory will do
-        self.job_application = JobApplicationWithJobSeekerProfileFactory(to_siae=self.siae)
+        self.job_application = JobApplicationWithJobSeekerProfileFactory(
+            to_siae=self.siae,
+            job_seeker_with_address=True,
+        )
         self.job_seeker = self.job_application.job_seeker
 
         # Pass step 1
@@ -281,12 +290,15 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         # Try to force the way
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
     def test_update_with_bad_address(self):
         # If HEXA address is valid, user can still change it
         # but it must be a valid one, otherwise the previous address is discarded
-        self.job_application = JobApplicationWithJobSeekerProfileFactory(to_siae=self.siae)
+        self.job_application = JobApplicationWithJobSeekerProfileFactory(
+            to_siae=self.siae,
+            job_seeker_with_address=True,
+        )
         self.job_seeker = self.job_application.job_seeker
 
         # Pass step 1

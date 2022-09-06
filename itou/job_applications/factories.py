@@ -27,6 +27,9 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobApplication
 
+    class Params:
+        job_seeker_with_address = factory.Trait(job_seeker=factory.SubFactory(JobSeekerWithMockedAddressFactory))
+
     job_seeker = factory.SubFactory(JobSeekerFactory)
     to_siae = factory.SubFactory(SiaeFactory, with_membership=True)
     message = factory.Faker("sentence", nb_words=40)
