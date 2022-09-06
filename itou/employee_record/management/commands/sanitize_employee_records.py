@@ -22,51 +22,50 @@ class Command(BaseCommand):
     def _check_3436_error_code(self, dry_run):
         # Report all employee records with ASP error code 3436
         err_3436 = EmployeeRecord.objects.asp_duplicates()
-        cnt_3436 = err_3436.count()
+        count_3436 = err_3436.count()
 
         self.stdout.write("* Checking REJECTED employee records with error 3436 (duplicates):")
 
-        if cnt_3436 == 0:
+        if count_3436 == 0:
             self.stdout.write(" - none found (great!)")
         else:
-            self.stdout.write(f" - found {cnt_3436} error(s)")
+            self.stdout.write(f" - found {count_3436} error(s)")
 
-        if dry_run:
-            return
+            if dry_run:
+                return
 
-        if cnt_3436 != 0:
-            self.stdout.write(" - fixing 3436 errors: forcing status to PROCESSED")
+            if count_3436 != 0:
+                self.stdout.write(" - fixing 3436 errors: forcing status to PROCESSED")
 
-            with transaction.atomic():
-                for to_fix in err_3436:
-                    to_fix.update_as_processed_as_duplicate()
+                with transaction.atomic():
+                    for to_fix in err_3436:
+                        to_fix.update_as_processed_as_duplicate()
 
-            self.stdout.write(" - done!")
+                self.stdout.write(" - done!")
 
     def _check_orphans(self, dry_run):
         # Report all orphans employee records (bad asp_id)
         orphans = EmployeeRecord.objects.orphans()
-        cnt_orphans = orphans.count()
+        count_orphans = orphans.count()
 
         self.stdout.write("* Checking PROCESSED employee records with bad asp_id (orphans):")
 
-        if cnt_orphans == 0:
+        if count_orphans == 0:
             self.stdout.write(" - none found (great!)")
         else:
-            self.stdout.write(f" - found {cnt_orphans} orphan(s)")
+            self.stdout.write(f" - found {count_orphans} orphan(s)")
 
-        # Fixing if no dry-run
-        if dry_run:
-            return
+            if dry_run:
+                return
 
-        if cnt_orphans != 0:
-            self.stdout.write(" - fixing orphans: switching status to DISABLED")
+            if count_orphans != 0:
+                self.stdout.write(" - fixing orphans: switching status to DISABLED")
 
-            with transaction.atomic():
-                for orphan in orphans:
-                    orphan.update_as_disabled()
+                with transaction.atomic():
+                    for orphan in orphans:
+                        orphan.update_as_disabled()
 
-            self.stdout.write(" - done!")
+                self.stdout.write(" - done!")
 
     def _check_jobseeker_profiles(self, dry_run):
         # Check incoherences in user profile leading to validation errors at processing time.
@@ -84,36 +83,35 @@ class Command(BaseCommand):
         no_hexa_address = profile_selected.filter(
             job_application__job_seeker__jobseeker_profile__hexa_commune__isnull=True
         )
-        cnt_no_hexa_address = no_hexa_address.count()
+        count_no_hexa_address = no_hexa_address.count()
         no_job_seeker_profile = profile_selected.filter(job_application__job_seeker__jobseeker_profile__isnull=True)
-        cnt_no_job_seeker_profile = no_job_seeker_profile.count()
+        count_no_job_seeker_profile = no_job_seeker_profile.count()
 
         self.stdout.write("* Checking employee records job seeker profile:")
 
-        if cnt_no_hexa_address == 0:
+        if count_no_hexa_address == 0:
             self.stdout.write(" - no profile found with invalid HEXA address (great!)")
         else:
-            self.stdout.write(f" - found {cnt_no_hexa_address} job seeker profile(s) without HEXA address")
+            self.stdout.write(f" - found {count_no_hexa_address} job seeker profile(s) without HEXA address")
 
-        if cnt_no_job_seeker_profile == 0:
+        if count_no_job_seeker_profile == 0:
             self.stdout.write(" - no empty job seeker profile found (great!)")
         else:
-            self.stdout.write(f" - found {cnt_no_job_seeker_profile} empty job seeker profile(s)")
+            self.stdout.write(f" - found {count_no_job_seeker_profile} empty job seeker profile(s)")
 
-        # Fixing if no dry-run
-        if dry_run:
-            return
+            if dry_run:
+                return
 
-        if cnt_no_job_seeker_profile != 0:
-            self.stdout.write(" - fixing missing jobseeker profiles: switching status to DISABLED")
+            if count_no_job_seeker_profile != 0:
+                self.stdout.write(" - fixing missing jobseeker profiles: switching status to DISABLED")
 
-            with transaction.atomic():
-                for without_profile in no_job_seeker_profile:
-                    without_profile.update_as_disabled()
+                with transaction.atomic():
+                    for without_profile in no_job_seeker_profile:
+                        without_profile.update_as_disabled()
 
-            self.stdout.write(" - done!")
+                self.stdout.write(" - done!")
 
-        if cnt_no_hexa_address != 0:
+        if count_no_hexa_address != 0:
             self.stdout.write(" - fixing missing address in profiles: switching status to DISABLED")
 
             with transaction.atomic():
@@ -122,9 +120,7 @@ class Command(BaseCommand):
 
             self.stdout.write(" - done!")
 
-    def handle(self, **options):
-        dry_run = options.get("dry_run", False)
-
+    def handle(self, dry_run=False, **options):
         self.stdout.write("+ Checking employee records coherence before transfering to ASP")
 
         if dry_run:

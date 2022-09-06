@@ -5,10 +5,7 @@ from contextlib import contextmanager
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 
 
-SUCCESS_CODE, SUCCESS_MSG = (
-    EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
-    "La ligne de la fiche salarié a été enregistrée avec succès.",
-)
+SUCCESS_MSG = "La ligne de la fiche salarié a été enregistrée avec succès."
 ERROR_CODE, ERROR_MSG = "6667", "Fiche salarié en erreur"
 FILES = {}
 
@@ -78,7 +75,7 @@ class SFTPGoodConnectionMock(SFTPConnectionMock):
             batch = json.load(content)
 
             for employee_record in batch.get("lignesTelechargement", []):
-                employee_record["codeTraitement"] = SUCCESS_CODE
+                employee_record["codeTraitement"] = EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE
                 employee_record["libelleTraitement"] = SUCCESS_MSG
 
             return stream.write(json.dumps(batch).encode())

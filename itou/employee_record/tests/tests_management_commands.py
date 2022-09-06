@@ -17,7 +17,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
-from ._common import ManagementCommandTestCase
+from .common import ManagementCommandTestCase
 
 
 # There is no need to create 700 employee records for a single batch
@@ -219,7 +219,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_automatic_duplicates_processing(self, _):
-        # Check that from now on employee records with a 3435 processing code
+        # Check that from now on employee records with a 3436 processing code
         # are auto-magically converted as PROCESSED employee records
 
         # Don't forget to make a complete upload / download cycle
