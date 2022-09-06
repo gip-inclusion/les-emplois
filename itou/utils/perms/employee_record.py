@@ -34,7 +34,7 @@ def siae_is_allowed(job_application, siae):
     return job_application.to_siae == siae
 
 
-def can_create_employee_record(request, job_application_id=None):
+def can_create_employee_record(request, job_application_id) -> JobApplication:
     """
     Check if conditions / permissions are set to use the employee record views
     If a valid job_application_id is given, return a full-fledged
@@ -47,24 +47,20 @@ def can_create_employee_record(request, job_application_id=None):
     if not siae.can_use_employee_record:
         raise PermissionDenied("Cette stucture ne peut pas utiliser la gestion des fiches salarié'.")
 
-    if job_application_id:
-        # We want to reuse a job application in view, but first check that all is ok
-        job_application = get_object_or_404(
-            JobApplication.objects.select_related(
-                "approval",
-                "to_siae",
-                "job_seeker",
-                "job_seeker__jobseeker_profile",
-            ),
-            pk=job_application_id,
-            to_siae=siae,
-        )
+    # We want to reuse a job application in view, but first check that all is ok
+    job_application = get_object_or_404(
+        JobApplication.objects.select_related(
+            "approval",
+            "to_siae",
+            "job_seeker",
+            "job_seeker__jobseeker_profile",
+        ),
+        pk=job_application_id,
+        to_siae=siae,
+    )
 
-        if not tunnel_step_is_allowed(job_application):
-            raise PermissionDenied("Cette fiche salarié ne peut pas être modifiée.")
+    if not tunnel_step_is_allowed(job_application):
+        raise PermissionDenied("Cette fiche salarié ne peut pas être modifiée.")
 
-        # Finally, the reusable Holy Grail
-        return job_application
-
-    # All checks performed, without asking for a job application object
-    return None
+    # Finally, the reusable Holy Grail
+    return job_application
