@@ -112,7 +112,6 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         employee_record_2.approval_number = approval.number
         employee_record_2.save()
 
-        approval.end_at = timezone.now().date() + timedelta(days=2)
         approval.end_at = timezone.localdate() + timedelta(days=2)
         approval.save()
 
