@@ -11,7 +11,7 @@ from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
 
-from ._common import EmployeeRecordTransferCommand
+from .common import EmployeeRecordTransferCommand
 
 
 class Command(EmployeeRecordTransferCommand):
@@ -168,16 +168,16 @@ class Command(EmployeeRecordTransferCommand):
 
                 # Employee record has not been processed by ASP :
                 if not dry_run:
+                    # One special case added for support concerns:
+                    # 3436 processing code are automatically converted as PROCESSED
+                    if processing_code == EmployeeRecord.ASP_DUPLICATE_ERROR_CODE:
+                        employee_record.status = Status.REJECTED
+                        employee_record.asp_processing_code = EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
+                        employee_record.update_as_processed_as_duplicate()
+                        continue
+
                     # Fixes unexpected stop on multiple pass on the same file
                     if employee_record.status != Status.REJECTED:
-                        # One special case added for support concerns:
-                        # 3436 processing code are automatically converted as PROCESSED
-                        if processing_code == EmployeeRecord.ASP_DUPLICATE_ERROR_CODE:
-                            employee_record.status = Status.REJECTED
-                            employee_record.asp_processing_code = EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
-                            employee_record.update_as_processed_as_duplicate()
-                            continue
-
                         # Standard error / rejection processing
                         employee_record.update_as_rejected(processing_code, processing_label)
                     else:

@@ -11,7 +11,7 @@ from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdat
 from itou.employee_record.serializers import EmployeeRecordUpdateNotificationBatchSerializer
 from itou.utils.iterators import chunks
 
-from ._common import EmployeeRecordTransferCommand
+from .common import EmployeeRecordTransferCommand
 
 
 class Command(EmployeeRecordTransferCommand):

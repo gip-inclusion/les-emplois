@@ -195,12 +195,25 @@ class EmployeeRecordModelTest(TestCase):
         bad_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
 
         with self.assertRaises(CloningError):
+            # Clone with previous asp_id
+            bad_employee_record.clone_orphan(previous_asp_id)
+
+        with self.assertRaises(CloningError):
             # Not an orphan
             bad_employee_record.clone_orphan(bad_employee_record.asp_id)
 
         with self.assertRaises(CloningError):
             # Not saved (no PK)
             bad_employee_record.pk = None
+            bad_employee_record.clone_orphan(-1)
+
+        bad_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+        bad_employee_record.approval_number = good_employee_record.approval_number
+        bad_employee_record.save()
+        bad_employee_record.asp_id = -2
+
+        with self.assertRaises(CloningError):
+            # Other case: duplicate in db (pair approval_number,asp_id)
             bad_employee_record.clone_orphan(-1)
 
 

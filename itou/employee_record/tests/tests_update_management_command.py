@@ -8,7 +8,7 @@ from itou.employee_record.factories import EmployeeRecordUpdateNotificationFacto
 from itou.employee_record.mocks.transfer_employee_records import SFTPGoodConnectionMock
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 
-from ._common import ManagementCommandTestCase
+from .common import ManagementCommandTestCase
 
 
 class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):

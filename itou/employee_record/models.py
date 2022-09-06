@@ -463,6 +463,9 @@ class EmployeeRecord(models.Model):
         if not self.pk:
             raise CloningError("This employee record has not been saved yet (no PK).")
 
+        if self.asp_id == asp_id:
+            raise CloningError(f"Can't clone an employee record with the same asp_id: {asp_id}")
+
         if not self.is_orphan:
             raise CloningError(f"This employee record is not an orphan {self.status=},{self.asp_id=}")
 

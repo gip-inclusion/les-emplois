@@ -14,7 +14,7 @@ class ManagementCommandTestCase(TestCase):
 
         out = StringIO()
         err = StringIO()
-        command = self.MANAGEMENT_COMMAND_NAME or management_command_name
+        command = management_command_name or self.MANAGEMENT_COMMAND_NAME
 
         assert command, "Management command name must be provided"
 
