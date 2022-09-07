@@ -1,6 +1,6 @@
 # Global tasks.
 # =============================================================================
-PYTHON_VERSION := python3.9
+PYTHON_VERSION := python3.10
 
 ifeq ($(USE_VENV),1)
 	EXEC_CMD :=
