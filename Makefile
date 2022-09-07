@@ -37,7 +37,7 @@ pylint:
 # Django.
 # =============================================================================
 
-.PHONY: django_admin populate_db
+.PHONY: django_admin populate_db populate_db_with_cities populate_db_minimal graph_models_itou
 
 # make django_admin
 # make django_admin COMMAND=dbshell
@@ -88,7 +88,7 @@ graph_models_itou:
 # Tests.
 # =============================================================================
 
-.PHONY: test
+.PHONY: test test-interactive coverage
 
 TEST_OPTS += --force-color --timing --no-input
 
@@ -120,7 +120,7 @@ shell_on_postgres_container:
 # Postgres CLI.
 # =============================================================================
 
-.PHONY: psql_itou psql_root
+.PHONY: psql_itou psql_root psql_to_csv
 
 # Connect to the `itou` database as the `itou` user.
 psql_itou:
@@ -145,7 +145,7 @@ psql_to_csv:
 # https://cookiecutter-django.readthedocs.io/en/latest/docker-postgres-backups.html
 # =============================================================================
 
-.PHONY: postgres_backup postgres_backups_cp_locally postgres_backups_list postgres_backup_restore postgres_backups_clean
+.PHONY: postgres_backup postgres_backups_cp_locally postgres_backups_list postgres_backup_restore postgres_restore_latest_backup postgres_backups_clean postgres_dump_cities
 
 postgres_backup:
 	docker-compose exec postgres backup
@@ -186,11 +186,13 @@ postgres_dump_cities:
 # Itou theme
 # =============================================================================
 
+.PHONY: update_itou_theme
 update_itou_theme:
 	docker exec itou_django /bin/sh -c "./scripts/upload_itou_theme.sh"
 
 # Deployment
 # =============================================================================
 
+.PHONY: deploy_prod
 deploy_prod:
 	./scripts/deploy_prod.sh
