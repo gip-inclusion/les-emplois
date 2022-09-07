@@ -2,11 +2,13 @@ import json
 import random
 from contextlib import contextmanager
 
-from itou.employee_record.models import EmployeeRecordBatch
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 
 
-# _SAMPLE_FILE = "itou/employee_record/mocks/sample_asp_feedback_file.json"
-SUCCESS_CODE, SUCCESS_MSG = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+SUCCESS_CODE, SUCCESS_MSG = (
+    EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+    "La ligne de la fiche salarié a été enregistrée avec succès.",
+)
 ERROR_CODE, ERROR_MSG = "6667", "Fiche salarié en erreur"
 FILES = {}
 
@@ -78,6 +80,23 @@ class SFTPGoodConnectionMock(SFTPConnectionMock):
             for employee_record in batch.get("lignesTelechargement", []):
                 employee_record["codeTraitement"] = SUCCESS_CODE
                 employee_record["libelleTraitement"] = SUCCESS_MSG
+
+            return stream.write(json.dumps(batch).encode())
+
+        return stream
+
+
+class SFTPAllDupsConnectionMock(SFTPConnectionMock):
+    """Same as good connection mock, but returns only employee records with 3436 processing code."""
+
+    def getfo(self, remote_path, stream, **kwargs):
+        if content := FILES.get(remote_path):
+            content.seek(0)
+            batch = json.load(content)
+
+            for employee_record in batch.get("lignesTelechargement", []):
+                employee_record["codeTraitement"] = EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
+                employee_record["libelleTraitement"] = ERROR_MSG
 
             return stream.write(json.dumps(batch).encode())
 
