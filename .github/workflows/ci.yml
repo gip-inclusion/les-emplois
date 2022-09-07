@@ -23,23 +23,22 @@ jobs:
       CELLAR_ADDON_KEY_ID: TheMeaningOfLife
       CELLAR_ADDON_KEY_SECRET: "42"
       CELLAR_ADDON_HOST: domain.com
-    services:
-      postgres:
-        # Docker Hub image
-        image: postgis/postgis:14-master
-        env:
-          POSTGRES_PASSWORD: password
-        ports:
-          - 5432:5432
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
     - uses: actions/checkout@v3
+    - name: 💾 Start database
+      run: >-
+        docker run
+        --detach
+        --rm
+        --env POSTGRES_PASSWORD=password
+        --volume "${{ github.workspace }}/.github/workflows/postgres-test-settings.sh":/docker-entrypoint-initdb.d/postgres-test-settings.sh:ro
+        --publish 5432:5432
+        --health-cmd pg_isready
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+        postgis/postgis:14-master
     - name: 🌍 Install spatial libraries
       run: sudo apt-get update && sudo apt-get install binutils build-essential libproj-dev gdal-bin
     - name: 💾 Create a database to check migrations
