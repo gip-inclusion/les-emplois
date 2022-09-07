@@ -3,7 +3,26 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 import itou.employee_record.models as models
-from itou.employee_record.enums import Status
+
+from .enums import Status
+
+
+class EmployeeRecordUpdateNotificationInline(admin.TabularInline):
+    model = models.EmployeeRecordUpdateNotification
+
+    fields = (
+        "created_at",
+        "status",
+        "asp_batch_file",
+        "asp_batch_line_number",
+    )
+
+    readonly_fields = fields
+    fk_name = "employee_record"
+
+    can_delete = False
+    show_change_link = True
+    extra = 0
 
 
 @admin.register(models.EmployeeRecord)
@@ -15,6 +34,8 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
     actions = [
         update_employee_record_as_ready,
     ]
+
+    inlines = (EmployeeRecordUpdateNotificationInline,)
 
     list_display = (
         "pk",
@@ -129,3 +150,11 @@ class EmployeeRecordUpdateNotificationAdmin(admin.ModelAdmin):
         "asp_processing_code",
         "asp_processing_label",
     )
+
+    search_fields = [
+        "employee_record__id",
+        "employee_record__approval_number",
+        "employee_record__asp_id",
+        "employee_record__job_application__job_seeker__email",
+        "employee_record__job_application__to_siae__siret",
+    ]
