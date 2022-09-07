@@ -1,4 +1,4 @@
-from itou.employee_record.mocks.asp_test_siaes import test_data_for_asp_id
+from itou.employee_record.mocks.asp_test_siaes import asp_to_siret_from_fixtures
 from itou.employee_record.serializers import (
     EmployeeRecordBatchSerializer,
     EmployeeRecordSerializer,
@@ -18,7 +18,7 @@ class TestEmployeeRecordSerializer(EmployeeRecordSerializer):
 
         # Map test fields / values
 
-        test_data = test_data_for_asp_id(instance.asp_id)
+        test_data = asp_to_siret_from_fixtures(instance.asp_id)
 
         result["mesure"] = test_data["mesure"]
         result["siret"] = test_data["siret"]
@@ -43,7 +43,7 @@ class TestEmployeeRecordUpdateNotificationSerializer(EmployeeRecordUpdateNotific
 
         # Map test fields / values
 
-        test_data = test_data_for_asp_id(instance.employee_record.asp_id)
+        test_data = asp_to_siret_from_fixtures(instance.employee_record.asp_id)
 
         result["mesure"] = test_data["mesure"]
         result["siret"] = test_data["siret"]

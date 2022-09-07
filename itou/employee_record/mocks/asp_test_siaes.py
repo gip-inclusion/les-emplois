@@ -28,7 +28,7 @@ ASP_ID_TO_SIRET_MAPPING = {
 }
 
 
-def test_data_for_asp_id(asp_id):
+def asp_to_siret_from_fixtures(asp_id):
     assert (
         asp_id in ASP_ID_TO_SIRET_MAPPING.keys()
     ), f"No such test ASP_ID entry: {asp_id}. Check SIRET number mapping for ASP test platform."
