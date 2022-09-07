@@ -36,10 +36,13 @@ par défaut viable et doivent donc être configurées par vos soins.
 
 ### Développement dans un Virtualenv
 
-Créez votre environnement avec vos commandes habituelles, par exemple
-`python -m venv <votrevenv itou>` ou `mkvirtualenv itou`.
+La commande make suivante crée un virtualenv et installe les dépendances pour
+le développement. Elle peut être exécutée régulièrement pour s’assurer que les
+dépendances sont bien à jour.
 
-Les dépendances peuvent être installées via `pip install -r requirements/dev.txt`.
+```bash
+$ make .venv
+```
 
 La variable d’environnement `DJANGO_SECRET_KEY` doit avoir une valeur. Par
 exemple, à l’aide de :
@@ -123,6 +126,20 @@ A noter qu'il existe déjà (juste après le `populate_db`) un compte super-util
 ### Avant un commit
 
     $ make quality  # Will run black, isort, and flake8
+
+### Mettre à jour les dépendances
+
+La version des dépendances est consignée dans les fichiers `requirements/*.in`.
+Une fois ces fichiers modifiés, les dépendances sont figées avec l’outil
+[pip-tools](https://pypi.org/project/pip-tools/). La commande suivante permet
+de mettre à jour les fichiers de dépendances :
+
+```sh
+$ make compile-deps
+```
+
+Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
+*commit*.
 
 ## Données de test
 

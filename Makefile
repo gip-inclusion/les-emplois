@@ -1,6 +1,14 @@
+# Delete target on error.
+# https://www.gnu.org/software/make/manual/html_node/Errors.html#Errors
+# > This is almost always what you want make to do, but it is not historical
+# > practice; so for compatibility, you must explicitly request it
+.DELETE_ON_ERROR:
+
 # Global tasks.
 # =============================================================================
 PYTHON_VERSION := python3.10
+VIRTUAL_ENV ?= .venv
+export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 
 ifeq ($(USE_VENV),1)
 	EXEC_CMD :=
@@ -8,11 +16,25 @@ else
 	EXEC_CMD := docker exec -ti itou_django
 endif
 
-.PHONY: run clean cdsitepackages quality fix pylint
+.PHONY: run clean cdsitepackages quality fix pylint compile-deps
 
 # Run Docker images
 run:
 	docker-compose up
+
+$(VIRTUAL_ENV): requirements/dev.txt
+	$(PYTHON_VERSION) -m venv $@
+	$@/bin/pip install -r $^
+	$@/bin/pip-sync $^
+	touch $@
+
+PIP_COMPILE_FLAGS := --upgrade --allow-unsafe --generate-hashes
+compile-deps: $(VIRTUAL_ENV)
+	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
+	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/demo.txt requirements/demo.in
+	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
+	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/prod.txt requirements/prod.in
+	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/staging.txt requirements/staging.in
 
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
@@ -20,19 +42,19 @@ clean:
 cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
-quality:
-	$(EXEC_CMD) black --check itou
-	$(EXEC_CMD) isort --check itou
-	$(EXEC_CMD) djhtml --check $(shell find itou/templates -name "*.html")
-	$(EXEC_CMD) flake8 itou --count --show-source --statistics
+quality: $(VIRTUAL_ENV)
+	black --check itou
+	isort --check itou
+	djhtml --check $(shell find itou/templates -name "*.html")
+	flake8 itou --count --show-source --statistics
 
-fix:
-	$(EXEC_CMD) black itou
-	$(EXEC_CMD) isort itou
-	$(EXEC_CMD) djhtml --in-place $(shell find itou/templates -name "*.html")
+fix: $(VIRTUAL_ENV)
+	black itou
+	isort itou
+	djhtml --in-place $(shell find itou/templates -name "*.html")
 
-pylint:
-	$(EXEC_CMD) pylint itou
+pylint: $(VIRTUAL_ENV)
+	pylint itou
 
 # Django.
 # =============================================================================

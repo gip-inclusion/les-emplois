@@ -57,7 +57,7 @@ jobs:
       env:
         CPUCOUNT: 1
     - name: ✨ Black, isort, flake8 & djhtml
-      run: USE_VENV=1 make quality
+      run: make quality
     - name: 🚧 Check pending migrations
       run: django-admin makemigrations --check --dry-run --noinput
     - name: 🤹‍ Django tests
