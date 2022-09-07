@@ -97,9 +97,7 @@ class Command(EmployeeRecordTransferCommand):
         """
         batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file)
         renderer = JSONRenderer()
-        success_code = "0000"
         record_errors = 0
-
         records = batch.get("lignesTelechargement")
 
         if not records:
@@ -109,9 +107,11 @@ class Command(EmployeeRecordTransferCommand):
         # Check for notification records :
         # Notifications are not mixed with employee records
         notification_number = 0
+
         for record in records:
             if record.get("typeMouvement") == MovementType.UPDATE:
                 notification_number += 1
+
         if notification_number == len(records):
             self.stdout.write(
                 f"File `{feedback_file}` is an update notifications file, passing.",
@@ -138,7 +138,7 @@ class Command(EmployeeRecordTransferCommand):
                 continue
 
             # Employee record succesfully processed by ASP :
-            if processing_code == success_code:
+            if processing_code == EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE:
                 # Archive a JSON copy of employee record (with processing code and label)
                 employee_record.asp_processing_code = processing_code
                 employee_record.asp_processing_label = processing_label
@@ -160,9 +160,7 @@ class Command(EmployeeRecordTransferCommand):
                 else:
                     self.stdout.write(f"DRY-RUN: Accepted {employee_record=}, {processing_code=}, {processing_label=}")
             else:
-                # Employee record has already been processed : SKIP
-                # (this can happen if files are processed twice
-                # or employee record transmitted twice or more)
+                # Employee record has already been processed : SKIP, not an error
                 if employee_record.status == Status.PROCESSED:
                     # Do not update, keep it clean
                     self.stdout.write(f"Skipping, already accepted: {employee_record=}")
@@ -172,6 +170,15 @@ class Command(EmployeeRecordTransferCommand):
                 if not dry_run:
                     # Fixes unexpected stop on multiple pass on the same file
                     if employee_record.status != Status.REJECTED:
+                        # One special case added for support concerns:
+                        # 3436 processing code are automatically converted as PROCESSED
+                        if processing_code == EmployeeRecord.ASP_DUPLICATE_ERROR_CODE:
+                            employee_record.status = Status.REJECTED
+                            employee_record.asp_processing_code = EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
+                            employee_record.update_as_processed_as_duplicate()
+                            continue
+
+                        # Standard error / rejection processing
                         employee_record.update_as_rejected(processing_code, processing_label)
                     else:
                         self.stdout.write(f"Already rejected: {employee_record=}")

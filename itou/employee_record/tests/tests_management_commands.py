@@ -7,6 +7,7 @@ from django.utils import timezone
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from itou.employee_record.mocks.transfer_employee_records import (
+    SFTPAllDupsConnectionMock,
     SFTPBadConnectionMock,
     SFTPConnectionMock,
     SFTPEvilConnectionMock,
@@ -48,15 +49,15 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download(self):
-        self.call_command("transfer_employee_records", download=True)
+        self.call_command(download=True)
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_upload(self):
-        self.call_command("transfer_employee_records", upload=True)
+        self.call_command(upload=True)
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download_and_upload(self):
-        self.call_command("transfer_employee_records")
+        self.call_command()
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
@@ -67,11 +68,11 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         employee_record = self.employee_record
 
         # Upload with dry run
-        self.call_command("transfer_employee_records", upload=True, dry_run=True)
+        self.call_command(upload=True, dry_run=True)
 
         # Then download "for real", should work but leave
         # employee record untouched
-        self.call_command("transfer_employee_records", upload=False, download=True)
+        self.call_command(upload=False, download=True)
 
         self.assertEqual(employee_record.status, Status.READY)
 
@@ -84,11 +85,11 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         employee_record = self.employee_record
 
         # Upload "for real"
-        self.call_command("transfer_employee_records", upload=True)
+        self.call_command(upload=True)
 
         # Then download dry run, should work but leave
         # employee record untouched
-        self.call_command("transfer_employee_records", upload=False, download=True, dry_run=True)
+        self.call_command(upload=False, download=True, dry_run=True)
 
         self.assertEqual(employee_record.status, Status.READY)
 
@@ -96,7 +97,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
     def test_upload_failure(self):
         employee_record = self.employee_record
         with self.assertRaises(Exception):
-            self.call_command("transfer_employee_records", upload=True)
+            self.call_command(upload=True)
 
         self.assertEqual(employee_record.status, Status.READY)
 
@@ -104,7 +105,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
     def test_download_failure(self):
         employee_record = self.employee_record
         with self.assertRaises(Exception):
-            self.call_command("transfer_employee_records", download=True)
+            self.call_command(download=True)
 
         self.assertEqual(employee_record.status, Status.READY)
 
@@ -122,18 +123,18 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         """
         employee_record = self.employee_record
 
-        self.call_command("transfer_employee_records", upload=True, download=False)
+        self.call_command(upload=True, download=False)
         employee_record.refresh_from_db()
 
         self.assertEqual(employee_record.status, Status.SENT)
         self.assertEqual(employee_record.batch_line_number, 1)
         self.assertIsNotNone(employee_record.asp_batch_file)
 
-        self.call_command("transfer_employee_records", upload=False, download=True)
+        self.call_command(upload=False, download=True)
         employee_record.refresh_from_db()
 
         self.assertEqual(employee_record.status, Status.PROCESSED)
-        self.assertEqual(employee_record.asp_processing_code, "0000")
+        self.assertEqual(employee_record.asp_processing_code, EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE)
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
@@ -146,7 +147,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         """
         employee_record = self.employee_record
 
-        self.call_command("transfer_employee_records", upload=True, download=True)
+        self.call_command(upload=True, download=True)
         employee_record.refresh_from_db()
 
         self.assertEqual(Status.PROCESSED, employee_record.status)
@@ -154,7 +155,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
 
         employee_record_json = json.loads(employee_record.archived_json)
 
-        self.assertEqual("0000", employee_record_json.get("codeTraitement"))
+        self.assertEqual(EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE, employee_record_json.get("codeTraitement"))
         self.assertIsNotNone(employee_record_json.get("libelleTraitement"))
 
     @mock.patch("pysftp.Connection", SFTPEvilConnectionMock)
@@ -168,7 +169,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         # Random upload failure
         for _ in range(10):
             with self.assertRaises(Exception):
-                self.call_command("transfer_employee_records", upload=True, download=False)
+                self.call_command(upload=True, download=False)
 
         # Employee record must be in the same status
         employee_record.refresh_from_db()
@@ -176,7 +177,7 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
 
         for _ in range(10):
             with self.assertRaises(Exception):
-                self.call_command("transfer_employee_records", upload=False, download=True)
+                self.call_command(upload=False, download=True)
 
         employee_record.refresh_from_db()
         self.assertEqual(employee_record.status, Status.READY)
@@ -193,7 +194,10 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         # Create an old PROCESSED employee record
         filename = "RIAE_FS_20210819100001.json"
         self.employee_record.update_as_sent(filename, 1)
-        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
         self.employee_record.update_as_processed(process_code, process_message, "{}")
 
         # Fake a date older than archiving delay
@@ -202,22 +206,35 @@ class TransferManagementCommandTest(ManagementCommandTestCase):
         )
 
         self.employee_record.update_as_archived()
-
-        # Nicer syntax:
-        self.call_command("transfer_employee_records", archive=True)
-
+        self.call_command(archive=True)
         self.employee_record.refresh_from_db()
 
         # Check correct status and empty archived JSON
         self.assertEqual(self.employee_record.status, Status.ARCHIVED)
         self.assertIsNone(self.employee_record.archived_json)
 
+    @mock.patch("pysftp.Connection", SFTPAllDupsConnectionMock)
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_automatic_duplicates_processing(self, _):
+        # Check that from now on employee records with a 3435 processing code
+        # are auto-magically converted as PROCESSED employee records
+
+        # Don't forget to make a complete upload / download cycle
+        self.call_command(upload=True, download=True)
+
+        self.employee_record.refresh_from_db()
+
+        self.assertEqual(0, EmployeeRecord.objects.asp_duplicates().count())
+        self.assertEqual(Status.PROCESSED, self.employee_record.status)
+        self.assertTrue(self.employee_record.processed_as_duplicate)
+
 
 class SanitizeManagementCommandTest(ManagementCommandTestCase):
 
     MANAGEMENT_COMMAND_NAME = "sanitize_employee_records"
-
-    fixtures = ["test_INSEE_communes.json", "test_asp_INSEE_countries.json"]
 
     def test_dry_run(self):
         # Check `dry-run` switch / option
@@ -238,7 +255,7 @@ class SanitizeManagementCommandTest(ManagementCommandTestCase):
         # Note: must be created with a valid profile, or the profile check will disable it beforehand
         EmployeeRecordWithProfileFactory(
             status=Status.REJECTED,
-            asp_processing_code=EmployeeRecord.DUPLICATE_ASP_ERROR_CODE,
+            asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE,
         )
         self.assertEqual(1, EmployeeRecord.objects.asp_duplicates().count())
 
@@ -267,7 +284,7 @@ class SanitizeManagementCommandTest(ManagementCommandTestCase):
         self.assertEqual(0, EmployeeRecord.objects.orphans().count())
 
     def test_profile_errors_check(self):
-        # Check for profile errors
+        # Check for profile errors during sanitize_employee_records
 
         # This factory does not define a profile
         EmployeeRecordFactory()
