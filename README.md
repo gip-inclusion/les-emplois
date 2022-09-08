@@ -69,6 +69,21 @@ docker volume rm itou_postgres_data_backup
 docker-compose down -v
 ```
 
+#### Lancer le serveur de développement
+
+```sh
+$ make run
+
+# Équivalent de :
+$ docker-compose up
+```
+
+Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/issues/4677#issuecomment-320804194) type `ipdb` :
+
+```sh
+$ docker-compose run --service-ports django
+```
+
 ### Développement dans un Virtualenv
 
 Créez votre environnement avec vos commandes habituelles, par exemple
@@ -76,27 +91,16 @@ Créez votre environnement avec vos commandes habituelles, par exemple
 
 Les dépendances peuvent êtres installées via `pip install -r requirements/dev.txt`.
 
-### Lancer le serveur de développement
-
-Avec Docker :
-
-    $ make run
-
-    # Équivalent de :
-    $ docker-compose up
-
-Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/issues/4677#issuecomment-320804194) type `ipdb` :
-
-    $ docker-compose run --service-ports django
-
-Une fois votre serveur de développement lancé, vous pouvez accéder au frontend à
-l'adresse http://127.0.0.1:8000/.
-
 Dans un Virtualenv, vous pouvez utiliser les commandes Django habituelles
 (`./manage.py`) mais également certaines recettes du Makefile, celles-ci
 seront lancées directement dans votre venv si `USE_VENV=1` est utilisé.
 Cette variable devrait _normalement_ pouvoir être définie en global dans
 votre environnement shell (`export`, `.env`, ...).
+
+### Accéder au serveur de développement
+
+Une fois votre serveur de développement lancé, vous pouvez accéder au frontend à
+l'adresse http://127.0.0.1:8000/.
 
 ### Peupler la base de données
 
