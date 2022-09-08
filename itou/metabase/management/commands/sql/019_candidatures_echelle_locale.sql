@@ -13,7 +13,7 @@ with candidatures_p as (
 org_prescripteur as ( /* On récupère l'id et le dept des organismes prescripteurs */
 	select
 		org.id as id_org,
-		org.département as dept_org
+		org.nom_département as dept_org  /*bien mettre nom département et pas département */
 	from
 		organisations org
 ),
