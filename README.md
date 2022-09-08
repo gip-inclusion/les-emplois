@@ -34,6 +34,26 @@ environnement de développement.
 environnement et par nature « sensible ». Ces variables n'ont donc pas de valeur
 par défaut viable et doivent donc être configurées par vos soins.
 
+### Développement dans un Virtualenv
+
+Créez votre environnement avec vos commandes habituelles, par exemple
+`python -m venv <votrevenv itou>` ou `mkvirtualenv itou`.
+
+Les dépendances peuvent être installées via `pip install -r requirements/dev.txt`.
+
+La variable d’environnement `DJANGO_SECRET_KEY` doit avoir une valeur. Par
+exemple, à l’aide de :
+
+```sh
+export DJANGO_SECRET_KEY=$(openssl rand -base64 42)
+```
+
+Dans un Virtualenv, vous pouvez utiliser les commandes Django habituelles
+(`./manage.py`) mais également certaines recettes du Makefile, celles-ci
+seront lancées directement dans votre venv si `USE_VENV=1` est utilisé.
+Cette variable devrait _normalement_ pouvoir être définie en global dans
+votre environnement shell (`export`, `.env`, ...).
+
 ### Développement avec Docker
 
 Vous devez disposer sur votre machine d'un démon `Docker` et de l'outil `Docker
@@ -83,26 +103,6 @@ Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/is
 ```sh
 $ docker-compose run --service-ports django
 ```
-
-### Développement dans un Virtualenv
-
-Créez votre environnement avec vos commandes habituelles, par exemple
-`python -m venv <votrevenv itou>` ou `mkvirtualenv itou`.
-
-Les dépendances peuvent êtres installées via `pip install -r requirements/dev.txt`.
-
-La variable d’environnement `DJANGO_SECRET_KEY` doit avoir une valeur. Par
-exemple, à l’aide de :
-
-```sh
-export DJANGO_SECRET_KEY=$(openssl rand -base64 42)
-```
-
-Dans un Virtualenv, vous pouvez utiliser les commandes Django habituelles
-(`./manage.py`) mais également certaines recettes du Makefile, celles-ci
-seront lancées directement dans votre venv si `USE_VENV=1` est utilisé.
-Cette variable devrait _normalement_ pouvoir être définie en global dans
-votre environnement shell (`export`, `.env`, ...).
 
 ### Accéder au serveur de développement
 
