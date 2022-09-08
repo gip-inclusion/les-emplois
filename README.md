@@ -47,6 +47,28 @@ fichier `.env`](https://docs.docker.com/compose/env-file/) à partir d'une copie
 du fichier racine `.env.template`. Le fichier `.env` doit être au même niveau
 que le fichier `README.md`.
 
+#### Mise à jour des dépendances Python
+
+Lors des mises à jour Python (par ex. ajout d'un package à Django), vous devez
+reconstruire (*rebuild*) votre image Docker en exécutant la commande suivante :
+
+```sh
+docker-compose up --build
+```
+
+#### Effacer l'ancienne base de données
+
+Pour supprimer la base de données dans Docker vous devez supprimer les volumes
+de l'image docker, en exécutant les commandes suivantes :
+
+```sh
+docker volume rm itou_postgres_data
+docker volume rm itou_postgres_data_backup
+
+# ou
+docker-compose down -v
+```
+
 ### Développement dans un Virtualenv
 
 Créez votre environnement avec vos commandes habituelles, par exemple
