@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -61,12 +62,12 @@ class ContractType(models.TextChoices):
         return empty + [(enum.value, enum.label) for enum in enums]
 
     @classmethod
-    def choices_from_siae_kind(cls, kind):
+    def choices_for_siae(cls, siae):
         choices = None
         # TODO(celinems): Use Python 3.10 match / case syntax when this version will be available on our project.
-        if kind == SiaeKind.GEIQ:
+        if siae.kind == SiaeKind.GEIQ:
             choices = [cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        elif kind in [SiaeKind.EA, SiaeKind.EATT]:
+        elif siae.kind in [SiaeKind.EA, SiaeKind.EATT]:
             choices = [
                 cls.PERMANENT,
                 cls.FIXED_TERM,
@@ -76,25 +77,31 @@ class ContractType(models.TextChoices):
                 cls.PROFESSIONAL_TRAINING,
                 cls.OTHER,
             ]
-        elif kind == SiaeKind.EITI:
+        elif siae.kind == SiaeKind.EITI:
             choices = [cls.BUSINESS_CREATION, cls.OTHER]
-        elif kind == SiaeKind.OPCS:
+        elif siae.kind == SiaeKind.OPCS:
             choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        elif kind == SiaeKind.ACI:
+        elif siae.kind == SiaeKind.ACI:
             choices = [
                 cls.FIXED_TERM_I,
                 cls.FIXED_TERM_USAGE,
                 cls.TEMPORARY,
                 cls.PROFESSIONAL_TRAINING,
-                cls.FIXED_TERM_I_PHC,
-                cls.FIXED_TERM_I_CVG,
                 cls.OTHER,
             ]
-        elif kind in [SiaeKind.ACIPHC, SiaeKind.EI, SiaeKind.AI, SiaeKind.ETTI]:
+            if siae.pk in settings.ACI_CONVERGENCE_PK_WHITELIST:
+                choices[-1:-1] = [
+                    cls.FIXED_TERM_I_PHC,
+                    cls.FIXED_TERM_I_CVG,
+                ]
+        elif siae.kind in [SiaeKind.ACIPHC, SiaeKind.EI, SiaeKind.AI, SiaeKind.ETTI]:
             # Siae.ELIGIBILITY_REQUIRED_KINDS but without EITI.
             choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
         else:
             choices = list(cls)
+            # These are only for ACI from ACI_CONVERGENCE_PK_WHITELIST
+            choices.remove(cls.FIXED_TERM_I_PHC)
+            choices.remove(cls.FIXED_TERM_I_CVG)
 
         return cls._choices_from_enums_list(choices)
 

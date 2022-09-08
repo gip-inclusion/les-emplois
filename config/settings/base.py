@@ -565,6 +565,9 @@ PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_W
 # Some experimental stats are progressively being deployed to more and more specific beta users.
 STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 
+# Only ACIs given by Convergence France may access some contracts
+ACI_CONVERGENCE_PK_WHITELIST = json.loads(os.environ.get("ACI_CONVERGENCE_PK_WHITELIST", "[]"))
+
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
 PILOTAGE_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/pilotage"
 

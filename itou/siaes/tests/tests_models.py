@@ -4,7 +4,7 @@ from unittest import mock
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -381,24 +381,50 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
 
 
 class SiaeContractTypeTest(TestCase):
-    def test_choices_from_siae_kind(self):
+    def test_choices_for_siae(self):
         # Test only for GEIQ as the logic is the same for other Siae kind.
         expected = [
             ("APPRENTICESHIP", "Contrat d'apprentissage"),
             ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
             ("OTHER", "Autre type de contrat"),
         ]
-        result = ContractType.choices_from_siae_kind(kind=SiaeKind.GEIQ)
+        result = ContractType.choices_for_siae(siae=SiaeFactory(kind=SiaeKind.GEIQ))
         self.assertEqual(result, expected)
 
-        result = ContractType.choices_from_siae_kind(kind=str(SiaeKind.GEIQ))
+        # For any ACI
+        expected = [
+            ("FIXED_TERM_I", "CDD insertion"),
+            ("FIXED_TERM_USAGE", "CDD d'usage"),
+            ("TEMPORARY", "Contrat de mission intérimaire"),
+            ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
+            ("OTHER", "Autre type de contrat"),
+        ]
+        result = ContractType.choices_for_siae(siae=SiaeFactory(kind=SiaeKind.ACI))
         self.assertEqual(result, expected)
 
-    def test_choices_from_siae_kind_new_siae_kind(self):
+        # For an ACI from Convergence France
+        expected = [
+            ("FIXED_TERM_I", "CDD insertion"),
+            ("FIXED_TERM_USAGE", "CDD d'usage"),
+            ("TEMPORARY", "Contrat de mission intérimaire"),
+            ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
+            ("FED_TERM_I_PHC", "CDD-I Premières heures en Chantier"),
+            ("FIXED_TERM_I_CVG", "CDD-I Convergence"),
+            ("OTHER", "Autre type de contrat"),
+        ]
+        siae = SiaeFactory(kind=SiaeKind.ACI)
+        with override_settings(ACI_CONVERGENCE_PK_WHITELIST=[siae.pk]):
+            result = ContractType.choices_for_siae(siae=siae)
+        self.assertEqual(result, expected)
+
+    def test_choices_for_siae_new_siae_kind(self):
         """
         A new SIAE kind has been added but it does not require specific contract types.
-        This method should return all every contract.
+        This method should return all contracts except those for ACI from Convergence France.
         """
         expected = ContractType.choices
-        result = ContractType.choices_from_siae_kind(kind="Destination unknown")
+
+        expected.remove(("FED_TERM_I_PHC", "CDD-I Premières heures en Chantier"))
+        expected.remove(("FIXED_TERM_I_CVG", "CDD-I Convergence"))
+        result = ContractType.choices_for_siae(siae=SiaeFactory(kind="NEW"))
         self.assertEqual(result, expected)
