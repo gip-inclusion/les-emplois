@@ -41,6 +41,10 @@ prescripteurs as (
 )
 select /* On selectionne les colonnes finales qui nous intéressent */
     id_candidat_anonymise,
+    case /* ajout d'une colonne permettant de calculer le taux de candidats acceptées tout en faisant une jointure avec la table candidatures */
+        when total_embauches > 0 then concat(substring(id_candidat_anonymise from 1 for 1000), '_accepté')
+        else null
+    end candidature_acceptée,
     actif,
     age,
     date_diagnostic,
