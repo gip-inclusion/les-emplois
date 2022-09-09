@@ -11,7 +11,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.approvals.models import Approval, PoleEmploiApproval
+from itou.approvals.models import Approval
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind, siae_kind_to_pe_type_siae
@@ -248,52 +248,6 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
         sleep_mock.assert_called_with(3)
         self.assertEqual(sleep_mock.call_count, 2)
         self.assertEqual(notify_mock.call_count, 2)
-
-
-class PoleEmploiApprovalsSendToPeManagementTestCase(TestCase):
-    @patch.object(PoleEmploiApproval, "notify_pole_emploi")
-    @patch("itou.approvals.management.commands.oneshot-send_pe_approvals_to_pe.sleep")
-    def test_management_command(self, sleep_mock, notify_mock):
-        stdout = io.StringIO()
-        # create ignored PE Approvals, will not even be counted in the batch. the cron will wait for
-        # the database to have the necessary job application, nir, or start date to fetch them.
-        ignored_approval = PoleEmploiApprovalFactory(nir="")
-        PoleEmploiApprovalFactory(nir=None)
-        PoleEmploiApprovalFactory(siae_siret=None)
-
-        # other approvals
-        pe_approval = PoleEmploiApprovalFactory(
-            nir="FOOBAR",
-            pe_notification_status="notification_should_retry",
-        )
-        other_pe_approval = PoleEmploiApprovalFactory(
-            nir="STUFF",
-            pe_notification_status="notification_pending",
-        )
-        management.call_command(
-            "oneshot-send_pe_approvals_to_pe",
-            wet_run=True,
-            delay=3,
-            stdout=stdout,
-        )
-        self.assertEqual(
-            stdout.getvalue().split("\n"),
-            [
-                "PE approvals needing to be sent count=2",
-                f"pe_approval={other_pe_approval} start_at={other_pe_approval.start_at.isoformat()} "
-                "pe_state=notification_pending",
-                f"pe_approval={pe_approval} start_at={pe_approval.start_at.isoformat()} "
-                "pe_state=notification_should_retry",
-                "",
-            ],
-        )
-        sleep_mock.assert_called_with(3)
-        self.assertEqual(sleep_mock.call_count, 2)
-        self.assertEqual(notify_mock.call_count, 2)
-
-        ignored_approval.refresh_from_db()
-        self.assertEqual(ignored_approval.pe_notification_status, "notification_error")
-        self.assertEqual(ignored_approval.pe_notification_exit_code, "MISSING_USER_DATA")
 
 
 @override_settings(

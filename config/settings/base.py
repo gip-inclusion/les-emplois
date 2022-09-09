@@ -104,6 +104,7 @@ LOCAL_APPS = [
     "itou.api",
     # Status
     "itou.status",
+    "itou.scripts",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
