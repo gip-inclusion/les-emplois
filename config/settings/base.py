@@ -531,33 +531,35 @@ METABASE_SITE_URL = "https://stats.inclusion.beta.gouv.fr"
 METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 
 # Metabase embedded dashboards
-METABASE_DASHBOARD_IDS = {
+METABASE_DASHBOARDS = {
     # Public stats.
-    "stats_public": 119,
+    "stats_public": {"dashboard_id": 119,},
     # Employer stats.
-    "stats_siae_etp": 128,
-    "stats_siae_hiring": 185,
+    "stats_siae_etp": {"dashboard_id": 128, "tally_form_id": "nrjbRv",},
+    "stats_siae_hiring": {"dashboard_id": 185, "tally_form_id": "waQPkB",},
     # Prescriber stats.
-    "stats_cd": 118,
-    "stats_pe_delay_main": 168,
-    "stats_pe_delay_raw": 180,
-    "stats_pe_conversion_main": 169,
-    "stats_pe_conversion_raw": 182,
-    "stats_pe_state_main": 149,
-    "stats_pe_state_raw": 183,
-    "stats_pe_tension": 162,
+    "stats_cd": {"dashboard_id": 118, "tally_form_id": "wb5Nro",},
+    "stats_pe_delay_main": {"dashboard_id": 168, "tally_form_id": "3lb9XW",},
+    "stats_pe_delay_raw": {"dashboard_id": 180,},
+    "stats_pe_conversion_main": {"dashboard_id": 169, "tally_form_id": "mODeK8",},
+    "stats_pe_conversion_raw": {"dashboard_id": 182,},
+    "stats_pe_state_main": {"dashboard_id": 149, "tally_form_id": "mRG61J",},
+    "stats_pe_state_raw": {"dashboard_id": 183,},
+    "stats_pe_tension": {"dashboard_id": 162, "tally_form_id": "wobaYV",},
     # Institution stats - DDETS - department level.
-    "stats_ddets_iae": 117,
-    "stats_ddets_diagnosis_control": 144,
-    "stats_ddets_hiring": 160,
+    "stats_ddets_iae": {"dashboard_id": 117, "tally_form_id": "nPdWLb",},
+    "stats_ddets_diagnosis_control": {"dashboard_id": 144,},
+    "stats_ddets_hiring": {"dashboard_id": 160, "tally_form_id": "mVLBXv",},
     # Institution stats - DREETS - region level.
-    "stats_dreets_iae": 117,
-    "stats_dreets_hiring": 160,
+    "stats_dreets_iae": {"dashboard_id": 117, "tally_form_id": "nPdWLb",},
+    "stats_dreets_hiring": {"dashboard_id": 160, "tally_form_id": "mVLBXv",},
     # Institution stats - DGEFP - nation level.
-    "stats_dgefp_iae": 117,
-    "stats_dgefp_diagnosis_control": 144,
-    "stats_dgefp_af": 142,
+    "stats_dgefp_iae": {"dashboard_id": 117,},
+    "stats_dgefp_diagnosis_control": {"dashboard_id": 144,},
+    "stats_dgefp_af": {"dashboard_id": 142,},
 }
+
+
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
 
 # Some experimental stats are progressively being deployed to more and more specific beta users.
@@ -568,6 +570,9 @@ PILOTAGE_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/pilota
 
 # Slack notifications sent by Metabase cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.environ.get("SLACK_CRON_WEBHOOK_URL", None)
+
+# Embed tally forms on stats views.
+ENABLE_TALLY_FORMS = False
 
 # Huey / async
 # Workers are run in prod via `CC_WORKER_COMMAND = django-admin run_huey`.
