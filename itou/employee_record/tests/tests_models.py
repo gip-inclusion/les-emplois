@@ -180,7 +180,9 @@ class EmployeeRecordModelTest(TestCase):
     def test_clone_orphan(self):
         # Check employee record clone features and properties
         good_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+        bad_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
         previous_asp_id = good_employee_record.asp_id
+
         good_employee_record.asp_id += 1
         good_employee_record.save()
 
@@ -188,11 +190,17 @@ class EmployeeRecordModelTest(TestCase):
 
         clone = good_employee_record.clone_orphan(previous_asp_id)
         self.assertTrue(clone.pk != good_employee_record.pk)
-        self.assertEqual(Status.NEW, clone.status)
+        self.assertNotEqual(good_employee_record.created_at, clone.created_at)
+        self.assertEqual(Status.READY, clone.status)
         self.assertEqual(previous_asp_id, clone.asp_id)
+        self.assertIsNone(clone.asp_batch_file)
+        self.assertIsNone(clone.asp_batch_line_number)
+        self.assertIsNone(clone.asp_processing_code)
+        self.assertIn(EmployeeRecord.ASP_CLONE_MESSAGE, clone.asp_processing_label)
+        self.assertEqual(Status.DISABLED, good_employee_record.status)
+        self.assertIsNone(clone.archived_json)
 
         # Check conditions are required
-        bad_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
 
         with self.assertRaises(CloningError):
             # Clone with previous asp_id
