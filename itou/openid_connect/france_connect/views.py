@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils import crypto
 from django.utils.http import urlencode
 
+from itou.utils.constants import ITOU_SESSION_NIR_KEY
 from itou.utils.urls import get_absolute_url
 
 from ..models import TooManyKindsException
@@ -132,7 +133,7 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         if e.user.is_labor_inspector:
             return HttpResponseRedirect(reverse("login:labor_inspector"))
 
-    nir = request.session.get(settings.ITOU_SESSION_NIR_KEY)
+    nir = request.session.get(ITOU_SESSION_NIR_KEY)
     if nir:
         user.nir = nir
         user.save(update_fields=["nir"])

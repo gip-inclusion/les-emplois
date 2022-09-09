@@ -4,6 +4,7 @@ from django.conf import settings
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
+from itou.employee_record import constants
 from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer
@@ -200,7 +201,7 @@ class Command(EmployeeRecordTransferCommand):
         files_to_delete = []
 
         # Get into the download folder
-        with conn.cd(settings.ASP_FS_REMOTE_DOWNLOAD_DIR):
+        with conn.cd(constants.ASP_FS_REMOTE_DOWNLOAD_DIR):
             result_files = conn.listdir()
 
             if len(result_files) == 0:
@@ -275,7 +276,7 @@ class Command(EmployeeRecordTransferCommand):
         in `PROCESSED` status for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS days
         """
         self.stdout.write(
-            f"Archiving employee records (more than {settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS} days old)"
+            f"Archiving employee records (more than {constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS} days old)"
         )
         archivable = EmployeeRecord.objects.archivable()
 

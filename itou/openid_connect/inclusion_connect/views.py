@@ -4,7 +4,6 @@ import logging
 
 import httpx
 from allauth.account.adapter import get_adapter
-from django.conf import settings  # TODO: move to itou.prescribers.constants
 from django.contrib import messages
 from django.contrib.auth import login
 from django.http import HttpResponseRedirect
@@ -15,6 +14,7 @@ from django.utils.safestring import mark_safe
 
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, Kind
 from itou.users.models import User
+from itou.utils.constants import ITOU_ASSISTANCE_URL
 from itou.utils.urls import get_absolute_url
 
 from ..models import TooManyKindsException
@@ -186,9 +186,10 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
             f"Un compte {existing_user.get_kind_display()} existe déjà avec cette adresse e-mail. "
             "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail pour "
             f"devenir {Kind(user_kind).label} sur la plateforme. Besoin d'aide ? "
-            f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>Contactez-nous</a>."
+            f"<a href='{ITOU_ASSISTANCE_URL}/#support' target='_blank'>Contactez-nous</a>."
         )
         messages.error(request, mark_safe(error))
+
         is_successful = False
 
     if not is_successful:

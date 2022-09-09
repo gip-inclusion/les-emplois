@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -9,6 +8,7 @@ from django.urls import reverse
 from django.utils.encoding import escape_uri_path
 from django.utils.safestring import mark_safe
 
+from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
@@ -136,7 +136,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "employee_records_list": employee_records_list,
         "badges": status_badges,
         "navigation_pages": navigation_pages,
-        "feature_availability_date": settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+        "feature_availability_date": EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
     }
 
     return render(request, template_name, context)

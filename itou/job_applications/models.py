@@ -16,6 +16,7 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
+from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.job_applications.enums import RefusalReason, SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.siaes.models import Siae
@@ -327,7 +328,7 @@ class JobApplicationQuerySet(models.QuerySet):
                 # Admin control: can prevent creation of employee record
                 create_employee_record=True,
                 # No employee record is available before this date
-                hiring_start_at__gte=settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+                hiring_start_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
             )
             # There must be **NO** employee record linked in this part
             .filter(employee_record__isnull=True)
@@ -728,7 +729,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         """
         is_application_valid = (
             self.hiring_start_at is not None
-            and self.hiring_start_at >= settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
+            and self.hiring_start_at >= EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
             and not self.hiring_without_approval
             and self.state == JobApplicationWorkflow.STATE_ACCEPTED
             and self.approval.is_valid()

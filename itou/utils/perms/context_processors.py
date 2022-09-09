@@ -1,8 +1,9 @@
 from collections import OrderedDict
 
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
+
+from itou.utils import constants as global_constants
 
 
 def get_current_organization_and_perms(request):
@@ -25,7 +26,7 @@ def get_current_organization_and_perms(request):
 
     if current_user.is_authenticated:
         # SIAE ?
-        siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
+        siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
         if siae_pk:
             memberships = request.user.active_or_in_grace_period_siae_memberships()
             user_siaes = [membership.siae for membership in memberships]
@@ -40,7 +41,7 @@ def get_current_organization_and_perms(request):
                     raise PermissionDenied
 
         # Prescriber organization ?
-        prescriber_org_pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+        prescriber_org_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
 
         if prescriber_org_pk:
             # Membership can now be deactivated, hence filtering on `membership.is_active` (same as SIAE above)
@@ -61,7 +62,7 @@ def get_current_organization_and_perms(request):
                     user_is_prescriber_org_admin = membership.is_admin
 
         # Institution?
-        institution_pk = request.session.get(settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
+        institution_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
 
         if institution_pk:
             memberships = (

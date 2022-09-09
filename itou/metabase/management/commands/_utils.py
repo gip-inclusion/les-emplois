@@ -1,3 +1,4 @@
+import logging
 import os
 from functools import lru_cache
 from operator import attrgetter
@@ -21,6 +22,13 @@ from itou.siaes.models import Siae
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
+
+def enable_sql_logging():
+    # Unfortunately each SQL query log appears twice ¬_¬
+    db_logger = logging.getLogger("django.db.backends")
+    db_logger.setLevel(logging.DEBUG)
+    db_logger.addHandler(logging.StreamHandler())
 
 
 def convert_boolean_to_int(b):

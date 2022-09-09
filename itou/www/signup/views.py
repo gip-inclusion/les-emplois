@@ -28,6 +28,7 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.adapter import UserAdapter
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.utils import constants as global_constants
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.urls import get_safe_url
@@ -35,6 +36,8 @@ from itou.www.signup import forms
 
 
 logger = logging.getLogger(__name__)
+
+ITOU_SESSION_FACILITATOR_SIGNUP_KEY = "facilitator_signup"
 
 
 class ItouPasswordResetView(PasswordResetView):
@@ -81,7 +84,7 @@ class JobSeekerSignupView(SignupView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["nir"] = self.request.session.get(settings.ITOU_SESSION_NIR_KEY)
+        kwargs["nir"] = self.request.session.get(global_constants.ITOU_SESSION_NIR_KEY)
         return kwargs
 
     @transaction.atomic
@@ -128,7 +131,7 @@ def job_seeker_nir(request, template_name="signup/job_seeker_nir.html", redirect
     if request.method == "POST":
         next_url = reverse("signup:job_seeker")
         if form.is_valid():
-            request.session[settings.ITOU_SESSION_NIR_KEY] = form.cleaned_data["nir"]
+            request.session[global_constants.ITOU_SESSION_NIR_KEY] = form.cleaned_data["nir"]
 
             # forward next page
             if redirect_field_name in form.data:
@@ -279,7 +282,7 @@ class SiaeJoinView(LoginRequiredMixin, SiaeBaseView):
 
 def valid_prescriber_signup_session_required(function=None):
     def decorated(request, *args, **kwargs):
-        session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        session_data = request.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
         if not session_data:
             # Someone tries to use the direct link of a step inside the process
             # without going through the beginning.
@@ -312,7 +315,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
     # Start a fresh session that will be used during the signup process.
     # Since we can go back-and-forth, or someone always has the option
     # of using a direct link, its state must be kept clean in each step.
-    request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {
+    request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {
         "authorization_status": None,
         "email": None,
         "kind": None,
@@ -361,7 +364,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
 def facilitator_search(request, template_name="signup/facilitator_search.html"):
     form = forms.FacilitatorSearchForm(data=request.POST or None)
     if request.method == "POST" and form.is_valid():
-        request.session[settings.ITOU_SESSION_FACILITATOR_SIGNUP_KEY] = form.org_data
+        request.session[ITOU_SESSION_FACILITATOR_SIGNUP_KEY] = form.org_data
         return HttpResponseRedirect(reverse("signup:facilitator_signup"))
 
     context = {
@@ -378,7 +381,7 @@ class FacilitatorSignupView(SignupView):
 
     def _get_session_siae(self):
         if not hasattr(self, "siae"):
-            org_data = self.request.session[settings.ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
+            org_data = self.request.session[ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
             self.siae = Siae(
                 kind=SiaeKind.OPCS,
                 source=Siae.SOURCE_USER_CREATED,
@@ -408,7 +411,7 @@ class FacilitatorSignupView(SignupView):
         return self.form_class(data=self.request.POST or None, siae=self._get_session_siae())
 
     def get(self, request, *args, **kwargs):
-        if settings.ITOU_SESSION_FACILITATOR_SIGNUP_KEY not in request.session:
+        if ITOU_SESSION_FACILITATOR_SIGNUP_KEY not in request.session:
             return HttpResponseRedirect(reverse("signup:facilitator_search"))
         return super().get(request, *args, **kwargs)
 
@@ -418,7 +421,7 @@ class FacilitatorSignupView(SignupView):
 
 
 @valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_request_invitation(request, membership_id, template_name="signup/prescriber_request_invitation.html"):
 
     prescriber_membership = get_object_or_404(
@@ -448,22 +451,21 @@ def prescriber_request_invitation(request, membership_id, template_name="signup/
         "prescriber": prescriber_membership.user,
         "organization": prescriber_membership.organization,
         "form": form,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_org(request, siret, template_name="signup/prescriber_choose_org.html"):
     """
     Ask the user to choose his organization in a pre-existing list of authorized organization.
     """
-
     form = forms.PrescriberChooseOrgKindForm(siret=siret, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         session_data["prescriber_org_data"] = form.org_data
         request.session.modified = True
 
@@ -494,19 +496,19 @@ def prescriber_choose_org(request, siret, template_name="signup/prescriber_choos
 
     context = {
         "form": form,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind.html"):
     """
     If the user hasn't found his organization in the pre-existing list, ask him to choose his kind.
     """
 
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
     form = forms.PrescriberChooseKindForm(data=request.POST or None)
 
@@ -539,13 +541,13 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
 
     context = {
         "form": form,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_confirm_authorization(request, template_name="signup/prescriber_confirm_authorization.html"):
     """
     Ask the user to confirm the "authorized" character of his organization.
@@ -553,7 +555,7 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     That should help the support team with illegitimate or erroneous requests.
     """
 
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
     form = forms.PrescriberConfirmAuthorizationForm(data=request.POST or None)
 
@@ -573,19 +575,19 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
 
     context = {
         "form": form,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_pole_emploi_safir_code.html"):
     """
     Find a pre-existing Pôle emploi organization from a given SAFIR code.
     """
 
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
     form = forms.PrescriberPoleEmploiSafirCodeForm(data=request.POST or None)
 
@@ -605,15 +607,15 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
 
     context = {
         "form": form,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe_email.html"):
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
     form = forms.PrescriberCheckPEemail(data=request.POST or None)
     if request.method == "POST" and form.is_valid():
         session_data["email"] = form.cleaned_data["email"]
@@ -634,15 +636,15 @@ def prescriber_check_pe_email(request, template_name="signup/prescriber_check_pe
     context = {
         "pole_emploi_org": pole_emploi_org,
         "form": form,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_emploi_user.html"):
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
     kind = session_data.get("kind")
     pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
 
@@ -669,20 +671,20 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
     context = {
         "inclusion_connect_url": inclusion_connect_url,
         "pole_emploi_org": pole_emploi_org,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_user(request, template_name="signup/prescriber_user.html"):
     """
     Display Inclusion Connect button.
     This page is also shown if an error is detected during
     OAuth callback.
     """
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
     authorization_status = session_data.get("authorization_status")
     prescriber_org_data = session_data.get("prescriber_org_data")
     kind = session_data.get("kind")
@@ -737,13 +739,13 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
         "kind_label": kind_label,
         "kind_is_other": kind == PrescriberOrganizationKind.OTHER.value,
         "prescriber_org_data": prescriber_org_data,
-        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+        "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+@push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 @login_required
 def prescriber_join_org(request):
     """
@@ -752,7 +754,7 @@ def prescriber_join_org(request):
     """
 
     # Get useful information from session.
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
     try:
         with transaction.atomic():
@@ -797,6 +799,6 @@ def prescriber_join_org(request):
     # redirect to post login page.
     next_url = get_adapter(request).get_login_redirect_url(request)
     # delete session data
-    request.session.pop(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+    request.session.pop(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
     request.session.modified = True
     return HttpResponseRedirect(next_url)

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -15,6 +14,7 @@ from itou.common_apps.organizations.views import deactivate_org_member, update_o
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.apis.geocoding import GeocodingDataException
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -25,6 +25,10 @@ from itou.www.siaes_views import forms as siaes_forms
 # This is a "magic" value for the number of items for paginator objects.
 # Set to 10 because we're humans, but can / must be discussed and pulled-up to settings if an agreement is reached.
 NB_ITEMS_PER_PAGE = 10
+
+ITOU_SESSION_EDIT_SIAE_KEY = "edit_siae_session_key"
+ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
+ITOU_SESSION_CURRENT_PAGE_KEY = "current_page"
 
 
 ### Job description views
@@ -95,12 +99,12 @@ def job_description_list(request, template_name="siaes/job_description_list.html
         .prefetch_related("appellation", "appellation__rome", "siae")
         .order_by_most_recent()
     )
-    page = int(request.GET.get("page") or request.session.get(settings.ITOU_SESSION_CURRENT_PAGE_KEY) or 1)
-    request.session[settings.ITOU_SESSION_CURRENT_PAGE_KEY] = page
+    page = int(request.GET.get("page") or request.session.get(ITOU_SESSION_CURRENT_PAGE_KEY) or 1)
+    request.session[ITOU_SESSION_CURRENT_PAGE_KEY] = page
 
     # Remove possible obsolete session data when coming from breakcrumbs links and back buttons
-    if request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY):
-        del request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY]
+    if request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY):
+        del request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY]
 
     form = siaes_forms.BlockJobApplicationsForm(instance=siae, data=request.POST or None)
 
@@ -160,7 +164,7 @@ def _get_job_description(session_data):
 @login_required
 def edit_job_description(request, template_name="siaes/edit_job_description.html"):
     siae = get_current_siae_or_404(request)
-    session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
+    session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
     job_description = _get_job_description(session_data)
 
     form = siaes_forms.EditJobDescriptionForm(
@@ -168,7 +172,7 @@ def edit_job_description(request, template_name="siaes/edit_job_description.html
     )
 
     if request.method == "POST" and form.is_valid():
-        request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
+        request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
         return HttpResponseRedirect(reverse("siaes_views:edit_job_description_details"))
 
     breadcrumbs = {
@@ -196,7 +200,7 @@ def edit_job_description(request, template_name="siaes/edit_job_description.html
 @login_required
 def edit_job_description_details(request, template_name="siaes/edit_job_description_details.html"):
     siae = get_current_siae_or_404(request)
-    session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+    session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
     if not session_data:
         return HttpResponseRedirect(reverse("siaes_views:edit_job_description"))
@@ -216,7 +220,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
         session_data["is_resume_mandatory"] = request.POST.get("is_resume_mandatory", False)
         session_data["is_qpv_mandatory"] = request.POST.get("is_qpv_mandatory", False)
 
-        request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
+        request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
         return HttpResponseRedirect(reverse("siaes_views:edit_job_description_preview"))
 
     breadcrumbs = {
@@ -248,7 +252,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
 @transaction.atomic
 def edit_job_description_preview(request, template_name="siaes/edit_job_description_preview.html"):
     siae = get_current_siae_or_404(request)
-    session_data = request.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+    session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
     if not session_data:
         return HttpResponseRedirect(reverse("siaes_views:edit_job_description"))
@@ -267,7 +271,7 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
             job_description.save()
             messages.success(request, "Enregistrement de la fiche de poste effectué.")
         finally:
-            request.session.pop(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+            request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
             return HttpResponseRedirect(reverse("siaes_views:job_description_list"))
 
     breadcrumbs = {
@@ -296,7 +300,7 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
 
 @login_required
 def update_job_description(request, job_description_id):
-    request.session[settings.ITOU_SESSION_JOB_DESCRIPTION_KEY] = {"pk": job_description_id}
+    request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {"pk": job_description_id}
     return HttpResponseRedirect(reverse("siaes_views:edit_job_description"))
 
 
@@ -417,7 +421,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
 
         try:
             siae = form.save()
-            request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+            request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
             return HttpResponseRedirect(reverse("dashboard:index"))
         except GeocodingDataException:
             messages.error(request, "L'adresse semble erronée. Veuillez la corriger avant de pouvoir « Enregistrer ».")
@@ -428,8 +432,8 @@ def create_siae(request, template_name="siaes/create_siae.html"):
 
 @login_required
 def edit_siae_step_contact_infos(request, template_name="siaes/edit_siae.html"):
-    if settings.ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
-        request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY] = {}
+    if ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
+        request.session[ITOU_SESSION_EDIT_SIAE_KEY] = {}
 
     siae = get_current_siae_or_404(request)
     if not siae.has_admin(request.user):
@@ -440,10 +444,10 @@ def edit_siae_step_contact_infos(request, template_name="siaes/edit_siae.html"):
     siae.brand = siae.display_name
 
     form = siaes_forms.EditSiaeForm(
-        instance=siae, data=request.POST or None, initial=request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
+        instance=siae, data=request.POST or None, initial=request.session[ITOU_SESSION_EDIT_SIAE_KEY]
     )
     if request.method == "POST" and form.is_valid():
-        request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY].update(form.cleaned_data)
+        request.session[ITOU_SESSION_EDIT_SIAE_KEY].update(form.cleaned_data)
         request.session.modified = True
         return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_description"))
 
@@ -453,7 +457,7 @@ def edit_siae_step_contact_infos(request, template_name="siaes/edit_siae.html"):
 
 @login_required
 def edit_siae_step_description(request, template_name="siaes/edit_siae_description.html"):
-    if settings.ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
+    if ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
         return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_contact_infos"))
 
     siae = get_current_siae_or_404(request)
@@ -461,11 +465,11 @@ def edit_siae_step_description(request, template_name="siaes/edit_siae_descripti
         raise PermissionDenied
 
     form = siaes_forms.EditSiaeDescriptionForm(
-        instance=siae, data=request.POST or None, initial=request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
+        instance=siae, data=request.POST or None, initial=request.session[ITOU_SESSION_EDIT_SIAE_KEY]
     )
 
     if request.method == "POST" and form.is_valid():
-        request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY].update(form.cleaned_data)
+        request.session[ITOU_SESSION_EDIT_SIAE_KEY].update(form.cleaned_data)
         request.session.modified = True
         return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_preview"))
 
@@ -476,14 +480,14 @@ def edit_siae_step_description(request, template_name="siaes/edit_siae_descripti
 @login_required
 @transaction.atomic
 def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"):
-    if settings.ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
+    if ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
         return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_contact_infos"))
 
     siae = get_current_siae_or_404(request)
     if not siae.has_admin(request.user):
         raise PermissionDenied
 
-    form_data = request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
+    form_data = request.session[ITOU_SESSION_EDIT_SIAE_KEY]
 
     # Update the object's data with the recorded changes, for the preview.
     # NOTE(vperron): This may seem "ugly" but it's probably acceptable here since it:
@@ -500,7 +504,7 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
             siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
             siae.save()
             # Clear the session now, so that we start fresh if we edit again.
-            del request.session[settings.ITOU_SESSION_EDIT_SIAE_KEY]
+            del request.session[ITOU_SESSION_EDIT_SIAE_KEY]
             request.session.modified = True
             messages.success(request, "Mise à jour effectuée !")
             return HttpResponseRedirect(reverse("dashboard:index"))

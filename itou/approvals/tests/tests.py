@@ -33,6 +33,7 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, UserFactory
+from itou.utils import constants as global_constants
 
 
 class CommonApprovalQuerySetTest(TestCase):
@@ -1368,7 +1369,7 @@ class ProlongationNotificationsTest(TestCase):
         self.assertIn(prolongation.approval.number_with_spaces, email.body)
         self.assertIn(title(prolongation.approval.user.first_name), email.body)
         self.assertIn(title(prolongation.approval.user.last_name), email.body)
-        self.assertIn(settings.ITOU_EMAIL_PROLONGATION, email.body)
+        self.assertIn(global_constants.ITOU_EMAIL_PROLONGATION, email.body)
 
 
 class ApprovalConcurrentModelTest(TransactionTestCase):

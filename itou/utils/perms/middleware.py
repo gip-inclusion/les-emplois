@@ -1,9 +1,9 @@
-from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import safestring
 
+from itou.utils import constants as global_constants
 from itou.www.login import urls as login_urls
 
 
@@ -38,7 +38,7 @@ class ItouCurrentOrganizationMiddleware:
 
         if user.is_authenticated:
             if user.is_siae_staff:
-                current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
+                current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
                 siae_set = user.siae_set.filter(siaemembership__is_active=True).active_or_in_grace_period()
 
                 if not siae_set.filter(pk=current_siae_pk).exists():
@@ -48,7 +48,7 @@ class ItouCurrentOrganizationMiddleware:
                     # preferably an active one.
                     first_siae = siae_set.active().first() or siae_set.first()
                     if first_siae:
-                        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_siae.pk
+                        request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = first_siae.pk
                     else:
                         # SIAE user has no active SIAE and thus must not be able to access any page,
                         # thus we force a logout with a few exceptions:
@@ -79,22 +79,24 @@ class ItouCurrentOrganizationMiddleware:
             elif user.is_prescriber:
                 # Prescriber users can now select an organization
                 # (if they are member of several prescriber organizations)
-                current_prescriber_org_key = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+                current_prescriber_org_key = request.session.get(
+                    global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+                )
                 if user.is_prescriber_with_org:
                     if not current_prescriber_org_key:
                         # Choose first prescriber organization for user if none is selected yet
                         # (f.i. after login)
-                        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = (
+                        request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = (
                             user.prescribermembership_set.filter(is_active=True).first().organization.pk
                         )
                 elif current_prescriber_org_key:
                     # If the user is an "orienteur"
                     # => No need to track the current org in session (none)
                     # => Remove any old session entry if needed
-                    del request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
+                    del request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
 
             elif user.is_labor_inspector:
-                current_institution_key = request.session.get(settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
+                current_institution_key = request.session.get(global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
                 if not current_institution_key:
                     first_active_membership = user.institutionmembership_set.filter(is_active=True).first()
                     if not first_active_membership:
@@ -109,7 +111,7 @@ class ItouCurrentOrganizationMiddleware:
                         return redirect("account_logout")
 
                     request.session[
-                        settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY
+                        global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY
                     ] = first_active_membership.institution.pk
 
         response = self.get_response(request)

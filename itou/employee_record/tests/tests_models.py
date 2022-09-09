@@ -1,11 +1,11 @@
 from datetime import date, timedelta
 from unittest import mock
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
+from itou.employee_record import constants
 from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import CloningError, InvalidStatusError
 from itou.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
@@ -170,7 +170,7 @@ class EmployeeRecordModelTest(TestCase):
 
         # Fake older date
         employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
+            days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
         )
 
         employee_record.save()
@@ -447,7 +447,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         # Fake old date, but not to old
         self.employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS - 1
+            days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS - 1
         )
 
         with self.assertRaises(InvalidStatusError):
@@ -455,7 +455,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         # Fake a date older than archiving delay
         self.employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
+            days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
         )
 
         self.employee_record.update_as_archived()

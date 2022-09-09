@@ -1,7 +1,6 @@
 import respx
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
-from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -11,6 +10,7 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
+from itou.utils import constants as global_constants
 
 
 def get_confirm_email_url(request, email):
@@ -63,7 +63,7 @@ class WelcomingTourTest(TestCase):
     @respx.mock
     def test_new_prescriber_sees_welcoming_tour_test(self):
         session = self.client.session
-        session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
+        session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
         session.save()
         response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
         response = self.client.get(response.url, follow=True)

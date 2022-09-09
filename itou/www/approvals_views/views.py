@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -11,6 +10,7 @@ from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import UserExistsForm
@@ -58,7 +58,7 @@ def display_printable_approval(request, job_application_id, template_name="appro
 
     context = {
         "approval": job_application.approval,
-        "itou_assistance_url": settings.ITOU_ASSISTANCE_URL,
+        "itou_assistance_url": global_constants.ITOU_ASSISTANCE_URL,
         "diagnosis_author": diagnosis_author,
         "diagnosis_author_org_name": diagnosis_author_org_name,
         "siae": job_application.to_siae,

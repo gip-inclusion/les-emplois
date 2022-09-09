@@ -9,9 +9,11 @@ from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
+from itou.openid_connect.france_connect import constants
 from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.www.signup.forms import JobSeekerSituationForm
 
 
@@ -79,8 +81,8 @@ class JobSeekerSignupTest(TestCase):
         post_data = {"nir": nir}
         response = self.client.post(url, post_data)
         self.assertRedirects(response, reverse("signup:job_seeker"))
-        self.assertIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertTrue(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+        self.assertIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertTrue(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
 
         # NIR is stored with user information.
         url = reverse("signup:job_seeker")
@@ -130,8 +132,8 @@ class JobSeekerSignupTest(TestCase):
         post_data = {"nir": nir, "skip": 1}
         response = self.client.post(url, post_data)
         self.assertRedirects(response, reverse("signup:job_seeker"))
-        self.assertNotIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+        self.assertNotIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertFalse(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
 
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")
@@ -236,13 +238,19 @@ class JobSeekerSignupTest(TestCase):
         self.assertTrue(user_email.verified)
 
     @respx.mock
+    @override_settings(
+        FRANCE_CONNECT_BASE_URL="https://france.connect.fake",
+        FRANCE_CONNECT_CLIENT_ID="IC_CLIENT_ID_123",
+        FRANCE_CONNECT_CLIENT_SECRET="IC_CLIENT_SECRET_123",
+    )
     def test_job_seeker_nir_with_france_connect(self):
+        importlib.reload(fc_constants)
         # NIR is set on a previous step and tested separately.
         # See self.test_job_seeker_nir
         nir = "141068078200557"
         self.client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
-        self.assertIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertTrue(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+        self.assertIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertTrue(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
 
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
@@ -256,11 +264,12 @@ class JobSeekerSignupTest(TestCase):
 
     @respx.mock
     def test_job_seeker_temporary_nir_with_france_connect(self):
+        importlib.reload(constants)
         # temporary NIR is discarded on a previous step and tested separately.
         # See self.test_job_seeker_temporary_nir
 
-        self.assertNotIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+        self.assertNotIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertFalse(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
 
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")

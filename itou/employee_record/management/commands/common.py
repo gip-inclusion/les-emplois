@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from rest_framework.renderers import JSONRenderer
 
+from itou.employee_record import constants
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
@@ -65,7 +66,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
             return remote_path
 
         # There are specific folders for upload and download on the SFTP server
-        with conn.cd(settings.ASP_FS_REMOTE_UPLOAD_DIR):
+        with conn.cd(constants.ASP_FS_REMOTE_UPLOAD_DIR):
             # After creating a FileIO object, internal pointer is at the end of the buffer
             # It must be set back to 0 (rewind) otherwise an empty file is sent
             json_stream.seek(0)

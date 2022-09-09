@@ -7,7 +7,6 @@ from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.tests import OAuth2TestsMixin
 from allauth.tests import MockedResponse, TestCase
-from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -16,6 +15,7 @@ from itou.allauth_adapters.peamu.provider import PEAMUProvider
 from itou.users import enums as users_enums
 from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
+from itou.utils import constants as global_constants
 
 
 @override_settings(
@@ -154,8 +154,8 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
 
         nir = "141068078200557"
         self.client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
-        self.assertIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertTrue(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+        self.assertIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertTrue(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
 
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
@@ -172,8 +172,8 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         # Complete signup with a discarded temporary NIR is tested in
         # JobSeekerSignupTest.test_job_seeker_temporary_nir
 
-        self.assertNotIn(settings.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_NIR_KEY))
+        self.assertNotIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
+        self.assertFalse(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
 
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")

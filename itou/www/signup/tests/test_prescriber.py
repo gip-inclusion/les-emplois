@@ -24,6 +24,7 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import KIND_PRESCRIBER
 from itou.users.factories import PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.www.signup.forms import PrescriberChooseKindForm
@@ -68,11 +69,11 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context["form"].errors.get("email"))
 
-        email = f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
+        email = f"athos{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}"
         post_data = {"email": email}
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("signup:prescriber_pole_emploi_user"))
-        session_data = self.client.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        session_data = self.client.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         self.assertEqual(email, session_data.get("email"))
 
         response = self.client.get(response.url)
@@ -106,7 +107,9 @@ class PrescriberSignupTest(TestCase):
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Organization
-        self.assertEqual(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY), organization.pk)
+        self.assertEqual(
+            self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY), organization.pk
+        )
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, f"Code SAFIR {organization.code_safir_pole_emploi}")
 
@@ -710,7 +713,7 @@ class PrescriberSignupTest(TestCase):
 
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
-        session_signup_data = self.client.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        session_signup_data = self.client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
         # Jump over the last step to avoid double-testing each one
         # as they are already tested on prescriber's signup views.
         # Prescriber's signup process heavily relies on session data.
@@ -737,7 +740,7 @@ class PrescriberSignupTest(TestCase):
         }
 
         client_session = self.client.session
-        client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
+        client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
         client_session.save()
         signup_url = reverse("signup:prescriber_user")
 
@@ -793,7 +796,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
 
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
-        session_signup_data = self.client.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        session_signup_data = self.client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
         # Jump over the last step to avoid double-testing each one
         # as they are already tested on prescriber's signup views.
         # Prescriber's signup process heavily relies on session data.
@@ -822,7 +825,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         }
 
         client_session = self.client.session
-        client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
+        client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
         client_session.save()
         signup_url = reverse("signup:prescriber_user")
 
@@ -862,7 +865,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         user = SiaeStaffFactory(email=OIDC_USERINFO["email"])
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
-        session_signup_data = self.client.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        session_signup_data = self.client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
         # Jump over the last step to avoid double-testing each one
         # as they are already tested on prescriber's signup views.
         # Prescriber's signup process heavily relies on session data.
@@ -889,7 +892,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         }
 
         client_session = self.client.session
-        client_session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
+        client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
         client_session.save()
         signup_url = reverse("signup:prescriber_user")
 
@@ -932,7 +935,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         but his e-mail suffix is wrong. An error should be raised.
         """
         pe_org = PrescriberPoleEmploiFactory()
-        pe_email = f"athos{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
+        pe_email = f"athos{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}"
 
         # Go through each step to ensure session data is recorded properly.
         # Step 1: choose organization kind or go to the "no organization" page.
@@ -978,7 +981,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         )
 
         # Organization
-        self.assertFalse(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY))
+        self.assertFalse(self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY))
         self.assertFalse(User.objects.filter(email=pe_email).exists())
 
     def test_permission_denied_when_skiping_first_step(self):

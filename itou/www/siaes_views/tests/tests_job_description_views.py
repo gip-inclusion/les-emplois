@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
@@ -11,6 +10,7 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import SiaeJobDescription
+from itou.www.siaes_views.views import ITOU_SESSION_CURRENT_PAGE_KEY, ITOU_SESSION_JOB_DESCRIPTION_KEY
 
 
 class JobDescriptionAbstractTest(TestCase):
@@ -66,8 +66,8 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.siae.job_description_through.count(), 4)
-        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
-        self.assertIn(settings.ITOU_SESSION_CURRENT_PAGE_KEY, self.client.session)
+        self.assertNotIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertIn(ITOU_SESSION_CURRENT_PAGE_KEY, self.client.session)
 
         for job in self.siae.job_description_through.all():
             with self.subTest(job.pk):
@@ -147,7 +147,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         # Step 1: edit job description
         response = self.client.get(self.edit_url)
 
-        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertNotIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         post_data = {
             "job_appellation_code": 11076,  # Must be a non existing one for the SIAE
@@ -162,9 +162,9 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self.client.post(self.edit_url, data=post_data)
 
         self.assertRedirects(response, self.edit_details_url)
-        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
-        session_data = self.client.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
             with self.subTest(k):
                 self.assertEqual(v, session_data.get(k))
@@ -179,9 +179,9 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self.client.post(self.edit_details_url, data=post_data)
 
         self.assertRedirects(response, self.edit_preview_url)
-        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
-        session_data = self.client.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
             with self.subTest(k):
                 self.assertEqual(v, session_data.get(k))
@@ -197,7 +197,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self.client.post(self.edit_preview_url)
 
         self.assertRedirects(response, self.list_url)
-        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertNotIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
         self.assertEqual(self.siae.job_description_through.count(), 5)
 
     def test_edit_job_description_opcs(self):
@@ -218,7 +218,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         # Step 1: edit job description
         response = self.client.get(self.edit_url)
 
-        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertNotIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         post_data = {
             "job_appellation_code": 11076,  # Must be a non existing one for the SIAE
@@ -234,9 +234,9 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self.client.post(self.edit_url, data=post_data)
 
         self.assertRedirects(response, self.edit_details_url)
-        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
-        session_data = self.client.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
             with self.subTest(k):
                 self.assertEqual(v, session_data.get(k))
@@ -252,9 +252,9 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self.client.post(self.edit_details_url, data=post_data)
 
         self.assertRedirects(response, self.edit_preview_url)
-        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
-        session_data = self.client.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
             with self.subTest(k):
                 self.assertEqual(v, session_data.get(k))
@@ -273,7 +273,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self.client.post(self.edit_preview_url)
 
         self.assertRedirects(response, self.list_url)
-        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertNotIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
         self.assertEqual(opcs.job_description_through.count(), 5)
 
     def test_empty_session_during_edit(self):
@@ -288,7 +288,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         # Step 1: edit job description
         response = self.client.get(self.edit_url)
 
-        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertNotIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         post_data = {
             "job_appellation_code": 11076,  # Must be a non existing one for the SIAE
@@ -303,16 +303,16 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self.client.post(self.edit_url, data=post_data)
 
         self.assertRedirects(response, self.edit_details_url)
-        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         # Remove session data
         # - do not remove directly from client (i.e self.client.session.pop(...) )
         # - don't forget to call session.save()
         session = self.client.session
-        session.pop(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         session.save()
 
-        self.assertIsNone(session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY))
+        self.assertIsNone(session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY))
 
         response = self.client.get(self.edit_details_url)
         self.assertRedirects(response, self.edit_url)
@@ -330,14 +330,14 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self.client.post(self.edit_details_url, data=post_data)
 
         self.assertRedirects(response, self.edit_preview_url)
-        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         # Remove session data
         session = self.client.session
-        session.pop(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         session.save()
 
-        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertNotIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         response = self.client.get(self.edit_preview_url)
         self.assertRedirects(response, self.edit_url)
@@ -362,14 +362,14 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
         response = self._login(self.user)
 
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertNotIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
         response = self.client.get(self.update_url, follow=True)
 
         self.assertRedirects(response, self.edit_url)
-        self.assertIn(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
+        self.assertIn(ITOU_SESSION_JOB_DESCRIPTION_KEY, self.client.session)
 
-        session_data = self.client.session.get(settings.ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
         self.assertEqual(session_data.get("pk"), self.job_description.pk)
         self.assertContains(response, self.job_description.appellation.name)

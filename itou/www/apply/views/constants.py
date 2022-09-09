@@ -1,6 +1,6 @@
-from django.conf import settings
 from django.utils.safestring import mark_safe
 
+from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup
 
 
@@ -14,7 +14,7 @@ ERROR_CANNOT_OBTAIN_NEW_FOR_USER = mark_safe(
 )
 
 _doc_link = get_external_link_markup(
-    url=f"{settings.ITOU_COMMUNITY_URL }/doc/emplois/derogation-au-delai-de-carence/",
+    url=f"{global_constants.ITOU_COMMUNITY_URL }/doc/emplois/derogation-au-delai-de-carence/",
     text="En savoir plus sur la dérogation du délai de carence",
 )
 

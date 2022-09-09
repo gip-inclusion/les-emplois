@@ -6,6 +6,7 @@ from django.conf import settings
 from itou.allauth_adapters.peamu.client import PEAMUOAuth2Client
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
 from itou.users import enums as users_enums
+from itou.utils import constants as global_constants
 
 
 class PEAMUSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -13,7 +14,7 @@ class PEAMUSocialAccountAdapter(DefaultSocialAccountAdapter):
         user = super().populate_user(request, sociallogin, data)
         setattr(user, "is_job_seeker", True)
         setattr(user, "identity_provider", users_enums.IdentityProvider.PE_CONNECT)
-        nir = request.session.get(settings.ITOU_SESSION_NIR_KEY)
+        nir = request.session.get(global_constants.ITOU_SESSION_NIR_KEY)
         if nir:
             setattr(user, "nir", nir)
         return user

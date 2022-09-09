@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -9,6 +8,7 @@ from itou.common_apps.address.departments import DEPARTMENTS, department_from_po
 from itou.jobs.models import Appellation
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
+from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup
 
 
@@ -66,8 +66,8 @@ class CreateSiaeForm(forms.ModelForm):
                 connue de nos services. Merci de nous contacter à l'adresse
                 """
             external_link = get_external_link_markup(
-                url=settings.ITOU_ASSISTANCE_URL,
-                text=settings.ITOU_ASSISTANCE_URL,
+                url=global_constants.ITOU_ASSISTANCE_URL,
+                text=global_constants.ITOU_ASSISTANCE_URL,
             )
             error_message_siret = (
                 "en précisant votre numéro de SIRET (si existant),"

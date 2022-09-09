@@ -9,6 +9,87 @@ C1_SIAE_FILTER_KEY = "identifiant_de_la_structure_(c1)"
 DEPARTMENT_FILTER_KEY = "d%C3%A9partement"
 REGION_FILTER_KEY = "r%C3%A9gion"
 
+METABASE_DASHBOARDS = {
+    # Public stats.
+    "stats_public": {
+        "dashboard_id": 119,
+    },
+    # Employer stats.
+    "stats_siae_etp": {
+        "dashboard_id": 128,
+        # Tally form suspended on 2022/09/30, should be restored soon.
+        # "tally_form_id": "nrjbRv",
+    },
+    "stats_siae_hiring": {
+        "dashboard_id": 185,
+        "tally_form_id": "waQPkB",
+    },
+    # Prescriber stats.
+    "stats_cd": {
+        "dashboard_id": 118,
+        # Tally form suspended on 2022/09/30, should be restored soon.
+        # "tally_form_id": "wb5Nro",
+    },
+    "stats_pe_delay_main": {
+        "dashboard_id": 168,
+        "tally_form_id": "3lb9XW",
+    },
+    "stats_pe_delay_raw": {
+        "dashboard_id": 180,
+    },
+    "stats_pe_conversion_main": {
+        "dashboard_id": 169,
+        "tally_form_id": "mODeK8",
+    },
+    "stats_pe_conversion_raw": {
+        "dashboard_id": 182,
+    },
+    "stats_pe_state_main": {
+        "dashboard_id": 149,
+        "tally_form_id": "mRG61J",
+    },
+    "stats_pe_state_raw": {
+        "dashboard_id": 183,
+    },
+    "stats_pe_tension": {
+        "dashboard_id": 162,
+        "tally_form_id": "wobaYV",
+    },
+    # Institution stats - DDETS - department level.
+    "stats_ddets_iae": {
+        "dashboard_id": 117,
+        # Tally form suspended on 2022/09/30, should be restored soon.
+        # "tally_form_id": "nPdWLb",
+    },
+    "stats_ddets_diagnosis_control": {
+        "dashboard_id": 144,
+    },
+    "stats_ddets_hiring": {
+        "dashboard_id": 160,
+        "tally_form_id": "mVLBXv",
+    },
+    # Institution stats - DREETS - region level.
+    "stats_dreets_iae": {
+        "dashboard_id": 117,
+        # Tally form suspended on 2022/09/30, should be restored soon.
+        # "tally_form_id": "nPdWLb",
+    },
+    "stats_dreets_hiring": {
+        "dashboard_id": 160,
+        "tally_form_id": "mVLBXv",
+    },
+    # Institution stats - DGEFP - nation level.
+    "stats_dgefp_iae": {
+        "dashboard_id": 117,
+    },
+    "stats_dgefp_diagnosis_control": {
+        "dashboard_id": 144,
+    },
+    "stats_dgefp_af": {
+        "dashboard_id": 142,
+    },
+}
+
 
 # Metabase private / signed URLs
 # See:
@@ -35,7 +116,7 @@ def metabase_embedded_url(request=None, dashboard_id=None, params={}, with_title
     """
     if dashboard_id is None:
         view_name = get_view_name(request)
-        metabase_dashboard = settings.METABASE_DASHBOARDS.get(view_name)
+        metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
         dashboard_id = metabase_dashboard["dashboard_id"] if metabase_dashboard else None
 
     payload = {"resource": {"dashboard": dashboard_id}, "params": params, "exp": round(time.time()) + (10 * 60)}

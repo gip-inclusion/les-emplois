@@ -1,6 +1,5 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -10,6 +9,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import SiaeMembership
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
@@ -137,7 +137,7 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 
     def clean_email(self):
         email = super().clean_email()
-        if email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
+        if email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
         return email
 
@@ -157,7 +157,7 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         user.save()
 
         if self.nir:
-            del request.session[settings.ITOU_SESSION_NIR_KEY]
+            del request.session[global_constants.ITOU_SESSION_NIR_KEY]
 
         return user
 
@@ -345,7 +345,7 @@ class PrescriberCheckPEemail(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if not email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
+        if not email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
             raise ValidationError("L'adresse e-mail doit être une adresse Pôle emploi.")
         return email
 

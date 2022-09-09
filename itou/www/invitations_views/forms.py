@@ -1,13 +1,13 @@
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
 from django import forms
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.models import modelformset_factory
 
 from itou.invitations.models import LaborInspectorInvitation, PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.models import User
+from itou.utils import constants as global_constants
 
 
 ########################################################################
@@ -46,7 +46,7 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
 
         self._invited_user_exists_error(email)
         if self.organization.kind == PrescriberOrganizationKind.PE and not email.endswith(
-            settings.POLE_EMPLOI_EMAIL_SUFFIX
+            global_constants.POLE_EMPLOI_EMAIL_SUFFIX
         ):
             error = forms.ValidationError("L'adresse e-mail doit être une adresse Pôle emploi")
             self.add_error("email", error)

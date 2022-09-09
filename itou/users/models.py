@@ -34,6 +34,7 @@ from itou.institutions.models import Institution
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.utils import constants as global_constants
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 from .enums import IdentityProvider, Kind, Title
@@ -520,7 +521,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def has_pole_emploi_email(self):
-        return self.email and self.email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX)
+        return self.email and self.email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX)
 
     @cached_property
     def is_siae_staff_with_siae(self):

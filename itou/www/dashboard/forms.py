@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
@@ -8,6 +7,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
@@ -45,7 +45,7 @@ class EditUserInfoForm(MandatoryAddressFormMixin, forms.ModelForm):
                     self.fields[name].disabled = True
             self.fields["email"].help_text = (
                 "Si vous souhaitez modifier votre adresse e-mail merci de "
-                f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>"
+                f"<a href='{global_constants.ITOU_ASSISTANCE_URL}/#support' target='_blank'>"
                 "contacter notre support technique</a>"
             )
         else:

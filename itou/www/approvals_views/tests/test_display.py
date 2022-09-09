@@ -7,6 +7,7 @@ from django.urls import reverse
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
 from itou.users.factories import UserFactory
+from itou.utils import constants as global_constants
 
 
 @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
@@ -25,7 +26,7 @@ class TestDisplayApproval(TestCase):
         self.assertEqual(response.context["approval"], job_application.approval)
         self.assertEqual(response.context["siae"], job_application.to_siae)
         self.assertEqual(response.context["job_seeker"], job_application.job_seeker)
-        self.assertContains(response, settings.ITOU_ASSISTANCE_URL)
+        self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
@@ -59,7 +60,7 @@ class TestDisplayApproval(TestCase):
         self.assertEqual(response.context["approval"], job_application.approval)
         self.assertEqual(response.context["siae"], job_application.to_siae)
         self.assertEqual(response.context["job_seeker"], job_application.job_seeker)
-        self.assertContains(response, settings.ITOU_ASSISTANCE_URL)
+        self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
@@ -85,7 +86,7 @@ class TestDisplayApproval(TestCase):
         self.assertEqual(response.context["approval"], job_application.approval)
         self.assertEqual(response.context["siae"], job_application.to_siae)
         self.assertEqual(response.context["job_seeker"], job_application.job_seeker)
-        self.assertContains(response, settings.ITOU_ASSISTANCE_URL)
+        self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 

@@ -1,6 +1,5 @@
 from typing import Optional, Union
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.manager import Manager
@@ -15,6 +14,7 @@ from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
 
+from . import constants
 from .enums import MovementType, NotificationStatus, NotificationType, Status
 from .exceptions import CloningError, InvalidStatusError
 
@@ -34,7 +34,7 @@ def validate_asp_batch_filename(value):
 
 # Oddly enough, no month param for timedeltas
 # => approximate 1 month to 30 days (see base settings)
-ARCHIVING_DELTA = timezone.timedelta(days=settings.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS)
+ARCHIVING_DELTA = timezone.timedelta(days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS)
 
 
 class EmployeeRecordQuerySet(models.QuerySet):

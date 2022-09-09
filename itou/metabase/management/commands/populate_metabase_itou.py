@@ -21,7 +21,6 @@ Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for 
 """
 
 import gc
-import logging
 from collections import OrderedDict
 
 from django.conf import settings
@@ -36,6 +35,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
+from itou.metabase import constants
 from itou.metabase.management.commands import (
     _approvals,
     _insee_codes,
@@ -59,6 +59,7 @@ from itou.metabase.management.commands._utils import (
     chunked_queryset,
     compose,
     convert_boolean_to_int,
+    enable_sql_logging,
     get_active_siae_pks,
 )
 from itou.prescribers.models import PrescriberOrganization
@@ -68,11 +69,8 @@ from itou.users.models import User
 from itou.utils.slack import send_slack_message
 
 
-if settings.METABASE_SHOW_SQL_REQUESTS:
-    # Unfortunately each SQL query log appears twice ¬_¬
-    mylogger = logging.getLogger("django.db.backends")
-    mylogger.setLevel(logging.DEBUG)
-    mylogger.addHandler(logging.StreamHandler())
+if constants.METABASE_SHOW_SQL_REQUESTS:
+    enable_sql_logging()
 
 
 class Command(BaseCommand):
@@ -155,7 +153,7 @@ class Command(BaseCommand):
 
             if self.dry_run:
                 total_rows = sum(
-                    [min(queryset.count(), settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET) for queryset in querysets]
+                    [min(queryset.count(), constants.METABASE_DRY_RUN_ROWS_PER_QUERYSET) for queryset in querysets]
                 )
             else:
                 total_rows = sum([queryset.count() for queryset in querysets])
@@ -218,10 +216,10 @@ class Command(BaseCommand):
                     injections = 0
                     total_injections = queryset.count()
                     if self.dry_run:
-                        total_injections = min(total_injections, settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET)
+                        total_injections = min(total_injections, constants.METABASE_DRY_RUN_ROWS_PER_QUERYSET)
 
-                    # Insert rows by batch of settings.METABASE_INSERT_BATCH_SIZE.
-                    for chunk_qs in chunked_queryset(queryset, chunk_size=settings.METABASE_INSERT_BATCH_SIZE):
+                    # Insert rows by batch of constants.METABASE_INSERT_BATCH_SIZE.
+                    for chunk_qs in chunked_queryset(queryset, chunk_size=constants.METABASE_INSERT_BATCH_SIZE):
                         injections_left = total_injections - injections
                         if injections_left == 0:
                             break  # During a dry run stop as soon as we have injected enough rows.

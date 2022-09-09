@@ -4,6 +4,7 @@ import pysftp
 from django.conf import settings
 from rest_framework.parsers import JSONParser
 
+from itou.employee_record import constants
 from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.test_serializers import TestEmployeeRecordUpdateNotificationBatchSerializer
@@ -160,7 +161,7 @@ class Command(EmployeeRecordTransferCommand):
 
         self.stdout.write("Starting DOWNLOAD of employee record notifications")
 
-        with conn.cd(settings.ASP_FS_REMOTE_DOWNLOAD_DIR):
+        with conn.cd(constants.ASP_FS_REMOTE_DOWNLOAD_DIR):
             result_files = conn.listdir()
 
             if len(result_files) == 0:

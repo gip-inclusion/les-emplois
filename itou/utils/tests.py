@@ -43,6 +43,7 @@ from itou.siaes.models import Siae, SiaeMembership
 from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise
 from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
@@ -123,7 +124,9 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         self.assertTrue(siae.has_admin(user))
 
         request = self.go_to_dashboard(
-            user=user, establishment_session_key=settings.ITOU_SESSION_CURRENT_SIAE_KEY, establishment_pk=siae.pk
+            user=user,
+            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_SIAE_KEY,
+            establishment_pk=siae.pk,
         )
 
         with self.assertNumQueries(1):
@@ -149,7 +152,9 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         self.assertFalse(siae2.has_admin(user))
 
         request = self.go_to_dashboard(
-            user=user, establishment_session_key=settings.ITOU_SESSION_CURRENT_SIAE_KEY, establishment_pk=siae2.pk
+            user=user,
+            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_SIAE_KEY,
+            establishment_pk=siae2.pk,
         )
 
         with self.assertNumQueries(1):
@@ -176,7 +181,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         request = self.go_to_dashboard(
             user=user,
-            establishment_session_key=settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
+            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
             establishment_pk=organization.pk,
         )
 
@@ -207,7 +212,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         request = self.go_to_dashboard(
             user=user,
-            establishment_session_key=settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
+            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
             establishment_pk=organization1.pk,
         )
 
@@ -234,7 +239,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         request = self.go_to_dashboard(
             user=user,
-            establishment_session_key=settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
+            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
             establishment_pk=institution.pk,
         )
 
@@ -265,7 +270,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         request = self.go_to_dashboard(
             user=user,
-            establishment_session_key=settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
+            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
             establishment_pk=institution2.pk,
         )
 
@@ -650,7 +655,7 @@ class PermsUserTest(TestCase):
         middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+        request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
         request.session.save()
 
         user_info = get_user_info(request)
@@ -670,7 +675,7 @@ class PermsUserTest(TestCase):
         middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
+        request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
         request.session.save()
 
         user_info = get_user_info(request)
@@ -690,7 +695,7 @@ class PermsUserTest(TestCase):
         middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
+        request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
         request.session.save()
 
         user_info = get_user_info(request)

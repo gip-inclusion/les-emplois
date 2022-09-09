@@ -19,6 +19,7 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_PRESCRIBER
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
 
 
@@ -150,7 +151,7 @@ class TestPEOrganizationInvitation(TestCase):
         self.sender = self.organization.members.first()
 
     def test_pe_organization_invitation_successful(self):
-        guest = UserFactory.build(email=f"sabine.lagrange{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
+        guest = UserFactory.build(email=f"sabine.lagrange{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}")
         post_data = POST_DATA | {
             "form-0-first_name": guest.first_name,
             "form-0-last_name": guest.last_name,

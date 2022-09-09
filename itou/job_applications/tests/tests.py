@@ -18,6 +18,7 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications.admin_forms import JobApplicationAdminForm
@@ -44,6 +45,7 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
 
 
@@ -272,13 +274,13 @@ class JobApplicationModelTest(TestCase):
         self.assertFalse(job_application.is_waiting_for_employee_record_creation)
 
         # test application before EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
-        day_in_the_past = settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date() - relativedelta(months=2)
+        day_in_the_past = EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date() - relativedelta(months=2)
         job_application.hiring_start_at = day_in_the_past
         self.assertFalse(job_application.is_waiting_for_employee_record_creation)
 
         # test application between EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE and today
         recent_day_in_the_past = (
-            datetime.date.today() - relativedelta(settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date(), today) / 2
+            datetime.date.today() - relativedelta(EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date(), today) / 2
         )
         job_application.hiring_start_at = recent_day_in_the_past
         self.assertTrue(job_application.is_waiting_for_employee_record_creation)
@@ -805,7 +807,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.to_siae.address_line_2, email.body)
         self.assertIn(job_application.to_siae.post_code, email.body)
         self.assertIn(job_application.to_siae.city, email.body)
-        self.assertIn(settings.ITOU_ASSISTANCE_URL, email.body)
+        self.assertIn(global_constants.ITOU_ASSISTANCE_URL, email.body)
         self.assertIn(job_application.to_siae.accept_survey_url, email.body)
 
     def test_email_deliver_approval_without_hiring_end_at(self, *args, **kwargs):
@@ -836,7 +838,7 @@ class JobApplicationNotificationsTest(TestCase):
 
         self.assertEqual("Confirmation de l'embauche", email.subject)
         self.assertNotIn("PASS IAE", email.body)
-        self.assertIn(settings.ITOU_ASSISTANCE_URL, email.body)
+        self.assertIn(global_constants.ITOU_ASSISTANCE_URL, email.body)
 
     @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_manually_deliver_approval(self, *args, **kwargs):

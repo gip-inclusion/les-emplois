@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core import mail
 from django.template.loader import get_template
 
-from itou.utils import constants
+from itou.utils import constants as global_constants
 
 
 def remove_extra_line_breaks(text):
@@ -21,13 +21,13 @@ def remove_extra_line_breaks(text):
 def get_email_text_template(template, context):
     context.update(
         {
-            "itou_assistance_url": constants.ITOU_ASSISTANCE_URL,
-            "itou_doc_url": constants.ITOU_DOC_URL,
-            "itou_email_prolongation": constants.ITOU_EMAIL_PROLONGATION,
+            "itou_assistance_url": global_constants.ITOU_ASSISTANCE_URL,
+            "itou_doc_url": global_constants.ITOU_DOC_URL,
+            "itou_email_prolongation": global_constants.ITOU_EMAIL_PROLONGATION,
             "itou_environment": settings.ITOU_ENVIRONMENT,
             "itou_fqdn": settings.ITOU_FQDN,
             "itou_protocol": settings.ITOU_PROTOCOL,
-            "itou_community_url": constants.ITOU_COMMUNITY_URL,
+            "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
         }
     )
     return remove_extra_line_breaks(get_template(template).render(context).strip())

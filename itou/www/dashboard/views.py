@@ -17,6 +17,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae
+from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -184,7 +185,7 @@ def user_can_edit_job_seeker_info(user, job_application, current_siae_pk=None):
 @login_required
 def edit_job_seeker_info(request, job_application_id, template_name="dashboard/edit_job_seeker_info.html"):
     job_application = get_object_or_404(JobApplication.objects.select_related("job_seeker"), pk=job_application_id)
-    current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
+    current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
     if not user_can_edit_job_seeker_info(request.user, job_application, current_siae_pk):
         raise PermissionDenied
 
@@ -217,7 +218,7 @@ def switch_siae(request):
     pk = request.POST["siae_id"]
     queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
-    request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
 
     return HttpResponseRedirect(dashboard_url)
 
@@ -233,7 +234,7 @@ def switch_prescriber_organization(request):
     pk = request.POST["prescriber_organization_id"]
     queryset = PrescriberOrganization.objects
     prescriber_organization = get_object_or_404(queryset, pk=pk)
-    request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
 
     return HttpResponseRedirect(dashboard_url)
 
@@ -249,7 +250,7 @@ def switch_institution(request):
     pk = request.POST["institution_id"]
     queryset = Institution.objects
     institution = get_object_or_404(queryset, pk=pk)
-    request.session[settings.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = institution.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = institution.pk
 
     return HttpResponseRedirect(dashboard_url)
 
@@ -259,7 +260,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
     if not request.user.is_siae_staff:
         raise PermissionDenied
 
-    current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
+    current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
     siae = get_object_or_404(Siae, pk=current_siae_pk)
     membership = request.user.siaemembership_set.get(siae=siae)
     new_job_app_notification_form = EditNewJobAppEmployersNotificationForm(

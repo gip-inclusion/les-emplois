@@ -1,9 +1,9 @@
-from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import timedelta
 
 import itou.employee_record.enums as er_enums
 import itou.siaes.enums as siae_enums
+from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory, JobApplicationWithoutApprovalFactory
 from itou.job_applications.models import JobApplication
@@ -61,8 +61,8 @@ class EmployeeRecordEligibilityTest(TestCase):
 
     def test_hiring_start_date(self):
         # Hiring date must be after the employee record feature availability date
-        bad_ts = settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE - timedelta(days=1)
-        good_ts = settings.EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE + timedelta(days=1)
+        bad_ts = EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE - timedelta(days=1)
+        good_ts = EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE + timedelta(days=1)
         siae = SiaeFactory()
         non_eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae, hiring_start_at=bad_ts)
         eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae, hiring_start_at=good_ts)

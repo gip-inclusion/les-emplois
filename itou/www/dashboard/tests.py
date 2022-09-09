@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
-from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -34,6 +33,7 @@ from itou.siaes.factories import (
 from itou.users.enums import IdentityProvider
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.www.dashboard.forms import EditUserEmailForm
 
@@ -114,7 +114,7 @@ class DashboardViewTest(TestCase):
         session = self.client.session
 
         # select the first SIAE's in the session
-        session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+        session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
         session.save()
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -122,7 +122,7 @@ class DashboardViewTest(TestCase):
         self.assertEqual(response.context["num_rejected_employee_records"], 2)
 
         # select the second SIAE's in the session
-        session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = other_siae.pk
+        session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = other_siae.pk
         session.save()
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -130,7 +130,7 @@ class DashboardViewTest(TestCase):
         self.assertEqual(response.context["num_rejected_employee_records"], 1)
 
         # select the third SIAE's in the session
-        session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = last_siae.pk
+        session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = last_siae.pk
         session.save()
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

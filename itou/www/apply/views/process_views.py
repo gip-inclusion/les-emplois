@@ -1,6 +1,5 @@
 import datetime
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
@@ -17,6 +16,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.users.models import ApprovalAlreadyExistsError
+from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup, get_safe_url
@@ -263,7 +263,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 job_application.accept(user=request.user)
         except ApprovalAlreadyExistsError:
             link_to_form = get_external_link_markup(
-                url=f"{settings.ITOU_COMMUNITY_URL }/aide/emplois/#support",
+                url=f"{global_constants.ITOU_COMMUNITY_URL }/aide/emplois/#support",
                 text="ce formulaire",
             )
             messages.error(
@@ -320,7 +320,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             elif not job_application.hiring_without_approval:
                 external_link = get_external_link_markup(
                     url=(
-                        f"{settings.ITOU_COMMUNITY_URL }/doc/emplois/pass-iae-comment-ca-marche/"
+                        f"{global_constants.ITOU_COMMUNITY_URL }/doc/emplois/pass-iae-comment-ca-marche/"
                         "#verification-des-demandes-de-pass-iae"
                     ),
                     text="consulter notre espace documentation",

@@ -1,8 +1,6 @@
 # pylint: disable=too-many-lines
-
 from unittest import mock
 
-from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -17,6 +15,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
 )
 from itou.siaes.models import Siae
+from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 
 
@@ -291,7 +290,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertNotContains(response, escape(expected_message))
         expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
         self.assertContains(response, escape(expected_message))
-        self.assertContains(response, escape(settings.ITOU_ASSISTANCE_URL))
+        self.assertContains(response, escape(global_constants.ITOU_ASSISTANCE_URL))
 
         self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
