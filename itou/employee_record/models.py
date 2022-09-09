@@ -162,9 +162,9 @@ class EmployeeRecord(models.Model):
 
     # 'C' stands for Creation
     ASP_MOVEMENT_TYPE = "C"
-
     ASP_DUPLICATE_ERROR_CODE = "3436"
     ASP_PROCESSING_SUCCESS_CODE = "0000"
+    ASP_CLONE_MESSAGE = "Fiche salarié clonée"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
@@ -312,7 +312,7 @@ class EmployeeRecord(models.Model):
         Status: NEW | REJECTED => READY
         """
         if self.status not in [Status.NEW, Status.REJECTED]:
-            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         profile = self.job_seeker.jobseeker_profile
 
@@ -455,11 +455,13 @@ class EmployeeRecord(models.Model):
         """
         Create and return a copy of a PROCESSED employee record object with a bad `asp_id` (orphan):
             -`asp_id` field must be different from the original one,
-            - by default, `status` is also changed to `NEW`.
+            - by default, `status` is also changed to `READY` to notify ASP.
 
         This is useful when orphans are detected (irrelevant `asp_id`):
             - deactivation of old employee record,
             - create a new one ready to be processed by SIAE before a new transfer to ASP.
+
+        If cloning is succesful, current employee record is DISABLED to avoid conflicts.
 
         Raises `CloningError` if cloning conditions are not met.
         """
@@ -472,10 +474,17 @@ class EmployeeRecord(models.Model):
         if not self.is_orphan:
             raise CloningError(f"This employee record is not an orphan {self.status=},{self.asp_id=}")
 
+        # Cleanup clone fields
         er_copy = EmployeeRecord.objects.get(pk=self.pk)
         er_copy.pk = None
+        er_copy.created_at = timezone.now()
         er_copy.asp_id = asp_id
-        er_copy.status = Status.NEW
+        er_copy.status = Status.READY
+        er_copy.asp_batch_file = None
+        er_copy.asp_batch_line_number = None
+        er_copy.asp_processing_label = f"{self.ASP_CLONE_MESSAGE} (pk origine: {self.pk})"
+        er_copy.asp_processing_code = None
+        er_copy.archived_json = None
 
         try:
             er_copy.save()
@@ -484,6 +493,9 @@ class EmployeeRecord(models.Model):
                 f"Can't persist employee record clone. "
                 f"Duplicate asp_ip / approval number pair ? ({self.asp_id=}, {self.approval_number=})"
             ) from ex
+
+        # Disable current object to acoid conflicts
+        self.update_as_disabled()
 
         return er_copy
 
