@@ -1,0 +1,59 @@
+import csv
+import datetime
+import os
+
+from dateutil.relativedelta import relativedelta
+from django.core.management.base import BaseCommand
+
+from itou.approvals.models import Approval
+
+
+class Command(BaseCommand):
+    def handle(self, **options):
+
+        first_day_of_month = datetime.date.today().replace(day=1)
+        rejected_approvals = (
+            Approval.objects.filter(
+                pe_notification_status="notification_error",
+                pe_notification_time__range=[
+                    # FIXME(vperron): these were the values used for the very first export, hardcoded.
+                    # datetime(2022, 5, 1, tzinfo=timezone.utc),
+                    # datetime(2022, 8, 31, tzinfo=timezone.utc),
+                    # Remove those as soon as the first regular export is done, git will keep track.
+                    first_day_of_month - relativedelta(months=1),
+                    first_day_of_month,
+                ],
+            )
+            .select_related("user")
+            .order_by("pe_notification_time")
+        )
+
+        writer = csv.writer(self.stdout, lineterminator=os.linesep)
+
+        if rejected_approvals:
+            writer.writerow(
+                [
+                    "numero",
+                    "date_notification",
+                    "code_echec",
+                    "nir",
+                    "pole_emploi_id",
+                    "nom_naissance",
+                    "prenom",
+                    "date_naissance",
+                ],
+            )
+
+        for approval in rejected_approvals:
+            writer.writerow(
+                [
+                    approval.number,
+                    approval.pe_notification_time,
+                    approval.pe_notification_exit_code,
+                    approval.user.nir,
+                    approval.user.pole_emploi_id,
+                    approval.user.last_name,
+                    approval.user.first_name,
+                    approval.user.birthdate,
+                ],
+            )
