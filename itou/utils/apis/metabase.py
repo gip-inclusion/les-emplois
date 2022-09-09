@@ -19,6 +19,12 @@ def _get_token(payload):
     return jwt.encode(payload, settings.METABASE_SECRET_KEY, algorithm="HS256")
 
 
+def get_view_name(request):
+    full_view_name = request.resolver_match.view_name  # e.g. "stats:stats_public"
+    view_name = full_view_name.split(":")[-1]  # e.g. "stats_public"
+    return view_name
+
+
 def metabase_embedded_url(request=None, dashboard_id=None, params={}, with_title=False):
     """
     Creates an embed/signed URL for embedded Metabase dashboards:
@@ -28,9 +34,8 @@ def metabase_embedded_url(request=None, dashboard_id=None, params={}, with_title
     * optional parameters typically for locked filters (e.g. allow viewing data of one departement only)
     """
     if dashboard_id is None:
-        full_view_name = request.resolver_match.view_name  # e.g. "stats:stats_public"
-        view_name = full_view_name.split(":")[-1]  # e.g. "stats_public"
-        dashboard_id = settings.METABASE_DASHBOARD_IDS.get(view_name)
+        view_name = get_view_name(request)
+        dashboard_id = settings.METABASE_DASHBOARDS[view_name]["dashboard_id"]
 
     payload = {"resource": {"dashboard": dashboard_id}, "params": params, "exp": round(time.time()) + (10 * 60)}
     is_titled = "true" if with_title else "false"

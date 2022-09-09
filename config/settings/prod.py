@@ -33,6 +33,9 @@ sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])
 
 ALLOW_POPULATING_METABASE = True
 
+# Embed tally forms on stats views.
+ENABLE_TALLY_FORMS = True
+
 # DRF Browseable API renderer is not available in production
 REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ["rest_framework.renderers.JSONRenderer"]  # noqa F405
 
