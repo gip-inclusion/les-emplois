@@ -46,7 +46,7 @@ from itou.users.models import User
 from itou.utils.apis import api_entreprise
 from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
-from itou.utils.emails import sanitize_mailjet_recipients
+from itou.utils.email_backend import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.pole_emploi import (

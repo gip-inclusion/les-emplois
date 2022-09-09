@@ -688,7 +688,8 @@ MAILJET_API_URL = "https://api.mailjet.com/v3.1"
 # The real backend is hardcoded in the wrapper to avoid multiple and
 # confusing parameters in Django settings.
 # Switch to a "standard" Django backend to get the synchronous behaviour back.
-EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
+EMAIL_BACKEND = "itou.utils.email_backend.AsyncEmailBackend"
+
 
 # Number of retries & retry delay parameters for emails (for async process)
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
