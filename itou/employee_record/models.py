@@ -97,6 +97,9 @@ class EmployeeRecordQuerySet(models.QuerySet):
     def disabled_for_siae(self, siae):
         return self.disabled().filter(job_application__to_siae=siae).select_related("job_application")
 
+    def archived(self):
+        return self.filter(status=Status.ARCHIVED)
+
     # Search queries
 
     def find_by_batch(self, filename, line_number):
