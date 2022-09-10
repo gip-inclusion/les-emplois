@@ -293,3 +293,16 @@ class SanitizeManagementCommandTest(ManagementCommandTestCase):
 
         self.assertIn(" - fixing missing jobseeker profiles: switching status to DISABLED", out)
         self.assertIn(" - done!", out)
+
+    def test_missing_approvals(self):
+        # Check for employee record without approval (through job application)
+
+        employee_record = EmployeeRecordFactory()
+        employee_record.job_application.approval = None
+        employee_record.job_application.save()
+
+        out, _ = self.call_command()
+
+        self.assertEqual(0, EmployeeRecord.objects.filter(job_application__approval__isnull=True).count())
+        self.assertIn(" - fixing missing approvals: DELETING employee records", out)
+        self.assertIn(" - done!", out)

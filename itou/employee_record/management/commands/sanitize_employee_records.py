@@ -21,6 +21,7 @@ class Command(BaseCommand):
 
     def _check_3436_error_code(self, dry_run):
         # Report all employee records with ASP error code 3436
+
         err_3436 = EmployeeRecord.objects.asp_duplicates()
         count_3436 = err_3436.count()
 
@@ -34,17 +35,17 @@ class Command(BaseCommand):
             if dry_run:
                 return
 
-            if count_3436 != 0:
-                self.stdout.write(" - fixing 3436 errors: forcing status to PROCESSED")
+            self.stdout.write(" - fixing 3436 errors: forcing status to PROCESSED")
 
-                with transaction.atomic():
-                    for to_fix in err_3436:
-                        to_fix.update_as_processed_as_duplicate()
+            with transaction.atomic():
+                for to_fix in err_3436:
+                    to_fix.update_as_processed_as_duplicate()
 
-                self.stdout.write(" - done!")
+            self.stdout.write(" - done!")
 
     def _check_orphans(self, dry_run):
         # Report all orphans employee records (bad asp_id)
+
         orphans = EmployeeRecord.objects.orphans()
         count_orphans = orphans.count()
 
@@ -58,14 +59,13 @@ class Command(BaseCommand):
             if dry_run:
                 return
 
-            if count_orphans != 0:
-                self.stdout.write(" - fixing orphans: switching status to DISABLED")
+            self.stdout.write(" - fixing orphans: switching status to DISABLED")
 
-                with transaction.atomic():
-                    for orphan in orphans:
-                        orphan.update_as_disabled()
+            with transaction.atomic():
+                for orphan in orphans:
+                    orphan.update_as_disabled()
 
-                self.stdout.write(" - done!")
+            self.stdout.write(" - done!")
 
     def _check_jobseeker_profiles(self, dry_run):
         # Check incoherences in user profile leading to validation errors at processing time.
@@ -73,6 +73,7 @@ class Command(BaseCommand):
         # Most frequent error cases are:
         # - no HEXA address
         # - no profile at all (?)
+
         profile_selected = EmployeeRecord.objects.filter(
             status__in=EmployeeRecord.CAN_BE_DISABLED_STATES
         ).select_related(
@@ -94,6 +95,17 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f" - found {count_no_hexa_address} job seeker profile(s) without HEXA address")
 
+            if dry_run:
+                return
+
+            self.stdout.write(" - fixing missing address in profiles: switching status to DISABLED")
+
+            with transaction.atomic():
+                for without_address in no_hexa_address:
+                    without_address.update_as_disabled()
+
+            self.stdout.write(" - done!")
+
         if count_no_job_seeker_profile == 0:
             self.stdout.write(" - no empty job seeker profile found (great!)")
         else:
@@ -102,21 +114,36 @@ class Command(BaseCommand):
             if dry_run:
                 return
 
-            if count_no_job_seeker_profile != 0:
-                self.stdout.write(" - fixing missing jobseeker profiles: switching status to DISABLED")
-
-                with transaction.atomic():
-                    for without_profile in no_job_seeker_profile:
-                        without_profile.update_as_disabled()
-
-                self.stdout.write(" - done!")
-
-        if count_no_hexa_address != 0:
-            self.stdout.write(" - fixing missing address in profiles: switching status to DISABLED")
+            self.stdout.write(" - fixing missing jobseeker profiles: switching status to DISABLED")
 
             with transaction.atomic():
-                for without_address in no_hexa_address:
-                    without_address.update_as_disabled()
+                for without_profile in no_job_seeker_profile:
+                    without_profile.update_as_disabled()
+
+            self.stdout.write(" - done!")
+
+    def _check_approvals(self, dry_run):
+        # Report employee records with no approvals
+        # (approvals can be deleted after processing)
+
+        no_approval = EmployeeRecord.objects.select_related("job_application").filter(
+            job_application__approval__isnull=True
+        )
+        count_no_approval = no_approval.count()
+
+        self.stdout.write("* Checking missing employee records approval:")
+
+        if count_no_approval == 0:
+            self.stdout.write(" - no missing approval (great!)")
+        else:
+            self.stdout.write(f" - found {count_no_approval} missing approval(s)")
+
+            if dry_run:
+                return
+
+            self.stdout.write(" - fixing missing approvals: DELETING employee records")
+
+            no_approval.delete()
 
             self.stdout.write(" - done!")
 
@@ -126,6 +153,7 @@ class Command(BaseCommand):
         if dry_run:
             self.stdout.write(" - DRY-RUN mode: not fixing, just reporting")
 
+        self._check_approvals(dry_run)
         self._check_jobseeker_profiles(dry_run)
         self._check_3436_error_code(dry_run)
         self._check_orphans(dry_run)
