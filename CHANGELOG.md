@@ -1,51 +1,5 @@
 # Journal des modifications
 
-## [49] - 2022-09-12
-
-### Ajouté
-- Inclusion Connect : Ajout de variables d'environnement en dev pour Inclusion Connect #1463
-- Pilotage : Ajout réseaux structures #1478
-- Pilotage : Ouverture nationale des stats PE+Employeur (Le Grand Jour du C2) #1486
-- Pilotage : Les DR PE peuvent maintenant voir les stats de toute leur région #1490
-- Pilotage : Ajout org_prescripteur pour améliorer le filtre par département ( Update 016_candidatures_recues_par_fiche_de_poste.sql #1492 )
-- Pilotage : Ajout org_prescripteur ( 015_Metabase : add column id organization #1494 )
-- Pilotage : Taux transformation prescpripteurs : ajout departement prescpripteurs #1495
-- Pilotage : cddr_par_fdp : ajout département presc #1497
-- Pilotage : delai cddr : ajout departement prescripteur #1499
-- Pilotage : candidatures echelle locale : ajout dept prescripteur #1501
-- Pilotage : Ajout du nom des organismes prescripteurs ( Update 019_candidatures_echelle_locale.sql #1510 )
-- Pilotage : Taux Transfo : candidat accepté #1514
-- Pilotage : Candidatures : modif ajout du nom du département #1518
-
-### Modifié
-- Theme : Maj du theme itou vers la v0.5.0 et du logo du ministère du travail #1491
-- Import ASP : Evolutions mineures des imports SIAE et EA, dont évolutions des règles de suppression automatiques de structures #1500
-- Inclusion Connect : Améliorations diverses pour inclusion connect #1487
-- Pilotage : Petites améliorations mineures métabase (format des Url, ajout de colonnes, tests) #1436
-- Pilotage : obtention du bon nombre de fiches de poste #1477
-- Fiche Salarié : Modification du modèle des fiches salarié #1468
-- Fiche Salarié : Permettre la correction de l'adresse du candidat lors de la création de la fiche salariée #1506
-- PASS IAE : ApprovalsWrapper, phase 2 : S'en débarasser totalement. #1450
-- PASS IAE : En tant que SIAE je veux m'assurer que l'annulation du PASS est justifiée dans mon cas #1476
-- Candidatures - refus : Un bouton radio sans texte #1471
-- Candidatures - refus : nouveaux motif de refus / Pilotage #1474
-- Candidatures - nouveau parcours : Enregistrement de la date d'expiration du diagnostique d'éligibilét en base de données #1472
-- Candidatures - nouveau parcours : Diverses corrections et améliorations #1473
-- Contrôle a posteriori : Déplacement des données de contrôle a posteriori pendant un move_siae_data #1479
-- Sécurité mots de passe : Améliorations de sécurité diverses #1502
-- Admin : Ne pas lever d'erreur 500 dans l'admin quand un NIR existe déjà. #1475
-- Technique : Déplacement des types de prescripteurs et des institutions dans des fichiers dédiées pour en améliorer la lecture #1446
-- Technique : Mise à jour des dates du passe IAE des fixtures #1480
-- Technique : Homogénéiser la construction de l'url du site #1488
-- Technique : Mise à jour de django-allauth #1513
-- Technique : Ajoute des recettes Docker dans le README #1516
-- Tests : Tester en local Itou X Identity Providers ( config: Update default FQDN #1489 )
-- Tests : Nettoyage de code de tests #1503
-- Tests : Correction d’un test au résultat incertain #1504
-
-### Supprimé
-- Pilotage : Abandon de 2 des 4 extracts C2 #1484
-
 ## [48] - 2022-08-29
 
 ### Ajouté
