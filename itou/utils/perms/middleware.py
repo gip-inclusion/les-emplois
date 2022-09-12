@@ -28,10 +28,12 @@ class ItouCurrentOrganizationMiddleware:
         # but he does not belong to any group.
         # This raises an error so we skip the middleware only in this case.
         login_routes = [reverse(f"login:{url.name}") for url in login_urls.urlpatterns] + [reverse("account_login")]
-        skip_middleware = request.path in [reverse("account_logout"), *login_routes] or (
-            request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite")
-        )
-        if skip_middleware:
+        skip_middleware_conditions = [
+            request.path in [reverse("account_logout"), *login_routes],
+            request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
+            request.path.startswith("/signup/siae/join"),  # siae staff about to join an siae
+        ]
+        if any(skip_middleware_conditions):
             return self.get_response(request)
 
         if user.is_authenticated:

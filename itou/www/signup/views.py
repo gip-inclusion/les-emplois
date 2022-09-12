@@ -15,7 +15,7 @@ from django.db import Error, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.http import urlencode
+from django.utils.http import urlencode, urlsafe_base64_decode
 from django.views.decorators.http import require_GET
 
 from itou.common_apps.address.models import lat_lon_to_coords
@@ -23,10 +23,11 @@ from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
+from itou.siaes.models import Siae, SiaeMembership
 from itou.users.adapter import UserAdapter
-from itou.users.enums import KIND_PRESCRIBER
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
+from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
 
@@ -202,34 +203,63 @@ def siae_select(request, template_name="signup/siae_select.html"):
     return render(request, template_name, context)
 
 
-class SiaeSignupView(SignupView):
+def siae_user(request, encoded_siae_id, token, template_name="signup/siae_user.html"):
+    """
+    Display Inclusion Connect button.
+    This page is also shown if an error is detected during
+    OAuth callback.
+    """
 
-    form_class = forms.SiaeSignupForm
-    template_name = "signup/siae_signup.html"
-
-    def warn_and_redirect(self, request):
+    # FIXME(alaurent) Move to commun ClassBaseViewMixin
+    # Get siae from endoded_siae_id
+    siae_id = int(urlsafe_base64_decode(encoded_siae_id))
+    siae = Siae.objects.active().filter(pk=siae_id).first()
+    if siae is None or not siae_signup_token_generator.check_token(siae=siae, token=token):
         messages.warning(
             request, "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription."
         )
         return HttpResponseRedirect(reverse("signup:siae_select"))
 
-    def get(self, request, *args, **kwargs):
-        form = forms.SiaeSignupForm(
-            initial={"encoded_siae_id": kwargs.get("encoded_siae_id"), "token": kwargs.get("token")}
-        )
-        if form.check_siae_signup_credentials():
-            self.initial = form.get_initial()
-            return super().get(request, *args, **kwargs)
-        return self.warn_and_redirect(request)
+    ic_params = {
+        "user_kind": KIND_SIAE_STAFF,
+        "previous_url": request.get_full_path(),
+        "next_url": reverse("signup:siae_join", args=(encoded_siae_id, token)),
+    }
 
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        form = forms.SiaeSignupForm(data=request.POST or None)
-        if form.check_siae_signup_credentials():
-            self.initial = form.get_initial()
-            return super().post(request, *args, **kwargs)
-        return self.warn_and_redirect(request)
+    inclusion_connect_url = (
+        f"{reverse('inclusion_connect:authorize')}?{urlencode(ic_params)}"
+        if settings.INCLUSION_CONNECT_BASE_URL
+        else None
+    )
+
+    context = {
+        "inclusion_connect_url": inclusion_connect_url,
+        "siae": siae,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def siae_join(request, encoded_siae_id, token):
+    # FIXME(alaurent) Move to commun ClassBaseViewMixin
+    # Get siae from endoded_siae_id
+    siae_id = int(urlsafe_base64_decode(encoded_siae_id))
+    siae = Siae.objects.active().filter(pk=siae_id).first()
+    if siae is None or not siae_signup_token_generator.check_token(siae=siae, token=token):
+        messages.warning(
+            request, "Ce lien d'inscriptheon est invalide ou a expiré. Veuillez procéder à une nouvelle inscription."
+        )
+        return HttpResponseRedirect(reverse("signup:siae_select"))
+
+    membership = SiaeMembership()
+    membership.user = request.user
+    membership.siae = siae
+    # Only the first member becomes an admin.
+    membership.is_admin = siae.active_members.count() == 0
+    membership.save()
+
+    url = get_adapter(request).get_login_redirect_url(request)
+    return HttpResponseRedirect(url)
 
 
 # Prescribers signup.
