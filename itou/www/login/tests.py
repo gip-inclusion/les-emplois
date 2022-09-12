@@ -95,11 +95,12 @@ class SiaeStaffLoginTest(TestCase):
         url = reverse("login:siae_staff")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "S'identifier avec Inclusion Connect")
+        self.assertContains(response, "S'identifier avec Inclusion Connect")
+        self.assertContains(response, reverse("inclusion_connect:authorize"))
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")
 
-    def test_login(self):
+    def test_login_using_django(self):
         user = SiaeStaffFactory()
         url = reverse("login:siae_staff")
         response = self.client.get(url)
@@ -111,6 +112,22 @@ class SiaeStaffLoginTest(TestCase):
         }
         response = self.client.post(url, data=form_data)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+    def test_login_using_django_but_has_sso_provider(self):
+        user = SiaeStaffFactory(identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
+        url = reverse("login:siae_staff")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        form_data = {
+            "login": user.email,
+            "password": DEFAULT_PASSWORD,
+        }
+        response = self.client.post(url, data=form_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response, "Votre compte est relié à Inclusion Connect. Merci de vous connecter avec ce service."
+        )
 
 
 class LaborInspectorLoginTest(TestCase):
