@@ -55,8 +55,8 @@ def format_address(obj):
     try:
         # first we use geo API to get a 'lane' and a number
         address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code)
-    except GeocodingDataException:
-        return None, ERROR_GEOCODING_API
+    except GeocodingDataException as ex:
+        return None, ERROR_GEOCODING_API + f" : {str(ex)}"
 
     # Default values
     additional_address = unidecode(obj.address_line_2)

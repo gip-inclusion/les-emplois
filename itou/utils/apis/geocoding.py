@@ -54,7 +54,7 @@ def get_geocoding_data(address, post_code=None, limit=1):
     data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
 
     if not data or not data.get("properties"):
-        raise GeocodingDataException()
+        raise GeocodingDataException("Unable to get properties set for geocoding data")
 
     longitude = data["geometry"]["coordinates"][0]
     latitude = data["geometry"]["coordinates"][1]
