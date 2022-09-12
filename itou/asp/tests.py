@@ -29,7 +29,7 @@ class FormatASPBadAdresses(TestCase):
         )
         result, error = format_address(job_seeker)
         self.assertFalse(result)
-        self.assertEqual(error, "Erreur de geocoding, impossible d'obtenir un résultat")
+        self.assertIn("Erreur de geocoding, impossible d'obtenir un résultat", error)
 
 
 @mock.patch(

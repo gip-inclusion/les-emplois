@@ -169,7 +169,8 @@ def create(request, job_application_id, template_name="employee_record/create.ht
             messages.error(
                 request,
                 mark_safe(
-                    f"<p>Une erreur est survenue : {ex}.</p><p>Veuillez réessayer de valider l'adresse à nouveau.</p>"
+                    f"<p>Une erreur est survenue durant la validation de l'adresse : {ex}.</p>"
+                    f"<p>Veuillez modifier l'adresse et essayer à nouveau.</p>"
                 ),
             )
         except Exception as ex:

@@ -64,12 +64,17 @@ class AbstractCreateEmployeeRecordTest(TestCase):
 
     # Bypass each step with minimum viable data
 
-    def pass_step_1(self):
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def pass_step_1(self, _mock):
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
         url = reverse("employee_record_views:create", args=(self.job_application.id,))
+        target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
         response = self.client.post(url, data=get_sample_form_data(self.job_seeker))
 
-        self.assertEqual(302, response.status_code)
+        self.assertRedirects(response, target_url)
         self.assertTrue(self.job_seeker.has_jobseeker_profile)
 
     @mock.patch(
@@ -143,6 +148,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.url = reverse("employee_record_views:create", args=(self.job_application.id,))
+        self.target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
 
     def test_access_granted(self):
         # Must have access
@@ -171,7 +177,11 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Fin du contrat : <b>Non renseigné")
 
-    def test_title(self):
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_title(self, _mock):
         # Job seeker / employee must have a title
 
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
@@ -194,9 +204,13 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         data["title"] = "MME"
         response = self.client.post(self.url, data=data)
 
-        self.assertEqual(302, response.status_code)
+        self.assertRedirects(response, self.target_url)
 
-    def test_birthplace(self):
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_birthplace(self, _mock):
         # If birth country is France, a commune (INSEE) is mandatory
         # otherwise, only a country is mandatory
 
@@ -218,18 +232,21 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
         self.assertEqual(200, response.status_code)
 
+        # Redirects must go to step 2
+        target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
+
         # Set a "random" commune in France
         data["insee_commune_code"] = 67152
         response = self.client.post(self.url, data=data)
 
-        self.assertEqual(302, response.status_code)
+        self.assertRedirects(response, target_url)
 
         # Set a country different from France
         data["insee_commune_code"] = ""
         data["birth_country"] = 92  # Denmark
         response = self.client.post(self.url, data=data)
 
-        self.assertEqual(302, response.status_code)
+        self.assertRedirects(response, target_url)
 
 
 class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
@@ -416,6 +433,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
+        self.target_url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
 
         self.pass_step_2()
 
@@ -447,7 +465,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         }
         response = self.client.post(self.url, data)
 
-        self.assertEqual(302, response.status_code)
+        self.assertRedirects(response, self.target_url)
 
         self.profile.refresh_from_db()
 
@@ -471,7 +489,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         }
         response = self.client.post(self.url, data)
 
-        self.assertEqual(302, response.status_code)
+        self.assertRedirects(response, self.target_url)
 
         self.profile.refresh_from_db()
 
@@ -496,7 +514,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         }
         response = self.client.post(self.url, data)
 
-        self.assertEqual(302, response.status_code)
+        self.assertRedirects(response, self.target_url)
 
         self.profile.refresh_from_db()
 
@@ -520,7 +538,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         }
         response = self.client.post(self.url, data)
 
-        self.assertEqual(302, response.status_code)
+        self.assertRedirects(response, self.target_url)
 
         self.profile.refresh_from_db()
 
