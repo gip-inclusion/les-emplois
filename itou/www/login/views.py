@@ -4,7 +4,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.urls import reverse
 from django.utils.http import urlencode
 
-from itou.users.enums import KIND_PRESCRIBER
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.urls import get_safe_url
 from itou.www.login.forms import ItouLoginForm
 
@@ -69,11 +69,25 @@ class SiaeStaffLoginView(ItouLoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        params = {
+            "user_kind": KIND_SIAE_STAFF,
+            "previous_url": self.request.get_full_path(),
+        }
+        next_url = get_safe_url(self.request, "next")
+        if next_url:
+            params["next_url"] = next_url
+        inclusion_connect_url = (
+            f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+            if settings.INCLUSION_CONNECT_BASE_URL
+            else None
+        )
         extra_context = {
             "account_type_display_name": "employeur solidaire",
             "login_url": reverse("login:siae_staff"),
             "signup_url": reverse("signup:siae_select"),
             "signup_allowed": True,
+            "uses_inclusion_connect": True,
+            "inclusion_connect_url": inclusion_connect_url,
         }
         return context | extra_context
 
