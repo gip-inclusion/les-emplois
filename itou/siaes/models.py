@@ -349,7 +349,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     @property
     def signup_magic_link(self):
         return reverse(
-            "signup:siae", kwargs={"encoded_siae_id": self.get_encoded_siae_id(), "token": self.get_token()}
+            "signup:siae_user", kwargs={"encoded_siae_id": self.get_encoded_siae_id(), "token": self.get_token()}
         )
 
     def get_encoded_siae_id(self):

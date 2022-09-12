@@ -8,8 +8,8 @@ from django.urls import reverse
 
 from itou.openid_connect.inclusion_connect.tests import mock_oauth_dance
 from itou.siaes.factories import SiaeFactory
-from itou.users.enums import KIND_PRESCRIBER
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
 
 
@@ -78,34 +78,29 @@ class WelcomingTourTest(TestCase):
         self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertContains(response, "Revoir le message")
 
+    @respx.mock
     def test_new_employer_sees_welcoming_tour(self):
-        employer = SiaeStaffFactory.build()
         siae = SiaeFactory(with_membership=True)
-
-        url = reverse("signup:siae", kwargs={"encoded_siae_id": siae.get_encoded_siae_id(), "token": siae.get_token()})
-        post_data = {
-            "encoded_siae_id": siae.get_encoded_siae_id(),
-            "token": siae.get_token(),
-            "siret": siae.siret,
-            "kind": siae.kind,
-            "siae_name": siae.display_name,
-            "first_name": employer.first_name,
-            "last_name": employer.last_name,
-            "email": employer.email,
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-        }
-        response = self.client.post(url, data=post_data)
-        response = self.verify_email(response.wsgi_request, email=employer.email)
+        encoded_siae_id = siae.get_encoded_siae_id()
+        token = siae.get_token()
+        previous_url = reverse("signup:siae_user", args=(encoded_siae_id, token))
+        next_url = reverse("signup:siae_join", args=(encoded_siae_id, token))
+        response = mock_oauth_dance(
+            self,
+            KIND_SIAE_STAFF,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        response = self.client.get(response.url, follow=True)
 
         # User should be redirected to the welcoming tour as he just signed up
         self.assertEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertTemplateUsed(response, "welcoming_tour/siae_staff.html")
 
         self.client.logout()
-        response = self.client.post(
-            reverse("login:siae_staff"), follow=True, data={"login": employer.email, "password": DEFAULT_PASSWORD}
-        )
+        response = mock_oauth_dance(self, KIND_SIAE_STAFF, assert_redirects=False)
+        response = self.client.get(response.url, follow=True)
         self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertContains(response, "Revoir le message")
 

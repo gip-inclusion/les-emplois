@@ -1,0 +1,28 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load format_filters %}
+
+{% block title %}Employeur solidaire - Inscription{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1 class="h1-hero-c1">
+        Inscription
+        <small class="text-muted">Employeur solidaire</small>
+    </h1>
+
+    <div class="alert alert-emploi">
+        <p class="lead mb-0">
+            Vous allez rejoindre <b>{{ siae.display_name }}</b>
+        </p>
+        <p class="mb-0">
+            {{ siae.siret|format_siret }} - {{ siae.kind }} {{ siae.get_kind_display }}<br>
+            {% if siae.address_line_1 %}{{ siae.address_line_1 }}<br>{% endif %}
+            {% if siae.address_line_2 %}{{ siae.address_line_2 }}<br>{% endif %}
+            {{ siae.post_code }} {{ siae.city }}
+        </p>
+    </div>
+
+    {% include "inclusion_connect/includes/description.html" %}
+
+{% endblock %}

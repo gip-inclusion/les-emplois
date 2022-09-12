@@ -3,17 +3,15 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.models import Siae, SiaeMembership
+from itou.siaes.models import SiaeMembership
 from itou.users.models import User
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
 from itou.utils.password_validation import CnilCompositionPasswordValidator
-from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
 
 
@@ -186,103 +184,6 @@ class SiaeSelectForm(forms.Form):
         self.fields["siaes"].queryset = self.siaes
 
     siaes = forms.ModelChoiceField(queryset=None, widget=forms.RadioSelect)
-
-
-class SiaeSignupForm(FullnameFormMixin, SignupForm):
-    """
-    Second of two forms of siae signup process.
-    This is the final form where the signup actually happens
-    on the siae identified by the first form.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["email"].widget.attrs["placeholder"] = "Adresse e-mail professionnelle"
-        self.fields["email"].help_text = (
-            "Utilisez plutôt votre adresse e-mail professionnelle, "
-            "cela nous permettra de vous identifier plus facilement comme membre de cette structure."
-        )
-        self.fields["kind"].widget.attrs["readonly"] = True
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["siret"].widget.attrs["readonly"] = True
-        self.fields["siae_name"].widget.attrs["readonly"] = True
-
-    kind = forms.CharField(
-        label="Type de votre structure",
-        help_text="Ce champ n'est pas modifiable.",
-        required=True,
-    )
-
-    siret = forms.CharField(
-        label="Numéro SIRET de votre structure",
-        help_text="Ce champ n'est pas modifiable.",
-        required=True,
-    )
-
-    siae_name = forms.CharField(
-        label="Nom de votre structure",
-        help_text="Ce champ n'est pas modifiable.",
-        required=True,
-    )
-
-    encoded_siae_id = forms.CharField(widget=forms.HiddenInput())
-
-    token = forms.CharField(widget=forms.HiddenInput())
-
-    def save(self, request):
-        # Avoid django-allauth to call its own often failing `generate_unique_username`
-        # function by forcing a username.
-        self.cleaned_data["username"] = User.generate_unique_username()
-        # Create the user.
-        user = super().save(request)
-
-        if self.check_siae_signup_credentials():
-            siae = self.get_siae()
-        else:
-            raise RuntimeError("This should never happen.")
-
-        user.is_siae_staff = True
-        user.save()
-
-        membership = SiaeMembership()
-        membership.user = user
-        membership.siae = siae
-        # Only the first member becomes an admin.
-        membership.is_admin = siae.active_members.count() == 0
-        membership.save()
-
-        return user
-
-    def get_encoded_siae_id(self):
-        if "encoded_siae_id" in self.initial:
-            return self.initial["encoded_siae_id"]
-        return self.data["encoded_siae_id"]
-
-    def get_token(self):
-        if "token" in self.initial:
-            return self.initial["token"]
-        return self.data["token"]
-
-    def get_siae(self):
-        if not self.get_encoded_siae_id():
-            return None
-        siae_id = int(urlsafe_base64_decode(self.get_encoded_siae_id()))
-        siae = Siae.objects.active().filter(pk=siae_id).first()
-        return siae
-
-    def check_siae_signup_credentials(self):
-        siae = self.get_siae()
-        return siae_signup_token_generator.check_token(siae=siae, token=self.get_token())
-
-    def get_initial(self):
-        siae = self.get_siae()
-        return {
-            "encoded_siae_id": self.get_encoded_siae_id(),
-            "token": self.get_token(),
-            "siret": siae.siret,
-            "kind": siae.kind,
-            "siae_name": siae.display_name,
-        }
 
 
 class CheckAlreadyExistsForm(forms.Form):
