@@ -90,24 +90,4 @@
             </div>
         </div>
     </section>
-
-    {% if enable_tally_form %}
-        <script async src="https://tally.so/widgets/embed.js"></script>
-
-        <script>
-            window.TallyConfig = {
-                "formId": "{{ tally_form_id }}",
-                "popup": {
-                    "emoji": {
-                        "text": "👋",
-                        "animation": "wave"
-                    },
-                    "open": {
-                        "trigger": "exit"
-                    }
-                }
-            };
-        </script>
-    {% endif %}
-
 {% endblock %}

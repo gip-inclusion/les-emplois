@@ -32,7 +32,6 @@ from itou.utils.apis.metabase import (
     C1_SIAE_FILTER_KEY,
     DEPARTMENT_FILTER_KEY,
     REGION_FILTER_KEY,
-    get_view_name,
     metabase_embedded_url,
 )
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -100,18 +99,10 @@ def get_params_for_whole_country():
 
 
 def render_stats(request, context, params={}, template_name="stats/stats.html"):
-    view_name = get_view_name(request)
-    tally_form_id = settings.METABASE_DASHBOARDS[view_name].get("tally_form_id")
-    enable_tally_form = settings.ENABLE_TALLY_FORMS and tally_form_id is not None
-
     base_context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "stats_base_url": settings.METABASE_SITE_URL,
-        "enable_tally_form": enable_tally_form,
     }
-
-    if enable_tally_form:
-        base_context["tally_form_id"] = tally_form_id
 
     # Key value pairs in context override preexisting pairs in base_context.
     base_context.update(context)
