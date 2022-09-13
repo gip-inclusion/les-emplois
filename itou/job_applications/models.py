@@ -747,6 +747,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.transferred_at = timezone.now()
         self.to_siae = target_siae
         self.state = JobApplicationWorkflow.STATE_NEW
+        # Consider job application as new : don't keep answers
+        self.answer = self.answer_to_prescriber = ""
 
         # Delete eligibility diagnosis if not provided by an authorized prescriber
         eligibility_diagnosis = self.eligibility_diagnosis
@@ -764,6 +766,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 "transferred_at",
                 "transferred_by",
                 "transferred_from",
+                "answer",
+                "answer_to_prescriber",
             ]
         )
 
