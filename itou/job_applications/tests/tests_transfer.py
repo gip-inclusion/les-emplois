@@ -127,6 +127,8 @@ class JobApplicationTransferModelTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_siae=origin_siae,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
+            answer="Answer to job seeker",
+            answer_to_prescriber="Answer to prescriber",
         )
 
         # Failing to transfer must not update new fields
@@ -147,6 +149,8 @@ class JobApplicationTransferModelTest(TestCase):
         self.assertEqual(job_application.to_siae, target_siae)
         self.assertEqual(job_application.state, JobApplicationWorkflow.STATE_NEW)
         self.assertIsNone(job_application.eligibility_diagnosis)
+        self.assertEqual(job_application.answer, "")
+        self.assertEqual(job_application.answer_to_prescriber, "")
 
     def test_workflow_transitions(self):
         # `source` contains possible entry points of transition
