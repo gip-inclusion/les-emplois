@@ -1,5 +1,4 @@
 from datetime import timedelta
-from unittest import mock
 from urllib.parse import urlencode
 
 import respx
@@ -177,9 +176,6 @@ class TestPEOrganizationInvitation(TestCase):
         )
 
 
-DASHBOARD_URL = reverse("dashboard:index")
-
-
 class TestAcceptPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
         self.organization = PrescriberOrganizationWithMembershipFactory()
@@ -189,8 +185,11 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.organization.save()
         self.sender = self.organization.members.first()
 
-    def assert_invitation_is_accepted(self, response, user, invitation):
-        self.assertRedirects(response, DASHBOARD_URL)
+    def assert_invitation_is_accepted(self, response, user, invitation, new_user=True):
+        if new_user:
+            self.assertRedirects(response, reverse("welcoming_tour:index"))
+        else:
+            self.assertRedirects(response, reverse("dashboard:index"))
 
         user.refresh_from_db()
         invitation.refresh_from_db()
@@ -235,18 +234,16 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.assertContains(response, url + '"')
 
         # Singup fails on Inclusion Connect with email different than the one from the invitation
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                login_hint=invitation.email,
-                channel="invitation",
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            login_hint=invitation.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
@@ -257,23 +254,23 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         # Singup works on Inclusion Connect with the correct email
         invitation.email = OIDC_USERINFO["email"]
         invitation.save()
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                login_hint=invitation.email,
-                channel="invitation",
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            login_hint=invitation.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation)
 
     def test_accept_existing_user_is_prescriber_without_org(self):
-        user = PrescriberFactory()
+        user = PrescriberFactory(has_completed_welcoming_tour=True)
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.organization,
@@ -283,10 +280,12 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         )
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assert_invitation_is_accepted(response, user, invitation)
+        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
     def test_accept_existing_user_belongs_to_another_organization(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
+        user.has_completed_welcoming_tour = True
+        user.save()
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.organization,
@@ -296,12 +295,12 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         )
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assert_invitation_is_accepted(response, user, invitation)
+        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
     @respx.mock
     def test_accept_existing_user_not_logged_in_using_IC(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        user = PrescriberFactory(email=OIDC_USERINFO["email"])
+        user = PrescriberFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
         # The user verified its email
         EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
         invitation = PrescriberWithOrgSentInvitationFactory(
@@ -325,25 +324,23 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                login_hint=user.email,
-                channel="invitation",
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            login_hint=user.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
 
         self.assertTrue(response.context["user"].is_authenticated)
-        self.assert_invitation_is_accepted(response, user, invitation)
+        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
     def test_accept_existing_user_not_logged_in_using_django_auth(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        user = PrescriberFactory()
+        user = PrescriberFactory(has_completed_welcoming_tour=True)
         # The user verified its email
         EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
         invitation = PrescriberWithOrgSentInvitationFactory(
@@ -363,7 +360,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
             follow=True,
         )
         self.assertTrue(response.context["user"].is_authenticated)
-        self.assert_invitation_is_accepted(response, user, invitation)
+        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
 
 class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
