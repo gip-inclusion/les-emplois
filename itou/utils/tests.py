@@ -881,6 +881,16 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(result, (None, "Problème de connexion à la base Sirene. Essayez ultérieurement."))
 
     @respx.mock
+    def test_etablissement_get_or_error_with_request_error(self):
+        self.siret_endpoint.mock(side_effect=httpx.RequestError)
+
+        with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
+            result = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertEqual(result, (None, "Problème de connexion à la base Sirene. Essayez ultérieurement."))
+        self.assertTrue(cm.records[0].message.startswith("A request to the INSEE API failed"))
+
+    @respx.mock
     def test_etablissement_get_or_error_with_other_http_bad_request_error(self):
         self.siret_endpoint.respond(400)
 

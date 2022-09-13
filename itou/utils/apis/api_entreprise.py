@@ -58,6 +58,9 @@ def etablissement_get_or_error(siret):
             params={"date": timezone.localdate().isoformat()},
         )
         r.raise_for_status()
+    except httpx.RequestError:
+        logger.exception("A request to the INSEE API failed")
+        return None, "Problème de connexion à la base Sirene. Essayez ultérieurement."
     except httpx.HTTPStatusError as e:
         if e.response.status_code == httpx.codes.BAD_REQUEST:
             error = f"Erreur dans le format du SIRET : « {siret} »."
