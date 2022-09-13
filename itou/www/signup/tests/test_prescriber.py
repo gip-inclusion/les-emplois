@@ -91,26 +91,22 @@ class PrescriberSignupTest(TestCase):
         self.assertContains(response, url + '"')
 
         # Connect with Inclusion Connect.
-        # Skip the welcoming tour to test dashboard content.
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                login_hint=email,
-                channel="pole_emploi",
-                user_info_email=email,
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
-
-        # Response should contain links available only to prescribers.
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            login_hint=email,
+            channel="pole_emploi",
+            user_info_email=email,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Organization
         self.assertEqual(self.client.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY), organization.pk)
+        response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, f"Code SAFIR {organization.code_safir_pole_emploi}")
 
         user = User.objects.get(email=email)
@@ -175,19 +171,15 @@ class PrescriberSignupTest(TestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
-
-        # Response should contain links available only to prescribers.
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
@@ -270,20 +262,16 @@ class PrescriberSignupTest(TestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_user")
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
-
-        # Response should contain links available only to prescribers.
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        previous_url = reverse("signup:prescriber_user")
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
@@ -363,19 +351,15 @@ class PrescriberSignupTest(TestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
-
-        # Response should contain links available only to prescribers.
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
@@ -510,18 +494,14 @@ class PrescriberSignupTest(TestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                previous_url=previous_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
-
-        # Response should contain links available only to prescribers.
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            previous_url=previous_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
@@ -593,16 +573,15 @@ class PrescriberSignupTest(TestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check new org is OK.
         same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).order_by("kind").all()
@@ -701,18 +680,14 @@ class PrescriberSignupTest(TestCase):
         self.assertContains(response, url + '"')
 
         # Connect with Inclusion Connect.
-        # Skip the welcoming tour to test dashboard content.
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                previous_url=previous_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
-
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            previous_url=previous_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         user = User.objects.get(email=OIDC_USERINFO["email"])
         self.assertTrue(user.has_sso_provider)
@@ -773,19 +748,15 @@ class PrescriberSignupTest(TestCase):
         self.assertContains(response, url + '"')
 
         # Connect with Inclusion Connect.
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
-
-        # Response should contain links available only to prescribers.
-        self.assertContains(response, reverse("apply:list_for_prescriber"))
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check organization
         org = PrescriberOrganization.objects.get(siret=org.siret)
@@ -851,18 +822,17 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect.
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_user")
-            next_url = reverse("signup:prescriber_join_org")
-            response = mock_oauth_dance(
-                self,
-                assert_redirects=False,
-                previous_url=previous_url,
-                next_url=next_url,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
+        previous_url = reverse("signup:prescriber_user")
+        next_url = reverse("signup:prescriber_join_org")
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
 
         # The user should be logged out and redirected to the home page.
         self.assertFalse(self.client.session.get(INCLUSION_CONNECT_SESSION_KEY))
@@ -920,13 +890,18 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         # Connect with Inclusion Connect.
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
-        response = mock_oauth_dance(self, assert_redirects=False, previous_url=previous_url, next_url=next_url)
+        response = mock_oauth_dance(
+            self,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
         # Follow the redirection.
         response = self.client.get(response.url, follow=True)
 
         # Show an error and don't create an organization.
         self.assertEqual(response.wsgi_request.path, signup_url)
-        self.assertNotContains(response, reverse("apply:list_for_prescriber"))
+        self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
         self.assertContains(response, "inclusion_connect_button.svg")
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
@@ -966,24 +941,23 @@ class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Connect with Inclusion Connect but, this time, don't use a PE email.
-        url = reverse("dashboard:index")
-        with mock.patch("itou.users.adapter.UserAdapter.get_login_redirect_url", return_value=url):
-            previous_url = reverse("signup:prescriber_pole_emploi_user")
-            next_url = reverse("signup:prescriber_join_org")
-            wrong_email = "athos@touspourun.com"
-            response = mock_oauth_dance(
-                self,
-                login_hint=pe_email,
-                channel="pole_emploi",
-                assert_redirects=False,
-                previous_url=previous_url,
-                next_url=next_url,
-                user_info_email=wrong_email,
-            )
-            # Follow the redirection.
-            response = self.client.get(response.url, follow=True)
+        previous_url = reverse("signup:prescriber_pole_emploi_user")
+        next_url = reverse("signup:prescriber_join_org")
+        wrong_email = "athos@touspourun.com"
+        response = mock_oauth_dance(
+            self,
+            login_hint=pe_email,
+            channel="pole_emploi",
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+            user_info_email=wrong_email,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
 
-        self.assertNotContains(response, reverse("apply:list_for_prescriber"))
+        # Response should contain elements available only to prescribers on the welcoming tour.
+        self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
         self.assertContains(response, "inclusion_connect_button.svg")
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
