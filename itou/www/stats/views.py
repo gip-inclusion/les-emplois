@@ -101,7 +101,8 @@ def get_params_for_whole_country():
 
 def render_stats(request, context, params={}, template_name="stats/stats.html"):
     view_name = get_view_name(request)
-    tally_form_id = settings.METABASE_DASHBOARDS[view_name].get("tally_form_id")
+    metabase_dashboard = settings.METABASE_DASHBOARDS.get(view_name)
+    tally_form_id = metabase_dashboard.get("tally_form_id") if metabase_dashboard else None
     enable_tally_form = settings.ENABLE_TALLY_FORMS and tally_form_id
 
     base_context = {

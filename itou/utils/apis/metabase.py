@@ -35,7 +35,8 @@ def metabase_embedded_url(request=None, dashboard_id=None, params={}, with_title
     """
     if dashboard_id is None:
         view_name = get_view_name(request)
-        dashboard_id = settings.METABASE_DASHBOARDS[view_name]["dashboard_id"]
+        metabase_dashboard = settings.METABASE_DASHBOARDS.get(view_name)
+        dashboard_id = metabase_dashboard["dashboard_id"] if metabase_dashboard else None
 
     payload = {"resource": {"dashboard": dashboard_id}, "params": params, "exp": round(time.time()) + (10 * 60)}
     is_titled = "true" if with_title else "false"
