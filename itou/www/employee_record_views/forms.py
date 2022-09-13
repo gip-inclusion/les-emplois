@@ -161,7 +161,7 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
 
         address_re_validator = RegexValidator(
             "^[a-zA-Z0-9@ ]{,32}$",
-            message="Le champ ne doit pas contenir de caractères spéciaux et ne pas excéder 32 caractères",
+            message="Le champ ne doit contenir ni caractères spéciaux, ni accents et ne pas excéder 32 caractères",
         )
         self.fields["hexa_lane_name"].validators = [address_re_validator]
         self.fields["hexa_additional_address"].validators = [address_re_validator]
