@@ -285,15 +285,9 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
     prescriber_orgs_with_members_same_siret = None
     prescriber_orgs_with_members_same_siren = None
 
-    form = forms.APIEntrepriseSearchWithDepartmentForm(data=request.POST or None)
+    form = forms.CheckAlreadyExistsForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-
-        # Puts the data from API entreprise and geocoding in session for the last creation step
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        session_data["prescriber_org_data"] = form.org_data
-        request.session.modified = True
-
         # Get organizations with members with precisely the same SIRET
         prescriber_orgs_with_members_same_siret = PrescriberOrganization.objects.prefetch_active_memberships().filter(
             siret=form.cleaned_data["siret"]
@@ -311,7 +305,9 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
         # else, displays the same form with the list of organizations with first member
         # to indicate which person to request an invitation from
         if not prescriber_orgs_with_members_same_siret and not prescriber_orgs_with_members_same_siren:
-            return HttpResponseRedirect(reverse("signup:prescriber_choose_org"))
+            return HttpResponseRedirect(
+                reverse("signup:prescriber_choose_org", kwargs={"siret": form.cleaned_data["siret"]})
+            )
 
     context = {
         "prescriber_orgs_with_members_same_siret": prescriber_orgs_with_members_same_siret,
@@ -322,7 +318,7 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
 
 
 def facilitator_search(request, template_name="signup/facilitator_search.html"):
-    form = forms.APIEntrepriseSearchForm(data=request.POST or None)
+    form = forms.FacilitatorSearchForm(data=request.POST or None)
     if request.method == "POST" and form.is_valid():
         request.session[settings.ITOU_SESSION_FACILITATOR_SIGNUP_KEY] = form.org_data
         return HttpResponseRedirect(reverse("signup:facilitator_signup"))
@@ -418,17 +414,17 @@ def prescriber_request_invitation(request, membership_id, template_name="signup/
 
 @valid_prescriber_signup_session_required
 @push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.html"):
+def prescriber_choose_org(request, siret, template_name="signup/prescriber_choose_org.html"):
     """
     Ask the user to choose his organization in a pre-existing list of authorized organization.
     """
 
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-    prescriber_org_data = session_data.get("prescriber_org_data")
-
-    form = forms.PrescriberChooseOrgKindForm(siret=prescriber_org_data.get("siret"), data=request.POST or None)
+    form = forms.PrescriberChooseOrgKindForm(siret=siret, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
+        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        session_data["prescriber_org_data"] = form.org_data
+        request.session.modified = True
 
         prescriber_kind = form.cleaned_data["kind"]
         authorization_status = None

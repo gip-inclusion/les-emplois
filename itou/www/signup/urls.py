@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from django.views.generic import TemplateView
 
 from itou.www.signup import views
@@ -38,8 +38,8 @@ urlpatterns = [
         views.prescriber_request_invitation,
         name="prescriber_request_invitation",
     ),
-    path(
-        "prescriber/choose_org",
+    re_path(
+        r"^prescriber/choose_org/(?P<siret>\d{14})?$",
         views.prescriber_choose_org,
         name="prescriber_choose_org",
     ),

@@ -11,14 +11,51 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
-from itou.utils.apis.api_entreprise import etablissement_get_or_error
-from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
+from itou.utils.apis import api_entreprise, geocoding as api_geocoding
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
 
 
 BLANK_CHOICE = (("", "---------"),)
+
+
+def _get_organization_data_from_api(siret):
+    # Fetch name and address from API entreprise.
+    establishment, error = api_entreprise.etablissement_get_or_error(siret)
+    if error:
+        raise forms.ValidationError(error)
+
+    if establishment.is_closed:
+        raise forms.ValidationError("La base Sirene indique que l'établissement est fermé.")
+
+    # Perform another API call to fetch geocoding data.
+    address_fields = [
+        establishment.address_line_1,
+        # `address_line_2` is omitted on purpose because it tends to return no results with the BAN API.
+        establishment.post_code,
+        establishment.city,
+        establishment.department,
+    ]
+    address_on_one_line = ", ".join([field for field in address_fields if field])
+    try:
+        geocoding_data = api_geocoding.get_geocoding_data(address_on_one_line, post_code=establishment.post_code)
+    except api_geocoding.GeocodingDataException:
+        geocoding_data = {}
+
+    return {
+        "siret": siret,
+        "is_head_office": establishment.is_head_office,
+        "name": establishment.name,
+        "address_line_1": establishment.address_line_1,
+        "address_line_2": establishment.address_line_2,
+        "post_code": establishment.post_code,
+        "city": establishment.city,
+        "department": establishment.department,
+        "longitude": geocoding_data.get("longitude"),
+        "latitude": geocoding_data.get("latitude"),
+        "geocoding_score": geocoding_data.get("score"),
+    }
 
 
 class FullnameFormMixin(forms.Form):
@@ -248,14 +285,19 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         }
 
 
-class APIEntrepriseSearchForm(forms.Form):
+class CheckAlreadyExistsForm(forms.Form):
     siret = forms.CharField(
         label="Numéro de SIRET de votre organisation",
+        # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
         min_length=14,
         help_text=mark_safe(
             "Retrouvez facilement votre numéro SIRET à partir du nom de votre organisation sur le site "
             '<a href="https://sirene.fr/" rel="noopener" target="_blank">sirene.fr</a>'
         ),
+    )
+    department = forms.ChoiceField(
+        label="Département",
+        choices=DEPARTMENTS.items(),
     )
 
     def __init__(self, *args, **kwargs):
@@ -264,54 +306,18 @@ class APIEntrepriseSearchForm(forms.Form):
         self.fields["siret"].widget.attrs["placeholder"] = "Numéro à 14 chiffres"
 
     def clean_siret(self):
-        # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
         siret = self.cleaned_data["siret"].replace(" ", "")
         validate_siret(siret)
-
-        # Fetch name and address from API entreprise.
-        etablissement, error = etablissement_get_or_error(siret)
-        if error:
-            raise forms.ValidationError(error)
-
-        if etablissement.is_closed:
-            raise forms.ValidationError("La base Sirene indique que l'établissement est fermé.")
-
-        # Perform another API call to fetch geocoding data.
-        address_fields = [
-            etablissement.address_line_1,
-            # `address_line_2` is omitted on purpose because it tends to return no results with the BAN API.
-            etablissement.post_code,
-            etablissement.city,
-            etablissement.department,
-        ]
-        address_on_one_line = ", ".join([field for field in address_fields if field])
-        try:
-            geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.post_code)
-        except GeocodingDataException:
-            geocoding_data = {}
-
-        self.org_data = {
-            "siret": siret,
-            "is_head_office": etablissement.is_head_office,
-            "name": etablissement.name,
-            "address_line_1": etablissement.address_line_1,
-            "address_line_2": etablissement.address_line_2,
-            "post_code": etablissement.post_code,
-            "city": etablissement.city,
-            "department": etablissement.department,
-            "longitude": geocoding_data.get("longitude"),
-            "latitude": geocoding_data.get("latitude"),
-            "geocoding_score": geocoding_data.get("score"),
-        }
 
         return siret
 
 
-class APIEntrepriseSearchWithDepartmentForm(APIEntrepriseSearchForm):
-    department = forms.ChoiceField(
-        label="Département",
-        choices=DEPARTMENTS.items(),
-    )
+class FacilitatorSearchForm(CheckAlreadyExistsForm):
+    department = None
+
+    def clean(self):
+        super().clean()
+        self.org_data = _get_organization_data_from_api(self.cleaned_data["siret"])
 
 
 # Prescribers signup.
@@ -333,6 +339,7 @@ class PrescriberRequestInvitationForm(FullnameFormMixin):
 class PrescriberChooseOrgKindForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.siret = kwargs.pop("siret")
+        self.org_data = None
         super().__init__(*args, **kwargs)
 
     kind = forms.ChoiceField(
@@ -360,6 +367,10 @@ class PrescriberChooseOrgKindForm(forms.Form):
                 )
             raise forms.ValidationError(mark_safe(error))
         return kind
+
+    def clean(self):
+        super().clean()
+        self.org_data = _get_organization_data_from_api(self.siret)
 
 
 class PrescriberChooseKindForm(forms.Form):

@@ -36,6 +36,9 @@ class PrescriberSignupTest(TestCase):
         respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
         )
+        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/26570134200148").mock(
+            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
+        )
 
     @respx.mock
     def test_create_user_prescriber_member_of_pole_emploi(self):
@@ -137,7 +140,7 @@ class PrescriberSignupTest(TestCase):
         Test the creation of a user of type prescriber with an authorized organization of *known* kind.
         """
 
-        siret = "11122233300001"
+        siret = "26570134200148"
 
         # Step 1: search organizations with SIRET
         url = reverse("signup:prescriber_check_already_exists")
@@ -145,19 +148,16 @@ class PrescriberSignupTest(TestCase):
             "siret": siret,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
-            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
-        )
         response = self.client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
-        url = reverse("signup:prescriber_choose_org")
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret})
         self.assertRedirects(response, url)
         post_data = {
             "kind": PrescriberOrganizationKind.CAP_EMPLOI.value,
         }
         response = self.client.post(url, data=post_data)
+        mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 3: Inclusion Connect button
         url = reverse("signup:prescriber_user")
@@ -219,7 +219,7 @@ class PrescriberSignupTest(TestCase):
         Test the creation of a user of type prescriber with an authorized organization of *unknown* kind.
         """
 
-        siret = "11122233300001"
+        siret = "26570134200148"
 
         # Step 1: search organizations with SIRET
         url = reverse("signup:prescriber_check_already_exists")
@@ -227,19 +227,16 @@ class PrescriberSignupTest(TestCase):
             "siret": siret,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
-            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
-        )
         response = self.client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 2: set 'other' organization.
-        url = reverse("signup:prescriber_choose_org")
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret})
         self.assertRedirects(response, url)
         post_data = {
             "kind": PrescriberOrganizationKind.OTHER.value,
         }
         response = self.client.post(url, data=post_data)
+        mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 3: ask the user his kind of prescriber.
         url = reverse("signup:prescriber_choose_kind")
@@ -323,7 +320,7 @@ class PrescriberSignupTest(TestCase):
         Test the creation of a user of type prescriber with an unauthorized organization.
         """
 
-        siret = "11122233300001"
+        siret = "26570134200148"
 
         # Step 1: search organizations with SIRET
         url = reverse("signup:prescriber_check_already_exists")
@@ -331,19 +328,16 @@ class PrescriberSignupTest(TestCase):
             "siret": siret,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
-            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
-        )
         response = self.client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 2: select kind of organization.
-        url = reverse("signup:prescriber_choose_org")
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret})
         self.assertRedirects(response, url)
         post_data = {
             "kind": PrescriberOrganizationKind.OTHER.value,
         }
         response = self.client.post(url, data=post_data)
+        mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 3: select the kind of prescriber 'UNAUTHORIZED'.
         url = reverse("signup:prescriber_choose_kind")
@@ -409,9 +403,7 @@ class PrescriberSignupTest(TestCase):
         # No email has been sent to support (validation/refusal of authorisation not needed).
         self.assertEqual(len(mail.outbox), 0)
 
-    @respx.mock
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_user_prescriber_with_existing_siren_other_department(self, mock_call_ban_geocoding_api):
+    def test_create_user_prescriber_with_existing_siren_other_department(self):
         """
         Test the creation of a user of type prescriber with existing SIREN but in an other department
         """
@@ -430,19 +422,13 @@ class PrescriberSignupTest(TestCase):
             "siret": siret2,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret2}").mock(
-            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
-        )
         response = self.client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 2: redirect to kind of organization selection.
-        url = reverse("signup:prescriber_choose_org")
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret2})
         self.assertRedirects(response, url)
 
-    @respx.mock
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_user_prescriber_with_existing_siren_same_department(self, mock_call_ban_geocoding_api):
+    def test_create_user_prescriber_with_existing_siren_same_department(self):
         """
         Test the creation of a user of type prescriber with existing SIREN in a same department
         """
@@ -459,11 +445,7 @@ class PrescriberSignupTest(TestCase):
             "siret": siret2,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret2}").mock(
-            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
-        )
         response = self.client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
         self.assertContains(response, existing_org_with_siret.display_name)
 
         # Request for an invitation link.
@@ -482,9 +464,7 @@ class PrescriberSignupTest(TestCase):
         # New organization link.
         self.assertContains(response, reverse("signup:prescriber_choose_org"))
 
-    @respx.mock
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_user_prescriber_with_existing_siren_without_member(self, mock_call_ban_geocoding_api):
+    def test_create_user_prescriber_with_existing_siren_without_member(self):
         """
         Test the creation of a user of type prescriber with existing organization does not have a member
         """
@@ -500,13 +480,9 @@ class PrescriberSignupTest(TestCase):
             "siret": siret2,
             "department": "67",
         }
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret2}").mock(
-            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
-        )
         response = self.client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
 
-        url = reverse("signup:prescriber_choose_org")
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret2})
         self.assertRedirects(response, url)
 
     @respx.mock
@@ -593,13 +569,13 @@ class PrescriberSignupTest(TestCase):
             "department": "67",
         }
         response = self.client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
         self.assertContains(response, existing_org_with_siret.display_name)
 
         # Step 2: Select kind
-        url = reverse("signup:prescriber_choose_org")
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret})
         post_data = {"kind": PrescriberOrganizationKind.PLIE.value}
         response = self.client.post(url, data=post_data)
+        mock_call_ban_geocoding_api.assert_called_once()
 
         # Step 3: Inclusion Connect button
         url = reverse("signup:prescriber_user")
@@ -657,24 +633,19 @@ class PrescriberSignupTest(TestCase):
             "department": "67",
         }
         response = self.client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
 
         self.assertContains(response, prescriber_organization.display_name)
 
-        url = reverse("signup:prescriber_choose_org")
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret})
         post_data = {
             "kind": PrescriberOrganizationKind.PLIE.value,
         }
         response = self.client.post(url, data=post_data)
         self.assertContains(response, mark_safe("utilise déjà ce type d'organisation avec le même SIRET"))
+        mock_call_ban_geocoding_api.assert_called_once()
 
-    @respx.mock
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_form_to_request_for_an_invitation(self, mock_call_ban_geocoding_api):
+    def test_form_to_request_for_an_invitation(self):
         siret = "26570134200148"
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
-            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
-        )
         prescriber_org = PrescriberOrganizationWithMembershipFactory(siret=siret)
         prescriber_membership = prescriber_org.prescribermembership_set.first()
 
@@ -684,7 +655,6 @@ class PrescriberSignupTest(TestCase):
             "department": prescriber_org.department,
         }
         response = self.client.post(url, data=post_data)
-        mock_call_ban_geocoding_api.assert_called_once()
         self.assertContains(response, prescriber_org.display_name)
 
         url = reverse("signup:prescriber_request_invitation", kwargs={"membership_id": prescriber_membership.id})
