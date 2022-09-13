@@ -102,7 +102,7 @@ def get_params_for_whole_country():
 def render_stats(request, context, params={}, template_name="stats/stats.html"):
     view_name = get_view_name(request)
     tally_form_id = settings.METABASE_DASHBOARDS[view_name].get("tally_form_id")
-    enable_tally_form = settings.ENABLE_TALLY_FORMS and tally_form_id
+    enable_tally_form = settings.ENABLE_TALLY_FORMS and tally_form_id is not None
 
     base_context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
