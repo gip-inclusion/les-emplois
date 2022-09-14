@@ -24,6 +24,7 @@ from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, Pres
 from itou.users.models import User
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
+from itou.utils.storage.testing import S3AccessingTestCase
 
 
 fake = faker.Faker(locale="fr_FR")
@@ -103,7 +104,7 @@ class ApplyTest(TestCase):
         )
 
 
-class ApplyAsJobSeekerTest(TestCase):
+class ApplyAsJobSeekerTest(S3AccessingTestCase):
     @property
     def default_session_data(self):
         return {
@@ -353,7 +354,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
 
 
-class ApplyAsAuthorizedPrescriberTest(TestCase):
+class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
     def setUp(self):
         create_test_cities(["67"], num_per_department=1)
         self.city = City.objects.first()
@@ -920,7 +921,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(last_url, reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk}))
 
 
-class ApplyAsPrescriberTest(TestCase):
+class ApplyAsPrescriberTest(S3AccessingTestCase):
     def setUp(self):
         create_test_cities(["67"], num_per_department=10)
         self.city = City.objects.first()
@@ -1247,7 +1248,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
 
 
-class ApplyAsPrescriberNirExceptionsTest(TestCase):
+class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
     """
     The following normal use cases are tested in tests above:
         - job seeker creation,
@@ -1330,7 +1331,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         self.assertEqual(job_seeker.nir, nir)
 
 
-class ApplyAsSiaeTest(TestCase):
+class ApplyAsSiaeTest(S3AccessingTestCase):
     def setUp(self):
         create_test_cities(["67"], num_per_department=1)
         self.city = City.objects.first()
@@ -1673,7 +1674,7 @@ class ApplyAsOtherTest(TestCase):
                 self.assertEqual(response.status_code, 403)
 
 
-class ApplicationViewTest(TestCase):
+class ApplicationViewTest(S3AccessingTestCase):
     def test_application_jobs_use_previously_selected_jobs(self):
         siae = SiaeFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
 

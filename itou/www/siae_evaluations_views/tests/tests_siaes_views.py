@@ -21,6 +21,7 @@ from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.storage.s3 import S3Upload
+from itou.utils.storage.testing import S3AccessingTestCase
 
 
 # fixme vincentporte : convert this method into factory
@@ -62,7 +63,7 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
     return evaluated_job_application
 
 
-class SiaeJobApplicationListViewTest(TestCase):
+class SiaeJobApplicationListViewTest(S3AccessingTestCase):
     def setUp(self):
         membership = SiaeMembershipFactory()
         self.user = membership.user
@@ -393,7 +394,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
                 self.assertNotIn("checked", response.context["level_2_fields"][i].subwidgets[0].data["attrs"])
 
 
-class SiaeUploadDocsViewTest(TestCase):
+class SiaeUploadDocsViewTest(S3AccessingTestCase):
     def setUp(self):
         membership = SiaeMembershipFactory()
         self.user = membership.user

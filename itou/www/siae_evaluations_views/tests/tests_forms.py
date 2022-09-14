@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from itou.siae_evaluations.factories import EvaluatedJobApplicationFactory
@@ -6,6 +6,7 @@ from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SubmitEv
 
 
 class SubmitEvaluatedAdministrativeCriteriaProofFormFormTests(TestCase):
+    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="good.com")
     def test_url_wo_correct_endpoint(self):
         form = SubmitEvaluatedAdministrativeCriteriaProofForm(data={"proof_url": "https://bad.com/rocky-balboa.pdf"})
 
