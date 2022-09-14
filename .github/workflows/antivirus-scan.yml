@@ -1,0 +1,81 @@
+---
+name: 🐛 Antivirus
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+    - cron: "0 0 1 * *"
+
+env:
+  CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+  CLEVER_TAR_FILE: clever-tools-latest_linux.tar.gz
+  CLEVER_CLI: clever-tools-latest_linux/clever
+  CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+  CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+  DEPLOY_BRANCH: master_clever
+  PYTHON_VERSION: "3.10"
+
+jobs:
+  antivirus:
+    runs-on: ubuntu-latest
+
+    env:
+      CC_CLAMAV: true
+
+    steps:
+    - name: 📥 Checkout to the latest version
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ env.DEPLOY_BRANCH }}
+
+    # Daily.
+    - name: 🏷 Setup app name (daily scan)
+      if: github.event.schedule == '0 0 * * *'
+      run:
+        echo "IMPORT_APP_NAME=`echo \"c1-antivirus-daily-$(date +%y-%m-%d-%Hh-%M)\"`" >> $GITHUB_ENV
+
+    - name: 🐛 Setup Antivirus script (daily scan)
+      if: github.event.schedule == '0 0 * * *'
+      run:
+        echo "CC_RUN_SUCCEEDED_HOOK=./scripts/antivirus-daily.sh" >> $GITHUB_ENV
+    # End of daily.
+
+    # Monthly.
+    - name: 🏷 Setup app name (complete scan)
+      if: github.event.schedule == '0 0 1 * *'
+      run:
+        echo "IMPORT_APP_NAME=`echo \"c1-antivirus-monthly-$(date +%y-%m-%d-%Hh-%M)\"`" >> $GITHUB_ENV
+
+    - name: 🐛 Setup Antivirus script (complete scan)
+      if: github.event.schedule == '0 0 1 * *'
+      run:
+        echo "CC_RUN_SUCCEEDED_HOOK=./scripts/antivirus-monthly.sh" >> $GITHUB_ENV
+    # End of monthly.
+
+    - name: 🧫 Create app on CleverCloud
+      run: |
+        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
+        tar -xvf $CLEVER_TAR_FILE
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI create $IMPORT_APP_NAME -t python --region par --alias $IMPORT_APP_NAME --org Itou
+        $CLEVER_CLI link $IMPORT_APP_NAME --org Itou
+        $CLEVER_CLI scale --flavor XL
+
+    - name: 🗺 Add environment variables and addons to the app
+      run: |
+        $CLEVER_CLI link $IMPORT_APP_NAME --org Itou
+        $CLEVER_CLI env set ITOU_ENVIRONMENT "PROD"
+        $CLEVER_CLI service link-addon c1-deployment-config
+        $CLEVER_CLI service link-addon c1-prod-database-encrypted
+        $CLEVER_CLI service link-addon c1-s3
+
+    - name: 🚀 Setup CleverCloud environment variables
+      run:
+        $CLEVER_CLI env import-vars CC_CLAMAV,CC_RUN_SUCCEEDED_HOOK
+
+    - name: 🚀 Deploy, run antivirus scan
+      run: $CLEVER_CLI deploy --alias $IMPORT_APP_NAME --branch $DEPLOY_BRANCH --force
+
+    - name: 🗑 Delete the app
+      run:
+        $CLEVER_CLI delete --yes
