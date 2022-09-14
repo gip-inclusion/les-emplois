@@ -3,13 +3,14 @@ import datetime
 import httpx
 import respx
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
 from itou.users.enums import IdentityProvider
 from itou.users.factories import UserFactory
 from itou.users.models import User
+from itou.utils.testing import reload_module
 
 from ..models import TooManyKindsException
 from . import constants
@@ -54,6 +55,12 @@ def mock_oauth_dance(test_class, expected_route="dashboard:index"):
     test_class.assertRedirects(response, reverse(expected_route))
 
 
+@override_settings(
+    FRANCE_CONNECT_BASE_URL="https://france.connect.fake",
+    FRANCE_CONNECT_CLIENT_ID="FC_CLIENT_ID_123",
+    FRANCE_CONNECT_CLIENT_SECRET="FC_CLIENT_SECRET_123",
+)
+@reload_module(constants)
 class FranceConnectTest(TestCase):
     def test_state_delete(self):
         state = FranceConnectState.objects.create(csrf="foo")

@@ -4,16 +4,17 @@ import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
-from itou.openid_connect.france_connect import constants
+from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.testing import reload_module
 from itou.www.signup.forms import JobSeekerSituationForm
 
 
@@ -243,8 +244,8 @@ class JobSeekerSignupTest(TestCase):
         FRANCE_CONNECT_CLIENT_ID="IC_CLIENT_ID_123",
         FRANCE_CONNECT_CLIENT_SECRET="IC_CLIENT_SECRET_123",
     )
+    @reload_module(fc_constants)
     def test_job_seeker_nir_with_france_connect(self):
-        importlib.reload(fc_constants)
         # NIR is set on a previous step and tested separately.
         # See self.test_job_seeker_nir
         nir = "141068078200557"
@@ -263,8 +264,13 @@ class JobSeekerSignupTest(TestCase):
         self.assertEqual(nir, job_seeker.nir)
 
     @respx.mock
+    @override_settings(
+        FRANCE_CONNECT_BASE_URL="https://france.connect.fake",
+        FRANCE_CONNECT_CLIENT_ID="IC_CLIENT_ID_123",
+        FRANCE_CONNECT_CLIENT_SECRET="IC_CLIENT_SECRET_123",
+    )
+    @reload_module(fc_constants)
     def test_job_seeker_temporary_nir_with_france_connect(self):
-        importlib.reload(constants)
         # temporary NIR is discarded on a previous step and tested separately.
         # See self.test_job_seeker_temporary_nir
 
