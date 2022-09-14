@@ -5,7 +5,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 
 
-def strip_sentry_sensitive_data(event, hint):
+def strip_sentry_sensitive_data(event, _hint):
     """
     Be very cautious about not raising any exception in this method,
     because when this happens, the initial 500 error
