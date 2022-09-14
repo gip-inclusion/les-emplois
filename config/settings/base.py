@@ -96,6 +96,7 @@ LOCAL_APPS = [
     "itou.www.siae_evaluations_views",
     "itou.api",
     "itou.status",
+    "itou.antivirus",
     "itou.scripts",
 ]
 
