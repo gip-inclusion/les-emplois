@@ -96,9 +96,11 @@ certifi==2022.9.14 \
     --hash=sha256:36973885b9542e6bd01dea287b2b4b3b21236307c56324fcc3f1160f2d655ed5 \
     --hash=sha256:e232343de1ab72c2aa521b625c80f699e356830fd0e2c620b465b304b17b0516
     # via
+    #   elastic-apm
     #   httpcore
     #   httpx
     #   requests
+    #   sentry-sdk
 cffi==1.15.1 \
     --hash=sha256:00a9ed42e88df81ffae7a8ab6d9356b371399b91dbdf0c3cb1e84c03a13aceb5 \
     --hash=sha256:03425bdae262c76aad70202debd780501fabeaca237cdfddc008987c0e0f59ef \
@@ -360,6 +362,29 @@ djhtml==1.5.1 \
 drf-spectacular==0.22.1 \
     --hash=sha256:17ac5e31e5d6150dd5fa10843b429202f4f38069202acc44394cc5a771de63d9 \
     --hash=sha256:866e16ddaae167a1234c76cd8c351161373551db994ce9665b347b32d5daf38b
+    # via -r requirements/base.in
+elastic-apm==6.10.1 \
+    --hash=sha256:001a9c14bff28f655f86f96c7d5c59f221149ade4f54a0fc6e2274eea9392586 \
+    --hash=sha256:0b98f290ccf06e86c6bd4dc0783d3cc0639ffb48f98353cb8b06aa598af3ab65 \
+    --hash=sha256:17419be0a91dc02ed6dfb6931d31a0a7af64dc7c062cd75260ce4ee767a172c4 \
+    --hash=sha256:1b84ff5135e6dc017d730512e465d6a9f0bc6e20b3ed862fbcd80f9b480a1eb1 \
+    --hash=sha256:1dc68fdfb899b7f2105e271811d539adac3eb0580d6208c5d9894b0d55d7b9e7 \
+    --hash=sha256:400e6bbd8cc3ef4e6dc72e7f2250ca478693da55fd76514623f5c21a0a3d285f \
+    --hash=sha256:46e510fcad0f66804d33db33cac17704cc35b67053d2c995d76a5d57b4dcf16d \
+    --hash=sha256:54eb03de15e4176e9032af28488fed5d0a01b6f2d72e63a6fd56968a1687e091 \
+    --hash=sha256:607ee63dcb6913f88782624398b5d4548c0e407f998b1cb42acae5ee29721812 \
+    --hash=sha256:7736aa545280b115c545dcfec8530d4711056e8715fa6ebc935fd3303c913a75 \
+    --hash=sha256:8d71118f8c4fd543be472b2e74dd5de21d6f37a621b284360a99d11f01ca3cee \
+    --hash=sha256:90600cceded4f94f8e8b782217475e0a57b3dfdfcf7b14b567ca76b4075cd204 \
+    --hash=sha256:a3afb36eda2f7ed603ba628107f23f90206ce287ab62cfb6efb899ec66063e82 \
+    --hash=sha256:a7591d5b6469905bbc1773348862507b24a81593ece9ef605814840cf149f3eb \
+    --hash=sha256:b248dc8d0ed1fb5374408e7af4645a3efc25325627db5c03a9f15065da81bdde \
+    --hash=sha256:b86fff3521ef08981ddabcbc6905e89bdbc355779eb68cf038e99e0d66f91942 \
+    --hash=sha256:c163ed76db4d0786a1fea5718c442b24af949dc4510cfa267da83140bca4680c \
+    --hash=sha256:c16ee7439242c0c23244c0324118b32763049680e63520f01e3829ae1f47fc7f \
+    --hash=sha256:d84f65df3320e79f5dd5f912e6e5392dc3a4791f1d9c376820b0a4e0f6e87dac \
+    --hash=sha256:db4c8bb1019a66951b04ce5ef5d5bbd8dd7bf38425d7ef16e775bc0794248924 \
+    --hash=sha256:f120f58b95432ddb7a437d29a992e49eb5f4c3e4cf25b0ab386299bda7227c85
     # via -r requirements/base.in
 et-xmlfile==1.1.0 \
     --hash=sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c \
@@ -1105,6 +1130,10 @@ s3transfer==0.6.0 \
     --hash=sha256:06176b74f3a15f61f1b4f25a1fc29a4429040b7647133a463da8fa5bd28d5ecd \
     --hash=sha256:2ed07d3866f523cc561bf4a00fc5535827981b117dd7876f036b0c1aca42c947
     # via boto3
+sentry-sdk==1.9.0 \
+    --hash=sha256:60b13757d6344a94bf0ccb3c0a006c4de77daab09871b30fbbd05d5ec24e54fb \
+    --hash=sha256:f185c53496d79b280fe5d9d21e6572aee1ab802d3354eb12314d216cfbaa8d30
+    # via -r requirements/base.in
 six==1.16.0 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
@@ -1222,7 +1251,12 @@ urllib3==1.26.12 \
     --hash=sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997
     # via
     #   botocore
+    #   elastic-apm
     #   requests
+    #   sentry-sdk
+uwsgi==2.0.20 \
+    --hash=sha256:88ab9867d8973d8ae84719cf233b7dafc54326fcaec89683c3f9f77c002cdff9
+    # via -r requirements/base.in
 virtualenv==20.16.5 \
     --hash=sha256:227ea1b9994fdc5ea31977ba3383ef296d7472ea85be9d6732e42a91c04e80da \
     --hash=sha256:d07dfc5df5e4e0dbc92862350ad87a36ed505b978f6c39609dc489eadd5b0d27

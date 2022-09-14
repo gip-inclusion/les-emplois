@@ -33,10 +33,7 @@ venv: $(VIRTUAL_ENV)
 PIP_COMPILE_FLAGS := --upgrade --allow-unsafe --generate-hashes
 compile-deps: $(VIRTUAL_ENV)
 	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/demo.txt requirements/demo.in
 	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/prod.txt requirements/prod.in
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/staging.txt requirements/staging.in
 
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
