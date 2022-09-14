@@ -32,6 +32,7 @@ django-admin-logs==1.0.2  # https://pypi.org/project/django-admin-logs/
 
 # Test & Mock
 # ------------------------------------------------------------------------------
+freezegun==1.2.2  # https://github.com/spulec/freezegun
 requests-mock==1.9.3  # https://github.com/jamielennox/requests-mock
 respx==0.19.2  # https://lundberg.github.io/respx/
 pytest==7.1.2  # https://github.com/pytest-dev/pytest

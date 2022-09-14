@@ -3,6 +3,7 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
+from freezegun import freeze_time
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionMembershipFactory
@@ -448,6 +449,7 @@ class SiaeUploadDocsViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    @freeze_time("2022-09-14 11:11:11")
     def test_access(self):
         self.maxDiff = None
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
