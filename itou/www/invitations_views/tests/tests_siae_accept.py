@@ -5,10 +5,10 @@ from django.conf import settings
 from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
-from django.test import TestCase
 from django.utils.html import escape
 
 from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory, SentSiaeStaffInvitationFactory
+from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
@@ -18,7 +18,7 @@ from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 
 
-class TestAcceptInvitation(TestCase):
+class TestAcceptInvitation(InclusionConnectBaseTestCase):
     def assert_accepted_invitation(self, response, invitation, user):
         user.refresh_from_db()
         invitation.refresh_from_db()

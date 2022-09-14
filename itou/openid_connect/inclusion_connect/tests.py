@@ -10,7 +10,7 @@ from django.contrib import auth
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 
@@ -24,6 +24,7 @@ from ..constants import OIDC_STATE_EXPIRATION
 from ..models import TooManyKindsException
 from . import constants
 from .models import InclusionConnectPrescriberData, InclusionConnectSiaeStaffData, InclusionConnectState
+from .testing import InclusionConnectBaseTestCase
 
 
 OIDC_USERINFO = {
@@ -83,7 +84,7 @@ def mock_oauth_dance(
     return response
 
 
-class InclusionConnectModelTest(TestCase):
+class InclusionConnectModelTest(InclusionConnectBaseTestCase):
     def test_state_delete(self):
         state = InclusionConnectState.objects.create(csrf="foo")
 
@@ -256,7 +257,7 @@ class InclusionConnectModelTest(TestCase):
             user.delete()
 
 
-class InclusionConnectViewTest(TestCase):
+class InclusionConnectViewTest(InclusionConnectBaseTestCase):
     def test_callback_invalid_state(self):
         url = reverse("inclusion_connect:callback")
         response = self.client.get(url, data={"code": "123", "state": "000"})
@@ -369,7 +370,7 @@ class InclusionConnectViewTest(TestCase):
             user.delete()
 
 
-class InclusionConnectSessionTest(TestCase):
+class InclusionConnectSessionTest(InclusionConnectBaseTestCase):
     def test_start_session(self):
         ic_session = InclusionConnectSession()
         self.assertEqual(ic_session.key, constants.INCLUSION_CONNECT_SESSION_KEY)
@@ -389,7 +390,7 @@ class InclusionConnectSessionTest(TestCase):
         self.assertTrue(request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY))
 
 
-class InclusionConnectLoginTest(TestCase):
+class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_normal_signin(self):
         """
@@ -461,7 +462,7 @@ class InclusionConnectLoginTest(TestCase):
         self.assertTrue(auth.get_user(self.client).is_authenticated)
 
 
-class InclusionConnectLogoutTest(TestCase):
+class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_simple_logout(self):
         mock_oauth_dance(self, KIND_PRESCRIBER)

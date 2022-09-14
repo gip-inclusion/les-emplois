@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 
+from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
 from itou.users import enums as users_enums
 from itou.users.factories import (
     DEFAULT_PASSWORD,
@@ -50,7 +51,7 @@ class ItouLoginFormTest(TestCase):
         self.assertIn("FranceConnect", form.errors["__all__"][0])
 
 
-class PrescriberLoginTest(TestCase):
+class PrescriberLoginTest(InclusionConnectBaseTestCase):
     def test_login_options(self):
         url = reverse("login:prescriber")
         response = self.client.get(url)
@@ -90,7 +91,7 @@ class PrescriberLoginTest(TestCase):
         )
 
 
-class SiaeStaffLoginTest(TestCase):
+class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
     def test_login_options(self):
         url = reverse("login:siae_staff")
         response = self.client.get(url)

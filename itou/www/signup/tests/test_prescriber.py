@@ -6,13 +6,14 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.messages import get_messages
 from django.core import mail
-from django.test import TestCase
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
+from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.factories import (
@@ -30,7 +31,13 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.www.signup.forms import PrescriberChooseKindForm
 
 
-class PrescriberSignupTest(TestCase):
+@override_settings(
+    API_INSEE_BASE_URL="https://insee.fake",
+    API_ENTREPRISE_BASE_URL="https://entreprise.fake",
+    API_INSEE_CONSUMER_KEY="foo",
+    API_INSEE_CONSUMER_SECRET="bar",
+)
+class PrescriberSignupTest(InclusionConnectBaseTestCase):
     def setUp(self):
         super().setUp()
 
@@ -780,7 +787,7 @@ class PrescriberSignupTest(TestCase):
         self.assertTrue(membership.is_admin)
 
 
-class InclusionConnectPrescribersViewsExceptionsTest(TestCase):
+class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCase):
     """
     Prescribers' signup and login exceptions: user already exists, ...
     """

@@ -13,6 +13,7 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
 
+from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
@@ -24,7 +25,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.urls import get_tally_form_url
 
 
-class SiaeSignupTest(TestCase):
+class SiaeSignupTest(InclusionConnectBaseTestCase):
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
     def test_join_an_siae_without_members(self):

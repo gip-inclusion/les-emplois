@@ -12,6 +12,7 @@ from django.utils.html import escape
 
 from itou.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from itou.invitations.models import PrescriberWithOrgInvitation
+from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
@@ -177,8 +178,9 @@ class TestPEOrganizationInvitation(TestCase):
         )
 
 
-class TestAcceptPrescriberWithOrgInvitation(TestCase):
+class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
     def setUp(self):
+        super().setUp()
         self.organization = PrescriberOrganizationWithMembershipFactory()
         # Create a second member to make sure emails are also
         # sent to regular members

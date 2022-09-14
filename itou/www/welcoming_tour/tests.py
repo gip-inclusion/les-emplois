@@ -5,6 +5,7 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
 from itou.openid_connect.inclusion_connect.tests import mock_oauth_dance
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
@@ -19,9 +20,10 @@ def get_confirm_email_url(request, email):
     return get_adapter().get_email_confirmation_url(request, EmailConfirmationHMAC(user_email))
 
 
-class WelcomingTourTest(TestCase):
+class WelcomingTourTest(InclusionConnectBaseTestCase):
     def setUp(self):
         self.email = None
+        super().setUp()
 
     def verify_email(self, request, email):
         # User verifies its email clicking on the email he received
