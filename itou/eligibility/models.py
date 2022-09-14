@@ -198,7 +198,7 @@ class EligibilityDiagnosis(models.Model):
 
     @property
     def is_valid(self):
-        return self.expires_at > timezone.now()
+        return self.expires_at and self.expires_at > timezone.now()
 
     @property
     def author_organization(self):
