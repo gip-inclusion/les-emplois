@@ -16,19 +16,7 @@ from .common import EmployeeRecordTransferCommand
 
 
 class Command(EmployeeRecordTransferCommand):
-    """
-    Employee record management command
-    ---
-    Allow to manually or automatically:
-    - upload ready to be processed employee records
-    - download feedback files of previous upload operations
-    - perform dry-run operations
-    """
-
     def add_arguments(self, parser):
-        """
-        Command line arguments
-        """
         super().add_arguments(parser)
 
         parser.add_argument(

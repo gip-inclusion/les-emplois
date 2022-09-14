@@ -35,9 +35,6 @@ ALLOWED_HOSTS = []
 
 SITE_ID = 1
 
-# Apps.
-# ------------------------------------------------------------------------------
-
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -59,8 +56,8 @@ THIRD_PARTY_APPS = [
     "bootstrap4",
     "django_select2",
     "huey.contrib.djhuey",
-    "rest_framework",  # DRF (Django Rest Framework).
-    "rest_framework.authtoken",  # Required for DRF TokenAuthentication.
+    "rest_framework",
+    "rest_framework.authtoken",
     "drf_spectacular",
     "django_filters",
     "import_export",
@@ -70,7 +67,6 @@ THIRD_PARTY_APPS = [
 
 
 LOCAL_APPS = [
-    # Core apps, order is important.
     "itou.utils",
     "itou.cities",
     "itou.jobs",
@@ -89,7 +85,6 @@ LOCAL_APPS = [
     "itou.asp",
     "itou.employee_record",
     "itou.siae_evaluations",
-    # www.
     "itou.www.apply",
     "itou.www.approvals_views",
     "itou.www.autocomplete",
@@ -105,17 +100,13 @@ LOCAL_APPS = [
     "itou.www.welcoming_tour",
     "itou.www.employee_record_views",
     "itou.www.siae_evaluations_views",
-    # API
     "itou.api",
-    # Status
     "itou.status",
     "itou.scripts",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
-# Middleware.
-# ------------------------------------------------------------------------------
 
 DJANGO_MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -135,15 +126,9 @@ ITOU_MIDDLEWARE = [
 
 MIDDLEWARE = DJANGO_MIDDLEWARE + ITOU_MIDDLEWARE
 
-# URLs.
-# ------------------------------------------------------------------------------
-
 ROOT_URLCONF = "config.urls"
 
 WSGI_APPLICATION = "config.wsgi.application"
-
-# Templates.
-# ------------------------------------------------------------------------------
 
 TEMPLATES = [
     {
@@ -152,7 +137,6 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
-                # Django.
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
@@ -161,7 +145,6 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                # Itou.
                 "itou.utils.perms.context_processors.get_current_organization_and_perms",
                 "itou.utils.settings_context_processors.expose_settings",
             ]
@@ -169,17 +152,12 @@ TEMPLATES = [
     }
 ]
 
-# Forms.
-# ------------------------------------------------------------------------------
-
 # Override default Django forms widgets templates.
 # Requires django.forms in INSTALLED_APPS
 # https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
-# Database.
-# ------------------------------------------------------------------------------
-
+# Note how we use Clever Cloud environment variables here. No way for now to alias them :/
 DATABASES = {
     "default": {
         "ATOMIC_REQUESTS": False,  # We handle transactions manually in the code.
@@ -192,11 +170,7 @@ DATABASES = {
     }
 }
 
-# https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-
-# Password validation.
-# ------------------------------------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -205,9 +179,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
     {"NAME": "itou.utils.password_validation.CnilCompositionPasswordValidator"},
 ]
-
-# Internationalization.
-# ------------------------------------------------------------------------------
 
 LANGUAGE_CODE = "fr-FR"
 
@@ -219,10 +190,6 @@ USE_TZ = True
 
 DATE_INPUT_FORMATS = ["%d/%m/%Y", "%d-%m-%Y", "%d %m %Y"]
 
-# Static files (CSS, JavaScript, Images).
-# ------------------------------------------------------------------------------
-
-# Path to the directory where collectstatic will collect static files for deployment.
 STATIC_ROOT = os.path.join(APPS_DIR, "static_collected")
 
 STATIC_URL = "/static/"
@@ -235,9 +202,6 @@ STATICFILES_FINDERS = (
 )
 
 STATICFILES_DIRS = (os.path.join(APPS_DIR, "static"),)
-
-# Security.
-# ------------------------------------------------------------------------------
 
 CSRF_COOKIE_HTTPONLY = True
 
@@ -261,10 +225,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SERIALIZER = "itou.utils.session.JSONSerializer"
 
 X_FRAME_OPTIONS = "DENY"
-
-# Logging.
-# https://docs.djangoproject.com/en/dev/topics/logging
-# ----------------------------------------------------
 
 LOGGING = {
     "version": 1,
@@ -313,16 +273,10 @@ LOGGING = {
     },
 }
 
-# Auth.
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-# ------------------------------------------------------------------------------
-
 AUTH_USER_MODEL = "users.User"
 
 AUTHENTICATION_BACKENDS = (
-    # Needed to login by username in Django admin.
     "django.contrib.auth.backends.ModelBackend",
-    # `allauth` specific authentication methods, such as login by e-mail.
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
@@ -341,10 +295,6 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
 
-# django-bootstrap4.
-# https://django-bootstrap4.readthedocs.io/en/latest/settings.html
-# ------------------------------------------------------------------------------
-
 BOOTSTRAP4 = {
     "required_css_class": "form-group-required",
     # Remove the default `.is-valid` class that Bootstrap will style in green
@@ -356,7 +306,6 @@ BOOTSTRAP4 = {
 # APIs.
 # ------------------------------------------------------------------------------
 
-# Base Adresse Nationale (BAN).
 # https://adresse.data.gouv.fr/faq
 API_BAN_BASE_URL = "https://api-adresse.data.gouv.fr"
 
@@ -368,7 +317,6 @@ API_INSEE_BASE_URL = "https://api.insee.fr"
 API_INSEE_CONSUMER_KEY = os.environ.get("API_INSEE_CONSUMER_KEY", "")
 API_INSEE_CONSUMER_SECRET = os.environ.get("API_INSEE_CONSUMER_SECRET", "")
 
-# API Entreprise.
 # https://api.gouv.fr/documentation/sirene_v3
 API_ENTREPRISE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene/V3"
 
@@ -669,20 +617,13 @@ HUEY = {
     "immediate": False,
 }
 
-# Email.
-# https://anymail.readthedocs.io/en/stable/esps/mailjet/
-# ------------------------------------------------------------------------------
 
+# Email https://anymail.readthedocs.io/en/stable/esps/mailjet/
 ANYMAIL = {
     "MAILJET_API_KEY": os.environ.get("API_MAILJET_KEY"),
     "MAILJET_SECRET_KEY": os.environ.get("API_MAILJET_SECRET"),
     "WEBHOOK_SECRET": os.environ.get("MAILJET_WEBHOOK_SECRET"),
 }
-
-MAILJET_API_URL = "https://api.mailjet.com/v3.1"
-
-# Asynchronous email backend.
-# ------------------------------------------------------------------------------
 
 # EMAIL_BACKEND points to an async wrapper of a "real" email backend
 # The real backend is hardcoded in the wrapper to avoid multiple and
@@ -691,12 +632,9 @@ MAILJET_API_URL = "https://api.mailjet.com/v3.1"
 EMAIL_BACKEND = "itou.utils.email_backend.AsyncEmailBackend"
 
 
-# Number of retries & retry delay parameters for emails (for async process)
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
 SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600
 
-# DRF (Django Rest Framework)
-# ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
     # Namespace versioning e.g. `GET /api/v1/something/`.
     # https://www.django-rest-framework.org/api-guide/versioning/#namespaceversioning
@@ -735,8 +673,6 @@ REST_FRAMEWORK = {
     },
 }
 
-# DRF Spectacular
-# ------------------------------------------------------------------------------
 SPECTACULAR_SETTINGS = {
     "TITLE": "API - Les emplois de l'inclusion",
     "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
