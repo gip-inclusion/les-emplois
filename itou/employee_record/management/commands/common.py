@@ -39,7 +39,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         """
         return pysftp.Connection(
             host=settings.ASP_FS_SFTP_HOST,
-            port=int(settings.ASP_FS_SFTP_PORT),
+            port=settings.ASP_FS_SFTP_PORT,  # default setting is None, pysftp would then default to 22
             username=settings.ASP_FS_SFTP_USER,
             private_key=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
             cnopts=connection_options,

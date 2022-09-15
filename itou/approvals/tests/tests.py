@@ -174,7 +174,7 @@ class CommonApprovalMixinTest(TestCase):
         self.assertFalse(approval.is_in_waiting_period)
 
     def test_originates_from_itou(self):
-        approval = ApprovalFactory(number="999990000001")
+        approval = ApprovalFactory(number="XXXXX0000001")
         self.assertTrue(approval.originates_from_itou)
         approval = PoleEmploiApprovalFactory(number="625741810182")
         self.assertFalse(approval.originates_from_itou)
@@ -633,7 +633,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             "start_at": approval.start_at.strftime("%d/%m/%Y"),
             "end_at": approval.end_at.strftime("%d/%m/%Y"),
             "user": job_app.job_seeker.pk,
-            "number": "999991234567",
+            "number": "XXXXX1234567",
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
@@ -1385,13 +1385,13 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
             approval_1 = ApprovalFactory.build(user=UserFactory(), number=None)
             self.assertEqual(Approval.objects.count(), 0)
             approval_1.save()
-            self.assertEqual(approval_1.number, "999990000001")
+            self.assertEqual(approval_1.number, "XXXXX0000001")
             self.assertEqual(Approval.objects.count(), 1)
 
             # if a second one is created after the save, no worries man.
             approval_2 = ApprovalFactory.build(user=UserFactory(), number=None)
             approval_2.save()
-            self.assertEqual(approval_2.number, "999990000002")
+            self.assertEqual(approval_2.number, "XXXXX0000002")
 
     def test_race_condition(self):
         """Demonstrate the issue where two concurrent requests are locking the last row of
@@ -1437,8 +1437,8 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
         t1.join()
         t2.join()  # without the singleton we would suffer from IntegrityError here
 
-        self.assertEqual(approval.number, "999990000002")
-        self.assertEqual(approval2.number, "999990000003")
+        self.assertEqual(approval.number, "XXXXX0000002")
+        self.assertEqual(approval2.number, "XXXXX0000003")
 
 
 class PENotificationMixinTestCase(TestCase):

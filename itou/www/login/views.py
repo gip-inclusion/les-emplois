@@ -110,10 +110,8 @@ class JobSeekerLoginView(ItouLoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        show_france_connect = settings.FRANCE_CONNECT_ENABLED
-        show_peamu = settings.PEAMU_ENABLED
         extra_context = {
-            "show_france_connect": show_france_connect,
-            "show_peamu": show_peamu,
+            "show_france_connect": bool(settings.FRANCE_CONNECT_BASE_URL),
+            "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
         }
         return context | extra_context

@@ -1,48 +1,51 @@
-from .base import *
+import os
+import socket
 
-DEBUG = os.environ.get("DJANGO_DEBUG", True)  # noqa F405
 
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "192.168.0.1"]
+ITOU_ENVIRONMENT = "DEV"
+os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
+
+from .base import *  # pylint: disable=wildcard-import,unused-wildcard-import
+
+
+# Django settings
+# ---------------
+SECRET_KEY = "foobar"
+
+DEBUG = True
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.1"]
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-ITOU_ENVIRONMENT = "DEV"
-SHOW_TEST_ACCOUNTS_BANNER  = True
-
-# Security.
-# ------------------------------------------------------------------------------
+SHOW_TEST_ACCOUNTS_BANNER = True
 
 SESSION_COOKIE_SECURE = False
 
 CSRF_COOKIE_SECURE = False
 
-AUTH_PASSWORD_VALIDATORS = []  # Avoid password strength validation in DEV.
+AUTH_PASSWORD_VALIDATORS = []
 
-# Django-extensions.
-# ------------------------------------------------------------------------------
-
-INSTALLED_APPS += ["django_extensions"]  # noqa F405
-
-# Django-debug-toolbar.
-# ------------------------------------------------------------------------------
-
-INSTALLED_APPS += ["debug_toolbar"]  # noqa F405
-
-# Django-admin-logs.
-# ------------------------------------------------------------------------------
-
-INSTALLED_APPS += ["django_admin_logs"]  # noqa F405
+INSTALLED_APPS.extend(
+    [
+        "django_extensions",
+        "debug_toolbar",
+        "django_admin_logs",
+    ]
+)
 
 INTERNAL_IPS = ["127.0.0.1"]
 
-# Enable django-debug-toolbar with Docker.
-import socket
+# `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
+# Enable django-debug-toolbar with Docker.
+# Hack is coming from https://stackoverflow.com/a/45624773
+# inspired by https://github.com/cookiecutter/cookiecutter-django/blob/master/%7B%7Bcookiecutter.project_slug%7D%7D/config/settings/local.py#L71
 _, _, ips = socket.gethostbyname_ex(socket.gethostname())
-INTERNAL_IPS += [ip[:-1] + "1" for ip in ips]
+INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
 
 MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]  # noqa F405
-
 DEBUG_TOOLBAR_CONFIG = {
     # https://django-debug-toolbar.readthedocs.io/en/latest/panels.html#panels
     "DISABLE_PANELS": [
@@ -53,38 +56,37 @@ DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TEMPLATE_CONTEXT": True,
 }
 
-# PEAMU.
-# ------------------------------------------------------------------------------
+
+REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [
+    # For DRF browseable API access
+    "rest_framework.renderers.BrowsableAPIRenderer",
+]
+
+# ITOU settings
+# -------------
+
+ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
 
 ITOU_PROTOCOL = "http"
 ITOU_FQDN = "127.0.0.1:8000"
 
-# Metabase.
-# ------------------------------------------------------------------------------
+# Bypasses the need for Redis
+HUEY["immediate"] = True
 
-ALLOW_POPULATING_METABASE = True
+DATABASES["default"]["HOST"] = "127.0.0.1"
+DATABASES["default"]["PORT"] = 5432
+DATABASES["default"]["NAME"] = "itou"
+DATABASES["default"]["USER"] = "postgres"  # check that with Docker
+DATABASES["default"]["PASSWORD"] = "password"
 
-# LOGGING.
-# ------------------------------------------------------------------------------
+ELASTIC_APM["ENABLED"] = False
+# FIXME(vperron): Remove this as soon as the checks are disabled
+# followup on https://github.com/elastic/apm-agent-python/pull/1632
+ELASTIC_APM["SERVER_URL"] = "http://127.0.0.1"
 
-# Log raw SQL to the console in Django.
-# https://www.neilwithdata.com/django-sql-logging
-LOGGING["loggers"]["django.db.backends"] = {
-    "level": os.getenv("SQL_LOG_LEVEL", "DEBUG"),
-}
-
-# ITOU.
-# ------------------------------------------------------------------------------
-
-# Le marché de l'inclusion
-# Match open regions with SIAE created by our fixtures.
-LEMARCHE_OPEN_REGIONS = ["Occitanie"]
-
-ASP_ITOU_PREFIX = "XXXXX"
-
-# France Connect.
-# ------------------------------------------------------------------------------
-
-# Integration platform and associated public key (non confidential)
-# When the integration platform is used, an endpoint called "/callback" should be defined in itou.
-FRANCE_CONNECT_BASE_URL = "https://fcp.integ01.dev-franceconnect.fr/api/v1"
+if os.getenv("SQL_DEBUG", "False") == "True":
+    LOGGING.setdefault("loggers", {})["django.db.backends"] = {
+        "level": "DEBUG",
+        "handlers": ["console"],
+        "propagate": False,
+    }

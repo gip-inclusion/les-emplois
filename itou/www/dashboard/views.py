@@ -1,5 +1,4 @@
 from allauth.account.views import PasswordChangeView
-from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -89,7 +88,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         active_campaigns = EvaluationCampaign.objects.for_institution(current_org).in_progress()
 
     context = {
-        "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
         "job_applications_categories": job_applications_categories,
         "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
         "can_show_financial_annexes": can_show_financial_annexes,

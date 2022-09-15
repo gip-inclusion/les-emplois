@@ -7,7 +7,7 @@ from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.contrib.messages import get_messages
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -159,6 +159,12 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @override_settings(
+        API_INSEE_BASE_URL="https://insee.fake",
+        API_ENTREPRISE_BASE_URL="https://entreprise.fake",
+        API_INSEE_CONSUMER_KEY="foo",
+        API_INSEE_CONSUMER_SECRET="bar",
+    )
     def test_create_facilitator(self, mock_call_ban_geocoding_api):
         respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)

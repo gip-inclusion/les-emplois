@@ -217,11 +217,8 @@ class Command(EmployeeRecordTransferCommand):
             self._upload_batch_file(conn, batch, dry_run)
 
     def handle(self, upload=True, download=True, preflight=False, wet_run=False, asp_test=False, **options):
-        if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
-            self.stdout.write(
-                "This management command can't be used in this environment. Update Django settings if needed."
-            )
-            # Goodbye Marylou
+        if not settings.ASP_FS_SFTP_HOST:
+            self.stdout.write("Your environment is missing ASP_FS_SFTP_HOST to run this command.")
             return
 
         dry_run = not wet_run
@@ -241,7 +238,7 @@ class Command(EmployeeRecordTransferCommand):
 
         with self.get_sftp_connection() as sftp:
             user = settings.ASP_FS_SFTP_USER or "django_tests"
-            self.stdout.write(f"Connected to: {user}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}")
+            self.stdout.write(f"Connected to: {user}@{settings.ASP_FS_SFTP_HOST}")
             self.stdout.write(f"Current remote dir is: {sftp.pwd}")
 
             # Send files to ASP

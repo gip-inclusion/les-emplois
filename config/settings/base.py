@@ -7,31 +7,26 @@ import json
 import os
 
 from dotenv import load_dotenv
+
+
 load_dotenv()
 
 from django.utils import timezone
 
 
-# Paths.
-# ------------------------------------------------------------------------------
+# Django settings
+# ---------------
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-ROOT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "../.."))
+_current_dir = os.path.dirname(os.path.realpath(__file__))
+ROOT_DIR = os.path.abspath(os.path.join(_current_dir, "../.."))
 
 APPS_DIR = os.path.abspath(os.path.join(ROOT_DIR, "itou"))
 
-EXPORT_DIR = os.environ.get("SCRIPT_EXPORT_PATH", f"{ROOT_DIR}/exports")
-IMPORT_DIR = os.environ.get("SCRIPT_IMPORT_PATH", f"{ROOT_DIR}/imports")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-# General.
-# ------------------------------------------------------------------------------
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
-SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
-
-DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "inclusion.beta.gouv.fr,emplois.inclusion.beta.gouv.fr").split(",")
 
 SITE_ID = 1
 
@@ -63,6 +58,7 @@ THIRD_PARTY_APPS = [
     "import_export",
     "hijack",
     "hijack.contrib.admin",
+    "elasticapm.contrib.django",
 ]
 
 
@@ -160,13 +156,15 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 # Note how we use Clever Cloud environment variables here. No way for now to alias them :/
 DATABASES = {
     "default": {
-        "ATOMIC_REQUESTS": False,  # We handle transactions manually in the code.
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "HOST": os.environ.get("POSTGRES_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
-        "NAME": os.environ.get("ITOU_POSTGRES_DATABASE_NAME", "itou"),
-        "USER": os.environ.get("ITOU_POSTGRES_USER", "itou"),
-        "PASSWORD": os.environ.get("ITOU_POSTGRES_PASSWORD", "mdp"),
+        "NAME": os.getenv("POSTGRESQL_ADDON_DB"),
+        # FIXME(vperron): We should get rid of those Clever Cloud proprietary values in our code
+        # and alias them as soon as we can in our pre-build and pre-run scripts. But those scripts
+        # will be defined in a later PR.
+        "HOST": os.getenv("POSTGRESQL_ADDON_DIRECT_HOST") or os.getenv("POSTGRESQL_ADDON_HOST"),
+        "PORT": os.getenv("POSTGRESQL_ADDON_DIRECT_PORT") or os.getenv("POSTGRESQL_ADDON_PORT"),
+        "USER": os.getenv("POSTGRESQL_ADDON_CUSTOM_USER") or os.getenv("POSTGRESQL_ADDON_USER"),
+        "PASSWORD": os.getenv("POSTGRESQL_ADDON_CUSTOM_PASSWORD") or os.getenv("POSTGRESQL_ADDON_PASSWORD"),
     }
 }
 
@@ -211,10 +209,8 @@ SECURE_BROWSER_XSS_FILTER = True
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-# Load the site over HTTPS only.
-# TODO: use a small value for testing, once confirmed that HSTS didn't break anything increase it.
-# https://docs.djangoproject.com/en/dev/ref/middleware/#http-strict-transport-security
-SECURE_HSTS_SECONDS = 30
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 SESSION_COOKIE_HTTPONLY = True
 
@@ -303,85 +299,6 @@ BOOTSTRAP4 = {
     "success_css_class": "",
 }
 
-# APIs.
-# ------------------------------------------------------------------------------
-
-# https://adresse.data.gouv.fr/faq
-API_BAN_BASE_URL = "https://api-adresse.data.gouv.fr"
-
-# https://api.gouv.fr/api/api-geo.html#doc_tech
-API_GEO_BASE_URL = "https://geo.api.gouv.fr"
-
-# INSEE API
-API_INSEE_BASE_URL = "https://api.insee.fr"
-API_INSEE_CONSUMER_KEY = os.environ.get("API_INSEE_CONSUMER_KEY", "")
-API_INSEE_CONSUMER_SECRET = os.environ.get("API_INSEE_CONSUMER_SECRET", "")
-
-# https://api.gouv.fr/documentation/sirene_v3
-API_ENTREPRISE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene/V3"
-
-# Pôle emploi's Emploi Store Dev aka ESD. There is a production AND a recette environment:
-#  - Production: https://www.pole-emploi.io
-#  - Recette: https://peio.pe-qvr.fr/
-# Key and secrets are on pole-emploi.io (prod and recette) accounts, the values are not the
-# same depending on the environment
-# Please note that some of APIs have a dry run mode which is handled through (possibly undocumented) scopes
-# Recette settings:
-## API_ESD_AUTH_BASE_URL="https://entreprise.pe-qvr.fr"
-## API_ESD_BASE_URL="https://api-r.es-qvr.fr/partenaire"
-# Production settings:
-## API_ESD_AUTH_BASE_URL="https://entreprise.pole-emploi.fr"
-## API_ESD_BASE_URL="https://api.emploi-store.fr/partenaire"
-API_ESD = {
-    "AUTH_BASE_URL": os.environ.get("API_ESD_AUTH_BASE_URL"),
-    "KEY": os.environ.get("API_ESD_KEY", ""),
-    "SECRET": os.environ.get("API_ESD_SECRET", ""),
-    "BASE_URL": os.environ.get("API_ESD_BASE_URL"),
-}
-
-
-# PE Connect aka PEAMU - technically one of ESD's APIs.
-# PEAM stands for Pôle emploi Access Management.
-# Technically there are two PEAM distinct systems:
-# - PEAM "Entreprise", PEAM-E or PEAME for short.
-# - PEAM "Utilisateur", PEAM-U or PEAMU for short.
-# To avoid confusion between the two when contacting ESD support,
-# we get the habit to always explicitely state that we are using PEAM*U*.
-# PE Connect is enabled by default, but a feature flag allows to deactivate it.
-# Disabled in the DEMO environment.
-PEAMU_ENABLED = os.environ.get("PEAMU_ENABLED", "True") == "True"
-PEAMU_AUTH_BASE_URL = "https://authentification-candidat.pole-emploi.fr"
-SOCIALACCOUNT_PROVIDERS = {
-    "peamu": {
-        "APP": {"key": "peamu", "client_id": API_ESD["KEY"], "secret": API_ESD["SECRET"]},
-    },
-}
-SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
-SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountAdapter"
-
-# France Connect
-# https://partenaires.franceconnect.gouv.fr/
-# France Connect is enabled by default, but a feature flag allows to deactivate it.
-# Disabled in the DEMO environment.
-FRANCE_CONNECT_ENABLED = os.environ.get("FRANCE_CONNECT_ENABLED", "True") == "True"
-FRANCE_CONNECT_BASE_URL = "https://app.franceconnect.gouv.fr/api/v1"
-FRANCE_CONNECT_CLIENT_ID = os.environ.get("FRANCE_CONNECT_CLIENT_ID")
-FRANCE_CONNECT_CLIENT_SECRET = os.environ.get("FRANCE_CONNECT_CLIENT_SECRET")
-
-
-# Inclusion Connect
-INCLUSION_CONNECT_BASE_URL = os.environ.get("INCLUSION_CONNECT_BASE_URL")
-INCLUSION_CONNECT_REALM = os.environ.get("INCLUSION_CONNECT_REALM")
-INCLUSION_CONNECT_CLIENT_ID = os.environ.get("INCLUSION_CONNECT_CLIENT_ID")
-INCLUSION_CONNECT_CLIENT_SECRET = os.environ.get("INCLUSION_CONNECT_CLIENT_SECRET")
-
-# Tally forms
-# ------------------------------------------------------------------------------
-TALLY_URL = "https://tally.so"
-
-
-# Itou.
-# ------------------------------------------------------------------------------
 
 # This trick
 # https://github.com/pennersr/django-allauth/issues/749#issuecomment-70402595
@@ -398,231 +315,139 @@ MIGRATION_MODULES = {
     "socialaccount": "itou.allauth_adapters.migrations",
 }
 
-# Environment, sets the type of env of the app (DEMO, REVIEW_APP, STAGING, DEV…)
-ITOU_ENVIRONMENT = "PROD"
+
+# ITOU settings
+# -------------
+
+
+# Environment, sets the type of env of the app (PROD, FAST-MACHINE, STAGING, DEMO, DEV…)
+ITOU_ENVIRONMENT = os.getenv("ITOU_ENVIRONMENT", "PROD")
 ITOU_PROTOCOL = "https"
-ITOU_FQDN = "emplois.inclusion.beta.gouv.fr"
-ITOU_EMAIL_CONTACT = "assistance@inclusion.beta.gouv.fr"
-ITOU_EMAIL_PROLONGATION = "prolongation@inclusion.beta.gouv.fr"
-ITOU_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/emplois"
+ITOU_FQDN = os.getenv("ITOU_FQDN", "emplois.inclusion.beta.gouv.fr")
+ITOU_EMAIL_CONTACT = os.getenv("ITOU_EMAIL_CONTACT", "assistance@inclusion.beta.gouv.fr")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gouv.fr")
 
-DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
-# FIXME(vperron): Those following lines are *not* settings. They are code constants that have
-# no reason to change or be modified through the environment. They should be moved in a constants.py
-# file in an app or in the module that uses them if it's a single Python module.
-# This gives the fake impression that we have many settings when we don't, and forces code
-# to import the whole Django settings (a full Django setup) when it may not be necessary.
-# The same could be said about any non-environment dependant variable here.
-ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
-ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
-ITOU_SESSION_CURRENT_INSTITUTION_KEY = "current_institution"
-ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
-ITOU_SESSION_FACILITATOR_SIGNUP_KEY = "facilitator_signup"
-ITOU_SESSION_NIR_KEY = "job_seeker_nir"
-ITOU_SESSION_EDIT_SIAE_KEY = "edit_siae_session_key"
-ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
-ITOU_SESSION_CURRENT_PAGE_KEY = "current_page"
+_sentry_dsn = os.getenv("SENTRY_DSN")
+if _sentry_dsn:
+    from ._sentry import sentry_init
 
-SHOW_TEST_ACCOUNTS_BANNER = False
+    sentry_init(dsn=_sentry_dsn)
 
-# Le marché de l'inclusion
-LEMARCHE_OPEN_REGIONS = ["Hauts-de-France", "Grand Est", "Île-de-France"]
-
-POLE_EMPLOI_EMAIL_SUFFIX = "@pole-emploi.fr"
-
-# Documentation link.
-ITOU_DOC_URL = "https://doc.inclusion.beta.gouv.fr"
-
-# Communauté link.
-ITOU_COMMUNITY_URL = "https://communaute.inclusion.beta.gouv.fr"
-
-# Approvals
-# ------------------------------------------------------------------------------
-
-# Approval numbering prefix can be different for non-production envs
-ASP_ITOU_PREFIX = "99999"
+SHOW_TEST_ACCOUNTS_BANNER = ITOU_ENVIRONMENT == "DEMO"
 
 # On November 30th, 2021, we delivered approvals for AI structures.
-# See itou.users.management.commands.import_ai_employees
-AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = os.environ.get("AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL", "")
+# See itou.scripts.management.commands.import_ai_employees
+AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = os.getenv("AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL")
 AI_EMPLOYEES_STOCK_IMPORT_DATE = datetime.datetime(2021, 11, 30, tzinfo=timezone.utc)
 
-# Metabase
-# ------------------------------------------------------------------------------
+# https://adresse.data.gouv.fr/faq
+API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL")
+
+# https://api.gouv.fr/api/api-geo.html#doc_tech
+API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL")
+
+API_INSEE_BASE_URL = os.getenv("API_INSEE_BASE_URL")
+API_INSEE_CONSUMER_KEY = os.getenv("API_INSEE_CONSUMER_KEY")
+API_INSEE_CONSUMER_SECRET = os.getenv("API_INSEE_CONSUMER_SECRET")
+
+# https://api.gouv.fr/documentation/sirene_v3
+API_ENTREPRISE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene/V3"
+
+# Pôle emploi's Emploi Store Dev aka ESD. There is a production AND a recette environment.
+# Key and secrets are stored on pole-emploi.io (prod and recette) accounts, the values are not the
+# same depending on the environment
+# Please note that some of APIs have a dry run mode which is handled through (possibly undocumented) scopes
+API_ESD = {
+    "AUTH_BASE_URL": os.getenv("API_ESD_AUTH_BASE_URL"),
+    "KEY": os.getenv("API_ESD_KEY"),
+    "SECRET": os.getenv("API_ESD_SECRET"),
+    "BASE_URL": os.getenv("API_ESD_BASE_URL"),
+}
+
+# PE Connect aka PEAMU - technically one of ESD's APIs.
+# PEAM stands for Pôle emploi Access Management.
+# Technically there are two PEAM distinct systems:
+# - PEAM "Entreprise", PEAM-E or PEAME for short.
+# - PEAM "Utilisateur", PEAM-U or PEAMU for short.
+# To avoid confusion between the two when contacting ESD support,
+# we get the habit to always explicitely state that we are using PEAM*U*.
+PEAMU_AUTH_BASE_URL = os.getenv("PEAMU_AUTH_BASE_URL")
+SOCIALACCOUNT_PROVIDERS = {
+    "peamu": {
+        "APP": {"key": "peamu", "client_id": API_ESD["KEY"], "secret": API_ESD["SECRET"]},
+    },
+}
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountAdapter"
+
+# France Connect https://partenaires.franceconnect.gouv.fr/
+FRANCE_CONNECT_BASE_URL = os.getenv("FRANCE_CONNECT_BASE_URL")
+FRANCE_CONNECT_CLIENT_ID = os.getenv("FRANCE_CONNECT_CLIENT_ID")
+FRANCE_CONNECT_CLIENT_SECRET = os.getenv("FRANCE_CONNECT_CLIENT_SECRET")
+
+INCLUSION_CONNECT_BASE_URL = os.getenv("INCLUSION_CONNECT_BASE_URL")
+INCLUSION_CONNECT_REALM = os.getenv("INCLUSION_CONNECT_REALM")
+INCLUSION_CONNECT_CLIENT_ID = os.getenv("INCLUSION_CONNECT_CLIENT_ID")
+INCLUSION_CONNECT_CLIENT_SECRET = os.getenv("INCLUSION_CONNECT_CLIENT_SECRET")
+
+TALLY_URL = os.getenv("TALLY_URL")
 
 # Metabase should only ever be populated:
 # - from production (by clever cloud cronjob)
-# - from local dev (by experimented metabase developers)
-ALLOW_POPULATING_METABASE = False
+# - from local dev (by experienced metabase developers)
+# but not from review apps, staging or workers.
+ALLOW_POPULATING_METABASE = ITOU_ENVIRONMENT in ("PROD", "DEV")
 
-METABASE_HOST = os.environ.get("METABASE_HOST")
-METABASE_PORT = os.environ.get("METABASE_PORT")
-METABASE_DATABASE = os.environ.get("METABASE_DATABASE")
-METABASE_USER = os.environ.get("METABASE_USER")
-METABASE_PASSWORD = os.environ.get("METABASE_PASSWORD")
-
-METABASE_DRY_RUN_ROWS_PER_QUERYSET = 1000
-
-# Useful to troobleshoot whether the script runs a deluge of SQL requests.
-METABASE_SHOW_SQL_REQUESTS = False
-
-# Set how many rows are inserted at a time in metabase database.
-# A bigger number makes the script faster until a certain point,
-# but it also increases RAM usage.
-# -- Bench results for self.populate_approvals()
-# by batch of 100 => 2m38s
-# by batch of 1000 => 2m23s
-# -- Bench results for self.populate_diagnostics()
-# by batch of 1 => 2m51s
-# by batch of 10 => 19s
-# by batch of 100 => 5s
-# by batch of 1000 => 5s
-METABASE_INSERT_BATCH_SIZE = 100
+METABASE_HOST = os.getenv("METABASE_HOST")
+METABASE_PORT = os.getenv("METABASE_PORT")
+METABASE_DATABASE = os.getenv("METABASE_DATABASE")
+METABASE_USER = os.getenv("METABASE_USER")
+METABASE_PASSWORD = os.getenv("METABASE_PASSWORD")
 
 # Embedding signed Metabase dashboard
-METABASE_SITE_URL = "https://stats.inclusion.beta.gouv.fr"
-METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
+METABASE_SITE_URL = os.getenv("METABASE_SITE_URL")
+METABASE_SECRET_KEY = os.getenv("METABASE_SECRET_KEY")
 
-# Metabase embedded dashboards
-METABASE_DASHBOARDS = {
-    # Public stats.
-    "stats_public": {
-        "dashboard_id": 119,
-    },
-    # Employer stats.
-    "stats_siae_etp": {
-        "dashboard_id": 128,
-        # Tally form suspended on 2022/09/30, should be restored soon.
-        # "tally_form_id": "nrjbRv",
-    },
-    "stats_siae_hiring": {
-        "dashboard_id": 185,
-        "tally_form_id": "waQPkB",
-    },
-    # Prescriber stats.
-    "stats_cd": {
-        "dashboard_id": 118,
-        # Tally form suspended on 2022/09/30, should be restored soon.
-        # "tally_form_id": "wb5Nro",
-    },
-    "stats_pe_delay_main": {
-        "dashboard_id": 168,
-        "tally_form_id": "3lb9XW",
-    },
-    "stats_pe_delay_raw": {
-        "dashboard_id": 180,
-    },
-    "stats_pe_conversion_main": {
-        "dashboard_id": 169,
-        "tally_form_id": "mODeK8",
-    },
-    "stats_pe_conversion_raw": {
-        "dashboard_id": 182,
-    },
-    "stats_pe_state_main": {
-        "dashboard_id": 149,
-        "tally_form_id": "mRG61J",
-    },
-    "stats_pe_state_raw": {
-        "dashboard_id": 183,
-    },
-    "stats_pe_tension": {
-        "dashboard_id": 162,
-        "tally_form_id": "wobaYV",
-    },
-    # Institution stats - DDETS - department level.
-    "stats_ddets_iae": {
-        "dashboard_id": 117,
-        # Tally form suspended on 2022/09/30, should be restored soon.
-        # "tally_form_id": "nPdWLb",
-    },
-    "stats_ddets_diagnosis_control": {
-        "dashboard_id": 144,
-    },
-    "stats_ddets_hiring": {
-        "dashboard_id": 160,
-        "tally_form_id": "mVLBXv",
-    },
-    # Institution stats - DREETS - region level.
-    "stats_dreets_iae": {
-        "dashboard_id": 117,
-        # Tally form suspended on 2022/09/30, should be restored soon.
-        # "tally_form_id": "nPdWLb",
-    },
-    "stats_dreets_hiring": {
-        "dashboard_id": 160,
-        "tally_form_id": "mVLBXv",
-    },
-    # Institution stats - DGEFP - nation level.
-    "stats_dgefp_iae": {
-        "dashboard_id": 117,
-    },
-    "stats_dgefp_diagnosis_control": {
-        "dashboard_id": 144,
-    },
-    "stats_dgefp_af": {
-        "dashboard_id": 142,
-    },
-}
+ASP_ITOU_PREFIX = "99999"
 
-
-PILOTAGE_DASHBOARDS_WHITELIST = json.loads(os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[]"))
-
-# Some experimental stats are progressively being deployed to more and more specific beta users.
-STATS_SIAE_USER_PK_WHITELIST = json.loads(os.environ.get("STATS_SIAE_USER_PK_WHITELIST", "[]"))
+PILOTAGE_DASHBOARDS_WHITELIST = json.loads(
+    os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[63, 90, 32, 52, 54, 116, 43, 136, 140, 129, 150]")
+)
 
 # Only ACIs given by Convergence France may access some contracts
 ACI_CONVERGENCE_PK_WHITELIST = json.loads(os.environ.get("ACI_CONVERGENCE_PK_WHITELIST", "[]"))
 
-PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
-PILOTAGE_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/pilotage"
+# Specific stats are progressively being deployed to more and more departments and specific users.
+# Kept as a setting to not let User PKs in clear in the code.
+STATS_SIAE_USER_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 
 # Slack notifications sent by Metabase cronjobs.
-SLACK_CRON_WEBHOOK_URL = os.environ.get("SLACK_CRON_WEBHOOK_URL", None)
+SLACK_CRON_WEBHOOK_URL = os.environ.get("SLACK_CRON_WEBHOOK_URL")
 
-# Embed tally forms on stats views.
-ENABLE_TALLY_FORMS = False
+REDIS_URL = os.getenv("REDIS_URL")  # pay attention, prod & staging share the same redis but != DB
+REDIS_DB = os.getenv("REDIS_DB")
 
-# Huey / async
-# Workers are run in prod via `CC_WORKER_COMMAND = django-admin run_huey`.
-# ------------------------------------------------------------------------------
-
-# Redis server URL:
-# Provided by the Redis addon (itou-redis)
-# Redis database to use with async (must be different for each environement)
-# 1 <= REDIS_DB <= 100 (number of dbs available on CleverCloud)
-REDIS_DB = os.environ.get("REDIS_DB", 1)
-# Complete URL (containing the instance password)
-REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
-
-# NOTE(vperron): those parameters are defaulted to the production instance.
-# This means that we would crash if a task was sent and no Redis was present (in local dev for instance)
-# I'm leaving this as-is, since this means that in development if we sent a task to huey we have
-# to mock that call or crash. This makes sense, since either we would test a non-real async queue
-# (in memory for instance) or just send something to some state and forget about it.
-
-# Huey instance
-# If any performance issue, increasing the number of workers *can* be a good idea
-# Parameter `immediate` means `synchronous` (async here)
 HUEY = {
     "name": "ITOU",
     # Don't store task results (see our Redis Post-Morten in documentation for more information)
     "results": False,
-    "url": REDIS_URL + f"/?db={REDIS_DB}",
+    "url": f"{REDIS_URL}/?db={REDIS_DB}",
     "consumer": {
         "workers": 2,
         "worker_type": "thread",
     },
-    "immediate": False,
+    # make the emails and tasks synchronous on review apps.
+    "immediate": ITOU_ENVIRONMENT in ("DEMO", "FAST-MACHINE"),
 }
-
 
 # Email https://anymail.readthedocs.io/en/stable/esps/mailjet/
 ANYMAIL = {
-    "MAILJET_API_KEY": os.environ.get("API_MAILJET_KEY"),
-    "MAILJET_SECRET_KEY": os.environ.get("API_MAILJET_SECRET"),
-    "WEBHOOK_SECRET": os.environ.get("MAILJET_WEBHOOK_SECRET"),
+    # it's the default but our probes need this at import time.
+    "MAILJET_API_URL": "https://api.mailjet.com/v3.1/",
+    "MAILJET_API_KEY": os.getenv("API_MAILJET_KEY"),
+    "MAILJET_SECRET_KEY": os.getenv("API_MAILJET_SECRET"),
+    "WEBHOOK_SECRET": os.getenv("MAILJET_WEBHOOK_SECRET"),
 }
 
 # EMAIL_BACKEND points to an async wrapper of a "real" email backend
@@ -646,12 +471,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "itou.api.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     # Response renderers
-    # See DEV template for an additional rendeder for DRF browseable API
+    # See DEV configuration for an additional rendeder for DRF browseable API
     # https://www.django-rest-framework.org/api-guide/renderers/#custom-renderers
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
-        # For DRF browseable API access
-        "rest_framework.renderers.BrowsableAPIRenderer",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Default permissions for API views: user must be authenticated
@@ -679,8 +502,17 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
 }
 
-# Requests
-# ------------------------------------------------------------------------------
+ELASTIC_APM = {
+    "ENABLED": bool(os.getenv("APM_SERVER_URL")),
+    "SERVICE_NAME": "itou-django",
+    "SERVICE_VERSION": os.getenv("COMMIT_ID"),
+    "SERVER_URL": os.getenv("APM_SERVER_URL"),
+    "SECRET_TOKEN": os.getenv("APM_AUTH_TOKEN"),
+    "ENVIRONMENT": ITOU_ENVIRONMENT,
+    "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
+    "TRANSACTION_SAMPLE_RATE": 0.1,
+}
+
 # Requests default timeout is None... See https://blog.mathieu-leplatre.info/handling-requests-timeout-in-python.html
 # Use `httpx`, which has a default timeout of 5 seconds, when possible.
 # Otherwise, set a timeout like this:
@@ -689,24 +521,20 @@ REQUESTS_TIMEOUT = 5  # in seconds
 
 # ASP SFTP connection
 # ------------------------------------------------------------------------------
-ASP_FS_SFTP_HOST = os.getenv("ASP_FS_SFTP_HOST", "localhost")
-ASP_FS_SFTP_PORT = os.getenv("ASP_FS_SFTP_PORT", 22)
+ASP_FS_SFTP_HOST = os.getenv("ASP_FS_SFTP_HOST")
+ASP_FS_SFTP_PORT = os.getenv("ASP_FS_SFTP_PORT")
 ASP_FS_SFTP_USER = os.getenv("ASP_FS_SFTP_USER")
 # Path to SSH keypair for SFTP connection
 ASP_FS_SFTP_PRIVATE_KEY_PATH = os.getenv("ASP_FS_SFTP_PRIVATE_KEY_PATH")
 ASP_FS_KNOWN_HOSTS = os.getenv("ASP_FS_KNOWN_HOSTS")
-# SFTP path: Where to put new employee records for ASP validation
-ASP_FS_REMOTE_UPLOAD_DIR = "depot"
-# SFTP path: Where to get submitted employee records validation feedback
-ASP_FS_REMOTE_DOWNLOAD_DIR = "retrait"
 
 # S3 uploads
 # ------------------------------------------------------------------------------
-S3_STORAGE_ACCESS_KEY_ID = os.environ.get("CELLAR_ADDON_KEY_ID", "")
-S3_STORAGE_SECRET_ACCESS_KEY = os.environ.get("CELLAR_ADDON_KEY_SECRET", "")
-S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("CELLAR_ADDON_HOST", "")
-S3_STORAGE_BUCKET_NAME = os.environ.get("S3_STORAGE_BUCKET_NAME", "")
-S3_STORAGE_BUCKET_REGION = os.environ.get("S3_STORAGE_BUCKET_REGION", "")
+S3_STORAGE_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID")
+S3_STORAGE_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
+S3_STORAGE_ENDPOINT_DOMAIN = os.getenv("CELLAR_ADDON_HOST")
+S3_STORAGE_BUCKET_NAME = os.getenv("S3_STORAGE_BUCKET_NAME")
+S3_STORAGE_BUCKET_REGION = "eu-west-3"
 
 STORAGE_UPLOAD_KINDS = {
     "default": {
@@ -743,3 +571,6 @@ EMPLOYEE_RECORD_TRANSFER_ENABLED = bool(os.environ.get("EMPLOYEE_RECORD_TRANSFER
 
 HIJACK_PERMISSION_CHECK = "itou.utils.perms.user.has_hijack_perm"
 HIJACK_ALLOWED_USER_EMAILS = [s.lower() for s in os.getenv("HIJACK_ALLOWED_USER_EMAILS", "").split(",") if s]
+
+EXPORT_DIR = os.getenv("SCRIPT_EXPORT_PATH", f"{ROOT_DIR}/exports")
+IMPORT_DIR = os.getenv("SCRIPT_IMPORT_PATH", f"{ROOT_DIR}/imports")

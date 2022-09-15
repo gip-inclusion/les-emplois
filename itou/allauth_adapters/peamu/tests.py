@@ -19,7 +19,18 @@ from itou.utils import constants as global_constants
 
 
 @override_settings(
-    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
+    PEAMU_AUTH_BASE_URL="https://peamu.auth.fake.url",
+    API_ESD={
+        "BASE_URL": "https://some.auth.domain",
+        "AUTH_BASE_URL": "https://some-authentication-domain.fr",
+        "KEY": "somekey",
+        "SECRET": "somesecret",
+    },
+    SOCIALACCOUNT_PROVIDERS={
+        "peamu": {
+            "APP": {"key": "peamu", "client_id": "somekey", "secret": "somesecret"},
+        },
+    },
 )  # noqa
 class PEAMUTests(OAuth2TestsMixin, TestCase):
     provider_id = PEAMUProvider.id
@@ -41,7 +52,8 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_data_created_by_peamu_login(self, mock_login_signal):
         test_email = "john.doe@example.com"
-        self.login(self.get_mocked_response())
+        response = self.get_mocked_response()
+        self.login(response)
         self.assertEqual(mock_login_signal.call_count, 1)
         email_address = EmailAddress.objects.get(email=test_email)
         account = email_address.user.socialaccount_set.get()

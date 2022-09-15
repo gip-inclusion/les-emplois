@@ -17,7 +17,7 @@ def get_probes_classes():
         MailjetApiProbe,
         PoleEmploiAccessManagementUserAuthProbe,
     }
-    if settings.FRANCE_CONNECT_ENABLED:
+    if settings.FRANCE_CONNECT_BASE_URL:
         classes.add(FranceConnectAuthProbe)
 
     return classes
@@ -85,7 +85,7 @@ class EmploiStoreDevApiProbe(HttpProbe):
 class MailjetApiProbe(HttpProbe):
     name = "api.mailjet"
     verbose_name = "Mailjet API"
-    url = settings.MAILJET_API_URL
+    url = settings.ANYMAIL["MAILJET_API_URL"]
 
 
 ##

@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.timezone import get_current_timezone
 
@@ -197,6 +197,12 @@ class PrescriberOrganizationModelTest(TestCase):
         self.assertEqual(PrescriberOrganization.objects.count(), 1)
 
     @respx.mock
+    @override_settings(
+        API_INSEE_BASE_URL="https://insee.fake",
+        API_ENTREPRISE_BASE_URL="https://entreprise.fake",
+        API_INSEE_CONSUMER_KEY="foo",
+        API_INSEE_CONSUMER_SECRET="bar",
+    )
     def test_update_prescriber_with_api_entreprise(self):
         respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)

@@ -841,6 +841,9 @@ class CnilCompositionPasswordValidatorTest(SimpleTestCase):
         self.assertEqual(CnilCompositionPasswordValidator().get_help_text(), CnilCompositionPasswordValidator.HELP_MSG)
 
 
+@override_settings(
+    API_INSEE_BASE_URL="https://fake.insee.url", API_INSEE_CONSUMER_KEY="foo", API_INSEE_CONSUMER_SECRET="bar"
+)
 class INSEEApiTest(SimpleTestCase):
     @respx.mock
     def test_access_token(self):
@@ -876,6 +879,12 @@ class INSEEApiTest(SimpleTestCase):
         self.assertIs(cm.records[0].exc_info[0], json.JSONDecodeError)
 
 
+@override_settings(
+    API_INSEE_BASE_URL="https://fake.insee.url",
+    API_ENTREPRISE_BASE_URL="https://api.entreprise.fake.com",
+    API_INSEE_CONSUMER_KEY="foo",
+    API_INSEE_CONSUMER_SECRET="bar",
+)
 class ApiEntrepriseTest(SimpleTestCase):
     def setUp(self):
         super().setUp()

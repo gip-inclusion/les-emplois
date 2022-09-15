@@ -1731,11 +1731,12 @@ class JobApplicationsEnumsTest(TestCase):
 
 
 class DisplayMissingEligibilityDiagnosesCommandTest(TestCase):
+    @override_settings(AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL="foo@bar.com")
     def test_nominal(self):
         stdout = io.StringIO()
         user = UserFactory(email="batman@batcave.org")
         ja = JobApplicationWithApprovalFactory(
-            eligibility_diagnosis=None, state="accepted", approval__number="999991234567", approval__created_by=user
+            eligibility_diagnosis=None, state="accepted", approval__number="XXXXX1234567", approval__created_by=user
         )
         management.call_command("display_missing_eligibility_diagnoses", stdout=stdout)
         self.assertEqual(

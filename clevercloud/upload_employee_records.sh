@@ -3,7 +3,7 @@
 # Fetch and upload files to ASP SFTP server
 
 # Do not run if this env var is not set:
-if [[ -z "$EMPLOYEE_RECORD_CRON_ENABLED" ]]; then
+if [[ "$EMPLOYEE_RECORD_CRON_ENABLED" != "1" ]]; then
     exit 0
 fi
 

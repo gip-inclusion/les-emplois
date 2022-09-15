@@ -103,17 +103,15 @@ def get_params_for_whole_country():
 def render_stats(request, context, params={}, template_name="stats/stats.html"):
     view_name = get_view_name(request)
     metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
-    tally_form_id = metabase_dashboard.get("tally_form_id") if metabase_dashboard else None
-    enable_tally_form = settings.ENABLE_TALLY_FORMS and tally_form_id
+    tally_form_id = None
+    if settings.TALLY_URL and metabase_dashboard:
+        tally_form_id = metabase_dashboard.get("tally_form_id")
 
     base_context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "stats_base_url": settings.METABASE_SITE_URL,
-        "enable_tally_form": enable_tally_form,
+        "tally_form_id": tally_form_id,
     }
-
-    if enable_tally_form:
-        base_context["tally_form_id"] = tally_form_id
 
     # Key value pairs in context override preexisting pairs in base_context.
     base_context.update(context)

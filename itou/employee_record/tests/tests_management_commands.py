@@ -1,7 +1,7 @@
 import json
 from unittest import mock
 
-from django.conf import settings
+from django.test.utils import override_settings
 from django.utils import timezone
 
 from itou.employee_record import constants
@@ -24,7 +24,8 @@ from .common import ManagementCommandTestCase
 # There is no need to create 700 employee records for a single batch
 # so this class var is changed to 1 for tests, otherwise download operation is not triggered.
 @mock.patch("itou.employee_record.models.EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS", new=1)
-class TransferManagementCommandTest(ManagementCommandTestCase):
+@override_settings(ASP_FS_SFTP_HOST="foobar.com", ASP_FS_SFTP_USER="django_tests")
+class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
     """
     Employee record management command, testing:
     - mocked sftp connection

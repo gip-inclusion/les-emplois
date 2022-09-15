@@ -116,7 +116,6 @@ test: $(VIRTUAL_ENV)
 
 coverage:
 	$(EXEC_CMD) coverage run -m pytest
-	$(EXEC_CMD) coverage html
 
 # Docker shell.
 # =============================================================================

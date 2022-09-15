@@ -1,8 +1,9 @@
 from datetime import datetime
 
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
+from django.conf import settings
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -286,6 +287,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, "Valide du 21/06/2022 au 06/12/2022")
         self.assertContains(response, "Délivrance : le 21/06/2022")
 
+    @override_settings(TALLY_URL="http://tally.fake")
     def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self):
         prescriber_org = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
             kind=PrescriberOrganizationKind.OTHER,
@@ -298,7 +300,7 @@ class DashboardViewTest(TestCase):
 
         self.assertContains(
             response,
-            f"https://tally.so/r/wgDzz1?"
+            f"http://tally.fake/r/wgDzz1?"
             f"idprescriber={prescriber_org.pk}"
             f"&iduser={prescriber.pk}"
             f"&source={settings.ITOU_ENVIRONMENT}",

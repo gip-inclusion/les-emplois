@@ -1,6 +1,6 @@
 from unittest import mock
 
-from django.test.utils import override_settings
+from django.test import override_settings
 
 import itou.employee_record.enums as er_enums
 from itou.employee_record.exceptions import SerializationError
@@ -11,6 +11,7 @@ from itou.employee_record.models import EmployeeRecordUpdateNotification
 from .common import ManagementCommandTestCase
 
 
+@override_settings(ASP_FS_SFTP_HOST="foobar.com", ASP_FS_SFTP_USER="django_tests")
 class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
 
     MANAGEMENT_COMMAND_NAME = "transfer_employee_records_updates"
@@ -78,11 +79,11 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
 
         self.assertIn("Using *TEST* JSON serializers", out)
 
-    @override_settings(EMPLOYEE_RECORD_TRANSFER_ENABLED=False)
+    @override_settings(ASP_FS_SFTP_HOST="")
     def test_wrong_environment(self):
         out, _ = self.call_command(upload=False, download=False, wet_run=True)
 
-        self.assertIn("Update Django settings if needed.", out)
+        self.assertIn("Your environment is missing ASP_FS_SFTP_HOST to run this command.", out)
 
     # Next part is about testing --preflight option,
     # which is common to all `EmployeeRecordTransferCommand` subclasses.

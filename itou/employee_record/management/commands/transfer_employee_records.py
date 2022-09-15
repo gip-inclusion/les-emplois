@@ -303,11 +303,8 @@ class Command(EmployeeRecordTransferCommand):
         archive=False,
         **_,
     ):
-        if not settings.EMPLOYEE_RECORD_TRANSFER_ENABLED:
-            self.stdout.write(
-                "This management command can't be used in this environment. Update Django settings if needed."
-            )
-            # Goodbye Marylou
+        if not settings.ASP_FS_SFTP_HOST:
+            self.stdout.write("Your environment is missing ASP_FS_SFTP_HOST to run this command.")
             return
 
         if preflight:
@@ -322,8 +319,8 @@ class Command(EmployeeRecordTransferCommand):
             self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
         with self.get_sftp_connection() as sftp:
-            user = settings.ASP_FS_SFTP_USER or "django_tests"
-            self.stdout.write(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}")
+            user = settings.ASP_FS_SFTP_USER
+            self.stdout.write(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}")
             self.stdout.write(f"Current dir: {sftp.pwd}")
 
             # Send files
