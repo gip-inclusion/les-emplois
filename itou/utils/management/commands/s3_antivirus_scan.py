@@ -36,19 +36,31 @@ class Command(BaseCommand):
 
             self.stderr.write("Scanning in sequence...")
             total_time = 0
+            files = list(pathlib.Path(workdir).iterdir())
+            stats = []
             for filepath in files:
                 start = time.perf_counter()
                 result = self.scan(filepath)
-                total_time += time.perf_counter() - start
+                elapsed = time.perf_counter() - start
+                total_time += elapsed
                 if result:
                     self.stdout.write(f"“{filepath}” is a virus.")
+                stats.append((elapsed, filepath))
             self.stderr.write(f"Scanned {len(files)} in {total_time}s. {total_time / len(files)}s per file.")
 
-            self.stderr.write("Scanning in parallel...")
-            start = time.perf_counter()
-            self.scan(workdir)
-            elapsed = time.perf_counter() - start
-            self.stderr.write(f"Scanned {len(files)} in {elapsed}s. {elapsed / len(files)}s per file.")
+            sorted_stats = sorted(stats, reverse=True)
+            print("Top 10 slow files:")
+            print("\n".join(sorted_stats[:10]))
+
+            with open("results.csv", "w") as f:
+                for t, path in sorted_stats:
+                    f.write(f"{t},{path}\n")
+
+            # self.stderr.write("Scanning in parallel...")
+            # start = time.perf_counter()
+            # self.scan(workdir)
+            # elapsed = time.perf_counter() - start
+            # self.stderr.write(f"Scanned {len(files)} in {elapsed}s. {elapsed / len(files)}s per file.")
 
     def download_files(self, bucket_name, workdir):
         # TODO: download concurrently with asyncio?
