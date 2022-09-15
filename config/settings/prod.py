@@ -56,5 +56,5 @@ ELASTIC_APM = {
 
 # Enable HTTP Strict Transport Security
 # see https://docs.djangoproject.com/en/4.0/ref/middleware/#http-strict-transport-security
-SECURE_HSTS_SECONDS = 3600  # We set this to a small value initially
+SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
