@@ -1,3 +1,4 @@
+{% load format_filters %}
 <div class="card my-5">
 
     <div class="card-header">
@@ -9,7 +10,7 @@
             <div class="col-md-7">
                 <p class="m-0">Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b></p>
                 <p class="m-0">Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b></p>
-                <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.approval.number_with_spaces }}</b></p>
+                <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.approval.number|format_approval_number }}</b></p>
             </div>
 
             {# Statuses #}

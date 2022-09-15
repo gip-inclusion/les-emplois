@@ -6,6 +6,8 @@ from textwrap import wrap
 
 from django import template
 from django.template.defaultfilters import stringfilter
+from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
 
 
 register = template.Library()
@@ -54,3 +56,16 @@ def format_nir(nir):
         # Some NIRs do not match the pattern (they can be NTT/NIA) so we can’t format them
         # When this happen, we should not crash but return the initial value
         return nir
+
+
+@register.filter(needs_autoescape=True)
+@stringfilter
+def format_approval_number(number, autoescape=True):
+    if not number:
+        return mark_safe("")
+    group_indices = [[0, 5], [5, 7], [7, None]]
+    escape = conditional_escape if autoescape else lambda text: text
+    parts = [escape(number[start:end]) for start, end in group_indices]
+    return mark_safe(
+        f'<span>{parts[0]}</span><span class="ml-1">{parts[1]}</span><span class="ml-1">{parts[2]}</span>'
+    )
