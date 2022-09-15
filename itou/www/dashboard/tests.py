@@ -304,6 +304,10 @@ class EditUserInfoViewTest(TestCase):
             "birthdate": "20/12/1978",
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -313,6 +317,10 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(user.last_name, post_data["last_name"])
         self.assertEqual(user.phone, post_data["phone"])
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
+        self.assertEqual(user.address_line_1, post_data["address_line_1"])
+        self.assertEqual(user.address_line_2, post_data["address_line_2"])
+        self.assertEqual(user.post_code, post_data["post_code"])
+        self.assertEqual(user.city, post_data["city"])
 
         # Ensure that the job seeker cannot edit email here.
         self.assertNotEqual(user.email, post_data["email"])
@@ -332,12 +340,20 @@ class EditUserInfoViewTest(TestCase):
             "birthdate": "20/12/1978",
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
         user = User.objects.get(id=user.id)
         self.assertEqual(user.phone, post_data["phone"])
+        self.assertEqual(user.address_line_1, post_data["address_line_1"])
+        self.assertEqual(user.address_line_2, post_data["address_line_2"])
+        self.assertEqual(user.post_code, post_data["post_code"])
+        self.assertEqual(user.city, post_data["city"])
 
         # Ensure that the job seeker cannot update data retreived from the SSO here.
         self.assertNotEqual(user.first_name, post_data["first_name"])
@@ -369,8 +385,10 @@ class EditJobSeekerInfo(TestCase):
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
-            "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "post_code": "35400",
+            "city": "Saint-Malo",
         }
         response = self.client.post(url, data=post_data)
 
@@ -381,7 +399,20 @@ class EditJobSeekerInfo(TestCase):
         self.assertEqual(job_seeker.first_name, post_data["first_name"])
         self.assertEqual(job_seeker.last_name, post_data["last_name"])
         self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
+        self.assertEqual(job_seeker.address_line_1, post_data["address_line_1"])
+        self.assertEqual(job_seeker.post_code, post_data["post_code"])
+        self.assertEqual(job_seeker.city, post_data["city"])
+
+        # Optional fields
+        post_data |= {
+            "phone": "0610203050",
+            "address_line_2": "Sous l'escalier",
+        }
+        response = self.client.post(url, data=post_data)
+        job_seeker.refresh_from_db()
+
         self.assertEqual(job_seeker.phone, post_data["phone"])
+        self.assertEqual(job_seeker.address_line_2, post_data["address_line_2"])
 
     def test_edit_by_prescriber(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
@@ -458,8 +489,10 @@ class EditJobSeekerInfo(TestCase):
         post_data = {
             "email": new_email,
             "birthdate": "20/12/1978",
-            "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "post_code": "35400",
+            "city": "Saint-Malo",
         }
         response = self.client.post(url, data=post_data)
 
@@ -468,6 +501,17 @@ class EditJobSeekerInfo(TestCase):
 
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         self.assertEqual(job_seeker.email, new_email)
+
+        # Optional fields
+        post_data |= {
+            "phone": "0610203050",
+            "address_line_2": "Sous l'escalier",
+        }
+        response = self.client.post(url, data=post_data)
+        job_seeker.refresh_from_db()
+
+        self.assertEqual(job_seeker.phone, post_data["phone"])
+        self.assertEqual(job_seeker.address_line_2, post_data["address_line_2"])
 
     def test_edit_email_when_confirmed(self):
         new_email = "bidou@yopmail.com"
@@ -495,8 +539,10 @@ class EditJobSeekerInfo(TestCase):
         post_data = {
             "email": new_email,
             "birthdate": "20/12/1978",
-            "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "post_code": "35400",
+            "city": "Saint-Malo",
         }
         response = self.client.post(url, data=post_data)
 
@@ -506,8 +552,21 @@ class EditJobSeekerInfo(TestCase):
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         # The email is not changed, but other fields are taken into account
         self.assertNotEqual(job_seeker.email, new_email)
-        self.assertEqual(job_seeker.phone, post_data["phone"])
         self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
+        self.assertEqual(job_seeker.address_line_1, post_data["address_line_1"])
+        self.assertEqual(job_seeker.post_code, post_data["post_code"])
+        self.assertEqual(job_seeker.city, post_data["city"])
+
+        # Optional fields
+        post_data |= {
+            "phone": "0610203050",
+            "address_line_2": "Sous l'escalier",
+        }
+        response = self.client.post(url, data=post_data)
+        job_seeker.refresh_from_db()
+
+        self.assertEqual(job_seeker.phone, post_data["phone"])
+        self.assertEqual(job_seeker.address_line_2, post_data["address_line_2"])
 
 
 class ChangeEmailViewTest(TestCase):
