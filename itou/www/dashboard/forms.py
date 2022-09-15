@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
-from itou.common_apps.address.forms import OptionalAddressFormMixin
+from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
@@ -11,7 +11,7 @@ from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
-class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
+class EditUserInfoForm(MandatoryAddressFormMixin, forms.ModelForm):
     """
     Edit a user profile.
     """
@@ -27,7 +27,6 @@ class EditUserInfoForm(OptionalAddressFormMixin, forms.ModelForm):
             del self.fields["pole_emploi_id"]
             del self.fields["lack_of_pole_emploi_id_reason"]
         else:
-            self.fields["phone"].required = True
             self.fields["birthdate"].required = True
             self.fields["birthdate"].widget = DuetDatePickerWidget(
                 attrs={
