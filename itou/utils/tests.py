@@ -549,10 +549,25 @@ class UtilsTemplateFiltersTestCase(TestCase):
         self.assertEqual(format_filters.format_siret("12345678912345"), "123 456 789 12345")
 
     def test_format_nir(self):
-        self.assertEqual(format_filters.format_nir("141068078200557"), "1 41 06 80 782 005 57")
-        self.assertEqual(format_filters.format_nir(" 1 41 06 80 782 005 57"), "1 41 06 80 782 005 57")
-        self.assertEqual(format_filters.format_nir(""), "")
-        self.assertEqual(format_filters.format_nir("12345678910"), "12345678910")
+        test_cases = [
+            (
+                "141068078200557",
+                '<span>1</span><span class="ml-1">41</span><span class="ml-1">06</span>'
+                '<span class="ml-1">80</span><span class="ml-1">782</span><span class="ml-1">005</span>'
+                '<span class="ml-1">57</span>',
+            ),
+            (
+                " 1 41 06 80 782 005 57",
+                '<span>1</span><span class="ml-1">41</span><span class="ml-1">06</span>'
+                '<span class="ml-1">80</span><span class="ml-1">782</span><span class="ml-1">005</span>'
+                '<span class="ml-1">57</span>',
+            ),
+            ("", ""),
+            ("12345678910", "12345678910"),
+        ]
+        for nir, expected in test_cases:
+            with self.subTest(nir):
+                self.assertEqual(format_filters.format_nir(nir), expected)
 
     def test_format_approval_number(self):
         test_cases = [
