@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from itou.openid_connect.inclusion_connect.tests import mock_oauth_dance
 from itou.siaes.factories import SiaeFactory
+from itou.users.enums import KIND_PRESCRIBER
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
 from itou.users.models import User
 
@@ -64,7 +65,7 @@ class WelcomingTourTest(TestCase):
         session = self.client.session
         session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
         session.save()
-        response = mock_oauth_dance(self, assert_redirects=False)
+        response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
         response = self.client.get(response.url, follow=True)
 
         # User should be redirected to the welcoming tour as he just signed up
@@ -72,7 +73,7 @@ class WelcomingTourTest(TestCase):
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         self.client.logout()
-        response = mock_oauth_dance(self, assert_redirects=False)
+        response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
         response = self.client.get(response.url, follow=True)
         self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
         self.assertContains(response, "Revoir le message")

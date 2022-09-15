@@ -236,6 +236,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         # Singup fails on Inclusion Connect with email different than the one from the invitation
         response = mock_oauth_dance(
             self,
+            KIND_PRESCRIBER,
             assert_redirects=False,
             login_hint=invitation.email,
             channel="invitation",
@@ -256,6 +257,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         invitation.save()
         response = mock_oauth_dance(
             self,
+            KIND_PRESCRIBER,
             assert_redirects=False,
             login_hint=invitation.email,
             channel="invitation",
@@ -326,6 +328,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
 
         response = mock_oauth_dance(
             self,
+            KIND_PRESCRIBER,
             assert_redirects=False,
             login_hint=user.email,
             channel="invitation",

@@ -13,17 +13,23 @@ from django.utils import crypto
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
-from itou.users.enums import KIND_PRESCRIBER
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, Kind
 from itou.users.models import User
 from itou.utils.urls import get_absolute_url
 
 from ..models import TooManyKindsException
 from . import constants
 from .enums import InclusionConnectChannel
-from .models import InclusionConnectState, InclusionConnectUserData
+from .models import InclusionConnectPrescriberData, InclusionConnectSiaeStaffData, InclusionConnectState
 
 
 logger = logging.getLogger(__name__)
+
+
+USER_DATA_CLASSES = {
+    KIND_PRESCRIBER: InclusionConnectPrescriberData,
+    KIND_SIAE_STAFF: InclusionConnectSiaeStaffData,
+}
 
 
 @dataclasses.dataclass
@@ -150,8 +156,9 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         # 'sub' is the unique identifier from Inclusion Connect, we need that to match a user later on.
         return _redirect_to_login_page_on_error(error_msg="Sub parameter missing.", request=request)
 
+    user_kind = ic_session["user_kind"]
     is_successful = True
-    ic_user_data = InclusionConnectUserData.from_user_info(user_data)
+    ic_user_data = USER_DATA_CLASSES[user_kind].from_user_info(user_data)
     ic_session_email = ic_session.get("user_email")
 
     if ic_session_email and ic_session_email != ic_user_data.email:
@@ -171,21 +178,18 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         messages.error(request, error)
         is_successful = False
 
-    prescriber_session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-
-    # User coming from the prescriber signup path.
-    if ic_session["user_kind"] == KIND_PRESCRIBER and prescriber_session_data:
-        # Prescriber signup path callback.
-        # Forbid signup for non prescribers
-        non_prescriber_user_exists = User.objects.filter(email=ic_user_data.email, is_prescriber=False).exists()
-
-        if non_prescriber_user_exists:
-            error = (
-                "Un compte non prescripteur existe déjà avec cette adresse e-mail. Besoin d'aide ? "
-                f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>Contactez-nous</a>."
-            )
-            messages.error(request, mark_safe(error))
-            is_successful = False
+    try:
+        user, _ = ic_user_data.create_or_update_user()
+    except TooManyKindsException:
+        existing_user = User.objects.get(email=user_data["email"])
+        error = (
+            f"Un compte {existing_user.get_kind_display()} existe déjà avec cette adresse e-mail. "
+            "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail pour "
+            f"devenir {Kind(user_kind).label} sur la plateforme. Besoin d'aide ? "
+            f"<a href='{settings.ITOU_ASSISTANCE_URL}/#support' target='_blank'>Contactez-nous</a>."
+        )
+        messages.error(request, mark_safe(error))
+        is_successful = False
 
     if not is_successful:
         logout_url_params = {
@@ -193,17 +197,6 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         }
         next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(logout_url_params)}"
         return HttpResponseRedirect(next_url)
-
-    try:
-        user, _ = ic_user_data.create_or_update_user()
-    except TooManyKindsException as e:
-        messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
-        if e.user.is_job_seeker:
-            return HttpResponseRedirect(reverse("login:job_seeker"))
-        if e.user.is_siae_staff:
-            return HttpResponseRedirect(reverse("login:siae_staff"))
-        if e.user.is_labor_inspector:
-            return HttpResponseRedirect(reverse("login:labor_inspector"))
 
     # Because we have more than one Authentication backend in our settings, we need to specify
     # the one we want to use in login

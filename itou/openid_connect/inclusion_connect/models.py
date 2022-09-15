@@ -11,6 +11,12 @@ class InclusionConnectState(OIDConnectState):
 
 
 @dataclasses.dataclass
-class InclusionConnectUserData(OIDConnectUserData):
+class InclusionConnectPrescriberData(OIDConnectUserData):
     is_prescriber: bool = True
+    identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
+
+
+@dataclasses.dataclass
+class InclusionConnectSiaeStaffData(OIDConnectUserData):
+    is_siae_staff: bool = True
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
