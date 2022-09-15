@@ -213,7 +213,7 @@
                     <div class="card-body">
                         <ul class="list-unstyled">
                             <li class="card-text mb-3">
-                                {% include "approvals/includes/status.html" with approval=user.latest_common_approval %}
+                                {% include "approvals/includes/status.html" with common_approval=user.latest_common_approval %}
                             </li>
                             {% if user.has_common_approval_in_waiting_period %}
                                 <li class="card-text mb-3">

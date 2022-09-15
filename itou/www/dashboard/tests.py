@@ -1,10 +1,14 @@
+from datetime import datetime
+
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 
+from itou.approvals.factories import ApprovalFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.institutions.factories import InstitutionMembershipFactory
@@ -269,6 +273,17 @@ class DashboardViewTest(TestCase):
         self.client.login(username=prescriber_pe.email, password=DEFAULT_PASSWORD)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Suspendre un PASS IAE")
+
+    @freeze_time("2022-09-15")
+    def test_dashboard_access_by_a_jobseeker(self):
+        approval = ApprovalFactory(start_at=datetime(2022, 6, 21), end_at=datetime(2022, 12, 6))
+        self.client.login(username=approval.user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertContains(response, "PASS IAE (agrément) disponible :")
+        self.assertContains(response, approval.number_with_spaces)
+        self.assertContains(response, "Valide du 21/06/2022 au 06/12/2022")
+        self.assertContains(response, "Délivrance : le 21/06/2022")
 
 
 class EditUserInfoViewTest(TestCase):
