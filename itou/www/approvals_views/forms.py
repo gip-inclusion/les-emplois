@@ -124,7 +124,7 @@ class SuspensionForm(forms.ModelForm):
         self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
 
         self.reasons_can_be_unsuspend = [
-            choice for choice, _ in self.fields["reason"].choices if choice in Suspension.REASONS_TO_UNSUSPEND
+            choice for choice, _ in self.fields["reason"].choices if choice in Suspension.REASONS_ALLOWING_UNSUSPEND
         ]
 
         # End date is not strictly required because it can be set

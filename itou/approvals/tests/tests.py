@@ -14,6 +14,7 @@ from django.template.defaultfilters import title
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
@@ -356,7 +357,7 @@ class ApprovalModelTest(TestCase):
         today = timezone.now().date()
         approval_start_at = today - relativedelta(months=3)
         reasons_to_not_open_process = [
-            reason.value for reason in Suspension.Reason if reason.value not in Suspension.REASONS_TO_UNSUSPEND
+            reason.value for reason in Suspension.Reason if reason.value not in Suspension.REASONS_ALLOWING_UNSUSPEND
         ]
 
         for reason_to_refuse in reasons_to_not_open_process:
@@ -371,7 +372,7 @@ class ApprovalModelTest(TestCase):
             suspension.delete()
             approval.delete()
 
-        for reason in Suspension.REASONS_TO_UNSUSPEND:
+        for reason in Suspension.REASONS_ALLOWING_UNSUSPEND:
             approval = ApprovalFactory(start_at=approval_start_at)
             suspension = SuspensionFactory(
                 approval=approval,
@@ -418,34 +419,57 @@ class ApprovalModelTest(TestCase):
         )
         self.assertIsNone(approval.last_in_progress_suspension)
 
-    def test_unsuspend(self):
+    @freeze_time("2022-09-17")
+    def test_unsuspend_valid(self):
         today = timezone.now().date()
-        approval_start_at = today - relativedelta(months=3)
-        approval = ApprovalFactory(start_at=approval_start_at)
-        suspension = SuspensionFactory(
-            approval=approval,
-            start_at=approval_start_at + relativedelta(months=1),
-            end_at=today + relativedelta(months=2),
-            reason=Suspension.Reason.BROKEN_CONTRACT.value,
-        )
-        approval.unsuspend(hiring_start_at=today)
-        suspension.refresh_from_db()
-        self.assertEqual(suspension.end_at, today - relativedelta(days=1))
+        approval_start_at = datetime.date(2022, 6, 17)
+        suspension_start_date = datetime.date(2022, 7, 17)
+        suspension_end_date = datetime.date(2022, 12, 17)
+        suspension_expected_end_date = datetime.date(2022, 9, 16)
 
+        REASONS_ALLOWING_UNSUSPEND = [
+            Suspension.Reason.BROKEN_CONTRACT.value,
+            Suspension.Reason.FINISHED_CONTRACT.value,
+            Suspension.Reason.APPROVAL_BETWEEN_CTA_MEMBERS.value,
+            Suspension.Reason.CONTRAT_PASSERELLE.value,
+            Suspension.Reason.SUSPENDED_CONTRACT.value,
+        ]
+
+        for reason in REASONS_ALLOWING_UNSUSPEND:
+            with self.subTest(f"reason={reason} expects end_at={suspension_expected_end_date}"):
+                approval = ApprovalFactory(start_at=approval_start_at)
+                suspension = SuspensionFactory(
+                    approval=approval, reason=reason, start_at=suspension_start_date, end_at=suspension_end_date
+                )
+                approval.unsuspend(hiring_start_at=today)
+                suspension.refresh_from_db()
+                self.assertEqual(suspension.end_at, suspension_expected_end_date)
+
+    @freeze_time("2022-09-17")
     def test_unsuspend_invalid(self):
         today = timezone.now().date()
-        approval_start_at = today - relativedelta(months=3)
-        approval = ApprovalFactory(start_at=approval_start_at)
-        suspension_end_at = today + relativedelta(months=2)
-        suspension = SuspensionFactory(
-            approval=approval,
-            start_at=approval_start_at + relativedelta(months=1),
-            end_at=suspension_end_at,
-            reason=Suspension.Reason.SUSPENDED_CONTRACT.value,
+        approval_start_at = datetime.date(2022, 6, 17)
+        suspension_start_date = datetime.date(2022, 7, 17)
+        suspension_end_date = datetime.date(2022, 12, 17)
+
+        invalid_reason = (
+            Suspension.Reason.SICKNESS.value,
+            Suspension.Reason.MATERNITY.value,
+            Suspension.Reason.INCARCERATION.value,
+            Suspension.Reason.TRIAL_OUTSIDE_IAE.value,
+            Suspension.Reason.DETOXIFICATION.value,
+            Suspension.Reason.FORCE_MAJEURE.value,
         )
-        approval.unsuspend(hiring_start_at=today)
-        suspension.refresh_from_db()
-        self.assertEqual(suspension.end_at, suspension_end_at)
+
+        for reason in invalid_reason:
+            with self.subTest(f"reason={reason} expects end_at={suspension_end_date}"):
+                approval = ApprovalFactory(start_at=approval_start_at)
+                suspension = SuspensionFactory(
+                    approval=approval, reason=reason, start_at=suspension_start_date, end_at=suspension_end_date
+                )
+                approval.unsuspend(hiring_start_at=today)
+                suspension.refresh_from_db()
+                self.assertEqual(suspension.end_at, suspension_end_date)
 
     def test_unsuspend_the_day_suspension_starts(self):
         today = timezone.now().date()

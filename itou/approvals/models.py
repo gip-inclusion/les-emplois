@@ -325,7 +325,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     @cached_property
     def can_be_unsuspended(self):
         if self.is_suspended:
-            return self.last_in_progress_suspension.reason in Suspension.REASONS_TO_UNSUSPEND
+            return self.last_in_progress_suspension.reason in Suspension.REASONS_ALLOWING_UNSUSPEND
         return False
 
     def unsuspend(self, hiring_start_at):
@@ -612,11 +612,12 @@ class Suspension(models.Model):
                 reasons.append(Suspension.Reason.CONTRAT_PASSERELLE)
             return [(reason.value, reason.label) for reason in reasons]
 
-    REASONS_TO_UNSUSPEND = [
+    REASONS_ALLOWING_UNSUSPEND = [
         Reason.BROKEN_CONTRACT.value,
         Reason.FINISHED_CONTRACT.value,
         Reason.APPROVAL_BETWEEN_CTA_MEMBERS.value,
         Reason.CONTRAT_PASSERELLE.value,
+        Reason.SUSPENDED_CONTRACT.value,
     ]
 
     approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
