@@ -7,6 +7,7 @@ from unittest.mock import PropertyMock, patch
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail, management
+from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.template.defaultfilters import title
 from django.test import TestCase, override_settings
@@ -34,7 +35,7 @@ from itou.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
 )
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
@@ -524,6 +525,51 @@ class JobApplicationQuerySetTest(TestCase):
         # After employee record is disabled
         employee_record.update_as_disabled()
         self.assertEqual(employee_record.status, Status.DISABLED)
+
+    def test_with_accepted_at_for_created_from_pe_approval(self):
+        JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            created_from_pe_approval=True,
+        )
+
+        job_application = JobApplication.objects.with_accepted_at().first()
+        self.assertEqual(job_application.accepted_at, job_application.created_at)
+
+    def test_with_accepted_at_for_accept_transition(self):
+        job_application = JobApplicationSentBySiaeFactory()
+        job_application.process()
+        job_application.accept(user=job_application.sender)
+
+        expected_created_at = JobApplicationTransitionLog.objects.filter(
+            job_application=job_application,
+            transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
+        ).aggregate(timestamp=Max("timestamp"))["timestamp"]
+        self.assertEqual(JobApplication.objects.with_accepted_at().first().accepted_at, expected_created_at)
+
+    def test_with_accepted_at_with_multiple_transition(self):
+        job_application = JobApplicationSentBySiaeFactory()
+        job_application.process()
+        job_application.accept(user=job_application.sender)
+        job_application.cancel(user=job_application.sender)
+        job_application.accept(user=job_application.sender)
+        job_application.cancel(user=job_application.sender)
+
+        expected_created_at = JobApplicationTransitionLog.objects.filter(
+            job_application=job_application,
+            transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
+        ).aggregate(timestamp=Max("timestamp"))["timestamp"]
+        self.assertEqual(JobApplication.objects.with_accepted_at().first().accepted_at, expected_created_at)
+
+    def test_with_accepted_at_default_value(self):
+        job_application = JobApplicationSentBySiaeFactory(created_from_pe_approval=False)
+
+        self.assertIsNone(JobApplication.objects.with_accepted_at().first().accepted_at)
+
+        job_application.process()  # 1 transition but no accept
+        self.assertIsNone(JobApplication.objects.with_accepted_at().first().accepted_at)
+
+        job_application.refuse(job_application.sender)  # 2 transitions, still no accept
+        self.assertIsNone(JobApplication.objects.with_accepted_at().first().accepted_at)
 
 
 class JobApplicationNotificationsTest(TestCase):

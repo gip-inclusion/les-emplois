@@ -167,6 +167,22 @@ class JobApplicationQuerySet(models.QuerySet):
     def with_last_change(self):
         return self.annotate(last_change=Greatest("created_at", Max("logs__timestamp")))
 
+    def with_accepted_at(self):
+        created_at_from_transition = Subquery(
+            JobApplicationTransitionLog.objects.filter(
+                job_application=OuterRef("pk"),
+                transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
+            )
+            .order_by("-timestamp")
+            .values("timestamp")[0:1],
+        )
+        return self.annotate(
+            accepted_at=Case(
+                When(created_from_pe_approval=True, then=F("created_at")),
+                When(created_from_pe_approval=False, then=created_at_from_transition),
+            )
+        )
+
     def with_is_pending_for_too_long(self):
         freshness_limit = timezone.now() - relativedelta(weeks=self.model.WEEKS_BEFORE_CONSIDERED_OLD)
         pending_states = JobApplicationWorkflow.PENDING_STATES

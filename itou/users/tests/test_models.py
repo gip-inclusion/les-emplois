@@ -17,7 +17,7 @@ from itou.asp.models import AllocationDuration, EmployerType
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionWithMembershipFactory
-from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import (
@@ -329,22 +329,49 @@ class ModelTest(TestCase):
 
     def test_last_accepted_job_application(self):
         # Set 2 job applications with:
-        # - different hiring date
+        # - created_from_pe_approval flag set (the simplest method to test created_at ordering)
+        # - different creation date
+        # `last_accepted_job_application` is the one with the greater `created_at`
+        now = timezone.now()
+        job_application_1 = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            created_from_pe_approval=True,
+            created_at=now + relativedelta(days=1),
+        )
+
+        user = job_application_1.job_seeker
+
+        job_application_2 = JobApplicationFactory(
+            job_seeker=user,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            created_from_pe_approval=True,
+            created_at=now,
+        )
+
+        self.assertEqual(job_application_1, user.last_accepted_job_application)
+        self.assertNotEqual(job_application_2, user.last_accepted_job_application)
+
+    def test_last_accepted_job_application_full_ordering(self):
+        # Set 2 job applications with:
+        # - created_from_pe_approval flag set (the simplest method to test created_at ordering)
         # - same creation date
+        # - different hiring date
         # `last_accepted_job_application` is the one with the greater `hiring_start_at`
         now = timezone.now()
-        job_application_1 = JobApplicationSentByJobSeekerFactory(
+        job_application_1 = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
+            created_from_pe_approval=True,
             created_at=now,
             hiring_start_at=now + relativedelta(days=1),
         )
 
         user = job_application_1.job_seeker
 
-        job_application_2 = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
-            created_at=now,
+        job_application_2 = JobApplicationFactory(
             job_seeker=user,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            created_from_pe_approval=True,
+            created_at=now,
             hiring_start_at=now,
         )
 
