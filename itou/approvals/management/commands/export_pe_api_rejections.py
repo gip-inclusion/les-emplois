@@ -16,10 +16,6 @@ class Command(BaseCommand):
             Approval.objects.filter(
                 pe_notification_status="notification_error",
                 pe_notification_time__range=[
-                    # FIXME(vperron): these were the values used for the very first export, hardcoded.
-                    # datetime(2022, 5, 1, tzinfo=timezone.utc),
-                    # datetime(2022, 8, 31, tzinfo=timezone.utc),
-                    # Remove those as soon as the first regular export is done, git will keep track.
                     first_day_of_month - relativedelta(months=1),
                     first_day_of_month,
                 ],
