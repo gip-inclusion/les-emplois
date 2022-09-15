@@ -1,5 +1,6 @@
 {% load static %}
 {% load call_method %}
+{% load format_filters %}
 {% comment %}
 
 Arguments:
@@ -40,7 +41,7 @@ Arguments:
     </p>
 {% else %}
     <p>
-        <b>{{ common_approval.number_with_spaces }}</b>
+        <b>{{ common_approval.number|format_approval_number }}</b>
     </p>
 {% endif %}
 

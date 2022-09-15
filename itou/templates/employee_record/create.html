@@ -19,7 +19,7 @@
                     <div class="col-sm-9 pt-3">
                         <div>Début du contrat : <b>{{ job_application.hiring_start_at|default_if_none:"Non renseigné" }}</b></div>
                         <div>Fin du contrat : <b>{{ job_application.hiring_end_at|default_if_none:"Non renseigné" }}</b></div>
-                        <div>Numéro de PASS IAE : <b>{{ job_application.approval.number_with_spaces }}</b></div>
+                        <div>Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b></div>
                     </div>
                     <div class="col-sm-3 text-right">
                         <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP"></img>

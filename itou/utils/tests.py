@@ -554,6 +554,17 @@ class UtilsTemplateFiltersTestCase(TestCase):
         self.assertEqual(format_filters.format_nir(""), "")
         self.assertEqual(format_filters.format_nir("12345678910"), "12345678910")
 
+    def test_format_approval_number(self):
+        test_cases = [
+            ("", ""),
+            ("XXXXX3500001", '<span>XXXXX</span><span class="ml-1">35</span><span class="ml-1">00001</span>'),
+            # Actual formatting does not really matter, just verify it does not crash.
+            ("foo", '<span>foo</span><span class="ml-1"></span><span class="ml-1"></span>'),
+        ]
+        for number, expected in test_cases:
+            with self.subTest(number):
+                self.assertEqual(format_filters.format_approval_number(number), expected)
+
 
 class UtilsEmailsTestCase(TestCase):
     def test_get_safe_url(self):

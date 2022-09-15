@@ -1,3 +1,4 @@
+{% load format_filters %}
 <div class="row">
     <div class="col-lg-8 col-md-7 col-12">
         <h3 class="h2">Auto-prescription pour
@@ -38,6 +39,6 @@
 </div>
 <div class="row">
     <div class="col-12">
-        <p class="m-0">PASS IAE :&nbsp;<b>{{ approval.number_with_spaces }}</b> délivré le {{ approval.start_at|date:"d E Y" }}</p>
+        <p class="m-0">PASS IAE :&nbsp;<b>{{ approval.number|format_approval_number }}</b> délivré le {{ approval.start_at|date:"d E Y" }}</p>
     </div>
 </div>

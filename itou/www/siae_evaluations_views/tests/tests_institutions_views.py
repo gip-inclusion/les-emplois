@@ -17,6 +17,7 @@ from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.perms.user import UserInfo
+from itou.utils.templatetags.format_filters import format_approval_number
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
 
@@ -391,7 +392,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, evaluated_siae)
-        self.assertContains(response, evaluated_job_application.job_application.approval.number_with_spaces)
+        formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
+        self.assertContains(response, formatted_number, html=True, count=1)
         self.assertContains(response, evaluated_job_application.job_application.job_seeker.last_name)
         self.assertEqual(
             response.context["back_url"],

@@ -21,7 +21,7 @@
                         {% with job_application=employee_record.job_application %}
                             <div>Début du contrat : <b>{{ job_application.hiring_start_at }}</b></div>
                             <div>Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b></div>
-                            <div>Numéro de PASS IAE : <b>{{ job_application.approval.number_with_spaces }}</b></div>
+                            <div>Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b></div>
                         {% endwith %}
                         <div>
                             <b>{{ employee_record.get_status_display }}</b> le {{ employee_record.updated_at }}
