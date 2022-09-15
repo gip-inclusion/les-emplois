@@ -91,6 +91,14 @@ class PrescriberLoginTest(TestCase):
 
 
 class SiaeStaffLoginTest(TestCase):
+    def test_login_options(self):
+        url = reverse("login:siae_staff")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "S'identifier avec Inclusion Connect")
+        self.assertContains(response, "Adresse e-mail")
+        self.assertContains(response, "Mot de passe")
+
     def test_login(self):
         user = SiaeStaffFactory()
         url = reverse("login:siae_staff")
@@ -106,6 +114,14 @@ class SiaeStaffLoginTest(TestCase):
 
 
 class LaborInspectorLoginTest(TestCase):
+    def test_login_options(self):
+        url = reverse("login:labor_inspector")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "S'identifier avec Inclusion Connect")
+        self.assertContains(response, "Adresse e-mail")
+        self.assertContains(response, "Mot de passe")
+
     def test_login(self):
         user = LaborInspectorFactory()
         url = reverse("login:labor_inspector")

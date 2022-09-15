@@ -58,6 +58,7 @@ class PrescriberLoginView(ItouLoginView):
             "login_url": reverse("login:prescriber"),
             "signup_url": reverse("signup:prescriber_check_already_exists"),
             "signup_allowed": True,
+            "uses_inclusion_connect": True,
             "inclusion_connect_url": inclusion_connect_url,
         }
         return context | extra_context
