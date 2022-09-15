@@ -1,20 +1,25 @@
-import uuid
+from urllib.parse import urlencode
 
+import respx
+from django.conf import settings
+from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
 from django.utils.html import escape
 
 from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory, SentSiaeStaffInvitationFactory
+from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
+from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 
 
 class TestAcceptInvitation(TestCase):
-    def assert_accepted_invitation(self, invitation, user):
+    def assert_accepted_invitation(self, response, invitation, user):
         user.refresh_from_db()
         invitation.refresh_from_db()
         self.assertTrue(user.is_siae_staff)
@@ -26,41 +31,56 @@ class TestAcceptInvitation(TestCase):
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEqual(invitation.sender.email, mail.outbox[0].to[0])
 
-    def test_if_siae_can_apply(self):
-        invitation = SentSiaeStaffInvitationFactory()
+        # Make sure there's a welcome message.
+        self.assertContains(
+            response, escape(f"Vous êtes désormais membre de la structure {invitation.siae.display_name}.")
+        )
+
+        # Assert the user sees his new siae dashboard
+        current_siae = get_current_siae_or_404(response.wsgi_request)
+        # A user can be member of one or more siae
+        self.assertTrue(current_siae in user.siae_set.all())
+
+    @respx.mock
+    def test_accept_invitation_signup_(self):
+        invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"])
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertContains(response, '<button type="submit" class="btn btn-primary">Inscription</button>', html=True)
+        self.assertContains(response, "inclusion_connect_button.svg")
 
-    def test_accept_invitation_signup(self):
-        invitation = SentSiaeStaffInvitationFactory()
-
-        response = self.client.get(invitation.acceptance_link, follow=True)
-
-        form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name}
-
-        # Assert data is already present and not editable
-        form = response.context.get("form")
-        for key, data in form_data.items():
-            self.assertEqual(form.fields[key].initial, data)
+        # We don't put the full path with the FQDN in the parameters
+        previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
+        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        params = {
+            "user_kind": KIND_SIAE_STAFF,
+            "login_hint": invitation.email,
+            "channel": "invitation",
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
         total_users_before = User.objects.count()
 
-        # Fill in the password and send
-        response = self.client.post(
-            invitation.acceptance_link,
-            data={**form_data, "password1": DEFAULT_PASSWORD, "password2": DEFAULT_PASSWORD},
-            follow=True,
+        response = mock_oauth_dance(
+            self,
+            KIND_SIAE_STAFF,
+            assert_redirects=False,
+            login_hint=invitation.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
         )
-        self.assertRedirects(response, reverse("dashboard:index"))
+        response = self.client.get(response.url, follow=True)
+        # Check user is redirected to the dashboard
+        last_url, _status_code = response.redirect_chain[-1]
+        self.assertEqual(last_url, reverse("dashboard:index"))
 
         total_users_after = User.objects.count()
         self.assertEqual((total_users_before + 1), total_users_after)
 
         user = User.objects.get(email=invitation.email)
-        self.assertTrue(user.emailaddress_set.first().verified)
-        # `username` should be a valid UUID, see `User.generate_unique_username()`.
-        self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
-        self.assert_accepted_invitation(invitation, user)
+        self.assert_accepted_invitation(response, invitation, user)
 
     def test_accept_invitation_logged_in_user(self):
         # A logged in user should log out before accepting an invitation.
@@ -71,28 +91,44 @@ class TestAcceptInvitation(TestCase):
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertRedirects(response, reverse("account_logout"))
 
-    def test_accept_invitation_signup_changed_email(self):
+    @respx.mock
+    def test_accept_invitation_signup_wrong_email(self):
         invitation = SentSiaeStaffInvitationFactory()
-
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertTrue(response.status_code, 200)
+        self.assertContains(response, "inclusion_connect_button.svg")
 
-        # Email is based on the invitation object.
-        # The user changes it because c'est un petit malin.
-        form_data = {
-            "first_name": invitation.first_name,
-            "last_name": invitation.last_name,
-            "email": "hey@you.com",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
+        # We don't put the full path with the FQDN in the parameters
+        previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
+        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        params = {
+            "user_kind": KIND_SIAE_STAFF,
+            "login_hint": invitation.email,
+            "channel": "invitation",
+            "previous_url": previous_url,
+            "next_url": next_url,
         }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
-        # Fill in the password and send
-        response = self.client.post(invitation.acceptance_link, data=form_data, follow=True)
-        self.assertRedirects(response, reverse("dashboard:index"))
-
-        user = User.objects.get(email=invitation.email)
-        self.assertEqual(invitation.email, user.email)
+        url = reverse("dashboard:index")
+        response = mock_oauth_dance(
+            self,
+            KIND_SIAE_STAFF,
+            assert_redirects=False,
+            # the login hint is different from OIDC_USERINFO["email"] which is used to create the IC account
+            login_hint=invitation.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        # Signup should have failed : as the email used in IC isn't the one from the invitation
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertIn("ne correspond pas à l’adresse e-mail de l’invitation", str(messages[0]))
+        self.assertEqual(response.wsgi_request.get_full_path(), previous_url)
+        self.assertFalse(User.objects.filter(email=invitation.email).exists())
 
     def test_expired_invitation(self):
         invitation = ExpiredSiaeStaffInvitationFactory()
@@ -152,24 +188,38 @@ class TestAcceptInvitation(TestCase):
 
         current_siae = get_current_siae_or_404(response.wsgi_request)
         self.assertEqual(siae.pk, current_siae.pk)
-        self.assert_accepted_invitation(invitation, user)
+        self.assert_accepted_invitation(response, invitation, user)
 
+    @respx.mock
     def test_accept_new_user_to_inactive_siae(self):
         siae = SiaeFactory(convention__is_active=False, with_membership=True)
         sender = siae.members.first()
         invitation = SentSiaeStaffInvitationFactory(
             sender=sender,
             siae=siae,
+            email=OIDC_USERINFO["email"],
         )
-        form_data = {
-            "first_name": invitation.first_name,
-            "last_name": invitation.last_name,
-            "email": invitation.email,
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
-        }
-        response = self.client.post(invitation.acceptance_link, data=form_data)
+        response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, escape("La structure que vous souhaitez rejoindre n'est plus active."))
+        self.assertNotContains(response, "inclusion_connect_button.svg")
+
+        # If the user still manages to signup with IC
+        previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
+        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        response = mock_oauth_dance(
+            self,
+            KIND_SIAE_STAFF,
+            assert_redirects=False,
+            login_hint=invitation.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertContains(response, escape("Cette structure n'est plus active."))
+        user = User.objects.get(email=invitation.email)
+        self.assertEqual(user.siae_set.count(), 0)
 
     def test_accept_existing_user_is_not_employer(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
