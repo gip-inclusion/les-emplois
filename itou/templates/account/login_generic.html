@@ -12,15 +12,17 @@
     <div class="py-5 py-lg-7">
         <h1 class="h1-hero-c1 text-center">Se connecter</h1>
 
-        {% if inclusion_connect_url %}
-            <p class="text-center mb-1">
-                Se connecter avec
-            </p>
-            {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
+        {% if uses_inclusion_connect %}
+            {% if inclusion_connect_url %}
+                <p class="text-center mb-1">
+                    Se connecter avec
+                </p>
+                {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
 
-            <hr class="my-5" data-text="ou">
-        {% else %}
-            <p class="font-italic text-center mt-3">Inclusion Connect est momentanément désactivé.</p>
+                <hr class="my-5" data-text="ou">
+            {% else %}
+                <p class="font-italic text-center mt-3">Inclusion Connect est momentanément désactivé.</p>
+            {% endif %}
         {% endif %}
 
         <form method="post" action="{{ login_url }}" class="js-prevent-multiple-submit">
