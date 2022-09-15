@@ -16,14 +16,14 @@ from django.utils import timezone
 
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.users import enums as users_enums
-from itou.users.enums import KIND_PRESCRIBER
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactory
 from itou.users.models import User
 
 from ..constants import OIDC_STATE_EXPIRATION
 from ..models import TooManyKindsException
 from . import constants
-from .models import InclusionConnectState, InclusionConnectUserData
+from .models import InclusionConnectPrescriberData, InclusionConnectSiaeStaffData, InclusionConnectState
 
 
 OIDC_USERINFO = {
@@ -38,6 +38,7 @@ OIDC_USERINFO = {
 # @respx.mock
 def mock_oauth_dance(
     test_class,
+    user_kind,
     previous_url=None,
     next_url=None,
     assert_redirects=True,
@@ -46,10 +47,11 @@ def mock_oauth_dance(
     user_info_email=None,
     channel=None,
 ):
+    assert user_kind, "Letting this filed empty is not allowed"
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE).respond(302)
     # Authorize params depend on user kind.
     authorize_params = {
-        "user_kind": KIND_PRESCRIBER,
+        "user_kind": user_kind,
         "previous_url": previous_url,
         "next_url": next_url,
         "login_hint": login_hint,
@@ -105,7 +107,7 @@ class InclusionConnectModelTest(TestCase):
         Similar to france_connect.tests.FranceConnectTest.test_create_django_user
         but with more tests.
         """
-        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
         self.assertFalse(User.objects.filter(username=ic_user_data.username).exists())
         self.assertFalse(User.objects.filter(email=ic_user_data.email).exists())
 
@@ -141,7 +143,7 @@ class InclusionConnectModelTest(TestCase):
         If there already is an existing user with this InclusionConnect id, we do not create it again,
         we use it and we update it.
         """
-        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
         UserFactory(
             username=ic_user_data.username,
             last_name="will_be_forgotten",
@@ -158,7 +160,7 @@ class InclusionConnectModelTest(TestCase):
         If there already is an existing user with this InclusionConnect id, but it comes from another SSO.
         The email is also different, so it will crash while trying to create a new user.
         """
-        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
         UserFactory(
             username=ic_user_data.username,
             last_name="will_be_forgotten",
@@ -173,7 +175,7 @@ class InclusionConnectModelTest(TestCase):
         If there already is an existing django user with email InclusionConnect sent us, we do not create it again,
         We user it and we update it with the data form the identity_provider.
         """
-        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
         UserFactory(email=ic_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
         user, created = ic_user_data.create_or_update_user()
         self.assertFalse(created)
@@ -187,7 +189,7 @@ class InclusionConnectModelTest(TestCase):
         If there already is an existing user with email InclusionConnect sent us, we do not create it again,
         we use it but we do not update it.
         """
-        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
         UserFactory(email=ic_user_data.email, identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
         user, created = ic_user_data.create_or_update_user()
         self.assertFalse(created)
@@ -197,10 +199,10 @@ class InclusionConnectModelTest(TestCase):
         self.assertNotEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
 
     def test_update_user_from_user_info(self):
-        user = UserFactory(**dataclasses.asdict(InclusionConnectUserData.from_user_info(OIDC_USERINFO)))
-        ic_user = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+        user = UserFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
+        ic_user = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
 
-        new_ic_user = InclusionConnectUserData(
+        new_ic_user = InclusionConnectPrescriberData(
             first_name="Jean", last_name="Gabin", username=ic_user.username, email="jean@lestontons.fr"
         )
         now = timezone.now()
@@ -231,10 +233,21 @@ class InclusionConnectModelTest(TestCase):
         self.assertTrue(isinstance(csrf_signed, str))
         self.assertTrue(InclusionConnectState.is_valid(csrf_signed))
 
-    def test_create_or_update_user_raise_too_many_kind_exception(self):
-        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+    def test_create_or_update_prescriber_raise_too_many_kind_exception(self):
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
 
         for field in ["is_job_seeker", "is_siae_staff", "is_labor_inspector"]:
+            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
+
+            with self.assertRaises(TooManyKindsException):
+                ic_user_data.create_or_update_user()
+
+            user.delete()
+
+    def test_create_or_update_siae_staff_raise_too_many_kind_exception(self):
+        ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
+
+        for field in ["is_job_seeker", "is_prescriber", "is_labor_inspector"]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
 
             with self.assertRaises(TooManyKindsException):
@@ -282,15 +295,32 @@ class InclusionConnectViewTest(TestCase):
     ######### Callback tests ###########
     ####################################
     @respx.mock
-    def test_callback_user_created(self):
+    def test_callback_prescriber_created(self):
         ### User does not exist.
-        mock_oauth_dance(self)
+        mock_oauth_dance(self, KIND_PRESCRIBER)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(email=OIDC_USERINFO["email"])
         self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
         self.assertEqual(user.last_name, OIDC_USERINFO["family_name"])
         self.assertEqual(user.username, OIDC_USERINFO["sub"])
         self.assertTrue(user.has_sso_provider)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+        self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
+
+    @respx.mock
+    def test_callback_siae_staff_created(self):
+        ### User does not exist.
+        # Don't check redirection as the user isn't an siae member yet, so it won't work.
+        mock_oauth_dance(self, KIND_SIAE_STAFF, assert_redirects=False)
+        self.assertEqual(User.objects.count(), 1)
+        user = User.objects.get(email=OIDC_USERINFO["email"])
+        self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
+        self.assertEqual(user.last_name, OIDC_USERINFO["family_name"])
+        self.assertEqual(user.username, OIDC_USERINFO["sub"])
+        self.assertTrue(user.has_sso_provider)
+        self.assertFalse(user.is_prescriber)
+        self.assertTrue(user.is_siae_staff)
         self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
 
     @respx.mock
@@ -304,7 +334,7 @@ class InclusionConnectViewTest(TestCase):
             email=OIDC_USERINFO["email"],
             identity_provider=users_enums.IdentityProvider.DJANGO,
         )
-        mock_oauth_dance(self)
+        mock_oauth_dance(self, KIND_PRESCRIBER)
         self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(email=OIDC_USERINFO["email"])
         self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
@@ -314,12 +344,28 @@ class InclusionConnectViewTest(TestCase):
         self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
 
     @respx.mock
-    def test_callback_redirect_on_too_many_kind_exception(self):
-        ic_user_data = InclusionConnectUserData.from_user_info(OIDC_USERINFO)
+    def test_callback_redirect_prescriber_on_too_many_kind_exception(self):
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
 
         for field in ["is_job_seeker", "is_siae_staff", "is_labor_inspector"]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
-            mock_oauth_dance(self, expected_route=f"login:{field[3:]}")
+            response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
+            response = self.client.get(response.url, follow=True)
+            self.assertContains(response, "existe déjà avec cette adresse e-mail")
+            self.assertContains(response, "pour devenir prescripteur sur la plateforme")
+            user.delete()
+
+    @respx.mock
+    def test_callback_redirect_siae_staff_on_too_many_kind_exception(self):
+        ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
+
+        for field in ["is_job_seeker", "is_prescriber", "is_labor_inspector"]:
+            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
+            # Don't check redirection as the user isn't an siae member yet, so it won't work.
+            response = mock_oauth_dance(self, KIND_SIAE_STAFF, assert_redirects=False)
+            response = self.client.get(response.url, follow=True)
+            self.assertContains(response, "existe déjà avec cette adresse e-mail")
+            self.assertContains(response, "pour devenir employeur sur la plateforme")
             user.delete()
 
 
@@ -352,7 +398,7 @@ class InclusionConnectLoginTest(TestCase):
         He can log in again later.
         """
         # Create an account with IC.
-        mock_oauth_dance(self)
+        mock_oauth_dance(self, KIND_PRESCRIBER)
 
         # Then log out.
         response = self.client.post(reverse("account_logout"))
@@ -363,7 +409,7 @@ class InclusionConnectLoginTest(TestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
         self.assertContains(response, reverse("inclusion_connect:authorize"))
 
-        response = mock_oauth_dance(self, assert_redirects=False)
+        response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
         expected_redirection = reverse("dashboard:index")
         self.assertRedirects(response, expected_redirection)
 
@@ -381,14 +427,14 @@ class InclusionConnectLoginTest(TestCase):
         user_info = OIDC_USERINFO
         user = PrescriberFactory(
             has_completed_welcoming_tour=True,
-            **InclusionConnectUserData.user_info_mapping_dict(user_info),
+            **InclusionConnectPrescriberData.user_info_mapping_dict(user_info),
         )
 
         # Existing user connects with IC which results in:
         # - IC side: account creation
         # - Django side: account update.
         # This logic is already tested here: InclusionConnectModelTest
-        response = mock_oauth_dance(self, assert_redirects=False)
+        response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
         # This existing user should not see the welcoming tour.
         expected_redirection = reverse("dashboard:index")
         self.assertRedirects(response, expected_redirection)
@@ -411,14 +457,14 @@ class InclusionConnectLoginTest(TestCase):
         self.assertFalse(auth.get_user(self.client).is_authenticated)
 
         # Then login with Inclusion Connect.
-        mock_oauth_dance(self, assert_redirects=False)
+        mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
         self.assertTrue(auth.get_user(self.client).is_authenticated)
 
 
 class InclusionConnectLogoutTest(TestCase):
     @respx.mock
     def test_simple_logout(self):
-        mock_oauth_dance(self)
+        mock_oauth_dance(self, KIND_PRESCRIBER)
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
         logout_url = reverse("inclusion_connect:logout")
         response = self.client.get(logout_url)
@@ -426,7 +472,7 @@ class InclusionConnectLogoutTest(TestCase):
 
     @respx.mock
     def test_logout_with_redirection(self):
-        mock_oauth_dance(self)
+        mock_oauth_dance(self, KIND_PRESCRIBER)
         expected_redirection = reverse("dashboard:index")
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
@@ -441,7 +487,7 @@ class InclusionConnectLogoutTest(TestCase):
         When ac IC user wants to log out from his local account,
         he should be logged out too from IC.
         """
-        response = mock_oauth_dance(self)
+        response = mock_oauth_dance(self, KIND_PRESCRIBER)
         self.assertTrue(auth.get_user(self.client).is_authenticated)
         # Follow the redirection.
         response = self.client.get(response.url)
@@ -475,7 +521,7 @@ class InclusionConnectLogoutTest(TestCase):
     def test_logout_with_incomplete_state(self):
         # This happens while testing. It should never happen for real users, but it's still painful for us.
 
-        mock_oauth_dance(self)
+        mock_oauth_dance(self, KIND_PRESCRIBER)
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
         session = self.client.session
