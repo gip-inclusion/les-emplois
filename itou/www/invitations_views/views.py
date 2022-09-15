@@ -240,7 +240,8 @@ def join_siae(request, invitation_id):
         messages.error(request, "Cette invitation n'est plus valide.")
 
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = invitation.siae.pk
-    return redirect("dashboard:index")
+    url = get_adapter(request).get_login_redirect_url(request)
+    return HttpResponseRedirect(url)
 
 
 @login_required
