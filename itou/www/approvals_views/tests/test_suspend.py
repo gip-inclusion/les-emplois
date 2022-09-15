@@ -75,6 +75,11 @@ class ApprovalSuspendViewTest(TestCase):
         suspension = approval.suspension_set.first()
         self.assertEqual(suspension.created_by, siae_user)
 
+        # Ensure suspension reason is not displayed in details page
+        detail_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(detail_url)
+        self.assertNotContains(response, suspension.get_reason_display())
+
     def test_create_suspension_without_end_date(self):
         # Only test form validation (faster)
 
