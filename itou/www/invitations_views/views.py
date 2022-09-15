@@ -10,7 +10,12 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
 
-from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
+from itou.invitations.models import (
+    InvitationAbstract,
+    LaborInspectorInvitation,
+    PrescriberWithOrgInvitation,
+    SiaeStaffInvitation,
+)
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.users.enums import KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.models import User
@@ -286,9 +291,8 @@ def invite_labor_inspector(request, template_name="invitations_views/create.html
 
 
 @login_required
-def join_institution(request, invitation_type, invitation_id):
-    invitation_type = InvitationAbstract.get_model_from_string(invitation_type)
-    invitation = get_object_or_404(invitation_type, pk=invitation_id)
+def join_institution(request, invitation_id):
+    invitation = get_object_or_404(LaborInspectorInvitation, pk=invitation_id)
     if not invitation.guest_can_join_institution(request):
         raise PermissionDenied()
 
