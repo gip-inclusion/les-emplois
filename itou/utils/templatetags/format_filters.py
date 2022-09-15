@@ -1,6 +1,7 @@
 """
 https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 """
+import io
 import re
 from textwrap import wrap
 
@@ -51,7 +52,12 @@ def format_nir(nir):
     nir_regex = r"^([12])([0-9]{2})([0-9]{2})(2[AB]|[0-9]{2})([0-9]{3})([0-9]{3})([0-9]{2})$"
     match = re.match(nir_regex, nir_without_spaces)
     if match is not None:
-        return " ".join(match.groups())
+        groups = match.groups()
+        with io.StringIO() as formatted:
+            formatted.write(f"<span>{groups[0]}</span>")
+            for group in groups[1:]:
+                formatted.write(f'<span class="ml-1">{group}</span>')
+            return mark_safe(formatted.getvalue())
     else:
         # Some NIRs do not match the pattern (they can be NTT/NIA) so we can’t format them
         # When this happen, we should not crash but return the initial value
