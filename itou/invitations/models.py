@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.users.enums import KIND_JOB_SEEKER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.models import User
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
@@ -38,18 +38,6 @@ class InvitationAbstract(models.Model):
     # reverse(f"login:{account_type}")
     SIGNIN_ACCOUNT_TYPE = ""
     EXPIRATION_DAYS = 14
-    GUEST_TYPE_JOB_SEEKER = KIND_JOB_SEEKER
-    GUEST_TYPE_PRESCRIBER = KIND_PRESCRIBER
-    GUEST_TYPE_PRESCRIBER_WITH_ORG = KIND_PRESCRIBER
-    GUEST_TYPE_SIAE_STAFF = KIND_SIAE_STAFF
-    GUEST_TYPE_LABOR_INSPECTOR = KIND_LABOR_INSPECTOR
-    GUEST_TYPES = [
-        (GUEST_TYPE_JOB_SEEKER, "Candidat"),
-        (GUEST_TYPE_PRESCRIBER, "Prescripteur sans organisation"),
-        (GUEST_TYPE_PRESCRIBER_WITH_ORG, "Prescripteur membre d'une organisation"),
-        (GUEST_TYPE_SIAE_STAFF, "Employeur"),
-        (GUEST_TYPE_LABOR_INSPECTOR, "Inspecteur du travail (DGEFP, DDETS, DREETS)"),
-    ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(verbose_name="E-mail")
@@ -76,11 +64,11 @@ class InvitationAbstract(models.Model):
         invitation_model = Invitation.get_model_from_string("siae_staff")
         invitation_model.objects.count()
         """
-        if model_string == cls.GUEST_TYPE_SIAE_STAFF:
+        if model_string == KIND_SIAE_STAFF:
             return SiaeStaffInvitation
-        elif model_string == cls.GUEST_TYPE_PRESCRIBER_WITH_ORG:
+        elif model_string == KIND_PRESCRIBER:
             return PrescriberWithOrgInvitation
-        elif model_string == cls.GUEST_TYPE_LABOR_INSPECTOR:
+        elif model_string == KIND_LABOR_INSPECTOR:
             return LaborInspectorInvitation
         raise TypeError
 
@@ -163,7 +151,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
     @property
     def acceptance_link(self):
         kwargs = {"invitation_id": self.pk}
-        signup_kwargs = {"invitation_type": self.GUEST_TYPE_PRESCRIBER_WITH_ORG, **kwargs}
+        signup_kwargs = {"invitation_type": KIND_PRESCRIBER, **kwargs}
         args = {"redirect_to": reverse("invitations_views:join_prescriber_organization", kwargs=kwargs)}
         acceptance_path = "{}?{}".format(
             reverse("invitations_views:new_user", kwargs=signup_kwargs), urlencode(args, True)
@@ -237,7 +225,7 @@ class SiaeStaffInvitation(InvitationAbstract):
     @property
     def acceptance_link(self):
         kwargs = {"invitation_id": self.pk}
-        signup_kwargs = {"invitation_type": self.GUEST_TYPE_SIAE_STAFF, **kwargs}
+        signup_kwargs = {"invitation_type": KIND_SIAE_STAFF, **kwargs}
         args = {"redirect_to": reverse("invitations_views:join_siae", kwargs=kwargs)}
         acceptance_path = "{}?{}".format(
             reverse("invitations_views:new_user", kwargs=signup_kwargs), urlencode(args, True)
@@ -312,8 +300,8 @@ class LaborInspectorInvitation(InvitationAbstract):
 
     @property
     def acceptance_link(self):
-        kwargs = {"invitation_id": self.pk, "invitation_type": self.GUEST_TYPE_LABOR_INSPECTOR}
-        signup_kwargs = {"invitation_type": self.GUEST_TYPE_LABOR_INSPECTOR, **kwargs}
+        kwargs = {"invitation_id": self.pk}
+        signup_kwargs = {"invitation_type": KIND_LABOR_INSPECTOR, **kwargs}
         args = {"redirect_to": reverse("invitations_views:join_institution", kwargs=kwargs)}
         acceptance_path = "{}?{}".format(
             reverse("invitations_views:new_user", kwargs=signup_kwargs), urlencode(args, True)
