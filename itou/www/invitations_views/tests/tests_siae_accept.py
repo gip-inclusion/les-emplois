@@ -72,9 +72,9 @@ class TestAcceptInvitation(TestCase):
             next_url=next_url,
         )
         response = self.client.get(response.url, follow=True)
-        # Check user is redirected to the dashboard
+        # Check user is redirected to the welcoming tour
         last_url, _status_code = response.redirect_chain[-1]
-        self.assertEqual(last_url, reverse("dashboard:index"))
+        self.assertEqual(last_url, reverse("welcoming_tour:index"))
 
         total_users_after = User.objects.count()
         self.assertEqual((total_users_before + 1), total_users_after)
@@ -184,7 +184,7 @@ class TestAcceptInvitation(TestCase):
         )
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertRedirects(response, reverse("dashboard:index"))
+        self.assertRedirects(response, reverse("welcoming_tour:index"))
 
         current_siae = get_current_siae_or_404(response.wsgi_request)
         self.assertEqual(siae.pk, current_siae.pk)
