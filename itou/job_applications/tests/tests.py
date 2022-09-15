@@ -642,7 +642,8 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
         email = job_application.email_accept_for_proxy
         # To.
-        self.assertIn(job_application.sender.email, email.to)
+        self.assertNotIn(job_application.to_siae.email, email.to)
+        self.assertEqual(email.to, [job_application.sender.email])
         self.assertEqual(len(email.to), 1)
         self.assertEqual(len(email.bcc), 0)
         # Subject.
