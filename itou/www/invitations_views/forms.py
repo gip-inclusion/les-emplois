@@ -269,11 +269,6 @@ class NewUserInvitationForm(SignupForm):
         self.fields["first_name"].initial = invitation.first_name
         self.fields["last_name"].initial = invitation.last_name
 
-    def clean(self):
-        if isinstance(self.invitation, SiaeStaffInvitation) and not self.invitation.siae.is_active:
-            raise forms.ValidationError("La structure que vous souhaitez rejoindre n'est plus active.")
-        super().clean()
-
     def save(self, request):
         self.cleaned_data["email"] = self.email
         # Avoid django-allauth to call its own often failing `generate_unique_username`

@@ -12,7 +12,7 @@ from django.utils import formats, safestring
 
 from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
-from itou.users.enums import KIND_PRESCRIBER
+from itou.users.enums import KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.models import User
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -27,7 +27,8 @@ from itou.www.invitations_views.forms import (
 from itou.www.signup import forms as signup_forms
 
 
-def handle_default_invited_user_registration(request, invitation):
+def handle_invited_user_registration_with_django(request, invitation, invitation_type):
+    # This view is now only used for labor inspectors
     form = NewUserInvitationForm(data=request.POST or None, invitation=invitation)
     if form.is_valid():
         user = form.save(request)
@@ -37,9 +38,9 @@ def handle_default_invited_user_registration(request, invitation):
     return render(request, "invitations_views/new_user.html", context=context)
 
 
-def handle_invited_prescriber_registration(request, invitation):
+def handle_invited_user_registration_with_inclusion_connect(request, invitation, invitation_type):
     params = {
-        "user_kind": KIND_PRESCRIBER,
+        "user_kind": invitation_type,
         "login_hint": invitation.email,
         "channel": InclusionConnectChannel.INVITATION.value,
         "previous_url": request.get_full_path(),
@@ -54,7 +55,7 @@ def handle_invited_prescriber_registration(request, invitation):
         "inclusion_connect_url": inclusion_connect_url,
         "invitation": invitation,
     }
-    return render(request, "invitations_views/new_prescriber.html", context=context)
+    return render(request, "invitations_views/new_ic_user.html", context=context)
 
 
 def new_user(request, invitation_type, invitation_id):
@@ -78,6 +79,10 @@ def new_user(request, invitation_type, invitation_id):
         messages.error(request, "Cette invitation n'est plus valide.")
         return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
+    if invitation_type == KIND_SIAE_STAFF and not invitation.siae.is_active:
+        messages.error(request, "La structure que vous souhaitez rejoindre n'est plus active.")
+        return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
+
     if User.objects.filter(email__iexact=invitation.email).exists():
         # The user exists but he should log in first.
         login_url = reverse(f"login:{invitation.SIGNIN_ACCOUNT_TYPE}")
@@ -89,9 +94,11 @@ def new_user(request, invitation_type, invitation_id):
 
     # A new user should be created before joining
     handle_registration = {
-        KIND_PRESCRIBER: handle_invited_prescriber_registration,
-    }.get(invitation_type, handle_default_invited_user_registration)
-    return handle_registration(request, invitation)
+        KIND_PRESCRIBER: handle_invited_user_registration_with_inclusion_connect,
+        KIND_SIAE_STAFF: handle_invited_user_registration_with_inclusion_connect,
+        KIND_LABOR_INSPECTOR: handle_invited_user_registration_with_django,
+    }[invitation_type]
+    return handle_registration(request, invitation, invitation_type)
 
 
 @login_required
