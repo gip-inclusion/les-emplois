@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import Error, transaction
 from django.http import HttpResponseRedirect
@@ -17,6 +18,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import urlencode, urlsafe_base64_decode
 from django.views.decorators.http import require_GET
+from django.views.generic import TemplateView, View
 
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
@@ -203,68 +205,72 @@ def siae_select(request, template_name="signup/siae_select.html"):
     return render(request, template_name, context)
 
 
-def siae_user(request, encoded_siae_id, token, template_name="signup/siae_user.html"):
+class SiaeBaseView(View):
+    def __init__(self):
+        super().__init__()
+        self.siae = None
+        self.encoded_siae_id = None
+        self.token = None
+
+    def setup(self, request, *args, **kwargs):
+        self.encoded_siae_id = kwargs["encoded_siae_id"]
+        self.token = kwargs["token"]
+        super().setup(request, *args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        siae_id = int(urlsafe_base64_decode(self.encoded_siae_id))
+        self.siae = Siae.objects.active().filter(pk=siae_id).first()
+        if self.siae is None or not siae_signup_token_generator.check_token(siae=self.siae, token=self.token):
+            messages.warning(
+                request,
+                "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.",
+            )
+            return HttpResponseRedirect(reverse("signup:siae_select"))
+        return super().dispatch(request, *args, **kwargs)
+
+
+class SiaeUserView(SiaeBaseView, TemplateView):
     """
     Display Inclusion Connect button.
     This page is also shown if an error is detected during
     OAuth callback.
     """
 
-    # FIXME(alaurent) Move to commun ClassBaseViewMixin
-    # Get siae from endoded_siae_id
-    siae_id = int(urlsafe_base64_decode(encoded_siae_id))
-    siae = Siae.objects.active().filter(pk=siae_id).first()
-    if siae is None or not siae_signup_token_generator.check_token(siae=siae, token=token):
-        messages.warning(
-            request, "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription."
+    template_name = "signup/siae_user.html"
+
+    def get_context_data(self, **kwargs):
+        ic_params = {
+            "user_kind": KIND_SIAE_STAFF,
+            "previous_url": self.request.get_full_path(),
+            "next_url": reverse("signup:siae_join", args=(self.encoded_siae_id, self.token)),
+        }
+        inclusion_connect_url = (
+            f"{reverse('inclusion_connect:authorize')}?{urlencode(ic_params)}"
+            if settings.INCLUSION_CONNECT_BASE_URL
+            else None
         )
-        return HttpResponseRedirect(reverse("signup:siae_select"))
-
-    ic_params = {
-        "user_kind": KIND_SIAE_STAFF,
-        "previous_url": request.get_full_path(),
-        "next_url": reverse("signup:siae_join", args=(encoded_siae_id, token)),
-    }
-
-    inclusion_connect_url = (
-        f"{reverse('inclusion_connect:authorize')}?{urlencode(ic_params)}"
-        if settings.INCLUSION_CONNECT_BASE_URL
-        else None
-    )
-
-    context = {
-        "inclusion_connect_url": inclusion_connect_url,
-        "siae": siae,
-    }
-    return render(request, template_name, context)
+        return super().get_context_data(**kwargs) | {
+            "inclusion_connect_url": inclusion_connect_url,
+            "siae": self.siae,
+        }
 
 
-@login_required
-def siae_join(request, encoded_siae_id, token):
-    if not request.user.is_siae_staff:
-        logger.error("A non staff user tried to join a SIAE")
-        messages.error(request, "Vous ne pouvez pas rejoindre une SIAE avec ce compte.")
-        return HttpResponseRedirect(reverse("home:hp"))
+class SiaeJoinView(LoginRequiredMixin, SiaeBaseView):
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_siae_staff:
+            logger.error("A non staff user tried to join a SIAE")
+            messages.error(request, "Vous ne pouvez pas rejoindre une SIAE avec ce compte.")
+            return HttpResponseRedirect(reverse("home:hp"))
 
-    # FIXME(alaurent) Move to commun ClassBaseViewMixin
-    # Get siae from endoded_siae_id
-    siae_id = int(urlsafe_base64_decode(encoded_siae_id))
-    siae = Siae.objects.active().filter(pk=siae_id).first()
-    if siae is None or not siae_signup_token_generator.check_token(siae=siae, token=token):
-        messages.warning(
-            request, "Ce lien d'inscriptheon est invalide ou a expiré. Veuillez procéder à une nouvelle inscription."
+        SiaeMembership.objects.create(
+            user=request.user,
+            siae=self.siae,
+            # Only the first member becomes an admin.
+            is_admin=self.siae.active_members.count() == 0,
         )
-        return HttpResponseRedirect(reverse("signup:siae_select"))
 
-    membership = SiaeMembership()
-    membership.user = request.user
-    membership.siae = siae
-    # Only the first member becomes an admin.
-    membership.is_admin = siae.active_members.count() == 0
-    membership.save()
-
-    url = get_adapter(request).get_login_redirect_url(request)
-    return HttpResponseRedirect(url)
+        url = get_adapter(request).get_login_redirect_url(request)
+        return HttpResponseRedirect(url)
 
 
 # Prescribers signup.
