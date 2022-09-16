@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.utils.safestring import mark_safe
 
 
@@ -64,3 +64,12 @@ class SiretConverter:
 
     def to_url(self, value):
         return f"{value}"
+
+
+def get_tally_form_url(form_id, **kwargs):
+    url = f"{settings.TALLY_URL}/r/{form_id}"
+
+    if kwargs:
+        url += "?" + urlencode(kwargs)
+
+    return mark_safe(url)

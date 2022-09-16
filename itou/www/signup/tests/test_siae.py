@@ -16,6 +16,7 @@ from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.urls import get_tally_form_url
 
 
 class SiaeSignupTest(TestCase):
@@ -235,7 +236,7 @@ class SiaeSignupTest(TestCase):
         url = reverse("signup:siae_select")
         response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
         self.assertContains(response, "https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support")
-        self.assertContains(response, f"{settings.TYPEFORM_URL}/to/RYfNLR79")
+        self.assertContains(response, get_tally_form_url("wA799W"))
         self.assertContains(response, reverse("signup:facilitator_search"))
 
     def test_siae_select_does_not_die_under_requests(self):

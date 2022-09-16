@@ -59,7 +59,7 @@ class SiaeModelTest(TestCase):
 
         siae = SiaeFactory(kind=SiaeKind.EI, department="57")
         url = siae.accept_survey_url
-        self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/nUjfDnrA?"))
+        self.assertTrue(url.startswith(f"{settings.TALLY_URL}/r/"))
         self.assertIn(f"id_siae={siae.pk}", url)
         self.assertIn("type_siae=Entreprise+d%27insertion", url)
         self.assertIn("region=Grand+Est", url)
@@ -67,7 +67,7 @@ class SiaeModelTest(TestCase):
 
         # Ensure that the URL does not break when there is no department.
         siae = SiaeFactory(kind=SiaeKind.AI, department="")
-        self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/nUjfDnrA?"))
+        self.assertTrue(url.startswith(f"{settings.TALLY_URL}/r/"))
         url = siae.accept_survey_url
         self.assertIn(f"id_siae={siae.pk}", url)
         self.assertIn("type_siae=Association+interm%C3%A9diaire", url)

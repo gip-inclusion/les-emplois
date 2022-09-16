@@ -1,5 +1,5 @@
 {% extends "layout/content_small.html" %}
-{% load bootstrap4 %}
+{% load bootstrap4 tally %}
 
 {% block title %}Employeur solidaire - Inscription{{ block.super }}{% endblock %}
 
@@ -42,7 +42,7 @@
 
             <p>
                 <strong>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</strong> :
-                Utilisez <a href="{{ TYPEFORM_URL }}/to/RYfNLR79" target="_blank" rel="noopener" title="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire</a>.
+                Utilisez <a href="{% tally_form_url "wA799W" %}" target="_blank" rel="noopener" title="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire</a>.
             </p>
 
             <p class="mb-0">

@@ -286,6 +286,24 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, "Valide du 21/06/2022 au 06/12/2022")
         self.assertContains(response, "Délivrance : le 21/06/2022")
 
+    def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self):
+        prescriber_org = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
+            kind=PrescriberOrganizationKind.OTHER,
+            with_pending_authorization=True,
+        )
+
+        prescriber = prescriber_org.members.first()
+        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(reverse("dashboard:index"))
+
+        self.assertContains(
+            response,
+            f"https://tally.so/r/wgDzz1?"
+            f"idprescriber={prescriber_org.pk}"
+            f"&iduser={prescriber.pk}"
+            f"&source={settings.ITOU_ENVIRONMENT}",
+        )
+
 
 class EditUserInfoViewTest(TestCase):
     def test_edit(self):
