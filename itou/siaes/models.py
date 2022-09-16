@@ -8,14 +8,14 @@ from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
-from django.utils.http import urlencode, urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_encode
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.siaes.enums import SIAE_WITH_CONVENTION_CHOICES, SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.urls import get_absolute_url
+from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
 
@@ -268,14 +268,13 @@ class Siae(AddressMixin, OrganizationAbstract):
         """
         Returns the typeform's satisfaction survey URL to be sent after a successful hiring.
         """
-        args = {
+        kwargs = {
             "id_siae": self.pk,
-            "region": self.region or "",
             "type_siae": self.get_kind_display(),
+            "region": self.region or "",
             "departement": self.department or "",
         }
-        qs = urlencode(args)
-        return f"{settings.TYPEFORM_URL}/to/nUjfDnrA?{qs}"
+        return get_tally_form_url("mY59xq", **kwargs)
 
     @property
     def display_name(self):

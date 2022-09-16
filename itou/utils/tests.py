@@ -61,7 +61,7 @@ from itou.utils.perms.context_processors import get_current_organization_and_per
 from itou.utils.perms.user import get_user_info
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
-from itou.utils.urls import get_absolute_url, get_external_link_markup, get_safe_url
+from itou.utils.urls import get_absolute_url, get_external_link_markup, get_safe_url, get_tally_form_url
 from itou.utils.validators import (
     alphanumeric,
     validate_af_number,
@@ -525,6 +525,17 @@ class UtilsTemplateTagsTestCase(TestCase):
             template.render(Context({"value": "Firstname Lastname", "predicate": False})),
             "F… L…",
         )
+
+    @override_settings(TALLY_URL="https://foobar")
+    def test_tally_url_custom_template_tag(self):
+        test_id = 1234
+        context = {
+            "test_id": test_id,
+        }
+        template = Template("{% load tally %}url:{% tally_form_url 'abcde' pk=test_id hard='coded'%}")
+        out = template.render(Context(context))
+
+        self.assertEqual(f"url:{get_tally_form_url('abcde', pk=test_id, hard='coded')}", out)
 
 
 class UtilsTemplateFiltersTestCase(TestCase):

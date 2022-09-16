@@ -1,5 +1,5 @@
 {% extends "layout/content.html" %}
-{% load static %}
+{% load static tally %}
 {% block title %}Tableau de bord{{ block.super }}{% endblock %}
 
 {% block messages %}
@@ -77,7 +77,7 @@
             {% if current_prescriber_organization.has_pending_authorization_proof %}
                 <p class="mb-0">
                     Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
-                    <a href="{{ TYPEFORM_URL }}/to/mk0GyI67#idprescriber={{ current_prescriber_organization.pk }}&iduser={{ user.pk }}&source={{ ITOU_ENVIRONMENT }}" rel="noopener" target="_blank" title="Cliquez ici pour l'envoyer (ouverture dans un nouvel onglet)">
+                    <a href="{% tally_form_url "wgDzz1" idprescriber=current_prescriber_organization.pk iduser=user.pk source=ITOU_ENVIRONMENT %}" rel="noopener" target="_blank" title="Cliquez ici pour l'envoyer (ouverture dans un nouvel onglet)">
                         cliquez ici pour l'envoyer
                         <i class="ri-external-link-line ri-lg"></i>
                     </a>

@@ -10,7 +10,7 @@ from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.utils.emails import get_email_message
-from itou.utils.urls import get_absolute_url
+from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
@@ -227,14 +227,13 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         """
         Returns the typeform's satisfaction survey URL to be sent after a successful hiring.
         """
-        args = {
+        kwargs = {
             "idorganisation": self.pk,
             "region": self.region or "",
-            "typeorga": self.get_kind_display(),
             "departement": self.department or "",
         }
-        qs = urlencode(args)
-        return f"{settings.TYPEFORM_URL}/to/EDHZSU7p?{qs}"
+
+        return get_tally_form_url("w2EoDp", **kwargs)
 
     def get_card_url(self):
         if not self.is_authorized:

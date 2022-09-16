@@ -91,18 +91,16 @@ class PrescriberOrganizationModelTest(TestCase):
 
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.PE, department="57")
         url = org.accept_survey_url
-        self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/EDHZSU7p?"))
+        self.assertTrue(url.startswith(f"{settings.TALLY_URL}/r/"))
         self.assertIn(f"idorganisation={org.pk}", url)
-        self.assertIn("typeorga=P%C3%B4le+emploi", url)
         self.assertIn("region=Grand+Est", url)
         self.assertIn("departement=57", url)
 
         # Ensure that the URL does not break when there is no department.
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI, department="")
         url = org.accept_survey_url
-        self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/EDHZSU7p?"))
+        self.assertTrue(url.startswith(f"{settings.TALLY_URL}/r/"))
         self.assertIn(f"idorganisation={org.pk}", url)
-        self.assertIn("typeorga=CAP+emploi", url)
         self.assertIn("region=", url)
         self.assertIn("departement=", url)
 
