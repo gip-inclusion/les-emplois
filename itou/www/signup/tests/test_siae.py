@@ -5,6 +5,7 @@ import httpx
 import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
+from django.contrib.messages import get_messages
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -16,7 +17,7 @@ from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oaut
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
 from itou.users.enums import KIND_SIAE_STAFF
-from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory
+from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -272,3 +273,27 @@ class SiaeSignupTest(TestCase):
         ):
             response = self.client.get(url, {"siren": "402191662"})
         self.assertEqual(response.status_code, 200)
+
+
+class SiaeSignupViewsExceptionsTest(TestCase):
+    def test_non_staff_cant_join_a_siae(self):
+        siae = SiaeFactory(kind=SiaeKind.ETTI)
+        self.assertEqual(0, siae.members.count())
+
+        user = PrescriberFactory(email=OIDC_USERINFO["email"])
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+
+        # Skip IC process and jump to joining the SIAE.
+        encoded_siae_id = siae.get_encoded_siae_id()
+        token = siae.get_token()
+        url = reverse("signup:siae_join", args=(encoded_siae_id, token))
+
+        response = self.client.get(url)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual("Vous ne pouvez pas rejoindre une SIAE avec ce compte.", str(messages[0]))
+        self.assertRedirects(response, reverse("home:hp"))
+
+        # Check `User` state.
+        self.assertFalse(siae.has_admin(user))
+        self.assertEqual(0, siae.members.count())
