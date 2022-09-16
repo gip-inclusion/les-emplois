@@ -241,6 +241,11 @@ def siae_user(request, encoded_siae_id, token, template_name="signup/siae_user.h
 
 @login_required
 def siae_join(request, encoded_siae_id, token):
+    if not request.user.is_siae_staff:
+        logger.error("A non staff user tried to join a SIAE")
+        messages.error(request, "Vous ne pouvez pas rejoindre une SIAE avec ce compte.")
+        return HttpResponseRedirect(reverse("home:hp"))
+
     # FIXME(alaurent) Move to commun ClassBaseViewMixin
     # Get siae from endoded_siae_id
     siae_id = int(urlsafe_base64_decode(encoded_siae_id))
