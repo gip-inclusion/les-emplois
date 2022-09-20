@@ -55,6 +55,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "drf_spectacular",
     "django_filters",
+    "django_htmx",
     "import_export",
     "hijack",
     "hijack.contrib.admin",
@@ -104,7 +105,7 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
-DJANGO_MIDDLEWARE = [
+DJANGO_MIDDLEWARES = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -115,12 +116,16 @@ DJANGO_MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
 ]
 
-ITOU_MIDDLEWARE = [
+THIRD_PARTY_MIDDLEWARES = [
+    "django_htmx.middleware.HtmxMiddleware",
+]
+
+ITOU_MIDDLEWARES = [
     "itou.utils.new_dns.middleware.NewDnsRedirectMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
 ]
 
-MIDDLEWARE = DJANGO_MIDDLEWARE + ITOU_MIDDLEWARE
+MIDDLEWARE = DJANGO_MIDDLEWARES + THIRD_PARTY_MIDDLEWARES + ITOU_MIDDLEWARES
 
 ROOT_URLCONF = "config.urls"
 
