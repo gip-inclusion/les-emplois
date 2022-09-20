@@ -113,7 +113,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # Middleware.
 # ------------------------------------------------------------------------------
 
-DJANGO_MIDDLEWARES = [
+DJANGO_MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -127,12 +127,12 @@ THIRD_PARTY_MIDDLEWARES = [
     "django_htmx.middleware.HtmxMiddleware",
 ]
 
-ITOU_MIDDLEWARES = [
+ITOU_MIDDLEWARE = [
     "itou.utils.new_dns.middleware.NewDnsRedirectMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
 ]
 
-MIDDLEWARE = DJANGO_MIDDLEWARES + THIRD_PARTY_MIDDLEWARES + ITOU_MIDDLEWARES
+MIDDLEWARE = DJANGO_MIDDLEWARE + THIRD_PARTY_MIDDLEWARES + ITOU_MIDDLEWARE
 
 # URLs.
 # ------------------------------------------------------------------------------
