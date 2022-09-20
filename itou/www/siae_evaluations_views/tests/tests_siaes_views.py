@@ -167,7 +167,7 @@ class SiaeJobApplicationListViewTest(TestCase):
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             ),
         )
-        self.assertContains(response, evaluated_administrative_criteria.administrative_criteria.name)
+        self.assertContains(response, evaluated_administrative_criteria.administrative_criteria.name, html=True)
         self.assertContains(
             response,
             reverse(
