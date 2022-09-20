@@ -42,9 +42,9 @@ boto3==1.24.32 \
     --hash=sha256:021f2a71cbcd75c87724b7dfbf28a691f07899345047f6bc999ef646d97461df \
     --hash=sha256:cb1f1d443672a65e23756cc712d060222e53e68d0700af60b4d904125d9186db
     # via -r requirements/base.in
-botocore==1.27.76 \
-    --hash=sha256:0d4a67801e5a4be4cd84795320ad9fb8c315ed1e7a63e1191b2b3f7a7171d43c \
-    --hash=sha256:b5c32922eba727a466f171dcc281f309d2a313e2f6dc592d43044caad96de338
+botocore==1.27.73 \
+    --hash=sha256:0b94d1e7b1435f8ff108c74a09fe03ec88aadbfafe97e940ea415dc86ba305a3 \
+    --hash=sha256:e281e45e84d2728207d63499a37cea1dc1dde6093167ab238370ece67f6e7316
     # via
     #   boto3
     #   s3transfer
@@ -181,7 +181,6 @@ django==4.0.7 \
     #   django-appconf
     #   django-bootstrap4
     #   django-filter
-    #   django-htmx
     #   django-import-export
     #   django-select2
     #   django-xworkflows
@@ -205,10 +204,6 @@ django-bootstrap4==22.1 \
 django-filter==22.1 \
     --hash=sha256:ed429e34760127e3520a67f415bec4c905d4649fbe45d0d6da37e6ff5e0287eb \
     --hash=sha256:ed473b76e84f7e83b2511bb2050c3efb36d135207d0128dfe3ae4b36e3594ba5
-    # via -r requirements/base.in
-django-htmx==1.12.2 \
-    --hash=sha256:93a356ec0a983a33cc11d927bfe4ab3eca847dc89786d6293e80bc12dc9da03c \
-    --hash=sha256:fe2d31eb8eeae1f531248c0b7cc441dc68b77158892514ed2fcf5f6119b89bd5
     # via -r requirements/base.in
 django-import-export==2.8.0 \
     --hash=sha256:31d7dcfba22251e3ef93accb7da844f58c4d78585db9dd7dae37bb76f939da2c \

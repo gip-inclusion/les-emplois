@@ -60,7 +60,6 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",  # Required for DRF TokenAuthentication.
     "drf_spectacular",
     "django_filters",
-    "django_htmx",
     "import_export",
 ]
 
@@ -123,16 +122,12 @@ DJANGO_MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-THIRD_PARTY_MIDDLEWARES = [
-    "django_htmx.middleware.HtmxMiddleware",
-]
-
 ITOU_MIDDLEWARE = [
     "itou.utils.new_dns.middleware.NewDnsRedirectMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
 ]
 
-MIDDLEWARE = DJANGO_MIDDLEWARE + THIRD_PARTY_MIDDLEWARES + ITOU_MIDDLEWARE
+MIDDLEWARE = DJANGO_MIDDLEWARE + ITOU_MIDDLEWARE
 
 # URLs.
 # ------------------------------------------------------------------------------
@@ -539,79 +534,30 @@ METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 # Metabase embedded dashboards
 METABASE_DASHBOARDS = {
     # Public stats.
-    "stats_public": {
-        "dashboard_id": 119,
-    },
+    "stats_public": {"dashboard_id": 119,},
     # Employer stats.
-    "stats_siae_etp": {
-        "dashboard_id": 128,
-        "tally_form_id": "nrjbRv",
-    },
-    "stats_siae_hiring": {
-        "dashboard_id": 185,
-        "tally_form_id": "waQPkB",
-    },
+    "stats_siae_etp": {"dashboard_id": 128, "tally_form_id": "nrjbRv",},
+    "stats_siae_hiring": {"dashboard_id": 185, "tally_form_id": "waQPkB",},
     # Prescriber stats.
-    "stats_cd": {
-        "dashboard_id": 118,
-        "tally_form_id": "wb5Nro",
-    },
-    "stats_pe_delay_main": {
-        "dashboard_id": 168,
-        "tally_form_id": "3lb9XW",
-    },
-    "stats_pe_delay_raw": {
-        "dashboard_id": 180,
-    },
-    "stats_pe_conversion_main": {
-        "dashboard_id": 169,
-        "tally_form_id": "mODeK8",
-    },
-    "stats_pe_conversion_raw": {
-        "dashboard_id": 182,
-    },
-    "stats_pe_state_main": {
-        "dashboard_id": 149,
-        "tally_form_id": "mRG61J",
-    },
-    "stats_pe_state_raw": {
-        "dashboard_id": 183,
-    },
-    "stats_pe_tension": {
-        "dashboard_id": 162,
-        "tally_form_id": "wobaYV",
-    },
+    "stats_cd": {"dashboard_id": 118, "tally_form_id": "wb5Nro",},
+    "stats_pe_delay_main": {"dashboard_id": 168, "tally_form_id": "3lb9XW",},
+    "stats_pe_delay_raw": {"dashboard_id": 180,},
+    "stats_pe_conversion_main": {"dashboard_id": 169, "tally_form_id": "mODeK8",},
+    "stats_pe_conversion_raw": {"dashboard_id": 182,},
+    "stats_pe_state_main": {"dashboard_id": 149, "tally_form_id": "mRG61J",},
+    "stats_pe_state_raw": {"dashboard_id": 183,},
+    "stats_pe_tension": {"dashboard_id": 162, "tally_form_id": "wobaYV",},
     # Institution stats - DDETS - department level.
-    "stats_ddets_iae": {
-        "dashboard_id": 117,
-        "tally_form_id": "nPdWLb",
-    },
-    "stats_ddets_diagnosis_control": {
-        "dashboard_id": 144,
-    },
-    "stats_ddets_hiring": {
-        "dashboard_id": 160,
-        "tally_form_id": "mVLBXv",
-    },
+    "stats_ddets_iae": {"dashboard_id": 117, "tally_form_id": "nPdWLb",},
+    "stats_ddets_diagnosis_control": {"dashboard_id": 144,},
+    "stats_ddets_hiring": {"dashboard_id": 160, "tally_form_id": "mVLBXv",},
     # Institution stats - DREETS - region level.
-    "stats_dreets_iae": {
-        "dashboard_id": 117,
-        "tally_form_id": "nPdWLb",
-    },
-    "stats_dreets_hiring": {
-        "dashboard_id": 160,
-        "tally_form_id": "mVLBXv",
-    },
+    "stats_dreets_iae": {"dashboard_id": 117, "tally_form_id": "nPdWLb",},
+    "stats_dreets_hiring": {"dashboard_id": 160, "tally_form_id": "mVLBXv",},
     # Institution stats - DGEFP - nation level.
-    "stats_dgefp_iae": {
-        "dashboard_id": 117,
-    },
-    "stats_dgefp_diagnosis_control": {
-        "dashboard_id": 144,
-    },
-    "stats_dgefp_af": {
-        "dashboard_id": 142,
-    },
+    "stats_dgefp_iae": {"dashboard_id": 117,},
+    "stats_dgefp_diagnosis_control": {"dashboard_id": 144,},
+    "stats_dgefp_af": {"dashboard_id": 142,},
 }
 
 

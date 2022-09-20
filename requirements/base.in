@@ -44,9 +44,6 @@ django-select2==7.10.0  # https://github.com/codingjoe/django-select2
 # Render Markdown in HTML
 markdown==3.4.1  # https://github.com/Python-Markdown/markdown
 
-# Easy JS
-django-htmx==1.12.2
-
 # Data management
 # ------------------------------------------------------------------------------
 
