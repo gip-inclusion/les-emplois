@@ -90,19 +90,6 @@
                                         Gérer la candidature
                                     </a>
                                 </div>
-                                {% if job_application.can_display_approval %}
-                                    <div class="col-sm-3">
-                                        <a
-                                            class="btn btn-outline-primary matomo-event"
-                                            data-matomo-action="telechargement-pdf"
-                                            data-matomo-category="agrement"
-                                            data-matomo-option="liste-candidatures"
-                                            href="{% url 'approvals:display_printable_approval' job_application_id=job_application.id %}"
-                                            target="_blank">
-                                            Afficher le PASS IAE
-                                        </a>
-                                    </div>
-                                {% endif %}
                             </div>
                         </div>
 
