@@ -61,6 +61,7 @@ jobs:
     - name: 🚧 Check pending migrations
       run: django-admin makemigrations --check --dry-run --noinput
     - name: 🤹‍ Django tests
-      run: django-admin test --noinput --failfast --parallel
+      run: make test
       env:
         DJANGO_DEBUG: True
+        USE_VENV: 1

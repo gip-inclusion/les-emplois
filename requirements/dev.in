@@ -39,6 +39,7 @@ requests-mock==1.9.3  # https://github.com/jamielennox/requests-mock
 respx==0.19.2  # https://lundberg.github.io/respx/
 pytest==7.1.2  # https://github.com/pytest-dev/pytest
 pytest-django== 4.5.2 # https://github.com/pytest-dev/pytest-django/
+pytest-xdist  # https://pypi.org/project/pytest-xdist/
 
 # Data extracts
 # ------------------------------------------------------------------------------

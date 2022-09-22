@@ -112,19 +112,13 @@ graph_models_itou:
 # Tests.
 # =============================================================================
 
-.PHONY: test test-interactive coverage
+.PHONY: coverage test
 
-TEST_OPTS += --force-color --timing --no-input
-
-test:
-	$(EXEC_CMD) ./manage.py test --settings=config.settings.test $(TEST_OPTS) --parallel $(TARGET)
-
-# Lets you add a debugger.
-test-interactive:
-	$(EXEC_CMD) ./manage.py test --settings=config.settings.test $(TEST_OPTS) --keepdb $(TARGET)
+test: $(VIRTUAL_ENV)
+	$(EXEC_CMD) pytest $(TARGET)
 
 coverage:
-	$(EXEC_CMD) coverage run ./manage.py test itou --settings=config.settings.test --no-input
+	$(EXEC_CMD) coverage run -m pytest
 	$(EXEC_CMD) coverage html
 
 # Docker shell.

@@ -2,8 +2,10 @@ import datetime
 import importlib
 import os
 import shutil
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from django.conf import settings
 from django.core import mail
@@ -42,7 +44,6 @@ def lazy_import_siae_command():
 )
 class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
-    path_dest = "./siaes/management/commands/data"
     path_source = "./siaes/fixtures"
     app_dir_path = Path((settings.APPS_DIR))
     mod = None
@@ -52,17 +53,22 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         """We need to setup fake files before loading any `import_siae` related script,
         since it does rely on dynamic file loading upon startup (!)
         """
-        # copying datasets from fixtures dir
+        path_dest = tempfile.mkdtemp()
+        cls.addClassCleanup(shutil.rmtree, path_dest)
+        data_dir = Path(path_dest) / "data"
+        data_dir.mkdir()
+        data_dir_mock = mock.patch("itou.siaes.management.commands._import_siae.utils.CURRENT_DIR", data_dir)
+        data_dir_mock.start()
+        cls.addClassCleanup(data_dir_mock.stop)
+
         files = [x for x in cls.app_dir_path.joinpath(cls.path_source).glob("fluxIAE_*.csv.gz") if x.is_file()]
-        cls.app_dir_path.joinpath(cls.path_dest).mkdir(parents=True, exist_ok=True)
         for file in files:
-            shutil.copy(file, cls.app_dir_path.joinpath(cls.path_dest))
+            shutil.copy(file, data_dir)
 
         cls.mod = importlib.import_module("itou.siaes.management.commands._import_siae.convention")
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(cls.app_dir_path.joinpath(cls.path_dest))
         cls.mod = None
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
