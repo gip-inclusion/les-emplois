@@ -41,7 +41,7 @@ le développement. Elle peut être exécutée régulièrement pour s’assurer q
 dépendances sont bien à jour.
 
 ```bash
-$ make .venv
+$ make venv
 ```
 
 La variable d’environnement `DJANGO_SECRET_KEY` doit avoir une valeur. Par

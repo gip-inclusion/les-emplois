@@ -16,7 +16,7 @@ else
 	EXEC_CMD := docker exec -ti itou_django
 endif
 
-.PHONY: run clean cdsitepackages quality fix pylint compile-deps
+.PHONY: run venv clean cdsitepackages quality fix pylint compile-deps
 
 # Run Docker images
 run:
@@ -27,6 +27,8 @@ $(VIRTUAL_ENV): requirements/dev.txt
 	$@/bin/pip install -r $^
 	$@/bin/pip-sync $^
 	touch $@
+
+venv: $(VIRTUAL_ENV)
 
 PIP_COMPILE_FLAGS := --upgrade --allow-unsafe --generate-hashes
 compile-deps: $(VIRTUAL_ENV)
