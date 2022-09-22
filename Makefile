@@ -44,13 +44,13 @@ cdsitepackages:
 quality: $(VIRTUAL_ENV)
 	black --check config itou
 	isort --check config itou
-	djhtml --check $(shell find itou/templates -name "*.html")
-	flake8 config itou --count --show-source --statistics
+	flake8 --count --show-source --statistics config itou
+	djlint --lint itou
 
 fix: $(VIRTUAL_ENV)
 	black config itou
 	isort config itou
-	djhtml --in-place $(shell find itou/templates -name "*.html")
+	djlint --reformat itou
 
 pylint: $(VIRTUAL_ENV)
 	pylint config itou

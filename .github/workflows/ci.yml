@@ -51,7 +51,7 @@ jobs:
         echo ".venv/bin" >> $GITHUB_PATH
       env:
         CPUCOUNT: 1
-    - name: ✨ Black, isort, flake8 & djhtml
+    - name: ✨ Black, isort, flake8 & djlint
       run: make quality
     - name: 🚧 Check pending migrations
       run: django-admin makemigrations --check --dry-run --noinput

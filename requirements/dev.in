@@ -22,7 +22,7 @@ pylint==2.14.5  # https://github.com/PyCQA/pylint
 pylint-django==2.5.3  # https://github.com/PyCQA/pylint-django
 pre-commit==2.20.0  # https://github.com/pre-commit/pre-commit
 coverage==6.4.2  # https://github.com/nedbat/coveragepy
-djhtml==1.5.1  # https://github.com/rtts/djhtml
+djlint==1.17.2  # https://www.djlint.com
 
 # Django
 # ------------------------------------------------------------------------------

@@ -30,13 +30,5 @@
         }
     },
     "isort.args":["--profile", "black"],
-    "emeraldwalk.runonsave": {
-        "commands": [
-            {
-                "match": "\\.html$",
-                "cmd": "djhtml --in-place ${file}"
-            }
-        ]
-    },
     "explorer.confirmDragAndDrop": false
 }
