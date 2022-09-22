@@ -34,6 +34,7 @@ from itou.siaes.factories import (
 from itou.users.enums import IdentityProvider
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
+from itou.utils.templatetags.format_filters import format_approval_number
 from itou.www.dashboard.forms import EditUserEmailForm
 
 
@@ -281,7 +282,7 @@ class DashboardViewTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertContains(response, "PASS IAE (agrément) disponible :")
-        self.assertContains(response, approval.number_with_spaces)
+        self.assertContains(response, format_approval_number(approval))
         self.assertContains(response, "Valide du 21/06/2022 au 06/12/2022")
         self.assertContains(response, "Délivrance : le 21/06/2022")
 
