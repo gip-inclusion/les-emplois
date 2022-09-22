@@ -1,0 +1,19 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <h3 class="modal-title" id="dialogLabel">Confirmation de l’embauche</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+            <i class="ri-close-line"></i>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>Êtes-vous sûre de vouloir confirmer l’embauche de <strong>{{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }}</strong> dans la structure suivante ?</p>
+        <p>
+            {% include "siaes/includes/_siae_info.html" with siae=job_application.to_siae %}
+        </p>
+    </div>
+    <div class="modal-footer">
+        {% comment %} TODO: change these buttons as they require a form. {% endcomment %}
+        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Retour</button>
+        <button type="submit" class="btn btn-primary" hx-post={{ request.path }} hx-vals='{"confirmed": "True"}' hx-target="#main" hx-include="#acceptForm">Confirmer</button>
+    </div>
+</div>

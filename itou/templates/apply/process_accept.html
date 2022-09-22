@@ -11,7 +11,7 @@
         </p>
     </div>
 
-    <form method="post" action="" class="mt-5" id="acceptForm">
+    <form method="post" action="" hx-post="{{ request.path }}" class="mt-5" id="acceptForm" hx-target="#dialog" tabindex="-1" aria-labelledby="dialogLabel" aria-hidden="true">
 
         {% csrf_token %}
 
@@ -51,7 +51,7 @@
                     Dans le cadre de cette embauche, souhaitez-vous obtenir un PASS IAE ?
                 </p>
                 <div class="form-group">
-                    <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#confirmModal">
+                    <button type="submit" class="btn btn-success btn-block">
                         Oui, j'ai besoin d'une aide au poste
                     </button>
                 </div>
@@ -63,7 +63,7 @@
                 </div>
                 <hr class="my-4">
             {% else %}
-                <button type="button" class="btn btn-success btn-block mt-5 mb-3" data-toggle="modal" data-target="#confirmModal">
+                <button type="submit" class="btn btn-success btn-block mt-5 mb-3">
                     Je l'embauche
                 </button>
             {% endif %}
@@ -71,28 +71,6 @@
             <a class="btn btn-outline-secondary btn-block"
                 href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
         {% endbuttons %}
-        <div class="modal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title" id="confirmModalLabel">Confirmation de l’embauche</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                            <i class="ri-close-line"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Êtes-vous sûre de vouloir confirmer l’embauche de <strong>{{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }}</strong> dans la structure suivante ?</p>
-                        <p>
-                            {% include "siaes/includes/_siae_info.html" with siae=job_application.to_siae %}
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Retour</button>
-                        <button type="submit" class="btn btn-primary">Confirmer</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </form>
 
 {% endblock %}
@@ -104,17 +82,4 @@
     {% if form_pe_status %}
         {{ form_pe_status.media }}
     {% endif %}
-    <script>
-        $(function () {
-            $("#acceptForm").on("submit", function (e) {
-                let modal = $("#confirmModal");
-                if (modal.is(":visible")) {
-                    return true;
-                }
-                modal.modal("show");
-                e.preventDefault();
-                return false;
-            });
-        })
-    </script>
 {% endblock %}
