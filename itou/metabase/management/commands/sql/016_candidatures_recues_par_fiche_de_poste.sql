@@ -38,7 +38,8 @@ select
     fdp.id as id_fdp,
     fdp.nom_rome as nom_rome_fdp,
     fdp.id_employeur,
-    fdp.siret_employeur
+    fdp.siret_employeur,
+    c.injection_ai
 from 
     candidatures c 
 left join
