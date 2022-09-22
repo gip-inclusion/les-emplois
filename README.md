@@ -34,6 +34,13 @@ environnement de développement.
 environnement et par nature « sensible ». Ces variables n'ont donc pas de valeur
 par défaut viable et doivent donc être configurées par vos soins.
 
+### Psycopg
+
+L’adaptateur Python pour le système de gestion de bases de données PostgreSQL,
+[psycopg](https://www.psycopg.org/), a quelques pré-requis auxquels votre
+système doit répondre.
+https://www.psycopg.org/docs/install.html#build-prerequisites
+
 ### Développement dans un Virtualenv
 
 La commande make suivante crée un virtualenv et installe les dépendances pour
