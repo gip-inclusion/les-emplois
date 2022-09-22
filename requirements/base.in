@@ -83,6 +83,8 @@ pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
 
 # Our S3 provider does not provide a UI to manage the S3 bucket. Use this CLI instead.
 boto3==1.24.32  # https://github.com/boto/boto3
+# boto3 does require botocore which gets compiled in our dependencies. Bump it when bumping boto3.
+botocore==1.27.78
 
 # API
 # ------------------------------------------------------------------------------

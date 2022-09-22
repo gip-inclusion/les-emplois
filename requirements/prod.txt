@@ -42,10 +42,11 @@ boto3==1.24.32 \
     --hash=sha256:021f2a71cbcd75c87724b7dfbf28a691f07899345047f6bc999ef646d97461df \
     --hash=sha256:cb1f1d443672a65e23756cc712d060222e53e68d0700af60b4d904125d9186db
     # via -r requirements/././base.in
-botocore==1.27.73 \
-    --hash=sha256:0b94d1e7b1435f8ff108c74a09fe03ec88aadbfafe97e940ea415dc86ba305a3 \
-    --hash=sha256:e281e45e84d2728207d63499a37cea1dc1dde6093167ab238370ece67f6e7316
+botocore==1.27.78 \
+    --hash=sha256:b45ae0680699ce100386ac1478e03fd3f29ef22d6bfb5a19169ffee6e67c5293 \
+    --hash=sha256:fc2ffdafce66c051c69ae6ac50599d6da11e84371c704ae9b7cf9e2742a4dc77
     # via
+    #   -r requirements/././base.in
     #   boto3
     #   s3transfer
 certifi==2022.9.14 \
