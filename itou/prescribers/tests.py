@@ -594,20 +594,20 @@ class UpdateRefusedPrescriberOrganizationKindManagementCommandsTest(TestCase):
         )
 
         # Controls before execution
-        self.assertEquals(len(PrescriberAuthorizationStatus) + 2, PrescriberOrganization.objects.all().count())
-        self.assertEquals(
+        self.assertEqual(len(PrescriberAuthorizationStatus) + 2, PrescriberOrganization.objects.all().count())
+        self.assertEqual(
             3,
             PrescriberOrganization.objects.filter(authorization_status=PrescriberAuthorizationStatus.REFUSED).count(),
         )
-        self.assertEquals(0, PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count())
+        self.assertEqual(0, PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count())
 
         # Update refused prescriber organizations without duplicated siret
         call_command("update_refused_prescriber_organizations_kind")
 
         # Controls after execution
-        self.assertEquals(len(PrescriberAuthorizationStatus) + 2, PrescriberOrganization.objects.all().count())
-        self.assertEquals(
+        self.assertEqual(len(PrescriberAuthorizationStatus) + 2, PrescriberOrganization.objects.all().count())
+        self.assertEqual(
             3,
             PrescriberOrganization.objects.filter(authorization_status=PrescriberAuthorizationStatus.REFUSED).count(),
         )
-        self.assertEquals(1, PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count())
+        self.assertEqual(1, PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count())

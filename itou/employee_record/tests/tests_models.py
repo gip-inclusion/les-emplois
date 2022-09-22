@@ -484,8 +484,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         )
         employee_record_code_3436.update_as_processed_as_duplicate()
         self.assertTrue(employee_record_code_3436.processed_as_duplicate)
-        self.assertEquals(Status.PROCESSED, employee_record_code_3436.status)
-        self.assertEquals("Statut forcé suite à doublon ASP", employee_record_code_3436.asp_processing_label)
+        self.assertEqual(Status.PROCESSED, employee_record_code_3436.status)
+        self.assertEqual("Statut forcé suite à doublon ASP", employee_record_code_3436.asp_processing_label)
         self.assertIsNone(employee_record_code_3436.archived_json)
 
         with self.assertRaises(InvalidStatusError):

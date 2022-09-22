@@ -59,7 +59,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         user = siae.members.first()
 
         form = AdministrativeCriteriaForm(user, siae)
-        self.assertEquals(AdministrativeCriteria.objects.all().count(), len(form.fields))
+        self.assertEqual(AdministrativeCriteria.objects.all().count(), len(form.fields))
 
     def test_error_criteria_number_for_siae(self):
         """
