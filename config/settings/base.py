@@ -61,6 +61,8 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "django_filters",
     "import_export",
+    "hijack",
+    "hijack.contrib.admin",
 ]
 
 
@@ -120,6 +122,7 @@ DJANGO_MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "hijack.middleware.HijackUserMiddleware",
 ]
 
 ITOU_MIDDLEWARE = [
@@ -793,3 +796,6 @@ EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 9, 27, tzinf
 # This is disabled by default, overidden in prod settings, and can be set
 # via local dev settings or env vars for a temporary environment.
 EMPLOYEE_RECORD_TRANSFER_ENABLED = bool(os.environ.get("EMPLOYEE_RECORD_TRANSFER_ENABLED", False))
+
+HIJACK_PERMISSION_CHECK = "itou.utils.perms.user.has_hijack_perm"
+HIJACK_ALLOWED_USER_EMAILS = [s.lower() for s in os.getenv("HIJACK_ALLOWED_USER_EMAILS", "").split(",") if s]

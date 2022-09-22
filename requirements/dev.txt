@@ -295,6 +295,7 @@ django==4.1.1 \
     #   django-debug-toolbar
     #   django-extensions
     #   django-filter
+    #   django-hijack
     #   django-import-export
     #   django-select2
     #   django-xworkflows
@@ -330,6 +331,10 @@ django-extensions==3.2.1 \
 django-filter==22.1 \
     --hash=sha256:ed429e34760127e3520a67f415bec4c905d4649fbe45d0d6da37e6ff5e0287eb \
     --hash=sha256:ed473b76e84f7e83b2511bb2050c3efb36d135207d0128dfe3ae4b36e3594ba5
+    # via -r requirements/base.in
+django-hijack==3.2.1 \
+    --hash=sha256:8df524fd085a43205a6bb497c53fd94483824b4f3179762fc1c31c1dea58d1ca \
+    --hash=sha256:b0723750b247e5b1f69f600a40b1d512404061f33918e0bffb4aa928314ea1db
     # via -r requirements/base.in
 django-import-export==2.8.0 \
     --hash=sha256:31d7dcfba22251e3ef93accb7da844f58c4d78585db9dd7dae37bb76f939da2c \

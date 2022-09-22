@@ -13,6 +13,7 @@ register_converter(SiretConverter, "siret")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("hijack/", include("hijack.urls")),
     # --------------------------------------------------------------------------------------
     # allauth URLs. Order is important because some URLs are overriden.
     # --------------------------------------------------------------------------------------

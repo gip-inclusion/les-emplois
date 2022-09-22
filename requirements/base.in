@@ -95,3 +95,6 @@ pyyaml==6.0  # https://github.com/yaml/pyyaml
 
 # For automatic export/import of models in the admin
 django-import-export==2.8.0
+
+# To impersonate users from the admin
+django-hijack==3.2.1  # https://github.com/django-hijack/django-hijack
