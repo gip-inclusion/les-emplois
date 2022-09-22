@@ -291,8 +291,10 @@ class ApplyAsJobSeekerTest(TestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
-        # 2 links: 1 in header + 1 in the page content
-        self.assertContains(response, reverse("dashboard:edit_user_info"), count=2)
+        # 1 in desktop header
+        # + 1 in mobile header
+        # + 1 in the page content
+        self.assertContains(response, reverse("dashboard:edit_user_info"), count=3)
 
     def test_apply_as_job_seeker_temporary_nir(self):
         """
