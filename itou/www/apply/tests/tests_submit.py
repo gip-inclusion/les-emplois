@@ -1713,6 +1713,24 @@ class ApplicationViewTest(TestCase):
             [jd.pk for jd in siae.job_description_through.all()],
         )
 
+    def test_application_resume_hidden_fields(self):
+        siae = SiaeFactory(with_membership=True, with_jobs=True)
+
+        self.client.login(username=siae.members.first().email, password=DEFAULT_PASSWORD)
+        apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
+        apply_session.init(
+            {
+                "job_seeker_pk": JobSeekerFactory(),
+                "selected_jobs": siae.job_description_through.all(),
+            }
+        )
+        apply_session.save()
+
+        response = self.client.get(reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="selected_jobs"')
+        self.assertContains(response, 'name="resume_link"')
+
     def test_application_eligibility_is_bypassed_for_siae_not_subject_to_eligibility_rules(self):
         siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)
 

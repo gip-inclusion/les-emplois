@@ -65,6 +65,7 @@
 {% endblock %}
 
 {% block form_content %}
+    {{ form.selected_jobs.as_hidden }}
     <div class="d-flex flex-column flex-lg-row">
         <div class="col-12 col-lg-7 pl-0">
             {% bootstrap_field form.message %}
