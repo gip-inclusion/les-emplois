@@ -18,6 +18,7 @@ from freezegun import freeze_time
 
 from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
+from itou.approvals.enums import ApprovalStatus
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
@@ -484,6 +485,47 @@ class ApprovalModelTest(TestCase):
         approval.unsuspend(hiring_start_at=today)
         with self.assertRaises(ObjectDoesNotExist):
             suspension.refresh_from_db()
+
+    def test_state(self):
+        now = timezone.localdate()
+
+        expired_approval = ApprovalFactory(
+            start_at=now - relativedelta(years=3),
+            end_at=now - relativedelta(years=1),
+        )
+        future_approval = ApprovalFactory(
+            start_at=now + relativedelta(days=1),
+        )
+        valid_approval = ApprovalFactory(
+            start_at=now - relativedelta(years=1),
+        )
+        suspended_approval = ApprovalFactory(
+            start_at=now - relativedelta(years=1),
+        )
+        SuspensionFactory(
+            approval=suspended_approval,
+            start_at=now - relativedelta(days=1),
+            end_at=now + relativedelta(days=1),
+        )
+
+        self.assertQuerysetEqual(Approval.objects.invalid(), [expired_approval])
+        self.assertEqual(expired_approval.state, ApprovalStatus.EXPIRED)
+        self.assertEqual(expired_approval.get_state_display(), "Expiré")
+
+        self.assertQuerysetEqual(Approval.objects.starts_in_the_future(), [future_approval])
+        self.assertEqual(future_approval.state, ApprovalStatus.FUTURE)
+        self.assertEqual(future_approval.get_state_display(), "Valide (non démarré)")
+
+        self.assertQuerysetEqual(
+            Approval.objects.valid().starts_in_the_past(), [valid_approval, suspended_approval], ordered=False
+        )
+        self.assertEqual(valid_approval.state, ApprovalStatus.VALID)
+        self.assertEqual(valid_approval.get_state_display(), "Valide")
+
+        suspended_approval.refresh_from_db()
+        self.assertEqual(suspended_approval.is_suspended, True)
+        self.assertEqual(suspended_approval.state, ApprovalStatus.SUSPENDED)
+        self.assertEqual(suspended_approval.get_state_display(), "Valide (suspendu)")
 
 
 class PoleEmploiApprovalModelTest(TestCase):

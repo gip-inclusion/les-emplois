@@ -22,6 +22,8 @@ from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiC
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric, validate_siret
 
+from . import enums
+
 
 logger = logging.getLogger(__name__)
 
@@ -258,6 +260,19 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 )
             )
         super().clean()
+
+    @property
+    def state(self):
+        if not self.is_valid():
+            return enums.ApprovalStatus.EXPIRED
+        if self.is_suspended:
+            return enums.ApprovalStatus.SUSPENDED
+        if self.is_in_progress:
+            return enums.ApprovalStatus.VALID
+        return enums.ApprovalStatus.FUTURE
+
+    def get_state_display(self):
+        return self.state.label
 
     @property
     def number_with_spaces(self):
