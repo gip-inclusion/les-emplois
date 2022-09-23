@@ -159,11 +159,12 @@
         </script>
 
         {% block script %}
-            <script src="{% static "vendor/htmx/htmx.min.js" %}" defer></script>
+            <script src="{% static "vendor/htmx/htmx.min.js" %}"></script>
             {% if debug %}
-                <script src="{% static "vendor/htmx/ext/debug.js" %}" defer></script>
-                <script src="{% static "vendor/htmx/ext/event-header.js" %}" defer></script>
+                <script src="{% static "vendor/htmx/ext/debug.js" %}"></script>
+                <script src="{% static "vendor/htmx/ext/event-header.js" %}"></script>
             {% endif%}
+            <script src="{% static "js/htmx_handlers.js" %}"></script>
             <script src="{% static "js/logout.js" %}"></script>
             <script src="{% static "js/city_autocomplete_field.js" %}"></script>
             <script src="{% static "js/commune_autocomplete_field.js" %}"></script>
@@ -225,6 +226,8 @@
                 <i class="ri-external-link-line ml-1"></i>
             </div>
         {% endif %}
+
+        {% include "layout/_base_modal.html" %}
 
     </body>
 </html>
