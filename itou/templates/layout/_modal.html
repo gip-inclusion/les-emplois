@@ -1,0 +1,40 @@
+{% extends "layout/modal.html" %}
+
+{% if id %}
+    {% block id %}{{ id }}{% endblock %}
+{% endif %}
+{% if size %}
+    {% block size %}{{ size }}{% endblock %}
+{% endif %}
+{% if title %}
+    {% block title %}{{ title }}{% endblock %}
+{% endif %}
+{% if body_id %}
+    {% block body_id %}{{ body_id }}{% endblock %}
+{% endif %}
+{% if body %}
+    {% block body %}{{ body|safe }}{% endblock %}
+{% endif %}
+{% if cancel_btn_tag %}
+    {% block cancel_btn_tag %}{{ cancel_btn_tag|safe }}{% endblock %}
+{% endif %}
+{% if cancel_btn %}
+    {% block cancel_btn %}{{ cancel_btn }}{% endblock %}
+{% endif %}
+{% if submit_btn_tag %}
+    {% block submit_btn_tag %}{{ submit_btn_tag|safe }}{% endblock %}
+{% endif %}
+{% if submit_btn_classes %}
+    {% block submit_btn_classes %}{{ submit_btn_classes }}{% endblock %}
+{% endif %}
+{% if submit_btn_hx_post %}
+    {% block submit_btn_hx_post %}{{ submit_btn_hx_post }}{% endblock %}
+{% endif %}
+{% if submit_btn_hx_target %}
+    {% block submit_btn_hx_target %}
+        {{ submit_btn_hx_target }}
+    {% endblock submit_btn_hx_target %}
+{% endif %}
+{% if submit_btn %}
+    {% block submit_btn %}{{ submit_btn }}{% endblock %}
+{% endif %}
