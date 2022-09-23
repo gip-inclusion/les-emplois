@@ -1,0 +1,8 @@
+{% load bootstrap4 %}
+
+<div class="pt-3 w-100 border-bottom">
+    <button class="p-0 btn collapse-caret" data-toggle="collapse" data-target="#collapse_filter_jobseeker" type="button" aria-expanded="true" aria-controls="collapse_filter_jobseeker">
+        <span class="h5 mb-1">Nom du salarié</span>
+    </button>
+</div>
+<div class="collapse show p-1" id="collapse_filter_jobseeker">{% bootstrap_field filters_form.users %}</div>

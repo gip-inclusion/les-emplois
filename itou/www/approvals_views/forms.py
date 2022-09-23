@@ -1,12 +1,75 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django_select2.forms import Select2MultipleWidget
 
-from itou.approvals.models import Prolongation, Suspension
+from itou.approvals.models import Approval, Prolongation, Suspension
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
+
+
+class ApprovalForm(forms.Form):
+    users = forms.MultipleChoiceField(required=False, label="Nom", widget=Select2MultipleWidget)
+    status_valid = forms.BooleanField(label="PASS IAE valide", required=False)
+    status_suspended = forms.BooleanField(label="PASS IAE valide (suspendu)", required=False)
+    status_future = forms.BooleanField(label="PASS IAE valide (non démarré)", required=False)
+    status_expired = forms.BooleanField(label="PASS IAE expiré", required=False)
+
+    def __init__(self, siae_pk, *args, **kwargs):
+        self.siae_pk = siae_pk
+        super().__init__(*args, **kwargs)
+        self.fields["users"].choices = self._get_choices_for_job_seekers()
+
+    def _get_approvals_qs_filter(self):
+        return Exists(
+            JobApplication.objects.filter(
+                approval=OuterRef("pk"), to_siae_id=self.siae_pk, state=JobApplicationWorkflow.STATE_ACCEPTED
+            )
+        )
+
+    def _get_choices_for_job_seekers(self):
+        # TODO(alaurent) : An Employee model linked to the siae, Approval and JobSeeker would make things easier here
+        approvals_qs = Approval.objects.filter(self._get_approvals_qs_filter())
+        users_qs = User.objects.filter(is_job_seeker=True, approvals__in=approvals_qs)
+        return [
+            (user.pk, user.get_full_name().title())
+            for user in users_qs.order_by("first_name", "last_name")
+            if user.get_full_name()
+        ]
+
+    def get_filters_counter(self):
+        return len(self.data)
+
+    def get_qs_filters(self):
+        # TODO(alaurent) : An Employee model linked to the siae, Approval and JobSeeker would make things easier here
+        qs_filters_list = [self._get_approvals_qs_filter()]
+        data = self.cleaned_data
+
+        if users := data.get("users"):
+            qs_filters_list.append(Q(user_id__in=users))
+
+        status_filters_list = []
+        now = timezone.localdate()
+        suspended_qs_filter = Q(suspension__start_at__lte=now, suspension__end_at__gte=now)
+        if data.get("status_valid"):
+            status_filters_list.append(Q(start_at__lte=now, end_at__gte=now) & ~suspended_qs_filter)
+        if data.get("status_suspended"):
+            status_filters_list.append(suspended_qs_filter)
+        if data.get("status_future"):
+            status_filters_list.append(Q(start_at__gt=now))
+        if data.get("status_expired"):
+            status_filters_list.append(Q(end_at__lt=now))
+        if status_filters_list:
+            status_filters = Q()
+            for status_filter in status_filters_list:
+                status_filters |= status_filter
+            qs_filters_list.append(status_filters)
+
+        return qs_filters_list
 
 
 class DeclareProlongationForm(forms.ModelForm):
