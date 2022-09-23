@@ -1,21 +1,28 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.pagination import ItouPaginator
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import UserExistsForm
-from itou.www.approvals_views.forms import DeclareProlongationForm, PoleEmploiApprovalSearchForm, SuspensionForm
+from itou.www.approvals_views.forms import (
+    ApprovalForm,
+    DeclareProlongationForm,
+    PoleEmploiApprovalSearchForm,
+    SuspensionForm,
+)
 
 
 class ApprovalBaseViewMixin:
@@ -53,6 +60,8 @@ class ApprovalDetailView(ApprovalBaseViewMixin, LoginRequiredMixin, DetailView):
     queryset = Approval.objects.select_related("user")
     template_name = "approvals/detail.html"
 
+    # FIXME(alaurent) : a user with 2 accepted job applications in self.siae with the same Approval should only be
+    # there once but if he has 2 Approvals with an accepted job application on self.siae, we should see him twice.
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         context_data["approval_can_be_suspended_by_siae"] = self.object.can_be_suspended_by_siae(self.siae)
@@ -70,6 +79,32 @@ class ApprovalDetailView(ApprovalBaseViewMixin, LoginRequiredMixin, DetailView):
             .select_related("sender")
             .prefetch_related("selected_jobs")
         )
+        return context_data
+
+
+class ApprovalListView(ApprovalBaseViewMixin, LoginRequiredMixin, ListView):
+    template_name = "approvals/list.html"
+    paginate_by = 10
+    paginator_class = ItouPaginator
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.form = ApprovalForm(self.siae.pk, self.request.GET or None)
+
+    def get_queryset(self):
+        form_filters = []
+        if self.form.is_valid():
+            form_filters = self.form.get_qs_filters()
+        return super().get_queryset().filter(*form_filters).distinct()
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data["filters_form"] = self.form
+        context_data["filters_counter"] = self.form.get_filters_counter()
         return context_data
 
 

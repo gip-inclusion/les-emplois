@@ -1,0 +1,51 @@
+{% load format_filters %}
+
+<div class="card my-5">
+
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-7">
+                <h3 class="h2 mb-1">{{ approval.user.get_full_name|title }}</h3>
+                <p class="small">Pass N° {{ approval|format_approval_number }}</p>
+            </div>
+
+            {# Statuses #}
+            <div class="col-md-5 text-right">
+                {# FIXME(alaurent) nonrmal au lieu de bold #}
+                <p class="small">
+                    <span class="badge badge-pill
+                        {% if approval.status == 'EXPIRED' %}
+                            badge-dark
+                        {% else %}
+                            badge-success
+                        {% endif %}
+                    ">
+                        <i class=
+                            {% if approval.status == 'EXPIRED' %}
+                                "ri-forbid-2-line"
+                            {% elif approval.status == 'SUSPENDED' %}
+                                "ri-error-warning-line"
+                            {% else %}
+                                "ri-checkbox-circle-line"
+                            {% endif %}
+                        ></i>
+                        {# FIXME(alaurent) Trop petit non ? #}
+                        &nbsp;PASS IAE {{ approval.get_state_display }}
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="text-right">
+            <a
+                class="btn btn-outline-primary"
+                href="{% url 'approvals:detail' pk=approval.id %}">
+                {# FIXME(alaurent) Faut il mettre un backurl pour le bouton fermer comme sur la page de gestion des candidatures ? #}
+                {# ?back_url={{ request.get_full_path|urlencode }} #}
+                Voir son profil
+            </a>
+        </div>
+    </div>
+</div>
