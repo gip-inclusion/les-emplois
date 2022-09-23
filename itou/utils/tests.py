@@ -43,7 +43,7 @@ from itou.siaes.models import Siae, SiaeMembership
 from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
-from itou.utils import constants as global_constants
+from itou.utils import constants as global_constants, pagination
 from itou.utils.apis import api_entreprise
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
@@ -1417,3 +1417,29 @@ class JSONTest(TestCase):
 
         for *_, s, expected in self.ASYMMETRIC_CONVERSION:
             self.assertEqual(loads(s), expected)
+
+
+class TestPaginator:
+    def test_paginator_unique_page(self):
+        object_list = range(10)
+        paginator = pagination.ItouPaginator(object_list, 10)
+        page = paginator.get_page(1)
+        assert not page.display_pager
+
+    def test_paginator_multiple_pages(self):
+        object_list = range(100)
+        paginator = pagination.ItouPaginator(object_list, 5)
+        page = paginator.get_page(10)
+        assert page.display_pager
+        assert page.pages_to_display == range(5, 16)
+
+    def test_pager_unique_page(self):
+        object_list = range(10)
+        pager = pagination.pager(object_list, 10)
+        assert not pager.display_pager
+
+    def test_pager_multiple_pages(self):
+        object_list = range(100)
+        pager = pagination.pager(object_list, 10, items_per_page=5)
+        assert pager.display_pager
+        assert pager.pages_to_display == range(5, 16)
