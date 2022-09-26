@@ -32,12 +32,23 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
 
 
 @login_required
-def display_printable_approval(request, job_application_id, template_name="approvals/printable_approval.html"):
+def display_printable_approval(request, approval_id, template_name="approvals/printable_approval.html"):
     siae = get_current_siae_or_404(request)
 
-    queryset = JobApplication.objects.select_related("job_seeker", "eligibility_diagnosis", "approval", "to_siae")
-    job_application = get_object_or_404(queryset, pk=job_application_id, to_siae=siae)
+    queryset = Approval.objects.select_related("user")
+    approval = get_object_or_404(queryset, pk=approval_id)
 
+    job_applications_queryset = JobApplication.objects.select_related("eligibility_diagnosis")
+    job_application = get_object_or_404(
+        job_applications_queryset,
+        job_seeker=approval.user,
+        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        to_siae=siae,
+        approval=approval,
+    )
+
+    # TODO(alaurent) We could probably just use "if not siae.is_subject_to_eligibility_rules"
+    # Fix this when refactoring the database
     if not job_application.can_display_approval:
         # Message only visible in DEBUG
         raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
@@ -53,13 +64,13 @@ def display_printable_approval(request, job_application_id, template_name="appro
         if diagnosis_author_org:
             diagnosis_author_org_name = diagnosis_author_org.display_name
 
-    if not diagnosis and job_application.approval and job_application.approval.originates_from_itou:
+    if not diagnosis and approval.originates_from_itou:
         # On November 30th, 2021, AI were delivered a PASS IAE
         # without a diagnosis for all of their employees.
         # We want to raise an error if the approval of the pass originates from our side, but
         # is not from the AI stock, as it should not happen.
         # We may have to add conditions there in case of new mass imports.
-        if not job_application.approval.is_from_ai_stock:
+        if not approval.is_from_ai_stock:
             # Keep track of job applications without a proper eligibility diagnosis because
             # it shouldn't happen.
             # If this occurs too much we may have to change `can_display_approval()`
@@ -71,12 +82,12 @@ def display_printable_approval(request, job_application_id, template_name="appro
             )
 
     context = {
-        "approval": job_application.approval,
+        "approval": approval,
         "itou_assistance_url": global_constants.ITOU_ASSISTANCE_URL,
         "diagnosis_author": diagnosis_author,
         "diagnosis_author_org_name": diagnosis_author_org_name,
-        "siae": job_application.to_siae,
-        "job_seeker": job_application.job_seeker,
+        "siae": siae,
+        "job_seeker": approval.user,
     }
     return render(request, template_name, context)
 
