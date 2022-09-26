@@ -4,7 +4,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
 from itou.users.factories import UserFactory
 from itou.utils import constants as global_constants
@@ -19,7 +19,7 @@ class TestDisplayApproval(TestCase):
         self.client.force_login(siae_member)
 
         response = self.client.get(
-            reverse("approvals:display_printable_approval", kwargs={"job_application_id": job_application.pk})
+            reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
         self.assertEqual(response.status_code, 200)
@@ -29,18 +29,6 @@ class TestDisplayApproval(TestCase):
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
-
-    def test_impossible_display_when_approval_is_missing(self, *args, **kwargs):
-        job_application = JobApplicationFactory()
-
-        siae_member = job_application.to_siae.members.first()
-        self.client.force_login(siae_member)
-
-        response = self.client.get(
-            reverse("approvals:display_printable_approval", kwargs={"job_application_id": job_application.pk})
-        )
-        # `can_display_approval` should fail and trigger a 404.
-        self.assertEqual(response.status_code, 404)
 
     def test_display_approval_even_if_diagnosis_is_missing(self, *args, **kwargs):
         # An approval has been delivered but it does not come from Itou.
@@ -53,7 +41,7 @@ class TestDisplayApproval(TestCase):
         self.client.force_login(siae_member)
 
         response = self.client.get(
-            reverse("approvals:display_printable_approval", kwargs={"job_application_id": job_application.pk})
+            reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
         self.assertEqual(response.status_code, 200)
@@ -79,7 +67,7 @@ class TestDisplayApproval(TestCase):
         self.client.force_login(siae_member)
 
         response = self.client.get(
-            reverse("approvals:display_printable_approval", kwargs={"job_application_id": job_application.pk})
+            reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
         self.assertEqual(response.status_code, 200)
@@ -102,5 +90,5 @@ class TestDisplayApproval(TestCase):
 
         with self.assertRaisesRegex(Exception, "had no eligibility diagnosis and also was not mass-imported"):
             self.client.get(
-                reverse("approvals:display_printable_approval", kwargs={"job_application_id": job_application.pk})
+                reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
             )
