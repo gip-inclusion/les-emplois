@@ -10,16 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: config.settings.dev
-      DJANGO_SECRET_KEY: ministryofsillywalks
       PYTHONPATH: .
-      PGPASSWORD: password
-      PGHOST: localhost
-      PGUSER: postgres
-      ITOU_POSTGRES_USER: postgres
-      ITOU_POSTGRES_PASSWORD: password
-      CELLAR_ADDON_KEY_ID: TheMeaningOfLife
-      CELLAR_ADDON_KEY_SECRET: "42"
-      CELLAR_ADDON_HOST: domain.com
     services:
       postgres:
         # Docker Hub image
@@ -44,6 +35,10 @@ jobs:
         psql <<SQL
             CREATE DATABASE itou;
         SQL
+      env:
+        PGPASSWORD: password
+        PGHOST: localhost
+        PGUSER: postgres
     - name: 💂 Install Python
       uses: actions/setup-python@v3
       with:
