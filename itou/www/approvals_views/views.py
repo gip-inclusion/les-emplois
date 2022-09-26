@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
@@ -15,6 +16,19 @@ from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import UserExistsForm
 from itou.www.approvals_views.forms import DeclareProlongationForm, PoleEmploiApprovalSearchForm, SuspensionForm
+
+
+class ApprovalBaseViewMixin(LoginRequiredMixin):
+    model = Approval
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.siae = get_current_siae_or_404(request)
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data["siae"] = self.siae
+        return context_data
 
 
 @login_required
