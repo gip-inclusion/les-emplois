@@ -43,26 +43,16 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
         job_applications_categories = [
             {
-                "name": "Candidatures à traiter",
+                "name": "À traiter",
                 "states": [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING],
                 "icon": "ri-user-add-line",
-                "badge": "badge-danger",
+                "badge": "badge-accent-02",
             },
             {
-                "name": "Candidatures acceptées ou mises en liste d'attente",
-                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_POSTPONED],
+                "name": "En attente",
+                "states": [JobApplicationWorkflow.STATE_POSTPONED],
                 "icon": "ri-user-follow-line",
-                "badge": "badge-secondary",
-            },
-            {
-                "name": "Candidatures refusées/annulées",
-                "states": [
-                    JobApplicationWorkflow.STATE_REFUSED,
-                    JobApplicationWorkflow.STATE_CANCELLED,
-                    JobApplicationWorkflow.STATE_OBSOLETE,
-                ],
-                "icon": "ri-user-follow-line",
-                "badge": "badge-secondary",
+                "badge": "badge-primary",
             },
         ]
         job_applications = current_org.job_applications_received.values("state").all()
