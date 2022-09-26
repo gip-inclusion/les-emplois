@@ -1,0 +1,94 @@
+{% extends "layout/content_small.html" %}
+
+{% block title %}
+    Profil salarié
+    -
+    {{ approval.user.get_full_name }}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="h1-hero-c1">
+        {{ approval.user.get_full_name|title }}
+    </h1>
+
+    <div class="card my-4">
+        <div class="card-body">
+
+            {# Approval status. #}
+            <div class="card-text">
+                {% include "approvals/includes/status.html" with common_approval=approval %}
+            </div>
+
+            {# Approval actions. #}
+            {% if approval and request.user.is_siae_staff %}
+                {% if approval_can_be_suspended_by_siae %}
+                    <a
+                        href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                        class="btn btn-link">
+                        Suspendre
+                    </a>
+                {% elif hire_by_other_siae %}
+                    <span class="btn btn-link disabled text-muted">Suspendre</span>
+                    <i
+                        class="ri-information-line ri-xl text-info"
+                        data-toggle="tooltip"
+                        title="La suspension n’est pas possible, un autre employeur a embauché le candidat.">
+                    </i>
+                {% endif %}
+                {% if approval_can_be_prolonged_by_siae %}
+                    <a
+                        href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                        class="btn btn-link">
+                        Prolonger
+                    </a>
+                {% endif %}
+                <a
+                    class="btn btn-outline-primary float-right matomo-event"
+                    data-matomo-action="telechargement-pdf"
+                    data-matomo-category="agrement"
+                    data-matomo-option="details-candidature"
+                    href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
+                    target="_blank">
+                    Afficher le PASS IAE
+                </a>
+            {% endif %}
+
+        </div>
+    </div>
+
+    {# Job seeker info ------------------------------------------------------------------------- #}
+    <div class="card my-4">
+        <div class="card-body">
+            <div class="card-text">
+                <h2>Informations du salarié</h2>
+                <hr class="my-4">
+                <h3 >Informations personnelles</h3>
+                {# FIXME(alaurent) Do we really want to depend on job_application here ? #}
+                {% include "apply/includes/job_seeker_info.html" %}
+                {# Eligibility ------------------------------------------------------------------------- #}
+                {# FIXME(alaurent) We need some wording edits in there #}
+                {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
+            </div>
+        </div>
+    </div>
+
+    {# Job applications ------------------------------------------------------------------------ #}
+    <div class="card my-4">
+        <div class="card-body">
+            <div class="card-text">
+                <h2>Candidatures</h2>
+                <div class="alert alert-info">
+                    <p>
+                        <i class="ri-information-line ri-xl text-info"></i> <b>Dates de contrat</b>
+                    </p>
+                    <p class="mb-0">Toutes les modifications concernant la date de début du contrat de travail continuent de se faire sur la candidature acceptée.</p>
+                </div>
+                <hr class="my-4">
+                {% include "approvals/includes/job_applications.html" %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% for any_job_application in all_job_applications %}
+    <div class="card my-3">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-8">
+                    <span class="small text-muted">
+                        Émise le {{ any_job_application.created_at|date }} par <b>{{ any_job_application.sender.get_full_name|title }}</b>
+                        <i class="ri-group-line ri-lg ml-1"></i> {{ any_job_application.get_sender_kind_display }}
+                    </span>
+                </div>
+
+                {# Statuses #}
+                <div class="col-md-4 text-right">
+                    <small>{% include "apply/includes/state_badge.html" with job_application=any_job_application %}</small>
+                </div>
+            </div>
+            <hr class="my-1">
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    {# FIXME(alaurent) que met-on si pas de métier recherché ? #}
+                    {% with any_job_application.selected_jobs.first as first_selected_job %}
+                        <b><i class="ri-briefcase-line ri-lg"></i> {{ first_selected_job }}</b>
+                        {# FIXME(alaurent) comment aligner verticalement l'icone de geoloc ? #}
+                        <i class="ri-map-pin-2-line mr-1"></i>{{ first_selected_job.display_location }}
+                    {% endwith %}
+                </div>
+
+                <div class="col-md-4 text-right">
+                    {% with any_job_application.selected_jobs.all.count as selected_jobs_count %}
+                        {% if  selected_jobs_count > 1 %}
+                            <span>
+                                {# FIXME(alaurent) gestion du pluriel #}
+                                <b>+ {{ selected_jobs_count }} autre{{ selected_jobs_count|pluralize }} poste{{ selected_jobs_count|pluralize }} <i class="ri-arrow-drop-down-line ml-2"></i></b>
+                            </span>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="text-right">
+                <a
+                    class="btn btn-outline-primary"
+                    href="{% url 'apply:details_for_siae' job_application_id=any_job_application.id %}">
+                    Voir sa candidature
+                </a>
+            </div>
+        </div>
+    </div>
+{% endfor %}
