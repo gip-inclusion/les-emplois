@@ -17,6 +17,23 @@ from itou.www.apply.forms import UserExistsForm
 from itou.www.approvals_views.forms import DeclareProlongationForm, PoleEmploiApprovalSearchForm, SuspensionForm
 
 
+class ApprovalBaseViewMixin:
+    model = Approval
+
+    def __init__(self):
+        super().__init__()
+        self.siae = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.siae = get_current_siae_or_404(request)
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data["siae"] = self.siae
+        return context_data
+
+
 @login_required
 def display_printable_approval(request, job_application_id, template_name="approvals/printable_approval.html"):
     siae = get_current_siae_or_404(request)
