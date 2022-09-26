@@ -6,6 +6,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.generic import DetailView
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.job_applications.enums import SenderKind
@@ -28,6 +29,44 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         context_data["siae"] = self.siae
+        return context_data
+
+    # TODO(alaurent) : An Employee model linked to the siae, Approval and JobSeeker would make things easier here
+    def get_job_application(self, approval):
+        return (
+            JobApplication.objects.filter(
+                job_seeker=approval.user,
+                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                to_siae=self.siae,
+                approval=approval,
+            )
+            .select_related("eligibility_diagnosis")
+            .first()
+        )
+
+
+class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
+    model = Approval
+    queryset = Approval.objects.select_related("user")
+    template_name = "approvals/detail.html"
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data["approval_can_be_suspended_by_siae"] = self.object.can_be_suspended_by_siae(self.siae)
+        context_data["hire_by_other_siae"] = not self.object.user.last_hire_was_made_by_siae(self.siae)
+        context_data["approval_can_be_prolonged_by_siae"] = self.object.can_be_prolonged_by_siae(self.siae)
+        job_application = self.get_job_application(self.object)
+        context_data["job_application"] = job_application
+        if job_application:
+            context_data["eligibility_diagnosis"] = job_application.get_eligibility_diagnosis()
+        context_data["all_job_applications"] = (
+            JobApplication.objects.filter(
+                job_seeker=self.object.user,
+                to_siae=self.siae,
+            )
+            .select_related("sender")
+            .prefetch_related("selected_jobs")
+        )
         return context_data
 
 
