@@ -14,9 +14,6 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
-  REVIEW_APPS_ORGANIZATION_NAME: ${{ secrets.CLEVER_REVIEW_APPS_ORG }}
-  CONFIGURATION_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_CONFIGURATION_ADDON }}
-  S3_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_S3_ADDON }}
   BRANCH: ${{ github.head_ref }}
   PYTHON_VERSION: "3.10"
 
@@ -56,44 +53,33 @@ jobs:
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        # Create a new application on Clever Cloud.
-        # -t: application type (Python).
-        # --org: organization name.
-        # --region: server location ("par" means Paris).
-        # --alias: custom application name, used to find it with the CLI.
-        $CLEVER_CLI create $REVIEW_APP_NAME -t python --org $REVIEW_APPS_ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
-        # Force Python version through env, because its default is not accurate and environment variables
-        # have precedence over configuration addons
-        $CLEVER_CLI env set CC_PYTHON_VERSION ${{ env.PYTHON_VERSION }} --alias $REVIEW_APP_NAME
+        $CLEVER_CLI create $REVIEW_APP_NAME -t python --org itou_review_apps --region par --alias $REVIEW_APP_NAME
+        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
         $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
 
     - name: 🗃 Create database addon
       run: |
-        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org $REVIEW_APPS_ORGANIZATION_NAME --plan xxs_sml --yes
+        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org itou_review_apps --plan xxs_sml --yes
         $CLEVER_CLI service link-addon $REVIEW_APP_DB_NAME
 
-    - name: 🤝 Link S3 addon
+    - name: 🤝 Link addons & add environment variables
       run: |
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
-        $CLEVER_CLI service link-addon $S3_ADDON
-
-    - name: 🗺 Add environment variables to the review app
-      run: |
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
-        $CLEVER_CLI service link-addon $CONFIGURATION_ADDON
-        $CLEVER_CLI env import-vars REVIEW_APP_DB_NAME
-        $CLEVER_CLI env import-vars DEPLOY_URL
+        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
+        $CLEVER_CLI env set ITOU_ENVIRONMENT "REVIEW-APP"
+        $CLEVER_CLI service link-addon c1-s3
+        $CLEVER_CLI service link-addon c1-prod-deployment-config
 
     - name: 🚀 Deploy to Clever Cloud
-      run: $CLEVER_CLI deploy --branch $BRANCH --force
+      run: |
+        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
+        $CLEVER_CLI deploy --branch $BRANCH --force
 
     - name: 🍻 Add link to pull request
       uses: thollander/actions-comment-pull-request@main
       with:
         message: "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- 
+
   redeploy:
     runs-on: ubuntu-latest
     # A push event targets a new deployment.
@@ -117,11 +103,13 @@ jobs:
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
 
     - name: ⏭ Skip fixtures
       run:
         $CLEVER_CLI env set SKIP_FIXTURES true
 
     - name: 🚀 Deploy to Clever Cloud
+      env:
+        CPUCOUNT: 1
       run: $CLEVER_CLI deploy --branch $BRANCH --force

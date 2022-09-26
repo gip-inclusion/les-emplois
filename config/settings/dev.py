@@ -70,9 +70,6 @@ ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
 ITOU_PROTOCOL = "http"
 ITOU_FQDN = "127.0.0.1:8000"
 
-# Bypasses the need for Redis
-HUEY["immediate"] = True
-
 DATABASES["default"]["HOST"] = "127.0.0.1"
 DATABASES["default"]["PORT"] = 5432
 DATABASES["default"]["NAME"] = "itou"

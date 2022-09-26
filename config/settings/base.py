@@ -334,7 +334,7 @@ if _sentry_dsn:
 
     sentry_init(dsn=_sentry_dsn)
 
-SHOW_TEST_ACCOUNTS_BANNER = ITOU_ENVIRONMENT == "DEMO"
+SHOW_TEST_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in ("DEMO", "REVIEW-APP")
 
 # On November 30th, 2021, we delivered approvals for AI structures.
 # See itou.scripts.management.commands.import_ai_employees
@@ -437,8 +437,7 @@ HUEY = {
         "workers": 2,
         "worker_type": "thread",
     },
-    # make the emails and tasks synchronous on review apps.
-    "immediate": ITOU_ENVIRONMENT in ("DEMO", "FAST-MACHINE"),
+    "immediate": ITOU_ENVIRONMENT not in ("PROD", "STAGING"),
 }
 
 # Email https://anymail.readthedocs.io/en/stable/esps/mailjet/
