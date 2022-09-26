@@ -36,28 +36,13 @@ fake = faker.Faker(locale="fr_FR")
 
 
 class ApplyTest(TestCase):
-    def test_we_redirect_to_siae_on_missing_session_for_fbv(self):
-        routes = {
-            "apply:step_eligibility",
-            "apply:step_application",
-        }
-        user = JobSeekerFactory()
-        siae = SiaeFactory(with_jobs=True)
-
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        for route in routes:
-            with self.subTest(route=route):
-                response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}))
-                self.assertRedirects(response, reverse("siaes_views:card", kwargs={"siae_id": siae.pk}))
-
-    def test_we_raise_a_permission_denied_on_missing_session_for_cbv(self):
+    def test_we_raise_a_permission_denied_on_missing_session(self):
         routes = {
             "apply:check_nir_for_sender",
             "apply:check_email_for_sender",
             "apply:check_nir_for_job_seeker",
             "apply:step_check_job_seeker_info",
             "apply:step_check_prev_applications",
-            "apply:step_application_sent",
             "apply:application_jobs",
             "apply:application_eligibility",
             "apply:application_resume",
