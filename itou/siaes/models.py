@@ -192,7 +192,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     )
 
     # These kinds of SIAE can use employee record app to send data to ASP
-    ASP_EMPLOYEE_RECORD_KINDS = [SiaeKind.EI, SiaeKind.ACI, SiaeKind.AI, SiaeKind.ETTI]
+    ASP_EMPLOYEE_RECORD_KINDS = [SiaeKind.ACI, SiaeKind.AI, SiaeKind.EI, SiaeKind.EITI, SiaeKind.ETTI]
 
     # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently

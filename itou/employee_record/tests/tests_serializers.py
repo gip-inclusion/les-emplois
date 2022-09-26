@@ -2,10 +2,13 @@ from datetime import timedelta
 
 from django.utils import timezone
 
+import itou.asp.models as asp_models
+import itou.siaes.models as siaes_models
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import (
+    EmployeeRecordSerializer,
     EmployeeRecordUpdateNotificationBatchSerializer,
     EmployeeRecordUpdateNotificationSerializer,
     _AddressSerializer,
@@ -67,6 +70,34 @@ class EmployeeRecordAddressSerializerTest(EmployeeRecordFixtureTest):
 
         self.assertIsNotNone(data)
         self.assertEqual(good_lane_name, data["adrLibelleVoie"])
+
+
+class EmployeeRecordSerializerTest(EmployeeRecordFixtureTest):
+    def test_oeth_employee_for_eiti(self):
+        employee_record = EmployeeRecordWithProfileFactory(
+            status=Status.PROCESSED,
+            job_application__to_siae__kind=siaes_models.SiaeKind.EITI,
+        )
+        employee_record.job_application.job_seeker.jobseeker_profile.oeth_employee = True
+        data = EmployeeRecordSerializer(employee_record).data
+
+        self.assertIsNotNone(data)
+        self.assertEqual(data["mesure"], "EITI_DC")
+        self.assertFalse(data["situationSalarie"]["salarieOETH"])
+
+    def test_oeth_employee_for_other(self):
+        for kind in set(siaes_models.Siae.ASP_EMPLOYEE_RECORD_KINDS) - {siaes_models.SiaeKind.EITI}:
+            with self.subTest(kind=kind):
+                employee_record = EmployeeRecordWithProfileFactory(
+                    status=Status.PROCESSED,
+                    job_application__to_siae__kind=kind,
+                )
+                employee_record.job_application.job_seeker.jobseeker_profile.oeth_employee = True
+                data = EmployeeRecordSerializer(employee_record).data
+
+                self.assertIsNotNone(data)
+                self.assertEqual(data["mesure"], asp_models.SiaeKind.from_siae_kind(kind))
+                self.assertTrue(data["situationSalarie"]["salarieOETH"])
 
 
 class EmployeeRecordUpdateNotificationSerializerTest(EmployeeRecordFixtureTest):

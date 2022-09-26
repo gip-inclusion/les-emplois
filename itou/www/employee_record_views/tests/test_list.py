@@ -14,7 +14,7 @@ class ListEmployeeRecordsTest(EmployeeRecordFixtureTest):
             name="Evil Corp.", membership__user__first_name="Elliot", membership__user__is_superuser=True
         )
         self.siae_without_perms = SiaeWithMembershipAndJobsFactory(
-            kind="EITI", name="A-Team", membership__user__first_name="Hannibal"
+            kind="EATT", name="A-Team", membership__user__first_name="Hannibal"
         )
         self.user = self.siae.members.get(first_name="Elliot")
         self.user_without_perms = self.siae_without_perms.members.get(first_name="Hannibal")

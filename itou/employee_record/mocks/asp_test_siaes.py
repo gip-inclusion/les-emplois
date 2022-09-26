@@ -25,6 +25,7 @@ ASP_ID_TO_SIRET_MAPPING = {
     2062: {"siret": "21590350101445", "mesure": "ACI_DC", "numeroAnnexe": "ACI033207853A0M0"},
     1516: {"siret": "33055039301440", "mesure": "EI_DC", "numeroAnnexe": "ACI023201111A0M0"},
     1060: {"siret": "33055039301440", "mesure": "AI_DC", "numeroAnnexe": "AI59L209512A0M0"},
+    3411: {"siret": "83533318801446", "mesure": "EITI_DC", "numeroAnnexe": ""},
 }
 
 

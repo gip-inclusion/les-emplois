@@ -498,14 +498,6 @@ class SiaeKind(models.TextChoices):
     EI_MP = "EI_MP", "Milieu Pénitentiaire - Entreprise d'Insertion"
     ACI_MP = "ACI_MP", "Milieu Pénitentiaire - Atelier et Chantier d'Insertion"
 
-    @property
-    def valid_kind_for_employee_record(self):
-        """
-        The ASP SIAE kind ("Mesure") must be one of the following
-        to be eligible for ASP employee record processing
-        """
-        return self.value in ["AI_DC", "ACI_DC", "ETTI_DC", "EI_DC"]
-
     @classmethod
     def from_siae_kind(cls, kind):
         """

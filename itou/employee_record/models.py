@@ -610,6 +610,12 @@ class EmployeeRecord(models.Model):
         return SiaeKind.from_siae_kind(self.job_application.to_siae.kind)
 
     @property
+    def asp_oeth_employee(self):
+        if self.asp_siae_type is SiaeKind.EITI:
+            return False
+        return self.job_seeker_profile.oeth_employee if self.job_seeker_profile else None
+
+    @property
     def batch_line_number(self):
         """
         This transient field is updated at runtime for JSON serialization.
