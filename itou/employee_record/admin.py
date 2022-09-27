@@ -45,7 +45,11 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "asp_processing_code",
         "status",
     )
-    list_filter = ("status",)
+
+    list_filter = (
+        "status",
+        "processed_as_duplicate",
+    )
 
     search_fields = (
         "pk",
@@ -72,6 +76,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "siret",
         "financial_annex",
         "asp_id",
+        "asp_processing_type",
         "asp_batch_file",
         "asp_batch_line_number",
         "asp_processing_code",
@@ -106,6 +111,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
                     "asp_batch_line_number",
                     "asp_processing_code",
                     "asp_processing_label",
+                    "asp_processing_type",
                     "archived_json",
                 )
             },
@@ -123,6 +129,14 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         url = reverse(f"admin:{app_label}_{model_name}_change", args=[job_seeker.id])
         return mark_safe(f'<a href="{url}">{job_seeker.id}</a>')
 
+    def asp_processing_type(self, obj):
+        return (
+            "Intégrée automatiquement par script (doublon ASP)"
+            if obj.processed_as_duplicate
+            else "Intégration ASP normale"
+        )
+
+    asp_processing_type.short_description = "Type d'intégration"
     job_seeker.short_description = "Salarié"
     job_seeker_profile_link.short_description = "Profil du salarié"
 
