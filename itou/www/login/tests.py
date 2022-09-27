@@ -81,7 +81,7 @@ class PrescriberLoginTest(TestCase):
 
         form_data = {
             "login": user.email,
-            "password": DEFAULT_PASSWORD,
+            "password": "a",
         }
         response = self.client.post(url, data=form_data)
         self.assertEqual(response.status_code, 200)
@@ -121,7 +121,7 @@ class SiaeStaffLoginTest(TestCase):
 
         form_data = {
             "login": user.email,
-            "password": DEFAULT_PASSWORD,
+            "password": "a",
         }
         response = self.client.post(url, data=form_data)
         self.assertEqual(response.status_code, 200)

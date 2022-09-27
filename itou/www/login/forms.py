@@ -1,6 +1,8 @@
 from allauth.account.forms import LoginForm
 from django import forms
 
+from itou.users.models import User
+
 
 class ItouLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
@@ -11,9 +13,9 @@ class ItouLoginForm(LoginForm):
 
     def clean(self):
         # Parent method performs authentication on form success.
-        super().clean()
-        if self.user and self.user.has_sso_provider:
-            identity_provider = self.user.get_identity_provider_display()
+        user = User.objects.filter(email=self.data["login"]).first()
+        if user and user.has_sso_provider:
+            identity_provider = user.get_identity_provider_display()
             error_message = f"Votre compte est relié à {identity_provider}. Merci de vous connecter avec ce service."
             raise forms.ValidationError(error_message)
-        return self.cleaned_data
+        return super().clean()
