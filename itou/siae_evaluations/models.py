@@ -304,8 +304,6 @@ class EvaluatedSiae(models.Model):
         on_delete=models.CASCADE,
         related_name="evaluated_siaes",
     )
-    # The timestamp of the first review, which marks the start of the
-    # adversarial phase.
     reviewed_at = models.DateTimeField(verbose_name=("Contrôlée le"), blank=True, null=True)
 
     objects = EvaluatedSiaeManager.from_queryset(EvaluatedSiaeQuerySet)()
@@ -336,10 +334,8 @@ class EvaluatedSiae(models.Model):
                 connection = mail.get_connection()
                 connection.send_messages([email])
 
-                # The first review marks the beginning of the adversarial phase.
-                if self.reviewed_at is None:
-                    self.reviewed_at = timezone.now()
-                    self.save(update_fields=["reviewed_at"])
+                self.reviewed_at = timezone.now()
+                self.save(update_fields=["reviewed_at"])
 
     # fixme vincentporte : to refactor. move all get_email_to_siae_xxx() method to emails.py in siae model
     def get_email_to_siae_selected(self):
