@@ -109,15 +109,17 @@ def format_address(obj):
         # so we use an aliases table as a last change to get the type
         # example: got "R" or "r" instead of "Rue"
         or find_lane_type_aliases(lane)
+        # If all previous options have failed, fallback to "lieu-dit" as lane type.
+        # This will fix some geolocation errors, f.i. when
+        # lane types are not in french and not referenced by ASP.
+        # (in Brittany or Basque country ...)
+        or LaneType.LD
     )
 
-    if lt:
-        result["lane_type"] = lt.name
-        # If split is successful, then we can strip the lane type
-        # from the lane name for a better result
-        result["lane"] = rest[0] if rest else lane_type
-    else:
-        return None, f"Impossible de trouver le type de voie : {lane_type} pour l'adresse : {address}"
+    result["lane_type"] = lt.name
+    # If split is successful, then we can strip the lane type
+    # from the lane name for a better result
+    result["lane"] = rest[0] if rest else lane_type
 
     # INSEE code: must double check with ASP ref file
     result["insee_code"] = address.get("insee_code")
