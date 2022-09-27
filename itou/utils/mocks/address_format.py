@@ -275,6 +275,18 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
         "longitude": 4.925175,
         "latitude": 45.749174,
     },
+    {
+        "score": 0.6832486776859503,
+        "address_line_1": "8 la boutrie - caillot",
+        "number": "8",
+        "lane": "la boutrie - caillot",
+        "address": "8 la boutrie - caillot",
+        "post_code": "85600",
+        "insee_code": "85146",
+        "city": "Montaigu-Vendée",
+        "longitude": -1.297749,
+        "latitude": 47.012473,
+    },
 ]
 
 RESULTS_BY_ADDRESS = {elt["address_line_1"]: elt for elt in BAN_GEOCODING_API_RESULTS_MOCK}

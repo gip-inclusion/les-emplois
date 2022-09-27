@@ -30,6 +30,7 @@ _sample_communes = [
     {"code": "37273", "name": "VILLE-AUX-DAMES"},
     {"code": "13200", "name": "MARSEILLE"},
     {"code": "67152", "name": "GEISPOLSHEIM"},
+    {"code": "85146", "name": "MONTAIGU-VENDEE"},
 ]
 
 
@@ -74,6 +75,7 @@ class CommuneFactory(factory.django.DjangoModelFactory):
     code, name = random.choice(_sample_communes).values()
 
 
+# FIXME: unreliable and confusing
 class MockedCommuneFactory(CommuneFactory):
     """
     A factory with a specific code for mock testing

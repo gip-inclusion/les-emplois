@@ -805,6 +805,8 @@ class JobSeekerProfileModelTest(TestCase):
     Job seeker profile is extra-data from the ASP and EmployeeRecord domains
     """
 
+    fixtures = ["test_INSEE_communes"]
+
     def setUp(self):
         self.profile = JobSeekerProfileFactory()
         user = self.profile.user
@@ -868,6 +870,23 @@ class JobSeekerProfileModelTest(TestCase):
         # address should be complete now
         self.profile.hexa_commune = asp.CommuneFactory()
         self.profile._clean_job_seeker_hexa_address()
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_job_seeker_hexa_address_with_unknown_lane_type(self, _mock):
+        # FIXME: rework geolocation mock and move this kind of tests to
+        # a test suite for utils.format_address
+        self.profile._clean_job_seeker_hexa_address()
+        user = self.profile.user
+        user.address_line_1 = "8 la boutrie - caillot"
+        user.address_line_2 = "saint hilaire de loulay"
+        user.post_code = "85600"
+        self.profile.update_hexa_address()
+
+        # undefined lane type should fallback to "Lieu-Dit" (LD) as lane type
+        self.assertEqual("LD", self.profile.hexa_lane_type)
 
     def test_job_seeker_situation_complete(self):
         # Both PE ID and situation must be filled or none
