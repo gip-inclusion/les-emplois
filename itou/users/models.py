@@ -36,7 +36,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
-from .enums import IdentityProvider, Title
+from .enums import IdentityProvider, Kind, Title
 
 
 class ApprovalAlreadyExistsError(Exception):
@@ -851,6 +851,23 @@ class User(AbstractUser, AddressMixin):
             # Take advantage of the fact that `cleaned_data` is passed by sharing:
             # the object is shared between the caller and the called routine.
             cleaned_data["lack_of_pole_emploi_id_reason"] = ""
+
+    # TODO(alaurent) Maybe replace with a field in db
+    @property
+    def kind(self):
+        if self.is_job_seeker:
+            return Kind.JOB_SEEKER
+        elif self.is_prescriber:
+            return Kind.PRESCREIBER
+        elif self.is_siae_staff:
+            return Kind.SIAE_STAFF
+        elif self.is_labor_inspector:
+            return Kind.LABOR_INSPECTOR
+        else:
+            raise ValueError("User has no valid kind")
+
+    def get_kind_display(self):
+        return self.kind.label
 
 
 def get_allauth_account_user_display(user):

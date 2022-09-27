@@ -28,7 +28,14 @@ from itou.prescribers.factories import (
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider, Title
-from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
+from itou.users.factories import (
+    JobSeekerFactory,
+    JobSeekerProfileFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    SiaeStaffFactory,
+    UserFactory,
+)
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
@@ -759,6 +766,32 @@ class ModelTest(TestCase):
             for fields in itertools.combinations(unique_fields, n):
                 with self.assertRaises(ValidationError):
                     UserFactory(**dict(zip(fields, itertools.repeat(True))))
+
+    def test_kind(self):
+        job_seeker = JobSeekerFactory()
+        self.assertEqual("job_seeker", job_seeker.kind)
+
+        prescriber = PrescriberFactory()
+        self.assertEqual("prescriber", prescriber.kind)
+
+        siae_staff = SiaeStaffFactory()
+        self.assertEqual("siae_staff", siae_staff.kind)
+
+        labor_inspector = LaborInspectorFactory()
+        self.assertEqual("labor_inspector", labor_inspector.kind)
+
+    def test_get_kind_display(self):
+        job_seeker = JobSeekerFactory()
+        self.assertEqual("candidat", job_seeker.get_kind_display())
+
+        prescriber = PrescriberFactory()
+        self.assertEqual("prescripteur", prescriber.get_kind_display())
+
+        siae_staff = SiaeStaffFactory()
+        self.assertEqual("employeur", siae_staff.get_kind_display())
+
+        labor_inspector = LaborInspectorFactory()
+        self.assertEqual("inspecteur du travail", labor_inspector.get_kind_display())
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):
