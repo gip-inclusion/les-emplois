@@ -525,6 +525,37 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, valide)
 
+    def test_second_review_does_not_update_reviewed_at(self):
+        campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
+        )
+        evaluated_siae = create_evaluated_siae_consistent_datas(campaign)
+        EvaluatedAdministrativeCriteria.objects.filter(
+            evaluated_job_application__evaluated_siae=evaluated_siae
+        ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
+        now = timezone.now()
+        evaluated_siae.reviewed_at = now
+        evaluated_siae.save(update_fields=["reviewed_at"])
+
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_validation",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        self.assertEqual(evaluated_siae.reviewed_at, now)
+
     def test_num_queries_in_view(self):
         self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
         evaluation_campaign = EvaluationCampaignFactory(
