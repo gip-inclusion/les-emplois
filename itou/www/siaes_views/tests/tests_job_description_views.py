@@ -11,7 +11,6 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import SiaeJobDescription
-from itou.users.factories import DEFAULT_PASSWORD
 
 
 class JobDescriptionAbstractTest(TestCase):
@@ -49,7 +48,7 @@ class JobDescriptionAbstractTest(TestCase):
         self.edit_preview_url = reverse("siaes_views:edit_job_description_preview")
 
     def _login(self, user):
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         response = self.client.get(self.url)
 

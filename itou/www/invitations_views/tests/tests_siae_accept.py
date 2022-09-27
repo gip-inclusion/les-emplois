@@ -65,7 +65,7 @@ class TestAcceptInvitation(TestCase):
     def test_accept_invitation_logged_in_user(self):
         # A logged in user should log out before accepting an invitation.
         logged_in_user = UserFactory()
-        self.client.login(email=logged_in_user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(logged_in_user)
         # Invitation for another user
         invitation = SentSiaeStaffInvitationFactory(email="loutre@example.com")
         response = self.client.get(invitation.acceptance_link, follow=True)
@@ -104,7 +104,7 @@ class TestAcceptInvitation(TestCase):
         self.assertContains(response, "expirée")
 
         user = SiaeStaffFactory(email=invitation.email)
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
         self.assertContains(response, escape("Cette invitation n'est plus valide."))
@@ -113,7 +113,7 @@ class TestAcceptInvitation(TestCase):
         siae = SiaeFactory(convention__is_active=False)
         invitation = SentSiaeStaffInvitationFactory(siae=siae)
         user = SiaeStaffFactory(email=invitation.email)
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
         self.assertContains(response, escape("Cette structure n'est plus active."))
@@ -146,7 +146,7 @@ class TestAcceptInvitation(TestCase):
             last_name=user.last_name,
             email=user.email,
         )
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertRedirects(response, reverse("dashboard:index"))
 
@@ -179,7 +179,7 @@ class TestAcceptInvitation(TestCase):
             email=user.email,
         )
 
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
 
         self.assertEqual(response.status_code, 403)
@@ -187,7 +187,7 @@ class TestAcceptInvitation(TestCase):
 
     def test_accept_connected_user_is_not_the_invited_user(self):
         invitation = SentSiaeStaffInvitationFactory()
-        self.client.login(email=invitation.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(invitation.sender)
         response = self.client.get(invitation.acceptance_link, follow=True)
 
         self.assertEqual(reverse("account_logout"), response.wsgi_request.path)

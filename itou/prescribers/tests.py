@@ -21,7 +21,7 @@ from itou.prescribers.factories import (
 )
 from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.factories import DEFAULT_PASSWORD, UserFactory
+from itou.users.factories import UserFactory
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 
 
@@ -254,7 +254,7 @@ class PrescriberOrganizationAdminTest(TestCase):
         ]
 
     def test_refuse_prescriber_habilitation_by_superuser(self):
-        self.client.login(username=self.superuser.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.superuser)
 
         prescriberorganization = PrescriberOrganizationFactory(
             authorized=True,
@@ -299,7 +299,7 @@ class PrescriberOrganizationAdminTest(TestCase):
                 )
 
     def test_refuse_prescriber_habilitation_pending_status(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         prescriberorganization = PrescriberOrganizationFactory(
             authorized=True,
@@ -340,7 +340,7 @@ class PrescriberOrganizationAdminTest(TestCase):
         self.assertEqual(updated_prescriberorganization.authorization_status, PrescriberAuthorizationStatus.REFUSED)
 
     def test_refuse_prescriber_habilitation_not_pending_status(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         prescriberorganization = PrescriberOrganizationFactory(
             authorized=True,
@@ -384,7 +384,7 @@ class PrescriberOrganizationAdminTest(TestCase):
                 )
 
     def test_accept_prescriber_habilitation_by_superuser(self):
-        self.client.login(username=self.superuser.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.superuser)
 
         prescriberorganization = PrescriberOrganizationFactory(
             authorized=True,
@@ -429,7 +429,7 @@ class PrescriberOrganizationAdminTest(TestCase):
                 )
 
     def test_accept_prescriber_habilitation_pending_status(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         prescriberorganization = PrescriberOrganizationFactory(
             authorized=True,
@@ -470,7 +470,7 @@ class PrescriberOrganizationAdminTest(TestCase):
         self.assertEqual(updated_prescriberorganization.authorization_status, PrescriberAuthorizationStatus.VALIDATED)
 
     def test_accept_prescriber_habilitation_refused_status(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         prescriberorganization = PrescriberOrganizationFactory(
             authorized=True,
@@ -511,7 +511,7 @@ class PrescriberOrganizationAdminTest(TestCase):
         self.assertEqual(updated_prescriberorganization.authorization_status, PrescriberAuthorizationStatus.VALIDATED)
 
     def test_accept_prescriber_habilitation_other_status(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         prescriberorganization = PrescriberOrganizationFactory(
             authorized=True,

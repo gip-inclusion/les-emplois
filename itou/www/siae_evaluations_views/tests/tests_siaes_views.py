@@ -18,7 +18,7 @@ from itou.siae_evaluations.factories import (
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.enums import KIND_SIAE_STAFF
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.storage.s3 import S3Upload
 
@@ -74,7 +74,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         # siae without active campaign
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context["evaluations_asked_at"])
@@ -124,7 +124,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=self.siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # no criterion selected
         response = self.client.get(self.url)
@@ -157,7 +157,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application, proof_url=""
         )
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(
@@ -195,7 +195,7 @@ class SiaeJobApplicationListViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # no criterion selected
         response = self.client.get(self.url)
@@ -239,7 +239,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
         self.siae = membership.siae
 
     def test_access_without_activ_campaign(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         evaluated_job_application = EvaluatedJobApplicationFactory()
         response = self.client.get(
@@ -252,7 +252,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_access_on_ended_campaign(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         evaluated_job_application = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__ended_at=timezone.now()
@@ -267,7 +267,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_access(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=self.siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
@@ -303,7 +303,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
         )
 
     def test_context_fields_list(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # Combinations :
         # (True, False) = eligibility diagnosis with level 1 administrative criteria
@@ -337,7 +337,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -360,7 +360,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -400,7 +400,7 @@ class SiaeUploadDocsViewTest(TestCase):
         self.siae = membership.siae
 
     def test_access_on_unknown_evaluated_job_application(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:siae_upload_doc",
@@ -422,7 +422,7 @@ class SiaeUploadDocsViewTest(TestCase):
             administrative_criteria=criterion.administrative_criteria,
         )
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:siae_upload_doc",
@@ -432,7 +432,7 @@ class SiaeUploadDocsViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_access_on_ended_campaign(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
@@ -452,7 +452,7 @@ class SiaeUploadDocsViewTest(TestCase):
     @freeze_time("2022-09-14 11:11:11")
     def test_access(self):
         self.maxDiff = None
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
@@ -492,7 +492,7 @@ class SiaeUploadDocsViewTest(TestCase):
 
     def test_post(self):
         fake_now = timezone.now()
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
@@ -554,7 +554,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application
         )
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         with self.assertNumQueries(
             1  # fetch django session
@@ -577,7 +577,7 @@ class SiaeSubmitProofsViewTest(TestCase):
     def test_is_not_submittable(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application, proof_url="")
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
@@ -596,7 +596,7 @@ class SiaeSubmitProofsViewTest(TestCase):
             submitted_at=fake_now - relativedelta(days=1),
         )
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
 
@@ -633,7 +633,7 @@ class SiaeSubmitProofsViewTest(TestCase):
             submitted_at=fake_now,
         )
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/dashboard/")
@@ -644,7 +644,7 @@ class SiaeSubmitProofsViewTest(TestCase):
             self.siae, self.user, institution=institution_membership.institution
         )
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
 
@@ -682,7 +682,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 404)

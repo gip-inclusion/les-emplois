@@ -14,7 +14,7 @@ from django.urls import reverse
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
 from itou.users import enums as users_enums
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
 
 
@@ -144,7 +144,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         The most secure option was to simply redirect the default path to our own.
         """
         user = JobSeekerFactory(has_completed_welcoming_tour=True)
-        self.client.login(username=user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.get("/accounts/profile/")
         self.assertRedirects(response, reverse("dashboard:index"))
 

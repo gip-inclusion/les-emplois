@@ -7,14 +7,13 @@ from itou.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from itou.users.factories import DEFAULT_PASSWORD
 
 
 class MembersTest(TestCase):
     def test_members(self):
         organization = PrescriberOrganizationWithMembershipFactory()
         user = organization.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("prescribers_views:members")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -31,7 +30,7 @@ class UserMembershipDeactivationTest(TestCase):
         memberships = admin.prescribermembership_set.all()
         membership = memberships.first()
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": admin.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
@@ -53,7 +52,7 @@ class UserMembershipDeactivationTest(TestCase):
         memberships = guest.prescribermembership_set.all()
         membership = memberships.first()
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
@@ -80,7 +79,7 @@ class UserMembershipDeactivationTest(TestCase):
         guest = PrescriberFactory()
         organization.members.add(guest)
 
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
@@ -95,13 +94,13 @@ class UserMembershipDeactivationTest(TestCase):
         admin = organization.members.filter(prescribermembership__is_admin=True).first()
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
 
         # guest is now an orienter
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
         url = reverse("dashboard:index")
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
@@ -122,14 +121,14 @@ class UserMembershipDeactivationTest(TestCase):
         self.assertEqual(len(memberships), 2)
 
         # Admin remove guest from structure
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
         self.client.logout()
 
         # guest must be able to login
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
         url = reverse("dashboard:index")
         response = self.client.get(url)
 

@@ -6,7 +6,6 @@ from django.urls import reverse
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
 
@@ -29,7 +28,7 @@ class EditOrganizationTest(TestCase):
         )
         user = organization.members.first()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("prescribers_views:edit_organization")
         response = self.client.get(url)
@@ -95,7 +94,7 @@ class EditOrganizationTest(TestCase):
         org2.members.add(user)
         org2.save()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("prescribers_views:edit_organization")
         response = self.client.get(url)

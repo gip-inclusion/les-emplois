@@ -7,7 +7,6 @@ from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.users.factories import DEFAULT_PASSWORD
 
 
 class DisableEmployeeRecordsTest(TestCase):
@@ -23,14 +22,14 @@ class DisableEmployeeRecordsTest(TestCase):
         self.next_url = reverse("employee_record_views:list")
 
     def test_access_granted(self):
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_disable_employee_record_new(self):
         self.assertEqual(self.employee_record.status, Status.NEW)
 
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=NEW")
         self.assertContains(response, "Confirmer la désactivation")
 
@@ -45,7 +44,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.employee_record.refresh_from_db()
         self.assertEqual(self.employee_record.status, Status.READY)
 
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=READY", follow=True)
         self.assertRedirects(response, f"{self.next_url}?status=READY")
         self.assertContains(response, escape(EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE))
@@ -61,7 +60,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.employee_record.refresh_from_db()
         self.assertEqual(self.employee_record.status, Status.SENT)
 
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=SENT", follow=True)
         self.assertRedirects(response, f"{self.next_url}?status=SENT")
         self.assertContains(response, escape(EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE))
@@ -79,7 +78,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.employee_record.refresh_from_db()
         self.assertEqual(self.employee_record.status, Status.REJECTED)
 
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=REJECTED")
         self.assertContains(response, "Confirmer la désactivation")
 
@@ -99,7 +98,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.employee_record.refresh_from_db()
         self.assertEqual(self.employee_record.status, Status.PROCESSED)
 
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=PROCESSED")
         self.assertContains(response, "Confirmer la désactivation")
 

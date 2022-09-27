@@ -43,7 +43,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
             "form-0-last_name": self.guest_data["last_name"],
             "form-0-email": self.guest_data["email"],
         }
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
 
     def assert_created_invitation(self):
         invitation = PrescriberWithOrgInvitation.objects.get(organization=self.organization)
@@ -113,7 +113,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
 
     def test_invite_existing_user_is_employer(self):
         guest = SiaeFactory(with_membership=True).members.first()
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
         )
@@ -123,7 +123,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
 
     def test_invite_existing_user_is_job_seeker(self):
         guest = JobSeekerFactory()
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
         )
@@ -135,7 +135,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         # The invited user is already a member
         self.organization.members.add(PrescriberFactory())
         guest = self.organization.members.exclude(email=self.sender.email).first()
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
         )
@@ -157,12 +157,12 @@ class TestPEOrganizationInvitation(TestCase):
             "form-0-last_name": guest.last_name,
             "form-0-email": guest.email,
         }
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         response = self.client.post(INVITATION_URL, data=post_data, follow=True)
         self.assertRedirects(response, INVITATION_URL)
 
     def test_pe_organization_invitation_unsuccessful(self):
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         post_data = POST_DATA | {
             "form-0-first_name": "René",
             "form-0-last_name": "Boucher",
@@ -281,7 +281,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
             last_name=user.last_name,
             email=user.email,
         )
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assert_invitation_is_accepted(response, user, invitation)
 
@@ -294,7 +294,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
             last_name=user.last_name,
             email=user.email,
         )
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assert_invitation_is_accepted(response, user, invitation)
 
@@ -381,7 +381,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
             email=user.email,
         )
 
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertEqual(response.status_code, 403)
         invitation.refresh_from_db()
@@ -389,7 +389,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
 
     def test_connected_user_is_not_the_invited_user(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertRedirects(response, reverse("account_logout"))
         invitation.refresh_from_db()
@@ -428,7 +428,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, escape("Cette invitation n'est plus valide."))
 
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         # Try to bypass the first check by directly reaching the join endpoint
         join_url = reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)

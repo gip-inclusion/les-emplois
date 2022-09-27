@@ -12,7 +12,7 @@ from itou.job_applications.factories import (
     JobApplicationWithJobSeekerProfileFactory,
 )
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithMockedAddressFactory
+from itou.users.factories import JobSeekerWithMockedAddressFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -59,7 +59,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.job_seeker = self.job_application.job_seeker
 
     def login_response(self):
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         return self.client.get(self.url)
 
     # Bypass each step with minimum viable data
@@ -69,7 +69,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def pass_step_1(self, _mock):
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         url = reverse("employee_record_views:create", args=(self.job_application.id,))
         target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
         response = self.client.post(url, data=get_sample_form_data(self.job_seeker))
@@ -125,7 +125,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
 
     def test_access_denied_bad_permissions(self):
         # Must not have access
-        self.client.login(username=self.user_without_perms.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user_without_perms)
 
         response = self.client.get(self.url)
         # Changed to 404
@@ -133,7 +133,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
 
     def test_access_denied_bad_siae_kind(self):
         # SIAE can't use employee record (not the correct kind)
-        self.client.login(username=self.user_siae_bad_kind.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user_siae_bad_kind)
 
         response = self.client.get(self.url)
 
@@ -152,7 +152,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
     def test_access_granted(self):
         # Must have access
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
@@ -161,7 +161,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
         hiring_end_at = self.job_application.hiring_end_at
 
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
@@ -171,7 +171,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.job_application.hiring_end_at = None
         self.job_application.save()
 
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
@@ -184,7 +184,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
     def test_title(self, _mock):
         # Job seeker / employee must have a title
 
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         self.client.get(self.url)
 
         data = {
@@ -215,7 +215,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         # otherwise, only a country is mandatory
 
         # Validation is done by the model
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         self.client.get(self.url)
 
         data = get_sample_form_data(self.job_seeker)

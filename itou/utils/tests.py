@@ -41,7 +41,7 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.apis import api_entreprise
 from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
@@ -1197,7 +1197,7 @@ class ResumeFormMixinTest(TestCase):
 class SupportRemarkAdminViewsTest(TestCase):
     def test_add_support_remark_to_suspension(self):
         user = UserFactory()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         today = timezone.now().date()
         job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)

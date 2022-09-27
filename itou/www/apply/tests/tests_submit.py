@@ -20,13 +20,7 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
-from itou.users.factories import (
-    DEFAULT_PASSWORD,
-    JobSeekerFactory,
-    JobSeekerProfileFactory,
-    PrescriberFactory,
-    UserFactory,
-)
+from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
@@ -50,7 +44,7 @@ class ApplyTest(TestCase):
         user = JobSeekerFactory()
         siae = SiaeFactory(with_jobs=True)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         for route in routes:
             with self.subTest(route=route):
                 response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}))
@@ -67,7 +61,7 @@ class ApplyTest(TestCase):
         user = JobSeekerFactory()
         siae = SiaeFactory(with_jobs=True)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         for route in routes:
             with self.subTest(route=route):
                 response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk, "session_uuid": uuid.uuid4()}))
@@ -76,7 +70,7 @@ class ApplyTest(TestCase):
 
     def test_start_coalesce_back_url(self):
         siae = SiaeFactory(with_membership=True)
-        self.client.login(username=siae.members.first().email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae.members.first())
 
         # Default / Fallback
         self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
@@ -128,7 +122,7 @@ class ApplyAsJobSeekerTest(TestCase):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         user = JobSeekerFactory(birthdate=None, nir="")
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -288,7 +282,7 @@ class ApplyAsJobSeekerTest(TestCase):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         user = JobSeekerFactory(nir="")
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -330,7 +324,7 @@ class ApplyAsJobSeekerTest(TestCase):
             PoleEmploiApprovalFactory(
                 pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
             )
-            self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+            self.client.force_login(user)
 
             # Follow all redirections…
             response = self.client.get(
@@ -346,7 +340,7 @@ class ApplyAsJobSeekerTest(TestCase):
     def test_apply_as_job_seeker_on_sender_tunnel(self):
         siae = SiaeFactory()
         user = JobSeekerFactory()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Without a session namespace
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
@@ -383,7 +377,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(with_pending_authorization=True)
         user = prescriber_organization.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         dummy_job_seeker_profile = JobSeekerProfileFactory.build()
 
@@ -643,7 +637,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         dummy_job_seeker_profile = JobSeekerProfileFactory.build()
 
@@ -906,7 +900,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Follow all redirections…
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
@@ -947,7 +941,7 @@ class ApplyAsPrescriberTest(TestCase):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         user = PrescriberFactory()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         dummy_job_seeker_profile = JobSeekerProfileFactory.build()
 
@@ -1215,7 +1209,7 @@ class ApplyAsPrescriberTest(TestCase):
         ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
 
         user = PrescriberFactory()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Follow all redirections…
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
@@ -1238,7 +1232,7 @@ class ApplyAsPrescriberTest(TestCase):
     def test_apply_as_prescriber_on_job_seeker_tunnel(self):
         siae = SiaeFactory()
         user = PrescriberFactory()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Without a session namespace
         response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
@@ -1284,7 +1278,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
         siae, user = self.create_test_data()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Follow all redirections…
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
@@ -1359,7 +1353,7 @@ class ApplyAsSiaeTest(TestCase):
         siae2 = SiaeFactory(with_membership=True)
 
         user = siae1.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae2.pk}), {"back_url": "/"})
         self.assertEqual(response.status_code, 403)
@@ -1370,7 +1364,7 @@ class ApplyAsSiaeTest(TestCase):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         dummy_job_seeker_profile = JobSeekerProfileFactory.build()
 
@@ -1625,7 +1619,7 @@ class ApplyAsSiaeTest(TestCase):
         ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
 
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Follow all redirections…
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
@@ -1660,7 +1654,7 @@ class ApplyAsOtherTest(TestCase):
         siae = SiaeFactory()
         institution = InstitutionWithMembershipFactory()
 
-        self.client.login(username=institution.members.first().email, password=DEFAULT_PASSWORD)
+        self.client.force_login(institution.members.first())
 
         for route in self.ROUTES:
             with self.subTest(route=route):
@@ -1671,7 +1665,7 @@ class ApplyAsOtherTest(TestCase):
         siae = SiaeFactory()
         user = UserFactory(is_job_seeker=False, is_prescriber=False, is_siae_staff=False, is_labor_inspector=False)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         for route in self.ROUTES:
             with self.subTest(route=route):
@@ -1683,7 +1677,7 @@ class ApplicationViewTest(TestCase):
     def test_application_jobs_use_previously_selected_jobs(self):
         siae = SiaeFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
 
-        self.client.login(username=siae.members.first().email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init(
             {
@@ -1703,7 +1697,7 @@ class ApplicationViewTest(TestCase):
     def test_application_resume_hidden_fields(self):
         siae = SiaeFactory(with_membership=True, with_jobs=True)
 
-        self.client.login(username=siae.members.first().email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init(
             {
@@ -1721,7 +1715,7 @@ class ApplicationViewTest(TestCase):
     def test_application_eligibility_is_bypassed_for_siae_not_subject_to_eligibility_rules(self):
         siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)
 
-        self.client.login(username=siae.members.first().email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init({"job_seeker_pk": JobSeekerFactory()})
         apply_session.save()
@@ -1735,7 +1729,7 @@ class ApplicationViewTest(TestCase):
         siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)
         prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
 
-        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(prescriber)
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init({"job_seeker_pk": JobSeekerFactory()})
         apply_session.save()
@@ -1749,7 +1743,7 @@ class ApplicationViewTest(TestCase):
         siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)
         eligibility_diagnosis = EligibilityDiagnosisFactory()
 
-        self.client.login(username=siae.members.first().email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init({"job_seeker_pk": eligibility_diagnosis.job_seeker})
         apply_session.save()
@@ -1764,7 +1758,7 @@ class ApplicationViewTest(TestCase):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         eligibility_diagnosis = EligibilityDiagnosisFactory()
 
-        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(prescriber)
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init({"job_seeker_pk": eligibility_diagnosis.job_seeker})
         apply_session.save()

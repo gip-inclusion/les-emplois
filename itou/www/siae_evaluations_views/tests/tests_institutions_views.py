@@ -15,7 +15,7 @@ from itou.siae_evaluations.factories import (
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.enums import KIND_SIAE_STAFF
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
@@ -77,7 +77,7 @@ class SamplesSelectionViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         # institution without active campaign
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Vous n'avez pas de contrôle en cours.")
@@ -106,7 +106,7 @@ class SamplesSelectionViewTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
         back_url = reverse("dashboard:index")
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         self.assertEqual(response.context["institution"], self.institution)
@@ -145,7 +145,7 @@ class SamplesSelectionViewTest(TestCase):
     def test_post_form(self):
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         post_data = {"chosen_percent": evaluation_enums.EvaluationChosenPercent.MIN}
@@ -164,7 +164,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.institution = membership.institution
 
     def test_access(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # institution without evaluation_campaign
         response = self.client.get(
@@ -209,7 +209,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_content(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -231,7 +231,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         transmis = "Résultats transmis"
         phase_contradictoire = "Phase contradictoire"
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -297,7 +297,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(response, transmis)
 
     def test_num_queries(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -328,7 +328,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.institution = membership.institution
 
     def test_access(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # institution without evaluation_campaign
         response = self.client.get(
@@ -363,7 +363,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_content(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -491,7 +491,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # not yet submitted by Siae
         response = self.client.get(url)
@@ -526,7 +526,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, valide)
 
     def test_num_queries_in_view(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -558,7 +558,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.institution = membership.institution
 
     def test_access(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # institution without evaluation_campaign
         response = self.client.get(
@@ -604,7 +604,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_content(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -630,7 +630,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
 
     def test_criterion_validation(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
@@ -735,7 +735,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         # to be added : readonly conditionnal field
 
     def test_post_form(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
@@ -768,7 +768,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
 
     def test_num_queries_in_view(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         EvaluatedAdministrativeCriteria.objects.create(
@@ -799,7 +799,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_job_application_state_labels(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         evaluated_administrative_criteria.proof_url = "https://www.test.com"
@@ -841,7 +841,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         self.institution = membership.institution
 
     def test_access(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # institution without evaluation_campaign
         response = self.client.get(
@@ -897,7 +897,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_actions_and_redirection(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         redirect_url = reverse(
@@ -993,7 +993,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         self.evaluated_siae = create_evaluated_siae_consistent_datas(self.evaluation_campaign)
 
     def test_access(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         # institution without evaluation_campaign
         response = self.client.get(
@@ -1026,7 +1026,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_actions_and_redirection(self):
-        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         self.evaluation_campaign.evaluations_asked_at = timezone.now()
         self.evaluation_campaign.save(update_fields=["evaluations_asked_at"])

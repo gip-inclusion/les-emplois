@@ -5,7 +5,6 @@ from itou.employee_record import factories as employee_record_factories
 from itou.employee_record.enums import Status
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.users.factories import DEFAULT_PASSWORD
 
 
 class ListEmployeeRecordsTest(TestCase):
@@ -29,7 +28,7 @@ class ListEmployeeRecordsTest(TestCase):
         """
         Non-eligible SIAE should not be able to access this list
         """
-        self.client.login(username=self.user_without_perms.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user_without_perms)
 
         response = self.client.get(self.url)
 
@@ -39,7 +38,7 @@ class ListEmployeeRecordsTest(TestCase):
         """
         Check if new employee records / job applications are displayed in the list
         """
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         response = self.client.get(self.url)
 
@@ -51,7 +50,7 @@ class ListEmployeeRecordsTest(TestCase):
         Check status filter
         """
         # No status defined
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(self.url)
 
         job_seeker_name = self.job_seeker.get_full_name().title()
@@ -68,7 +67,7 @@ class ListEmployeeRecordsTest(TestCase):
             self.assertNotContains(response, job_seeker_name)
 
     def test_employee_records_with_hiring_end_at(self):
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         hiring_end_at = self.job_application.hiring_end_at
 
         response = self.client.get(self.url)
@@ -77,7 +76,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.assertContains(response, f"Fin de contrat :&nbsp;<b>{hiring_end_at.strftime('%e').lstrip()}")
 
     def test_employee_records_without_hiring_end_at(self):
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         self.job_application.hiring_end_at = None
         self.job_application.save()
 
@@ -87,7 +86,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.assertContains(response, "Fin de contrat :&nbsp;<b>Non renseigné")
 
     def test_rejected_without_custom_message(self):
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.siae)
         record.update_as_ready()
@@ -100,7 +99,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.assertContains(response, "JSON Invalide")
 
     def test_rejected_custom_messages(self):
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.siae)
 

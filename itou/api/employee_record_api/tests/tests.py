@@ -103,13 +103,13 @@ class EmployeeRecordAPIPermissionsTest(APITestCase):
         A session authentication is valid to use the API (same security level as token)
         => Allows testing in DEV context
         """
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
 
         response = self.client.get(ENDPOINT_URL, format="json")
         self.assertEqual(response.status_code, 200)
 
     def test_permission_ko_with_session(self):
-        self.client.login(username=self.unauthorized_user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.unauthorized_user)
 
         response = self.client.get(ENDPOINT_URL, format="json")
         self.assertRedirects(response, reverse("account_logout"), status_code=302, target_status_code=200)
@@ -146,7 +146,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         Fetch list of employee records with and without `status` query param
         """
         # Using session auth (same as token but less steps)
-        self.client.login(username=self.siae_member.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.siae_member)
 
         # Get list without filtering by status (PROCESSED)
         # note: there is no way to create a processed employee record
@@ -231,7 +231,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         # BUGFIX:
         # Test that employee phone number and email address are passed
         # to API serializer.
-        self.client.login(username=self.siae_member.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.siae_member)
 
         response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
 
@@ -268,7 +268,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         employee_record.update_as_ready()
 
         member = employee_record.job_application.to_siae.members.first()
-        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(member)
 
         response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
 
@@ -301,7 +301,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         employee_record.update_as_sent("RIAE_FS_20220101000000.json", 1)
 
         member = employee_record.job_application.to_siae.members.first()
-        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
 
         self.assertEqual(response.status_code, 200)
@@ -340,7 +340,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         yesterday_param = f"{today - relativedelta(days=1):%Y-%m-%d}"
 
         member = employee_record.job_application.to_siae.members.first()
-        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + f"?created={today_param}", format="json")
 
         self.assertEqual(response.status_code, 200)
@@ -383,7 +383,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
 
         member = employee_record_1.job_application.to_siae.members.first()
 
-        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + f"?since={today}", format="json")
 
         self.assertEqual(response.status_code, 200)
@@ -431,7 +431,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
 
         member = employee_record_1.job_application.to_siae.members.first()
 
-        self.client.login(username=member.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + "?status=NEW", format="json")
 
         self.assertEqual(response.status_code, 200)
