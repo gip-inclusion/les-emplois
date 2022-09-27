@@ -1,6 +1,9 @@
 """
 https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 """
+import re
+import string
+
 from django import template
 from django.template import defaultfilters
 
@@ -31,4 +34,4 @@ def mask_unless(value, predicate):
     if predicate:
         return value
 
-    return " ".join(part[0] + "…" for part in value.split(" "))
+    return " ".join(part[0] + "…" for part in re.split(f"[{re.escape(string.whitespace)}]+", value) if part)

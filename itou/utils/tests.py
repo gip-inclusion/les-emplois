@@ -530,6 +530,22 @@ class UtilsTemplateTagsTestCase(TestCase):
             template.render(Context({"value": "Firstname Lastname", "predicate": False})),
             "F… L…",
         )
+        self.assertEqual(
+            template.render(Context({"value": "Firstname Middlename Lastname", "predicate": False})),
+            "F… M… L…",
+        )
+        self.assertEqual(
+            template.render(Context({"value": "Firstname Middlename Lastname1-Lastname2", "predicate": False})),
+            "F… M… L…",
+        )
+        self.assertEqual(
+            template.render(Context({"value": " Firstname  Middlename   Lastname ", "predicate": False})),
+            "F… M… L…",
+        )
+        self.assertEqual(
+            template.render(Context({"value": "\tFirstname\t\tMiddlename\tLastname\t\t", "predicate": False})),
+            "F… M… L…",
+        )
 
     @override_settings(TALLY_URL="https://foobar")
     def test_tally_url_custom_template_tag(self):
