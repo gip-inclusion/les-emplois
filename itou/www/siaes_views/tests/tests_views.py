@@ -17,7 +17,6 @@ from itou.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
 )
 from itou.siaes.models import Siae
-from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 
 
@@ -57,7 +56,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertTrue(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_ASP)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -82,7 +81,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertTrue(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -113,7 +112,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertTrue(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_STAFF_CREATED)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -131,7 +130,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertTrue(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_ASP)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -149,7 +148,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertFalse(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_GEIQ)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -167,7 +166,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertFalse(siae.should_have_convention)
         self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -185,7 +184,7 @@ class CreateSiaeViewTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
@@ -225,7 +224,7 @@ class CreateSiaeViewTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
@@ -265,7 +264,7 @@ class CreateSiaeViewTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
@@ -303,7 +302,7 @@ class CreateSiaeViewTest(TestCase):
         siae.save()
         user = siae.members.first()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
@@ -338,7 +337,7 @@ class CreateSiaeViewTest(TestCase):
         new_siret = siae.siren + "12345"
         self.assertNotEqual(siae.siret, new_siret)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
@@ -369,7 +368,7 @@ class CreateSiaeViewTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
@@ -432,7 +431,7 @@ class EditSiaeViewTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("siaes_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
@@ -534,7 +533,7 @@ class EditSiaeViewTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Only admin members should be allowed to edit SIAE's details
         membership = user.siaemembership_set.first()
@@ -552,7 +551,7 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("siaes_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
@@ -592,7 +591,7 @@ class MembersTest(TestCase):
     def test_members(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("siaes_views:members")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -609,7 +608,7 @@ class UserMembershipDeactivationTest(TestCase):
         memberships = admin.siaemembership_set.all()
         membership = memberships.first()
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": admin.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
@@ -632,7 +631,7 @@ class UserMembershipDeactivationTest(TestCase):
         self.assertFalse(guest in siae.active_admin_members)
         self.assertTrue(admin in siae.active_admin_members)
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
@@ -657,7 +656,7 @@ class UserMembershipDeactivationTest(TestCase):
         """
         siae = SiaeWith2MembershipsFactory()
         guest = siae.members.filter(siaemembership__is_admin=False).first()
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
@@ -673,13 +672,13 @@ class UserMembershipDeactivationTest(TestCase):
         admin = siae.members.filter(siaemembership__is_admin=True).first()
         guest = siae.members.filter(siaemembership__is_admin=False).first()
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
         self.client.logout()
 
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
         url = reverse("dashboard:index")
         response = self.client.get(url)
 
@@ -703,14 +702,14 @@ class UserMembershipDeactivationTest(TestCase):
         self.assertEqual(len(memberships), 2)
 
         # Admin remove guest from structure
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
         self.client.logout()
 
         # guest must be able to login
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
         url = reverse("dashboard:index")
         response = self.client.get(url)
 
@@ -730,7 +729,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         admin = siae.members.filter(siaemembership__is_admin=True).first()
         guest = siae.members.filter(siaemembership__is_admin=False).first()
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
 
         # Redirection to confirm page
@@ -764,7 +763,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         membership.save()
         self.assertTrue(guest in siae.active_admin_members)
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
 
         # Redirection to confirm page
@@ -796,7 +795,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         admin = siae.members.filter(siaemembership__is_admin=True).first()
         guest = siae.members.filter(siaemembership__is_admin=False).first()
 
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
 
         # Redirection to confirm page
@@ -825,7 +824,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         admin = siae.members.filter(siaemembership__is_admin=True).first()
         guest = siae.members.filter(siaemembership__is_admin=False).first()
 
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
         # update: less test with RE_PATH
         with self.assertRaises(NoReverseMatch):
             reverse("siaes_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})

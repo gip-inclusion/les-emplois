@@ -7,7 +7,7 @@ from django.utils.html import escape
 from itou.invitations.models import SiaeStaffInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
+from itou.users.factories import JobSeekerFactory, UserFactory
 from itou.www.invitations_views.forms import SiaeStaffInvitationForm
 
 
@@ -31,7 +31,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         }
 
     def test_send_one_invitation(self):
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         response = self.client.get(INVITATION_URL)
 
         # Assert form is present
@@ -61,7 +61,7 @@ class TestSendSingleSiaeInvitation(TestCase):
             email=self.guest_data["email"],
             is_siae_staff=True,
         )
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         self.assertEqual(response.status_code, 200)
 
@@ -87,7 +87,7 @@ class TestSendSingleSiaeInvitation(TestCase):
             last_name=self.guest_data["last_name"],
             email=self.guest_data["email"],
         )
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         response = self.client.post(INVITATION_URL, data=self.post_data)
 
         for error_dict in response.context["formset"].errors:
@@ -97,14 +97,14 @@ class TestSendSingleSiaeInvitation(TestCase):
 
     def test_two_employers_invite_the_same_guest(self):
         # SIAE 1 invites guest.
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         self.assertEqual(SiaeStaffInvitation.objects.count(), 1)
 
         # SIAE 2 invites guest as well.
         siae_2 = SiaeFactory(with_membership=True)
         sender_2 = siae_2.members.first()
-        self.client.login(email=sender_2.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(sender_2)
         self.client.post(INVITATION_URL, data=self.post_data)
         self.assertEqual(SiaeStaffInvitation.objects.count(), 2)
         invitation = SiaeStaffInvitation.objects.get(siae=siae_2)
@@ -135,7 +135,7 @@ class TestSendMultipleSiaeInvitation(TestCase):
         }
 
     def test_send_multiple_invitations(self):
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         response = self.client.get(INVITATION_URL)
 
         self.assertTrue(response.context["formset"])
@@ -144,7 +144,7 @@ class TestSendMultipleSiaeInvitation(TestCase):
         self.assertEqual(invitations, 2)
 
     def test_send_multiple_invitations_duplicated_email(self):
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         response = self.client.get(INVITATION_URL)
 
         self.assertTrue(response.context["formset"])
@@ -170,7 +170,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
     def setUp(self):
         self.sender_siae = SiaeFactory(with_membership=True)
         self.sender = self.sender_siae.members.first()
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         self.post_data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
@@ -221,7 +221,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
 
     def test_invite_existing_user_is_prescriber(self):
         guest = PrescriberOrganizationWithMembershipFactory().members.first()
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         self.post_data.update(
             {
                 "form-0-first_name": guest.first_name,
@@ -238,7 +238,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
 
     def test_invite_existing_user_is_job_seeker(self):
         guest = JobSeekerFactory()
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         self.post_data.update(
             {
                 "form-0-first_name": guest.first_name,
@@ -257,7 +257,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         # The invited user is already a member
         SiaeMembershipFactory(siae=self.sender_siae, is_admin=False)
         guest = self.sender_siae.members.exclude(email=self.sender.email).first()
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.sender)
         self.post_data.update(
             {
                 "form-0-first_name": guest.first_name,

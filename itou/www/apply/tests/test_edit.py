@@ -6,7 +6,6 @@ from django.utils import timezone
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -55,7 +54,7 @@ class EditContractTest(TestCase):
         """
         Checks possibility of changing hiring start date to a future date.
         """
-        self.client.login(username=self.user1.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user1)
 
         response = self.client.get(self.url)
 
@@ -87,7 +86,7 @@ class EditContractTest(TestCase):
         """
         Checks possibility of changing hiring start date to a future date, with no hiring_end_at date.
         """
-        self.client.login(username=self.user1.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user1)
 
         response = self.client.get(self.url)
 
@@ -134,7 +133,7 @@ class EditContractTest(TestCase):
         """
         Past contract start date are not allowed
         """
-        self.client.login(username=self.user1.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user1)
 
         response = self.client.get(self.url)
 
@@ -155,7 +154,7 @@ class EditContractTest(TestCase):
         The contract start date can only be postponed of 30 days
         """
 
-        self.client.login(username=self.user1.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user1)
 
         url = reverse("apply:edit_contract_start_date", kwargs={"job_application_id": self.job_application_1.id})
         response = self.client.get(url)
@@ -177,7 +176,7 @@ class EditContractTest(TestCase):
         If hiring date is postponed,
         approval start date must be updated accordingly (if there is an approval)
         """
-        self.client.login(username=self.user1.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user1)
         response = self.client.get(self.url)
 
         future_start_date = (timezone.now() + relativedelta(days=20)).date()
@@ -202,7 +201,7 @@ class EditContractTest(TestCase):
         When the job application is linked to a previous approval,
         check that approval dates are not updated if the hiring date change
         """
-        self.client.login(username=self.user2.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user2)
         response = self.client.get(self.old_url)
 
         future_start_date = (timezone.now() + relativedelta(days=5)).date()
@@ -223,7 +222,7 @@ class EditContractTest(TestCase):
         Previously running approval start date must not be updated
         when postponing contract dates
         """
-        self.client.login(username=self.user2.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user2)
         response = self.client.get(self.old_url)
 
         approval = self.job_application_2.approval

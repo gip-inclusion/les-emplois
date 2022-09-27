@@ -511,7 +511,7 @@ class InclusionConnectLogoutTest(TestCase):
         he should be logged out without inclusion connect.
         """
         user = UserFactory()
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.post(reverse("account_logout"))
         expected_redirection = reverse("home:hp")
         self.assertRedirects(response, expected_redirection)

@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
-from itou.users.factories import DEFAULT_PASSWORD, UserFactory
+from itou.users.factories import UserFactory
 
 
 @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
@@ -15,7 +15,7 @@ class TestDisplayApproval(TestCase):
         job_application = JobApplicationWithApprovalFactory()
 
         siae_member = job_application.to_siae.members.first()
-        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae_member)
 
         response = self.client.get(
             reverse("approvals:display_printable_approval", kwargs={"job_application_id": job_application.pk})
@@ -33,7 +33,7 @@ class TestDisplayApproval(TestCase):
         job_application = JobApplicationFactory()
 
         siae_member = job_application.to_siae.members.first()
-        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae_member)
 
         response = self.client.get(
             reverse("approvals:display_printable_approval", kwargs={"job_application_id": job_application.pk})
@@ -49,7 +49,7 @@ class TestDisplayApproval(TestCase):
         )
 
         siae_member = job_application.to_siae.members.first()
-        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae_member)
 
         response = self.client.get(
             reverse("approvals:display_printable_approval", kwargs={"job_application_id": job_application.pk})
@@ -75,7 +75,7 @@ class TestDisplayApproval(TestCase):
         )
 
         siae_member = job_application.to_siae.members.first()
-        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae_member)
 
         response = self.client.get(
             reverse("approvals:display_printable_approval", kwargs={"job_application_id": job_application.pk})
@@ -97,7 +97,7 @@ class TestDisplayApproval(TestCase):
         job_application = JobApplicationWithApprovalFactory(eligibility_diagnosis=None)
 
         siae_member = job_application.to_siae.members.first()
-        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae_member)
 
         with self.assertRaisesRegex(Exception, "had no eligibility diagnosis and also was not mass-imported"):
             self.client.get(

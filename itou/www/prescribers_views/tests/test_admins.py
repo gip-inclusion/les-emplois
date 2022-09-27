@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 
 from itou.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
-from itou.users.factories import DEFAULT_PASSWORD
 
 
 class PrescribersOrganizationAdminMembersManagementTest(TestCase):
@@ -16,7 +15,7 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         admin = organization.members.filter(prescribermembership__is_admin=True).first()
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
 
         # Redirection to confirm page
@@ -52,7 +51,7 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         membership.save()
         self.assertTrue(guest in organization.active_admin_members)
 
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(admin)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
 
         # Redirection to confirm page
@@ -86,7 +85,7 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         admin = organization.members.filter(prescribermembership__is_admin=True).first()
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
 
         # Redirection to confirm page
@@ -115,7 +114,7 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         admin = organization.members.filter(prescribermembership__is_admin=True).first()
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
-        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(guest)
 
         # update: possible actions are now filtered via RE_PATH in urls.py
         with self.assertRaises(NoReverseMatch):

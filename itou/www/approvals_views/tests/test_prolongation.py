@@ -10,7 +10,6 @@ from itou.approvals.models import Approval, Prolongation
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import DeclareProlongationForm
 
@@ -60,7 +59,7 @@ class ApprovalProlongationTest(TestCase):
         Test the creation of a prolongation.
         """
 
-        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.siae_user)
 
         back_url = "/"
         params = urlencode({"back_url": back_url})
@@ -132,7 +131,7 @@ class ApprovalProlongationTest(TestCase):
         Test the creation of a prolongation without prescriber.
         """
 
-        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.siae_user)
 
         back_url = "/"
         params = urlencode({"back_url": back_url})

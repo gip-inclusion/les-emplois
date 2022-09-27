@@ -5,7 +5,6 @@ from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.users.factories import DEFAULT_PASSWORD
 
 
 class ReactivateEmployeeRecordsTest(TestCase):
@@ -28,7 +27,7 @@ class ReactivateEmployeeRecordsTest(TestCase):
         self.employee_record.update_as_processed(process_code, process_message, "{}")
         self.employee_record.update_as_disabled()
 
-        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=DISABLED")
         self.assertContains(response, "Confirmer la réactivation")
 

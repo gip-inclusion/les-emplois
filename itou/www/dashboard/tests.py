@@ -42,7 +42,7 @@ class DashboardViewTest(TestCase):
     def test_dashboard(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
@@ -52,7 +52,7 @@ class DashboardViewTest(TestCase):
         siae = SiaePendingGracePeriodFactory()
         user = SiaeStaffFactory()
         siae.members.add(user)
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
@@ -62,7 +62,7 @@ class DashboardViewTest(TestCase):
         siae = SiaeAfterGracePeriodFactory()
         user = SiaeStaffFactory()
         siae.members.add(user)
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("dashboard:index")
         response = self.client.get(url, follow=True)
@@ -76,7 +76,7 @@ class DashboardViewTest(TestCase):
     def test_dashboard_eiti(self):
         siae = SiaeFactory(kind=SiaeKind.EITI, with_membership=True)
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
@@ -91,7 +91,7 @@ class DashboardViewTest(TestCase):
         user.siae_set.add(other_siae)
         user.siae_set.add(last_siae)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
@@ -148,7 +148,7 @@ class DashboardViewTest(TestCase):
             with self.subTest(f"should display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
-                self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+                self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, "Prolonger ou suspendre un agrément émis par Pôle emploi")
@@ -158,7 +158,7 @@ class DashboardViewTest(TestCase):
             with self.subTest(f"should not display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
-                self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+                self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertNotContains(response, "Prolonger ou suspendre un agrément émis par Pôle emploi")
@@ -170,7 +170,7 @@ class DashboardViewTest(TestCase):
                 siae = SiaeFactory(kind=kind, with_membership=True, membership__is_admin=True)
                 user = siae.members.get()
 
-                self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+                self.client.force_login(user)
                 response = self.client.get(reverse("dashboard:index"))
 
                 if user.can_create_siae_antenna(siae):
@@ -182,7 +182,7 @@ class DashboardViewTest(TestCase):
         membershipfactory = InstitutionMembershipFactory()
         user = membershipfactory.user
         institution = membershipfactory.institution
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
@@ -230,7 +230,7 @@ class DashboardViewTest(TestCase):
         # preset for incoming new pages
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
@@ -243,19 +243,19 @@ class DashboardViewTest(TestCase):
     def test_dashboard_prescriber_suspend_link(self):
 
         user = JobSeekerFactory()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Suspendre un PASS IAE")
 
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Suspendre un PASS IAE")
 
         membershipfactory = InstitutionMembershipFactory()
         user = membershipfactory.user
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Suspendre un PASS IAE")
 
@@ -263,7 +263,7 @@ class DashboardViewTest(TestCase):
             kind=PrescriberOrganizationKind.CAP_EMPLOI
         )
         prescriber = prescriber_org.members.first()
-        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(prescriber)
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Suspendre un PASS IAE")
 
@@ -271,14 +271,14 @@ class DashboardViewTest(TestCase):
             kind=PrescriberOrganizationKind.PE
         )
         prescriber_pe = prescriber_org_pe.members.first()
-        self.client.login(username=prescriber_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(prescriber_pe)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Suspendre un PASS IAE")
 
     @freeze_time("2022-09-15")
     def test_dashboard_access_by_a_jobseeker(self):
         approval = ApprovalFactory(start_at=datetime(2022, 6, 21), end_at=datetime(2022, 12, 6))
-        self.client.login(username=approval.user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(approval.user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertContains(response, "PASS IAE (agrément) disponible :")
@@ -293,7 +293,7 @@ class DashboardViewTest(TestCase):
         )
 
         prescriber = prescriber_org.members.first()
-        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(prescriber)
         response = self.client.get(reverse("dashboard:index"))
 
         self.assertContains(
@@ -308,7 +308,7 @@ class DashboardViewTest(TestCase):
 class EditUserInfoViewTest(TestCase):
     def test_edit(self):
         user = JobSeekerFactory()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -345,7 +345,7 @@ class EditUserInfoViewTest(TestCase):
 
     def test_edit_sso(self):
         user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -389,7 +389,7 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.created_by = user
         job_application.job_seeker.save()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
@@ -440,7 +440,7 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.created_by = user
         job_application.job_seeker.save()
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -458,7 +458,7 @@ class EditJobSeekerInfo(TestCase):
         prescribers_factories.PrescriberMembershipFactory(
             user=other_prescriber, organization=job_application.sender_prescriber_organization
         )
-        self.client.login(username=other_prescriber.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(other_prescriber)
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -467,7 +467,7 @@ class EditJobSeekerInfo(TestCase):
         job_application = JobApplicationSentByPrescriberFactory()
         # The job seeker manages his own personal information (autonomous)
         user = job_application.sender
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
 
@@ -480,7 +480,7 @@ class EditJobSeekerInfo(TestCase):
 
         # Lambda prescriber not member of the sender organization
         prescriber = PrescriberFactory()
-        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(prescriber)
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
 
         response = self.client.get(url)
@@ -495,7 +495,7 @@ class EditJobSeekerInfo(TestCase):
         user = siae.members.first()
         job_application = JobApplicationSentByPrescriberFactory(to_siae=siae, job_seeker__created_by=user)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
@@ -545,7 +545,7 @@ class EditJobSeekerInfo(TestCase):
         EmailAddress.objects.create(user=job_seeker, email=job_seeker.email, verified=True)
 
         # Now the SIAE wants to edit the jobseeker email. The field is not available, and it cannot be bypassed
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
@@ -593,7 +593,7 @@ class ChangeEmailViewTest(TestCase):
         old_email = user.email
         new_email = "jean@gabin.fr"
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
         url = reverse("dashboard:edit_user_email")
         response = self.client.get(url)
 
@@ -654,12 +654,12 @@ class ChangeEmailViewTest(TestCase):
         url = reverse("dashboard:edit_user_email")
 
         job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
-        self.client.login(username=job_seeker.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(job_seeker)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
         prescriber = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
-        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(prescriber)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
@@ -698,7 +698,7 @@ class SwitchSiaeTest(TestCase):
     def test_switch_siae(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         related_siae = SiaeFactory()
         related_siae.members.add(user)
@@ -742,7 +742,7 @@ class SwitchSiaeTest(TestCase):
     def test_can_still_switch_to_inactive_siae_during_grace_period(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         related_siae = SiaePendingGracePeriodFactory()
         related_siae.members.add(user)
@@ -765,7 +765,7 @@ class SwitchSiaeTest(TestCase):
     def test_cannot_switch_to_inactive_siae_after_grace_period(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         related_siae = SiaeAfterGracePeriodFactory()
         related_siae.members.add(user)
@@ -795,7 +795,7 @@ class EditUserPreferencesTest(TestCase):
         recipient = user.siaemembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Recipient's notifications are empty for the moment.
         self.assertFalse(recipient.notifications)
@@ -823,7 +823,7 @@ class EditUserPreferencesTest(TestCase):
         job_descriptions_pks = list(siae.job_description_through.values_list("pk", flat=True))
         recipient = user.siaemembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Recipient's notifications are empty for the moment.
         self.assertFalse(recipient.notifications)
@@ -853,7 +853,7 @@ class EditUserPreferencesTest(TestCase):
         user = siae.members.first()
         recipient = user.siaemembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Recipient's notifications are empty for the moment.
         self.assertFalse(recipient.notifications)
@@ -881,7 +881,7 @@ class EditUserPreferencesTest(TestCase):
         job_descriptions_pks = list(siae.job_description_through.values_list("pk", flat=True))
         recipient = user.siaemembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Recipient's notifications are empty for the moment.
         self.assertFalse(recipient.notifications)
@@ -913,13 +913,13 @@ class EditUserPreferencesExceptionsTest(TestCase):
         # Only employers can currently access the Preferences page.
 
         prescriber = PrescriberFactory()
-        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(prescriber)
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
         job_seeker = JobSeekerFactory()
-        self.client.login(username=job_seeker.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(job_seeker)
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)

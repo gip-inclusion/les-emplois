@@ -10,7 +10,6 @@ from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import SuspensionForm
 
@@ -35,7 +34,7 @@ class ApprovalSuspendViewTest(TestCase):
         self.assertEqual(0, approval.suspension_set.count())
 
         siae_user = job_application.to_siae.members.first()
-        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae_user)
 
         back_url = "/"
         params = urlencode({"back_url": back_url})
@@ -157,7 +156,7 @@ class ApprovalSuspendViewTest(TestCase):
 
         suspension = SuspensionFactory(approval=approval, start_at=start_at, end_at=end_at, created_by=siae_user)
 
-        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae_user)
 
         back_url = "/"
         params = urlencode({"back_url": back_url})
@@ -205,7 +204,7 @@ class ApprovalSuspendViewTest(TestCase):
 
         suspension = SuspensionFactory(approval=approval, start_at=start_at, end_at=end_at, created_by=siae_user)
 
-        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(siae_user)
 
         back_url = "/"
         params = urlencode({"back_url": back_url})

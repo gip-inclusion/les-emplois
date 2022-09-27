@@ -16,7 +16,6 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -101,7 +100,7 @@ class ProcessListJobSeekerTest(ProcessListTest):
         """
         Maggie wants to see job applications sent for her.
         """
-        self.client.login(username=self.maggie.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.maggie)
         response = self.client.get(self.job_seeker_base_url)
 
         # Count job applications used by the template
@@ -115,7 +114,7 @@ class ProcessListJobSeekerTest(ProcessListTest):
         Provide a list of job applications sent by a job seeker
         and filtered by a state.
         """
-        self.client.login(username=self.maggie.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.maggie)
         expected_state = self.maggie.job_applications.last().state
         params = urlencode({"states": [expected_state]}, True)
         url = f"{self.job_seeker_base_url}?{params}"
@@ -141,7 +140,7 @@ class ProcessListJobSeekerTest(ProcessListTest):
                 created_at=now - timezone.timedelta(days=diff_day), job_seeker=self.maggie
             )
 
-        self.client.login(username=self.maggie.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.maggie)
 
         date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
 
@@ -172,7 +171,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see a list of job applications sent to his SIAE.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         response = self.client.get(self.siae_base_url)
 
         total_applications = len(response.context["job_applications_page"].object_list)
@@ -184,7 +183,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see only accepted job applications.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         state_accepted = JobApplicationWorkflow.STATE_ACCEPTED
         params = urlencode({"states": [state_accepted]}, True)
         url = f"{self.siae_base_url}?{params}"
@@ -199,7 +198,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see NEW and PROCESSING job applications.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         job_applications_states = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING]
         params = urlencode({"states": job_applications_states}, True)
         url = f"{self.siae_base_url}?{params}"
@@ -214,7 +213,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see job applications sent at a specific date.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
         job_applications = self.hit_pit.job_applications_received.not_archived().order_by("created_at")
         jobs_in_range = job_applications[3:]
@@ -242,7 +241,7 @@ class ProcessListSiaeTest(ProcessListTest):
         in the HTTP query if they are not filled in by the user.
         Make sure the template loads all available job applications if fields are empty.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         url = f"{self.siae_base_url}?start_date=&end_date="
         response = self.client.get(url)
         total_applications = len(response.context["job_applications_page"].object_list)
@@ -253,7 +252,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see applications sent by Pôle emploi.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         sender_organization = self.pole_emploi
         params = urlencode({"sender_organizations": [sender_organization.id]}, True)
         url = f"{self.siae_base_url}?{params}"
@@ -268,7 +267,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see applications sent by a member of Pôle emploi.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         sender = self.thibault_pe
         params = urlencode({"senders": [sender.id]}, True)
         url = f"{self.siae_base_url}?{params}"
@@ -283,7 +282,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see Maggie's job applications.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         job_seekers_ids = [self.maggie.id]
         params = urlencode({"job_seekers": job_seekers_ids}, True)
         url = f"{self.siae_base_url}?{params}"
@@ -298,7 +297,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see applications sent by Pôle emploi and L'Envol.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         senders_ids = [self.pole_emploi.id, self.l_envol.id]
         params = urlencode({"sender_organizations": [self.thibault_pe.id, self.audrey_envol.id]}, True)
         url = f"{self.siae_base_url}?{params}"
@@ -315,7 +314,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         now = timezone.now()
         yesterday = (now - timezone.timedelta(days=1)).date()
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
 
         params = urlencode(
             {
@@ -364,7 +363,7 @@ class ProcessListSiaeTest(ProcessListTest):
         Eddie wants to see applications of job seeker for whom
         the diagnosis of eligibility has been validated.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
 
         params = urlencode({"eligibility_validated": True})
         url = f"{self.siae_base_url}?{params}"
@@ -383,7 +382,7 @@ class ProcessListSiaeTest(ProcessListTest):
         Eddie wants to see applications of job seeker for whom
         the diagnosis of eligibility has been validated with specific criteria.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
 
         diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
 
@@ -429,7 +428,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see applications of job seeker who live in given department.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
 
         # Maggie moves to Department 37
         self.maggie.post_code = "37000"
@@ -447,7 +446,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see applications with a given job appellation.
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
 
         create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
         (appellation1, appellation2) = Appellation.objects.all().order_by("?")[:2]
@@ -474,7 +473,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         Connect as Thibault to see a list of job applications
         sent by his organization (Pôle emploi).
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
         response = self.client.get(self.prescriber_base_url)
 
         # Count job applications used by the template
@@ -486,7 +485,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         Connect as Thibault to see a list of available job applications exports
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
         response = self.client.get(self.prescriber_exports_url)
 
         self.assertEqual(200, response.status_code)
@@ -495,7 +494,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         Connect as Thibault to see a list of available job applications exports
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
 
         response = self.client.get(self.prescriber_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]
@@ -514,7 +513,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         Thibault wants to filter a list of job applications
         by the default initial state.
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
         expected_state = JobApplicationWorkflow.initial_state
         params = urlencode({"states": [expected_state]}, True)
         url = f"{self.prescriber_base_url}?{params}"
@@ -529,7 +528,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         Thibault wants to see job applications sent by his colleague Laurie.
         He filters results using her full name.
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
         sender_id = self.laurie_pe.id
         params = urlencode({"senders": sender_id})
         url = f"{self.prescriber_base_url}?{params}"
@@ -543,7 +542,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         Thibault wants to see Maggie's job applications.
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
         job_seekers_ids = [self.maggie.id]
         params = urlencode({"job_seekers": job_seekers_ids}, True)
         url = f"{self.prescriber_base_url}?{params}"
@@ -557,7 +556,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         Thibault wants to see applications sent to Hit Pit.
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
         to_siaes_ids = [self.hit_pit.pk]
         params = urlencode({"to_siaes": to_siaes_ids}, True)
         url = f"{self.prescriber_base_url}?{params}"
@@ -578,7 +577,7 @@ class ProcessListExportsPrescriberTest(ProcessListTest):
         """
         Connect as Thibault to see a list of available job applications exports
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
         response = self.client.get(self.prescriber_exports_url)
 
         self.assertEqual(200, response.status_code)
@@ -587,7 +586,7 @@ class ProcessListExportsPrescriberTest(ProcessListTest):
         """
         Connect as a SIAE and try to see the prescriber export -> redirected
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         response = self.client.get(self.prescriber_exports_url)
 
         self.assertEqual(302, response.status_code)
@@ -603,7 +602,7 @@ class ProcessListExportsSiaeTest(ProcessListTest):
         """
         Connect as a SIAE to see a list of available job applications exports
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
         response = self.client.get(self.siae_exports_url)
 
         self.assertEqual(200, response.status_code)
@@ -612,7 +611,7 @@ class ProcessListExportsSiaeTest(ProcessListTest):
         """
         Connect as Thibault and try to see the siae export -> redirected
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
         response = self.client.get(self.siae_exports_url)
 
         self.assertEqual(404, response.status_code)
@@ -628,7 +627,7 @@ class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
         """
         Connect as Thibault to download a CSV export of available job applications
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
 
         response = self.client.get(self.prescriber_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]
@@ -646,7 +645,7 @@ class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
         """
         Connect as Thibault and attempt to download a CSV export of available job applications from SIAE
         """
-        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.thibault_pe)
 
         response = self.client.get(self.prescriber_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]
@@ -668,7 +667,7 @@ class ProcessListExportsDownloadSiaeTest(ProcessListTest):
         """
         Connect as Thibault to download a CSV export of available job applications
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
 
         response = self.client.get(self.siae_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]
@@ -684,7 +683,7 @@ class ProcessListExportsDownloadSiaeTest(ProcessListTest):
         """
         Connect as SIAE and attempt to download a CSV export of available job applications from prescribers
         """
-        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(self.eddie_hit_pit)
 
         response = self.client.get(self.siae_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]

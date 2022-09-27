@@ -32,7 +32,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
+from itou.users.factories import JobSeekerFactory, UserFactory
 
 
 class CommonApprovalQuerySetTest(TestCase):
@@ -618,7 +618,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         permission = Permission.objects.get(content_type=content_type, codename="change_approval")
         user.user_permissions.add(permission)
 
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         approval = job_app.approval
@@ -644,7 +644,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
 class CustomApprovalAdminViewsTest(TestCase):
     def test_manually_add_approval(self):
         user = UserFactory()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
