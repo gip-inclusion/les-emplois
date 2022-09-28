@@ -15,9 +15,11 @@
 
     {% bootstrap_form form alert_error_type="all" %}
 
-    {% buttons %}
-        <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Précédent</a>
-        <button type="submit" class="btn btn-primary">Continuer</button>
-    {% endbuttons %}
+    <div class="text-right">
+        {% buttons %}
+            <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Précédent</a>
+            <button type="submit" class="btn btn-primary">Continuer</button>
+        {% endbuttons %}
+    </div>
 
 </form>

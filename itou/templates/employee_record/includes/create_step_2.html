@@ -36,7 +36,7 @@
         </div>
     {% else %}
         <div>
-            <p><b>L'adresse du salarié n'a pu être determinée automatiquement.</b></p>
+            <p>L'adresse du salarié n'a pu être determinée automatiquement.</p>
         </div>
     {% endif %}
 </div>
@@ -96,18 +96,15 @@
                 {% bootstrap_field form.insee_commune %}
                 {% bootstrap_field form.insee_commune_code %}
             </div>
-
-            <div class="mt-4">
-                {% buttons %}
-                    <button type="submit" class="btn btn-primary">Modifier l'adresse du salarié</button>
-                {% endbuttons %}
-            </div>
         </div>
-    </form>
-
-    <div class="mb-3">
-        <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create" job_application.id %}">Précédent</a>
-        {% if profile.hexa_address_filled %}
-            <a class="btn btn btn-outline-primary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Continuer</a>
-        {% endif %}
+        <div class="mt-4 text-right">
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">Modifier l'adresse du salarié</button>
+            {% endbuttons %}
+        </div>
     </div>
+    <div class="mb-3 text-right">
+        <a class="btn btn-outline-secondary" href="{% url "employee_record_views:create" job_application.id %}">Précédent</a>
+        <a class="btn btn-outline-primary{% if not profile.hexa_address_filled %} disabled{% endif %}" href="{% url "employee_record_views:create_step_3" job_application.id %}">Continuer</a>
+    </div>
+</form>

@@ -16,8 +16,10 @@
     {% bootstrap_field form.insee_commune %}
     {% bootstrap_field form.insee_commune_code %}
 
-    {% buttons %}
-        <a class="btn btn btn-outline-secondary" href="#">Annuler</a>
-        <button type="submit" class="btn btn-primary">Continuer</button>
-    {% endbuttons %}
+    <div class="text-right">
+        {% buttons %}
+            <a class="btn btn-outline-secondary" href="{% url "employee_record_views:list" %}?status=NEW">Annuler</a>
+            <button type="submit" class="btn btn-primary">Continuer</button>
+        {% endbuttons %}
+    </div>
 </form>

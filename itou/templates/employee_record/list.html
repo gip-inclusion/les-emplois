@@ -20,16 +20,16 @@
     <h1 class="h1-hero-c1">Fiches salarié ASP - <span class="text-muted">{{ current_siae.display_name }}</span></h1>
 
     <div class="mt-3">
-        <form method="get" class="form" id="status-filter-form">
-            <div class="row">
-                <div class="col-sm-3">
-                    <div class="card-deck">
-                        <div class="card">
-                            <div class="card-header">
-                                <b>Filtrer les fiches</b>
-                            </div>
-                            <div class="card-body">
-                                <p class="text-muted"><b>Par statut</b></p>
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="card-deck">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Filtrer les fiches</b>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted"><b>Par statut</b></p>
+                            <form method="get" class="form" id="status-filter-form">
                                 <div class="container form-group m-0" id="status-filter-form-group">
                                     {% for status, badge in form.status|zip:badges %}
                                         <div class="row">
@@ -44,11 +44,11 @@
                                         </div>
                                     {% endfor %}
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
 
             <div class="col-sm-9">
                 <div class="container rounded bg-gray-400 p-3 mb-3">

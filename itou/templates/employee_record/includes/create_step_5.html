@@ -19,10 +19,12 @@
 
     <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.id %}" class="js-prevent-multiple-submit">
         {% csrf_token %}
-        {% buttons %}
-            <a class="btn btn-outline-secondary" href="{% url "employee_record_views:create_step_4" employee_record.job_application.id %}">Précédent</a>
-            <button type="submit" class="btn btn-primary">Valider la fiche salarié</button>
-        {% endbuttons %}
+        <div class="text-right">
+            {% buttons %}
+                <a class="btn btn-outline-secondary" href="{% url "employee_record_views:create_step_4" employee_record.job_application.id %}">Précédent</a>
+                <button type="submit" class="btn btn-primary">Valider la fiche salarié</button>
+            {% endbuttons %}
+        </div>
     </form>
 
 {% else %}
@@ -30,7 +32,7 @@
         <p><b>La création de cette fiche salariée est terminée.</b></p>
         <p class="mb-0">Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.</p>
     </div>
-    <div class="mb-3">
+    <div class="mb-3 text-right">
         <a href="{% url "employee_record_views:list" %}?status=NEW" class="btn btn-primary">
             Retour à la liste des fiches salarié
         </a>
