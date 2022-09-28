@@ -30,6 +30,7 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
     complement_adresse = serializers.CharField(source="address_line_2")
     date_maj = serializers.SerializerMethodField()
     structure_parente = serializers.SerializerMethodField()
+    lien_source = serializers.SerializerMethodField()
 
     class Meta:
         model = Siae
@@ -54,6 +55,7 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
             "source",
             "date_maj",
             "structure_parente",
+            "lien_source",
         ]
         read_only_fields = fields
 
@@ -82,6 +84,9 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
         dt = obj.updated_at or obj.created_at
         return dt.astimezone(timezone.get_current_timezone()).isoformat()
 
+    def get_lien_source(self, obj) -> str:
+        return self.context["request"].build_absolute_uri(obj.get_card_url())
+
 
 class PrescriberOrgStructureSerializer(serializers.ModelSerializer):
     """Serialize Prescriber Organization instance to the data.inclusion structure schema.
@@ -106,6 +111,7 @@ class PrescriberOrgStructureSerializer(serializers.ModelSerializer):
     source = serializers.ReadOnlyField(default="")
     date_maj = serializers.SerializerMethodField()
     structure_parente = serializers.SerializerMethodField()
+    lien_source = serializers.SerializerMethodField()
 
     class Meta:
         model = PrescriberOrganization
@@ -130,6 +136,7 @@ class PrescriberOrgStructureSerializer(serializers.ModelSerializer):
             "source",
             "date_maj",
             "structure_parente",
+            "lien_source",
         ]
         read_only_fields = fields
 
@@ -147,3 +154,7 @@ class PrescriberOrgStructureSerializer(serializers.ModelSerializer):
 
     def get_structure_parente(self, obj) -> Optional[str]:
         return None
+
+    def get_lien_source(self, obj) -> str:
+        url = obj.get_card_url()
+        return self.context["request"].build_absolute_uri(url) if url else None

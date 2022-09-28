@@ -12,6 +12,19 @@ def _str_with_tz(dt):
     return dt.astimezone(timezone.get_current_timezone()).isoformat()
 
 
+class DataInclusionStructureTest(APITestCase):
+    maxDiff = None
+
+    def test_list_missing_type_query_param(self):
+        user = SiaeStaffFactory()
+        authenticated_client = APIClient()
+        authenticated_client.force_authenticate(user)
+        url = reverse("v1:structures-list")
+
+        response = authenticated_client.get(url, format="json")
+        self.assertEqual(response.status_code, 400)
+
+
 class DataInclusionSiaeStructureTest(APITestCase):
     url = reverse("v1:structures-list")
     maxDiff = None
@@ -60,6 +73,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
                     "source": siae.source,
                     "date_maj": _str_with_tz(siae.updated_at),
                     "structure_parente": None,
+                    "lien_source": f"http://testserver{reverse('siaes_views:card', kwargs={'siae_id': siae.pk})}",
                 },
                 {
                     "id": str(antenne.uid),
@@ -83,6 +97,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
                     "date_maj": _str_with_tz(antenne.updated_at),
                     # Antenne references parent structure
                     "structure_parente": str(siae.uid),
+                    "lien_source": f"http://testserver{reverse('siaes_views:card', kwargs={'siae_id': antenne.pk})}",
                 },
             ],
         )
@@ -130,7 +145,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_list_structures(self):
-        orga = PrescriberOrganizationFactory()
+        orga = PrescriberOrganizationFactory(is_authorized=True)
 
         response = self.authenticated_client.get(
             self.url,
@@ -162,6 +177,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
                     "source": "",
                     "date_maj": _str_with_tz(orga.created_at),
                     "structure_parente": None,
+                    "lien_source": f"http://testserver{reverse('prescribers_views:card', kwargs={'org_id': orga.pk})}",
                 }
             ],
         )
