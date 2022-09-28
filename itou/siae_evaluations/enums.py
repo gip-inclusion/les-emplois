@@ -50,7 +50,6 @@ class EvaluatedSiaeState(models.TextChoices):
     SUBMITTED = "SUBMITTED"
     ACCEPTED = "ACCEPTED"
     REFUSED = "REFUSED"
-    REVIEWED = "REVIEWED"
     ADVERSARIAL_STAGE = "ADVERSARIAL_STAGE"
 
 

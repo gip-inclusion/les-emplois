@@ -139,7 +139,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
 class EvaluatedSiaeAdmin(admin.ModelAdmin):
     list_display = ("evaluation_campaign", "siae", "reviewed_at")
     list_display_links = ("siae",)
-    readonly_fields = ("evaluation_campaign", "siae", "reviewed_at", "state")
+    readonly_fields = ("evaluation_campaign", "siae", "reviewed_at", "final_reviewed_at", "state")
     list_filter = (
         "reviewed_at",
         "evaluation_campaign__institution__department",

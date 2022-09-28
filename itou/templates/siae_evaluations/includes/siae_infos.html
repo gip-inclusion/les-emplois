@@ -6,18 +6,27 @@
     </div>
     <div class="col-lg-3 col-md-3 col-4">
         <p class="small mb-0">
-            {% if evaluated_siae.state == "SUBMITTED"%}
-                {# NOTE(vperron): Why do we check reviewed_at here, instead of state == ADVERSARIAL_STATE ? #}
-                <p class="badge badge-pilotage float-right">{%if evaluated_siae.reviewed_at%}Phase contradictoire - {%endif%}À traiter</p>
-            {%elif evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ACCEPTED" %}
-                <p class="badge badge-pilotage float-right">{%if evaluated_siae.reviewed_at%}Phase contradictoire - {%endif%}En cours</p>
-            {%elif evaluated_siae.state == "REVIEWED" %}
-                <p class="badge badge-communaute-light float-right">Résultats transmis</p>
-            {%elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
-                <p class="badge badge-marche-light float-right">Phase contradictoire</p>
-            {%else%}
-                <p class="badge badge-emploi float-right">{%if evaluated_siae.reviewed_at%}Phase contradictoire - {%endif%}En attente</p>
-            {%endif%}
+            {% if evaluated_siae.final_reviewed_at %}
+                <p class="badge{% if evaluated_siae.state == "ACCEPTED" %} badge-success{% else %} badge-danger{%endif%} float-right">
+                    {% if evaluated_siae.state == "ACCEPTED" %}
+                        Résultat positif
+                    {% elif evaluated_siae.state == "REFUSED" %}
+                        Résultat négatif
+                    {% else %}
+                        Non contrôlée
+                    {% endif %}
+                </p>
+            {% else %}
+                {% if evaluated_siae.state == "SUBMITTED" %}
+                    <p class="badge badge-pilotage float-right">{% if evaluated_siae.reviewed_at %}Phase contradictoire - {% endif %}À traiter</p>
+                {% elif evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ACCEPTED" %}
+                    <p class="badge badge-pilotage float-right">{% if evaluated_siae.reviewed_at %}Phase contradictoire - {% endif %}En cours</p>
+                {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
+                    <p class="badge badge-marche-light float-right">Phase contradictoire</p>
+                {% else %}
+                    <p class="badge badge-emploi float-right">{% if evaluated_siae.reviewed_at %}Phase contradictoire - {% endif %}En attente</p>
+                {% endif %}
+            {% endif %}
         </p>
     </div>
 </div>
