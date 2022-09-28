@@ -304,7 +304,11 @@ class EvaluatedSiae(models.Model):
         on_delete=models.CASCADE,
         related_name="evaluated_siaes",
     )
+    # In “phase amiable” until documents have been reviewed.
     reviewed_at = models.DateTimeField(verbose_name=("Contrôlée le"), blank=True, null=True)
+    # Refused documents from the phase amiable can be uploaded again, a second
+    # refusal is final (phase contradictoire).
+    final_reviewed_at = models.DateTimeField(verbose_name="Contrôle définitif le", blank=True, null=True)
 
     objects = EvaluatedSiaeManager.from_queryset(EvaluatedSiaeQuerySet)()
 
@@ -316,26 +320,51 @@ class EvaluatedSiae(models.Model):
     def __str__(self):
         return f"{self.siae}"
 
+    @cached_property
+    def can_review(self):
+        if self.reviewed_at is None:
+            return self.state in {
+                evaluation_enums.EvaluatedSiaeState.ACCEPTED,
+                evaluation_enums.EvaluatedSiaeState.REFUSED,
+            }
+        if self.final_reviewed_at is None:
+            return (
+                self.state == evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+                and not EvaluatedAdministrativeCriteria.objects.filter(
+                    evaluated_job_application__evaluated_siae_id=self.pk,
+                    review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+                    submitted_at__lt=self.reviewed_at,
+                ).exists()
+            )
+        return False
+
     def review(self):
-        if self.state in [evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluation_enums.EvaluatedSiaeState.REFUSED]:
-            with transaction.atomic():
+        ACCEPTED = evaluation_enums.EvaluatedSiaeState.ACCEPTED
+        REFUSED = evaluation_enums.EvaluatedSiaeState.REFUSED
+        ADVERSARIAL_STAGE = evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+        if self.state in {ACCEPTED, REFUSED, ADVERSARIAL_STAGE}:
+            adversarial_stage = bool(self.reviewed_at)
 
-                email = {
-                    (evaluation_enums.EvaluatedSiaeState.ACCEPTED, True): functools.partial(
-                        self.get_email_to_siae_reviewed, adversarial=True
-                    ),
-                    (evaluation_enums.EvaluatedSiaeState.ACCEPTED, False): functools.partial(
-                        self.get_email_to_siae_reviewed, adversarial=False
-                    ),
-                    (evaluation_enums.EvaluatedSiaeState.REFUSED, True): self.get_email_to_siae_adversarial_stage,
-                    (evaluation_enums.EvaluatedSiaeState.REFUSED, False): self.get_email_to_siae_refused,
-                }[(self.state, bool(self.reviewed_at))]()
+            now = timezone.now()
+            if self.state == ACCEPTED:
+                self.reviewed_at = now
+                self.final_reviewed_at = now
+            elif self.state == REFUSED:
+                self.reviewed_at = now
+            elif self.state == ADVERSARIAL_STAGE:
+                self.final_reviewed_at = now
+            else:
+                raise TypeError(f"Cannot review an “{self.__class__.__name__}” with status “{self.state}”.")
+            self.save()
 
-                connection = mail.get_connection()
-                connection.send_messages([email])
-
-                self.reviewed_at = timezone.now()
-                self.save(update_fields=["reviewed_at"])
+            email = {
+                (ACCEPTED, True): functools.partial(self.get_email_to_siae_reviewed, adversarial=True),
+                (ACCEPTED, False): functools.partial(self.get_email_to_siae_reviewed, adversarial=False),
+                (REFUSED, False): self.get_email_to_siae_refused,
+                (ADVERSARIAL_STAGE, True): self.get_email_to_siae_adversarial_stage,
+            }[(self.state, adversarial_stage)]()
+            connection = mail.get_connection()
+            connection.send_messages([email])
 
     # fixme vincentporte : to refactor. move all get_email_to_siae_xxx() method to emails.py in siae model
     def get_email_to_siae_selected(self):
@@ -435,6 +464,9 @@ class EvaluatedSiae(models.Model):
         ):
             return evaluation_enums.EvaluatedSiaeState.SUBMITTED
 
+        if self.reviewed_at and self.final_reviewed_at is None:
+            return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+
         if any(
             eval_admin_crit.review_state
             in [
@@ -444,23 +476,8 @@ class EvaluatedSiae(models.Model):
             for eval_job_app in self.evaluated_job_applications.all()
             for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
         ):
-            if self.reviewed_at and all(
-                eval_admin_crit.submitted_at < self.reviewed_at
-                for eval_job_app in self.evaluated_job_applications.all()
-                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
-            ):
-                return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
-            else:
-                return evaluation_enums.EvaluatedSiaeState.REFUSED
-
-        if self.reviewed_at and all(
-            eval_admin_crit.submitted_at < self.reviewed_at
-            for eval_job_app in self.evaluated_job_applications.all()
-            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedSiaeState.REVIEWED
-        else:
-            return evaluation_enums.EvaluatedSiaeState.ACCEPTED
+            return evaluation_enums.EvaluatedSiaeState.REFUSED
+        return evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
 
 class EvaluatedJobApplication(models.Model):

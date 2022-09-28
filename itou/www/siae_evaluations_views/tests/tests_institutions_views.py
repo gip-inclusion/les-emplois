@@ -228,7 +228,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         en_attente = "En attente"
         a_traiter = "À traiter"
         en_cours = "En cours"
-        transmis = "Résultats transmis"
+        resultat_positif = "Résultat positif"
         phase_contradictoire = "Phase contradictoire"
 
         self.client.force_login(self.user)
@@ -277,7 +277,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(response, en_cours)
 
         # REVIEWED
-        evaluated_siae.reviewed_at = timezone.now()
+        review_time = timezone.now()
+        evaluated_siae.reviewed_at = review_time
         evaluated_siae.save(update_fields=["reviewed_at"])
 
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -292,9 +293,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
 
+        evaluated_siae.final_reviewed_at = review_time
+        evaluated_siae.save(update_fields=["final_reviewed_at"])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, transmis)
+        self.assertContains(response, resultat_positif)
 
     def test_num_queries(self):
         self.client.force_login(self.user)
@@ -382,6 +385,14 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             "siae_evaluations_views:institution_evaluated_siae_validation",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
+        validation_button_disabled = """
+            <button class="btn btn-outline-primary disabled btn-sm float-right">
+                Valider
+            </button>"""
+        validation_button = """
+            <button class="btn btn-primary btn-sm float-right">
+                Valider
+            </button>"""
         back_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
@@ -415,6 +426,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, back_url)
         self.assertContains(response, "Justificatifs téléversés")
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
 
         # EvaluatedAdministrativeCriteria submitted
         evaluated_administrative_criteria.submitted_at = timezone.now()
@@ -426,7 +438,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertNotContains(response, "Documents téléversés")
         self.assertNotContains(response, "En attente")
         self.assertNotContains(response, "Nouveaux justificatifs à traiter")
-        self.assertContains(response, validation_url)
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertNotContains(response, message)
 
         # EvaluatedAdministrativeCriteria Accepted
@@ -437,31 +449,33 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
-        self.assertContains(response, validation_url)
+        self.assertContains(response, validation_button, html=True, count=2)
         self.assertNotContains(response, message)
 
         # EvaluatedAdministrativeCriteria Accepted & Reviewed
         evaluated_siae.reviewed_at = timezone.now()
-        evaluated_siae.save(update_fields=["reviewed_at"])
+        evaluated_siae.final_reviewed_at = timezone.now()
+        evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
-        self.assertContains(response, validation_url)
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, message)
 
         # EvaluatedAdministrativeCriteria Refused
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
         evaluated_siae.reviewed_at = None
-        evaluated_siae.save(update_fields=["reviewed_at"])
+        evaluated_siae.final_reviewed_at = None
+        evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
-        self.assertContains(response, validation_url)
+        self.assertContains(response, validation_button, html=True, count=2)
         self.assertNotContains(response, message)
 
         # EvaluatedAdministrativeCriteria Refused & Reviewed
@@ -472,7 +486,90 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
-        self.assertContains(response, validation_url)
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
+        self.assertContains(response, message)
+
+        # Adversarial phase
+
+        adversarial_phase_start = evaluated_siae.reviewed_at
+
+        # EvaluatedAdministrativeCriteriaState.UPLOADED (again)
+        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
+        evaluated_administrative_criteria.uploaded_at = timezone.now()
+        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        evaluated_administrative_criteria.submitted_at = None
+        evaluated_administrative_criteria.save(
+            update_fields=["proof_url", "review_state", "submitted_at", "uploaded_at"]
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
+        self.assertContains(response, back_url)
+        self.assertContains(response, "Justificatifs téléversés")
+
+        # EvaluatedAdministrativeCriteriaState.SUBMITTED (again)
+        evaluated_administrative_criteria.submitted_at = timezone.now()
+        evaluated_administrative_criteria.save(update_fields=["submitted_at"])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, evaluated_job_application_url)
+        self.assertContains(response, back_url)
+        self.assertNotContains(response, "Documents téléversés")
+        self.assertNotContains(response, "En attente")
+        self.assertNotContains(response, "Problème constaté")
+        self.assertContains(response, "Nouveaux justificatifs à traiter")
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
+        self.assertNotContains(response, message)
+
+        # EvaluatedAdministrativeCriteriaState.ACCEPTED (again)
+        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria.save(update_fields=["review_state"])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, evaluated_job_application_url)
+        self.assertContains(response, back_url)
+        self.assertContains(response, validation_button, html=True, count=2)
+        self.assertNotContains(response, message)
+
+        # EvaluatedAdministrativeCriteria Accepted & Reviewed (again)
+        now = timezone.now()
+        evaluated_siae.reviewed_at = now
+        evaluated_siae.final_reviewed_at = now
+        evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, evaluated_job_application_url)
+        self.assertContains(response, back_url)
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
+        self.assertContains(response, message)
+
+        # EvaluatedAdministrativeCriteria Refused (again)
+        evaluated_siae.reviewed_at = adversarial_phase_start
+        evaluated_siae.final_reviewed_at = None
+        evaluated_siae.save(update_fields=["final_reviewed_at", "reviewed_at"])
+        evaluated_administrative_criteria.review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
+        )
+        evaluated_administrative_criteria.save(update_fields=["review_state"])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, evaluated_job_application_url)
+        self.assertContains(response, back_url)
+        self.assertContains(response, validation_button, html=True, count=2)
+        self.assertNotContains(response, message)
+
+        # EvaluatedAdministrativeCriteria Refused & Reviewed (again)
+        evaluated_siae.final_reviewed_at = timezone.now()
+        evaluated_siae.save(update_fields=["final_reviewed_at"])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, evaluated_job_application_url)
+        self.assertContains(response, back_url)
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, message)
 
     def test_job_seeker_infos_for_institution_state(self):

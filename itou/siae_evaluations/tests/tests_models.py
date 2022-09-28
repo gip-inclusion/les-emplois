@@ -618,7 +618,7 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         self.assertGreater(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
         del evaluated_siae.state
 
         # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at
@@ -628,6 +628,12 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_administrative_criteria0.save(update_fields=["review_state"])
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at, with final_reviewed_at
+        evaluated_siae.final_reviewed_at = fake_now
+        evaluated_siae.save(update_fields=["final_reviewed_at"])
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
         del evaluated_siae.state
 
@@ -637,19 +643,17 @@ class EvaluatedSiaeModelTest(TestCase):
         # with review_state ACCEPTED not reviewed : removed, should not exist in real life
 
         # with review_state ACCEPTED reviewed, submitted_at before reviewed_at
+        # : removed, should not exist in real life
+
+        # with review_state ACCEPTED reviewed, submitted_at after reviewed_at
         evaluated_administrative_criteria0.review_state = (
             evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         )
         evaluated_administrative_criteria0.save(update_fields=["review_state"])
-        evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
-        evaluated_siae.save(update_fields=["reviewed_at"])
-        self.assertLessEqual(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REVIEWED, evaluated_siae.state)
-        del evaluated_siae.state
-
-        # with review_state ACCEPTED reviewed, submitted_at after reviewed_at
-        evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
-        evaluated_siae.save(update_fields=["reviewed_at"])
+        review_time = fake_now - relativedelta(days=1)
+        evaluated_siae.reviewed_at = review_time
+        evaluated_siae.final_reviewed_at = review_time
+        evaluated_siae.save(update_fields=["final_reviewed_at", "reviewed_at"])
         self.assertGreater(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
         del evaluated_siae.state
@@ -678,20 +682,26 @@ class EvaluatedSiaeModelTest(TestCase):
         del evaluated_siae.state
 
         # one Refused, two Accepted
+        evaluated_siae.reviewed_at = fake_now
+        evaluated_siae.save(update_fields=["reviewed_at"])
         evaluated_administrative_criteria[
             0
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
         del evaluated_siae.state
 
         # three Accepted
+        evaluated_siae.final_reviewed_at = fake_now
+        evaluated_siae.save(update_fields=["final_reviewed_at"])
         evaluated_administrative_criteria[
             1
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
         del evaluated_siae.state
+        evaluated_siae.final_reviewed_at = None
+        evaluated_siae.save(update_fields=["final_reviewed_at"])
 
         # REVIEWED, submitted_at less than reviewed_at
         evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
@@ -722,12 +732,16 @@ class EvaluatedSiaeModelTest(TestCase):
         del evaluated_siae.state
 
         # three Accepted
+        evaluated_siae.final_reviewed_at = fake_now
+        evaluated_siae.save(update_fields=["final_reviewed_at"])
         evaluated_administrative_criteria[
             1
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REVIEWED, evaluated_siae.state)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
         del evaluated_siae.state
+        evaluated_siae.final_reviewed_at = None
+        evaluated_siae.save(update_fields=["final_reviewed_at"])
 
         # REVIEWED, submitted_at greater than reviewed_at
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
@@ -754,10 +768,12 @@ class EvaluatedSiaeModelTest(TestCase):
             0
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
         del evaluated_siae.state
 
         # three Accepted
+        evaluated_siae.final_reviewed_at = fake_now
+        evaluated_siae.save(update_fields=["final_reviewed_at"])
         evaluated_administrative_criteria[
             1
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
@@ -793,7 +809,7 @@ class EvaluatedSiaeModelTest(TestCase):
             (evaluation_enums.EvaluatedSiaeState.ACCEPTED, fake_now, "la conformité des nouveaux justificatifs"),
             (evaluation_enums.EvaluatedSiaeState.REFUSED, None, "un ou plusieurs justificatifs sont attendus"),
             (
-                evaluation_enums.EvaluatedSiaeState.REFUSED,
+                evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE,
                 fake_now,
                 "plusieurs de vos justificatifs n’ont pas été validés",
             ),

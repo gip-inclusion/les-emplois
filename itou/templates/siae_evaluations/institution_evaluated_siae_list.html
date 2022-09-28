@@ -32,12 +32,16 @@
                             <div class="card-body">
                                 <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}"
                                     class="btn btn-outline-primary btn-sm float-right">
-                                    {%if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED"%}
-                                        Contrôler cette SIAE
-                                    {%elif evaluated_siae.state == "REVIEWED" or evaluated_siae.state == "ADVERSARIAL_STAGE"%}
-                                        Revoir ses justificatifs
+                                    {% if evaluated_siae.final_reviewed_at %}
+                                        Voir le résultat
                                     {% else %}
-                                        Voir
+                                        {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
+                                            Contrôler cette SIAE
+                                        {%elif evaluated_siae.state == "ADVERSARIAL_STAGE"%}
+                                            Revoir ses justificatifs
+                                        {% else %}
+                                            Voir
+                                        {%endif%}
                                     {%endif%}
                                 </a>
                             </div>
@@ -55,4 +59,3 @@
 
 
 {% endblock %}
-

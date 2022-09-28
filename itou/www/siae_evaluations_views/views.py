@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import mail
+from django.db import transaction
 from django.db.models import Min
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
@@ -114,6 +115,27 @@ def institution_evaluated_siae_detail(
     context = {
         "evaluated_siae": evaluated_siae,
         "back_url": back_url,
+        "show_notified": (
+            evaluated_siae.reviewed_at
+            and (
+                evaluated_siae.final_reviewed_at
+                and evaluated_siae.state
+                in {
+                    evaluation_enums.EvaluatedSiaeState.ACCEPTED,
+                    evaluation_enums.EvaluatedSiaeState.REFUSED,
+                }
+                or evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+                # Hide the “Résultats transmis !” banner when SIAE starts
+                # uploading new documents. Otherwise, the banner is shown while
+                # the SIAE remains in ADVERSARIAL_STAGE (until the institution
+                # submits their second review), and the page would not look
+                # much different after the second review is submitted.
+                and not EvaluatedAdministrativeCriteria.objects.filter(
+                    evaluated_job_application__evaluated_siae_id=evaluated_siae.pk,
+                    submitted_at__gt=evaluated_siae.reviewed_at,
+                ).exists()
+            )
+        ),
     }
     return render(request, template_name, context)
 
@@ -214,7 +236,9 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
         evaluation_campaign__ended_at__isnull=True,
     )
 
-    evaluated_siae.review()
+    if evaluated_siae.can_review:
+        with transaction.atomic():
+            evaluated_siae.review()
 
     return HttpResponseRedirect(
         reverse(
