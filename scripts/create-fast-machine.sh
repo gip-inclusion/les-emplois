@@ -25,36 +25,27 @@ if [ -z $CLEVER_SECRET ]; then
   exit 1
 fi
 
-# Then we can create the machine
+clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
 
 ORGANIZATION_NAME=Itou
-IMPORT_APP_NAME=c1-imports-$(date +%y-%m-%d-%Hh-%M)
-DEPLOY_BRANCH=master_clever
-CC_PYTHON_VERSION=3.10
+APP_NAME=c1-fast-machine-$(date +%y-%m-%d-%Hh-%M)
 
-clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-# Create a new application on Clever Cloud.
-# --type: application type (Python).
-# --org: organization name.
-# --region: server location ("par" means Paris).
-# --alias: custom application name, used to find it with the CLI.
-clever create $IMPORT_APP_NAME --type python --region par --alias $IMPORT_APP_NAME --org $ORGANIZATION_NAME
-clever env set CC_PYTHON_VERSION "$CC_PYTHON_VERSION" --alias $IMPORT_APP_NAME
-clever link $IMPORT_APP_NAME --org $ORGANIZATION_NAME
-clever scale --flavor XL --alias $IMPORT_APP_NAME
-clever service link-addon c1-imports-config --alias $IMPORT_APP_NAME
-clever service link-addon c1-fast-machine-config --alias $IMPORT_APP_NAME
-clever service link-addon c1-prod-database-encrypted  --alias $IMPORT_APP_NAME
-clever service link-addon c1-itou-redis --alias $IMPORT_APP_NAME
+clever create $APP_NAME --type python --region par --alias $APP_NAME --org $ORGANIZATION_NAME
+clever link $APP_NAME --org $ORGANIZATION_NAME
+clever scale --flavor XL --alias $APP_NAME
 
-# We never want huey to be run in such a machine so CC_WORKER_COMMAND must be empty.
-#
-# This value being incorrectly set to "django_admin run_huey" led to the epic issue of march 2022
-# where an import machine unexpectedly ran huey tasks with invalid settings.
-# You never want to face this kind of hard-to-debug issue ever again
-clever env set CC_WORKER_COMMAND "" --alias $IMPORT_APP_NAME
+clever env set ITOU_ENVIRONMENT "FAST-MACHINE" --alias $APP_NAME
 
-clever deploy --alias $IMPORT_APP_NAME --branch $DEPLOY_BRANCH --force
+clever service link-addon c1-prod-bucket-config --alias $APP_NAME
+clever service link-addon c1-prod-deployment-config --alias $APP_NAME
+clever service link-addon c1-imports-config --alias $APP_NAME
+clever service link-addon c1-prod-database-encrypted  --alias $APP_NAME
+clever service link-addon c1-itou-redis --alias $APP_NAME
+
+# This has to be enforced at at least deployment time (issue between uwsgi build & Python 3.10 on Clever machines)
+clever env set CPUCOUNT 1 --alias $APP_NAME
+
+clever deploy --alias $APP_NAME --branch master_clever --force
 
 cat << EOF
 
@@ -62,11 +53,11 @@ cat << EOF
 
 Vous pouvez maintenant:
  - ✈️ Aller sur la machine:
-    clever ssh --alias $IMPORT_APP_NAME
+    clever ssh --alias $APP_NAME
  - 🔨 Jouer un script d’import, par ex:
     cd ~/app_* && ./scripts/imports-asp.sh
  - 🍺 Supprimer la machine:
-    clever delete --alias $IMPORT_APP_NAME --yes
+    clever delete --alias $APP_NAME --yes
 EOF
 
 exit 0
