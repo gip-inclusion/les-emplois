@@ -2,6 +2,9 @@
 <ul>
     <li>Prénom : <b>{{ job_application.job_seeker.first_name }}</b></li>
     <li>Nom : <b>{{ job_application.job_seeker.last_name }}</b></li>
+    {% if approval.user.nir %}
+        <li>Numéro de sécurité sociale : <b>{{ approval.user.nir|format_nir }}</b></li>
+    {% endif %}
     <li>Date de naissance : <b>{{ job_application.job_seeker.birthdate|date:"d/m/Y" }}</b></li>
     <li>E-mail :
         <a href="mailto:{{ job_application.job_seeker.email }}">{{ job_application.job_seeker.email }}</a>
@@ -27,14 +30,13 @@
         </li>
     {% endif %}
 </ul>
-<p>
-    {% if job_application.has_editable_job_seeker %}
-        <p>
-            <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
-                class="btn btn-outline-primary">
-                Modifier les informations personnelles
-            </a>
-        </p>
-    {% else %}
-        <p>Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.<p>
-    {% endif %}
+{% if job_application.has_editable_job_seeker %}
+    <p>
+        <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
+            class="btn btn-outline-primary">
+            Modifier les informations personnelles
+        </a>
+    </p>
+{% else %}
+    <p>Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.<p>
+{% endif %}
