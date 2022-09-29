@@ -16,7 +16,7 @@
                         Contrôler les pièces justificatives
                     </h1>
                     <h3 class="h3">
-                        Liste des Siae à contrôler
+                        Liste des Siae {% if ended_at %}contrôlées{% else %}à contrôler{%endif%}
                     </h3>
                     <p>Contrôle initié le {{evaluations_asked_at|date:"d F Y"}}{% if ended_at %}, clôturé le {{ended_at|date:"d F Y"}}{% endif%}</p>
                 </div>
