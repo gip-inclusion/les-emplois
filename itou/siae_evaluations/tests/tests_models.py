@@ -52,6 +52,7 @@ def create_batch_of_job_applications(siae):
 class EvaluationCampaignMiscMethodsTest(TestCase):
     def test_select_min_max_job_applications(self):
         siae = SiaeFactory()
+        job_seeker = JobSeekerFactory()
 
         # zero job application
         qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
@@ -59,47 +60,33 @@ class EvaluationCampaignMiscMethodsTest(TestCase):
         self.assertEqual(0, qs.count())
 
         # one job applications made by SIAE
-        job_application = JobApplicationFactory(to_siae=siae)
+        job_application = JobApplicationFactory(to_siae=siae, job_seeker=job_seeker)
         self.assertEqual(
             job_application,
             select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).first(),
         )
         self.assertEqual(1, select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count())
 
-        # from 2 job applications to 10
-        for i in range(1, 10):
-            with self.subTest(i):
-                JobApplicationFactory(to_siae=siae)
-                self.assertEqual(
-                    evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-                    select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
-                )
+        # under 10 job applications, 20% is below the minimum value of 2 -> select 2
+        JobApplicationFactory.create_batch(5, to_siae=siae, job_seeker=job_seeker)
+        self.assertEqual(
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+            select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
+        )
 
-        self.assertEqual(10, JobApplication.objects.filter(to_siae=siae).count())
+        # from 20 job applications to 100 we have the correct percentage
+        JobApplicationFactory.create_batch(55, to_siae=siae, job_seeker=job_seeker)
+        self.assertEqual(
+            12,
+            select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
+        )
 
-        # from 20 job applications to 100
-        for i in range(10, 100, 10):
-            with self.subTest(i):
-                JobApplicationFactory.create_batch(10, to_siae=siae)
-                self.assertEqual(
-                    int(
-                        JobApplication.objects.filter(to_siae=siae).count()
-                        * evaluation_enums.EvaluationJobApplicationsBoundariesNumber.SELECTION_PERCENTAGE
-                        / 100
-                    ),
-                    select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
-                )
-
-        self.assertEqual(100, JobApplication.objects.filter(to_siae=siae).count())
-
-        # more 100 job applications
-        for i in range(100, 200, 50):
-            with self.subTest(i):
-                JobApplicationFactory.create_batch(50, to_siae=siae)
-                self.assertEqual(
-                    evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX,
-                    select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
-                )
+        # Over 100, stop at the max number -> 20
+        JobApplicationFactory.create_batch(50, to_siae=siae, job_seeker=job_seeker)
+        self.assertEqual(
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX,
+            select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
+        )
 
 
 class EvaluationCampaignQuerySetTest(TestCase):
