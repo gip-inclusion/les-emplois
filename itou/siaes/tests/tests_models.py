@@ -20,6 +20,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
 )
 from itou.siaes.models import Siae, SiaeJobDescription
+from itou.users.factories import JobSeekerFactory
 
 
 class SiaeFactoriesTest(TestCase):
@@ -335,6 +336,7 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         self.siae = SiaeFactory(with_jobs=True)
 
     def test_with_annotation_is_popular(self):
+        job_seeker = JobSeekerFactory()  # We don't care if it's always the same
         siae_job_descriptions = self.siae.job_description_through.all()
 
         # Test attribute presence
@@ -344,7 +346,7 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         # Test popular threshold: popular job description
         popular_job_description = siae_job_descriptions[0]
         for _ in range(SiaeJobDescription.POPULAR_THRESHOLD + 1):
-            JobApplicationFactory(to_siae=self.siae, selected_jobs=[popular_job_description])
+            JobApplicationFactory(to_siae=self.siae, selected_jobs=[popular_job_description], job_seeker=job_seeker)
 
         self.assertTrue(
             SiaeJobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
@@ -366,6 +368,7 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         JobApplicationFactory.create_batch(
             threshold_exceeded,
             to_siae=self.siae,
+            job_seeker=job_seeker,
             selected_jobs=[popular_job_description],
             state=JobApplicationWorkflow.STATE_ACCEPTED,
         )

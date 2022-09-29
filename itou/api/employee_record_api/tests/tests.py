@@ -9,7 +9,8 @@ from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithCompleteJobSeekerProfileFactory
-from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory
+from itou.siaes.factories import SiaeFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
@@ -22,8 +23,10 @@ class DummyEmployeeRecordAPITest(APITestCase):
 
     def test_happy_path(self):
         user = SiaeStaffFactory()
+        siae = SiaeFactory()
+        job_seeker = JobSeekerFactory()
         # Create enough fake job applications so that the dummy endpoint returns the first 25 of them.
-        JobApplicationFactory.create_batch(30)
+        JobApplicationFactory.create_batch(30, job_seeker=job_seeker, to_siae=siae)
 
         url = reverse("v1:token-auth")
         data = {"username": user.email, "password": DEFAULT_PASSWORD}
