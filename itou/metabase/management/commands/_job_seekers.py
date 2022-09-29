@@ -143,6 +143,37 @@ def format_criteria_name_as_column_name(criteria):
     return f"critère_n{criteria.level}_{column_name}"
 
 
+def get_gender_from_nir(job_seeker):
+    if job_seeker.nir:
+        match job_seeker.nir[0]:
+            case "1":
+                return "Homme"
+            case "2":
+                return "Femme"
+            case _:
+                raise ValueError("Unexpected NIR first digit")
+    return None
+
+
+def get_birth_year_from_nir(job_seeker):
+    if job_seeker.nir:
+        # It will be our data analysts' job to decide whether `05` means `1905` or `2005`.
+        birth_year = int(job_seeker.nir[1:3])
+        return birth_year
+    return None
+
+
+def get_birth_month_from_nir(job_seeker):
+    if job_seeker.nir:
+        birth_month = int(job_seeker.nir[3:5])
+        if not 1 <= birth_month <= 12:
+            # Exotic values means the birth month is unknown, as the 31-42 range was never observed in our data.
+            # https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France#ancrage_B
+            birth_month = 0
+        return birth_month
+    return None
+
+
 TABLE = MetabaseTable(name="candidats")
 TABLE.add_columns(
     [
@@ -151,6 +182,24 @@ TABLE.add_columns(
             "type": "varchar",
             "comment": "ID anonymisé du candidat",
             "fn": lambda o: anonymize(o.id, salt="job_seeker.id"),
+        },
+        {
+            "name": "sexe_selon_nir",
+            "type": "varchar",
+            "comment": "Sexe du candidat selon le NIR",
+            "fn": get_gender_from_nir,
+        },
+        {
+            "name": "annee_naissance_selon_nir",
+            "type": "integer",
+            "comment": "Année de naissance du candidat selon le NIR",
+            "fn": get_birth_year_from_nir,
+        },
+        {
+            "name": "mois_naissance_selon_nir",
+            "type": "integer",
+            "comment": "Mois de naissance du candidat selon le NIR",
+            "fn": get_birth_month_from_nir,
         },
         {"name": "age", "type": "integer", "comment": "Age du candidat en années", "fn": get_user_age_in_years},
         {
