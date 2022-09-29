@@ -26,6 +26,7 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerWithAddressFactory
 from itou.users.models import User
+from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -46,6 +47,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertFalse(job_application.has_editable_job_seeker)
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
+        self.assertContains(response, format_nir(job_application.job_seeker.nir))
 
         job_application.job_seeker.created_by = siae_user
         job_application.job_seeker.save()
@@ -108,6 +110,8 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        # Job seeker nir is displayed
+        self.assertContains(response, format_nir(job_application.job_seeker.nir))
 
     def test_details_for_prescriber_as_siae(self, *args, **kwargs):
         """As a SIAE user, I cannot access the job_applications details for prescribers."""
