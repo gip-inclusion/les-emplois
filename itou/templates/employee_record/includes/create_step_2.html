@@ -4,11 +4,7 @@
 
 <div class="alert alert-emploi">
     <h5 class="h4"><b>Adresse saisie sur la plateforme de l'inclusion :</b></h5>
-    <p>{{ job_seeker.address_line_1 }}</p>
-    {% if job_seeker.address_line_2 %}
-        <p>{{ job_seeker.address_line_2 }}</p>
-    {% endif %}
-    <p>{{ job_seeker.post_code}} {{ job_seeker.city}}</p>
+    <p>{{ job_seeker.address_on_one_line|default:"Non renseigné" }}</p>
 
     <h5 class="h4"><b>Adresse
         {% if address_updated_by_user %}

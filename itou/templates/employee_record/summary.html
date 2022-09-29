@@ -16,7 +16,7 @@
                 <div class="row">
                     <div class="col-sm-9 pt-3">
                         {% with job_application=employee_record.job_application %}
-                            <div>Début du contrat : <b>{{ job_application.hiring_start_at }}</b></div>
+                            <div>Début du contrat : <b>{{ job_application.hiring_start_at|default:"Non renseigné" }}</b></div>
                             <div>Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b></div>
                             <div>Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b></div>
                         {% endwith %}
@@ -33,7 +33,7 @@
 
         {% include "employee_record/includes/employee_record_summary.html" %}
 
-        <a href="{% url "employee_record_views:list" %}?status={{ status }}" class="btn btn-primary">Retour à la liste</a>
+        <a href="{% url "employee_record_views:list" %}?status={{ status|default:employee_record.status }}" class="btn btn-primary">Retour à la liste</a>
 
     </div>
 

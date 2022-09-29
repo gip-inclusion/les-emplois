@@ -46,6 +46,10 @@
                                 </div>
                             </form>
                         </div>
+                        <div class="card-footer text-center">
+                            <hr>
+                            <a class="btn btn-outline-primary" href="{% url "employee_record_views:add" %}">Ajouter un salarié</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -61,6 +65,7 @@
                             <ul>
                                 <li>Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à partir du <b>{{ feature_availability_date|date }}</b>.</li>
                                 <li>Vous devez avoir une annexe financière valide dans l'extranet de l'ASP pour pouvoir déclarer une fiche salarié dans les emplois.</li>
+                                <li>Les fiches salarié créées afin de prolonger ou suspendre un agrément Pôle emploi, ou un PASS IAE délivré avant le {{ feature_availability_date|date }}, sont identifiés par la mention <b>Ancien agrément ou PASS IAE</b>.</li>
                             </ul>
                         </div>
                         <div class="col-sm-2 text-right">

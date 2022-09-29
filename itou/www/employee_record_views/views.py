@@ -17,6 +17,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.employee_record_views.forms import (
+    AddEmployeeRecordForm,
     NewEmployeeRecordStep1Form,
     NewEmployeeRecordStep2Form,
     NewEmployeeRecordStep3Form,
@@ -51,6 +52,36 @@ STEPS = [
 
 
 # Views
+
+
+@login_required()
+def add_employee_records(request, template_name="employee_record/add.html"):
+    siae = get_current_siae_or_404(request)
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
+    form = AddEmployeeRecordForm(request.POST or None)
+    context = {"form": form}
+
+    if form.is_valid():
+        try:
+            employee_record = EmployeeRecord.get_for_approval_number_and_asp_id(
+                approval_number=form.approval.number, asp_id=siae.convention.asp_id
+            )
+        except EmployeeRecord.DoesNotExist:
+            pass
+        else:
+            return HttpResponseRedirect(
+                reverse("employee_record_views:summary", kwargs={"employee_record_id": employee_record.pk})
+            )
+
+        if not form.approval.user.last_hire_was_made_by_siae(siae):
+            messages.error(request, "Impossible d'ajouter le salarié, vous n'êtes pas son dernier employeur.")
+            return HttpResponseRedirect(reverse("employee_record_views:list"))
+
+        context["can_view_personal_information"] = request.user.can_view_personal_information(form.approval.user)
+
+    return render(request, template_name, context)
 
 
 @login_required
@@ -163,7 +194,11 @@ def create(request, job_application_id, template_name="employee_record/create.ht
 
         # Try a geo lookup of the address every time we call this form
         try:
-            profile.update_hexa_address()
+            if employee.post_code and employee.address_line_1:
+                # Seems weird to prevent going to the second step when we are missing those informations,
+                # especially when we ask them after.
+                # TODO(rsebille) Find something better than this.
+                profile.update_hexa_address()
         except ValidationError as ex:
             profile.clear_hexa_address()
             messages.error(

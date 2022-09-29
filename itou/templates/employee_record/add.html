@@ -1,0 +1,41 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load format_filters %}
+{% load str_filters %}
+
+{% block title %}Ajouter un salarié{{ block.super }}{% endblock %}
+
+{% block content %}
+    <h1 class="h1-hero-c1">Ajouter un salarié</h1>
+
+    <div class="alert alert-info">
+        <p class="mb-0">
+            Cette fonction est destinée à ajouter un salarié déclaré dans l'extranet IAE 2.0 de l'ASP mais non présent
+            dans vos fiches salariés.
+        </p>
+    </div>
+    <div class="c-form">
+        {% if form.approval %}
+            <p>
+                Le PASS IAE <b>{{ form.approval|format_approval_number }}</b> est associé au compte de
+                <b>{{ form.approval.user.get_full_name|mask_unless:can_view_personal_information }}</b>.
+            </p>
+            <div class="text-right">
+                <a class="btn btn-outline-secondary" href="{% url "employee_record_views:add" %}">Annuler</a>
+                <a class="btn btn-primary" href="{% url "employee_record_views:create" job_application_id=form.approval.user.last_accepted_job_application.pk  %}">Ajouter ce salarié</a>
+            </div>
+        {% else %}
+            <form method="post" role="form" class="js-prevent-multiple-submit">
+                {% csrf_token %}
+                {% bootstrap_form form alert_error_type="all" %}
+
+                <hr class="my-5">
+                <div class="text-right">
+                    {% buttons %}
+                        <button type="submit" class="btn btn-outline-primary">Suivant</button>
+                    {% endbuttons %}
+                </div>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

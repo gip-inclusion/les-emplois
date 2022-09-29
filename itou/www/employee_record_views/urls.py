@@ -6,6 +6,7 @@ from itou.www.employee_record_views import views
 app_name = "employee_record_views"
 
 urlpatterns = [
+    path("add", views.add_employee_records, name="add"),
     path("list", views.list_employee_records, name="list"),
     path("create/<uuid:job_application_id>", views.create, name="create"),
     path("create_step_2/<uuid:job_application_id>", views.create_step_2, name="create_step_2"),

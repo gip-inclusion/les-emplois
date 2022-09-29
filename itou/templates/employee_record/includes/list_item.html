@@ -1,15 +1,20 @@
 {% load format_filters %}
 <div class="card my-5">
 
-    <div class="card-header">
+    <div class="card-header d-flex align-items-start">
         <h3 class="h2">{{ item.job_seeker.get_full_name|title }}</h3>
+        {% if item.created_from_pe_approval %}
+            <span class="badge badge-sm badge-pill badge-outline-tertiary ml-2">Ancien agrément ou PASS IAE</span>
+        {% endif %}
     </div>
 
     <div class="card-body">
         <div class="row">
             <div class="col-md-7">
-                <p class="m-0">Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b></p>
-                <p class="m-0">Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b></p>
+                {% if not item.created_from_pe_approval %}
+                    <p class="m-0">Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b></p>
+                    <p class="m-0">Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b></p>
+                {% endif %}
                 <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.approval.number|format_approval_number }}</b></p>
             </div>
 

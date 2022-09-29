@@ -3,6 +3,7 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
 
+from itou.approvals import models as approvals_models
 from itou.asp.models import Commune, RSAAllocation
 from itou.employee_record.enums import Status
 from itou.siaes.models import SiaeFinancialAnnex
@@ -13,6 +14,31 @@ from itou.utils.widgets import DuetDatePickerWidget
 
 # Endpoint for INSEE communes autocomplete
 COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
+
+
+class AddEmployeeRecordForm(forms.Form):
+
+    number = forms.CharField(
+        label="Numéro de PASS IAE",
+        required=True,
+        strip=True,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.approval = None
+
+    def clean_number(self):
+        return self.cleaned_data.get("number", "").replace(" ", "")
+
+    def clean(self):
+        number = self.cleaned_data.get("number")
+        # FIXME(rsebille) Maybe only search for a valid one?
+        approval = approvals_models.Approval.objects.filter(number=number).select_related("user")
+        if not approval.exists():
+            raise forms.ValidationError("Ce PASS IAE n'existe pas")
+        self.approval = approval.get()
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):

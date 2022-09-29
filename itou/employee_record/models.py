@@ -705,6 +705,10 @@ class EmployeeRecord(models.Model):
 
         return fs
 
+    @classmethod
+    def get_for_approval_number_and_asp_id(cls, approval_number, asp_id):
+        return cls.objects.filter(approval_number=approval_number, asp_id=asp_id).exclude(status=Status.DISABLED).get()
+
 
 class EmployeeRecordBatch:
     """
