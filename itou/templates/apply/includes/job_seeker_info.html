@@ -6,6 +6,11 @@
     <li>
         Nom : <b>{{ job_application.job_seeker.last_name }}</b>
     </li>
+    {% if job_application.job_seeker.nir %}
+        <li>
+            Numéro de sécurité sociale : <b>{{ job_application.job_seeker.nir|format_nir }}</b>
+        </li>
+    {% endif %}
     <li>
         Date de naissance : <b>{{ job_application.job_seeker.birthdate|date:"d/m/Y" }}</b>
     </li>
