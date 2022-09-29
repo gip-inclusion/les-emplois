@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
@@ -82,6 +83,13 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     preview = False
 
+    if not EmployeeRecord.objects.processed_for_siae(siae).filter(approval_number=approval.number).exists():
+        messages.error(
+            request,
+            "Impossible de prolonger un PASS IAE qui n'est pas associé à une fiche salarié à l'état 'Intégrée'",
+        )
+        return HttpResponseRedirect(back_url)
+
     form = DeclareProlongationForm(approval=approval, siae=siae, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
@@ -129,6 +137,13 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     preview = False
+
+    if not EmployeeRecord.objects.processed_for_siae(siae).filter(approval_number=approval.number).exists():
+        messages.error(
+            request,
+            "Impossible de suspendre un PASS IAE qui n'est pas associé à une fiche salarié à l'état 'Intégrée'",
+        )
+        return HttpResponseRedirect(back_url)
 
     form = SuspensionForm(approval=approval, siae=siae, data=request.POST or None)
 
@@ -342,6 +357,11 @@ def pe_approval_create(request, pe_approval_id):
         )
         job_application.save()
 
-    messages.success(request, "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.")
-    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
-    return HttpResponseRedirect(next_url)
+    messages.success(
+        request,
+        "L'agrément a bien été importé, vous devez créer une fiche salarié "
+        "avant de pouvoir le prolonger ou le suspendre.",
+    )
+    return HttpResponseRedirect(
+        reverse("employee_record_views:create", kwargs={"job_application_id": job_application.id})
+    )

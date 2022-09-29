@@ -29,8 +29,11 @@
 
 {% else %}
     <div class="alert alert-success">
-        <p><b>La création de cette fiche salariée est terminée.</b></p>
+        <p><b>La création de cette fiche salarié est terminée.</b></p>
         <p class="mb-0">Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.</p>
+        {% if job_application.created_from_pe_approval %}
+            <p class="mb-0">Une fois la fiche salarié intégrée vous pourrez prolonger ou suspendre le PASS IAE.</p>
+        {% endif %}
     </div>
     <div class="mb-3 text-right">
         <a href="{% url "employee_record_views:list" %}?status=NEW" class="btn btn-primary">
