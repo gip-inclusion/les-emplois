@@ -13,7 +13,7 @@ from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oaut
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_SIAE_STAFF
-from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory, UserFactory
+from itou.users.factories import SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 
