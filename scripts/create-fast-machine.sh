@@ -36,8 +36,8 @@ clever scale --flavor XL --alias $APP_NAME
 
 clever env set ITOU_ENVIRONMENT "FAST-MACHINE" --alias $APP_NAME
 
-clever service link-addon c1-prod-bucket-config --alias $APP_NAME
-clever service link-addon c1-prod-deployment-config --alias $APP_NAME
+clever service link-addon c1-bucket-config --alias $APP_NAME
+clever service link-addon c1-deployment-config --alias $APP_NAME
 clever service link-addon c1-imports-config --alias $APP_NAME
 clever service link-addon c1-prod-database-encrypted  --alias $APP_NAME
 clever service link-addon c1-itou-redis --alias $APP_NAME
