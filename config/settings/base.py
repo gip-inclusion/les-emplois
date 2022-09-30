@@ -542,7 +542,8 @@ METABASE_DASHBOARDS = {
     # Employer stats.
     "stats_siae_etp": {
         "dashboard_id": 128,
-        "tally_form_id": "nrjbRv",
+        # Tally form suspended on 2022/09/30, should be restored soon.
+        # "tally_form_id": "nrjbRv",
     },
     "stats_siae_hiring": {
         "dashboard_id": 185,
@@ -551,7 +552,8 @@ METABASE_DASHBOARDS = {
     # Prescriber stats.
     "stats_cd": {
         "dashboard_id": 118,
-        "tally_form_id": "wb5Nro",
+        # Tally form suspended on 2022/09/30, should be restored soon.
+        # "tally_form_id": "wb5Nro",
     },
     "stats_pe_delay_main": {
         "dashboard_id": 168,
@@ -581,7 +583,8 @@ METABASE_DASHBOARDS = {
     # Institution stats - DDETS - department level.
     "stats_ddets_iae": {
         "dashboard_id": 117,
-        "tally_form_id": "nPdWLb",
+        # Tally form suspended on 2022/09/30, should be restored soon.
+        # "tally_form_id": "nPdWLb",
     },
     "stats_ddets_diagnosis_control": {
         "dashboard_id": 144,
@@ -593,7 +596,8 @@ METABASE_DASHBOARDS = {
     # Institution stats - DREETS - region level.
     "stats_dreets_iae": {
         "dashboard_id": 117,
-        "tally_form_id": "nPdWLb",
+        # Tally form suspended on 2022/09/30, should be restored soon.
+        # "tally_form_id": "nPdWLb",
     },
     "stats_dreets_hiring": {
         "dashboard_id": 160,
