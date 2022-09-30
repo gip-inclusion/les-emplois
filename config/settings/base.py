@@ -453,7 +453,7 @@ ANYMAIL = {
 # The real backend is hardcoded in the wrapper to avoid multiple and
 # confusing parameters in Django settings.
 # Switch to a "standard" Django backend to get the synchronous behaviour back.
-EMAIL_BACKEND = "itou.utils.email_backend.AsyncEmailBackend"
+EMAIL_BACKEND = "itou.utils.tasks.AsyncEmailBackend"
 
 
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
