@@ -69,6 +69,7 @@ jobs:
         $CLEVER_CLI service link-addon c1-deployment-config
         $CLEVER_CLI service link-addon c1-imports-config
         $CLEVER_CLI service link-addon c1-prod-database-encrypted
+        $CLEVER_CLI service link-addon c1-bucket-config
 
     - name: "🚀 Deploy post-deploy hook to Clever"
       run:

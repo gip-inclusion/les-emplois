@@ -67,6 +67,7 @@ jobs:
         $CLEVER_CLI env set ITOU_ENVIRONMENT "FAST-MACHINE"
         $CLEVER_CLI service link-addon c1-prod-database-encrypted
         $CLEVER_CLI service link-addon c1-deployment-config
+        $CLEVER_CLI service link-addon c1-bucket-config
 
     - name: 🚀 Deploy worker configuration to Clever
       run: |

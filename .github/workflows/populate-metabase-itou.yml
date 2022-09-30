@@ -84,6 +84,7 @@ jobs:
         $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
         $CLEVER_CLI env set ITOU_ENVIRONMENT "FAST-MACHINE"
         $CLEVER_CLI service link-addon c1-deployment-config
+        $CLEVER_CLI service link-addon c1-bucket-config
         $CLEVER_CLI service link-addon c1-prod-database-encrypted
         $CLEVER_CLI service link-addon c1-itou-redis
 
