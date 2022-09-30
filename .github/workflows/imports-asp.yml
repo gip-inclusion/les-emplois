@@ -56,15 +56,7 @@ jobs:
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        # Create a new application on Clever Cloud.
-        # -t: application type (Python).
-        # --org: organization name.
-        # --region: server location ("par" means Paris).
-        # --alias: custom application name, used to find it with the CLI.
         $CLEVER_CLI create $IMPORT_APP_NAME -t python --region par --alias $IMPORT_APP_NAME --org Itou
-        # Force Python version through env, because its default value 3 is not accurate and environment variables
-        # have precedence over configuration addons
-        $CLEVER_CLI env set CC_PYTHON_VERSION ${{ env.PYTHON_VERSION }} --alias $IMPORT_APP_NAME
         $CLEVER_CLI link $IMPORT_APP_NAME --org $ITOU_ORGANIZATION_NAME
         $CLEVER_CLI scale --flavor XL
 
@@ -73,10 +65,10 @@ jobs:
     - name: 🗺 Add environment variables and addons to the app
       run: |
         $CLEVER_CLI link $IMPORT_APP_NAME --org $ITOU_ORGANIZATION_NAME
+        $CLEVER_CLI env set ITOU_ENVIRONMENT "FAST-MACHINE"
+        $CLEVER_CLI service link-addon c1-prod-deployment-config
         $CLEVER_CLI service link-addon c1-imports-config
-        $CLEVER_CLI service link-addon c1-fast-machine-config
         $CLEVER_CLI service link-addon c1-prod-database-encrypted
-        $CLEVER_CLI service link-addon c1-itou-redis
 
     - name: "🚀 Deploy post-deploy hook to Clever"
       run:
