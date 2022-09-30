@@ -437,7 +437,7 @@ HUEY = {
         "workers": 2,
         "worker_type": "thread",
     },
-    "immediate": ITOU_ENVIRONMENT not in ("PROD", "STAGING"),
+    "immediate": ITOU_ENVIRONMENT not in ("DEMO", "PROD", "STAGING"),
 }
 
 # Email https://anymail.readthedocs.io/en/stable/esps/mailjet/
