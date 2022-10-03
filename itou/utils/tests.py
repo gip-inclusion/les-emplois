@@ -47,7 +47,6 @@ from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise
 from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
-from itou.utils.email_backend import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.pole_emploi import (
@@ -60,6 +59,7 @@ from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import get_user_info
+from itou.utils.tasks import sanitize_mailjet_recipients
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import get_absolute_url, get_external_link_markup, get_safe_url, get_tally_form_url
