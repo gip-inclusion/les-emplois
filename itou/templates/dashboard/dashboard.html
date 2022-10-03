@@ -606,7 +606,8 @@
                 {% if can_view_stats_ddets and active_campaigns %}
                     <div class="card">
                         <p class="h4 card-header">
-                            Contrôle a posteriori <span class="badge badge-accent-03 text-primary">Nouveau</span>
+                            Contrôle a posteriori
+                            {% if campaign_in_progress %}<span class="badge badge-accent-03 text-primary">Nouveau</span>{% endif %}
                         </p>
                         <div class="card-body">
                             <ul class="list-unstyled">

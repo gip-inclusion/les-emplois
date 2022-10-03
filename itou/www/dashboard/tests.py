@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.test import TestCase, override_settings
@@ -215,6 +216,19 @@ class DashboardViewTest(TestCase):
         )
 
         evaluation_campaign.ended_at = timezone.now()
+        evaluation_campaign.save(update_fields=["ended_at"])
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Contrôle a posteriori")
+        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
+        self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+            ),
+        )
+
+        evaluation_campaign.ended_at = timezone.now() - relativedelta(years=3)
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")

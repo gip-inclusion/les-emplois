@@ -49,23 +49,25 @@
                             {{ evaluated_siae.siae.phone|format_phone }}
                         </a>
                     </p>
-                    <div class="row">
-                        <div class="col-8">
-                            <p>
-                                Lorsque vous aurez contrôlé<strong>tous vos justificatifs</strong> pour cette SIAE,
-                                veuillez valider le contrôle effectué pour la notifier de son résultat.
-                            </p>
-                        </div>
+                    {% if not evaluated_siae.evaluation_campaign.ended_at %}
+                        <div class="row">
+                            <div class="col-8">
+                                <p>
+                                    Lorsque vous aurez contrôlé <strong>tous vos justificatifs</strong> pour cette SIAE,
+                                    veuillez valider le contrôle effectué pour la notifier de son résultat.
+                                </p>
+                            </div>
 
-                        <div class="col-4">
-                            <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
-                                {% csrf_token %}
-                                <button class="btn {% if evaluated_siae.can_review %}btn-primary {% else %}btn-outline-primary disabled {% endif %}btn-sm float-right">
-                                    Valider
-                                </button>
-                            </form>
+                            <div class="col-4">
+                                <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
+                                    {% csrf_token %}
+                                    <button class="btn {% if evaluated_siae.can_review %}btn-primary {% else %}btn-outline-primary disabled {% endif %}btn-sm float-right">
+                                        Valider
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="row">
@@ -98,7 +100,7 @@
                 <div class="row">
                     <div class="col-8">
                         <p>
-                            Lorsque vous aurez contrôlé<strong>tous vos justificatifs</strong> pour cette SIAE,
+                            Lorsque vous aurez contrôlé <strong>tous vos justificatifs</strong> pour cette SIAE,
                             veuillez valider le contrôle effectué pour la notifier de son résultat.
                         </p>
                     </div>
