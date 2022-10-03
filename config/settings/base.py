@@ -6,12 +6,11 @@ import datetime
 import json
 import os
 
+from django.utils import timezone
 from dotenv import load_dotenv
 
 
 load_dotenv()
-
-from django.utils import timezone
 
 
 # Django settings
