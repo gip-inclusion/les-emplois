@@ -6,9 +6,10 @@ services:
   # https://hub.docker.com/r/mdillon/postgis/tags
   postgres:
     container_name: itou_postgres
-    env_file:
-      - ./envs/dev.env
     environment:
+      # Required by the "_/postgres" image used by "postgis/postgis"
+      # https://registry.hub.docker.com/_/postgres/
+      - POSTGRES_PASSWORD=password
       # Avoid a log error when starting the itou_postgres container:
       # > Role "root" does not exist.
       # Without this variable, the default Unix account ('root')
@@ -16,6 +17,8 @@ services:
       # https://www.postgresql.org/docs/current/libpq-envars.html
       - PGUSER=postgres
       - PGPASSWORD=password
+      # Set the name of the database, this used by the scripts we add to the image (ie. psql_init.sh, backup, ...)
+      - ITOU_POSTGRES_DATABASE_NAME=itou
     # The default memory setting (64M) is not enough anymore due to the size of the database we import
     # https://stackoverflow.com/questions/56839975/docker-shm-size-dev-shm-resizing-shared-memory
     shm_size: 1g
@@ -32,13 +35,13 @@ services:
 
   django:
     container_name: itou_django
-    env_file:
-      - ./envs/dev.env
-      - ./envs/secrets.env
     environment:
       - PGHOST=postgres
       - PGUSER=postgres
       - PGPASSWORD=password
+      - PYTHONPATH=.
+      - DJANGO_SETTINGS_MODULE=config.settings.dev
+      - ITOU_LOG_LEVEL=DEBUG
     depends_on:
       - postgres
     build:
