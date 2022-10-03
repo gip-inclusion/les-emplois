@@ -6,7 +6,7 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
-from django.db.models import Count, F
+from django.db.models import Count, F, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -89,11 +89,17 @@ class CampaignAlreadyPopulatedException(Exception):
 
 
 class EvaluationCampaignQuerySet(models.QuerySet):
+    in_progress_q = Q(ended_at=None)
+
     def for_institution(self, institution):
         return self.filter(institution=institution).order_by("-evaluated_period_end_at")
 
     def in_progress(self):
-        return self.filter(ended_at=None)
+        return self.filter(self.in_progress_q)
+
+    def viewable(self):
+        recent_q = Q(ended_at__gte=timezone.now() - relativedelta(years=3))
+        return self.filter(self.in_progress_q | recent_q)
 
 
 class EvaluationCampaignManager(models.Manager):
@@ -284,6 +290,9 @@ class EvaluatedSiaeQuerySet(models.QuerySet):
 
     def in_progress(self):
         return self.exclude(evaluation_campaign__evaluations_asked_at=None).filter(evaluation_campaign__ended_at=None)
+
+    def viewable(self):
+        return self.filter(evaluation_campaign__in=EvaluationCampaign.objects.viewable())
 
 
 class EvaluatedSiaeManager(models.Manager):
@@ -480,6 +489,12 @@ class EvaluatedSiae(models.Model):
         return evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
 
+class EvaluatedJobApplicationQuerySet(models.QuerySet):
+    def viewable(self):
+        viewable_campaigns = EvaluationCampaign.objects.viewable()
+        return self.filter(evaluated_siae__evaluation_campaign__in=viewable_campaigns)
+
+
 class EvaluatedJobApplication(models.Model):
 
     job_application = models.ForeignKey(
@@ -496,6 +511,8 @@ class EvaluatedJobApplication(models.Model):
         related_name="evaluated_job_applications",
     )
     labor_inspector_explanation = models.TextField(verbose_name="Commentaires de l'inspecteur du travail", blank=True)
+
+    objects = EvaluatedJobApplicationQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Auto-prescription"
@@ -589,6 +606,12 @@ class EvaluatedJobApplication(models.Model):
             )
 
 
+class EvaluatedAdministrativeCriteriaQuerySet(models.QuerySet):
+    def viewable(self):
+        viewable_campaigns = EvaluationCampaign.objects.viewable()
+        return self.filter(evaluated_job_application__evaluated_siae__evaluation_campaign__in=viewable_campaigns)
+
+
 class EvaluatedAdministrativeCriteria(models.Model):
 
     administrative_criteria = models.ForeignKey(
@@ -614,6 +637,8 @@ class EvaluatedAdministrativeCriteria(models.Model):
         choices=evaluation_enums.EvaluatedAdministrativeCriteriaState.choices,
         default=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
     )
+
+    objects = EvaluatedAdministrativeCriteriaQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Critère administratif"

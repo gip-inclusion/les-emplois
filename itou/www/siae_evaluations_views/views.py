@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core import mail
 from django.db import transaction
 from django.db.models import Min
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
 from django.utils import text, timezone
@@ -82,7 +82,7 @@ def institution_evaluated_siae_list(
         evaluations_asked_at__isnull=False,
     )
     evaluated_siaes = get_list_or_404(
-        EvaluatedSiae.objects
+        EvaluatedSiae.objects.viewable()
         # select related `siae`` because of __str__() method of EvaluatedSiae
         .select_related("siae")
         .prefetch_related(
@@ -107,7 +107,9 @@ def institution_evaluated_siae_detail(
 ):
     institution = get_current_institution_or_404(request)
     evaluated_siae = get_object_or_404(
-        EvaluatedSiae.objects.select_related("evaluation_campaign", "siae").prefetch_related(
+        EvaluatedSiae.objects.viewable()
+        .select_related("evaluation_campaign", "siae")
+        .prefetch_related(
             "evaluated_job_applications",
             "evaluated_job_applications__evaluated_administrative_criteria",
             "evaluated_job_applications__job_application",
@@ -118,19 +120,21 @@ def institution_evaluated_siae_detail(
         evaluation_campaign__institution=institution,
         evaluation_campaign__evaluations_asked_at__isnull=False,
     )
+    evaluation_campaign = evaluated_siae.evaluation_campaign
     back_url = get_safe_url(
         request,
         "back_url",
         fallback_url=reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
-            kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign.pk},
+            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
         ),
     )
     context = {
         "evaluated_siae": evaluated_siae,
         "back_url": back_url,
         "show_notified": (
-            evaluated_siae.reviewed_at
+            not evaluation_campaign.ended_at
+            and evaluated_siae.reviewed_at
             and (
                 evaluated_siae.final_reviewed_at
                 and evaluated_siae.state
@@ -160,17 +164,18 @@ def institution_evaluated_job_application(
 ):
     institution = get_current_institution_or_404(request)
     evaluated_job_application = get_object_or_404(
-        EvaluatedJobApplication.objects.prefetch_related(
+        EvaluatedJobApplication.objects.viewable()
+        .prefetch_related(
             "evaluated_administrative_criteria",
             "evaluated_administrative_criteria__administrative_criteria",
             "job_application",
             "job_application__approval",
             "job_application__job_seeker",
-        ).select_related("evaluated_siae"),
+        )
+        .select_related("evaluated_siae__evaluation_campaign"),
         pk=evaluated_job_application_pk,
         evaluated_siae__evaluation_campaign__institution=institution,
         evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
-        evaluated_siae__evaluation_campaign__ended_at=None,
     )
     evaluated_siae = evaluated_job_application.evaluated_siae
 
@@ -187,11 +192,14 @@ def institution_evaluated_job_application(
     )
 
     form = LaborExplanationForm(instance=evaluated_job_application, data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        evaluated_job_application.labor_inspector_explanation = form.cleaned_data["labor_inspector_explanation"]
-        evaluated_job_application.save(update_fields=["labor_inspector_explanation"])
-        return HttpResponseRedirect(back_url)
+    if request.method == "POST":
+        campaign_closed = evaluated_job_application.evaluated_siae.evaluation_campaign.ended_at
+        if campaign_closed:
+            raise Http404
+        if form.is_valid():
+            evaluated_job_application.labor_inspector_explanation = form.cleaned_data["labor_inspector_explanation"]
+            evaluated_job_application.save(update_fields=["labor_inspector_explanation"])
+            return HttpResponseRedirect(back_url)
 
     if not evaluated_siae.reviewed_at:
         # “Phase amiable”.

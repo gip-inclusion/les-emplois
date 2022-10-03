@@ -31,6 +31,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     job_applications_categories = []
     num_rejected_employee_records = 0
     active_campaigns = []
+    campaign_in_progress = False
 
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
@@ -85,7 +86,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     if request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
-        active_campaigns = EvaluationCampaign.objects.for_institution(current_org).in_progress()
+        active_campaigns = EvaluationCampaign.objects.for_institution(current_org).viewable()
+        campaign_in_progress = any(campaign.ended_at is None for campaign in active_campaigns)
 
     context = {
         "job_applications_categories": job_applications_categories,
@@ -102,6 +104,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
         "num_rejected_employee_records": num_rejected_employee_records,
         "active_campaigns": active_campaigns,
+        "campaign_in_progress": campaign_in_progress,
         "precriber_kind_pe": PrescriberOrganizationKind.PE,
         "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
     }
