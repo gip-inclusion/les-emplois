@@ -8,6 +8,14 @@ services:
     container_name: itou_postgres
     env_file:
       - ./envs/dev.env
+    environment:
+      # Avoid a log error when starting the itou_postgres container:
+      # > Role "root" does not exist.
+      # Without this variable, the default Unix account ('root')
+      # is used automatically when starting postgres.
+      # https://www.postgresql.org/docs/current/libpq-envars.html
+      - PGUSER=postgres
+      - PGPASSWORD=password
     # The default memory setting (64M) is not enough anymore due to the size of the database we import
     # https://stackoverflow.com/questions/56839975/docker-shm-size-dev-shm-resizing-shared-memory
     shm_size: 1g
@@ -27,6 +35,10 @@ services:
     env_file:
       - ./envs/dev.env
       - ./envs/secrets.env
+    environment:
+      - PGHOST=postgres
+      - PGUSER=postgres
+      - PGPASSWORD=password
     depends_on:
       - postgres
     build:

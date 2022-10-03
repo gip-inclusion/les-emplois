@@ -30,8 +30,6 @@ fi
 
 message_welcome "Restoring the '${ITOU_POSTGRES_DATABASE_NAME}' database from the '${backup_filename}' backup..."
 
-export PGHOST="${POSTGRES_HOST}"
-export PGPORT="${POSTGRES_PORT}"
 export PGUSER="${ITOU_POSTGRES_USER}"
 export PGPASSWORD="${ITOU_POSTGRES_PASSWORD}"
 export PGDATABASE="${ITOU_POSTGRES_DATABASE_NAME}"

@@ -142,7 +142,7 @@ psql_itou:
 
 # Connect to postgres client as the `root` user.
 psql_root:
-	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U postgres
+	docker exec -ti itou_postgres psql -U postgres
 
 # Write query results to a CSV file.
 # --
