@@ -15,8 +15,6 @@ source "${working_dir}/_sourced/messages.sh"
 
 message_welcome "Backing up the '${ITOU_POSTGRES_DATABASE_NAME}' database..."
 
-export PGUSER="${ITOU_POSTGRES_USER}"
-export PGPASSWORD="${ITOU_POSTGRES_PASSWORD}"
 export PGDATABASE="${ITOU_POSTGRES_DATABASE_NAME}"
 
 backup_filename="${BACKUP_FILE_PREFIX}_custom_format_$(date +'%Y_%m_%dT%H_%M_%S').dump"

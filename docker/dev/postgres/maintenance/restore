@@ -30,15 +30,13 @@ fi
 
 message_welcome "Restoring the '${ITOU_POSTGRES_DATABASE_NAME}' database from the '${backup_filename}' backup..."
 
-export PGUSER="${ITOU_POSTGRES_USER}"
-export PGPASSWORD="${ITOU_POSTGRES_PASSWORD}"
 export PGDATABASE="${ITOU_POSTGRES_DATABASE_NAME}"
 
 message_info "Dropping the database..."
 dropdb "${ITOU_POSTGRES_DATABASE_NAME}"
 
 message_info "Creating a new database..."
-createdb --owner="${ITOU_POSTGRES_USER}"
+createdb
 
 message_info "Applying the backup to the new database..."
 pg_restore --dbname="${ITOU_POSTGRES_DATABASE_NAME}" --format=c --clean --no-owner --verbose "${backup_filename}"
