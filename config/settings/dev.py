@@ -70,11 +70,11 @@ ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
 ITOU_PROTOCOL = "http"
 ITOU_FQDN = "127.0.0.1:8000"
 
-DATABASES["default"]["HOST"] = "127.0.0.1"
-DATABASES["default"]["PORT"] = 5432
-DATABASES["default"]["NAME"] = "itou"
-DATABASES["default"]["USER"] = "postgres"  # check that with Docker
-DATABASES["default"]["PASSWORD"] = "password"
+DATABASES["default"]["HOST"] = os.getenv("PGHOST", "127.0.0.1")
+DATABASES["default"]["PORT"] = os.getenv("PGPORT", "5432")
+DATABASES["default"]["NAME"] = os.getenv("PGDATABASE", "itou")
+DATABASES["default"]["USER"] = os.getenv("PGUSER", "postgres")
+DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")
 
 ELASTIC_APM["ENABLED"] = False
 # FIXME(vperron): Remove this as soon as the checks are disabled
