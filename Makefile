@@ -7,6 +7,12 @@
 # Global tasks.
 # =============================================================================
 PYTHON_VERSION := python3.10
+ifeq ($(shell uname -s),Linux)
+	REQUIREMENTS_PATH := requirements/dev.txt
+else
+	REQUIREMENTS_PATH := requirements/dev.in
+endif
+
 VIRTUAL_ENV ?= .venv
 export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 
@@ -22,7 +28,7 @@ endif
 run:
 	docker-compose up
 
-$(VIRTUAL_ENV): requirements/dev.txt
+$(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 	$(PYTHON_VERSION) -m venv $@
 	$@/bin/pip install -r $^
 	$@/bin/pip-sync $^
