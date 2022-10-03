@@ -67,7 +67,7 @@ jobs:
         $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
         $CLEVER_CLI env set ITOU_ENVIRONMENT "REVIEW-APP"
         $CLEVER_CLI service link-addon c1-s3
-        $CLEVER_CLI service link-addon c1-deployment-config
+        $CLEVER_CLI service link-addon c1-config
 
     - name: 🚀 Deploy to Clever Cloud
       run: |
