@@ -7,7 +7,7 @@ from rest_framework.renderers import JSONRenderer
 from itou.employee_record import constants
 from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.exceptions import SerializationError
-from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer
+from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
