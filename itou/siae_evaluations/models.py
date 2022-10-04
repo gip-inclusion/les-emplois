@@ -344,15 +344,16 @@ class EvaluatedSiae(models.Model):
     # fixme vincentporte : to refactor. move all get_email_to_siae_xxx() method to emails.py in siae model
     def get_email_to_siae_selected(self):
         to = self.siae.active_admin_members
+        evaluated_siae_url = reverse(
+            "siae_evaluations_views:siae_job_applications_list",
+            kwargs={"evaluated_siae_pk": self.pk},
+        )
         context = {
             "campaign": self.evaluation_campaign,
             "siae": self.siae,
             # end_date for eligible siaes to return their documents of proofs is 6 weeks after notification
             "end_date": timezone.now() + relativedelta(weeks=6),
-            "url": (
-                f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}"
-                f"{reverse('siae_evaluations_views:siae_job_applications_list')}"
-            ),
+            "url": (f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}" + evaluated_siae_url),
         }
         subject = "siae_evaluations/email/to_siae_selected_subject.txt"
         body = "siae_evaluations/email/to_siae_selected_body.txt"

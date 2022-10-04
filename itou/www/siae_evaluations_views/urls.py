@@ -33,7 +33,11 @@ urlpatterns = [
         views.institution_evaluated_siae_validation,
         name="institution_evaluated_siae_validation",
     ),
-    path("siae_job_applications_list", views.siae_job_applications_list, name="siae_job_applications_list"),
+    path(
+        "siae_job_applications_list/<int:evaluated_siae_pk>/",
+        views.siae_job_applications_list,
+        name="siae_job_applications_list",
+    ),
     path(
         "siae_select_criteria/<int:evaluated_job_application_pk>/",
         views.siae_select_criteria,
@@ -44,5 +48,5 @@ urlpatterns = [
         views.siae_upload_doc,
         name="siae_upload_doc",
     ),
-    path("siae_submit_proofs", views.siae_submit_proofs, name="siae_submit_proofs"),
+    path("siae_submit_proofs/<int:evaluated_siae_pk>/", views.siae_submit_proofs, name="siae_submit_proofs"),
 ]
