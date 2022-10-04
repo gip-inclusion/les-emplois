@@ -136,7 +136,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.EvaluatedSiae)
-class EvaluatedSiae(admin.ModelAdmin):
+class EvaluatedSiaeAdmin(admin.ModelAdmin):
     list_display = ("evaluation_campaign", "siae", "reviewed_at")
     list_display_links = ("siae",)
     readonly_fields = ("evaluation_campaign", "siae", "reviewed_at", "state")
@@ -150,7 +150,7 @@ class EvaluatedSiae(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        queryset = super(EvaluatedSiae, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         queryset = queryset.prefetch_related(
             "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
         )
@@ -161,7 +161,7 @@ class EvaluatedSiae(admin.ModelAdmin):
 
 
 @admin.register(models.EvaluatedJobApplication)
-class EvaluatedJobApplication(admin.ModelAdmin):
+class EvaluatedJobApplicationAdmin(admin.ModelAdmin):
     list_display = ("evaluated_siae", "job_application", "approval", "job_seeker")
     list_display_links = ("job_application",)
     readonly_fields = ("evaluated_siae", "job_application", "approval", "job_seeker", "state")
@@ -170,7 +170,7 @@ class EvaluatedJobApplication(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        queryset = super(EvaluatedJobApplication, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         queryset = queryset.prefetch_related("evaluated_administrative_criteria")
         return queryset
 
@@ -189,7 +189,7 @@ class EvaluatedJobApplication(admin.ModelAdmin):
 
 
 @admin.register(models.EvaluatedAdministrativeCriteria)
-class EvaluatedAdministrativeCriteria(admin.ModelAdmin):
+class EvaluatedAdministrativeCriteriaAdmin(admin.ModelAdmin):
     list_display = ("evaluated_job_application", "administrative_criteria", "submitted_at", "review_state")
     list_display_links = ("administrative_criteria",)
     readonly_fields = (
