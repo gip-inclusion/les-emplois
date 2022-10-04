@@ -156,6 +156,7 @@ def institution_evaluated_job_application(
         pk=evaluated_job_application_pk,
         evaluated_siae__evaluation_campaign__institution=institution,
         evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
+        evaluated_siae__evaluation_campaign__ended_at=None,
     )
 
     back_url = (
