@@ -239,7 +239,7 @@ class SiaeAdmin(ExportActionMixin, OrganizationAdmin):
 
 
 @admin.register(models.SiaeJobDescription)
-class SiaeJobDescription(admin.ModelAdmin):
+class SiaeJobDescriptionAdmin(admin.ModelAdmin):
     list_display = (
         "display_name",
         "siae",
@@ -263,7 +263,7 @@ class SiaeJobDescription(admin.ModelAdmin):
 
 
 @admin.register(models.SiaeConvention)
-class SiaeConvention(admin.ModelAdmin):
+class SiaeConventionAdmin(admin.ModelAdmin):
     list_display = ("kind", "siret_signature", "is_active")
     list_filter = ("kind", "is_active")
     raw_id_fields = ("reactivated_by",)
@@ -327,7 +327,7 @@ class SiaeConvention(admin.ModelAdmin):
 
 
 @admin.register(models.SiaeFinancialAnnex)
-class SiaeFinancialAnnex(admin.ModelAdmin):
+class SiaeFinancialAnnexAdmin(admin.ModelAdmin):
     list_display = ("number", "state", "start_at", "end_at")
     list_filter = ("state",)
     raw_id_fields = ("convention",)
