@@ -12,6 +12,7 @@ register = template.Library()
 def pluralizefr(value, arg="s"):
     """
     Return a plural suffix if the value is greater than 1
+    NB : the basic django pluralize filter returns the plural suffix for value==0
     """
     try:
         return arg if float(value) > 1 else ""
