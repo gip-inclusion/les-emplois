@@ -259,7 +259,6 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
             to_siae=self.siae,
-            job_seeker_with_address=True,
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))

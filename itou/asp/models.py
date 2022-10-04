@@ -6,6 +6,8 @@ from django.db.models import Q
 from django.utils.functional import cached_property
 from unidecode import unidecode
 
+from .exceptions import CommuneUnknownInPeriodError, UnknownCommuneError
+
 
 class LaneType(models.TextChoices):
     """
@@ -335,14 +337,6 @@ class PrescriberType(models.TextChoices):
 
 
 class CommuneQuerySet(PeriodQuerySet):
-    def by_insee_code(self, insee_code):
-        """
-        Lookup a Commune object by INSEE code
-
-        May return several results if not used with PeriodQuerySet.current
-        """
-        return self.filter(code=insee_code)
-
     def by_insee_code_and_period(self, insee_code, period):
         """
         Lookup a Commune object by INSEE code and valid at the given period
@@ -366,11 +360,31 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     code = models.CharField(max_length=5, verbose_name="Code commune INSEE", db_index=True)
     name = models.CharField(max_length=50, verbose_name="Nom de la commune")
 
-    objects = models.Manager.from_queryset(CommuneQuerySet)()
+    objects = CommuneQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Commune"
         indexes = [GinIndex(fields=["name"], name="aps_communes_name_gin_trgm", opclasses=["gin_trgm_ops"])]
+
+    @classmethod
+    def by_insee_code(cls, insee_code: str):
+        try:
+            return Commune.objects.current().get(code=insee_code)
+        except Commune.DoesNotExist as ex:
+            raise UnknownCommuneError(f"Code INSEE {insee_code} inconnu dans le référentiel ASP") from ex
+
+    @staticmethod
+    def by_insee_code_and_period(insee_code: str, period: dt.date):
+        """Get a commune at a given point in time.
+        Raises `CommuneUnknowInPeriodError` if not found.
+        """
+        result = Commune.objects.by_insee_code_and_period(insee_code, period).get()
+        if not result:
+            raise CommuneUnknownInPeriodError(
+                f"Période inconnue dans le référentiel ASP pour le code INSEE {insee_code} "
+                f"en date du {period:%d-%m-%Y}"
+            )
+        return result
 
     @cached_property
     def department_code(self):
@@ -449,7 +463,7 @@ class Country(PrettyPrintMixin, models.Model):
     def is_france(self):
         """
         Check if provided country is France
-        Polynesian islands are considered as a disting country but are french in fine
+        Polynesian islands are considered as a distinct country but are french in-fine
         """
         return self.group == self.Group.FRANCE
 

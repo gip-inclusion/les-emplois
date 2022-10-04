@@ -35,6 +35,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrga
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils import constants as global_constants
+from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 from .enums import IdentityProvider, Kind, Title
@@ -1123,19 +1124,24 @@ class JobSeekerProfile(models.Model):
 
     def update_hexa_address(self):
         """
-        This method tries to fill the HEXA address fields
-        based the current address of the job seeker (User model).
+        This method tries to fill the HEXA address fields based the current address of the job seeker (`User` model).
 
-        Conversion from standard itou address to HEXA is making sync
-        geo API calls.
+        Conversion from standard itou address to HEXA is making sync geo API calls.
 
-        Returns current object or re-raise error,
-        thus calling this method should be done in a try/except block
+        Calling this method should be done in a (multiple) try/except block.
+
+        Raises `UnknownCommuneError` or `AddressLookupError` instead of `ValidationError`:
+            - not a validation part
+            - easier to pinpoint issues on frontend side (and correctly notify user)
+
+        Using this method can block user from completing an employee record creation.
+
+        If anything goes wrong here, it must "fail fast" and notify the user in the most accurate way possible.
         """
         result, error = format_address(self.user)
 
         if error:
-            raise ValidationError(error)
+            raise AddressLookupError(error)
 
         # Fill matching fields
         self.hexa_lane_type = result.get("lane_type")
@@ -1148,19 +1154,19 @@ class JobSeekerProfile(models.Model):
 
         # Special field: Commune object contains both city name and INSEE code
         insee_code = result.get("insee_code")
-        self.hexa_commune = Commune.objects.by_insee_code(insee_code).first()
 
-        if not self.hexa_commune:
-            raise ValidationError(self.ERROR_HEXA_LOOKUP_COMMUNE)
-
+        # This may raise an asp.exceptions.UnknownCommuneError : let it crash if needed
+        self.hexa_commune = Commune.by_insee_code(insee_code)
         self.save()
 
         return self
 
     def clear_hexa_address(self):
         """
-        Delete hexa address fields.
-        This method updates the profile in db.
+        Wipe hexa address fields and updates the profile in DB.
+
+        Use with caution:
+            clearing HEXA addresses of a job seeker can block employee record update notifications transfer.
         """
         self.hexa_lane_type = ""
         self.hexa_lane_number = ""
