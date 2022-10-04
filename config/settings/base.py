@@ -6,6 +6,7 @@ import datetime
 import json
 import os
 
+from django.utils import timezone
 from dotenv import load_dotenv
 
 
@@ -446,12 +447,10 @@ ANYMAIL = {
     "WEBHOOK_SECRET": os.getenv("MAILJET_WEBHOOK_SECRET"),
 }
 
-# EMAIL_BACKEND points to an async wrapper of a "real" email backend
-# The real backend is hardcoded in the wrapper to avoid multiple and
-# confusing parameters in Django settings.
-# Switch to a "standard" Django backend to get the synchronous behaviour back.
-EMAIL_BACKEND = "itou.utils.tasks.AsyncEmailBackend"
-
+if ITOU_ENVIRONMENT in ["DEMO", "PROD", "STAGING"]:
+    EMAIL_BACKEND = "itou.utils.tasks.AsyncEmailBackend"
+elif ITOU_ENVIRONMENT in ["REVIEW-APP", "FAST-MACHINE"]:
+    EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
 SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600
