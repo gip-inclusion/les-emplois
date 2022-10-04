@@ -712,17 +712,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-        # institution with ended evaluation_campaign
-        evaluation_campaign.ended_at = timezone.now()
-        evaluation_campaign.save(update_fields=["ended_at"])
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
-                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
-            )
-        )
-        self.assertEqual(response.status_code, 200)
-
     def test_content(self):
         self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
@@ -748,6 +737,24 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             )
             + f"#{evaluated_job_application.pk}",
         )
+
+    def test_does_not_show_evaluations_from_previous_campaigns(self):
+        evaluated_siae = EvaluatedSiaeFactory(accepted=True, evaluation_campaign__institution=self.institution)
+        past_job_application = evaluated_siae.evaluated_job_applications.get()
+        new_evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution, evaluations_asked_at=timezone.now()
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=new_evaluation_campaign, siae=evaluated_siae.siae)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_job_application",
+                kwargs={"evaluated_job_application_pk": past_job_application.pk},
+            )
+        )
+        assert response.status_code == 404
 
     def test_criterion_validation(self):
         self.client.force_login(self.user)
