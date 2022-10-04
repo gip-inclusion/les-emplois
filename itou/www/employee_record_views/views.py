@@ -8,11 +8,13 @@ from django.urls import reverse
 from django.utils.encoding import escape_uri_path
 from django.utils.safestring import mark_safe
 
+from itou.asp.exceptions import UnknownCommuneError
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.users.models import JobSeekerProfile
+from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.pagination import pager
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -150,7 +152,6 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     Step 1: Name and birth date / place / country of the jobseeker
     """
     job_application = can_create_employee_record(request, job_application_id)
-
     form = NewEmployeeRecordStep1Form(data=request.POST or None, instance=job_application.job_seeker)
     step = 1
 
@@ -161,9 +162,36 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         employee = job_application.job_seeker
         profile, profile_was_created = JobSeekerProfile.objects.get_or_create(user=employee)
 
-        # Try a geo lookup of the address every time we call this form
         try:
+            # Try a geo lookup of the address every time we call this form
             profile.update_hexa_address()
+        except AddressLookupError:
+            # Can occur if employee address is badly formatted and is not found by geoloc API
+            profile.clear_hexa_address()
+            messages.error(
+                request,
+                mark_safe(
+                    f"L'adresse de <b>{employee.get_full_name()}</b> comporte un plusieurs éléments incorrects. "
+                    f"Merci de la vérifier et de la modifier au besoin :<br>"
+                    f"<ul>"
+                    f"<li>adresse : {employee.address_line_1}</li>"
+                    f"<li>complément : {employee.address_line_2}</li>"
+                    f"<li>code postal : {employee.post_code}</li>"
+                    f"<li>commune : {employee.city}</li>"
+                    f"</ul>"
+                    f"Vous pouvez au besoin modifier cette addresse en cliquant "
+                    f"<a href='"
+                    f"{reverse('dashboard:edit_job_seeker_info', kwargs={'job_application_id': job_application.pk})}"
+                    f"'><b>sur ce lien.</b></a>"
+                ),
+            )
+        except UnknownCommuneError:
+            # Can occur if INSEE code of employee address is unknown in ASP commune refs.
+            # At this point the infamous "METZ workaround" is a solution.
+            profile.clear_hexa_address()
+            messages.error(
+                request, f"Impossible de déterminer le code INSEE pour l'adresse de {employee.get_full_name()}"
+            )
         except ValidationError as ex:
             profile.clear_hexa_address()
             messages.error(
@@ -174,9 +202,9 @@ def create(request, job_application_id, template_name="employee_record/create.ht
                 ),
             )
         except Exception as ex:
+            # Other unexpected error cases : don't keep a incomplete new profile
             messages.error(request, f"Une erreur est survenue : {ex=}")
             if profile_was_created:
-                # Don't keep incomplete profiles in DB
                 profile.delete()
         else:
             return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.pk,)))
