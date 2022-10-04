@@ -15,7 +15,7 @@ from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.apis.geocoding import GeocodingDataException
+from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
@@ -423,7 +423,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
             siae = form.save()
             request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
             return HttpResponseRedirect(reverse("dashboard:index"))
-        except GeocodingDataException:
+        except GeocodingDataError:
             messages.error(request, "L'adresse semble erronée. Veuillez la corriger avant de pouvoir « Enregistrer ».")
 
     context = {"form": form}
@@ -508,7 +508,7 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
             request.session.modified = True
             messages.success(request, "Mise à jour effectuée !")
             return HttpResponseRedirect(reverse("dashboard:index"))
-        except GeocodingDataException:
+        except GeocodingDataError:
             messages.error(
                 request,
                 mark_safe(

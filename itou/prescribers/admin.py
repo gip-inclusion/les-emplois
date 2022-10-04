@@ -9,7 +9,7 @@ from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.admin import PkSupportRemarkInline
-from itou.utils.apis.geocoding import GeocodingDataException
+from itou.utils.apis.exceptions import GeocodingDataError
 
 
 class TmpMissingSiretFilter(admin.SimpleListFilter):
@@ -184,7 +184,7 @@ class PrescriberOrganizationAdmin(OrganizationAdmin):
                 try:
                     # Set geocoding.
                     obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
-                except GeocodingDataException:
+                except GeocodingDataError:
                     # do nothing, the user has not made any changes to the address
                     pass
 
@@ -192,7 +192,7 @@ class PrescriberOrganizationAdmin(OrganizationAdmin):
             try:
                 # Refresh geocoding.
                 obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
-            except GeocodingDataException:
+            except GeocodingDataError:
                 messages.error(request, "L'adresse semble erronée car le geocoding n'a pas pu être recalculé.")
 
         super().save_model(request, obj, form, change)

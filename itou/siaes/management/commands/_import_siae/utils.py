@@ -15,7 +15,8 @@ from django.utils import timezone
 from itou.common_apps.address.models import AddressMixin
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.models import Siae
-from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
+from itou.utils.apis.exceptions import GeocodingDataError
+from itou.utils.apis.geocoding import get_geocoding_data
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -155,7 +156,7 @@ def geocode_siae(siae):
         siae.city = geocoding_data["city"]
 
         siae.coords = geocoding_data["coords"]
-    except GeocodingDataException:
+    except GeocodingDataError:
         pass
 
     return siae

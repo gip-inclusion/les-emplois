@@ -5,8 +5,9 @@ import os
 from django.core.management.base import BaseCommand
 
 from itou.common.address.departments import DEPARTMENTS
-from itou.common_apps.apis.geocoding import GeocodingDataException, get_geocoding_data
+from itou.common_apps.apis.geocoding import get_geocoding_data
 from itou.prescribers.models import PrescriberOrganization
+from itou.utils.apis.exceptions import GeocodingDataError
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -140,7 +141,7 @@ class Command(BaseCommand):
                             )
                         )
                         prescriber_organization.coords = geocoding_data["coords"]
-                    except GeocodingDataException:
+                    except GeocodingDataError:
                         prescriber_organization.coords = ""
 
                     prescriber_organization.save()
