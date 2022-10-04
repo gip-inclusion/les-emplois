@@ -30,7 +30,7 @@ class SubmitEvaluatedAdministrativeCriteriaProofForm(forms.ModelForm):
         fields = ["proof_url"]
 
     def save(self):
-        instance = super(SubmitEvaluatedAdministrativeCriteriaProofForm, self).save(commit=False)
+        instance = super().save(commit=False)
         instance.uploaded_at = timezone.now()
         instance.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         instance.submitted_at = None

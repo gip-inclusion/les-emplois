@@ -12,7 +12,7 @@ class EvaluatedSiaesInline(admin.TabularInline):
     extra = 0
 
     def get_queryset(self, request):
-        queryset = super(EvaluatedSiaesInline, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         queryset = queryset.prefetch_related(
             "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
         )
@@ -37,7 +37,7 @@ class EvaluatedJobApplicationsInline(admin.TabularInline):
     extra = 0
 
     def get_queryset(self, request):
-        queryset = super(EvaluatedJobApplicationsInline, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         queryset = queryset.prefetch_related("evaluated_administrative_criteria")
         return queryset
 
@@ -150,7 +150,7 @@ class EvaluatedSiae(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        queryset = super(EvaluatedSiae, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         queryset = queryset.prefetch_related(
             "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
         )
@@ -170,7 +170,7 @@ class EvaluatedJobApplication(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        queryset = super(EvaluatedJobApplication, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         queryset = queryset.prefetch_related("evaluated_administrative_criteria")
         return queryset
 
