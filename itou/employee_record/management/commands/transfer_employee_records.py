@@ -1,14 +1,16 @@
 from io import BytesIO
 
 from django.conf import settings
+from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
+from itou.approvals.models import Approval
 from itou.employee_record import constants
-from itou.employee_record.enums import MovementType, Status
+from itou.employee_record.enums import MovementType, NotificationType, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
 
@@ -163,6 +165,23 @@ class Command(EmployeeRecordTransferCommand):
                         employee_record.status = Status.REJECTED
                         employee_record.asp_processing_code = EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
                         employee_record.update_as_processed_as_duplicate()
+
+                        # If the ASP mark the employee record as duplicate,
+                        # and there is a suspension or a prolongation for the associated approval,
+                        # then we create a notification to be sure the ASP has the correct end date.
+                        try:
+                            approval = Approval.objects.get(number=employee_record.approval_number)
+                        except Approval.DoesNotExist:
+                            pass  # No point to send a notification about an approval if it doesn't exist
+                        else:
+                            if approval.suspension_set.exists() or approval.prolongation_set.exists():
+                                # Mimic the SQL function "create_employee_record_approval_notification()"
+                                EmployeeRecordUpdateNotification.objects.update_or_create(
+                                    employee_record=employee_record,
+                                    notification_type=NotificationType.APPROVAL,
+                                    defaults={"updated_at": timezone.now},
+                                )
+
                         continue
 
                     # Fixes unexpected stop on multiple pass on the same file

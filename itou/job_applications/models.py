@@ -7,13 +7,13 @@ from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Subquery, When
+from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
-from itou.approvals.models import Approval, Suspension
+from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
@@ -271,19 +271,6 @@ class JobApplicationQuerySet(models.QuerySet):
 
     # Employee record querysets
 
-    def _prefetch_employee_record_list(self):
-        """Fetch all needed data to avoid N+1 effects. Not a public API: use `eligible_as_employee_record`."""
-        return (
-            self.select_related(
-                "to_siae",
-                "to_siae__convention",
-                "approval",
-                "job_seeker",
-            ).prefetch_related("employee_record")
-            # Order by most recent hirings
-            .order_by("-hiring_start_at")
-        )
-
     def _eligible_job_applications_with_employee_record(self, siae):
         """
         Eligible job applications for employee record query: part 1
@@ -294,11 +281,11 @@ class JobApplicationQuerySet(models.QuerySet):
             - has the same approval,
             - is in `NEW` state.
 
-        Otherwise these employee records will be rejected by ASP as duplicates.
+        Otherwise, these employee records will be rejected by ASP as duplicates.
 
         Not a public API: use `eligible_as_employee_record`.
         """
-        return self._prefetch_employee_record_list().filter(
+        return self.filter(
             to_siae=siae,
             employee_record__status=employeerecord_enums.Status.NEW,
             employee_record__asp_id=F("to_siae__convention__asp_id"),
@@ -315,23 +302,49 @@ class JobApplicationQuerySet(models.QuerySet):
 
         Not a public API: use `eligible_as_employee_record`.
         """
-        return (
-            self._prefetch_employee_record_list()
-            .filter(to_siae=siae)
-            # Hiring must be valid
-            .accepted()
+        return self.accepted().filter(
             # Must be linked to an approval
-            .exclude(approval__isnull=True)
+            approval__isnull=False,
+            # Only for that SIAE
+            to_siae=siae,
             # Hiring structure must be one of those kinds
-            .filter(to_siae__kind__in=Siae.ASP_EMPLOYEE_RECORD_KINDS)
+            # FIXME(rsebille): should probably not be handled as SQL because we already have `siae`
+            to_siae__kind__in=Siae.ASP_EMPLOYEE_RECORD_KINDS,
+            # Admin control: can prevent creation of employee record
+            create_employee_record=True,
+            # There must be **NO** employee record linked in this part
+            employee_record__isnull=True,
+            # No employee record is available before this date
+            hiring_start_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+        )
+
+    def _eligible_job_applications_with_a_suspended_or_extended_approval(self, siae):
+        return (
+            self.accepted()
+            .annotate(
+                has_suspension=Exists(
+                    Suspension.objects.filter(siae=OuterRef("to_siae"), approval=OuterRef("approval"))
+                ),
+                has_prolongation=Exists(
+                    Prolongation.objects.filter(declared_by_siae=OuterRef("to_siae"), approval=OuterRef("approval"))
+                ),
+            )
             .filter(
+                # Must be linked to an approval with a Suspension or a Prolongation
+                Q(has_suspension=True) | Q(has_prolongation=True),
+                # Only for that SIAE
+                to_siae=siae,
+                # Hiring structure must be one of those kinds
+                # FIXME(rsebille): should probably not be handled as SQL because we already have `siae`
+                to_siae__kind__in=Siae.ASP_EMPLOYEE_RECORD_KINDS,
                 # Admin control: can prevent creation of employee record
                 create_employee_record=True,
-                # No employee record is available before this date
-                hiring_start_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+                # There must be **NO** employee record linked in this part
+                employee_record__isnull=True,
+                # Limit to recent approvals as the older ones will already have been handled by the support.
+                # The date was chosen arbitrarily, don't mind it too much :).
+                approval__created_at__gte="2022-01-01",
             )
-            # There must be **NO** employee record linked in this part
-            .filter(employee_record__isnull=True)
         )
 
     def eligible_as_employee_record(self, siae):
@@ -346,23 +359,30 @@ class JobApplicationQuerySet(models.QuerySet):
             - the hiring date must be greater than 2021.09.27 (feature production date)
             - employee record is not blocked via admin (`create_employee_record` field)
 
-        Enabling / disabling an employee record has no impact on job application eligilibility concerns.
+        Enabling / disabling an employee record has no impact on job application eligibility concerns.
 
         Getting a correct list of eligible job applications for employee records:
             - is not achievable in one single request (opposite conditions)
             - is consuming a lot of resources (200-800ms per round)
-        Splitting in 2 queries, reunited by a UNION:
-            - lowers SQL query time under 20ms
+        Splitting in multiple queries, reunited by a UNION:
+            - lowers SQL query time under 30ms
             - adds correctness to result
         Each query is commented according to the newest Whimsical schemas.
         """
-        eligibible_job_applications_part_1 = self._eligible_job_applications_with_employee_record(siae).only("id")
-        eligibible_job_applications_part_2 = self._eligible_job_applications_without_employee_record(siae).only("id")
-        eligibible_job_applications = eligibible_job_applications_part_1.union(eligibible_job_applications_part_2)
+        eligible_job_applications = JobApplicationQuerySet.union(
+            self._eligible_job_applications_with_employee_record(siae),
+            self._eligible_job_applications_without_employee_record(siae),
+            self._eligible_job_applications_with_a_suspended_or_extended_approval(siae),
+        )
 
-        # TIP: you can't filter on an UNION of querysets,
+        # TIP: you can't filter on a UNION of querysets,
         # but you can convert it as a subquery and then order and filter it
-        return self._prefetch_employee_record_list().filter(pk__in=eligibible_job_applications.values("id"))
+        return (
+            self.filter(pk__in=eligible_job_applications.values("id"))
+            .select_related("to_siae", "to_siae__convention", "approval", "job_seeker")
+            .prefetch_related("employee_record", "approval__suspension_set", "approval__prolongation_set")
+            .order_by("-hiring_start_at")
+        )
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):

@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
@@ -527,6 +527,45 @@ class JobApplicationQuerySetTest(TestCase):
         # After employee record is disabled
         employee_record.update_as_disabled()
         self.assertEqual(employee_record.status, Status.DISABLED)
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+
+        # No employee record, but with a suspension
+        job_app = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            hiring_start_at=None,
+        )
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+        SuspensionFactory(
+            siae=job_app.to_siae,
+            approval=job_app.approval,
+        )
+        self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+        # No employee record, but with a prolongation
+        job_app = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            hiring_start_at=None,
+        )
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+        ProlongationFactory(
+            declared_by_siae=job_app.to_siae,
+            approval=job_app.approval,
+        )
+        self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+        # No employee record, but with a prolongation and a suspension
+        job_app = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            hiring_start_at=None,
+        )
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+        SuspensionFactory(
+            siae=job_app.to_siae,
+            approval=job_app.approval,
+        )
+        ProlongationFactory(
+            declared_by_siae=job_app.to_siae,
+            approval=job_app.approval,
+        )
+        self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(

@@ -12,7 +12,8 @@
                     Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b>
                 </p>
                 <p class="m-0">
-                    Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b>
+                    Fin de contrat :&nbsp;<b{% if item.has_outdated_date %} class="text-danger"{% endif %}>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b>
+                    {% if item.has_outdated_date %}<i class="ri-error-warning-fill ri-xl text-danger align-text-bottom"></i>{% endif %}
                 </p>
                 <p class="m-0">
                     Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.approval.number|format_approval_number }}</b>
@@ -98,12 +99,33 @@
 
         {# Actions #}
         {% if form.status.value == "NEW" %}
-            <div class="text-right">
-                {% if item.employee_record_new %}
-                    <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}?status=NEW" class="btn btn-outline-primary mt-2">Désactiver la fiche salarié</a>
-                {% endif %}
-                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary mt-2">Créer la fiche salarié</a>
-            </div>
+            {% if item.has_outdated_date %}
+                <div class="alert alert-danger mt-4" role="status">
+                    <div class="row">
+                        <div class="col-auto pr-0">
+                            <i class="ri-error-warning-fill ri-xl text-danger"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-2">
+                                <strong>Attention, une action de votre part est requise</strong>
+                            </p>
+                            <p class="mb-0">
+                                La nouvelle date de fin du PASS IAE n’a pas pu être transmise à l’Extranet IAE 2.0 de l’ASP. Une mise à jour manuelle est nécessaire.
+                            </p>
+                        </div>
+                        <div class="col-auto align-self-center">
+                            <a class="btn btn-primary" href="{% url "employee_record_views:create" item.id %}">Mettre à jour</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-right">
+                    {% if item.employee_record_new %}
+                        <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}?status=NEW" class="btn btn-outline-primary mt-2">Désactiver la fiche salarié</a>
+                    {% endif %}
+                    <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary mt-2">Créer la fiche salarié</a>
+                </div>
+            {% endif %}
         {% elif form.status.value == "READY" %}
             <div class="text-right">
                 <a href="{% url "employee_record_views:summary" employee_record.id %}?status=READY" class="btn btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
@@ -128,7 +150,5 @@
                 <a href="{% url "employee_record_views:summary" employee_record.id %}?status=DISABLED" class="btn btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
             </div>
         {% endif %}
-
     </div>
-
 </div>

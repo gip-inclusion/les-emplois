@@ -5,7 +5,7 @@ from django.test.utils import override_settings
 from django.utils import timezone
 
 from itou.employee_record import constants
-from itou.employee_record.enums import Status
+from itou.employee_record.enums import NotificationType, Status
 from itou.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from itou.employee_record.mocks.transfer_employee_records import (
     SFTPAllDupsConnectionMock,
@@ -18,11 +18,12 @@ from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
+# There is no need to create 700 employee records for a single batch
+# so this class var is changed to 1 for tests, otherwise download operation is not triggered.
+from ...approvals.factories import ProlongationFactory, SuspensionFactory
 from .common import ManagementCommandTestCase
 
 
-# There is no need to create 700 employee records for a single batch
-# so this class var is changed to 1 for tests, otherwise download operation is not triggered.
 @mock.patch("itou.employee_record.models.EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS", new=1)
 @override_settings(ASP_FS_SFTP_HOST="foobar.com", ASP_FS_SFTP_USER="django_tests")
 class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
@@ -229,6 +230,42 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         self.assertEqual(0, EmployeeRecord.objects.asp_duplicates().count())
         self.assertEqual(Status.PROCESSED, self.employee_record.status)
         self.assertTrue(self.employee_record.processed_as_duplicate)
+
+    @mock.patch("pysftp.Connection", SFTPAllDupsConnectionMock)
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_duplicates_with_a_suspension_generate_an_update_notification(self, _):
+        SuspensionFactory(approval=self.employee_record.job_application.approval)
+
+        # Don't forget to make a complete upload / download cycle
+        self.call_command(upload=True, download=True)
+
+        self.employee_record.refresh_from_db()
+
+        self.assertEqual(self.employee_record.update_notifications.count(), 1)
+        self.assertEqual(
+            self.employee_record.update_notifications.first().notification_type, NotificationType.APPROVAL
+        )
+
+    @mock.patch("pysftp.Connection", SFTPAllDupsConnectionMock)
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_duplicates_with_a_prolongation_generate_an_update_notification(self, _):
+        ProlongationFactory(approval=self.employee_record.job_application.approval)
+
+        # Don't forget to make a complete upload / download cycle
+        self.call_command(upload=True, download=True)
+
+        self.employee_record.refresh_from_db()
+
+        self.assertEqual(self.employee_record.update_notifications.count(), 1)
+        self.assertEqual(
+            self.employee_record.update_notifications.first().notification_type, NotificationType.APPROVAL
+        )
 
 
 class SanitizeManagementCommandTest(ManagementCommandTestCase):

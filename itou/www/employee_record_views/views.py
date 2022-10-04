@@ -108,11 +108,18 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
     # Not needed every time (not pulled-up), and DRY here
     base_query = EmployeeRecord.objects.full_fetch()
+    has_outdated_date = False
 
     if status == Status.NEW:
         # Browse to get only the linked employee record in "new" state
         data = eligibible_job_applications
         for item in data:
+            item.has_outdated_date = (
+                item.approval.suspension_set.filter(siae=siae).exists()
+                or item.approval.prolongation_set.filter(declared_by_siae=siae).exists()
+            )
+            has_outdated_date |= item.has_outdated_date
+
             for e in item.employee_record.all():
                 if e.status == Status.NEW:
                     item.employee_record_new = e
@@ -138,6 +145,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "badges": status_badges,
         "navigation_pages": navigation_pages,
         "feature_availability_date": EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+        "has_outdated_date": has_outdated_date,
     }
 
     return render(request, template_name, context)
