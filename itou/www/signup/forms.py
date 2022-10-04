@@ -11,6 +11,7 @@ from itou.siaes.models import SiaeMembership
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
+from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
 
@@ -38,7 +39,7 @@ def _get_organization_data_from_api(siret):
     address_on_one_line = ", ".join([field for field in address_fields if field])
     try:
         geocoding_data = api_geocoding.get_geocoding_data(address_on_one_line, post_code=establishment.post_code)
-    except api_geocoding.GeocodingDataException:
+    except GeocodingDataError:
         geocoding_data = {}
 
     return {

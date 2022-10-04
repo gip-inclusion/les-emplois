@@ -3,7 +3,8 @@ import re
 from unidecode import unidecode
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
-from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
+from itou.utils.apis.exceptions import GeocodingDataError
+from itou.utils.apis.geocoding import get_geocoding_data
 
 
 ERROR_HEXA_CONVERSION = "Impossible de transformer cet objet en adresse HEXA"
@@ -55,7 +56,7 @@ def format_address(obj):
     try:
         # first we use geo API to get a 'lane' and a number
         address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code)
-    except GeocodingDataException as ex:
+    except GeocodingDataError as ex:
         return None, ERROR_GEOCODING_API + f" : {str(ex)}"
 
     # Default values

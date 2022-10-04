@@ -5,12 +5,10 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.utils.http import urlencode
 
+from itou.utils.apis.exceptions import AddressLookupError, GeocodingDataError
+
 
 logger = logging.getLogger(__name__)
-
-
-class GeocodingDataException(Exception):
-    pass
 
 
 def call_ban_geocoding_api(address, post_code=None, limit=1):
@@ -53,8 +51,11 @@ def get_geocoding_data(address, post_code=None, limit=1):
 
     data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
 
-    if not data or not data.get("properties"):
-        raise GeocodingDataException("Unable to get properties set for geocoding data")
+    if not data:
+        raise GeocodingDataError("Empty response from API")
+
+    if not data.get("properties"):
+        raise AddressLookupError(f"Unable to lookup address: {address}")
 
     longitude = data["geometry"]["coordinates"][0]
     latitude = data["geometry"]["coordinates"][1]

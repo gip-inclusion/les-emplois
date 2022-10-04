@@ -14,7 +14,7 @@ from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline
 from itou.siaes import models
 from itou.siaes.admin_forms import SiaeAdminForm
 from itou.utils.admin import PkSupportRemarkInline
-from itou.utils.apis.geocoding import GeocodingDataException
+from itou.utils.apis.exceptions import GeocodingDataError
 
 
 class SiaeMembersInline(MembersInline):
@@ -212,7 +212,7 @@ class SiaeAdmin(ExportActionMixin, OrganizationAdmin):
                 try:
                     # Set geocoding.
                     obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
-                except GeocodingDataException:
+                except GeocodingDataError:
                     # do nothing, the user has not made any changes to the address
                     pass
 
@@ -220,7 +220,7 @@ class SiaeAdmin(ExportActionMixin, OrganizationAdmin):
             try:
                 # Refresh geocoding.
                 obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
-            except GeocodingDataException:
+            except GeocodingDataError:
                 messages.error(request, "L'adresse semble erronée car le geocoding n'a pas pu être recalculé.")
 
         # Pulled-up the save action:

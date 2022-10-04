@@ -45,7 +45,8 @@ from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactor
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise
-from itou.utils.apis.geocoding import GeocodingDataException, get_geocoding_data
+from itou.utils.apis.exceptions import GeocodingDataError
+from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
@@ -316,7 +317,7 @@ class UtilsGeocodingTest(TestCase):
     def test_get_geocoding_data_error(self, mock_call_ban_geocoding_api):
         geocoding_data = mock_call_ban_geocoding_api()
 
-        with self.assertRaises(GeocodingDataException):
+        with self.assertRaises(GeocodingDataError):
             get_geocoding_data(geocoding_data)
 
 
