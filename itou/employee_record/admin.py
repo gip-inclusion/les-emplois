@@ -71,7 +71,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "updated_at",
         "approval_number",
         "job_application",
-        "job_seeker",
+        "job_seeker_link",
         "job_seeker_profile_link",
         "siret",
         "financial_annex",
@@ -93,7 +93,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
                     "status",
                     "job_application",
                     "approval_number",
-                    "job_seeker",
+                    "job_seeker_link",
                     "job_seeker_profile_link",
                     "siret",
                     "asp_id",
@@ -118,16 +118,20 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         ),
     )
 
-    def job_seeker(self, obj):
-        return obj.job_application.job_seeker or "-"
+    def job_seeker_link(self, obj):
+        if job_seeker := obj.job_application.job_seeker:
+            url = reverse("admin:users_user_change", args=[job_seeker.pk])
+            return mark_safe(f'<a href="{url}">{job_seeker}</a>')
+
+        return "-"
 
     def job_seeker_profile_link(self, obj):
         job_seeker = obj.job_application.job_seeker
         app_label = job_seeker._meta.app_label
 
         model_name = job_seeker.jobseeker_profile._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[job_seeker.id])
-        return mark_safe(f'<a href="{url}">{job_seeker.id}</a>')
+        url = reverse(f"admin:{app_label}_{model_name}_change", args=[job_seeker.pk])
+        return mark_safe(f'<a href="{url}">Profil salarié ID:{job_seeker.pk}</a>')
 
     def asp_processing_type(self, obj):
         return (
@@ -137,7 +141,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         )
 
     asp_processing_type.short_description = "Type d'intégration"
-    job_seeker.short_description = "Salarié"
+    job_seeker_link.short_description = "Salarié"
     job_seeker_profile_link.short_description = "Profil du salarié"
 
 
