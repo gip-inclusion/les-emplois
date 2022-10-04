@@ -11,9 +11,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from django.utils import timezone  # pylint: disable=wrong-import-position # noqa: E402
-
-
 # Django settings
 # ---------------
 
@@ -551,22 +548,6 @@ STORAGE_UPLOAD_KINDS = {
         "key_path": "evaluations",
     },
 }
-
-# Employee records
-# ------------------------------------------------------------------------------
-# Employee record data archiving / pruning:
-# "Proof of record" model field is erased after this delay (in days)
-EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS = int(os.environ.get("EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS", 13 * 30))
-
-# This is the official and final production phase date of the employee record feature.
-# It is used as parameter to filter the eligible job applications for the feature.
-# (no job application before this date can be used for this feature)
-EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 9, 27, tzinfo=datetime.timezone.utc)
-
-# Only PROD or temporary tests environments are able to transfer employee records data to ASP
-# This is disabled by default, overidden in prod settings, and can be set
-# via local dev settings or env vars for a temporary environment.
-EMPLOYEE_RECORD_TRANSFER_ENABLED = bool(os.environ.get("EMPLOYEE_RECORD_TRANSFER_ENABLED", False))
 
 HIJACK_PERMISSION_CHECK = "itou.utils.perms.user.has_hijack_perm"
 HIJACK_ALLOWED_USER_EMAILS = [s.lower() for s in os.getenv("HIJACK_ALLOWED_USER_EMAILS", "").split(",") if s]
