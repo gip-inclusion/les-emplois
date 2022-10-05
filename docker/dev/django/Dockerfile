@@ -67,12 +67,12 @@ RUN pip install --upgrade pip \
 RUN apt-get purge -y --auto-remove build-essential libpq-dev $(! command -v gpg > /dev/null || echo 'gnupg dirmngr') \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --chown=app:app . $APP_DIR
+COPY --chown=app:app ./docker/dev/django/entrypoint.sh /entrypoint.sh
 
-RUN chmod +x $APP_DIR/docker/dev/django/entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 USER app
 
 WORKDIR $APP_DIR
 
-ENTRYPOINT ["./docker/dev/django/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
