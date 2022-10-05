@@ -7,6 +7,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.views.decorators.http import require_POST
 
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import (
@@ -167,6 +168,7 @@ def institution_evaluated_job_application(
 
 
 @login_required
+@require_POST
 def institution_evaluated_administrative_criteria(request, evaluated_administrative_criteria_pk, action):
     institution = get_current_institution_or_404(request)
     evaluated_administrative_criteria = get_object_or_404(
@@ -198,6 +200,7 @@ def institution_evaluated_administrative_criteria(request, evaluated_administrat
 
 
 @login_required
+@require_POST
 def institution_evaluated_siae_validation(request, evaluated_siae_pk):
     institution = get_current_institution_or_404(request)
     evaluated_siae = get_object_or_404(
@@ -369,6 +372,7 @@ def siae_upload_doc(
 
 
 @login_required
+@require_POST
 def siae_submit_proofs(request, evaluated_siae_pk):
     evaluated_siae = get_object_or_404(
         EvaluatedSiae,

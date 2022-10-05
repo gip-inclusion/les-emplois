@@ -539,7 +539,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at"])
 
         self.client.force_login(self.user)
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_validation",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -875,7 +875,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         self.client.force_login(self.user)
 
         # institution without evaluation_campaign
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={"evaluated_administrative_criteria_pk": 1, "action": "dummy"},
@@ -888,7 +888,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
         evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
         evaluated_administrative_criteria = evaluated_job_application.evaluated_administrative_criteria.first()
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -902,7 +902,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         # institution with evaluation_campaign in "siae upload its proofs" phase
         evaluation_campaign.evaluations_asked_at = timezone.now()
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -916,7 +916,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -937,7 +937,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         )
 
         # action = dummy
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -952,7 +952,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED, eval_admin_crit.review_state)
 
         # action reinit
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -967,7 +967,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING, eval_admin_crit.review_state)
 
         # action = accept
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -982,7 +982,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         self.assertEqual(evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED, eval_admin_crit.review_state)
 
         # action = refuse
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -1001,7 +1001,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         evsiae.reviewed_at = timezone.now()
         evsiae.save(update_fields=["reviewed_at"])
 
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_administrative_criteria",
                 kwargs={
@@ -1027,7 +1027,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         self.client.force_login(self.user)
 
         # institution without evaluation_campaign
-        response = self.client.get(
+        response = self.client.post(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_validation",
                 kwargs={"evaluated_siae_pk": 1},
@@ -1041,19 +1041,19 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
             kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
         )
 
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 404)
 
         # institution with evaluation_campaign in "siae upload its proofs" phase
         self.evaluation_campaign.evaluations_asked_at = timezone.now()
         self.evaluation_campaign.save(update_fields=["evaluations_asked_at"])
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
 
         # institution with ended evaluation_campaign
         self.evaluation_campaign.ended_at = timezone.now()
         self.evaluation_campaign.save(update_fields=["ended_at"])
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 404)
 
     def test_actions_and_redirection(self):
@@ -1075,7 +1075,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         )
 
         # before validation
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, redirect_url)
         self.evaluated_siae.refresh_from_db()
@@ -1085,7 +1085,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=self.evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, redirect_url)
         self.evaluated_siae.refresh_from_db()
@@ -1098,7 +1098,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
             evaluated_job_application__evaluated_siae=self.evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, redirect_url)
         self.evaluated_siae.refresh_from_db()
@@ -1106,7 +1106,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
 
         # cannot validate twice
         timestamp = self.evaluated_siae.reviewed_at
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
         self.evaluated_siae.refresh_from_db()
         self.assertEqual(timestamp, self.evaluated_siae.reviewed_at)
