@@ -1,18 +1,22 @@
-{% extends "layout/content.html" %}
+{% extends "layout/base.html" %}
 
 {% block title %}Erreur 500{{ block.super }}{% endblock %}
 
-{% block content %}
+{% block content_full_viewport %}
 
-    <h1 class="h1-hero-c1">Erreur 500</h1>
-    <p class="lead">Une erreur technique s'est produite.</p>
-    <p>Notre équipe technique a été informée du problème et s'en occupera le plus rapidement possible.</p>
+    <section>
+        <div class="container">
+            <h1 class="h1-hero-c1">Erreur 500</h1>
+            <p class="lead">Une erreur technique s'est produite.</p>
+            <p>Notre équipe technique a été informée du problème et s'en occupera le plus rapidement possible.</p>
 
-    {# Using ITOU_ASSISTANCE_URL would have required a custom error handler. #}
-    <p>
-        Toutefois, nous vous invitons à contacter
-        <a href="https://communaute.inclusion.beta.gouv.fr/assistance/"> l'assistance de la Plateforme de l'inclusion</a>
-        afin que nous disposions de toutes les informations nécessaires à la résolution du problème.
-    </p>
+            {# Using ITOU_ASSISTANCE_URL would have required a custom error handler. #}
+            <p>
+                Toutefois, nous vous invitons à contacter
+                <a href="https://communaute.inclusion.beta.gouv.fr/assistance/"> l'assistance de la Plateforme de l'inclusion</a>
+                afin que nous disposions de toutes les informations nécessaires à la résolution du problème.
+            </p>
+        </div>
+    </section>
 
 {% endblock %}
