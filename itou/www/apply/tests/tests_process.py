@@ -33,7 +33,52 @@ from itou.utils.widgets import DuetDatePickerWidget
 # patch the one used in the `models` module, not the original one in tasks
 @patch("itou.job_applications.models.huey_notify_pole_emploi", return_value=False)
 class ProcessViewsTest(TestCase):
-    """Application process"""
+    def accept_job_application(self, job_application, post_data=None, city=None, assert_successful=True):
+        """
+        This is not a test. It's a shortcut to process "apply:accept" view steps:
+        - GET
+        - POST: show the confirmation modal)
+        - POST: hide the modal and redirect to the next url.
+        """
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url_accept)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Confirmation de l’embauche")
+
+        if not post_data:
+            hiring_start_at = timezone.localdate()
+            hiring_end_at = Approval.get_default_end_date(hiring_start_at)
+            post_data = {
+                "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+                "answer": "",
+                "address_line_1": job_application.job_seeker.address_line_1,
+                "post_code": job_application.job_seeker.post_code,
+                "city": city.name,
+                "city_slug": city.slug,
+            }
+
+        # Confirmation modal.
+        # Users clicks on the confirmation button.
+        # As buttons uses HTMX, test AJAX requests from now on.
+        # TODO: use django-htmx.tests.test_middleware.RequestFactory instead.
+        # See https://github.com/adamchainz/django-htmx/blob/main/tests/test_middleware.py
+        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        if assert_successful:
+            self.assertTemplateUsed(response, "apply/partials/_accept_confirmation_modal.html")
+            self.assertContains(response, "Confirmation de l’embauche")
+
+        post_data = post_data | {"confirmed": "True"}
+        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
+        # It renders an HttpResponseRedirect subclass which, unfortunately, responds with a 200 status code.
+        # I guess it's normal as it's an AJAX response.
+        # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
+        if assert_successful:
+            self.assertRedirects(response, next_url, status_code=200)
+        return response, next_url
 
     def test_details_for_siae(self, *args, **kwargs):
         """Display the details of a job application."""
@@ -211,17 +256,10 @@ class ProcessViewsTest(TestCase):
 
         for hiring_end_at, state in cases:
             with self.subTest(hiring_end_at=hiring_end_at, state=state):
-
                 job_application = JobApplicationSentByJobSeekerFactory(
                     state=state, job_seeker=job_seeker, to_siae=siae
                 )
                 self.client.force_login(siae_user)
-
-                url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-                response = self.client.get(url)
-                self.assertEqual(response.status_code, 200)
-                self.assertContains(response, "Confirmation de l’embauche")
-
                 # Good duration.
                 hiring_start_at = today
                 post_data = {
@@ -235,9 +273,7 @@ class ProcessViewsTest(TestCase):
                 if hiring_end_at:
                     post_data["hiring_end_at"] = hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
 
-                response = self.client.post(url, data=post_data)
-                next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-                self.assertRedirects(response, next_url)
+                _, next_url = self.accept_job_application(job_application=job_application, post_data=post_data)
 
                 job_application = JobApplication.objects.get(pk=job_application.pk)
                 self.assertEqual(job_application.hiring_start_at, hiring_start_at)
@@ -257,7 +293,6 @@ class ProcessViewsTest(TestCase):
         # Exceptions #
         ##############
         job_application = JobApplicationSentByJobSeekerFactory(state=state, job_seeker=job_seeker, to_siae=siae)
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         # Wrong dates.
         hiring_start_at = today
@@ -270,8 +305,10 @@ class ProcessViewsTest(TestCase):
             "answer": "",
             **address,
         }
-        response = self.client.post(url, data=post_data)
-        self.assertFormError(response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+        self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
 
         # Wrong dates: end < start.
         hiring_start_at = today
@@ -282,14 +319,15 @@ class ProcessViewsTest(TestCase):
             "answer": "",
             **address,
         }
-        response = self.client.post(url, data=post_data)
-        self.assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+        self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
 
         # No address provided.
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae=siae
         )
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         hiring_start_at = today
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
@@ -301,10 +339,12 @@ class ProcessViewsTest(TestCase):
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
         }
-        response = self.client.post(url, data=post_data)
-        self.assertFormError(response.context["form_user_address"], "address_line_1", "Ce champ est obligatoire.")
-        self.assertFormError(response.context["form_user_address"], "city", "Ce champ est obligatoire.")
-        self.assertFormError(response.context["form_user_address"], "post_code", "Ce champ est obligatoire.")
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+        self.assertFormError(response, "form_user_address", "address_line_1", "Ce champ est obligatoire.")
+        self.assertFormError(response, "form_user_address", "city", "Ce champ est obligatoire.")
+        self.assertFormError(response, "form_user_address", "post_code", "Ce champ est obligatoire.")
 
     def test_accept_with_active_suspension(self, *args, **kwargs):
         """Test the `accept` transition with active suspension for active user"""
@@ -345,8 +385,6 @@ class ProcessViewsTest(TestCase):
 
         # login with other siae
         self.client.force_login(other_siae_user)
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-
         hiring_start_at = today + relativedelta(days=20)
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
 
@@ -362,8 +400,7 @@ class ProcessViewsTest(TestCase):
             "city": city.name,
             "city_slug": city.slug,
         }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        self.accept_job_application(job_application=job_application, post_data=post_data)
         get_job_application = JobApplication.objects.get(pk=job_application.pk)
         g_suspension = get_job_application.approval.suspension_set.in_progress().last()
 
@@ -393,10 +430,6 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
 
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
         post_data = {
             # Data for `JobSeekerPoleEmploiStatusForm`.
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
@@ -413,10 +446,8 @@ class ProcessViewsTest(TestCase):
             ),
             "answer": "",
         }
-        response = self.client.post(url, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
 
+        self.accept_job_application(job_application=job_application, post_data=post_data)
         job_application.refresh_from_db()
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
 
@@ -451,14 +482,13 @@ class ProcessViewsTest(TestCase):
         # The delivered approval should start at the same time as the contract.
         user = job_application.to_siae.members.first()
         self.client.force_login(user)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             **base_for_post_data,
         }
-        response = self.client.post(url_accept, data=post_data)
-        self.assertEqual(response.status_code, 302)
+
+        self.accept_job_application(job_application=job_application, post_data=post_data)
 
         # First job application has been accepted.
         # All other job applications are obsolete.
@@ -479,18 +509,16 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_app_starting_earlier.state.is_obsolete)
 
         self.client.force_login(user)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_app_starting_earlier.pk})
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             **base_for_post_data,
         }
-        response = self.client.post(url_accept, data=post_data)
+        self.accept_job_application(job_application=job_app_starting_earlier, post_data=post_data)
         job_app_starting_earlier.refresh_from_db()
 
         # Second job application has been accepted.
         # The job seeker has now two part-time jobs at the same time.
-        self.assertEqual(response.status_code, 302)
         self.assertTrue(job_app_starting_earlier.state.is_accepted)
         self.assertEqual(job_app_starting_earlier.approval.start_at, job_app_starting_earlier.hiring_start_at)
         self.assertEqual(job_app_starting_earlier.approval.end_at, approval_default_ending)
@@ -506,40 +534,20 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_app_starting_later.state.is_obsolete)
 
         self.client.force_login(user)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_app_starting_later.pk})
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             **base_for_post_data,
         }
-        response = self.client.post(url_accept, data=post_data)
+        self.accept_job_application(job_application=job_app_starting_later, post_data=post_data)
         job_app_starting_later.refresh_from_db()
 
         # Third job application has been accepted.
         # The job seeker has now three part-time jobs at the same time.
-        self.assertEqual(response.status_code, 302)
         self.assertTrue(job_app_starting_later.state.is_accepted)
         self.assertEqual(job_app_starting_later.approval.start_at, job_app_starting_earlier.hiring_start_at)
 
     def test_accept_with_double_user(self, *args, **kwargs):
-        def accept_job_application(job_application, city):
-            today = timezone.localdate()
-            return self.client.post(
-                reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),
-                data={
-                    "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-                    "hiring_start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                    "hiring_end_at": Approval.get_default_end_date(today).strftime(
-                        DuetDatePickerWidget.INPUT_DATE_FORMAT
-                    ),
-                    "answer": "",
-                    "address_line_1": job_application.job_seeker.address_line_1,
-                    "post_code": job_application.job_seeker.post_code,
-                    "city": city.name,
-                    "city_slug": city.slug,
-                },
-                follow=True,
-            )
 
         create_test_cities(["54"], num_per_department=1)
         city = City.objects.first()
@@ -557,8 +565,8 @@ class ProcessViewsTest(TestCase):
 
         # Accept the job application for the first job seeker.
         self.client.force_login(siae.members.first())
-        response = accept_job_application(job_application, city)
-        self.assertEqual(response.status_code, 200)
+        _, next_url = self.accept_job_application(job_application=job_application, city=city, assert_successful=False)
+        response = self.client.get(next_url)
         self.assertNotIn(
             "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. ",
             str(list(response.context["messages"])[0]),
@@ -577,8 +585,10 @@ class ProcessViewsTest(TestCase):
         )
 
         # Gracefully display a message instead of just plain crashing
-        response = accept_job_application(another_job_application, city)
-        self.assertEqual(response.status_code, 200)
+        _, next_url = self.accept_job_application(
+            job_application=another_job_application, city=city, assert_successful=False
+        )
+        response = self.client.get(next_url)
         self.assertIn(
             "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. ",
             str(list(response.context["messages"])[0]),
@@ -738,23 +748,7 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
 
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        hiring_start_at = timezone.localdate()
-        hiring_end_at = Approval.get_default_end_date(hiring_start_at)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-            "answer": "",
-            "address_line_1": job_seeker.address_line_1,
-            "post_code": job_seeker.post_code,
-            "city": city.name,
-            "city_slug": city.slug,
-        }
-        response = self.client.post(url_accept, data=post_data)
-
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
+        self.accept_job_application(job_application=job_application, city=city)
 
         job_application.refresh_from_db()
         self.assertEqual(job_seeker.approvals.count(), 1)
