@@ -14,7 +14,7 @@
                 <p class="badge badge-pilotage float-right">Nouveaux justificatifs à traiter</p>
             {%elif state == "SUBMITTED" %}
                 <p class="badge badge-pilotage float-right">À traiter</p>
-            {%elif state == "REFUSED" or state == "REFUSED_2" %}
+            {% elif not evaluated_siae.reviewed_at and state == "REFUSED" or state == "REFUSED_2" %}
                 <p class="badge badge-danger float-right">Problème constaté</p>
             {%elif state == "ACCEPTED" %}
                 <p class="badge badge-success float-right">Validé</p>

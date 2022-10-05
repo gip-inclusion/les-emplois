@@ -8,6 +8,7 @@ from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import (
+    EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
@@ -621,6 +622,28 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, valide)
+
+    def test_job_application_adversarial_stage(self):
+        reviewed_at = timezone.now()
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            evaluated_siae__reviewed_at=reviewed_at,
+            evaluated_siae__evaluation_campaign__institution=self.institution,
+            evaluated_siae__evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=7),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            uploaded_at=reviewed_at - relativedelta(days=1, hours=1),
+            submitted_at=reviewed_at - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
+            )
+        )
+        self.assertContains(response, "Phase contradictoire - En attente")
 
     def test_num_queries_in_view(self):
         self.client.force_login(self.user)
