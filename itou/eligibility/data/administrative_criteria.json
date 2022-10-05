@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
       "level": "1",
-      "name": "Bénéficiaire du RSA (socle)",
+      "name": "Bénéficiaire du RSA",
       "desc": "Revenu de solidarité active",
       "written_proof": "Attestation RSA",
       "written_proof_url": "",
@@ -172,9 +172,9 @@
     "pk": 13,
     "fields": {
       "level": "2",
-      "name": "Réfugié statutaire, protégé subsidiaire ou demandeur d'asile",
+      "name": "Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile",
       "desc": "",
-      "written_proof": "Titre de séjour valide ou demande de renouvellement du titre de séjour. Pour les demandeurs d'asile : autorisation temporaire de travail",
+      "written_proof": "Titre de séjour valide ou demande de renouvellement du titre de séjour. Pour les demandeurs d'asile : autorisation temporaire de travail. Pour les bénéficiaires d'une protection temporaire : autorisation provisoire de séjour.",
       "written_proof_url": "",
       "written_proof_validity": "Titre valide au moment de la délivrance du PASS IAE",
       "ui_rank": 9,
