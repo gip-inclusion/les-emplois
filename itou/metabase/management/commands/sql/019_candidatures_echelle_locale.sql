@@ -14,7 +14,7 @@ org_prescripteur as ( /* On récupère l'id et le dept des organismes prescripte
 	select
 		org.id as id_org,
 		org.nom_département as dept_org,  /*bien mettre nom département et pas département */
-		org.région as région_org 
+		org.région as région_org
 	from
 		organisations org
 ),
@@ -80,7 +80,10 @@ select
     candidatures_p.nom_département_structure,
     nom_structure,
     type_structure,
-    origine,
+    case
+		when candidatures_p.origine = 'Candidat' then 'Candidature en ligne'
+		else candidatures_p.origine
+	end origine,
     origine_détaillée,
     case /* Ajout colonne avec des noms de prescripteurs correspondant à ceux de la table taux_transformation_prescripteurs */
         when candidatures_p.origine_détaillée = 'Prescripteur habilité AFPA' then 'AFPA - Agence nationale pour la formation professionnelle des adultes'
