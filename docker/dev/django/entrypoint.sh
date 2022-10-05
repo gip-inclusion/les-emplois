@@ -14,10 +14,6 @@ done
 
 django-admin migrate
 
-# --nopin disables for you the annoying PIN security prompt on the web
-# debugger. For local dev only of course!
-# --keep-meta-shutdown is set to avoid this issue : https://github.com/django-extensions/django-extensions/issues/1715
-# This option should be removed when the package Werkzeug is updated with the fix.
-django-admin runserver_plus --keep-meta-shutdown 0.0.0.0:8000 --nopin
+django-admin runserver 0.0.0.0:8000
 
 exec "$@"
