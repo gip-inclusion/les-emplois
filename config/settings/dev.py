@@ -5,7 +5,7 @@ import socket
 ITOU_ENVIRONMENT = "DEV"
 os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
 
-from .base import *  # pylint: disable=wildcard-import,unused-wildcard-import
+from .base import *  # pylint: disable=wildcard-import,unused-wildcard-import,wrong-import-position # noqa: E402,F403
 
 
 # Django settings
@@ -26,7 +26,7 @@ CSRF_COOKIE_SECURE = False
 
 AUTH_PASSWORD_VALIDATORS = []
 
-INSTALLED_APPS.extend(
+INSTALLED_APPS.extend(  # noqa: F405
     [
         "django_extensions",
         "debug_toolbar",
@@ -41,7 +41,7 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 # Enable django-debug-toolbar with Docker.
 # Hack is coming from https://stackoverflow.com/a/45624773
-# inspired by https://github.com/cookiecutter/cookiecutter-django/blob/master/%7B%7Bcookiecutter.project_slug%7D%7D/config/settings/local.py#L71
+# inspired by https://github.com/cookiecutter/cookiecutter-django/blob/master/%7B%7Bcookiecutter.project_slug%7D%7D/config/settings/local.py#L71 # pylint: disable=line-too-long # noqa: E501
 _, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
 
@@ -57,8 +57,8 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 
-REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [
-    # For DRF browseable API access
+REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
+    # For DRF browsable API access
     "rest_framework.renderers.BrowsableAPIRenderer",
 ]
 
@@ -70,19 +70,19 @@ ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
 ITOU_PROTOCOL = "http"
 ITOU_FQDN = "127.0.0.1:8000"
 
-DATABASES["default"]["HOST"] = os.getenv("PGHOST", "127.0.0.1")
-DATABASES["default"]["PORT"] = os.getenv("PGPORT", "5432")
-DATABASES["default"]["NAME"] = os.getenv("PGDATABASE", "itou")
-DATABASES["default"]["USER"] = os.getenv("PGUSER", "postgres")
-DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")
+DATABASES["default"]["HOST"] = os.getenv("PGHOST", "127.0.0.1")  # noqa: F405
+DATABASES["default"]["PORT"] = os.getenv("PGPORT", "5432")  # noqa: F405
+DATABASES["default"]["NAME"] = os.getenv("PGDATABASE", "itou")  # noqa: F405
+DATABASES["default"]["USER"] = os.getenv("PGUSER", "postgres")  # noqa: F405
+DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")  # noqa: F405
 
-ELASTIC_APM["ENABLED"] = False
+ELASTIC_APM["ENABLED"] = False  # noqa: F405
 # FIXME(vperron): Remove this as soon as the checks are disabled
 # followup on https://github.com/elastic/apm-agent-python/pull/1632
-ELASTIC_APM["SERVER_URL"] = "http://127.0.0.1"
+ELASTIC_APM["SERVER_URL"] = "http://127.0.0.1"  # noqa: F405
 
 if os.getenv("SQL_DEBUG", "False") == "True":
-    LOGGING.setdefault("loggers", {})["django.db.backends"] = {
+    LOGGING.setdefault("loggers", {})["django.db.backends"] = {  # noqa: F405
         "level": "DEBUG",
         "handlers": ["console"],
         "propagate": False,

@@ -42,18 +42,18 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality: $(VIRTUAL_ENV)
-	black --check itou
-	isort --check itou
+	black --check config itou
+	isort --check config itou
 	djhtml --check $(shell find itou/templates -name "*.html")
-	flake8 itou --count --show-source --statistics
+	flake8 config itou --count --show-source --statistics
 
 fix: $(VIRTUAL_ENV)
-	black itou
-	isort itou
+	black config itou
+	isort config itou
 	djhtml --in-place $(shell find itou/templates -name "*.html")
 
 pylint: $(VIRTUAL_ENV)
-	pylint itou
+	pylint config itou
 
 # Django.
 # =============================================================================
