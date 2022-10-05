@@ -222,16 +222,16 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
 
 
 @login_required
-def siae_job_applications_list(request, template_name="siae_evaluations/siae_job_applications_list.html"):
-
-    # note vincentporte : misconception. This view should be called with one evaluated_siae
-    # id, not trying to deal with any evaluated_siae of one siae. Must be fixed soon.
+def siae_job_applications_list(
+    request,
+    evaluated_siae_pk,
+    template_name="siae_evaluations/siae_job_applications_list.html",
+):
     siae = get_current_siae_or_404(request)
-    evaluated_siae = (
-        EvaluatedSiae.objects.filter(siae=siae, evaluation_campaign__ended_at=None)
+    evaluated_siae = get_object_or_404(
+        EvaluatedSiae.objects.filter(pk=evaluated_siae_pk, siae=siae, evaluation_campaign__ended_at=None)
         .exclude(evaluation_campaign__evaluations_asked_at=None)
         .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
-        .first()
     )
 
     evaluated_job_applications = (
@@ -249,9 +249,10 @@ def siae_job_applications_list(request, template_name="siae_evaluations/siae_job
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
     context = {
+        "evaluated_siae": evaluated_siae,
         "evaluated_job_applications": evaluated_job_applications,
         "evaluations_asked_at": evaluations_asked_at,
-        "is_submittable": evaluated_siae and evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
+        "is_submittable": evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
         "back_url": back_url,
     }
     return render(request, template_name, context)
@@ -281,7 +282,13 @@ def siae_select_criteria(
         initial=initial_data,
     )
 
-    url = reverse("siae_evaluations_views:siae_job_applications_list") + f"#{evaluated_job_application.pk}"
+    url = (
+        reverse(
+            "siae_evaluations_views:siae_job_applications_list",
+            kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
+        )
+        + f"#{evaluated_job_application.pk}"
+    )
 
     if request.method == "POST" and form_administrative_criteria.is_valid():
         evaluated_job_application.save_selected_criteria(
@@ -326,7 +333,7 @@ def siae_upload_doc(
 ):
 
     evaluated_administrative_criteria = get_object_or_404(
-        EvaluatedAdministrativeCriteria,
+        EvaluatedAdministrativeCriteria.objects.select_related("evaluated_job_application"),
         pk=evaluated_administrative_criteria_pk,
         evaluated_job_application__evaluated_siae__siae=get_current_siae_or_404(request),
         evaluated_job_application__evaluated_siae__evaluation_campaign__ended_at__isnull=True,
@@ -337,7 +344,12 @@ def siae_upload_doc(
     )
 
     url = (
-        reverse("siae_evaluations_views:siae_job_applications_list")
+        reverse(
+            "siae_evaluations_views:siae_job_applications_list",
+            kwargs={
+                "evaluated_siae_pk": evaluated_administrative_criteria.evaluated_job_application.evaluated_siae_id
+            },
+        )
         + f"#{evaluated_administrative_criteria.evaluated_job_application.pk}"
     )
 
@@ -357,16 +369,10 @@ def siae_upload_doc(
 
 
 @login_required
-def siae_submit_proofs(request):
-    # notice this is a blind view, without template.
-
-    # note vincentporte : misconception. This view should be called with one evaluated_siae
-    # move all this logic into model after fixing call with one evaluated_siae
-    # info : this queryset is used to check that each EvaluatedJobApplication
-    # is linked to at least one EvaluatedAdministrativeCriteria, to prevent
-    # submitting orphan EvaluatedJobApplication
+def siae_submit_proofs(request, evaluated_siae_pk):
     evaluated_siae = get_object_or_404(
         EvaluatedSiae,
+        pk=evaluated_siae_pk,
         siae=get_current_siae_or_404(request),
         evaluation_campaign__evaluations_asked_at__isnull=False,
         evaluation_campaign__ended_at=None,
@@ -407,4 +413,9 @@ def siae_submit_proofs(request):
         )
         return HttpResponseRedirect(back_url)
 
-    return HttpResponseRedirect(reverse("siae_evaluations_views:siae_job_applications_list"))
+    return HttpResponseRedirect(
+        reverse(
+            "siae_evaluations_views:siae_job_applications_list",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+    )

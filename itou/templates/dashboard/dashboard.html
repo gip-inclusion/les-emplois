@@ -454,12 +454,16 @@
                     <p class="h4 card-header">Contrôle a posteriori <span class="badge badge-accent-03 text-primary">Nouveau</span></p>
                     <div class="card-body">
                         <ul class="list-unstyled">
-                            <li class="card-text mb-3">
-                                <i class="ri-file-copy-2-line ri-lg mr-1"></i>
-                                <a href="{% url 'siae_evaluations_views:siae_job_applications_list' %}">Justifier mes auto-prescriptions</a>
-                                {# note vincentporte: static icon, will be displayed dynamically later.#}
-                                <i class="ri-error-warning-fill ri-lg mr-1 text-danger"></i>
-                            </li>
+                            {% for evaluated_siae in active_campaigns %}
+                                <li class="card-text mb-3">
+                                    <i class="ri-file-copy-2-line ri-lg mr-1"></i>
+                                    <a href="{% url 'siae_evaluations_views:siae_job_applications_list' evaluated_siae.pk %}">
+                                        Justifier mes auto-prescriptions
+                                    </a>
+                                    {# note vincentporte: static icon, will be displayed dynamically later.#}
+                                    <i class="ri-error-warning-fill ri-lg mr-1 text-danger"></i>
+                                </li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>
