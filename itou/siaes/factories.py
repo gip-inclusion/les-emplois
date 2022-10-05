@@ -82,6 +82,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
                 [kind for kind in SiaeKind if kind not in models.Siae.ELIGIBILITY_REQUIRED_KINDS]
             ),
         )
+        use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Siae.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
             membership=factory.RelatedFactory("itou.siaes.factories.SiaeMembershipFactory", "siae"),
         )
