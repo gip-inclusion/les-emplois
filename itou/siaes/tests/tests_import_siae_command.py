@@ -17,18 +17,6 @@ from itou.siaes.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2Me
 from itou.siaes.models import Siae
 
 
-def set_inactive(membership):
-    """
-    Helper used to set the membership inactive in the "has_members" meaning,
-    see organization abstract models for details.
-    """
-    user = membership.user
-    user.is_active = False
-    user.save(update_fields=["is_active"])
-    membership.is_active = False
-    membership.save(update_fields=["is_active"])
-
-
 def lazy_import_siae_command():
     # Has to be lazy-loaded to benefit from the file mock, this management command does crazy stuff at import.
     from itou.siaes.management.commands import import_siae
@@ -182,22 +170,24 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_one(self):
         instance = lazy_import_siae_command()
-        siae = SiaeWith2MembershipsFactory(auth_email="")
-        members = siae.siaemembership_set.all()
-        set_inactive(members[0])  # the other member is still active
-        siae.siaemembership_set.set(members)
-
+        SiaeWith2MembershipsFactory(
+            auth_email="",
+            membership1__is_active=False,
+            membership1__user__is_active=False,
+        )
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         self.assertEqual(instance.fatal_errors, 0)
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_two(self):
         instance = lazy_import_siae_command()
-        siae = SiaeWith2MembershipsFactory(auth_email="")
-        members = siae.siaemembership_set.all()
-        set_inactive(members[0])
-        set_inactive(members[1])
-        siae.siaemembership_set.set([members[0], members[1]])
+        SiaeWith2MembershipsFactory(
+            auth_email="",
+            membership1__is_active=False,
+            membership1__user__is_active=False,
+            membership2__is_active=False,
+            membership2__user__is_active=False,
+        )
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         self.assertEqual(instance.fatal_errors, 1)
