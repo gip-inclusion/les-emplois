@@ -1,17 +1,21 @@
-{% extends "layout/content.html" %}
+{% extends "layout/base.html" %}
 
 {% block title %}Erreur 403{{ block.super }}{% endblock %}
 
-{% block content %}
+{% block content_full_viewport %}
 
-    <h1 class="h1-hero-c1">Vous ne pouvez pas continuer</h1>
+    <section>
+        <div class="container">
+            <h1 class="h1-hero-c1">Vous ne pouvez pas continuer</h1>
 
-    {% if exception %}
-        <div class="lead alert alert-warning" role="status">
-            <p class="mb-0">{{ exception }}</p>
+            {% if exception %}
+                <div class="lead alert alert-warning" role="status">
+                    <p class="mb-0">{{ exception }}</p>
+                </div>
+            {% else %}
+                <h2 class="h1">Accès refusé</h2>
+            {% endif %}
         </div>
-    {% else %}
-        <h2 class="h1">Accès refusé</h2>
-    {% endif %}
+    </section>
 
 {% endblock %}
