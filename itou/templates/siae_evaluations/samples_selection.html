@@ -8,16 +8,13 @@
 {% block content %}
     <div class="card c-card mt-4 p-3">
         <div class="card-body">
-
-            <p class="h1">
-                Sélectionner l'échantillon
-            </p>
-            <p class="h2">
-                Contrôle a posteriori des auto-prescriptions faites par les SIAE
-            </p>
-            <p class="h3">
-                Sélection des structures à contrôler
-            </p>
+            <h1>
+                Campagne du {{ evaluation_campaign.evaluated_period_start_at|date:"j F Y" }}
+                au {{ evaluation_campaign.evaluated_period_end_at|date:"j F Y" }}
+            </h1>
+            <h2>Sélectionner l'échantillon</h2>
+            <h3>Contrôle a posteriori des auto-prescriptions faites par les SIAE</h3>
+            <h4>Sélection des structures à contrôler</h4>
             <p>
                 Par défaut, un contrôle de 30% des SIAE ayant auto-prescrit a été défini au niveau national.
                 Ce ratio est adaptable au niveau local entre {{ min }}% et {{ max }}%.
@@ -34,7 +31,7 @@
                 faites par les SIAE de votre territoire:
             </p>
             <p class="font-weight-bold">
-                Données du contrôle a posteriori pour la période du {{evaluation_campaign.evaluated_period_start_at|date:"d F Y"}} au {{evaluation_campaign.evaluated_period_end_at|date:"d F Y"}}
+                Données du contrôle a posteriori cette campagne
             </p>
             <p>
                 <a class="btn btn-outline-primary" href="{% url 'stats:stats_ddets_diagnosis_control' %}{% if back_url %}?back_url={{ back_url }}{% endif %}" title="Voir les données">
@@ -42,9 +39,7 @@
                 </a>
             </p>
 
-            <p class="h3">
-                Sélection des salariés à contrôler
-            </p>
+            <h4>Sélection des salariés à contrôler</h4>
             <p>
                 Pour chacune des SIAE à contrôler, nous effectuerons une sélection aléatoire de 20% des recrutements en auto-prescription
                 (entre 2 et 20 dossiers maximum).
@@ -55,11 +50,9 @@
                     <p>Si une ETTI de votre territoire a fait 270 auto-prescriptions, vous devrez en contrôler seulement 20 au lieu de 54 (20% de 270)</p>
                 </div>
             </p>
-            <p class="h2">
-                Validation de l'échantillon des SIAE
-            </p>
+            <h3>Validation de l'échantillon des SIAE</h3>
 
-            {% if evaluation_campaign and evaluation_campaign.percent_set_at%}
+            {% if evaluation_campaign.percent_set_at%}
                 <p>
                     <div class="alert alert-success" role="status">
                         <p>Votre contrôle a posteriori sur la période du {{evaluation_campaign.evaluated_period_start_at|date:"d F Y"}}
@@ -69,7 +62,7 @@
                         </p>
                     </div>
                 </p>
-            {% elif evaluation_campaign %}
+            {% else %}
                 <p>
                     Pour initier le contrôle a posteriori des auto-prescriptions, nous avons besoin de connaître le pourcentage
                     de SIAE que vous souhaitez contrôler. Vous ne pourrez choisir qu'une fois, ensuite, nous effectuerons une sélection
@@ -91,20 +84,7 @@
                     {% endbuttons %}
 
                 </form>
-
-
-
-            {% else %}
-                <p>
-                    <div class="alert alert-info" role="status">
-                        <p class="font-weight-bold">Vous n'avez pas de contrôle en cours.</p>
-                    </div>
-                </p>
-
-
             {% endif %}
-
-
         </div>
     </div>
 

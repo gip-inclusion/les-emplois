@@ -323,7 +323,7 @@ def stats_ddets_diagnosis_control(request):
     department = get_stats_ddets_department(request)
     params = get_params_for_departement(department)
     context = {
-        "page_title": "Données 2021 du contrôle a posteriori",
+        "page_title": "Données du contrôle a posteriori",
         "back_url": reverse("siae_evaluations_views:samples_selection"),
         "show_diagnosis_control_message": True,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
@@ -404,7 +404,7 @@ def stats_dgefp_diagnosis_control(request):
     ensure_stats_dgefp_permission(request)
     params = get_params_for_whole_country()
     context = {
-        "page_title": "Données 2021 (version bêta) du contrôle a posteriori",
+        "page_title": "Données (version bêta) du contrôle a posteriori",
         "show_diagnosis_control_message": True,
     }
     return render_stats(request=request, context=context, params=params)
