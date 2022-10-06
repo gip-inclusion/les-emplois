@@ -28,7 +28,6 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
-  CRON_APPS_ORGANIZATION_NAME: ${{ secrets.CLEVER_CRON_APPS_ORGANIZATION_NAME }}
   DEPLOY_BRANCH: master_clever
   PYTHON_VERSION: "3.10"
 
@@ -74,14 +73,14 @@ jobs:
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $CRON_TASK_APP_NAME -t python --region par --alias $CRON_TASK_APP_NAME --org Itou
-        $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI link $CRON_TASK_APP_NAME --org Itou
         $CLEVER_CLI scale --flavor XL
 
     # We need at the minimum a database and redis in order to boot the app, as well as all the necessary
     # environment variables a configuration addon provides us
     - name: 🗺 Add environment variables and addons to the app
       run: |
-        $CLEVER_CLI link $CRON_TASK_APP_NAME --org $CRON_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI link $CRON_TASK_APP_NAME --org Itou
         $CLEVER_CLI env set ITOU_ENVIRONMENT "FAST-MACHINE"
         $CLEVER_CLI service link-addon c1-deployment-config
         $CLEVER_CLI service link-addon c1-bucket-config

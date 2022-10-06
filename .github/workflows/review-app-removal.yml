@@ -11,7 +11,6 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
-  REVIEW_APPS_ORGANIZATION_NAME: ${{ secrets.CLEVER_REVIEW_APPS_ORG }}
   BRANCH: ${{ github.head_ref }}
 
 
@@ -37,7 +36,7 @@ jobs:
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $REVIEW_APPS_ORGANIZATION_NAME
+        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
 
     - name: 🗑 Delete the review app
       run: |
