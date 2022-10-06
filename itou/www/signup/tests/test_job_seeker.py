@@ -37,7 +37,7 @@ class JobSeekerSignupTest(TestCase):
         post_data = {"some": "data"}
         response = self.client.post(url, post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, "form", "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
+        self.assertFormError(response.context["form"], "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
 
         # Check if one of eligibility criterion is checked.
         next_url = reverse("signup:job_seeker_nir")
