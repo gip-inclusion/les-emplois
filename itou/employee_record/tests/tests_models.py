@@ -2,7 +2,6 @@ from datetime import date, timedelta
 from unittest import mock
 
 from django.core.exceptions import ValidationError
-from django.test import TestCase
 from django.utils import timezone
 
 from itou.employee_record import constants
@@ -10,6 +9,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import CloningError, InvalidStatusError
 from itou.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
+from itou.employee_record.tests.common import EmployeeRecordFixtureTest
 from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
     JobApplicationWithApprovalNotCancellableFactory,
@@ -22,10 +22,7 @@ from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
-class EmployeeRecordModelTest(TestCase):
-
-    fixtures = ["test_INSEE_communes.json"]
-
+class EmployeeRecordModelTest(EmployeeRecordFixtureTest):
     def setUp(self):
         self.employee_record = EmployeeRecordFactory()
 
@@ -226,7 +223,7 @@ class EmployeeRecordModelTest(TestCase):
             bad_employee_record.clone_orphan(-1)
 
 
-class EmployeeRecordBatchTest(TestCase):
+class EmployeeRecordBatchTest(EmployeeRecordFixtureTest):
     """
     Misc tests on batch wrapper level
     """
@@ -250,12 +247,10 @@ class EmployeeRecordBatchTest(TestCase):
         )
 
 
-class EmployeeRecordLifeCycleTest(TestCase):
+class EmployeeRecordLifeCycleTest(EmployeeRecordFixtureTest):
     """
     Note: employee records status is never changed manually
     """
-
-    fixtures = ["test_INSEE_communes.json"]
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -496,12 +491,10 @@ class EmployeeRecordLifeCycleTest(TestCase):
             employee_record_other_status.update_as_processed_as_duplicate()
 
 
-class EmployeeRecordJobApplicationConstraintsTest(TestCase):
+class EmployeeRecordJobApplicationConstraintsTest(EmployeeRecordFixtureTest):
     """
     Check constraints between job applications and employee records
     """
-
-    fixtures = ["test_INSEE_communes.json", "test_asp_INSEE_countries.json"]
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -547,7 +540,7 @@ class EmployeeRecordJobApplicationConstraintsTest(TestCase):
         self.assertFalse(self.job_application.can_be_cancelled)
 
 
-class EmployeeRecordQuerysetTest(TestCase):
+class EmployeeRecordQuerysetTest(EmployeeRecordFixtureTest):
     def test_orphans(self):
         # Check orphans employee records
         # (asp_id in object different from actual SIAE convention asp_id field)

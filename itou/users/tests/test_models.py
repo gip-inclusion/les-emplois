@@ -402,11 +402,13 @@ class ModelTest(TestCase):
         self.assertIsNone(job_seeker.clean())
 
         # France and Commune filled
+        job_seeker = JobSeekerFactory(born_in_france=True)
         job_seeker.birth_country = asp.CountryFranceFactory()
         job_seeker.birth_place = asp.CommuneFactory()
         self.assertIsNone(job_seeker.clean())
 
         # Europe and no commune
+        job_seeker = JobSeekerFactory()
         job_seeker.birth_place = None
         job_seeker.birth_country = asp.CountryEuropeFactory()
         self.assertIsNone(job_seeker.clean())
@@ -805,7 +807,7 @@ class JobSeekerProfileModelTest(TestCase):
     Job seeker profile is extra-data from the ASP and EmployeeRecord domains
     """
 
-    fixtures = ["test_INSEE_communes"]
+    fixtures = ["test_asp_INSEE_communes_small.json"]
 
     def setUp(self):
         self.profile = JobSeekerProfileFactory()

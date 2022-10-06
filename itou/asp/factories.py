@@ -7,6 +7,7 @@ from itou.asp import models
 
 
 _sample_europe_countries = [
+    {"code": "100", "name": "FRANCE", "group": "1"},
     {"code": "101", "name": "DANEMARK", "group": "2"},
     {"code": "111", "name": "BULGARIE", "group": "2"},
     {"code": "135", "name": "PAYS-BAS", "group": "2"},
@@ -37,6 +38,10 @@ _sample_communes = [
 class CountryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Country
+        # ASP models must not be saved
+        strategy = factory.BUILD_STRATEGY
+
+    code, name, group = random.choice(_sample_europe_countries).values()
 
 
 class CountryFranceFactory(CountryFactory):
@@ -68,10 +73,14 @@ class CommuneFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.Commune
+        # ASP models must not be saved()
+        strategy = factory.BUILD_STRATEGY
 
+    # FIXME: may cause issues in testing validity periods
     start_date = datetime.date(2000, 1, 1)
     end_date = None
 
+    # FIXME: replace by provider or fixture
     code, name = random.choice(_sample_communes).values()
 
 

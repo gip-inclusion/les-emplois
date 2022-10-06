@@ -4,7 +4,15 @@ from django.core import management
 from django.test import TestCase
 
 
-class ManagementCommandTestCase(TestCase):
+class EmployeeRecordFixtureTest(TestCase):
+    # "Use the fixture, Luke!"
+    fixtures = [
+        "test_asp_INSEE_communes_small.json",
+        "test_asp_INSEE_countries_small.json",
+    ]
+
+
+class ManagementCommandTestCase(EmployeeRecordFixtureTest):
 
     # Override as needed
     MANAGEMENT_COMMAND_NAME = None

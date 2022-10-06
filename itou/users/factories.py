@@ -12,7 +12,7 @@ from itou.asp.models import AllocationDuration, EducationLevel, LaneType
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.users import models
 from itou.users.enums import Title
-from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK
+from itou.utils.mocks.address_format import get_random_asp_commune, get_random_geocoding_api_result
 from itou.utils.validators import validate_nir
 
 
@@ -92,17 +92,23 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 
 
 class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
+    # Needs ASP test fixtures installed
+
     @factory.post_generation
     def set_approval_user(self, create, extracted, **kwargs):
         if not create:
             # Simple build, do nothing.
             return
-        # We did not create test fixtures for this
-        address = BAN_GEOCODING_API_RESULTS_MOCK[0]
+
+        # Format user address randomly from an API mock: these are all valid addresses
+        address = get_random_geocoding_api_result()
+
         self.address_line_1 = address.get("address_line_1")
         self.post_code = address.get("post_code")
         self.insee_code = address.get("insee_code")
         self.city = address.get("city")
+
+        self.birth_place = get_random_asp_commune()
 
 
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):

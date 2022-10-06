@@ -52,7 +52,7 @@ def get_geocoding_data(address, post_code=None, limit=1):
     data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
 
     if not data:
-        raise GeocodingDataError("Empty response from API")
+        raise GeocodingDataError("Empty response from BAN API")
 
     if not data.get("properties"):
         raise AddressLookupError(f"Unable to lookup address: {address}")
