@@ -315,6 +315,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             1  # django session
             + 1  # fetch user
             + 3  # fetch institution membership & institution x 2 !should be fixed!
+            + 1  # fetch evaluation campaign
             + 3  # fetch evaluated_siae and its prefetch_related eval_job_app & eval_admin_crit
             + 1  # one again institution membership
             + 1  # social account

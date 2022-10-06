@@ -15,15 +15,15 @@
                     <h1 class="h1">Contrôler les pièces justificatives</h1>
                     <h3 class="h3">
                         Liste des Siae
-                        {% if ended_at %}
+                        {% if evaluation_campaign.ended_at %}
                             contrôlées
                         {% else %}
                             à contrôler
                         {% endif %}
                     </h3>
                     <p>
-                        Contrôle initié le {{ evaluations_asked_at|date:"d F Y" }}
-                        {% if ended_at %}, clôturé le {{ ended_at|date:"d F Y" }}{% endif %}
+                        Contrôle initié le {{ evaluation_campaign.evaluations_asked_at|date:"d F Y" }}
+                        {% if evaluation_campaign.ended_at %}, clôturé le {{ evaluation_campaign.ended_at|date:"d F Y" }}{% endif %}
                     </p>
                 </div>
             </div>
