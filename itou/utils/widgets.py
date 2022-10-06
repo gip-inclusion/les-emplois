@@ -28,10 +28,10 @@ class DuetDatePickerWidget(forms.DateInput):
 
     class Media:
         css = {
-            "all": ("https://cdn.jsdelivr.net/npm/@duetds/date-picker@1.4.0/dist/duet/themes/default.css",),
+            "all": ("vendor/duetds-date-picker-1.4.0/default.css",),
         }
         js = (
-            "https://cdn.jsdelivr.net/npm/@duetds/date-picker@1.4.0/dist/duet/duet.js",
+            "vendor/duetds-date-picker-1.4.0/duet.js",
             "js/duet_date_picker_widget.js",
         )
 

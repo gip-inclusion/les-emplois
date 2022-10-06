@@ -1,3 +1,4 @@
+{% load static %}
 {% extends "layout/content.html" %}
 
 {% block title %}API ReDoc{{ block.super }}{% endblock %}
@@ -8,7 +9,7 @@
 
 {% block script %}
     {{ block.super }}
-    <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+    <script src="{% static "vendor/redoc-2.0.0/redoc.standalone.js" %}"></script>
 {% endblock %}
 
 {% block extra_head %}

@@ -1,3 +1,4 @@
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -34,7 +35,7 @@
                     targetOrigin: "{{ ITOU_PILOTAGE_URL }}"
                 }
             </script>
-            <script src="https://cdn.jsdelivr.net/npm/iframe-resizer@4.3.2/js/iframeResizer.contentWindow.min.js"></script>
+            <script src="{% static "vendor/iframe-resizer-4.3.2/iframeResizer.contentWindow.min.js" %}"></script>
             {% comment %} we took the scripts from {{stats_base_url}} to always use the same version{% endcomment %}
             <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
             <iframe
