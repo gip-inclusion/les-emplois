@@ -10,7 +10,7 @@
             <title>{% block title %} - Les emplois de l'inclusion{% endblock %}</title>
             <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
             {% block meta_description %}{% endblock %}
-            {% import_static_CSS_theme_inclusion %}
+            <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}" type="text/css">
             <link rel="stylesheet" href="{{ base_url }}{% static 'css/itou.css' %}" type="text/css">
             <style type="text/css">
                 /* Don't display the BETA banner on pdf files. */

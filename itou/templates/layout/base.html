@@ -27,8 +27,8 @@
         {# Use this to get the value of the CSRF token in JavaScript. #}
         <meta name="csrf-token" content="{{ csrf_token }}">
         <link rel="shortcut icon" href="{% static_theme_images "favicon.ico" %}" type="image/ico">
-        {% import_static_CSS_theme_inclusion %}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.css" integrity="sha256-NRYg+xSNb5bHzrFEddJ0wL3YDp6YNt2dGNI+T5rOb2c=" crossorigin="anonymous" type="text/css">
+        <link rel="stylesheet" href="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.css" %}" type="text/css">
+        <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}" type="text/css">
         <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
         {% block extra_head %}{% endblock %}
     </head>
@@ -70,8 +70,13 @@
             <a href="#header">Retour au début de la page</a>
         </div>
 
-        {% import_static_JS_theme_inclusion %}
-        <script src="https://cdn.jsdelivr.net/npm/jquery-ui_1.12@1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+        <script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
+        <script src="{% static "vendor/bootstrap-4.3.1/popper.min.js" %}"></script>
+        <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
+        <script src="{% static "vendor/tarteaucitron/tarteaucitron.js" %}"></script>
+        <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
+        <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
+
         <script>
 
             // Tarteaucitron's language is set according to the browser configuration
