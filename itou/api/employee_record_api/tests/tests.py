@@ -122,8 +122,8 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
 
     # ASP fakers need this fixture
     fixtures = [
-        "test_asp_INSEE_countries.json",
-        "test_INSEE_communes.json",
+        "test_asp_INSEE_countries_small.json",
+        "test_asp_INSEE_communes_small.json",
     ]
 
     @mock.patch(
@@ -256,8 +256,8 @@ class EmployeeRecordAPIParametersTest(APITestCase):
     # employee record updates PR (simpler and better factories)
 
     fixtures = [
-        "test_asp_INSEE_countries.json",
-        "test_INSEE_communes.json",
+        "test_asp_INSEE_countries_small.json",
+        "test_asp_INSEE_communes_small.json",
     ]
 
     @mock.patch(

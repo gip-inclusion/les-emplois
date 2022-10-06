@@ -1,3 +1,4 @@
+import datetime as dt
 import re
 
 from django.contrib.postgres.indexes import GinIndex
@@ -337,10 +338,11 @@ class PrescriberType(models.TextChoices):
 
 
 class CommuneQuerySet(PeriodQuerySet):
+    def by_insee_code(self, insee_code: str):
+        return Commune.objects.current().get(code=insee_code)
+
     def by_insee_code_and_period(self, insee_code, period):
-        """
-        Lookup a Commune object by INSEE code and valid at the given period
-        """
+        "Lookup a Commune object by INSEE code and valid at the given period"
         return self.filter(code=insee_code, start_date__lte=period).filter((Q(end_date=None) | Q(end_date__gt=period)))
 
 
@@ -366,8 +368,11 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
         verbose_name = "Commune"
         indexes = [GinIndex(fields=["name"], name="aps_communes_name_gin_trgm", opclasses=["gin_trgm_ops"])]
 
-    @classmethod
-    def by_insee_code(cls, insee_code: str):
+    @staticmethod
+    def by_insee_code(insee_code: str):
+        """Get **current** commune for given INSEE code (no history, single result).
+        Raises `UnknownCommuneError` if code is not found in ASP ref.
+        """
         try:
             return Commune.objects.current().get(code=insee_code)
         except Commune.DoesNotExist as ex:

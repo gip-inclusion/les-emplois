@@ -3,6 +3,7 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
 
+from itou.asp.exceptions import UnknownCommuneError
 from itou.asp.models import Commune, RSAAllocation
 from itou.employee_record.enums import Status
 from itou.siaes.models import SiaeFinancialAnnex
@@ -102,12 +103,9 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         birth_date = self.cleaned_data.get("birthdate")
 
         # Country coherence is done at model level (users.User)
-
         # Here we must add coherence between birthdate and communes
         # existing at this period (not a simple check of existence)
-        birth_place = Commune.objects.by_insee_code_and_period(commune_code, birth_date).first()
-
-        self.cleaned_data["birth_place"] = birth_place
+        self.cleaned_data["birth_place"] = Commune.objects.by_insee_code_and_period(commune_code, birth_date).first()
 
     class Meta:
         model = User
@@ -187,8 +185,12 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
             raise forms.ValidationError("Le code postal ne correspond pas à la commune")
 
         if commune_code:
-            commune = Commune.objects.current().by_insee_code(commune_code).first()
-            self.cleaned_data["hexa_commune"] = commune
+            try:
+                commune = Commune.by_insee_code(commune_code)
+            except UnknownCommuneError:
+                raise forms.ValidationError(f"Le code INSEE {commune_code} n'est pas référencé")
+            else:
+                self.cleaned_data["hexa_commune"] = commune
 
     class Meta:
         model = JobSeekerProfile

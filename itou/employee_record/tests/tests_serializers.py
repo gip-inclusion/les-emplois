@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from django.test import TestCase
 from django.utils import timezone
 
 from itou.employee_record.enums import Status
@@ -11,9 +10,10 @@ from itou.employee_record.serializers import (
     EmployeeRecordUpdateNotificationSerializer,
     _AddressSerializer,
 )
+from itou.employee_record.tests.common import EmployeeRecordFixtureTest
 
 
-class EmployeeRecordAddressSerializerTest(TestCase):
+class EmployeeRecordAddressSerializerTest(EmployeeRecordFixtureTest):
     def test_hexa_additional_address(self):
         # If additional address contains special characters
         # or is more than 32 charactrs long
@@ -69,7 +69,7 @@ class EmployeeRecordAddressSerializerTest(TestCase):
         self.assertEqual(good_lane_name, data["adrLibelleVoie"])
 
 
-class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
+class EmployeeRecordUpdateNotificationSerializerTest(EmployeeRecordFixtureTest):
     def test_notification_serializer(self):
         # High-level : just check basic information
         start_at = timezone.now().date()

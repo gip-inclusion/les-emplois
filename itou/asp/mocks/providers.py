@@ -11,7 +11,7 @@ class INSEECommuneProvider(BaseProvider):
     """
 
     def asp_insee_commune(self):
-        return Commune.objects.all().order_by("?").first()
+        return Commune.objects.current().order_by("?").first()
 
 
 class INSEECountryProvider(BaseProvider):
@@ -22,4 +22,4 @@ class INSEECountryProvider(BaseProvider):
     """
 
     def asp_country(self):
-        return Country.objects.all().order_by("?").first()
+        return Country.objects.current().order_by("?").first()

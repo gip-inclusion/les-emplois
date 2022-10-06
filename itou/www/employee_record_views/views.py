@@ -14,7 +14,6 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.users.models import JobSeekerProfile
-from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.pagination import pager
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -160,12 +159,12 @@ def create(request, job_application_id, template_name="employee_record/create.ht
 
         # Create jobseeker_profile if needed
         employee = job_application.job_seeker
-        profile, profile_was_created = JobSeekerProfile.objects.get_or_create(user=employee)
+        profile, _ = JobSeekerProfile.objects.get_or_create(user=employee)
 
         try:
             # Try a geo lookup of the address every time we call this form
             profile.update_hexa_address()
-        except AddressLookupError:
+        except ValidationError:
             # Can occur if employee address is badly formatted and is not found by geoloc API
             profile.clear_hexa_address()
             messages.error(
@@ -192,20 +191,6 @@ def create(request, job_application_id, template_name="employee_record/create.ht
             messages.error(
                 request, f"Impossible de déterminer le code INSEE pour l'adresse de {employee.get_full_name()}"
             )
-        except ValidationError as ex:
-            profile.clear_hexa_address()
-            messages.error(
-                request,
-                mark_safe(
-                    f"<p>Une erreur est survenue durant la validation de l'adresse : {ex}.</p>"
-                    f"<p>Veuillez modifier l'adresse et essayer à nouveau.</p>"
-                ),
-            )
-        except Exception as ex:
-            # Other unexpected error cases : don't keep a incomplete new profile
-            messages.error(request, f"Une erreur est survenue : {ex=}")
-            if profile_was_created:
-                profile.delete()
         else:
             return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.pk,)))
 

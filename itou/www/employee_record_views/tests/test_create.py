@@ -1,11 +1,11 @@
 from unittest import mock
 
-from django.test import TestCase
 from django.urls import reverse
 
 from itou.asp.models import Commune, Country
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.tests.common import EmployeeRecordFixtureTest
 from itou.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
@@ -13,7 +13,7 @@ from itou.job_applications.factories import (
 )
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import JobSeekerWithMockedAddressFactory
-from itou.utils.mocks.address_format import mock_get_geocoding_data
+from itou.utils.mocks.address_format import get_random_insee_code, mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -24,19 +24,12 @@ def get_sample_form_data(user):
         "first_name": user.first_name,
         "last_name": user.last_name,
         "birthdate": user.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-        "birth_country": 91,
-        "insee_commune_code": 67152,
+        "birth_country": 91,  # France
+        "insee_commune_code": get_random_insee_code(),
     }
 
 
-class AbstractCreateEmployeeRecordTest(TestCase):
-
-    # These fixtures are needed for INSEE addresses and countries
-    fixtures = [
-        "test_INSEE_communes.json",
-        "test_INSEE_country.json",
-    ]
-
+class AbstractCreateEmployeeRecordTest(EmployeeRecordFixtureTest):
     def setUp(self):
         self.siae = SiaeWithMembershipAndJobsFactory(
             name="Evil Corp.", membership__user__first_name="Elliot", kind="EI"
@@ -45,7 +38,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
             kind="EI", name="A-Team", membership__user__first_name="Hannibal"
         )
         self.siae_bad_kind = SiaeWithMembershipAndJobsFactory(
-            kind="EITI", name="A-Team", membership__user__first_name="Barracus"
+            kind="EA", name="A-Team", membership__user__first_name="Barracus"
         )
 
         self.user = self.siae.members.get(first_name="Elliot")
@@ -72,9 +65,12 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.client.force_login(self.user)
         url = reverse("employee_record_views:create", args=(self.job_application.id,))
         target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
-        response = self.client.post(url, data=get_sample_form_data(self.job_seeker))
+        data = get_sample_form_data((self.job_seeker))
+        response = self.client.post(url, data=data)
 
+        print("DATA", data)
         self.assertRedirects(response, target_url)
+
         self.assertTrue(self.job_seeker.has_jobseeker_profile)
 
     @mock.patch(
@@ -187,14 +183,6 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.force_login(self.user)
         self.client.get(self.url)
 
-        data = {
-            "first_name": self.job_seeker.first_name,
-            "last_name": self.job_seeker.last_name,
-            "birthdate": self.job_seeker.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "birth_country": 91,
-            "insee_commune_code": 62152,
-        }
-
         data = get_sample_form_data(self.job_seeker)
         data.pop("title")
 
@@ -210,7 +198,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
-    def test_birthplace(self, _mock):
+    def test_bad_birthplace(self, _mock):
         # If birth country is France, a commune (INSEE) is mandatory
         # otherwise, only a country is mandatory
 
@@ -232,13 +220,22 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
         self.assertEqual(200, response.status_code)
 
-        # Redirects must go to step 2
-        target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_good_birthplace(self, _mock):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
 
-        # Set a "random" commune in France
-        data["insee_commune_code"] = 67152
+        data = get_sample_form_data(self.job_seeker)
+        data["insee_commune_code"] = get_random_insee_code()
         response = self.client.post(self.url, data=data)
 
+        # Redirects must go to step 2
+        target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
+
+        # Default test values are ok
         self.assertRedirects(response, target_url)
 
         # Set a country different from France
@@ -428,7 +425,9 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae, job_seeker=JobSeekerWithMockedAddressFactory()
+            to_siae=self.siae,
+            job_seeker_with_address=True,
+            job_seeker=JobSeekerWithMockedAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
@@ -568,7 +567,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             approval=self.job_application.approval,
         )
         # Get a test commune from fixtures
-        commune = Commune.objects.by_insee_code("81093").first()
+        commune = Commune.by_insee_code(get_random_insee_code())
 
         dup_job_application.job_seeker.jobseeker_profile.education_level = "00"
         dup_job_application.job_seeker.jobseeker_profile.commune = commune
@@ -596,7 +595,9 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae, job_seeker=JobSeekerWithMockedAddressFactory()
+            to_siae=self.siae,
+            job_seeker_with_address=True,
+            job_seeker=JobSeekerWithMockedAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
@@ -614,7 +615,9 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae, job_seeker=JobSeekerWithMockedAddressFactory()
+            to_siae=self.siae,
+            job_seeker_with_address=True,
+            job_seeker=JobSeekerWithMockedAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
@@ -642,7 +645,9 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae, job_seeker=JobSeekerWithMockedAddressFactory()
+            to_siae=self.siae,
+            job_seeker_with_address=True,
+            job_seeker=JobSeekerWithMockedAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))

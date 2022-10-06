@@ -1,3 +1,8 @@
+import random
+
+from itou.asp.models import Commune
+
+
 BAN_GEOCODING_API_RESULTS_MOCK = [
     {
         "score": 0.8745736363636364,
@@ -289,8 +294,22 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
     },
 ]
 
+# Revert lookup
 RESULTS_BY_ADDRESS = {elt["address_line_1"]: elt for elt in BAN_GEOCODING_API_RESULTS_MOCK}
 
 
-def mock_get_geocoding_data(address, post_code=None, limit=1):
+def mock_get_geocoding_data(address, **_):
+    print(address, RESULTS_BY_ADDRESS.get(address))
     return RESULTS_BY_ADDRESS.get(address)
+
+
+def get_random_geocoding_api_result():
+    return random.choice(BAN_GEOCODING_API_RESULTS_MOCK)
+
+
+def get_random_insee_code():
+    return get_random_geocoding_api_result()["insee_code"]
+
+
+def get_random_asp_commune():
+    return Commune.by_insee_code(get_random_insee_code())

@@ -33,8 +33,6 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
     - ...
     """
 
-    fixtures = ["test_INSEE_communes.json", "test_asp_INSEE_countries.json"]
-
     MANAGEMENT_COMMAND_NAME = "transfer_employee_records"
 
     @mock.patch(
@@ -45,7 +43,6 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.update_as_ready()
-
         self.employee_record = employee_record
         self.job_application = job_application
 

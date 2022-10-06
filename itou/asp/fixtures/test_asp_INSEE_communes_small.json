@@ -1,0 +1,502 @@
+[
+  {
+    "model": "asp.Commune",
+    "pk": 4521,
+    "fields": {
+      "code": "07141",
+      "name": "LENTILLERES",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 4522,
+    "fields": {
+      "code": "07141",
+      "name": "LENTILLERES",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 5883,
+    "fields": {
+      "code": "08488",
+      "name": "VIVIER-AU-COURT",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 5884,
+    "fields": {
+      "code": "08488",
+      "name": "VIVIER-AU-COURT",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 8709,
+    "fields": {
+      "code": "12176",
+      "name": "ONET-LE-CHATEAU",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 8710,
+    "fields": {
+      "code": "12176",
+      "name": "ONET-LE-CHATEAU",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 9216,
+    "fields": {
+      "code": "13200",
+      "name": "MARSEILLE",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 30394,
+    "fields": {
+      "code": "37273",
+      "name": "VILLE-AUX-DAMES",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 30395,
+    "fields": {
+      "code": "37273",
+      "name": "VILLE-AUX-DAMES",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 33842,
+    "fields": {
+      "code": "41269",
+      "name": "VENDOME",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 33843,
+    "fields": {
+      "code": "41269",
+      "name": "VENDOME",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 48057,
+    "fields": {
+      "code": "59183",
+      "name": "DUNKERQUE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 48058,
+    "fields": {
+      "code": "59183",
+      "name": "DUNKERQUE",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 48273,
+    "fields": {
+      "code": "59291",
+      "name": "HAUTMONT",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 48274,
+    "fields": {
+      "code": "59291",
+      "name": "HAUTMONT",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 48391,
+    "fields": {
+      "code": "59350",
+      "name": "LILLE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 48392,
+    "fields": {
+      "code": "59350",
+      "name": "LILLE",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 51887,
+    "fields": {
+      "code": "62215",
+      "name": "CARVIN",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 51888,
+    "fields": {
+      "code": "62215",
+      "name": "CARVIN",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 52499,
+    "fields": {
+      "code": "62525",
+      "name": "LONGUENESSE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 52500,
+    "fields": {
+      "code": "62525",
+      "name": "LONGUENESSE",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 52589,
+    "fields": {
+      "code": "62570",
+      "name": "MERICOURT",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 52590,
+    "fields": {
+      "code": "62570",
+      "name": "MERICOURT",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 52965,
+    "fields": {
+      "code": "62758",
+      "name": "SAINT-MARTIN-BOULOGNE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 52966,
+    "fields": {
+      "code": "62758",
+      "name": "SAINT-MARTIN-BOULOGNE",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 55184,
+    "fields": {
+      "code": "64483",
+      "name": "SAINT-JEAN-DE-LUZ",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 55185,
+    "fields": {
+      "code": "64483",
+      "name": "SAINT-JEAN-DE-LUZ",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 57089,
+    "fields": {
+      "code": "67152",
+      "name": "GEISPOLSHEIM",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 57090,
+    "fields": {
+      "code": "67152",
+      "name": "GEISPOLSHEIM",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 57705,
+    "fields": {
+      "code": "67482",
+      "name": "STRASBOURG",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 57706,
+    "fields": {
+      "code": "67482",
+      "name": "STRASBOURG",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 59177,
+    "fields": {
+      "code": "69256",
+      "name": "VAULX-EN-VELIN",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 59178,
+    "fields": {
+      "code": "69256",
+      "name": "VAULX-EN-VELIN",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 65739,
+    "fields": {
+      "code": "77284",
+      "name": "MEAUX",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 65740,
+    "fields": {
+      "code": "77284",
+      "name": "MEAUX",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 70768,
+    "fields": {
+      "code": "83100",
+      "name": "PUGET-VILLE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 70769,
+    "fields": {
+      "code": "83100",
+      "name": "PUGET-VILLE",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 70840,
+    "fields": {
+      "code": "83136",
+      "name": "THORONET",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 70841,
+    "fields": {
+      "code": "83136",
+      "name": "THORONET",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 71481,
+    "fields": {
+      "code": "85146",
+      "name": "MONTAIGU",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 71482,
+    "fields": {
+      "code": "85146",
+      "name": "MONTAIGU",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 72190,
+    "fields": {
+      "code": "86194",
+      "name": "POITIERS",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 72191,
+    "fields": {
+      "code": "86194",
+      "name": "POITIERS",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 72619,
+    "fields": {
+      "code": "87114",
+      "name": "PANAZOL",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 72620,
+    "fields": {
+      "code": "87114",
+      "name": "PANAZOL",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 73122,
+    "fields": {
+      "code": "88160",
+      "name": "EPINAL",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 73123,
+    "fields": {
+      "code": "88160",
+      "name": "EPINAL",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 75231,
+    "fields": {
+      "code": "91432",
+      "name": "MORANGIS",
+      "start_date": "1968-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 75232,
+    "fields": {
+      "code": "91432",
+      "name": "MORANGIS",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 76017,
+    "fields": {
+      "code": "97108",
+      "name": "CAPESTERRE-DE-MARIE-GALANT",
+      "start_date": "1900-01-01",
+      "end_date": null
+    }
+  }
+]
