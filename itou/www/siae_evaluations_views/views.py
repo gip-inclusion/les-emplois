@@ -32,7 +32,9 @@ from itou.www.siae_evaluations_views.forms import (
 @login_required
 def samples_selection(request, template_name="siae_evaluations/samples_selection.html"):
     institution = get_current_institution_or_404(request)
-    evaluation_campaign = EvaluationCampaign.objects.first_active_campaign(institution)
+    evaluation_campaign = get_object_or_404(
+        EvaluationCampaign.objects.for_institution(institution).in_progress(),
+    )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 

@@ -80,8 +80,7 @@ class SamplesSelectionViewTest(TestCase):
         # institution without active campaign
         self.client.force_login(self.user)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Vous n'avez pas de contrôle en cours.")
+        assert response.status_code == 404
 
         # institution with active campaign to select
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
@@ -101,7 +100,7 @@ class SamplesSelectionViewTest(TestCase):
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["percent_set_at", "ended_at"])
         response = self.client.get(self.url)
-        self.assertContains(response, "Vous n'avez pas de contrôle en cours.")
+        assert response.status_code == 404
 
     def test_content(self):
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
