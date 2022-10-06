@@ -265,7 +265,7 @@ class ProcessViewsTest(TestCase):
             **address,
         }
         response = self.client.post(url, data=post_data)
-        self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
+        self.assertFormError(response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
 
         # Wrong dates: end < start.
         hiring_start_at = today
@@ -277,7 +277,7 @@ class ProcessViewsTest(TestCase):
             **address,
         }
         response = self.client.post(url, data=post_data)
-        self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
+        self.assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
 
         # No address provided.
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -296,9 +296,9 @@ class ProcessViewsTest(TestCase):
             "answer": "",
         }
         response = self.client.post(url, data=post_data)
-        self.assertFormError(response, "form_user_address", "address_line_1", "Ce champ est obligatoire.")
-        self.assertFormError(response, "form_user_address", "city", "Ce champ est obligatoire.")
-        self.assertFormError(response, "form_user_address", "post_code", "Ce champ est obligatoire.")
+        self.assertFormError(response.context["form_user_address"], "address_line_1", "Ce champ est obligatoire.")
+        self.assertFormError(response.context["form_user_address"], "city", "Ce champ est obligatoire.")
+        self.assertFormError(response.context["form_user_address"], "post_code", "Ce champ est obligatoire.")
 
     def test_accept_with_active_suspension(self, *args, **kwargs):
         """Test the `accept` transition with active suspension for active user"""

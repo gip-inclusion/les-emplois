@@ -638,7 +638,9 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
         self.assertFormError(
-            response, "adminform", "number", [ApprovalAdminForm.ERROR_NUMBER_CANNOT_BE_CHANGED % approval.number]
+            response.context["adminform"],
+            "number",
+            [ApprovalAdminForm.ERROR_NUMBER_CANNOT_BE_CHANGED % approval.number],
         )
 
 
