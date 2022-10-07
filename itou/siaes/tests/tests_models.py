@@ -416,7 +416,7 @@ class SiaeContractTypeTest(TestCase):
             ("OTHER", "Autre type de contrat"),
         ]
         siae = SiaeFactory(kind=SiaeKind.ACI)
-        with override_settings(ACI_CONVERGENCE_PK_WHITELIST=[siae.pk]):
+        with override_settings(ACI_CONVERGENCE_SIRET_WHITELIST=[siae.siret]):
             result = ContractType.choices_for_siae(siae=siae)
         self.assertEqual(result, expected)
 
