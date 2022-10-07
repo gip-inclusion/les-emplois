@@ -1,7 +1,8 @@
+from datetime import datetime, timezone
+
 import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
-from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
@@ -34,8 +35,8 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     to_siae = factory.SubFactory(SiaeFactory, with_membership=True)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
-    hiring_start_at = timezone.localdate()
-    hiring_end_at = timezone.localdate() + relativedelta(years=2)
+    hiring_start_at = datetime.now(timezone.utc).date()
+    hiring_end_at = datetime.now(timezone.utc).date() + relativedelta(years=2)
     resume_link = "https://server.com/rockie-balboa.pdf"
 
     @factory.post_generation
@@ -133,8 +134,8 @@ class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory
 
 
 class JobApplicationWithApprovalNotCancellableFactory(JobApplicationWithApprovalFactory):
-    hiring_start_at = timezone.localdate() - relativedelta(days=5)
-    hiring_end_at = timezone.localdate() + relativedelta(years=2, days=-5)
+    hiring_start_at = datetime.now(timezone.utc).date() - relativedelta(days=5)
+    hiring_end_at = datetime.now(timezone.utc).date() + relativedelta(years=2, days=-5)
 
 
 class JobApplicationWithJobSeekerProfileFactory(JobApplicationWithApprovalNotCancellableFactory):
@@ -159,7 +160,10 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     Suitable for employee records tests
     """
 
-    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory)
+    job_seeker = factory.SubFactory(
+        JobSeekerWithMockedAddressFactory,
+        born_in_france=True,
+    )
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
 
     @factory.post_generation

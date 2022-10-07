@@ -6,21 +6,16 @@ import factory
 import factory.fuzzy
 from allauth.account import models as allauth_models
 
-from itou.asp.factories import CommuneFactory, CountryFranceFactory
-from itou.asp.mocks.providers import INSEECommuneProvider, INSEECountryProvider
+from itou.asp.factories import CommuneFactory, CountryFactory, CountryFranceFactory
 from itou.asp.models import AllocationDuration, EducationLevel, LaneType
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.users import models
 from itou.users.enums import Title
-from itou.utils.mocks.address_format import get_random_asp_commune, get_random_geocoding_api_result
+from itou.utils.mocks.address_format import get_random_geocoding_api_result
 from itou.utils.validators import validate_nir
 
 
 DEFAULT_PASSWORD = "P4ssw0rd!***"
-
-# Register ASP fakers
-factory.Faker.add_provider(INSEECommuneProvider)
-factory.Faker.add_provider(INSEECountryProvider)
 
 
 def _verify_emails_for_user(self, create, extracted, **kwargs):
@@ -61,8 +56,16 @@ class JobSeekerFactory(UserFactory):
     title = random.choice(Title.values)
     is_job_seeker = True
     pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
-    birth_country = factory.SubFactory(CountryFranceFactory)
-    birth_place = factory.SubFactory(CommuneFactory)
+
+    class Params:
+        # Birth place and birth country removed from default:
+        # only created when creating a new job seeker profile (employee records)
+        with_birth_place = factory.Trait(birth_place=factory.SubFactory(CommuneFactory))
+        with_birth_country = factory.Trait(birth_country=factory.SubFactory(CountryFactory))
+        born_in_france = factory.Trait(
+            with_birth_place=True,
+            birth_country=factory.SubFactory(CountryFranceFactory),
+        )
 
     @factory.lazy_attribute
     def nir(self):
@@ -107,8 +110,6 @@ class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
         self.post_code = address.get("post_code")
         self.insee_code = address.get("insee_code")
         self.city = address.get("city")
-
-        self.birth_place = get_random_asp_commune()
 
 
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
