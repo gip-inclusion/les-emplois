@@ -1,5 +1,59 @@
 # Journal des modifications
 
+## [50] - 2022-10-10
+
+### Ajouté
+- Fiches salarié : ajout de messages d'information en cas d'erreurs de géolocalisation de l'adresse #1338
+- Fiches salarié : nettoyage automatique des fiches salarié sans PASS IAE #1523
+- Pilotage : intégration de formulaires Tally sur les vues stats #1522, #1529
+- PHC : limite l'accès aux contrats PHC à une liste définie d'ACIs #1520
+- PASS IAE : ajout d'une commande pour gérer les rejets d'API PE #1528
+- Candidatures : amélioration du parcours de prescription du dépôt de candidatures (étape 3 de la refonte) #1485
+- UI : enlève les espaces lors de la présentation d’identifiants #1540
+- Inclusion Connect : utiliser Inclusion Connect en tant qu'employeur #1526
+- Support : ajout d'une fonctionnalité pour prendre temporairement l'identité d'un utilisateur #1541
+- Technique : gestion des settings & secrets #1461, #1567, #1572
+- Technique : utilisation de `pip-tools` pour la gestion de dépendances #1507
+- Technique : suppression de Typeform et remplacement par Tally #1530
+- Technique : utilisation de pytest pour lancer les tests #1554
+- Contrôle a posteriori : évaluation SIAE, implémentation de la phase contradictoire #1566
+- Contrôle a posteriori : ajout de l’ID des SIAE évaluées aux URLs du contrôle a posteriori #1576
+- Contrôle a posteriori : cache les candidatures des campagnes précédentes #1579
+
+### Modifié
+- Technique : mise à jour vers Django 4.1 #1453 
+- Technique : amélioration de la résilience du parcours d'inscription prescripteur face aux API indisponibles #1532
+- Technique : correction de l'intégation continue (CI) #1534  
+- Technique : accélération des tests #1559
+- Technique : mise à jour vers Django 4.1.2 # 1588
+- Documentation : modification des notes d’installation (Docker, venv, config) #1515, #1517, #1519, #1551 
+- PASS IAE : affichage du PASS IAE pour les demandeurs d'emploi #1535
+- Pilotage : candidatures - ajout du nom du conseiller Pôle emploi #1543 
+- Pilotage : candidatures par fiche de poste - ajout colonne injection AI #1546 
+- Pilotage : ajout de colonnes utiles extraites du NIR (sexe, année et mois de naissance) dans la table candidats sur Metabase #1565
+- Pilotage : ajout de deux blocs informatifs en bas des pages stats #1565
+- Thème : mise à jour vers la version 0.5.1 #1542
+- Candidatures : les candidatures ne sont plus toutes enregistrées comme "spontanées" #1548
+- Candidatures : nettoyage des vues de l'ancien parcours de dépôt de candidatures #1556 
+- Prolongation / suspension : le dernier employeur qui a embauché un candidat a la main pour prolonger ou suspendre #1536
+- Prolongation / suspension : le motif de suspension “contrat de travail suspendu depuis plus de 15 jours” d'un pass IAE n’empêche plus de postuler à d'autres offres #1539
+- UI : notification des données factices sur l'environnement de démo #1530
+- UI : lors de la saisie des informations d'un utilisateur, le téléphone devient optionnel et les informations de l'adresse obligatoires #1530
+- UI : correction “S’inscrire” dans les options de navigation #1549 
+- E-mails : vérification de la suppression de l'e-mail de notification d'une nouvelle embauche pour les SIAE #1530
+- E-mails : modification de l'e-mail envoyé aux prescripteurs lors d'un refus d'habilitation #1530
+- PHC : utiliser le SIRET plutôt que la clé primaire des SIAE pour choisir les contrats convergence #1596
+- Fiches salarié : déblocage du parcours des fiches salarié en cas d'absence de type de voie dans l'adresse du salarié #1560
+- Tests : corrections de tests #1543, #1550, #1552, #1563, #1533, #1569, #1583, #1591, #1586
+
+### Supprimé
+- Candidatures : les réponses données aux candidatures sont supprimées lors d'un transfert entre SIAE #1530
+- Prolongation / suspension : suppression de l'affichage de la raison d'une suspension #1530
+- Pilotage : désactivation temporaire de certains formulaires Tally #1565
+- Pilotage : désactivation temporaire du tableau de bord AF DGEFP #1565
+- Pilotage : retrait de plusieurs badges "Nouveaux" # 1565
+- Contrôle a posteriori : retrait des dates de la campagne de contrôle a posteriori 2021 #1587 
+
 ## [49] - 2022-09-12
 
 ### Ajouté
@@ -29,7 +83,7 @@
 - PASS IAE : En tant que SIAE je veux m'assurer que l'annulation du PASS est justifiée dans mon cas #1476
 - Candidatures - refus : Un bouton radio sans texte #1471
 - Candidatures - refus : nouveaux motif de refus / Pilotage #1474
-- Candidatures - nouveau parcours : Enregistrement de la date d'expiration du diagnostique d'éligibilét en base de données #1472
+- Candidatures - nouveau parcours : Enregistrement de la date d'expiration du diagnostique d'éligibilité en base de données #1472
 - Candidatures - nouveau parcours : Diverses corrections et améliorations #1473
 - Contrôle a posteriori : Déplacement des données de contrôle a posteriori pendant un move_siae_data #1479
 - Sécurité mots de passe : Améliorations de sécurité diverses #1502
