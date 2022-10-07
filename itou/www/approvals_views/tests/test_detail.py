@@ -6,7 +6,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.enums import SenderKind
-from itou.job_applications.factories import JobApplicationFactory
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberOrganizationFactory
 
@@ -25,8 +25,8 @@ class TestApprovalDetailView:
         assert job_application.is_sent_by_authorized_prescriber
         EligibilityDiagnosisFactory(job_seeker=approval.user, author_siae=job_application.to_siae)
 
-        # Another job applcation on the same SIAE
-        same_siae_job_application = JobApplicationFactory(
+        # Another job applcation on the same SIAE, by a non authorized prescriber
+        same_siae_job_application = JobApplicationSentByPrescriberOrganizationFactory(
             job_seeker=job_application.job_seeker,
             to_siae=job_application.to_siae,
             state=JobApplicationWorkflow.STATE_NEW,
@@ -52,6 +52,8 @@ class TestApprovalDetailView:
         assertNotContains(
             response, reverse("apply:details_for_siae", kwargs={"job_application_id": other_siae_job_application.pk})
         )
+        assertContains(response, '<i class="ri-group-line ml-2" aria-hidden="true"></i> Prescripteur', count=1)
+        assertContains(response, '<i class="ri-group-line ml-2" aria-hidden="true"></i> Orienteur', count=1)
 
     def test_suspend_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)

@@ -339,6 +339,17 @@ class JobApplicationModelTest(TestCase):
         self.assertFalse(job_application1.is_waiting_for_employee_record_creation)
         self.assertFalse(job_application2.is_waiting_for_employee_record_creation)
 
+    def test_get_sender_kind_display(self):
+        items = [
+            [JobApplicationSentByAuthorizedPrescriberOrganizationFactory(), "Prescripteur"],
+            [JobApplicationSentByPrescriberOrganizationFactory(), "Orienteur"],
+            [JobApplicationSentBySiaeFactory(), "Employeur (SIAE)"],
+            [JobApplicationSentByJobSeekerFactory(), "Demandeur d'emploi"],
+        ]
+        for job_application, sender_kind_display in items:
+            with self.subTest(sender_kind_display):
+                self.assertEqual(job_application.get_sender_kind_display(), sender_kind_display)
+
 
 class JobApplicationQuerySetTest(TestCase):
 

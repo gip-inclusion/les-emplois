@@ -713,6 +713,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 kind = "Prescripteur habilité"
         return kind
 
+    def get_sender_kind_display(self):
+        # Override default getter since we want to separate Orienteur and Prescripteur
+        if self.sender_kind == SenderKind.PRESCRIBER and (
+            not self.sender_prescriber_organization or not self.sender_prescriber_organization.is_authorized
+        ):
+            return "Orienteur"
+        else:
+            return SenderKind(self.sender_kind).label
+
     @property
     def candidate_has_employee_record(self):
 
