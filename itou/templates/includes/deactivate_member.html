@@ -17,7 +17,7 @@
         {% endif %}
     </ul>
 
-    <form action="{% url base_url|add:":deactivate_member" target_member.pk %}" method="POST">
+    <form action="{% url base_url|add:":deactivate_member" target_member.pk %}" method="post">
         {% csrf_token %}
         <div class="mt-4 form-group">
             <a class="btn btn-outline-primary" href="{% url base_url|add:":members" %}">Annuler</a>

@@ -435,6 +435,38 @@ Usage:
     visibility: hidden;
 }
 
+.approval-left-border {
+    border-left-width: 3px !important;
+}
+
+.test-accounts-banner-overlay {
+    z-index: 2;
+}
+
+.test-accounts-image-menu {
+    min-height: 11rem;
+}
+
+.give-my-advice {
+    width: 150px;
+}
+
+.progress-bar-initial {
+    width: 33%;
+}
+
+.progress-bar-intermediate {
+    width: 66%;
+}
+
+.progress-bar-final {
+    width: 100%;
+}
+
+.edit-siae-header-image {
+    width: 100px;
+}
+
 /* Welcoming tour.
 --------------------------------------------------------------------------- */
 #welcoming_tour {

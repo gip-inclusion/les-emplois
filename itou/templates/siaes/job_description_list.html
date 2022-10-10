@@ -80,7 +80,7 @@
                                 <i class="ri-map-pin-line"></i> {{ job_description.display_location }}
                             </td>
                             <td class="text-center">
-                                <p class="">{{ job_description.open_positions }}</p>
+                                <p>{{ job_description.open_positions }}</p>
                             </td>
                             <td>
                                 {# Change job description status form #}
@@ -109,7 +109,7 @@
                                     <i class="ri-delete-bin-line ri-lg text-danger"></i>
                                 </button>
                                 {# Modal for job description deletion #}
-                                <div id="_delete_modal_{{ job_description.id }}" class="modal fade" tabindex="-1" aria-labelledby="Suppression de la fiche de poste" style="display:none;" aria-hidden="true">
+                                <div id="_delete_modal_{{ job_description.id }}" class="modal fade" tabindex="-1" aria-labelledby="Suppression de la fiche de poste" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header">

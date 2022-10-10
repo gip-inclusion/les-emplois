@@ -3,18 +3,17 @@
 {% load bootstrap4 %}
 
 <!DOCTYPE HTML>
-<html>
-    <html lang="fr">
-        <head>
-            <meta charset="utf-8">
-            <title>
-                {% block title %}- Les emplois de l'inclusion{% endblock %}
-            </title>
-            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-            {% block meta_description %}{% endblock %}
-            <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}" type="text/css">
-            <link rel="stylesheet" href="{{ base_url }}{% static 'css/itou.css' %}" type="text/css">
-            <style type="text/css">
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <title>
+            {% block title %}- Les emplois de l'inclusion{% endblock %}
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        {% block meta_description %}{% endblock %}
+        <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}" type="text/css">
+        <link rel="stylesheet" href="{{ base_url }}{% static 'css/itou.css' %}" type="text/css">
+        <style type="text/css">
                 /* Don't display the BETA banner on pdf files. */
                 body:after {
                     content: "";
@@ -33,10 +32,10 @@
                         display: none;
                     }
                 }
-            </style>
-            {% block extra_head %}{% endblock %}
-        </head>
-        <body>
-            {% block content %}{% endblock %}
-        </body>
-    </html>
+        </style>
+        {% block extra_head %}{% endblock %}
+    </head>
+    <body>
+        {% block content %}{% endblock %}
+    </body>
+</html>

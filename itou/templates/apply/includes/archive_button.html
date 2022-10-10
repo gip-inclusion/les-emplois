@@ -6,7 +6,7 @@
 <div class="modal fade text-left" id="delete-job-application" tabindex="-1" role="dialog" aria-labelledby="no-email-modal-label" aria-modal="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="POST" action="{% url 'apply:archive' job_application_id=job_application.pk %}">
+            <form method="post" action="{% url 'apply:archive' job_application_id=job_application.pk %}">
                 {% csrf_token %}
                 <div class="modal-header">
                     <h3 class="modal-title" id="no-email-modal-label">

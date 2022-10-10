@@ -1,5 +1,5 @@
 {% load static %}
- 
+
 {% load theme_inclusion %}
 <section class="s-preheader d-none d-xl-block">
     <div class="container s-preheader__container">
@@ -14,12 +14,12 @@
     <section class="s-header__container container">
         <div class="s-header__row row">
             <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center pr-0 pr-md-3">
-                <a href="/" class="s-header__logo-ministere">
+                <a href="{% url 'home:hp' %}" class="s-header__logo-ministere">
                     <img src="{% static_theme_images 'logo-ministere-emploi.svg' %}" alt="Ministère du travail, du plein emploi et de l'insertion" />
                 </a>
             </div>
             <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center px-0 px-md-3">
-                <a href="/">
+                <a href="{% url 'home:hp' %}">
                     <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" />
                 </a>
             </div>
@@ -120,7 +120,7 @@
                             </li>
                         {% endif %}
                         <li>
-                            <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="/">
+                            <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="{% url 'home:hp' %}">
                                 <span>Rechercher des employeurs</span>
                             </a>
                         </li>
@@ -157,7 +157,7 @@
                             </li>
                         {% endif %}
                         <li>
-                            <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="/">
+                            <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="{% url 'home:hp' %}">
                                 <span>Rechercher des employeurs</span>
                             </a>
                         </li>
