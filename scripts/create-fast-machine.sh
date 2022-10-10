@@ -27,11 +27,10 @@ fi
 
 clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
 
-ORGANIZATION_NAME=Itou
 APP_NAME=c1-fast-machine-$(date +%y-%m-%d-%Hh-%M)
 
-clever create $APP_NAME --type python --region par --alias $APP_NAME --org $ORGANIZATION_NAME
-clever link $APP_NAME --org $ORGANIZATION_NAME
+clever create $APP_NAME --type python --region par --alias $APP_NAME --org Itou
+clever link $APP_NAME --org Itou
 clever scale --flavor XL --alias $APP_NAME
 
 clever env set ITOU_ENVIRONMENT "FAST-MACHINE" --alias $APP_NAME
