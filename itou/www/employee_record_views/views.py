@@ -170,8 +170,9 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         profile, _ = JobSeekerProfile.objects.get_or_create(user=employee)
 
         try:
-            # Try a geo lookup of the address every time we call this form
-            profile.update_hexa_address()
+            if employee.post_code and employee.address_line_1:
+                # Try a geo lookup of the address
+                profile.update_hexa_address()
         except ValidationError:
             # Can occur if employee address is badly formatted and is not found by geoloc API
             profile.clear_hexa_address()
