@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils import timezone
 
 
@@ -13,4 +15,4 @@ EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS = 13 * 30
 # This is the official and final production phase date of the employee record feature.
 # It is used as parameter to filter the eligible job applications for the feature.
 # (no job application before this date can be used for this feature)
-EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 9, 27, tzinfo=timezone.utc)
+EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 9, 27, tzinfo=datetime.timezone.utc)

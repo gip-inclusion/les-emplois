@@ -315,7 +315,9 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         Waiting period cannot be bypassed.
         """
         now_date = timezone.now().date() - relativedelta(months=1)
-        now = timezone.datetime(year=now_date.year, month=now_date.month, day=now_date.day, tzinfo=timezone.utc)
+        now = timezone.datetime(
+            year=now_date.year, month=now_date.month, day=now_date.day, tzinfo=datetime.timezone.utc
+        )
 
         with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
             siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))

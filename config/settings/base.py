@@ -339,7 +339,7 @@ SHOW_TEST_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in ("DEMO", "REVIEW-APP")
 # On November 30th, 2021, we delivered approvals for AI structures.
 # See itou.scripts.management.commands.import_ai_employees
 AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = os.getenv("AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL")
-AI_EMPLOYEES_STOCK_IMPORT_DATE = datetime.datetime(2021, 11, 30, tzinfo=timezone.utc)
+AI_EMPLOYEES_STOCK_IMPORT_DATE = datetime.datetime(2021, 11, 30, tzinfo=datetime.timezone.utc)
 
 # https://adresse.data.gouv.fr/faq
 API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL")
@@ -561,7 +561,7 @@ EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS = int(os.environ.get("EMPLOYEE_RECORD_AR
 # This is the official and final production phase date of the employee record feature.
 # It is used as parameter to filter the eligible job applications for the feature.
 # (no job application before this date can be used for this feature)
-EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 9, 27, tzinfo=timezone.utc)
+EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE = timezone.datetime(2021, 9, 27, tzinfo=datetime.timezone.utc)
 
 # Only PROD or temporary tests environments are able to transfer employee records data to ASP
 # This is disabled by default, overidden in prod settings, and can be set

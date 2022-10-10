@@ -3,7 +3,6 @@ import io
 
 from django.core import management
 from django.test import TestCase
-from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.approvals.factories import ApprovalFactory
@@ -15,12 +14,12 @@ class ExportPEApiRejectionsTestCase(TestCase):
         # generate an approval that should not be found.
         ApprovalFactory(
             pe_notification_status="notification_error",
-            pe_notification_time=datetime.datetime(2022, 7, 5, tzinfo=timezone.utc),
+            pe_notification_time=datetime.datetime(2022, 7, 5, tzinfo=datetime.timezone.utc),
             pe_notification_exit_code="NOTFOUND",
         )
         approval = ApprovalFactory(
             pe_notification_status="notification_error",
-            pe_notification_time=datetime.datetime(2022, 8, 31, tzinfo=timezone.utc),
+            pe_notification_time=datetime.datetime(2022, 8, 31, tzinfo=datetime.timezone.utc),
             pe_notification_exit_code="FOOBAR",
             user__last_name="Pers,e",
             user__first_name='Jul"ie',
