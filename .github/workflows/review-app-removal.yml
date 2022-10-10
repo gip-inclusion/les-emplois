@@ -44,4 +44,4 @@ jobs:
 
     - name: 🗑 Delete the review app database
       run: |
-        $CLEVER_CLI addon delete $REVIEW_APP_DB_NAME --org $REVIEW_APPS_ORGANIZATION_NAME --yes
+        $CLEVER_CLI addon delete $REVIEW_APP_DB_NAME --org itou_review_apps --yes
