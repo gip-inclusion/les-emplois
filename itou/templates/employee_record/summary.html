@@ -16,26 +16,33 @@
                 <div class="row">
                     <div class="col-sm-9 pt-3">
                         {% with job_application=employee_record.job_application %}
-                            <div>Début du contrat : <b>{{ job_application.hiring_start_at }}</b></div>
-                            <div>Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b></div>
-                            <div>Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b></div>
+                            <div>
+                                Début du contrat : <b>{{ job_application.hiring_start_at }}</b>
+                            </div>
+                            <div>
+                                Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b>
+                            </div>
+                            <div>
+                                Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b>
+                            </div>
                         {% endwith %}
                         <div>
                             <b>{{ employee_record.get_status_display }}</b> le {{ employee_record.updated_at }}
                         </div>
                     </div>
                     <div class="col-sm-3 text-right">
-                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP"></img>
-                    </div>
+                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP">
+                    </img>
                 </div>
             </div>
         </div>
-
-        {% include "employee_record/includes/employee_record_summary.html" %}
-
-        <a href="{% url "employee_record_views:list" %}?status={{ status }}" class="btn btn-primary">Retour à la liste</a>
-
     </div>
+
+    {% include "employee_record/includes/employee_record_summary.html" %}
+
+    <a href="{% url "employee_record_views:list" %}?status={{ status }}" class="btn btn-primary">Retour à la liste</a>
+
+</div>
 
 
 {% endblock %}

@@ -9,9 +9,7 @@
 
             {{ field.label }}
 
-            {% if field.help_text %}
-                <p class="small mb-0 form-text text-muted">{{ field.help_text }}</p>
-            {% endif %}
+            {% if field.help_text %}<p class="small mb-0 form-text text-muted">{{ field.help_text }}</p>{% endif %}
 
             {# Show written proof only to SIAE because prescribers feel they have #}
             {# to provide them when they don't have to. #}

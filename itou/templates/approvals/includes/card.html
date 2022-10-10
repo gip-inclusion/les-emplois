@@ -1,9 +1,7 @@
 {% if common_approval %}
     <div class="card my-3">
         <div class="card-body">
-            <div class="card-text">
-                {% include "approvals/includes/status.html" with common_approval=common_approval %}
-            </div>
+            <div class="card-text">{% include "approvals/includes/status.html" with common_approval=common_approval %}</div>
         </div>
     </div>
 {% endif %}

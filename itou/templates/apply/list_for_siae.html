@@ -18,15 +18,19 @@
             <p>
                 Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.
             </p>
-            <p class="mb-0">
-                Les demandes rétroactives ne sont pas autorisées.
-            </p>
+            <p class="mb-0">Les demandes rétroactives ne sont pas autorisées.</p>
         </div>
     {% endif %}
 
     <div class="row">
         <div class="col-12 col-md-4 mt-2">
-            <a id="js-job-applications-filters-button" class="btn btn-primary d-block d-md-none" href="#js-job-applications-filters-form" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseFilter">
+            <a id="js-job-applications-filters-button"
+               class="btn btn-primary d-block d-md-none"
+               href="#js-job-applications-filters-form"
+               data-toggle="collapse"
+               role="button"
+               aria-expanded="false"
+               aria-controls="collapseFilter">
                 Filtres des résultats <i class="ri-filter-line"></i>
             </a>
             <form method="get" action="" id="js-job-applications-filters-form" class="collapse show">
@@ -71,9 +75,7 @@
             </div>
 
             {% if not job_applications_page %}
-                <h2 class="font-weight-normal text-muted mt-4">
-                    Aucune candidature pour le moment.
-                </h2>
+                <h2 class="font-weight-normal text-muted mt-4">Aucune candidature pour le moment.</h2>
             {% else %}
                 {% for job_application in job_applications_page %}
 
@@ -92,13 +94,12 @@
                                 </div>
                                 {% if job_application.can_display_approval %}
                                     <div class="col-sm-3">
-                                        <a
-                                            class="btn btn-outline-primary matomo-event"
-                                            data-matomo-action="telechargement-pdf"
-                                            data-matomo-category="agrement"
-                                            data-matomo-option="liste-candidatures"
-                                            href="{% url 'approvals:display_printable_approval' job_application_id=job_application.id %}"
-                                            target="_blank">
+                                        <a class="btn btn-outline-primary matomo-event"
+                                           data-matomo-action="telechargement-pdf"
+                                           data-matomo-category="agrement"
+                                           data-matomo-option="liste-candidatures"
+                                           href="{% url 'approvals:display_printable_approval' job_application_id=job_application.id %}"
+                                           target="_blank">
                                             Afficher le PASS IAE
                                         </a>
                                     </div>

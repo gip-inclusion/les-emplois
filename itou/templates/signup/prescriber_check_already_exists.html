@@ -11,9 +11,7 @@
         <small class="text-muted">Prescripteur/Orienteur</small>
     </h1>
 
-    <h2 class="h1">
-        Votre organisation est-elle déjà inscrite ?
-    </h2>
+    <h2 class="h1">Votre organisation est-elle déjà inscrite ?</h2>
 
     <p class="mb-6">
         <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}" class="fs-lg">Je travaille pour Pôle emploi</a>
@@ -69,7 +67,8 @@
             {% if prescriber_orgs_with_members_same_siret %}
                 <div class="alert alert-warning" role="status">
                     <p class="small mb-0">
-                        Attention une ou plusieurs organisations existent déjà avec ce SIRET.<br>
+                        Attention une ou plusieurs organisations existent déjà avec ce SIRET.
+                        <br>
                         Si vous ne trouvez pas votre organisation dans la liste ci-dessus ou si
                         vous souhaitez créer un compte avec ce SIRET pour un autre type
                         d'organisation, vous avez la possibilité de l'inscrire.

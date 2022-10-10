@@ -7,7 +7,9 @@
 
 {% block right_content %}
     <div class="py-5 py-lg-7">
-        <h1 class="h1-hero-c1">Inscription <span class="text-muted">candidat</span></h1>
+        <h1 class="h1-hero-c1">
+            Inscription <span class="text-muted">candidat</span>
+        </h1>
         <form method="post" action="{% url 'signup:job_seeker_nir' %}" class="js-prevent-multiple-submit js-format-nir">
 
             {% csrf_token %}
@@ -21,12 +23,7 @@
             {% if form.errors %}
                 <div class="alert alert-info">
                     Vous possédez un numéro de sécurité sociale temporaire ?
-                    <button
-                        type="submit" name="skip" value="1"
-                        class="btn btn-link p-0 matomo-event"
-                        data-matomo-category="nir-temporaire"
-                        data-matomo-action="etape-suivante"
-                        data-matomo-option="inscription">
+                    <button type="submit" name="skip" value="1" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="inscription">
                         Cliquez ici pour accéder à l'étape suivante.
                     </button>
                 </div>
@@ -38,8 +35,12 @@
 
         </form>
         <p class="mt-5">
-            Vous n'avez pas de numéro de sécurité sociale ?<br>
-            <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale" title="Article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)" rel="noopener" target="_blank">ameli.fr</a><i class="ri-external-link-line ml-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.
+            Vous n'avez pas de numéro de sécurité sociale ?
+            <br>
+            <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"
+               title="Article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
+               rel="noopener"
+               target="_blank">ameli.fr</a><i class="ri-external-link-line ml-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.
         </p>
     </div>
 {% endblock %}

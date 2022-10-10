@@ -23,9 +23,7 @@
     <form action="{% url base_url|add:":update_admin_role" action target_member.pk %}" method="POST">
         {% csrf_token %}
         <div class="mt-4 form-group">
-            <a class="btn btn-outline-primary" href="{% url base_url|add:":members" %}">
-                Annuler
-            </a>
+            <a class="btn btn-outline-primary" href="{% url base_url|add:":members" %}">Annuler</a>
             <button class="btn btn-primary submit">
                 {% if action == "remove" %}
                     Retirer les droits administrateur

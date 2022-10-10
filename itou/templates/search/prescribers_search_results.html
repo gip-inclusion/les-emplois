@@ -37,17 +37,13 @@
 
         <p class="font-weight-bold text-muted">
             {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages and prescriber_orgs_page.paginator.count as counter %}
-                <b>{{ counter }}</b> résultat{% if counter > 1 %}s{% endif %}
-                {% if prescriber_orgs_page.paginator.num_pages > 1 %}
-                    - Page <b>{{ current_page }}</b>/{{ total_pages }}
-                {% endif %}
+                <b>{{ counter }}</b> résultat{{ counter|pluralize }}
+                {% if prescriber_orgs_page.paginator.num_pages > 1 %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endif %}
             {% endwith %}
         </p>
 
         <div class="row">
-            <div class="col-12 col-md-4">
-                {% include "search/includes/prescribers_search_filters.html" with form=form %}
-            </div>
+            <div class="col-12 col-md-4">{% include "search/includes/prescribers_search_filters.html" with form=form %}</div>
             <div class="col-12 col-md-8">
                 {% for prescriber_org in prescriber_orgs_page %}
                     <div class="card my-4">
@@ -62,9 +58,7 @@
                                 {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
                             </h4>
                             <hr>
-                            <h4 class="h5 card-subtitle mb-2 text-muted">
-                                {{ prescriber_org.address_on_one_line }}
-                            </h4>
+                            <h4 class="h5 card-subtitle mb-2 text-muted">{{ prescriber_org.address_on_one_line }}</h4>
                             <p class="small mb-0 card-text">
                                 <span class="badge badge-info">{{ prescriber_org.distance.km|floatformat:"-1" }} km</span>
                                 de votre lieu de recherche
@@ -74,9 +68,7 @@
                 {% empty %}
                     <div class="card my-4">
                         <div class="card-body">
-                            <p class="font-weight-normal text-muted">
-                                Aucun résultat avec les filtres actuels.
-                            </p>
+                            <p class="font-weight-normal text-muted">Aucun résultat avec les filtres actuels.</p>
                         </div>
                     </div>
                 {% endfor %}

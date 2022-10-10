@@ -1,13 +1,16 @@
 {% comment %} takes 2 arguments siae <Siae> and jobs_descriptions <List of SiaeJobDescription> {% endcomment %}
 <div class="py-3">
-    <button class="mb-1 p-0 btn btn-link collapsed collapse-caret text-left" data-toggle="collapse"  data-target="#collapse{{siae.id}}" type="button" aria-expanded="false" aria-controls="collapse{{siae.id}}">
+    <button class="mb-1 p-0 btn btn-link collapsed collapse-caret text-left" data-toggle="collapse"  data-target="#collapse{{ siae.id }}" type="button" aria-expanded="false" aria-controls="collapse{{ siae.id }}">
         <span class="h5">Voir les métiers exercés au sein de la structure</span>
     </button>
-    <ul class="collapse" id="collapse{{siae.id}}">
+    <ul class="collapse" id="collapse{{ siae.id }}">
         {% for job in jobs_descriptions %}
             <li>
-                <a href="{% if job.pk %}{{job.get_absolute_url}}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
-                    class="matomo-event" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+                <a href="{% if job.pk %}{{ job.get_absolute_url }}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
+                   class="matomo-event"
+                   data-matomo-category="candidature"
+                   data-matomo-action="clic"
+                   data-matomo-option="clic-metiers">
                     {{ job.display_name }}
                 </a>
             </li>

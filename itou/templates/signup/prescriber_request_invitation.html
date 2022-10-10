@@ -18,14 +18,13 @@
         </p>
     </div>
 
-    <form method="post" class="js-prevent-multiple-submit">{% csrf_token %}
+    <form method="post" class="js-prevent-multiple-submit">
+        {% csrf_token %}
 
         {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
-            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-                Retour
-            </a>
+            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
             <button type="submit" class="btn btn-primary">Valider la demande</button>
         {% endbuttons %}
     </form>

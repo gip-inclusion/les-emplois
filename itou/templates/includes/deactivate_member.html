@@ -11,16 +11,16 @@
         <li>Cet utilisateur sera notifié par e-mail de son retrait de votre organisation.</li>
         <li>En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre organisation.</li>
         {% if current_user.is_siae_staff or current_user.is_prescriber %}
-            <li>Toutes les candidatures effectuées par ce collaborateur resteront dans le tableau de bord de l'organisation. Ce collaborateur sera notifié par mail des éventuelles suites données aux candidatures qu'il a transmises.</li>
+            <li>
+                Toutes les candidatures effectuées par ce collaborateur resteront dans le tableau de bord de l'organisation. Ce collaborateur sera notifié par mail des éventuelles suites données aux candidatures qu'il a transmises.
+            </li>
         {% endif %}
     </ul>
 
     <form action="{% url base_url|add:":deactivate_member" target_member.pk %}" method="POST">
         {% csrf_token %}
         <div class="mt-4 form-group">
-            <a class="btn btn-outline-primary" href="{% url base_url|add:":members"%}">
-                Annuler
-            </a>
+            <a class="btn btn-outline-primary" href="{% url base_url|add:":members" %}">Annuler</a>
             <button class="btn btn-primary submit">Retirer l'utilisateur</button>
         </div>
     </form>

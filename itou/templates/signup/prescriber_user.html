@@ -21,9 +21,16 @@
     {% if prescriber_org_data %}
         <div class="alert alert-emploi" role="status">
             <p class="mb-0">
-                <b>{{ prescriber_org_data.name }}</b> - {{ prescriber_org_data.siret|format_siret }}<br>
-                {% if prescriber_org_data.address_line_1 %}{{ prescriber_org_data.address_line_1 }}<br>{% endif %}
-                {% if prescriber_org_data.address_line_2 %}{{ prescriber_org_data.address_line_2 }}<br>{% endif %}
+                <b>{{ prescriber_org_data.name }}</b> - {{ prescriber_org_data.siret|format_siret }}
+                <br>
+                {% if prescriber_org_data.address_line_1 %}
+                    {{ prescriber_org_data.address_line_1 }}
+                    <br>
+                {% endif %}
+                {% if prescriber_org_data.address_line_2 %}
+                    {{ prescriber_org_data.address_line_2 }}
+                    <br>
+                {% endif %}
                 {{ prescriber_org_data.post_code }} {{ prescriber_org_data.city }}
             </p>
         </div>
@@ -36,9 +43,7 @@
     {% include "inclusion_connect/includes/description.html" %}
 
     <div class="mt-3">
-        <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-            Retour
-        </a>
+        <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
 
     </div>
 

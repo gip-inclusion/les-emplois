@@ -15,9 +15,7 @@
 
         <b class="mb-4">Inscrivez-vous avec un service tiers</b>
         {% if show_france_connect %}
-            <div>
-                {% include "signup/includes/france_connect_button.html" %}
-            </div>
+            <div>{% include "signup/includes/france_connect_button.html" %}</div>
             <div class="mt-4 mb-3">
                 <p class="text-center">
                     <b>Ou</b>
@@ -50,9 +48,7 @@
             {# bootstrap_form_errors form alert_error_type="all" #}
 
             {% bootstrap_field form.email form_group_class="form-group mb-1" %}
-            <div class="text-right small font-italic mb-0">
-                {% include "signup/includes/no_email_link.html" %}
-            </div>
+            <div class="text-right small font-italic mb-0">{% include "signup/includes/no_email_link.html" %}</div>
 
             {% bootstrap_field form.last_name form_group_class="form-group mt-1" %}
             {% bootstrap_field form.first_name %}
@@ -74,9 +70,7 @@
         <div class="mt-5 mb-5">
             <p>Vous avez déjà un compte ?</p>
             <p>
-                <a class="btn btn-outline-primary" href="{% url 'login:job_seeker' %}">
-                    Connexion
-                </a>
+                <a class="btn btn-outline-primary" href="{% url 'login:job_seeker' %}">Connexion</a>
             </p>
         </div>
     </div>

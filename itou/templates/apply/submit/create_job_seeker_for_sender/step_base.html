@@ -12,12 +12,17 @@
                     <h1 class="my-5">Création du compte candidat</h1>
                     <div class="c-stepper my-5">
                         <div class="progress progress--emploi mb-2">
-                            <div class="progress-bar" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
                         </div>
-                        <span>{% block progress_title %}{% endblock %}</span>
+                        <span>
+                            {% block progress_title %}{% endblock %}
+                        </span>
                     </div>
                     <div class="c-form">
-                        <h2>{% block step_title %}{% endblock %}</h2>
+                        <h2>
+                            {% block step_title %}{% endblock %}
+                        </h2>
                         <hr class="mt-5">
                         {% bootstrap_form_errors form type="all" %}
                         <form method="post" class="js-enable-submit-when-valid js-collapsable-subfields">

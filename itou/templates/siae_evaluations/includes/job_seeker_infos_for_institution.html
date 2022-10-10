@@ -1,28 +1,32 @@
 {% load format_filters %}
 <div class="row">
     <div class="col-md-8">
-        <h3 class="h2">Auto-prescription pour
-            <span class="text-muted">
-                {{job_seeker.get_full_name|title}}
-            </span>
+        <h3 class="h2">
+            Auto-prescription pour
+            <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
         </h3>
-        <p class="m-0">PASS IAE :&nbsp;<b>{{ approval.number|format_approval_number }}</b> délivré le {{ approval.start_at|date:"d E Y" }}</p>
+        <p class="m-0">
+            PASS IAE :&nbsp;<b>{{ approval.number|format_approval_number }}</b> délivré le {{ approval.start_at|date:"d E Y" }}
+        </p>
     </div>
     <div class="col-md-4 text-right">
         <p class="small mb-0">
-            {% if state == "SUBMITTED" and reviewed_at%}
+            {% if state == "SUBMITTED" and reviewed_at %}
                 <p class="badge badge-pilotage float-right">Nouveaux justificatifs à traiter</p>
-            {%elif state == "SUBMITTED" %}
+            {% elif state == "SUBMITTED" %}
                 <p class="badge badge-pilotage float-right">À traiter</p>
             {% elif not evaluated_siae.reviewed_at and state == "REFUSED" or state == "REFUSED_2" %}
                 <p class="badge badge-danger float-right">Problème constaté</p>
-            {%elif state == "ACCEPTED" %}
+            {% elif state == "ACCEPTED" %}
                 <p class="badge badge-success float-right">Validé</p>
-            {%elif state == "UPLOADED" %}
+            {% elif state == "UPLOADED" %}
                 <p class="badge badge-pilotage float-right">Justificatifs téléversés</p>
             {% else %}
-                <p class="badge badge-emploi float-right">{%if evaluated_siae.reviewed_at%}Phase contradictoire - {%endif%}En attente</p>
-            {%endif%}
+                <p class="badge badge-emploi float-right">
+                    {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
+                    En attente
+                </p>
+            {% endif %}
         </p>
     </div>
 </div>

@@ -12,14 +12,16 @@
         <section class="bg-white text-center">
             <div class="container">
                 <h2 class="h1">Nos missions</h2>
-                <p class="lead">Ce service facilite la mise en relation des personnes les plus éloignées de l'emploi avec les employeurs solidaires (SIAE, GEIQ, EA et EATT) et les accompagnants (orienteurs et prescripteurs habilités).<br>Il offre aux utilisateurs un outil mutualisé pour simplifier les procédures, fluidifier les parcours d'insertion entre professionnels et renforcer la qualité de l'accompagnement des personnes.</p>
+                <p class="lead">
+                    Ce service facilite la mise en relation des personnes les plus éloignées de l'emploi avec les employeurs solidaires (SIAE, GEIQ, EA et EATT) et les accompagnants (orienteurs et prescripteurs habilités).
+                    <br>
+                    Il offre aux utilisateurs un outil mutualisé pour simplifier les procédures, fluidifier les parcours d'insertion entre professionnels et renforcer la qualité de l'accompagnement des personnes.
+                </p>
 
                 <div class="card-deck card-deck-itou mt-5">
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="h4 card-title font-weight-light">
-                                Inscrivez-vous pour commencer à utiliser la plateforme
-                            </h3>
+                            <h3 class="h4 card-title font-weight-light">Inscrivez-vous pour commencer à utiliser la plateforme</h3>
                         </div>
                         <div class="card-footer">
                             <a class="btn btn-primary stretched-link" href="{% url 'account_signup' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
@@ -30,22 +32,16 @@
 
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="h4 card-title font-weight-light">
-                                Discutez entre professionnels sur La communauté de l'inclusion
-                            </h3>
+                            <h3 class="h4 card-title font-weight-light">Discutez entre professionnels sur La communauté de l'inclusion</h3>
                         </div>
                         <div class="card-footer">
-                            <a class="btn btn-primary stretched-link" href="{{ ITOU_COMMUNITY_URL }}">
-                                Accéder à La communauté
-                            </a>
+                            <a class="btn btn-primary stretched-link" href="{{ ITOU_COMMUNITY_URL }}">Accéder à La communauté</a>
                         </div>
                     </div>
 
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="h4 card-title font-weight-light">
-                                Découvrez l'espace de documentation pour tout comprendre
-                            </h3>
+                            <h3 class="h4 card-title font-weight-light">Découvrez l'espace de documentation pour tout comprendre</h3>
                         </div>
                         <div class="card-footer">
                             <a class="btn btn-primary stretched-link" href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/" target="_blank" title="En savoir plus (ouverture dans un nouvel onglet)">
@@ -61,7 +57,8 @@
 
     <section class="bg-gray-400 text-center">
         <div class="container">
-            <div class="js-tac-livestorm w-100" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm"></div>
+            <div class="js-tac-livestorm w-100" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm">
+            </div>
         </div>
     </section>
 

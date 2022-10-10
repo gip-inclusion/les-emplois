@@ -1,13 +1,20 @@
 {% load format_filters %}
 <ul>
-    <li>Prénom : <b>{{ job_application.sender.first_name }}</b></li>
+    <li>
+        Prénom : <b>{{ job_application.sender.first_name }}</b>
+    </li>
 
-    <li>Nom : <b>{{ job_application.sender.last_name }}</b></li>
+    <li>
+        Nom : <b>{{ job_application.sender.last_name }}</b>
+    </li>
 
-    <li>Type : <b>{{ job_application.get_sender_kind_display }}</b></li>
+    <li>
+        Type : <b>{{ job_application.get_sender_kind_display }}</b>
+    </li>
 
-    <li>E-mail : <a
-        href="mailto:{{ job_application.sender.email }}">{{ job_application.sender.email }}</a></li>
+    <li>
+        E-mail : <a href="mailto:{{ job_application.sender.email }}">{{ job_application.sender.email }}</a>
+    </li>
 
     {% if job_application.sender_prescriber_organization %}
         <li>

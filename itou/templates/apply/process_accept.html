@@ -6,18 +6,14 @@
     {{ block.super }}
 
     <div class="alert alert-info">
-        <p class="mb-0">
-            Confirmez votre choix en renseignant quelques informations supplémentaires.
-        </p>
+        <p class="mb-0">Confirmez votre choix en renseignant quelques informations supplémentaires.</p>
     </div>
 
     <form method="post" action="" class="mt-5" id="acceptForm">
 
         {% csrf_token %}
 
-        {% if form_address or form_pe_status %}
-            <h3 class="h2">Candidat</h3>
-        {% endif %}
+        {% if form_address or form_pe_status %}<h3 class="h2">Candidat</h3>{% endif %}
 
         {% if form_pe_status %}
             {% if not job_application.approval_not_needed %}
@@ -44,12 +40,8 @@
 
         {% buttons %}
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
-                <h4 class="h3 text-center mt-5">
-                    Obtention d'un PASS IAE
-                </h4>
-                <p class="text-center pt-2">
-                    Dans le cadre de cette embauche, souhaitez-vous obtenir un PASS IAE ?
-                </p>
+                <h4 class="h3 text-center mt-5">Obtention d'un PASS IAE</h4>
+                <p class="text-center pt-2">Dans le cadre de cette embauche, souhaitez-vous obtenir un PASS IAE ?</p>
                 <div class="form-group">
                     <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#confirmModal">
                         Oui, j'ai besoin d'une aide au poste
@@ -68,8 +60,7 @@
                 </button>
             {% endif %}
 
-            <a class="btn btn-outline-secondary btn-block"
-                href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
+            <a class="btn btn-outline-secondary btn-block" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
         {% endbuttons %}
         <div class="modal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -81,10 +72,10 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Êtes-vous sûre de vouloir confirmer l’embauche de <strong>{{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }}</strong> dans la structure suivante ?</p>
                         <p>
-                            {% include "siaes/includes/_siae_info.html" with siae=job_application.to_siae %}
+                            Êtes-vous sûre de vouloir confirmer l’embauche de <strong>{{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }}</strong> dans la structure suivante ?
                         </p>
+                        <p>{% include "siaes/includes/_siae_info.html" with siae=job_application.to_siae %}</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Retour</button>
@@ -101,9 +92,7 @@
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form_accept.media }}
-    {% if form_pe_status %}
-        {{ form_pe_status.media }}
-    {% endif %}
+    {% if form_pe_status %}{{ form_pe_status.media }}{% endif %}
     <script>
         $(function () {
             $("#acceptForm").on("submit", function (e) {

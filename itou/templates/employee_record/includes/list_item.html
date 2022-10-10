@@ -8,24 +8,40 @@
     <div class="card-body">
         <div class="row">
             <div class="col-md-7">
-                <p class="m-0">Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b></p>
-                <p class="m-0">Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b></p>
-                <p class="m-0">Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.approval.number|format_approval_number }}</b></p>
+                <p class="m-0">
+                    Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b>
+                </p>
+                <p class="m-0">
+                    Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b>
+                </p>
+                <p class="m-0">
+                    Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.approval.number|format_approval_number }}</b>
+                </p>
             </div>
 
             {# Statuses #}
             <div class="col-md-5 text-right">
                 <p class="small mb-0">
                     {% if form.status.value == "SENT" %}
-                        <p class="badge badge-warning">Transmise à l'ASP le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
+                        <p class="badge badge-warning">
+                            Transmise à l'ASP le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        </p>
                     {% elif form.status.value == "REJECTED" %}
-                        <p class="badge badge-danger">Retour en erreur le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
+                        <p class="badge badge-danger">
+                            Retour en erreur le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        </p>
                     {% elif form.status.value == "PROCESSED" %}
-                        <p class="badge badge-success">Intégrée ASP le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
+                        <p class="badge badge-success">
+                            Intégrée ASP le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        </p>
                     {% elif form.status.value == "READY" %}
-                        <p class="badge badge-secondary">Complétée le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
+                        <p class="badge badge-secondary">
+                            Complétée le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        </p>
                     {% elif form.status.value == "DISABLED" %}
-                        <p class="badge badge-emploi-lightest">Désactivée le&nbsp;<b>{{ employee_record.updated_at }}</b></p>
+                        <p class="badge badge-emploi-lightest">
+                            Désactivée le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        </p>
                     {% endif %}
                 </p>
             </div>
@@ -34,10 +50,14 @@
         {# ASP error #}
         {% if form.status.value == "REJECTED" %}
             <div class="my-3 alert alert-emploi">
-                <p><b>Informations sur l'erreur de traitement :</b></p>
+                <p>
+                    <b>Informations sur l'erreur de traitement :</b>
+                </p>
                 {% if employee_record.asp_processing_code == "3308" %}
                     <p>Il semblerait que la commune de naissance sélectionnée ne corresponde pas au département de naissance choisi.</p>
-                    <p>Si vous ne trouvez pas la commune de naissance que vous souhaitez renseigner dans le menu déroulant, renseignez une autre ville de naissance pour débloquer le transfert.</p>
+                    <p>
+                        Si vous ne trouvez pas la commune de naissance que vous souhaitez renseigner dans le menu déroulant, renseignez une autre ville de naissance pour débloquer le transfert.
+                    </p>
                     <p>Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.</p>
                     <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                 {% elif employee_record.asp_processing_code == "3417" %}
@@ -46,20 +66,32 @@
                     <p>Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.</p>
                     <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                 {% elif employee_record.asp_processing_code == "3435" %}
-                    <p>Nous n’avons pas encore reçu d’annexe financière à jour pour votre structure. Nous ne pouvons donc pas transmettre votre fiche salarié à l’ASP.</p>
-                    <p>Pour résoudre ce problème, rendez-vous dans l’ASP et vérifiez que votre annexe financière “valide” ou “provisoire” est à jour.</p>
+                    <p>
+                        Nous n’avons pas encore reçu d’annexe financière à jour pour votre structure. Nous ne pouvons donc pas transmettre votre fiche salarié à l’ASP.
+                    </p>
+                    <p>
+                        Pour résoudre ce problème, rendez-vous dans l’ASP et vérifiez que votre annexe financière “valide” ou “provisoire” est à jour.
+                    </p>
                     <p>Si c’est le cas, patientez une semaine, et tentez de renvoyer la fiche salarié.</p>
-                    <p>Si elle n’est pas à jour, demandez à votre DDETS de la mettre à jour dans l’ASP, et patientez une semaine le temps que nous recevions l’information avant de tenter le renvoi de la fiche salarié.</p>
-                    <p>Vous pouvez vérifier vos annexes financières de rattachement dans votre tableau de bord, rubrique “Annexes financières” en bas à gauche.</p>
+                    <p>
+                        Si elle n’est pas à jour, demandez à votre DDETS de la mettre à jour dans l’ASP, et patientez une semaine le temps que nous recevions l’information avant de tenter le renvoi de la fiche salarié.
+                    </p>
+                    <p>
+                        Vous pouvez vérifier vos annexes financières de rattachement dans votre tableau de bord, rubrique “Annexes financières” en bas à gauche.
+                    </p>
                     <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                 {% elif employee_record.asp_processing_code == "3436" %}
                     <p>La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.</p>
                     <p>Connectez-vous à l’ASP pour la retrouver et déclarer les contrats associés.</p>
-                    <p>Si vos SIAE ont un SIRET commun pour 2 mesures, que vous avez déjà créé cette fiche salarié pour l’une des 2 mesures, vous devez vous rendre dans l’ASP pour gérer les autres contrats associés à ce PASS IAE.</p>
+                    <p>
+                        Si vos SIAE ont un SIRET commun pour 2 mesures, que vous avez déjà créé cette fiche salarié pour l’une des 2 mesures, vous devez vous rendre dans l’ASP pour gérer les autres contrats associés à ce PASS IAE.
+                    </p>
                     <p>Pour changer de mesure, créez directement un nouveau contrat dans l’ASP et sélectionnez la bonne mesure.</p>
                     <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                 {% else %}
-                    <p>Erreur {{ employee_record.asp_processing_code }} :&nbsp;<small>{{ employee_record.asp_processing_label }}</small></p>
+                    <p>
+                        Erreur {{ employee_record.asp_processing_code }} :&nbsp;<small>{{ employee_record.asp_processing_label }}</small>
+                    </p>
                 {% endif %}
             </div>
         {% endif %}

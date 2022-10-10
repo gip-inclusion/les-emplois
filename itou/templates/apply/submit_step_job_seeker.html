@@ -19,8 +19,12 @@
                             <i class="ri-information-line ri-xl"></i>
                         </div>
                         <div class="col">
-                            <p class="mb-2"><strong>Créer un compte pour votre candidat</strong></p>
-                            <p class="mb-0">Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre candidat pour l'inscrire.</p>
+                            <p class="mb-2">
+                                <strong>Créer un compte pour votre candidat</strong>
+                            </p>
+                            <p class="mb-0">
+                                Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre candidat pour l'inscrire.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -58,7 +62,9 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p>L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker_name }}</b>.</p>
+                            <p>
+                                L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker_name }}</b>.
+                            </p>
                             <p>
                                 L'identité du candidat est une information clé pour la structure.
                                 Si cette candidature n'est pas pour <b>{{ job_seeker_name }}</b>, cliquez sur
@@ -66,19 +72,17 @@
                                 personnelles.
                             </p>
                             {% if can_add_nir %}
-                                <p>En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce candidat.</b></p>
+                                <p>
+                                    En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce candidat.</b>
+                                </p>
                             {% endif %}
                         </div>
                         <div class="modal-footer">
                             {% buttons %}
                                 {# Reload this page with a new form. #}
-                                <button type="submit" name="cancel" value="1" class="btn btn-sm btn-secondary">
-                                    Ce n'est pas mon candidat
-                                </button>
+                                <button type="submit" name="cancel" value="1" class="btn btn-sm btn-secondary">Ce n'est pas mon candidat</button>
                                 {# Go to the next step. #}
-                                <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">
-                                    Continuer
-                                </button>
+                                <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">Continuer</button>
                             {% endbuttons %}
                         </div>
                     </div>

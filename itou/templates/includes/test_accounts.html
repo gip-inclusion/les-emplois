@@ -8,7 +8,10 @@
     <div class="sticky-top shadow bg-danger text-white text-center layout" style="z-index:2;">
         <div class="layout-content py-0">
             <div class="d-flex align-items-center text-center p-1">
-                <p class="font-weight-bold flex-grow-1 mb-0 p-1 text-white h3">{{ ITOU_ENVIRONMENT }}{% if ITOU_ENVIRONMENT == "DEMO" %} - Données fictives{% endif %}</p>
+                <p class="font-weight-bold flex-grow-1 mb-0 p-1 text-white h3">
+                    {{ ITOU_ENVIRONMENT }}
+                    {% if ITOU_ENVIRONMENT == "DEMO" %}- Données fictives{% endif %}
+                </p>
                 {% if not user.is_authenticated %}
                     <div>
                         <button class="btn btn-sm btn-light border" data-toggle="modal" data-target="#testAccountsModal">
@@ -32,7 +35,8 @@
                 <div class="modal-body">
 
                     <p class="alert alert-danger">
-                        L'environnement de démonstration des <b>emplois de l'inclusion</b> est limité à des fins de formation.<br>
+                        L'environnement de démonstration des <b>emplois de l'inclusion</b> est limité à des fins de formation.
+                        <br>
                         Les données, documents et e-mails envoyés depuis cet environnement n'ont <b>aucune valeur</b>.
                         Ils sont susceptibles d'être <b>détruits à intervalle régulier</b>.
                     </p>

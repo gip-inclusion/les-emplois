@@ -24,7 +24,13 @@
                 {% else %}
                     <tr class="table-{% if status.is_success %}success{% else %}danger{% endif %}">
                         <td>{{ display_name }}</td>
-                        <td>{% if status.is_success %}OK{% else %}KO{% endif %}</td>
+                        <td>
+                            {% if status.is_success %}
+                                OK
+                            {% else %}
+                                KO
+                            {% endif %}
+                        </td>
                         <td>
                             <span title="{{ status.last_success_at|date:"c"|default:"" }}">
                                 {{ status.last_success_at|timesince|default:"N/A" }}

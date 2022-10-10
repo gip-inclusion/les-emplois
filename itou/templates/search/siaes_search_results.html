@@ -46,9 +46,7 @@
         </p>
 
         <div class="row">
-            <div class="col-12 col-md-4">
-                {% include "search/includes/siaes_search_filters.html" with form=form %}
-            </div>
+            <div class="col-12 col-md-4">{% include "search/includes/siaes_search_filters.html" with form=form %}</div>
             <div class="col-12 col-md-8">
                 {% for siae in siaes_page %}
                     {% with siae.job_description_through.active as jobs_descriptions %}
@@ -63,8 +61,10 @@
                 {% endfor %}
 
                 {% include "includes/pagination.html" with page=siaes_page %}
-            </div> {# col-8 #}
-        </div> {# row #}
+            </div>
+            {# col-8 #}
+        </div>
+        {# row #}
     </form>
 
 {% endblock %}

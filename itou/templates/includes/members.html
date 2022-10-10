@@ -8,9 +8,7 @@
                 <th scope="col">Nom</th>
                 <th scope="col">Email</th>
                 <th scope="col">Date d'inscription</th>
-                {% if user in active_admin_members %}
-                    <th scope="col">Action</th>
-                {% endif %}
+                {% if user in active_admin_members %}<th scope="col">Action</th>{% endif %}
             </tr>
         </thead>
         <tbody>
@@ -21,21 +19,19 @@
                         {{ member.user.get_full_name }}
                         {% if member.user in active_admin_members %}
                             <small>
-                                <span class="badge badge-info" data-toggle="tooltip" title="Administrateur de la structure">
-                                    admin
-                                </span>
+                                <span class="badge badge-info" data-toggle="tooltip" title="Administrateur de la structure">admin</span>
                             </small>
                         {% endif %}
                     </td>
-                    <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
+                    <td>
+                        <a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a>
+                    </td>
                     <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
                     {% if user in active_admin_members %}
                         <td>
                             <div>
                                 {% if member.user != user %}
-                                    <a href="{% url base_url|add:":deactivate_member" member.user.pk %}" role="button">
-                                        Retirer de la structure
-                                    </a>
+                                    <a href="{% url base_url|add:":deactivate_member" member.user.pk %}" role="button">Retirer de la structure</a>
                                     <br>
                                     {% if not member.user in active_admin_members %}
                                         <a href="{% url base_url|add:":update_admin_role" "add" member.user.pk %}" role="button">

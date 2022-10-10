@@ -3,13 +3,7 @@
     <span>Supprimer cette candidature</span>
 </button>
 
-<div
-    class="modal fade text-left"
-    id="delete-job-application"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="no-email-modal-label"
-    aria-modal="true">
+<div class="modal fade text-left" id="delete-job-application" tabindex="-1" role="dialog" aria-labelledby="no-email-modal-label" aria-modal="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form method="POST" action="{% url 'apply:archive' job_application_id=job_application.pk %}">
@@ -34,24 +28,18 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a
-                        href="#"
-                        class="btn btn-sm btn-secondary"
-                        data-dismiss="modal"
-                        aria-label="Non">
-                        Non
-                    </a>
+                    <a href="#" class="btn btn-sm btn-secondary" data-dismiss="modal" aria-label="Non">Non</a>
                     <input type="submit"
-                        class="btn btn-sm btn-danger matomo-event"
-                        data-matomo-category="employeurs"
-                        data-matomo-action="clic"
-                        data-matomo-option="suppression-candidature"
-                        rel="noopener"
-                        aria-label="Oui, je souhaite supprimer cette candidature"
-                        value="Oui, je souhaite supprimer cette candidature">
-                    </input>
-                </div>
-            </form>
-        </div>
+                           class="btn btn-sm btn-danger matomo-event"
+                           data-matomo-category="employeurs"
+                           data-matomo-action="clic"
+                           data-matomo-option="suppression-candidature"
+                           rel="noopener"
+                           aria-label="Oui, je souhaite supprimer cette candidature"
+                           value="Oui, je souhaite supprimer cette candidature">
+                </input>
+            </div>
+        </form>
     </div>
+</div>
 </div>

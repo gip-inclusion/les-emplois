@@ -5,8 +5,13 @@
 <html lang="fr">
     <head>
         <meta charset="utf-8">
-        <title>{% block title %} - Les emplois de l'inclusion{% endblock %}</title>
-        {% block meta_description %}<meta name="description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">{% endblock %}
+        <title>
+            {% block title %}- Les emplois de l'inclusion{% endblock %}
+        </title>
+        {% block meta_description %}
+            <meta name="description"
+                  content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+        {% endblock %}
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         {# https://metatags.io #}
@@ -15,13 +20,15 @@
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
         <meta property="og:title" content="Les emplois de l'inclusion">
-        <meta property="og:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+        <meta property="og:description"
+              content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
         <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
         {# https://metatags.io Twitter #}
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}/">
         <meta property="twitter:title" content="Les emplois de l'inclusion">
-        <meta property="twitter:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+        <meta property="twitter:description"
+              content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
         <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
 
         {# Use this to get the value of the CSRF token in JavaScript. #}
@@ -35,8 +42,12 @@
     <body>
         <nav role="navigation" aria-label="Accès rapide" tabindex="1" class="sr-only">
             <ul>
-                <li><a href="#nav-primary">Aller au menu principal</a></li>
-                <li><a href="#main">Aller au contenu principal</a></li>
+                <li>
+                    <a href="#nav-primary">Aller au menu principal</a>
+                </li>
+                <li>
+                    <a href="#main">Aller au contenu principal</a>
+                </li>
             </ul>
         </nav>
 

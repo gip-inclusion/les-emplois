@@ -27,8 +27,12 @@
 
 {% else %}
     <div class="alert alert-success">
-        <p><b>La création de cette fiche salariée est terminée.</b></p>
-        <p class="mb-0">Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.</p>
+        <p>
+            <b>La création de cette fiche salariée est terminée.</b>
+        </p>
+        <p class="mb-0">
+            Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.
+        </p>
     </div>
     <div class="mb-3">
         <a href="{% url "employee_record_views:list" %}?status=NEW" class="btn btn-primary">

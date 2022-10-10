@@ -1,14 +1,16 @@
 <div class="row ">
     <div class="col-md-9 mt-1">
-        <h3>
-            {{ criteria.name }}
-        </h3>
+        <h3>{{ criteria.name }}</h3>
     </div>
     <div class="col-md-3 mt-1 text-right">
         {% if review_state == "ACCEPTED" %}
-            <p class="text-success"><i class="ri-checkbox-circle-line"></i> Validé</p>
+            <p class="text-success">
+                <i class="ri-checkbox-circle-line"></i> Validé
+            </p>
         {% elif review_state == "REFUSED" or review_state == "REFUSED_2" %}
-            <p class="text-danger"><i class="ri-indeterminate-circle-line"></i> Refusé</p>
+            <p class="text-danger">
+                <i class="ri-indeterminate-circle-line"></i> Refusé
+            </p>
         {% endif %}
     </div>
 </div>

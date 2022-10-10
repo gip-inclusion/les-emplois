@@ -16,7 +16,9 @@
         <h3 class="h2 mb-2">
             <a class="matomo-event" href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-structure">{{ siae.display_name }}</a>
             {# Display non-user-edited name too, but only if it's not the same text #}
-            {% if siae.brand and siae.brand|lower != siae.name|lower %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
+            {% if siae.brand and siae.brand|lower != siae.name|lower %}
+                <small class="text-muted">({{ siae.name|title }})</small>
+            {% endif %}
         </h3>
         <h4 class="h5 mb-2 text-muted">{{ siae.address_on_one_line }}</h4>
         <p class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-0">
@@ -25,8 +27,11 @@
                 <span class="text-muted fs-sm ml-1">de votre lieu de recherche.</span>
             </span>
             {% if jobs_descriptions %}
-                <a class="d-none d-md-inline font-weight-bold matomo-event mt-3 mt-md-0"  href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
-                    data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+                <a class="d-none d-md-inline font-weight-bold matomo-event mt-3 mt-md-0"
+                   href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
+                   data-matomo-category="candidature"
+                   data-matomo-action="clic"
+                   data-matomo-option="clic-metiers">
                     Voir tous les métiers ({{ jobs_descriptions|length }})
                 </a>
             {% endif %}
@@ -39,13 +44,15 @@
             <div class="d-flex justify-content-between align-items-center">
                 <span>Cette structure vous intéresse ?</span>
                 <a class="btn btn-sm btn-primary"
-                    href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                    title="Proposer votre candidature auprès de l'employeur solidaire {{ siae.display_name }}">
+                   href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
+                   title="Proposer votre candidature auprès de l'employeur solidaire {{ siae.display_name }}">
                     Proposer votre candidature
                 </a>
             </div>
         {% else %}
-            <p class="mb-0"><i>Cet employeur ne traite plus de nouvelles candidatures pour le moment</i></p>
+            <p class="mb-0">
+                <i>Cet employeur ne traite plus de nouvelles candidatures pour le moment</i>
+            </p>
         {% endif %}
     </div>
 </div>

@@ -30,9 +30,7 @@
                 Pour faciliter cette prise de décision, nous vous donnons un accès à l'ensemble des auto-prescriptions
                 faites par les SIAE de votre territoire:
             </p>
-            <p class="font-weight-bold">
-                Données du contrôle a posteriori cette campagne
-            </p>
+            <p class="font-weight-bold">Données du contrôle a posteriori cette campagne</p>
             <p>
                 <a class="btn btn-outline-primary" href="{% url 'stats:stats_ddets_diagnosis_control' %}{% if back_url %}?back_url={{ back_url }}{% endif %}" title="Voir les données">
                     Voir les données
@@ -47,16 +45,19 @@
             <p>
                 <div class="alert alert-info" role="status">
                     <p class="font-weight-bold">Exemple</p>
-                    <p>Si une ETTI de votre territoire a fait 270 auto-prescriptions, vous devrez en contrôler seulement 20 au lieu de 54 (20% de 270)</p>
+                    <p>
+                        Si une ETTI de votre territoire a fait 270 auto-prescriptions, vous devrez en contrôler seulement 20 au lieu de 54 (20% de 270)
+                    </p>
                 </div>
             </p>
             <h3>Validation de l'échantillon des SIAE</h3>
 
-            {% if evaluation_campaign.percent_set_at%}
+            {% if evaluation_campaign.percent_set_at %}
                 <p>
                     <div class="alert alert-success" role="status">
-                        <p>Votre contrôle a posteriori sur la période du {{evaluation_campaign.evaluated_period_start_at|date:"d F Y"}}
-                            au {{evaluation_campaign.evaluated_period_end_at|date:"d F Y"}} concerne {{evaluation_campaign.chosen_percent}}%
+                        <p>
+                            Votre contrôle a posteriori sur la période du {{ evaluation_campaign.evaluated_period_start_at|date:"d F Y" }}
+                            au {{ evaluation_campaign.evaluated_period_end_at|date:"d F Y" }} concerne {{ evaluation_campaign.chosen_percent }}%
                             des SIAE.
                             Vous serez notifié lorsque l'étape de transmission des pièces justificatives commencera.
                         </p>
@@ -74,8 +75,10 @@
 
                     {% bootstrap_form_errors form alert_error_type="all" %}
 
-                    <p class="font-weight-bold">Ratio sélectionné : <span id="showChosenPercentValue"></span> %</p>
-                    <p>{{min}}% {{ form.chosen_percent }} {{max}}%</p>
+                    <p class="font-weight-bold">
+                        Ratio sélectionné : <span id="showChosenPercentValue"></span> %
+                    </p>
+                    <p>{{ min }}% {{ form.chosen_percent }} {{ max }}%</p>
 
                     {% buttons %}
                         <button type="submit" class="btn btn-primary  float-right" onclick="return confirm('Le ratio sélectionné ne sera plus modifiable pour cette campagne de contrôle. Confirmez-vous son enregistrement ? ')">

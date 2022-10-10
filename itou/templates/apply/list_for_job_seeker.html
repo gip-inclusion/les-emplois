@@ -10,7 +10,13 @@
 
     <div class="row">
         <div class="col-12 col-md-4 mt-2">
-            <a id="js-job-applications-filters-button" class="btn btn-primary d-block d-md-none" href="#js-job-applications-filters-form" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseFilter">
+            <a id="js-job-applications-filters-button"
+               class="btn btn-primary d-block d-md-none"
+               href="#js-job-applications-filters-form"
+               data-toggle="collapse"
+               role="button"
+               aria-expanded="false"
+               aria-controls="collapseFilter">
                 Filtres des résultats <i class="ri-filter-line"></i>
             </a>
             <form method="get" action="" id="js-job-applications-filters-form" class="collapse show">
@@ -48,9 +54,7 @@
             </div>
 
             {% if not job_applications_page %}
-                <h2 class="h1 font-weight-normal text-muted">
-                    Aucune candidature pour le moment.
-                </h2>
+                <h2 class="h1 font-weight-normal text-muted">Aucune candidature pour le moment.</h2>
             {% else %}
                 {% for job_application in job_applications_page %}
 
@@ -63,14 +67,7 @@
                         {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
                         <div class="card-footer">
-                            <a
-                                href="#"
-                                data-toggle="collapse"
-                                data-target="#answer{{ forloop.counter0 }}"
-                                aria-expanded="false"
-                                aria-controls="answer{{ forloop.counter0 }}"
-                                title="Plus d'informations sur cette candidature"
-                            >Plus d'informations</a>
+                            <a href="#" data-toggle="collapse" data-target="#answer{{ forloop.counter0 }}" aria-expanded="false" aria-controls="answer{{ forloop.counter0 }}" title="Plus d'informations sur cette candidature">Plus d'informations</a>
                             <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
                                 <p>
                                     <b>Message de candidature :</b>

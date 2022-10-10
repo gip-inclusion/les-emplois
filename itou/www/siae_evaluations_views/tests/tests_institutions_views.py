@@ -642,7 +642,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
                 kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
             )
         )
-        self.assertContains(response, "Phase contradictoire - En attente")
+        self.assertContains(response, "Phase contradictoire - En attente", html=True)
 
     def test_num_queries_in_view(self):
         self.client.force_login(self.user)
@@ -806,7 +806,9 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertNotContains(response, refuse_url)
         self.assertNotContains(response, accepte_url)
         self.assertContains(response, reinit_url)
-        self.assertContains(response, '<p class="text-success"><i class="ri-checkbox-circle-line"></i> Validé</p>')
+        self.assertContains(
+            response, '<p class="text-success"><i class="ri-checkbox-circle-line"></i> Validé</p>', html=True
+        )
 
         # refused
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
@@ -817,7 +819,9 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertNotContains(response, refuse_url)
         self.assertNotContains(response, accepte_url)
         self.assertContains(response, reinit_url)
-        self.assertContains(response, '<p class="text-danger"><i class="ri-indeterminate-circle-line"></i> Refusé</p>')
+        self.assertContains(
+            response, '<p class="text-danger"><i class="ri-indeterminate-circle-line"></i> Refusé</p>', html=True
+        )
 
         # reinited
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING

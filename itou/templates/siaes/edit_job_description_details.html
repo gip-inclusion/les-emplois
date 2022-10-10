@@ -11,9 +11,12 @@
 {% block content %}
     <div class="c-stepper my-3 my-lg-6">
         <div class="progress progress--emploi">
-            <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">
+            </div>
         </div>
-        <p><strong>Étape 2</strong>/3 : Description </p>
+        <p>
+            <strong>Étape 2</strong>/3 : Description
+        </p>
     </div>
 
     <div class="d-block rounded-lg shadow-lg p-3 p-lg-5">
@@ -32,7 +35,9 @@
                         <i class="ri-information-line ri-xl text-emplois"></i>
                     </div>
                     <div class="col">
-                        <p><b>Conseil</b></p>
+                        <p>
+                            <b>Conseil</b>
+                        </p>
                         <p>
                             Vous pouvez vous référer à la description sur la fiche métier présente dans le <a href="https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome={{ rome }}" title="Référentiel des codes ROME" rel="noopener" target="_blank"><b>Répertoire Opérationnel des Métiers et des Emplois (ROME)</b></a>.
                         </p>
@@ -47,15 +52,17 @@
                     </div>
                     <div class="col">
                         {% if is_opcs %}
-                            <p><b>Conseil</b></p>
+                            <p>
+                                <b>Conseil</b>
+                            </p>
                             <p>
                                 Ajoutez la liste des publics éligibles à ce marché spécifique afin d’augmenter vos chances de recevoir des candidatures qualifiées.
                             </p>
                         {% else %}
-                            <p><b>Exemple</b></p>
                             <p>
-                                « Poste ouvert aux candidats ne maîtrisant pas la langue française. »
+                                <b>Exemple</b>
                             </p>
+                            <p>« Poste ouvert aux candidats ne maîtrisant pas la langue française. »</p>
                         {% endif %}
                     </div>
                 </div>

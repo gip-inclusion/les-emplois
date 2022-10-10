@@ -12,9 +12,7 @@
     </h1>
 
     <div class="alert alert-secondary">
-        <p class="mb-0">
-            Votre organisation n'est pas encore inscrite.
-        </p>
+        <p class="mb-0">Votre organisation n'est pas encore inscrite.</p>
     </div>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -24,9 +22,7 @@
         {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
-            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-                Retour
-            </a>
+            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
             <button type="submit" class="btn btn-primary">Continuer</button>
         {% endbuttons %}
 

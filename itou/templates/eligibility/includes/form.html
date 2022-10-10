@@ -20,11 +20,7 @@
 
     {% bootstrap_form_errors form_administrative_criteria type="all" %}
 
-    {% if request.user.is_siae_staff %}
-        <h3 class="h2">
-            Critères administratifs de niveau 1
-        </h3>
-    {% endif %}
+    {% if request.user.is_siae_staff %}<h3 class="h2">Critères administratifs de niveau 1</h3>{% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_1_PREFIX in field.name %}
@@ -32,11 +28,7 @@
         {% endif %}
     {% endfor %}
 
-    {% if request.user.is_siae_staff %}
-        <h3 class="h2">
-            Critères administratifs de niveau 2
-        </h3>
-    {% endif %}
+    {% if request.user.is_siae_staff %}<h3 class="h2">Critères administratifs de niveau 2</h3>{% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_2_PREFIX in field.name %}
@@ -48,13 +40,9 @@
         {% bootstrap_form form_confirm_eligibility %}
     {% endif %}
 
-    <p>
-        En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.
-    </p>
+    <p>En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.</p>
     {% buttons %}
-        {% if cancel_url %}
-            <a class="btn btn-outline-primary" href="{{ cancel_url }}">Annuler</a>
-        {% endif %}
+        {% if cancel_url %}<a class="btn btn-outline-primary" href="{{ cancel_url }}">Annuler</a>{% endif %}
         <button type="submit" class="btn btn-primary">Valider</button>
     {% endbuttons %}
 

@@ -33,12 +33,19 @@
 
         <div class="alert alert-danger mt-2" role="status">
             <p>
-                <strong>Si vous êtes une SIAE</strong> :<br>
+                <strong>Si vous êtes une SIAE</strong> :
+                <br>
                 Merci de vérifier dans l’extranet IAE 2.0 de l’ASP si votre annexe financière “valide” ou “provisoire” est déjà enregistrée.
             </p>
-            <p><i>Si c’est le cas</i>, tentez de vous reconnecter dans une dizaine de jours, le temps que l’ASP nous transmette l’information.</p>
-            <p><i>Si ce n’est pas le cas</i>, demandez à votre DDETS d’enregistrer au plus vite l’annexe financière dans l’ASP.</p>
-            <p>En cas de nécessité d’inscription rapide, demandez à votre DDETS de nous contacter via <a href="https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support" target="_blank" rel="noopener" title="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">ce formulaire</a>.</p>
+            <p>
+                <i>Si c’est le cas</i>, tentez de vous reconnecter dans une dizaine de jours, le temps que l’ASP nous transmette l’information.
+            </p>
+            <p>
+                <i>Si ce n’est pas le cas</i>, demandez à votre DDETS d’enregistrer au plus vite l’annexe financière dans l’ASP.
+            </p>
+            <p>
+                En cas de nécessité d’inscription rapide, demandez à votre DDETS de nous contacter via <a href="https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support" target="_blank" rel="noopener" title="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">ce formulaire</a>.
+            </p>
 
             <p>
                 <strong>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</strong> :
@@ -76,18 +83,13 @@
             a radio input and a label.
             The best solution I've yet found to display more info to the user than just a
             label is to manually render the inputs.
-            {% endcomment %}
+                {% endcomment %}
                 <ul>
                     {% for siae in siaes_without_members %}
                         <li>
                             <p>
                                 <label for="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" class="align-top">
-                                    <input
-                                        type="radio"
-                                        name="{{ siae_select_form.siaes.html_name }}"
-                                        value="{{ siae.pk }}"
-                                        id="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}"
-                                        required>
+                                    <input type="radio" name="{{ siae_select_form.siaes.html_name }}" value="{{ siae.pk }}" id="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
                                     <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
                                     <br>
                                     {{ siae.display_name }}

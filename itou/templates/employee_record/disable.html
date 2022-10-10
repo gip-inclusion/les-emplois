@@ -15,31 +15,36 @@
             <div class="card-body p-1">
                 <div class="row">
                     <div class="col-sm-9 pt-3">
-                        <h5 class="h4 card-title">
-                            Vous êtes sur le point de désactiver cette fiche salarié.
-                        </h5>
+                        <h5 class="h4 card-title">Vous êtes sur le point de désactiver cette fiche salarié.</h5>
                         {% with job_application=employee_record.job_application %}
-                            <div>Début du contrat : <b>{{ job_application.hiring_start_at }}</b></div>
-                            <div>Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b></div>
-                            <div>Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b></div>
+                            <div>
+                                Début du contrat : <b>{{ job_application.hiring_start_at }}</b>
+                            </div>
+                            <div>
+                                Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b>
+                            </div>
+                            <div>
+                                Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b>
+                            </div>
                         {% endwith %}
                         <div>
                             <b>{{ employee_record.get_status_display }}</b> le {{ employee_record.updated_at }}
                         </div>
                     </div>
                     <div class="col-sm-3 text-right">
-                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP"></img>
-                    </div>
+                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP">
+                    </img>
                 </div>
             </div>
         </div>
-        <form method="post" action="" class="js-prevent-multiple-submit">
-            {% csrf_token %}
-            <input type="hidden" name="confirm" value="true">
-            {% buttons %}
-                <a class="btn btn-outline-primary" href="{{ back_url }}">Retour à la liste</a>
-                <button type="submit" class="btn btn-danger">Confirmer la désactivation</button>
-            {% endbuttons %}
-        </form>
     </div>
+    <form method="post" action="" class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        <input type="hidden" name="confirm" value="true">
+        {% buttons %}
+            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour à la liste</a>
+            <button type="submit" class="btn btn-danger">Confirmer la désactivation</button>
+        {% endbuttons %}
+    </form>
+</div>
 {% endblock %}

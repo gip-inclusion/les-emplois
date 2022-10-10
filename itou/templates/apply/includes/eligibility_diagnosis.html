@@ -11,9 +11,7 @@
             <p>
                 Confirmée par
                 <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
-                {% if eligibility_diagnosis.author_siae %}
-                    ({{ eligibility_diagnosis.author_siae.display_name }})
-                {% endif %}
+                {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
                 {% if eligibility_diagnosis.author_prescriber_organization %}
                     ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
                 {% endif %}
@@ -22,17 +20,13 @@
             {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
                 {% if administrative_criteria %}
                     <p>
-                        <span class="badge badge-secondary">
-                            Situation administrative du candidat
-                        </span>
+                        <span class="badge badge-secondary">Situation administrative du candidat</span>
                     </p>
                     {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
                     {% regroup administrative_criteria|dictsort:"level" by get_level_display as levels %}
                     <ul>
                         {% for level in levels %}
-                            {% for criteria in level.list %}
-                                <li>{{ criteria.name }}</li>
-                            {% endfor %}
+                            {% for criteria in level.list %}<li>{{ criteria.name }}</li>{% endfor %}
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -48,15 +42,11 @@
             <hr>
 
             {% if eligibility_diagnosis is not None %}
-                <h3>
-                    Critères d'éligibilité
-                </h3>
+                <h3>Critères d'éligibilité</h3>
                 <p>
                     Validés par
                     <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
-                    {% if eligibility_diagnosis.author_siae %}
-                        ({{ eligibility_diagnosis.author_siae.display_name }})
-                    {% endif %}
+                    {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
                     {% if eligibility_diagnosis.author_prescriber_organization %}
                         ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
                     {% endif %}
@@ -67,9 +57,7 @@
                 {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
                     {% if administrative_criteria %}
                         <p>
-                            <span class="badge badge-secondary">
-                                Critères administratifs
-                            </span>
+                            <span class="badge badge-secondary">Critères administratifs</span>
                         </p>
                         {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
                         {% regroup administrative_criteria|dictsort:"level" by get_level_display as levels %}
@@ -78,9 +66,7 @@
                                 <li>
                                     <span class="badge badge-secondary">{{ level.grouper }}</span>
                                     <ul>
-                                        {% for criteria in level.list %}
-                                            <li>{{ criteria.name }}</li>
-                                        {% endfor %}
+                                        {% for criteria in level.list %}<li>{{ criteria.name }}</li>{% endfor %}
                                     </ul>
                                 </li>
                             {% endfor %}

@@ -27,12 +27,7 @@
                             <div class="col">
                                 <p class="mb-0">
                                     Vous possédez un numéro de sécurité sociale temporaire ?
-                                    <button
-                                        type="submit" name="skip" value="1"
-                                        class="btn btn-link p-0 matomo-event"
-                                        data-matomo-category="nir-temporaire"
-                                        data-matomo-action="etape-suivante"
-                                        data-matomo-option="candidature">
+                                    <button type="submit" name="skip" value="1" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="candidature">
                                         Cliquez ici pour accéder à l'étape suivante.
                                     </button>
                                 </p>
@@ -46,12 +41,19 @@
                                 <i class="ri-information-line ri-xl text-info"></i>
                             </div>
                             <div class="col">
-                                <p class="mb-0">{% if request.user.is_job_seeker %}
-                                    Vous n'avez pas de numéro de sécurité sociale ?<br>
-                                {% else %}
-                                    Le candidat n'a pas de numéro de sécurité sociale ?<br>
-                                {% endif %}
-                                    <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale" title="ameli.fr, article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)" rel="noopener" target="_blank">ameli.fr</a><i class="ri-external-link-line ml-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.</p>
+                                <p class="mb-0">
+                                    {% if request.user.is_job_seeker %}
+                                        Vous n'avez pas de numéro de sécurité sociale ?
+                                        <br>
+                                    {% else %}
+                                        Le candidat n'a pas de numéro de sécurité sociale ?
+                                        <br>
+                                    {% endif %}
+                                    <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"
+                                       title="ameli.fr, article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
+                                       rel="noopener"
+                                       target="_blank">ameli.fr</a><i class="ri-external-link-line ml-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -83,21 +85,19 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p>Le numéro {{ form.nir.value|format_nir }} est associé au compte de <b>{{  job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>.</p>
                             <p>
-                                Si cette candidature n'est pas pour <b>{{  job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                                Le numéro {{ form.nir.value|format_nir }} est associé au compte de <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>.
+                            </p>
+                            <p>
+                                Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
                             </p>
                         </div>
                         <div class="modal-footer">
                             {% buttons %}
                                 {# Reload this page with a new form. #}
-                                <button type="submit" name="cancel" value="1" class="btn btn-sm btn-secondary">
-                                    Ce n'est pas mon candidat
-                                </button>
+                                <button type="submit" name="cancel" value="1" class="btn btn-sm btn-secondary">Ce n'est pas mon candidat</button>
                                 {# Go to the next step. #}
-                                <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">
-                                    Continuer
-                                </button>
+                                <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">Continuer</button>
                             {% endbuttons %}
                         </div>
                     </div>

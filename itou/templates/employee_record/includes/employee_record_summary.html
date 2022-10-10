@@ -4,27 +4,17 @@
         <h5 class="h4">Etat civil</h5>
 
         <div class="py-2">
+            <div>{{ employee.get_title_display }} {{ employee.get_full_name }}</div>
+            <div>Né(e) le : {{ employee.birthdate }}</div>
             <div>
-                {{ employee.get_title_display }} {{ employee.get_full_name }}
+                {% if employee.birth_place %}À : {{ employee.birth_place }} ({{ employee.birth_place.department_code }}){% endif %}
             </div>
-            <div>
-                Né(e) le : {{ employee.birthdate }}
-            </div>
-            <div>
-                {% if employee.birth_place %}
-                    À : {{ employee.birth_place }} ({{ employee.birth_place.department_code }})
-                {% endif %}
-            </div>
-            <div>
-                Pays de naissance : {{ employee.birth_country }}
-            </div>
+            <div>Pays de naissance : {{ employee.birth_country }}</div>
         </div>
 
         <h5 class="h4">Domiciliation</h5>
 
-        <div class="py-2">
-            {{ profile.hexa_address_display }}
-        </div>
+        <div class="py-2">{{ profile.hexa_address_display }}</div>
 
         <h5 class="h4">Situation du salarié</h5>
 
@@ -37,43 +27,31 @@
                 </div>
             {% endif %}
 
-            {% if profile.resourceless %}
-                <div>Le salarié ne dispose d'aucune ressource</div>
-            {% endif %}
+            {% if profile.resourceless %}<div>Le salarié ne dispose d'aucune ressource</div>{% endif %}
 
             {% if profile.unemployed_since %}
                 <div>Salarié sans emploi depuis {{ profile.get_unemployed_since_display|lower }}</div>
             {% endif %}
 
-            {% if profile.oeth_employee %}
-                <div>Bénéficiaire de la loi handicap (OETH)</div>
-            {% endif %}
+            {% if profile.oeth_employee %}<div>Bénéficiaire de la loi handicap (OETH)</div>{% endif %}
 
-            {% if profile.rqth_employee %}
-                <div>Titulaire de la RQTH</div>
-            {% endif %}
+            {% if profile.rqth_employee %}<div>Titulaire de la RQTH</div>{% endif %}
 
             {% if profile.rsa_allocation_since %}
-                <div>
-                    {{ profile.get_has_rsa_allocation_display }} (depuis {{ profile.get_rsa_allocation_since_display|lower }})
-                </div>
+                <div>{{ profile.get_has_rsa_allocation_display }} (depuis {{ profile.get_rsa_allocation_since_display|lower }})</div>
             {% endif %}
 
             {% if profile.ass_allocation_since %}
-                <div>
-                    Bénéficiaire de l'ASS depuis (depuis {{ profile.get_ass_allocation_since_display|lower }})
-                </div>
+                <div>Bénéficiaire de l'ASS depuis (depuis {{ profile.get_ass_allocation_since_display|lower }})</div>
             {% endif %}
 
             {% if profile.aah_allocation_since %}
-                <div>
-                    Bénéficiaire de l'AAH depuis (depuis {{ profile.get_aah_allocation_since_display|lower }})
-                </div>
+                <div>Bénéficiaire de l'AAH depuis (depuis {{ profile.get_aah_allocation_since_display|lower }})</div>
             {% endif %}
 
         </div>
 
-        <h5 class="h4">Annexe financière </h5>
+        <h5 class="h4">Annexe financière</h5>
 
         <div>
             {% if employee_record.financial_annex %}

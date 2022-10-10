@@ -5,9 +5,7 @@
             <p class="card-text">Candidature spontanée</p>
         {% else %}
             <ul class="card-text">
-                {% for job in job_application.selected_jobs.all %}
-                    <li>{{ job.display_name }}</li>
-                {% endfor %}
+                {% for job in job_application.selected_jobs.all %}<li>{{ job.display_name }}</li>{% endfor %}
             </ul>
         {% endif %}
     </div>

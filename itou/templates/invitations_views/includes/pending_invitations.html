@@ -18,7 +18,9 @@
                     <tr>
                         <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ invitation.first_name }} {{ invitation.last_name }}</td>
-                        <td><a href="mailto:{{ invitation.email }}">{{ invitation.email }}</a></td>
+                        <td>
+                            <a href="mailto:{{ invitation.email }}">{{ invitation.email }}</a>
+                        </td>
                         <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
                         <td>
                             <p>
@@ -27,9 +29,7 @@
                                 </a>
                             </p>
                             <div class="collapse form-group" id="share-invitation-link-{{ forloop.counter }}">
-                                <p>
-                                    Copiez-collez le lien ci-dessous :
-                                </p>
+                                <p>Copiez-collez le lien ci-dessous :</p>
                                 {# Poor man's copy and paste with onClick #}
                                 <input type="text" class="form-control" readonly="readonly" value="{{ invitation.acceptance_link }}" onClick="this.select()">
                             </div>
@@ -41,8 +41,10 @@
     </div>
     <div class="alert alert-warning">
         <p class="mb-0">
-            Chaque collaborateur invité reçoit son propre lien d'invitation, ce lien est valable 15 jours (lorsque le lien expire, l'invitation n'est plus affichée ci-dessus). <br>
-            Ce lien d'invitation est transmis automatiquement par e-mail. <br>
+            Chaque collaborateur invité reçoit son propre lien d'invitation, ce lien est valable 15 jours (lorsque le lien expire, l'invitation n'est plus affichée ci-dessus).
+            <br>
+            Ce lien d'invitation est transmis automatiquement par e-mail.
+            <br>
             En cas de besoin, vous pouvez également le copier depuis la colonne « Lien d'invitation ».
         </p>
     </div>

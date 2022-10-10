@@ -4,7 +4,9 @@
 {% block title %}Modification de la date de contrat{{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1 class="h1-hero-c1">Candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span></h1>
+    <h1 class="h1-hero-c1">
+        Candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
+    </h1>
     <h2 class="h1">Modification de la date de contrat</h2>
 
     <form method="post" action="" class="js-prevent-multiple-submit">

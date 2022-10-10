@@ -14,9 +14,7 @@
 
         {% if uses_inclusion_connect %}
             {% if inclusion_connect_url %}
-                <p class="text-center mb-1">
-                    Se connecter avec
-                </p>
+                <p class="text-center mb-1">Se connecter avec</p>
                 {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
 
                 <hr class="my-5" data-text="ou">
@@ -40,9 +38,7 @@
                 <a href="{% url 'account_reset_password' %}" class="font-weight-bold">Mot de passe oublié ?</a>
             </p>
 
-            <p class="text-center">
-                {% bootstrap_button "Se connecter" button_type="submit" button_class="btn-primary btn" %}
-            </p>
+            <p class="text-center">{% bootstrap_button "Se connecter" button_type="submit" button_class="btn-primary btn" %}</p>
 
         </form>
     </div>
@@ -55,9 +51,7 @@
             <p class="mb-5">
                 <a class="btn btn-outline-primary" href="{{ signup_url }}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
                     Créer un compte
-                    {% if account_type_display_name %}
-                        {{ account_type_display_name|lower }}
-                    {% endif %}
+                    {% if account_type_display_name %}{{ account_type_display_name|lower }}{% endif %}
                 </a>
             </p>
         {% endif %}

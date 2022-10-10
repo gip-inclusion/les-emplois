@@ -14,9 +14,12 @@
 
     <div class="c-stepper my-3 my-lg-6">
         <div class="progress progress--emploi">
-            <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            </div>
         </div>
-        <p><strong>Étape 3</strong>/3 : Aperçu</p>
+        <p>
+            <strong>Étape 3</strong>/3 : Aperçu
+        </p>
     </div>
 
 
@@ -25,17 +28,21 @@
             <h1 class="h1-hero">
                 <img src="{% static 'img/edit_siae_header.svg' %}" alt="En-tête édition SIAE" style="width: 100px;">
             </h1>
-            <h2 class="h1">Aperçu de la fiche <br class="d-none d-lg-inline">de ma structure</h2>
+            <h2 class="h1">
+                Aperçu de la fiche
+                <br class="d-none d-lg-inline">
+                de ma structure
+            </h2>
         </div>
 
         <div class="card c-card c-card--emploi my-3 my-lg-5">
             <div class="card-body">
-                <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }} </p>
+                <p>
+                    <i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }}
+                </p>
                 <hr>
-                <h2 class="h2">
-                    {{ siae.display_name }}
-                </h2>
-                <p> {{ siae.address_on_one_line }} </p>
+                <h2 class="h2">{{ siae.display_name }}</h2>
+                <p>{{ siae.address_on_one_line }}</p>
             </div>
         </div>
 
@@ -89,7 +96,9 @@
                         <i class="ri-information-line ri-xl text-warning"></i>
                     </div>
                     <div class="col">
-                        <p class="mb-0">En cliquant sur le bouton <b>« Publier »</b>, vous acceptez que vos informations et coordonnées soient rendues publiques.</p>
+                        <p class="mb-0">
+                            En cliquant sur le bouton <b>« Publier »</b>, vous acceptez que vos informations et coordonnées soient rendues publiques.
+                        </p>
                     </div>
                 </div>
             </div>

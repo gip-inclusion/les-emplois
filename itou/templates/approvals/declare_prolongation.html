@@ -12,7 +12,8 @@
         <span class="text-muted">{{ approval.user.get_full_name|title }}</span>
     </h1>
 
-    {% if not preview %}{# Edit mode. #}
+    {% if not preview %}
+        {# Edit mode. #}
 
         {% include "approvals/includes/card.html" with common_approval=approval %}
 
@@ -43,27 +44,22 @@
             <hr>
 
             {% buttons %}
-                <a class="btn btn-outline-primary" href="{{ back_url }}">
-                    Retour
-                </a>
+                <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
                 {# Enable preview mode: preview=1. #}
-                <button type="submit" name="preview" value="1" class="btn btn-primary">
-                    Valider la déclaration
-                </button>
+                <button type="submit" name="preview" value="1" class="btn btn-primary">Valider la déclaration</button>
             {% endbuttons %}
 
         </form>
 
-    {% else %}{# Preview mode: ask for confirmation before committing to DB. #}
+    {% else %}
+        {# Preview mode: ask for confirmation before committing to DB. #}
 
         <form method="post" action="" class="js-prevent-multiple-submit">
 
             {% csrf_token %}
 
             {# Hide all form fields. #}
-            {% for field in form %}
-                <input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
-            {% endfor %}
+            {% for field in form %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}">{% endfor %}
 
             {# Show the user a preview of the prolongation. #}
             <div class="card my-3 text-center">
@@ -71,9 +67,7 @@
                     <h5 class="h4 card-title">
                         Vous êtes sur le point de déclarer une prolongation de PASS IAE pour la raison suivante :
                     </h5>
-                    <p class="card-text">
-                        {{ form.instance.get_reason_display }}
-                    </p>
+                    <p class="card-text">{{ form.instance.get_reason_display }}</p>
                     <p class="card-text text-success">
                         À partir du
                         <span class="badge badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
@@ -96,13 +90,9 @@
                 </p>
                 {% buttons %}
                     {# Allow the user to modify the prolongation: edit=1. #}
-                    <button type="submit" name="edit" value="1" class="btn btn-secondary">
-                        Annuler
-                    </button>
+                    <button type="submit" name="edit" value="1" class="btn btn-secondary">Annuler</button>
                     {# Create a prolongation: save=1. #}
-                    <button type="submit" name="save" value="1" class="btn btn-primary">
-                        Confirmer la déclaration
-                    </button>
+                    <button type="submit" name="save" value="1" class="btn btn-primary">Confirmer la déclaration</button>
                 {% endbuttons %}
             </div>
 

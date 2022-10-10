@@ -1,10 +1,9 @@
 {% load format_filters %}
 <div class="row">
     <div class="col-lg-8 col-md-7 col-12">
-        <h3 class="h2">Auto-prescription pour
-            <span class="text-muted">
-                {{job_seeker.get_full_name|title}}
-            </span>
+        <h3 class="h2">
+            Auto-prescription pour
+            <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
         </h3>
     </div>
     <div class="col-lg-4 col-md-5 col-12 text-right">
@@ -12,7 +11,7 @@
             {% if state == "REFUSED_2" %}
                 <p class="badge badge-danger float-right">problème constaté</p>
 
-            {% elif reviewed_at%}
+            {% elif reviewed_at %}
                 {% if state == "ACCEPTED" %}
                     <p class="badge badge-success float-right">validé</p>
                 {% elif state == "UPLOADED" %}
@@ -21,9 +20,9 @@
                     <p class="badge badge-communaute-light float-right">transmis</p>
                 {% else %}
                     <p class="badge badge-pilotage float-right">nouveaux justificatifs à traiter</p>
-                {%endif%}
+                {% endif %}
 
-            {%else%}
+            {% else %}
                 {% if state == "PENDING" %}
                     <p class="badge badge-pilotage float-right">à traiter</p>
                 {% elif state == "PROCESSING" %}
@@ -39,6 +38,8 @@
 </div>
 <div class="row">
     <div class="col-12">
-        <p class="m-0">PASS IAE :&nbsp;<b>{{ approval.number|format_approval_number }}</b> délivré le {{ approval.start_at|date:"d E Y" }}</p>
+        <p class="m-0">
+            PASS IAE :&nbsp;<b>{{ approval.number|format_approval_number }}</b> délivré le {{ approval.start_at|date:"d E Y" }}
+        </p>
     </div>
 </div>

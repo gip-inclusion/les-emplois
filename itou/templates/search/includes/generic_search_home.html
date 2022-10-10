@@ -1,7 +1,9 @@
 <section class="bg-emploi-light container-search">
 
     <div class="container container-max-lg">
-        <h1 class="h1-hero-c1 lh-sm text-center"><strong>{{ title }}</strong></h1>
+        <h1 class="h1-hero-c1 lh-sm text-center">
+            <strong>{{ title }}</strong>
+        </h1>
 
         <form method="get" action="{% url url_search %}" role="search">
             {% include template_form_name with form=form align="center" %}

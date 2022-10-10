@@ -10,7 +10,7 @@
 
 {% block title %}
     Auto-prescriptions à justifier pour
-    {{full_name|title}}
+    {{ full_name|title }}
 {% endblock %}
 
 
@@ -21,7 +21,7 @@
             <div class="card">
 
                 <div class="card-header">
-                    {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker approval=evaluated_administrative_criteria.evaluated_job_application.job_application.approval state=evaluated_administrative_criteria.evaluated_job_application.state reviewed_at=evaluated_administrative_criteria.evaluated_job_application.evaluated_siae.reviewed_at%}
+                    {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker approval=evaluated_administrative_criteria.evaluated_job_application.job_application.approval state=evaluated_administrative_criteria.evaluated_job_application.state reviewed_at=evaluated_administrative_criteria.evaluated_job_application.evaluated_siae.reviewed_at %}
                 </div>
 
                 <div class="card-body">
@@ -34,10 +34,10 @@
                     {% if evaluated_administrative_criteria.proof_url %}
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <a href="{{evaluated_administrative_criteria.proof_url}}" target="_blank">Visualiser le justificatif précédemment téléversé</a>
+                                <a href="{{ evaluated_administrative_criteria.proof_url }}" target="_blank">Visualiser le justificatif précédemment téléversé</a>
                             </div>
                         </div>
-                    {%endif%}
+                    {% endif %}
 
 
                     <div class="row mt-3">
@@ -55,7 +55,9 @@
                                             <i class="ri-information-line ri-xl text-info"></i>
                                         </div>
                                         <div class="col">
-                                            <p class="mb-0">Si vous êtes dans l'incapacité à fournir le bon justificatif, vous pouvez créer et fournir en lieu et place de celui-ci, une attestation au nom de votre structure pour en expliquer les raisons à votre DDETS.</p>
+                                            <p class="mb-0">
+                                                Si vous êtes dans l'incapacité à fournir le bon justificatif, vous pouvez créer et fournir en lieu et place de celui-ci, une attestation au nom de votre structure pour en expliquer les raisons à votre DDETS.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

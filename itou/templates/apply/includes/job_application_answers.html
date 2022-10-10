@@ -20,8 +20,6 @@
 
     {% if job_application.answer %}
         <h4 class="h6 mt-4">Copie du message envoyé au candidat</h4>
-        <div class="bg-gray-100 border rounded font-italic px-3 pt-3 pb-0">
-            {{ job_application.answer|linebreaks }}
-        </div>
+        <div class="bg-gray-100 border rounded font-italic px-3 pt-3 pb-0">{{ job_application.answer|linebreaks }}</div>
     {% endif %}
 {% endif %}

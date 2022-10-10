@@ -1,22 +1,33 @@
 <div class="js-display-if-javascript-enabled">
     <div id="{{ dropzone_form_id }}" class="dropzone border-dashed text-center text-secondary mb-2">
         <div class="dz-message my-1">
-            <div class="h4"><i class="ri-upload-2-line ri-2x"></i></div>
-            <div class="h5"><a href="" class="js-prevent-default">Choisissez un fichier</a> ou <b>glissez ici</b>.</div>
-            <div class="small">Taille maximale : {{ s3_upload.config.max_file_size }} Mo</div>
-            <div class="small">Type de fichier : PDF</div>
-        </a>
+            <div class="h4">
+                <i class="ri-upload-2-line ri-2x"></i>
+            </div>
+            <div class="h5">
+                <a href="" class="js-prevent-default">Choisissez un fichier</a> ou <b>glissez ici</b>.
+                </div>
+                <div class="small">Taille maximale : {{ s3_upload.config.max_file_size }} Mo</div>
+                <div class="small">Type de fichier : PDF</div>
+            </a>
+        </div>
     </div>
-</div>
 
 
-<p class="small mt-0">
-    <i class="ri-question-line mr-1"></i>
-    Ce fichier n'est pas un PDF ?
-    <a href="{{ ITOU_COMMUNITY_URL }}/doc/emplois/postuler-pour-un-candidat-prescrire/#ajouter-un-cv-a-la-candidature" target="_blank" rel="noopener" class="matomo-event" matomo-category="ajout-fichier-candidature" matomo-action="clic" matomo-option="clic-sur-lien-aide-pdf" title="Découvrez comment le convertir (ouverture dans un nouvel onglet)">
-        Découvrez comment le convertir.
-    </a>
-</p>
+    <p class="small mt-0">
+        <i class="ri-question-line mr-1"></i>
+        Ce fichier n'est pas un PDF ?
+        <a href="{{ ITOU_COMMUNITY_URL }}/doc/emplois/postuler-pour-un-candidat-prescrire/#ajouter-un-cv-a-la-candidature"
+           target="_blank"
+           rel="noopener"
+           class="matomo-event"
+           matomo-category="ajout-fichier-candidature"
+           matomo-action="clic"
+           matomo-option="clic-sur-lien-aide-pdf"
+           title="Découvrez comment le convertir (ouverture dans un nouvel onglet)">
+            Découvrez comment le convertir.
+        </a>
+    </p>
 </div>
 <noscript>
     <div class="alert alert-danger" role="status">

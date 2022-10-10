@@ -3,7 +3,7 @@
 {% load bootstrap4 %}
 {% load static %}
 
-{% block title%}Contrôler les pièces justificatives{{ block.super }}{% endblock %}
+{% block title %}Contrôler les pièces justificatives{{ block.super }}{% endblock %}
 
 {% block content %}
     <div class="row justify-content-center">
@@ -12,37 +12,42 @@
             <div class="row mt-3">
                 <div class="col-12">
 
-                    <h1 class="h1">
-                        Contrôler les pièces justificatives
-                    </h1>
+                    <h1 class="h1">Contrôler les pièces justificatives</h1>
                     <h3 class="h3">
-                        Liste des Siae {% if ended_at %}contrôlées{% else %}à contrôler{%endif%}
+                        Liste des Siae
+                        {% if ended_at %}
+                            contrôlées
+                        {% else %}
+                            à contrôler
+                        {% endif %}
                     </h3>
-                    <p>Contrôle initié le {{evaluations_asked_at|date:"d F Y"}}{% if ended_at %}, clôturé le {{ended_at|date:"d F Y"}}{% endif%}</p>
+                    <p>
+                        Contrôle initié le {{ evaluations_asked_at|date:"d F Y" }}
+                        {% if ended_at %}, clôturé le {{ ended_at|date:"d F Y" }}{% endif %}
+                    </p>
                 </div>
             </div>
 
             {% for evaluated_siae in evaluated_siaes %}
                 <div class="row mt-3">
                     <div class="col-12">
-                        <div class="card"  >
+                        <div class="card">
                             <div class="card-header">
-                                {% include "siae_evaluations/includes/siae_infos.html" with evaluated_siae=evaluated_siae%}
+                                {% include "siae_evaluations/includes/siae_infos.html" with evaluated_siae=evaluated_siae %}
                             </div>
                             <div class="card-body">
-                                <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}"
-                                    class="btn btn-outline-primary btn-sm float-right">
+                                <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}" class="btn btn-outline-primary btn-sm float-right">
                                     {% if evaluated_siae.final_reviewed_at %}
                                         Voir le résultat
                                     {% else %}
                                         {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
                                             Contrôler cette SIAE
-                                        {%elif evaluated_siae.state == "ADVERSARIAL_STAGE"%}
+                                        {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
                                             Revoir ses justificatifs
                                         {% else %}
                                             Voir
-                                        {%endif%}
-                                    {%endif%}
+                                        {% endif %}
+                                    {% endif %}
                                 </a>
                             </div>
                         </div>

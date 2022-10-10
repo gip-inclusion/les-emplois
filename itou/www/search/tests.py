@@ -150,7 +150,7 @@ class SearchPrescriberTest(TestCase):
         PrescriberOrganizationFactory(authorized=True, coords=vannes.coords)
 
         response = self.client.get(url, {"city": guerande.slug, "distance": 100})
-        self.assertContains(response, "<b>2</b> résultats")
+        self.assertContains(response, "<b>2</b> résultats", html=True)
 
         response = self.client.get(url, {"city": guerande.slug, "distance": 15})
-        self.assertContains(response, "<b>1</b> résultat")
+        self.assertContains(response, "<b>1</b> résultat", html=True)

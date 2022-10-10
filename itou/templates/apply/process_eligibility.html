@@ -19,12 +19,8 @@
         <li>
             Sélectionner le ou les critères administratifs
             <ul>
-                <li>
-                    un critère administratif de niveau 1
-                </li>
-                <li>
-                    trois critères de niveau 2 (seulement deux critères de niveau 2 pour les ETTI et AI)
-                </li>
+                <li>un critère administratif de niveau 1</li>
+                <li>trois critères de niveau 2 (seulement deux critères de niveau 2 pour les ETTI et AI)</li>
             </li>
         </ol>
 
@@ -48,7 +44,9 @@
         <div class="alert alert-emploi" role="status">
             <div class="row">
                 <div class="col">
-                    <p class="mb-0">Si le candidat n'est pas éligible à l'insertion par l'activité économique, vous pouvez décliner sa candidature :</p>
+                    <p class="mb-0">
+                        Si le candidat n'est pas éligible à l'insertion par l'activité économique, vous pouvez décliner sa candidature :
+                    </p>
                 </div>
                 <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
                     <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-sm btn-primary">
@@ -59,4 +57,4 @@
             </div>
         </div>
 
-{% endblock %}
+    {% endblock %}

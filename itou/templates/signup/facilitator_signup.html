@@ -12,22 +12,20 @@
         <small class="text-muted">Facilitateur de clauses sociales</small>
     </h1>
 
-    <h2 class="h1">
-        Inscrire mon organisation porteuse de la clause sociale d’insertion
-    </h2>
+    <h2 class="h1">Inscrire mon organisation porteuse de la clause sociale d’insertion</h2>
 
     <!-- this prevents the user from clicking on the "back" button of the browser -->
     <form method="post" action="" class="js-prevent-multiple-submit">
 
         <div class="card c-card c-card--emploi my-3 my-lg-5">
             <div class="card-body">
-                <p><i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }} </p>
+                <p>
+                    <i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }}
+                </p>
                 <hr>
-                <h2 class="h2">
-                    {{ siae.display_name }}
-                </h2>
-                <p> SIRET : {{ siae.siret }} </p>
-                <p> {{ siae.address_on_one_line }} </p>
+                <h2 class="h2">{{ siae.display_name }}</h2>
+                <p>SIRET : {{ siae.siret }}</p>
+                <p>{{ siae.address_on_one_line }}</p>
             </div>
         </div>
 
@@ -43,9 +41,13 @@
                     <i class="ri-information-line ri-xl"></i>
                 </div>
                 <div class="col">
-                    <p class="mb-2"><strong>Attention</strong></p>
-                    <p class="mb-0">Le Ministère du Travail (DGEFP) et Pôle emploi traitent vos données personnelles. Ce site est ouvert aux acteurs de l'inclusion et permet de simplifier le recrutement des personnes éligibles aux structures de l'Insertion par l'Activité Économique (IAE). Il est une composante du Pacte ambition IAE.
-                        Pour plus d'information sur le traitement de vos données personnelles ou pour exercer vos droits, consultez la section Protection des données. En cliquant sur le bouton "Valider la demande", vous acceptez les conditions générales d'utilisation.</p>
+                    <p class="mb-2">
+                        <strong>Attention</strong>
+                    </p>
+                    <p class="mb-0">
+                        Le Ministère du Travail (DGEFP) et Pôle emploi traitent vos données personnelles. Ce site est ouvert aux acteurs de l'inclusion et permet de simplifier le recrutement des personnes éligibles aux structures de l'Insertion par l'Activité Économique (IAE). Il est une composante du Pacte ambition IAE.
+                        Pour plus d'information sur le traitement de vos données personnelles ou pour exercer vos droits, consultez la section Protection des données. En cliquant sur le bouton "Valider la demande", vous acceptez les conditions générales d'utilisation.
+                    </p>
                 </div>
             </div>
         </div>
@@ -56,7 +58,9 @@
                 <a class="btn btn-link" title="Retourner à l'édition des coordonnées" href="{{ prev_url }}">Retour</a>
             </div>
             <div class="col-6 col-lg-auto">
-                <button type="submit"  aria-label="Valider les informations soumises"  class="btn float-right btn-primary">Valider</button>
+                <button type="submit"  aria-label="Valider les informations soumises"  class="btn float-right btn-primary">
+                    Valider
+                </button>
             </div>
         </div>
 

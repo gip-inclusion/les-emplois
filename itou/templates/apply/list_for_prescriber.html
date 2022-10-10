@@ -12,7 +12,13 @@
 
     <div class="row">
         <div class="col-12 col-md-4 mt-2">
-            <a id="js-job-applications-filters-button" class="btn btn-primary d-block d-md-none" href="#js-job-applications-filters-form" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseFilter">
+            <a id="js-job-applications-filters-button"
+               class="btn btn-primary d-block d-md-none"
+               href="#js-job-applications-filters-form"
+               data-toggle="collapse"
+               role="button"
+               aria-expanded="false"
+               aria-controls="collapseFilter">
                 Filtres des résultats <i class="ri-filter-line"></i>
             </a>
             <form method="get" action="" id="js-job-applications-filters-form" class="collapse show">
@@ -58,9 +64,7 @@
             </div>
 
             {% if not job_applications_page %}
-                <h2 class="font-weight-normal text-muted">
-                    Aucune candidature pour le moment.
-                </h2>
+                <h2 class="font-weight-normal text-muted">Aucune candidature pour le moment.</h2>
             {% else %}
                 {% for job_application in job_applications_page %}
                     <div class="card mb-3 mt-4">

@@ -43,8 +43,8 @@
                 <p class="text-with-btn">
                     <span class="h4">Cette structure vous intéresse ?</span>
                     <a class="btn btn-primary float-right"
-                        href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                        title="Proposer votre candidature auprès de l'employeur solidaire {{ siae.display_name }}">
+                       href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
+                       title="Proposer votre candidature auprès de l'employeur solidaire {{ siae.display_name }}">
                         Proposer votre candidature
                     </a>
                 </p>

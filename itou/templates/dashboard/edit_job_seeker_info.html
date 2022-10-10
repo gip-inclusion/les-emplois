@@ -1,10 +1,14 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 
-{% block title %}Informations personnelles de {{ job_application.job_seeker.get_full_name|title }}{{ block.super }}{% endblock %}
+{% block title %}
+    Informations personnelles de {{ job_application.job_seeker.get_full_name|title }}{{ block.super }}
+{% endblock %}
 
 {% block content %}
-    <h1 class="h1-hero-c1">Informations personnelles de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span></h1>
+    <h1 class="h1-hero-c1">
+        Informations personnelles de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
+    </h1>
 
     <div class="alert alert-warning">
         <p>
@@ -12,22 +16,22 @@
         </p>
         <p class="mb-0">
             Tout changement entraînera une modification définitive dans notre base de données. <b>Les informations
-                supprimées seront perdues.</b>
-        </p>
-    </div>
+        supprimées seront perdues.</b>
+    </p>
+</div>
 
-    <form method="post" action="" class="js-prevent-multiple-submit">
+<form method="post" action="" class="js-prevent-multiple-submit">
 
-        {% csrf_token %}
+    {% csrf_token %}
 
-        {% bootstrap_form form alert_error_type="all" %}
+    {% bootstrap_form form alert_error_type="all" %}
 
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
-            <button type="submit" class="btn btn-primary">Mettre à jour</button>
-        {% endbuttons %}
+    {% buttons %}
+        <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+    {% endbuttons %}
 
-    </form>
+</form>
 {% endblock %}
 
 {% block script %}

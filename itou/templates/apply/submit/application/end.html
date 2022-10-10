@@ -15,18 +15,20 @@
                         {% if request.user.is_job_seeker %}
                             Votre candidature
                         {% else %}
-                            La candidature de {{  job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+                            La candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
                         {% endif %}
                         <b>a bien été envoyée chez {{ job_application.to_siae.display_name }}</b>.
                     </p>
                     {% if can_view_personal_information %}
-                        <p><b>
-                            {% if can_edit_personal_information %}
-                                Veuillez vous assurer que {{ request.user.is_job_seeker|yesno:"vos coordonnées,les coordonnées de votre candidat" }} sont bien à jour :
-                            {% else %}
-                                Le candidat a la possibilité de mettre à jour ses coordonnées en se connectant sur son espace.
-                            {% endif %}
-                        </b></p>
+                        <p>
+                            <b>
+                                {% if can_edit_personal_information %}
+                                    Veuillez vous assurer que {{ request.user.is_job_seeker|yesno:"vos coordonnées,les coordonnées de votre candidat" }} sont bien à jour :
+                                {% else %}
+                                    Le candidat a la possibilité de mettre à jour ses coordonnées en se connectant sur son espace.
+                                {% endif %}
+                            </b>
+                        </p>
                         <div id="informations" {% if form.is_bound %}style="display: none;"{% endif %} data-swap-element-with=".c-form">
                             <div class="card c-card c-card--noshadow border-bottom p-3">
                                 <div class="card-header d-flex flex-row align-items-center">
@@ -44,12 +46,15 @@
                                 <div class="card-body">
                                     <hr>
                                     <p>
-                                        <span class="text-muted">Adresse</span><br />
-                                        <b>{{ job_application.job_seeker.address_on_one_line|default:"Non renseigné" }}</b><br />
+                                        <span class="text-muted">Adresse</span>
+                                        <br />
+                                        <b>{{ job_application.job_seeker.address_on_one_line|default:"Non renseigné" }}</b>
+                                        <br />
                                     </p>
                                     <hr>
                                     <p>
-                                        <span class="text-muted">N&deg; de téléphone</span><br />
+                                        <span class="text-muted">N&deg; de téléphone</span>
+                                        <br />
                                         <b>{{ job_application.job_seeker.phone|format_phone|default:"Non renseigné" }}</b>
                                     </p>
                                 </div>
@@ -94,6 +99,5 @@
                 </div>
             </div>
         </div>
-    </div>
     </section>
 {% endblock %}

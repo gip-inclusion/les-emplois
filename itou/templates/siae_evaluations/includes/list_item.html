@@ -1,62 +1,60 @@
 
-<div class="card my-3"  >
+<div class="card my-3">
     {# navigation : anchor to scroll to a specific card when returning to this page #}
-    <a class="scrolldown-anchor" id="{{item.pk}}"></a>
+    <a class="scrolldown-anchor" id="{{ item.pk }}"></a>
     <div class="card-header">
-        {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.state reviewed_at=item.evaluated_siae.reviewed_at%}
+        {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.state reviewed_at=item.evaluated_siae.reviewed_at %}
     </div>
 
     <div class="card-body">
 
-        {%for evaluated_administrative_criteria in item.evaluated_administrative_criteria.all %}
+        {% for evaluated_administrative_criteria in item.evaluated_administrative_criteria.all %}
             <div class="row mt-1">
                 <div class="col-md-12">
-                    {% if item.evaluated_siae.reviewed_at%}
+                    {% if item.evaluated_siae.reviewed_at %}
                         {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state %}
-                    {%else%}
+                    {% else %}
                         {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria %}
-                    {%endif%}
+                    {% endif %}
                 </div>
                 <div class="col-md-12 mt-3">
                     {% if evaluated_administrative_criteria.can_upload %}
                         <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}"
-                            class="btn {% if evaluated_administrative_criteria.proof_url and evaluated_administrative_criteria.review_state == 'PENDING'%}btn-outline-primary {%else%}btn-primary {%endif%}float-right">
+                           class="btn {% if evaluated_administrative_criteria.proof_url and evaluated_administrative_criteria.review_state == 'PENDING' %}btn-outline-primary {% else %}btn-primary {% endif %}float-right">
                             {% if evaluated_administrative_criteria.proof_url %}
                                 Modifier le justificatif
-                            {%else%}
+                            {% else %}
                                 Ajouter un justificatif
-                            {%endif%}
+                            {% endif %}
                         </a>
                     {% else %}
-                        <a href="{{evaluated_administrative_criteria.proof_url}}" target="_blank" class="btn btn-outline-primary float-right">Visualiser le justificatif soumis</a>
+                        <a href="{{ evaluated_administrative_criteria.proof_url }}" target="_blank" class="btn btn-outline-primary float-right">Visualiser le justificatif soumis</a>
                     {% endif %}
                 </div>
             </div>
 
-        {%endfor%}
+        {% endfor %}
 
         <div class="row mt-1">
             <div class="col-md-12">
-                {% if item.should_select_criteria == "PENDING"%}
-                    <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}"
-                        class="btn btn-primary">Sélectionner les critères</a>
+                {% if item.should_select_criteria == "PENDING" %}
+                    <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-primary">Sélectionner les critères</a>
                 {% elif item.should_select_criteria == "EDITABLE" %}
-                    <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}"
-                        class="btn btn-outline-primary">Modifier les critères</a>
+                    <a href="{% url 'siae_evaluations_views:siae_select_criteria' item.pk %}" class="btn btn-outline-primary">Modifier les critères</a>
                 {% endif %}
 
             </div>
         </div>
 
-        {%if item.evaluated_siae.reviewed_at and item.state == 'REFUSED' or item.evaluated_siae.reviewed_at and  item.state == 'REFUSED_2'%}
+        {% if item.evaluated_siae.reviewed_at and item.state == 'REFUSED' or item.evaluated_siae.reviewed_at and  item.state == 'REFUSED_2' %}
             <div class="row mt-5">
                 <div class="col-md-12">
                     <h3>Commentaires de la DDETS</h3>
-                    {{item.labor_inspector_explanation}}
+                    {{ item.labor_inspector_explanation }}
 
                 </div>
             </div>
-        {%endif%}
+        {% endif %}
 
 
     </div>

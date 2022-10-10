@@ -23,7 +23,7 @@
             {% csrf_token %}
             <input type="hidden" name="force_new_application" value="force">
             {% buttons %}
-                <a class="btn btn-outline-primary" href="/">Annuler</a>
+                <a class="btn btn-outline-primary" href="{% url 'home:hp' %}">Annuler</a>
                 <button type="submit" class="btn btn-primary">Postuler à nouveau</button>
             {% endbuttons %}
         </form>

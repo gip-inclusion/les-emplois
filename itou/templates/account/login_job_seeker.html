@@ -12,9 +12,7 @@
     <div class="py-5 py-lg-7">
         <h1 class="h1-hero-c1 text-center">Se connecter</h1>
         {% if show_france_connect %}
-            <div class="mt-4">
-                {% include "signup/includes/france_connect_button.html" %}
-            </div>
+            <div class="mt-4">{% include "signup/includes/france_connect_button.html" %}</div>
             <div class="mt-4 mb-3">
                 <p class="text-center">
                     <hr class="my-5" data-text="ou">
@@ -50,9 +48,7 @@
                 <a href="{% url 'account_reset_password' %}" class="font-weight-bold">Mot de passe oublié ?</a>
             </p>
 
-            <p class="text-center">
-                {% bootstrap_button "Se connecter" button_type="submit" button_class="btn-primary btn" %}
-            </p>
+            <p class="text-center">{% bootstrap_button "Se connecter" button_type="submit" button_class="btn-primary btn" %}</p>
 
         </form>
 
@@ -61,7 +57,9 @@
 
 {% block left_content %}
     <div class="py-5 py-lg-7 text-center">
-        <h1 class="h1-hero-c1">S'inscrire</h2>
+        <h1 class="h1-hero-c1">
+            S'inscrire
+        </h2>
         <p class="mb-5">
             <a class="btn btn-outline-primary" href="{% url 'signup:job_seeker_situation' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
                 Créer un compte candidat

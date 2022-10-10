@@ -4,7 +4,9 @@
 {% load list_filters %}
 {% load bootstrap4 %}
 
-{% block title %}Nouvelle fiche salarié ASP - étape {{ step }} - {{ current_siae.display_name }}{{ block.super }}{% endblock %}
+{% block title %}
+    Nouvelle fiche salarié ASP - étape {{ step }} - {{ current_siae.display_name }}{{ block.super }}
+{% endblock %}
 
 {% block content %}
 
@@ -17,38 +19,43 @@
             <div class="card-body p-1">
                 <div class="row">
                     <div class="col-sm-9 pt-3">
-                        <div>Début du contrat : <b>{{ job_application.hiring_start_at|default_if_none:"Non renseigné" }}</b></div>
-                        <div>Fin du contrat : <b>{{ job_application.hiring_end_at|default_if_none:"Non renseigné" }}</b></div>
-                        <div>Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b></div>
+                        <div>
+                            Début du contrat : <b>{{ job_application.hiring_start_at|default_if_none:"Non renseigné" }}</b>
+                        </div>
+                        <div>
+                            Fin du contrat : <b>{{ job_application.hiring_end_at|default_if_none:"Non renseigné" }}</b>
+                        </div>
+                        <div>
+                            Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b>
+                        </div>
                     </div>
                     <div class="col-sm-3 text-right">
-                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP"></img>
-                    </div>
+                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP">
+                    </img>
                 </div>
             </div>
         </div>
-
-        <ul class="list-unstyled multi-steps my-5">
-            {% for pstep, label in steps %}
-                <li {% if pstep == step %}class="is-active"{% endif %}>
-                    {{ label }}
-                </li>
-            {% endfor %}
-        </ul>
-
-        {% if step == 1 %}
-            {% include "employee_record/includes/create_step_1.html" %}
-        {% elif step == 2 %}
-            {% include "employee_record/includes/create_step_2.html" %}
-        {% elif step == 3 %}
-            {% include "employee_record/includes/create_step_3.html" %}
-        {% elif step == 4 %}
-            {% include "employee_record/includes/create_step_4.html" %}
-        {% elif step == 5 %}
-            {% include "employee_record/includes/create_step_5.html" %}
-        {% endif %}
-
     </div>
+
+    <ul class="list-unstyled multi-steps my-5">
+        {% for pstep, label in steps %}
+            <li {% if pstep == step %}class="is-active"{% endif %}>{{ label }}</li>
+        {% endfor %}
+    </ul>
+
+    {% if step == 1 %}
+        {% include "employee_record/includes/create_step_1.html" %}
+    {% elif step == 2 %}
+        {% include "employee_record/includes/create_step_2.html" %}
+    {% elif step == 3 %}
+        {% include "employee_record/includes/create_step_3.html" %}
+    {% elif step == 4 %}
+        {% include "employee_record/includes/create_step_4.html" %}
+    {% elif step == 5 %}
+        {% include "employee_record/includes/create_step_5.html" %}
+    {% endif %}
+
+</div>
 
 {% endblock %}
 

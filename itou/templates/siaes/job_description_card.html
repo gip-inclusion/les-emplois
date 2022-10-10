@@ -15,14 +15,10 @@
         <hr>
         <div class="text-right">
             {% if can_update_job_description %}
-                <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}"
-                    class="btn btn-sm btn-outline-primary"
-                    arial-label="Modifier la fiche de poste">
+                <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" arial-label="Modifier la fiche de poste">
                     Modifier
                 </a>
-                <a href="{% url "siaes_views:job_description_list" %}"
-                    class="btn btn-sm btn-primary"
-                    title="Retour vers la liste des postes">
+                <a href="{% url "siaes_views:job_description_list" %}" class="btn btn-sm btn-primary" title="Retour vers la liste des postes">
                     Fermer
                 </a>
             {% else %}
@@ -38,11 +34,11 @@
                     {% if job.is_active and not siae.block_job_applications %}
                         <div class="col text-right">
                             <a href="{% url "apply:start" siae_pk=siae.pk %}?job_description_id={{ job.pk }}"
-                                class="matomo-event btn btn-sm btn-primary"
-                                data-matomo-category="candidature"
-                                data-matomo-action="clic"
-                                data-matomo-option="clic-metiers"
-                                title="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                               class="matomo-event btn btn-sm btn-primary"
+                               data-matomo-category="candidature"
+                               data-matomo-action="clic"
+                               data-matomo-option="clic-metiers"
+                               title="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                 Postuler
                             </a>
                         </div>

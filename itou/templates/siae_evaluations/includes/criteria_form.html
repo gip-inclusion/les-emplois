@@ -6,15 +6,13 @@
 
     {% bootstrap_form_errors form_administrative_criteria type="all" %}
 
-    <h3 class="h2">
-        Critères administratifs déclarés lors de l'embauche
-    </h3>
-    <p>Vous devez justifier l’embauche du salarié en sélectionnant soit 1 critère administratif de niveau 1, soit {{form_administrative_criteria.num_level2_admin_criteria}} critères administratifs de niveau 2.</p>
+    <h3 class="h2">Critères administratifs déclarés lors de l'embauche</h3>
+    <p>
+        Vous devez justifier l’embauche du salarié en sélectionnant soit 1 critère administratif de niveau 1, soit {{ form_administrative_criteria.num_level2_admin_criteria }} critères administratifs de niveau 2.
+    </p>
 
     {% if level_1_fields %}
-        <h3 class="h2">
-            Niveau 1
-        </h3>
+        <h3 class="h2">Niveau 1</h3>
 
         {% for field in level_1_fields %}
             {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
@@ -22,9 +20,7 @@
     {% endif %}
 
     {% if level_2_fields %}
-        <h3 class="h2">
-            Niveau 2
-        </h3>
+        <h3 class="h2">Niveau 2</h3>
 
         {% for field in level_2_fields %}
             {# notice that eligibility/includes/criteria_input.html requires form_administrative_criteria.OBJECTS #}
@@ -36,4 +32,4 @@
     {% buttons %}
         <button type="submit" class="btn btn-primary float-right">Enregistrer ce(s) critère(s)</button>
     {% endbuttons %}
-
+</form>

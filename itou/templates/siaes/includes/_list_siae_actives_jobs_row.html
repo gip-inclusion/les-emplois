@@ -2,8 +2,10 @@
 
 <li class="list-group-item list-group-item-action p-2{% if is_appended %} border-top{% endif %}">
     <a class="d-flex flex-wrap align-items-center text-decoration-none matomo-event"
-        href="{% if job.pk %}{{job.get_absolute_url}}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
-        data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-metiers">
+       href="{% if job.pk %}{{ job.get_absolute_url }}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
+       data-matomo-category="candidature"
+       data-matomo-action="clic"
+       data-matomo-option="clic-metiers">
         <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
         {% if job.is_popular %}
             <span class="badge badge-sm badge-pill badge-pilotage text-primary">

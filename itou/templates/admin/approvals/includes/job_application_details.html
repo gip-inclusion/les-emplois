@@ -3,9 +3,7 @@
 {% with job_application.job_seeker as job_seeker %}
 
     <h2 class="h1">
-        <a href="{% url "admin:users_user_change" job_seeker.id %}" target="_blank">
-            Candidat
-        </a>
+        <a href="{% url "admin:users_user_change" job_seeker.id %}" target="_blank">Candidat</a>
     </h2>
 
     <ul>
@@ -14,55 +12,53 @@
             {{ job_seeker.last_name }}
             <small>
                 (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.last_name|urlencode }}" target="_blank">
-                    rechercher dans les agréments Pôle emploi
-                </a>)
-            </small>
-        </li>
+                rechercher dans les agréments Pôle emploi
+            </a>)
+        </small>
+    </li>
+    <li>
+        <b>Prénom : </b>
+        {{ job_seeker.first_name }}
+    </li>
+    <li>
+        <b>Date de naissance : </b>
+        {{ job_seeker.birthdate|date:"d/m/Y" }}
+    </li>
+    <li>
+        <b>Email : </b>
+        {{ job_seeker.email }}
+    </li>
+    {% if job_seeker.phone %}
         <li>
-            <b>Prénom : </b>
-            {{ job_seeker.first_name }}
+            <b>Téléphone : </b>
+            {{ job_seeker.phone|format_phone }}
         </li>
+    {% endif %}
+    {% if job_seeker.pole_emploi_id %}
         <li>
-            <b>Date de naissance : </b>
-            {{ job_seeker.birthdate|date:"d/m/Y" }}
-        </li>
-        <li>
-            <b>Email : </b>
-            {{ job_seeker.email }}
-        </li>
-        {% if job_seeker.phone %}
-            <li>
-                <b>Téléphone : </b>
-                {{ job_seeker.phone|format_phone }}
-            </li>
-        {% endif %}
-        {% if job_seeker.pole_emploi_id %}
-            <li>
-                <b>Identifiant Pôle emploi : </b>
-                {{ job_seeker.pole_emploi_id }}
-                <small>
-                    (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.pole_emploi_id|urlencode }}" target="_blank">
-                        rechercher dans les agréments Pôle emploi
-                    </a>)
-                </small>
-            </li>
-        {% endif %}
-        {% if job_seeker.lack_of_pole_emploi_id_reason %}
-            <li>
-                <b>Raison de l'absence d'identifiant Pôle emploi : </b>
-                {{ job_seeker.get_lack_of_pole_emploi_id_reason_display }}
-            </li>
-        {% endif %}
-    </ul>
+            <b>Identifiant Pôle emploi : </b>
+            {{ job_seeker.pole_emploi_id }}
+            <small>
+                (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.pole_emploi_id|urlencode }}" target="_blank">
+                rechercher dans les agréments Pôle emploi
+            </a>)
+        </small>
+    </li>
+{% endif %}
+{% if job_seeker.lack_of_pole_emploi_id_reason %}
+    <li>
+        <b>Raison de l'absence d'identifiant Pôle emploi : </b>
+        {{ job_seeker.get_lack_of_pole_emploi_id_reason_display }}
+    </li>
+{% endif %}
+</ul>
 
 {% endwith %}
 
 {% with job_application.to_siae as siae %}
 
     <h2 class="h1">
-        <a href="{% url "admin:siaes_siae_change" siae.id %}" target="_blank">
-            Employeur solidaire
-        </a>
+        <a href="{% url "admin:siaes_siae_change" siae.id %}" target="_blank">Employeur solidaire</a>
     </h2>
 
     <ul>
@@ -87,9 +83,7 @@
 {% endwith %}
 
 <h2 class="h1">
-    <a href="{% url "admin:job_applications_jobapplication_change" job_application.id %}" target="_blank">
-        Candidature
-    </a>
+    <a href="{% url "admin:job_applications_jobapplication_change" job_application.id %}" target="_blank">Candidature</a>
 </h2>
 
 <ul>

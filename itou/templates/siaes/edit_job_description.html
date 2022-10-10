@@ -11,9 +11,12 @@
 {% block content %}
     <div class="c-stepper my-3 my-lg-6">
         <div class="progress progress--emploi">
-            <div class="progress-bar" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
+            </div>
         </div>
-        <p><strong>Étape 1</strong>/3 : Informations générales</p>
+        <p>
+            <strong>Étape 1</strong>/3 : Informations générales
+        </p>
     </div>
 
     <div class="d-block rounded-lg shadow-lg p-3 p-lg-5">
@@ -46,9 +49,7 @@
                 {% bootstrap_field form.market_context_description %}
             {% endif %}
             {% bootstrap_field form.contract_type %}
-            <div id="_other_contract_type_group">
-                {% bootstrap_field form.other_contract_type %}
-            </div>
+            <div id="_other_contract_type_group">{% bootstrap_field form.other_contract_type %}</div>
             {% bootstrap_field form.hours_per_week %}
             {% bootstrap_field form.open_positions %}
 
@@ -58,7 +59,8 @@
                     <button type="submit" class="btn btn-primary" aria-label="Passer à l'étape suivante">Suivant</button>
                 </div>
             {% endbuttons %}
-        </div>
+        </form>
+    </div>
 {% endblock %}
 
 {% block script %}

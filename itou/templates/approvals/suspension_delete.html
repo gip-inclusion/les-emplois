@@ -13,12 +13,8 @@
 
     <div class="card my-3 text-center">
         <div class="card-body">
-            <h5 class="h4 card-title">
-                Vous êtes sur le point d'annuler la suspension
-            </h5>
-            <p class="card-text">
-                {{ suspension.get_reason_display }}
-            </p>
+            <h5 class="h4 card-title">Vous êtes sur le point d'annuler la suspension</h5>
+            <p class="card-text">{{ suspension.get_reason_display }}</p>
             <p class="card-text">
                 À partir du
                 <span class="badge badge-dark">{{ suspension.start_at|date:"d/m/Y" }}</span>
@@ -35,12 +31,8 @@
         <input type="hidden" name="confirm" value="true">
 
         {% buttons %}
-            <a class="btn btn-outline-primary" href="{{ back_url }}">
-                Retour
-            </a>
-            <button type="submit" class="btn btn-danger">
-                Confirmer l'annulation de la suspension
-            </button>
+            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+            <button type="submit" class="btn btn-danger">Confirmer l'annulation de la suspension</button>
         {% endbuttons %}
 
     </form>

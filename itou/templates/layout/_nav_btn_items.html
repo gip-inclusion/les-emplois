@@ -99,44 +99,32 @@
                     <div class="dropdown-divider"></div>
                 </li>
                 <li>
-                    <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
-                        Tableau de bord
-                    </a>
+                    <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">Tableau de bord</a>
                 </li>
                 {% if user.is_siae_staff %}
                     <li>
-                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_notifications' %}">
-                            Mes notifications
-                        </a>
+                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
                     </li>
                 {% endif %}
                 <li>
                     <div class="dropdown-divider"></div>
                 </li>
                 <li>
-                    <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
-                        Modifier mon profil
-                    </a>
+                    <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">Modifier mon profil</a>
                 </li>
                 {% if not user.has_sso_provider %}
                     <li>
-                        <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
-                            Modifier mon mot de passe
-                        </a>
+                        <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">Modifier mon mot de passe</a>
                     </li>
                     <li>
-                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_email' %}">
-                            Modifier mon adresse e-mail
-                        </a>
+                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_email' %}">Modifier mon adresse e-mail</a>
                     </li>
                 {% endif %}
                 <li>
                     <div class="dropdown-divider"></div>
                 </li>
                 <li>
-                    <a class="dropdown-item text-danger" id="js-logout" href="{% url 'account_logout' %}">
-                        Déconnexion
-                    </a>
+                    <a class="dropdown-item text-danger" id="js-logout" href="{% url 'account_logout' %}">Déconnexion</a>
                 </li>
             </ul>
         </div>

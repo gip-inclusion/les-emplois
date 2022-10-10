@@ -38,34 +38,26 @@
                     {# Approval actions. #}
                     {% if job_application.approval and request.user.is_siae_staff %}
                         {% if approval_can_be_suspended_by_siae %}
-                            <a
-                                href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                class="btn btn-link">
+                            <a href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-link">
                                 Suspendre
                             </a>
                         {% elif hire_by_other_siae %}
                             <span class="btn btn-link disabled text-muted">Suspendre</span>
-                            <i
-                                class="ri-information-line ri-xl text-info"
-                                data-toggle="tooltip"
-                                title="La suspension n’est pas possible, un autre employeur a embauché le candidat.">
+                            <i class="ri-information-line ri-xl text-info" data-toggle="tooltip" title="La suspension n’est pas possible, un autre employeur a embauché le candidat.">
                             </i>
                         {% endif %}
                         {% if approval_can_be_prolonged_by_siae %}
-                            <a
-                                href="{% url 'approvals:declare_prolongation' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                class="btn btn-link">
+                            <a href="{% url 'approvals:declare_prolongation' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-link">
                                 Prolonger
                             </a>
                         {% endif %}
                         {% if job_application.can_display_approval %}
-                            <a
-                                class="btn btn-outline-primary float-right matomo-event"
-                                data-matomo-action="telechargement-pdf"
-                                data-matomo-category="agrement"
-                                data-matomo-option="details-candidature"
-                                href="{% url 'approvals:display_printable_approval' job_application_id=job_application.id %}"
-                                target="_blank">
+                            <a class="btn btn-outline-primary float-right matomo-event"
+                               data-matomo-action="telechargement-pdf"
+                               data-matomo-category="agrement"
+                               data-matomo-option="details-candidature"
+                               href="{% url 'approvals:display_printable_approval' job_application_id=job_application.id %}"
+                               target="_blank">
                                 Afficher le PASS IAE
                             </a>
                         {% endif %}

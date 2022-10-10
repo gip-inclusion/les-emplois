@@ -253,9 +253,9 @@ class ViewsTest(TestCase):
 
         response = self.client.get(urls.reverse("status:index"))
         self.assertContains(response, "<tr class=", count=len(active_probes))
-        self.assertContains(response, "<td>OK</td>", count=1)
-        self.assertContains(response, "<td>KO</td>", count=1)
-        self.assertContains(response, "<td>???</td>", count=len(active_probes) - 2)
+        self.assertContains(response, "<td>OK</td>", count=1, html=True)
+        self.assertContains(response, "<td>KO</td>", count=1, html=True)
+        self.assertContains(response, "<td>???</td>", count=len(active_probes) - 2, html=True)
 
         for probe in active_probes:
-            self.assertContains(response, f"<td>{probe.verbose_name}</td>", count=1)
+            self.assertContains(response, f"<td>{probe.verbose_name}</td>", count=1, html=True)

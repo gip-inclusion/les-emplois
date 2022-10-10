@@ -12,7 +12,9 @@
 
     {% if confirmation %}
 
-        <p>Confirmez que <a href="mailto:{{ confirmation.email_address.email }}" title="{{ confirmation.email_address.email }} est bien votre adresse e-mail">{{ confirmation.email_address.email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous.</p>
+        <p>
+            Confirmez que <a href="mailto:{{ confirmation.email_address.email }}" title="{{ confirmation.email_address.email }} est bien votre adresse e-mail">{{ confirmation.email_address.email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous.
+        </p>
 
         <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
 
@@ -20,9 +22,7 @@
 
             {# `is_safe_url` is secure enough to let us use request params here. #}
             {# See Allauth.account.adapter.DefaultAccountAdapter.is_safe_url #}
-            {% if request.GET.next %}
-                <input type="hidden" name="next" value="{{ request.GET.next }}">
-            {% endif %}
+            {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
             {% buttons %}
                 <button type="submit" class="btn btn-primary">Confirmer</button>
@@ -35,9 +35,7 @@
         {% url 'account_email' as email_url %}
 
         <div class="alert alert-danger" role="status">
-            <p>
-                Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.
-            </p>
+            <p>Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
             <p class="mb-0">
                 Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
             </p>
