@@ -37,6 +37,7 @@
         <link rel="stylesheet" href="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.css" %}" type="text/css">
         <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}" type="text/css">
         <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
+        <link rel="stylesheet" href="{% static "vendor/duetds-date-picker-1.4.0/themes/default.css" %}" type="text/css">
         {% block extra_head %}{% endblock %}
     </head>
     <body>
@@ -84,6 +85,7 @@
         <script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
         <script src="{% static "vendor/bootstrap-4.3.1/popper.min.js" %}"></script>
         <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
+        <script src="{% static "vendor/duetds-date-picker-1.4.0/duet.js" %}"></script>
         <script src="{% static "vendor/tarteaucitron/tarteaucitron.js" %}"></script>
         <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
         <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
@@ -181,6 +183,7 @@
             <script src="{% static "js/configure_jobs.js" %}"></script>
             <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
             <script src="{% static 'js/utils.js'%}"></script>
+            <script src="{% static "js/duet_date_picker_widget.js" %}"></script>
             {% if SHOW_TEST_ACCOUNTS_BANNER %}
                 <script src="{% static 'js/test_accounts.js'%}"></script>
             {% endif %}

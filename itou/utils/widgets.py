@@ -26,15 +26,6 @@ class DuetDatePickerWidget(forms.DateInput):
 
     template_name = "utils/widgets/duet_date_picker_widget.html"
 
-    class Media:
-        css = {
-            "all": ("vendor/duetds-date-picker-1.4.0/default.css",),
-        }
-        js = (
-            "vendor/duetds-date-picker-1.4.0/duet.js",
-            "js/duet_date_picker_widget.js",
-        )
-
     def format_value(self, value):
         """
         Check that dates are in IS0-8601 format: YYYY-MM-DD.
