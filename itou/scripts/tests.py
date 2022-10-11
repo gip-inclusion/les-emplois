@@ -216,8 +216,8 @@ class AiCSVFileMock:
     codeextensionvoie: str = "B"
     adr_libelle_voie: str = "du Louvre"
     adr_cplt_distribution: str = ""
-    codepostalcedex: str = "75001"
-    codeinseecom: str = "75101"
+    codepostalcedex: str = "13000"
+    codeinseecom: str = "13200"
     adr_telephone: str = "0622568941"
     adr_mail: str = "sylia@chamade.fr"
     ctr_date_embauche: str = "2021-08-12"
@@ -240,6 +240,8 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
     """November 30th we imported AI employees.
     See users.management.commands.import_ai_employees.
     """
+
+    fixtures = ["test_asp_INSEE_communes_small.json"]
 
     @property
     def command(self):
