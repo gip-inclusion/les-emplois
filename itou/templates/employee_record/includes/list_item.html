@@ -147,7 +147,6 @@
         {% elif form.status.value == "DISABLED" %}
             <div class="text-right">
                 <a href="{% url "employee_record_views:reactivate" employee_record.id %}" class="btn btn-outline-primary mt-2">Réactiver la fiche salarié</a>
-                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=DISABLED" class="btn btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
             </div>
         {% endif %}
     </div>
