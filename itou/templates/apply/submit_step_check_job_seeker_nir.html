@@ -111,7 +111,7 @@
     <script type="text/javascript" src="{% static 'js/split_nir.js' %}"></script>
     {% if preview_mode %}
         {# Show the confirmation modal after submitting the form. #}
-        <script type="text/javascript">
+        <script nonce="{{ CSP_NONCE }}" type="text/javascript">
             // Adding the "show" CSS class is not enough and not documented.
             // A JS initialization is recommended.
             $("#nir-confirmation-modal").modal("show");

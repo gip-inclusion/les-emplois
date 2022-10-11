@@ -78,7 +78,7 @@
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form_accept.media }}
     {% if form_pe_status %}{{ form_pe_status.media }}{% endif %}
-    <script>
+    <script nonce="{{ CSP_NONCE }}">
         $(function () {
             $("#acceptForm").on("submit", function (e) {
                 let modal = $("#confirmModal");

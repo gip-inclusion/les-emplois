@@ -94,7 +94,7 @@
     <script src='{% static "js/s3_upload.js" %}'></script>
     {{ s3_upload.form_values|json_script:"s3-form-values" }}
     {{ s3_upload.config|json_script:"s3-upload-config" }}
-    <script>
+    <script nonce="{{ CSP_NONCE }}">
         s3UploadInit({
             dropzoneSelector: "#resume_form",
             callbackLocationSelector: "#{{ form.proof_url.id_for_label }}",

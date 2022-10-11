@@ -88,7 +88,7 @@
         <script src="{% static "vendor/jquery-ui-1.13.2/jquery-ui.min.js" %}"></script>
         <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
 
-        <script>
+        <script nonce="{{ CSP_NONCE }}">
 
             // Tarteaucitron's language is set according to the browser configuration
             // but a lot of users don't know how to change it.
@@ -193,7 +193,7 @@
 
         {% if ITOU_FQDN in ALLOWED_HOSTS %}
             {# Matomo/Piwik open source web analytics #}
-            <script>
+            <script nonce="{{ CSP_NONCE }}">
                 var _paq = window._paq || [];
                 /* Custom variables: https://matomo.org/docs/custom-variables/ */
                 /* Fields are, in order: index, name, value, scope. */

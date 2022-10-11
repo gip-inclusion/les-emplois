@@ -27,7 +27,7 @@
     </head>
     <body>
         {% block content %}
-            <script>
+            <script nonce="{{ CSP_NONCE }}">
                 window.iFrameResizer = {
                     targetOrigin: "{{ ITOU_PILOTAGE_URL }}"
                 }
