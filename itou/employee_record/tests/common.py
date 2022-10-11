@@ -8,7 +8,7 @@ class EmployeeRecordFixtureTest(TestCase):
     # "Use the fixture, Luke!"
     fixtures = [
         "test_asp_INSEE_communes_small.json",
-        "test_asp_INSEE_countries_small.json",
+        "test_asp_INSEE_countries.json",
     ]
 
 

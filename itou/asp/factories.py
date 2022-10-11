@@ -7,7 +7,6 @@ from itou.asp import models
 
 
 _sample_europe_countries = [
-    {"code": "100", "name": "FRANCE", "group": "1"},
     {"code": "101", "name": "DANEMARK", "group": "2"},
     {"code": "111", "name": "BULGARIE", "group": "2"},
     {"code": "135", "name": "PAYS-BAS", "group": "2"},
@@ -27,18 +26,18 @@ _sample_france = [
 
 _sample_communes = [
     {"code": "64483", "name": "SAINT-JEAN-DE-LUZ"},
-    {"code": "97108", "name": "CAPESTERRE-BELLE-EAU"},
+    {"code": "97108", "name": "CAPESTERRE-DE-MARIE-GALANT"},
+    {"code": "97107", "name": "CAPESTERRE-BELLE-EAU"},
     {"code": "37273", "name": "VILLE-AUX-DAMES"},
     {"code": "13200", "name": "MARSEILLE"},
     {"code": "67152", "name": "GEISPOLSHEIM"},
-    {"code": "85146", "name": "MONTAIGU-VENDEE"},
+    {"code": "85146", "name": "MONTAIGU"},
 ]
 
 
 class CountryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Country
-        # ASP models must not be saved
         strategy = factory.BUILD_STRATEGY
 
     code, name, group = random.choice(_sample_europe_countries).values()
@@ -67,21 +66,41 @@ class CountryOutsideEuropeFactory(CountryFactory):
 
 
 class CommuneFactory(factory.django.DjangoModelFactory):
-    """
-    Factory for ASP INSEE commune
+    """Factory for ASP INSEE commune:
+    - if `code` or `name` are build parameters, object values will result of a lookup in `_sample_communes`
+    - otherwise, fields `code` and `name` will be set from a randomly picked sample commune
     """
 
     class Meta:
         model = models.Commune
-        # ASP models must not be saved()
         strategy = factory.BUILD_STRATEGY
 
     # FIXME: may cause issues in testing validity periods
     start_date = datetime.date(2000, 1, 1)
     end_date = None
 
-    # FIXME: replace by provider or fixture
-    code, name = random.choice(_sample_communes).values()
+    # Skipping definition of `code` and `name` fields
+    # will be set in `_adjust_kwargs`
+
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        # Allow creation with parameters `code` or `name` (first matched)
+        # either field must be a match in `_sample_communes`
+        match kwargs:
+            case {"code": code}:
+                for item in _sample_communes:
+                    if item["code"] == code:
+                        kwargs["name"] = item["name"]
+            case {"name": name}:
+                for item in _sample_communes:
+                    if item["name"] == name:
+                        kwargs["code"] = item["code"]
+            case _:
+                code, name = random.choice(_sample_communes).values()
+                kwargs["code"] = code
+                kwargs["name"] = name
+
+        return kwargs
 
 
 # FIXME: unreliable and confusing
