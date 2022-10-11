@@ -65,26 +65,12 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
 
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
 
-    approval_can_be_suspended_by_siae = job_application.approval and job_application.approval.can_be_suspended_by_siae(
-        job_application.to_siae
-    )
-
-    hire_by_other_siae = job_application.approval and not job_application.approval.user.last_hire_was_made_by_siae(
-        job_application.to_siae
-    )
-
-    approval_can_be_prolonged_by_siae = job_application.approval and job_application.approval.can_be_prolonged_by_siae(
-        job_application.to_siae
-    )
     expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
         job_seeker=job_application.job_seeker, for_siae=job_application.to_siae
     )
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
 
     context = {
-        "approval_can_be_suspended_by_siae": approval_can_be_suspended_by_siae,
-        "hire_by_other_siae": hire_by_other_siae,
-        "approval_can_be_prolonged_by_siae": approval_can_be_prolonged_by_siae,
         "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "job_application": job_application,
@@ -364,9 +350,6 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
-    approval_can_be_suspended_by_siae = job_application.approval and job_application.approval.can_be_suspended_by_siae(
-        job_application.to_siae
-    )
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
     if not job_application.can_be_cancelled:
@@ -384,7 +367,6 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
 
     context = {
         "job_application": job_application,
-        "approval_can_be_suspended_by_siae": approval_can_be_suspended_by_siae,
     }
     return render(request, template_name, context)
 

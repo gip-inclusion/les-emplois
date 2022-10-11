@@ -691,9 +691,6 @@ class ProcessViewsTest(TestCase):
         self.assertContains(
             response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
         )
-        self.assertContains(
-            response, reverse("approvals:suspend", kwargs={"approval_id": job_application.approval_id})
-        )
 
         post_data = {
             "confirm": "true",
