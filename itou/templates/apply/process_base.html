@@ -17,52 +17,24 @@
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
-        {% if job_application.state.is_accepted %}
+        {% if job_application.state.is_accepted and job_application.approval %}
 
-            <div class="card my-4">
-                <div class="card-body">
-
-                    {# Approval status. #}
-                    <div class="card-text">
-                        {% if job_application.approval %}
-                            {% include "approvals/includes/status.html" with common_approval=job_application.approval %}
-                        {% elif job_application.hiring_without_approval %}
-                            Vous n'avez pas demandé de PASS IAE (agrément).
-                        {% elif job_application.approval_manually_refused_at %}
-                            PASS IAE refusé (délai de carence non respecté).
-                        {% else %}
-                            PASS IAE (agrément) en cours de délivrance.
-                        {% endif %}
+            <div class="alert alert-info">
+                <div class="row">
+                    <div class="col-auto pr-0">
+                        <i class="ri-information-line ri-xl text-info"></i>
                     </div>
-
-                    {# Approval actions. #}
-                    {% if job_application.approval and request.user.is_siae_staff %}
-                        {% if approval_can_be_suspended_by_siae %}
-                            <a href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-link">
-                                Suspendre
-                            </a>
-                        {% elif hire_by_other_siae %}
-                            <span class="btn btn-link disabled text-muted">Suspendre</span>
-                            <i class="ri-information-line ri-xl text-info" data-toggle="tooltip" title="La suspension n’est pas possible, un autre employeur a embauché le candidat.">
-                            </i>
-                        {% endif %}
-                        {% if approval_can_be_prolonged_by_siae %}
-                            <a href="{% url 'approvals:declare_prolongation' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-link">
-                                Prolonger
-                            </a>
-                        {% endif %}
-                        {% if job_application.can_display_approval %}
-                            <a class="btn btn-outline-primary float-right matomo-event"
-                               data-matomo-action="telechargement-pdf"
-                               data-matomo-category="agrement"
-                               data-matomo-option="details-candidature"
-                               href="{% url 'approvals:display_printable_approval' job_application_id=job_application.id %}"
-                               target="_blank">
-                                Afficher le PASS IAE
-                            </a>
-                        {% endif %}
-                    {% endif %}
-
+                    <div class="col">
+                        <b>PASS IAE</b>
+                        <p class="mb-0">
+                            Désormais, le PASS IAE est visible depuis le profil salarié, la gestion de celui-ci également (exemple : « suspendre » ou  « prolonger » un PASS IAE).
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                        <a class="btn btn-emploi" href="{% url 'approvals:detail' pk=job_application.approval.id %}">
+                            Accéder au Profil salarié
+                        </a>
+                    </div>
                 </div>
             </div>
 
