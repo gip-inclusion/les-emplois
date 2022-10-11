@@ -1,14 +1,11 @@
 "use strict"
 
-const picker = document.querySelectorAll("duet-date-picker")
-
-const DATE_FORMAT = /^(\d{2})\/(\d{2})\/(\d{4})$/
-
-picker.forEach(pickerInstance => {
+document.querySelectorAll("duet-date-picker").forEach(pickerInstance => {
 
   pickerInstance.dateAdapter = {
 
     parse(value = "", createDate) {
+      const DATE_FORMAT = /^(\d{2})\/(\d{2})\/(\d{4})$/
       const matches = value.match(DATE_FORMAT)
       if (matches) {
         return createDate(matches[3], matches[2], matches[1])
