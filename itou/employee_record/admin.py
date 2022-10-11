@@ -1,9 +1,11 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 import itou.employee_record.models as models
 
+from ..utils.templatetags.str_filters import pluralizefr
 from .enums import Status
 
 
@@ -31,8 +33,21 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
     def update_employee_record_as_ready(self, _request, queryset):
         queryset.update(status=Status.READY)
 
+    @admin.action(description="Planifier une notification de changement 'PASS IAE' pour ces fiches salarié")
+    def schedule_approval_update_notification(self, request, queryset):
+        for employee_record in queryset:
+            models.EmployeeRecordUpdateNotification.objects.update_or_create(
+                employee_record=employee_record,
+                notification_type=models.NotificationType.APPROVAL,
+                defaults={"updated_at": timezone.now},
+            )
+
+        s = pluralizefr(queryset)
+        messages.add_message(request, messages.SUCCESS, f"{len(queryset)} notification{s} planifiée{s}")
+
     actions = [
         update_employee_record_as_ready,
+        schedule_approval_update_notification,
     ]
 
     inlines = (EmployeeRecordUpdateNotificationInline,)
