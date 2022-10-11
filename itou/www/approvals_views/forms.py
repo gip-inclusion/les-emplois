@@ -123,10 +123,6 @@ class SuspensionForm(forms.ModelForm):
         # Show new reasons but keep old ones for history.
         self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
 
-        self.reasons_can_be_unsuspend = [
-            choice for choice, _ in self.fields["reason"].choices if choice in Suspension.REASONS_ALLOWING_UNSUSPEND
-        ]
-
         # End date is not strictly required because it can be set
         # with `set_default_end_date` input
         self.fields["end_at"].required = False
