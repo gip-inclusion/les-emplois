@@ -46,7 +46,7 @@
 
 {% block script %}
     {{ block.super }}
-    <script>
+    <script nonce="{{ CSP_NONCE }}">
         $(document).ready(() => {
             /**
              * JS to collapse subfields

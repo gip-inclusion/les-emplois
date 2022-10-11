@@ -128,7 +128,7 @@
     {% if tally_form_id %}
         <script async src="https://tally.so/widgets/embed.js"></script>
 
-        <script>
+        <script nonce="{{ CSP_NONCE }}">
             window.TallyConfig = {
                 "formId": "{{ tally_form_id }}",
                 "popup": {

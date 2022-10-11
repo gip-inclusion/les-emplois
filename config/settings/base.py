@@ -105,6 +105,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 DJANGO_MIDDLEWARES = [
+    "csp.middleware.CSPMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -146,6 +147,9 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
+                # Django CSP
+                "csp.context_processors.nonce",
+                # Itou.
                 "itou.utils.perms.context_processors.get_current_organization_and_perms",
                 "itou.utils.settings_context_processors.expose_settings",
             ]
@@ -566,3 +570,46 @@ IMPORT_DIR = os.getenv("SCRIPT_IMPORT_PATH", f"{ROOT_DIR}/imports")
 
 MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL")
 MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
+
+# Content Security Policy
+# Beware, some browser extensions may prevent the reports to be sent to sentry with CORS errors.
+CSP_DEFAULT_SRC = ["'self'"]
+CSP_FRAME_SRC = [
+    "https://app.livestorm.co",  # Upcoming events from the homepage
+    "https://stats.inclusion.beta.gouv.fr",
+]
+CSP_IMG_SRC = [
+    "'self'",
+    "data:",  # Because of tarteaucitron.js
+    "*.tile.openstreetmap.org",
+]
+CSP_STYLE_SRC = [
+    "'self'",
+    # It would be better to whilelist styles hashes but it's to much work for now.
+    "'unsafe-inline'",
+    "https://fonts.googleapis.com",
+    "https://cdnjs.cloudflare.com/",  # Used by select 2, gis widgets and maybe more in the future
+]
+CSP_FONT_SRC = [
+    "'self'",
+    "https://fonts.gstatic.com",
+]
+CSP_SCRIPT_SRC = [
+    "'self'",
+    "https://stats.data.gouv.fr",
+    "https://stats.inclusion.beta.gouv.fr",
+    "https://static.hotjar.com",
+    "https://cdnjs.cloudflare.com/",  # Used by select 2, gis widgets and maybe more in the future
+]
+CSP_CONNECT_SRC = [
+    "'self'",
+    "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
+    "https://stats.data.gouv.fr",
+]
+if S3_STORAGE_ENDPOINT_DOMAIN:
+    CSP_CONNECT_SRC += [
+        f"https://{S3_STORAGE_ENDPOINT_DOMAIN}",
+    ]
+CSP_INCLUDE_NONCE_IN = ["script-src"]
+CSP_REPORT_URI = os.getenv("CSP_REPORT_URI", None)
+CSP_REPORT_ONLY = True

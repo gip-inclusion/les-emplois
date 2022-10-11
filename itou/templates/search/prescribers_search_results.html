@@ -9,7 +9,7 @@
 
 {% block script %}
     {{ block.super }}
-    <script>
+    <script nonce="{{ CSP_NONCE }}">
         $("#search-filter-form :input").change(function() {
             $("#search-form").submit();
         });
