@@ -9,6 +9,7 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siae_evaluations import enums as evaluation_enums
+from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -260,7 +261,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(
             accepted=True,
             evaluation_campaign__institution=self.institution,
-            evaluation_campaign__ended_at=timezone.now() - relativedelta(years=3),
+            evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
         self.client.force_login(self.user)
         response = self.client.get(
@@ -470,7 +471,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(
             accepted=True,
             evaluation_campaign__institution=self.institution,
-            evaluation_campaign__ended_at=timezone.now() - relativedelta(years=3),
+            evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
         self.client.force_login(self.user)
         response = self.client.get(
@@ -926,7 +927,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(
             accepted=True,
             evaluation_campaign__institution=self.institution,
-            evaluation_campaign__ended_at=timezone.now() - relativedelta(years=3),
+            evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
         self.client.force_login(self.user)

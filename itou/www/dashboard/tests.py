@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.test import TestCase, override_settings
@@ -24,6 +23,7 @@ from itou.job_applications.notifications import (
 )
 from itou.prescribers import factories as prescribers_factories
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import (
@@ -228,7 +228,7 @@ class DashboardViewTest(TestCase):
             ),
         )
 
-        evaluation_campaign.ended_at = timezone.now() - relativedelta(years=3)
+        evaluation_campaign.ended_at = timezone.now() - CAMPAIGN_VIEWABLE_DURATION
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")

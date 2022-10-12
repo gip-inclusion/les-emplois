@@ -20,6 +20,8 @@ from itou.siaes.models import Siae
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.utils.emails import get_email_message
 
+from .constants import CAMPAIGN_VIEWABLE_DURATION
+
 
 def select_min_max_job_applications(job_applications):
     # select SELECTION_PERCENTAGE % max, within bounds
@@ -98,7 +100,7 @@ class EvaluationCampaignQuerySet(models.QuerySet):
         return self.filter(self.in_progress_q)
 
     def viewable(self):
-        recent_q = Q(ended_at__gte=timezone.now() - relativedelta(years=3))
+        recent_q = Q(ended_at__gte=timezone.now() - CAMPAIGN_VIEWABLE_DURATION)
         return self.filter(self.in_progress_q | recent_q)
 
 
