@@ -1,4 +1,3 @@
-import json
 from unittest import mock
 
 from django.test.utils import override_settings
@@ -153,10 +152,10 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         self.assertEqual(Status.PROCESSED, employee_record.status)
         self.assertIsNotNone(employee_record.archived_json)
 
-        employee_record_json = json.loads(employee_record.archived_json)
-
-        self.assertEqual(EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE, employee_record_json.get("codeTraitement"))
-        self.assertIsNotNone(employee_record_json.get("libelleTraitement"))
+        self.assertEqual(
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE, employee_record.archived_json.get("codeTraitement")
+        )
+        self.assertIsNotNone(employee_record.archived_json.get("libelleTraitement"))
 
     @mock.patch("pysftp.Connection", SFTPEvilConnectionMock)
     @mock.patch(

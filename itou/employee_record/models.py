@@ -1,3 +1,5 @@
+import contextlib
+import json
 from typing import Optional, Union
 
 from django.core.exceptions import ValidationError
@@ -379,9 +381,9 @@ class EmployeeRecord(models.Model):
         self.processed_at = timezone.now()
         self.asp_processing_code = code
         self.asp_processing_label = label
-        # NOTE(vperron): the following line should perform json.loads(archive) in order
-        # to actually store a JSON dictionary instead of a serialized string.
-        # The current records should then be migrated in-place.
+        if archive is not None:
+            with contextlib.suppress(json.JSONDecodeError):
+                archive = json.loads(archive)
         self.archived_json = archive
         self.save()
 

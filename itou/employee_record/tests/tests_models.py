@@ -1,3 +1,4 @@
+import json
 from datetime import date, timedelta
 from unittest import mock
 
@@ -332,6 +333,64 @@ class EmployeeRecordLifeCycleTest(EmployeeRecordFixtureTest):
         self.assertEqual(self.employee_record.status, Status.PROCESSED)
         self.assertEqual(self.employee_record.asp_processing_code, process_code)
         self.assertEqual(self.employee_record.asp_processing_label, process_message)
+        self.assertEqual(self.employee_record.archived_json, {})
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_state_processed_when_archive_is_none(self, _mock):
+        filename = "RIAE_FS_20210410130001.json"
+        self.employee_record.update_as_sent(filename, 1)
+
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
+        self.employee_record.update_as_processed(process_code, process_message, None)
+
+        self.assertEqual(self.employee_record.status, Status.PROCESSED)
+        self.assertEqual(self.employee_record.asp_processing_code, process_code)
+        self.assertEqual(self.employee_record.asp_processing_label, process_message)
+        self.assertIsNone(self.employee_record.archived_json)
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_state_processed_when_archive_is_empty(self, _mock):
+        filename = "RIAE_FS_20210410130001.json"
+        self.employee_record.update_as_sent(filename, 1)
+
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
+        self.employee_record.update_as_processed(process_code, process_message, "")
+
+        self.assertEqual(self.employee_record.status, Status.PROCESSED)
+        self.assertEqual(self.employee_record.asp_processing_code, process_code)
+        self.assertEqual(self.employee_record.asp_processing_label, process_message)
+        self.assertEqual(self.employee_record.archived_json, "")
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_state_processed_when_archive_is_not_json(self, _mock):
+        filename = "RIAE_FS_20210410130001.json"
+        self.employee_record.update_as_sent(filename, 1)
+
+        process_code, process_message = (
+            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
+            "La ligne de la fiche salarié a été enregistrée avec succès.",
+        )
+        self.employee_record.update_as_processed(process_code, process_message, "whatever")
+
+        self.assertEqual(self.employee_record.status, Status.PROCESSED)
+        self.assertEqual(self.employee_record.asp_processing_code, process_code)
+        self.assertEqual(self.employee_record.asp_processing_label, process_message)
+        self.assertEqual(self.employee_record.archived_json, "whatever")
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -429,7 +488,7 @@ class EmployeeRecordLifeCycleTest(EmployeeRecordFixtureTest):
 
         filename_second = "RIAE_FS_20210410130002.json"
         self.employee_record.update_as_sent(filename_second, 1)
-        self.assertEqual(self.employee_record.archived_json, archive_first)
+        self.assertEqual(self.employee_record.archived_json, json.loads(archive_first))
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
@@ -437,7 +496,7 @@ class EmployeeRecordLifeCycleTest(EmployeeRecordFixtureTest):
         )
         archive_second = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [2]."}'
         self.employee_record.update_as_processed(process_code, process_message, archive_second)
-        self.assertEqual(self.employee_record.archived_json, archive_second)
+        self.assertEqual(self.employee_record.archived_json, json.loads(archive_second))
         self.assertEqual(self.employee_record.asp_batch_file, filename_second)
 
     @mock.patch(
