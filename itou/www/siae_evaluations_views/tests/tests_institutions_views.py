@@ -1,4 +1,6 @@
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
+from django.contrib.messages.storage.base import Message
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
@@ -67,7 +69,7 @@ def get_evaluated_administrative_criteria(institution):
 
 class SamplesSelectionViewTest(TestCase):
     def setUp(self):
-        membership = InstitutionMembershipFactory()
+        membership = InstitutionMembershipFactory(institution__name="DDETS Ille et Vilaine")
         self.user = membership.user
         self.institution = membership.institution
         self.url = reverse("siae_evaluations_views:samples_selection")
@@ -155,6 +157,21 @@ class SamplesSelectionViewTest(TestCase):
         updated_evaluation_campaign = EvaluationCampaign.objects.get(pk=evaluation_campaign.pk)
         self.assertIsNotNone(updated_evaluation_campaign.percent_set_at)
         self.assertEqual(updated_evaluation_campaign.chosen_percent, post_data["chosen_percent"])
+
+    def test_post_form_opt_out(self):
+        EvaluationCampaignFactory(institution=self.institution, name="Campagne 2022")
+
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data={"opt_out": "on"})
+
+        assert list(messages.get_messages(response.wsgi_request)) == [
+            Message(
+                messages.SUCCESS,
+                "DDETS Ille et Vilaine ne participera pas à la campagne de contrôle a posteriori Campagne 2022.",
+            )
+        ]
+        self.assertRedirects(response, reverse("dashboard:index"))
+        assert not EvaluationCampaign.objects.exists()
 
 
 class InstitutionEvaluatedSiaeListViewTest(TestCase):
