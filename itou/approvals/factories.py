@@ -23,7 +23,7 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(JobSeekerFactory)
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
-    start_at = datetime.date.today()
+    start_at = factory.LazyFunction(datetime.date.today)
     end_at = factory.LazyAttribute(lambda obj: Approval.get_default_end_date(obj.start_at))
 
     @factory.post_generation
@@ -85,7 +85,7 @@ class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
     number = factory.fuzzy.FuzzyText(length=12, chars=string.digits)
     birth_name = factory.LazyAttribute(lambda obj: obj.last_name)
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
-    start_at = datetime.date.today()
+    start_at = factory.LazyFunction(datetime.date.today)
     end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1))
     siae_siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     siae_kind = factory.fuzzy.FuzzyChoice(SiaeKind.values)
