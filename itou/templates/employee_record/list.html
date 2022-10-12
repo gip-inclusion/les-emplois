@@ -22,15 +22,15 @@
     </h1>
 
     <div class="mt-3">
-        <form method="get" class="form" id="status-filter-form">
-            <div class="row">
-                <div class="col-sm-3">
-                    <div class="card-deck">
-                        <div class="card">
-                            <div class="card-header">
-                                <b>Filtrer les fiches</b>
-                            </div>
-                            <div class="card-body">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="card-deck">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Filtrer les fiches</b>
+                        </div>
+                        <div class="card-body">
+                            <form method="get" class="form" id="status-filter-form">
                                 <p class="text-muted">
                                     <b>Par statut</b>
                                 </p>
@@ -46,91 +46,101 @@
                                         </div>
                                     {% endfor %}
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
 
             <div class="col-sm-9">
                 <div class="container rounded bg-gray-400 p-3 mb-3">
                     <div class="row">
                         <div class="col-sm-10">
                             <h5>Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</h5>
-                            <p class="mt-3">Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.</p>
+                            <p class="mt-3">Une fois envoyées et validées, vous retrouverez directement vos données sur
+                                l'extranet de l'ASP.</p>
                             <ul>
                                 <li>
-                                    Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à partir du <b>{{ feature_availability_date|date }}</b>.
+                                    Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à
+                                    partir du <b>{{ feature_availability_date|date }}</b>.
                                 </li>
                                 <li>
-                                    Vous devez avoir une annexe financière valide dans l'extranet de l'ASP pour pouvoir déclarer une fiche salarié dans les emplois.
+                                    Vous devez avoir une annexe financière valide dans l'extranet de l'ASP pour pouvoir
+                                    déclarer une fiche salarié dans les emplois.
                                 </li>
                             </ul>
                         </div>
                         <div class="col-sm-2 text-right">
-                            <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP" class="img-fluid">
-                        </img>
+                            <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP"
+                                 class="img-fluid" />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {# Messages #}
-            <div class="alert alert-info mb-4">
-                {% if form.status.value == "NEW" %}
-                    <p class="mb-0">
-                        Vous trouverez ici les candidatures validées à partir desquelles vous devez créér de nouvelles fiches salarié.
-                    </p>
-                {% elif form.status.value == "READY" %}
-                    <p class="mb-0">Vous trouverez ici les fiches salarié complétées et en attente d'envoi à l'ASP.</p>
-                    <p class="mb-0">À ce stade, seule la visualisation des informations de la fiche est possible.</p>
-                {% elif form.status.value == "SENT" %}
-                    <p class="mb-0">Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
-                    <p class="mb-0">
-                        À ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de la fiche est possible.
-                    </p>
-                {% elif form.status.value == "REJECTED" %}
-                    <p class="mb-0">Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une erreur.</p>
-                    <p class="mb-0">Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
-                {% elif form.status.value == "PROCESSED" %}
-                    <p class="mb-0">Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
-                    <p class="mb-0">
-                        Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter le détail de la fiche salarié.
-                    </p>
-                {% elif form.status.value == "DISABLED" %}
-                    <p class="mb-0">Vous trouverez ici les fiches salarié que vous avez désactivées.</p>
-                    <p class="mb-0">
-                        En cas de besoin vous pouvez réactiver une fiche, elle sera transférée dans la catégorie "Nouvelle".
-                    </p>
-                {% endif %}
-            </div>
-
-            {# "Real" employee records objects #}
-            <div class="employee-records-list">
-                {% if employee_records_list %}
-                    {% for employee_record in navigation_pages %}
-                        {% with item=employee_record.job_application %}
-                            {% include "employee_record/includes/list_item.html" %}
-                        {% endwith %}
-                    {% endfor %}
-                    {# New employee records i.e. job applications #}
-                {% else %}
-                    {% for item in navigation_pages %}
-                        {% include "employee_record/includes/list_item.html" %}
-                    {% endfor %}
-                {% endif %}
-            </div>
-
-            {% if not navigation_pages %}
-                <div class="text-muted text-center">
-                    <i class="ri-forbid-line mr-1"></i>
-                    <span>Aucune fiche salarié avec le statut selectionné ...</span>
+                {# Messages #}
+                <div class="alert alert-info mb-4">
+                    {% if form.status.value == "NEW" %}
+                        <p class="mb-0">
+                            Vous trouverez ici les candidatures validées à partir desquelles vous devez créér de
+                            nouvelles fiches salarié.
+                        </p>
+                    {% elif form.status.value == "READY" %}
+                        <p class="mb-0">Vous trouverez ici les fiches salarié complétées et en attente d'envoi à
+                            l'ASP.</p>
+                        <p class="mb-0">À ce stade, seule la visualisation des informations de la fiche est
+                            possible.</p>
+                    {% elif form.status.value == "SENT" %}
+                        <p class="mb-0">Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
+                        <p class="mb-0">
+                            À ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de
+                            la fiche est possible.
+                        </p>
+                    {% elif form.status.value == "REJECTED" %}
+                        <p class="mb-0">Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une
+                            erreur.</p>
+                        <p class="mb-0">Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
+                    {% elif form.status.value == "PROCESSED" %}
+                        <p class="mb-0">Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
+                        <p class="mb-0">
+                            Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter le détail de
+                            la fiche salarié.
+                        </p>
+                    {% elif form.status.value == "DISABLED" %}
+                        <p class="mb-0">Vous trouverez ici les fiches salarié que vous avez désactivées.</p>
+                        <p class="mb-0">
+                            En cas de besoin vous pouvez réactiver une fiche, elle sera transférée dans la catégorie
+                            "Nouvelle".
+                        </p>
+                    {% endif %}
                 </div>
-            {% endif %}
 
-            {% include "includes/pagination.html" with page=navigation_pages %}
+                {# "Real" employee records objects #}
+                <div class="employee-records-list">
+                    {% if employee_records_list %}
+                        {% for employee_record in navigation_pages %}
+                            {% with item=employee_record.job_application %}
+                                {% include "employee_record/includes/list_item.html" %}
+                            {% endwith %}
+                        {% endfor %}
+                        {# New employee records i.e. job applications #}
+                    {% else %}
+                        {% for item in navigation_pages %}
+                            {% include "employee_record/includes/list_item.html" %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
 
+                {% if not navigation_pages %}
+                    <div class="text-muted text-center">
+                        <i class="ri-forbid-line mr-1"></i>
+                        <span>Aucune fiche salarié avec le statut selectionné ...</span>
+                    </div>
+                {% endif %}
+
+                {% include "includes/pagination.html" with page=navigation_pages %}
+
+            </div>
         </div>
     </div>
-</div>
 
 {% endblock %}
