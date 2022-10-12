@@ -7,6 +7,8 @@ from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, Evalua
 
 
 class SetChosenPercentForm(forms.ModelForm):
+    opt_out = forms.BooleanField(label="Je choisis de ne pas débuter le contrôle", required=False)
+
     class Meta:
         model = EvaluationCampaign
         fields = ["chosen_percent"]
@@ -22,6 +24,11 @@ class SetChosenPercentForm(forms.ModelForm):
                 }
             )
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Use default when not specified. Can be omitted when opt_out is True.
+        self.fields["chosen_percent"].required = False
 
 
 class SubmitEvaluatedAdministrativeCriteriaProofForm(forms.ModelForm):

@@ -50,8 +50,6 @@
                     </p>
                 </div>
             </p>
-            <h3>Validation de l'échantillon des SIAE</h3>
-
             {% if evaluation_campaign.percent_set_at %}
                 <p>
                     <div class="alert alert-success" role="status">
@@ -64,28 +62,35 @@
                     </div>
                 </p>
             {% else %}
-                <p>
-                    Pour initier le contrôle a posteriori des auto-prescriptions, nous avons besoin de connaître le pourcentage
-                    de SIAE que vous souhaitez contrôler. Vous ne pourrez choisir qu'une fois, ensuite, nous effectuerons une sélection
-                    aléatoire de SIAE. Veuillez choisir le pourcentage de SIAE à contrôler puis valider ci-dessous :
-                </p>
-                <form method="post" action="" class="js-prevent-multiple-submit">
-
+                <form id="ratio-form" method="post">
                     {% csrf_token %}
 
                     {% bootstrap_form_errors form alert_error_type="all" %}
 
-                    <p class="font-weight-bold">
-                        Ratio sélectionné : <span id="showChosenPercentValue"></span> %
-                    </p>
-                    <p>{{ min }}% {{ form.chosen_percent }} {{ max }}%</p>
+                    <div id="ratio-select">
+                        <h3>Validation de l'échantillon des SIAE</h3>
+                        <p>
+                            Pour initier le contrôle a posteriori des auto-prescriptions, nous avons besoin de connaître le pourcentage
+                            de SIAE que vous souhaitez contrôler. Vous ne pourrez choisir qu'une fois, ensuite, nous effectuerons une sélection
+                            aléatoire de SIAE. Veuillez choisir le pourcentage de SIAE à contrôler puis valider ci-dessous :
+                        </p>
+
+                        <p class="font-weight-bold">
+                            Ratio sélectionné : <span id="showChosenPercentValue"></span> %
+                        </p>
+                        <p>{{ min }}% {{ form.chosen_percent }} {{ max }}%</p>
+                    </div>
+
+                    <h3>Désactiver le contrôle pour cette campagne</h3>
+                    {{ form.opt_out.errors }}
+                    <label for="{{ form.opt_out.id_for_label }}">
+                        {{ form.opt_out }}
+                        {{ form.opt_out.label }}
+                    </label>
 
                     {% buttons %}
-                        <button type="submit" class="btn btn-primary  float-right" onclick="return confirm('Le ratio sélectionné ne sera plus modifiable pour cette campagne de contrôle. Confirmez-vous son enregistrement ? ')">
-                            Valider
-                        </button>
+                        <button type="submit" class="btn btn-primary float-right">Valider</button>
                     {% endbuttons %}
-
                 </form>
             {% endif %}
         </div>
@@ -99,14 +104,8 @@
 {% endblock %}
 
 {% block script %}
-    <script type="text/javascript">
-        var slider = document.getElementById("chosenPercentRange");
-        var output = document.getElementById("showChosenPercentValue");
-        output.innerHTML = slider.value;
-
-        slider.oninput = function () {
-            output.innerHTML = this.value;
-        }
-
-    </script>
+    {{ block.super }}
+    {% if not evaluation_campaign.percent_set_at %}
+        <script src="{% static 'js/siae_evaluations_sample_selection.js' %}"></script>
+    {% endif %}
 {% endblock %}
