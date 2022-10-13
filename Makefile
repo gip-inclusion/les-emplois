@@ -45,7 +45,7 @@ quality: $(VIRTUAL_ENV)
 	black --check config itou
 	isort --check config itou
 	flake8 --count --show-source --statistics config itou
-	djlint --lint itou
+	djlint --lint --check itou
 
 fix: $(VIRTUAL_ENV)
 	black config itou
