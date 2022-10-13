@@ -105,12 +105,36 @@
         {% include "welcoming_tour/includes/message.html" %}
     {% endif %}
 
+    {# Mise en avant temporaire des stats employeur le temps de leur déploiement. #}
+    {% if can_view_stats_siae_hiring or can_view_stats_pe %}
+        <div class="alert alert-info fade show" role="status">
+            <div class="row">
+                <div class="col-auto pr-0">
+                    <i class="ri-information-line ri-xl text-info"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <span class="badge badge-accent-03 text-primary">Nouveau</span>
+                        Vous avez maintenant accès à un espace <strong>Statistiques et pilotage 🎉</strong>
+                    </p>
+                    <p class="mb-0">
+                        {% if can_view_stats_siae_hiring %}
+                            Vous trouverez votre <a href="{% url 'stats:stats_siae_hiring' %}">nouveau tableau de bord dédié à votre structure</a>. Il vous permettra de suivre l’état de vos candidatures et vos réalisations avec vos prescripteurs partenaires.
+                        {% elif can_view_stats_pe %}
+                            Vous trouverez ci-dessous vos <strong>nouveaux tableaux de bord dédiés</strong> pour suivre et analyser vos réalisations avec vos structures partenaires.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
 {% endblock %}
 
 {% block pre_content %}
     {# Mise en avant temporaire de Dora. #}
     {% if user.is_prescriber or user.is_siae_staff %}
-        <section class="s-banner-01 pb-3">
+        <section class="s-banner-01 pt-3 pb-0">
             <div class="s-banner-01__container container">
                 <div class="s-banner-01__row row">
                     <div class="s-banner-01__col col-12">
@@ -140,36 +164,6 @@
 {% endblock %}
 
 {% block content %}
-
-    {# Mise en avant temporaire des stats employeur le temps de leur déploiement. #}
-    {% if can_view_stats_siae_hiring %}
-        <div class="card mb-5 bg-gray-400 text-center">
-            <p class="h4 card-header">
-                <span class="badge badge-accent-03 text-primary">Nouveau</span>
-                Vous avez maintenant accès à un espace <strong>Statistiques et pilotage 🎉</strong>
-            </p>
-            <div class="card-body">
-                <p>
-                    Vous trouverez votre <a href="{% url 'stats:stats_siae_hiring' %}">nouveau tableau de bord dédié à votre structure</a>. Il vous permettra de suivre l’état de vos candidatures et vos réalisations avec vos prescripteurs partenaires.
-                </p>
-            </div>
-        </div>
-    {% endif %}
-
-    {# Mise en avant temporaire des stats PE le temps de leur déploiement. #}
-    {% if can_view_stats_pe %}
-        <div class="card mb-5 bg-gray-400 text-center">
-            <p class="h4 card-header">
-                <span class="badge badge-accent-03 text-primary">Nouveau</span>
-                Vous avez maintenant accès à un espace <strong>Statistiques et pilotage 🎉</strong>
-            </p>
-            <div class="card-body">
-                <p>
-                    Vous trouverez ci-dessous vos <strong>nouveaux tableaux de bord dédiés</strong> pour suivre et analyser vos réalisations avec vos structures partenaires.
-                </p>
-            </div>
-        </div>
-    {% endif %}
 
     <h1 class="h1">
         Tableau de bord
@@ -226,9 +220,7 @@
 
             {% if user.latest_common_approval %}
                 <div class="card">
-                    <p class="h4 card-header">
-                        Numéro d'agrément
-                    </p>
+                    <p class="h4 card-header">Numéro d'agrément</p>
                     <div class="card-body">
                         <ul class="list-unstyled">
                             <li class="card-text mb-3">
