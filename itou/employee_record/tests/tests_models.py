@@ -18,7 +18,6 @@ from itou.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
@@ -117,7 +116,7 @@ class EmployeeRecordModelTest(EmployeeRecordFixtureTest):
         # Complete profile, but geoloc API not reachable
         job_application = JobApplicationWithJobSeekerProfileFactory()
 
-        with self.assertRaises(AddressLookupError):
+        with self.assertRaises(ValidationError):
             employee_record = EmployeeRecord.from_job_application(job_application)
             employee_record.update_as_ready()
 
