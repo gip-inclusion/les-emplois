@@ -1211,7 +1211,7 @@ class JobSeekerProfile(models.Model):
 
     @property
     def hexa_address_filled(self):
-        return self.hexa_lane_name and self.hexa_lane_type and self.hexa_post_code and self.hexa_commune
+        return bool(self.hexa_lane_name and self.hexa_lane_type and self.hexa_post_code and self.hexa_commune)
 
     @property
     def hexa_address_display(self):

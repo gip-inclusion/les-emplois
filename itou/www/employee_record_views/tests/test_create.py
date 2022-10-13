@@ -12,7 +12,7 @@ from itou.job_applications.factories import (
     JobApplicationWithJobSeekerProfileFactory,
 )
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.users.factories import JobSeekerWithMockedAddressFactory
+from itou.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMockedAddressFactory
 from itou.utils.mocks.address_format import get_random_insee_code, mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -70,7 +70,7 @@ class AbstractCreateEmployeeRecordTest(EmployeeRecordFixtureTest):
 
         self.assertRedirects(response, target_url)
 
-        self.assertTrue(self.job_seeker.has_jobseeker_profile)
+        return response
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -244,6 +244,23 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
         self.assertRedirects(response, target_url)
 
+    def test_pass_step_1_without_geolocated_address(self):
+        # Do not mess with job seeker profile and geolocation at step 1
+        # just check user model info
+
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
+        # No geoloc mock used, and basic factoriy with simple address
+        data = get_sample_form_data(JobSeekerWithAddressFactory())
+        data["insee_commune_code"] = get_random_insee_code()
+        response = self.client.post(self.url, data=data)
+
+        # Redirects must go to step 2
+        target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
+
+        self.assertRedirects(response, target_url)
+
 
 class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
     """
@@ -414,6 +431,20 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         data["hexa_additional_address"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, 200)
+
+    def test_failed_geoloc(self):
+        # Check that when address geo lookup fails, user is properly notified
+        # to input employee address manually
+
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
+        # No geoloc mock used, and basic factory with simple address
+        self.job_seeker = JobSeekerWithAddressFactory()
+
+        response = self.pass_step_1()
+
+        self.assertContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
 
 
 class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):

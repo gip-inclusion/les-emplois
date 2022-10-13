@@ -3,7 +3,7 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
 
-from itou.asp.exceptions import UnknownCommuneError
+from itou.asp.exceptions import CommuneUnknownInPeriodError, UnknownCommuneError
 from itou.asp.models import Commune, RSAAllocation
 from itou.employee_record.enums import Status
 from itou.siaes.models import SiaeFinancialAnnex
@@ -89,12 +89,14 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
             }
         )
 
-        # Init ASP commune
         if self.instance.birth_place:
             self.initial[
                 "insee_commune"
             ] = f"{self.instance.birth_place.name} ({self.instance.birth_place.department_code})"
             self.initial["insee_commune_code"] = self.instance.birth_place.code
+
+        if self.instance.birth_country:
+            self.initial["birth_country"] = self.instance.birth_country_id
 
     def clean(self):
         super().clean()
@@ -105,7 +107,14 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         # Country coherence is done at model level (users.User)
         # Here we must add coherence between birthdate and communes
         # existing at this period (not a simple check of existence)
-        self.cleaned_data["birth_place"] = Commune.objects.by_insee_code_and_period(commune_code, birth_date).first()
+
+        if commune_code and birth_date:
+            try:
+                self.cleaned_data["birth_place"] = Commune.by_insee_code_and_period(commune_code, birth_date)
+            except CommuneUnknownInPeriodError as ex:
+                raise forms.ValidationError(
+                    f"Le code INSEE {commune_code} n'est pas référencé en date du {birth_date:%d-%m-%Y}"
+                ) from ex
 
     class Meta:
         model = User

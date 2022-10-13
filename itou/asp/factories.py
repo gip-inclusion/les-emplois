@@ -106,6 +106,26 @@ class CommuneFactory(factory.django.DjangoModelFactory):
 
         return kwargs
 
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        # Allow creation with parameters `code` or `name` (first matched)
+        # either field must be a match in `_sample_communes`
+        match kwargs:
+            case {"code": code}:
+                for item in _sample_communes:
+                    if item["code"] == code:
+                        kwargs["name"] = item["name"]
+            case {"name": name}:
+                for item in _sample_communes:
+                    if item["name"] == name:
+                        kwargs["code"] = item["code"]
+            case _:
+                code, name = random.choice(_sample_communes).values()
+                kwargs["code"] = code
+                kwargs["name"] = name
+
+        return kwargs
+
 
 # FIXME: unreliable and confusing
 class MockedCommuneFactory(CommuneFactory):

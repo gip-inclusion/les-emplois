@@ -2,69 +2,102 @@
 
 <h4 class="h3">Domiciliation du salarié</h4>
 
-<div class="alert alert-emploi">
-    <h5 class="h4">
-        <b>Adresse saisie sur la plateforme de l'inclusion :</b>
-    </h5>
-    <p>{{ job_seeker.address_line_1 }}</p>
-    {% if job_seeker.address_line_2 %}<p>{{ job_seeker.address_line_2 }}</p>{% endif %}
-    <p>{{ job_seeker.post_code }} {{ job_seeker.city }}</p>
+<div class="alert alert-info">
+    <h4>
+        <b>Adresse saisie sur les emplois de l'inclusion :</b>
+    </h4>
 
-    <h5 class="h4">
-        <b>Adresse
-            {% if address_updated_by_user %}
-                modifiée manuellement
-            {% else %}
-                vérifiée automatiquement
+    <div class="pl-2 pb-4">
+        {% if address_filled %}
+            <div class="row">
+                <div class="col-md-3">Adresse</div>
+                <div class="col-md-9">
+                    <b>{{ job_seeker.address_line_1 }}</b>
+                </div>
+            </div>
+            {% if job_seeker.address_line_2 %}
+                <div class="row">
+                    <div class="col-md-3">Complément</div>
+                    <div class="col-md-9">
+                        <b>{{ job_seeker.address_line_2 }}</b>
+                    </div>
+                </div>
             {% endif %}
-        :</b>
-    </h5>
-    {% if profile.hexa_address_filled %}
-        <div class="row">
-            <div class="col-md-3">Numéro</div>
-            <div class="col-md-9">
-                <b>{{ profile.hexa_lane_number|default:"-" }} {{ profile.get_hexa_std_extension_display }}{{ profile.hexa_non_std_extension }}</b>
+            <div class="row">
+                <div class="col-md-3">Commune</div>
+                <div class="col-md-9">
+                    <b>{{ job_seeker.post_code }} {{ job_seeker.city }}</b>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3">Voie</div>
-            <div class="col-md-9">
-                <b>{{ profile.get_hexa_lane_type_display }} {{ profile.hexa_lane_name }}</b>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3">Commune</div>
-            <div class="col-md-9">
-                <b>{{ profile.hexa_post_code }} {{ profile.hexa_commune.name }}</b>
-                <br>
-                <span><small>(code INSEE : {{ profile.hexa_commune.code }})</small></span>
-            </div>
-        </div>
-    {% else %}
-        <div>
+        {% else %}
             <p>
-                <b>L'adresse du salarié n'a pu être determinée automatiquement.</b>
+                <b>Aucune adresse n'a été saisie sur les emplois de l'inclusion !</b>
             </p>
+        {% endif %}
+    </div>
+
+    {% if profile.hexa_address_filled %}
+        <h4>
+            <b>Adresse à envoyer à l'ASP : </b>
+        </h4>
+        <div class="pl-2">
+            <div class="row">
+                <div class="col-md-3">Numéro</div>
+                <div class="col-md-9">
+                    <b>{{ profile.hexa_lane_number|default:"-" }} {{ profile.get_hexa_std_extension_display }}{{ profile.hexa_non_std_extension }}</b>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">Voie</div>
+                <div class="col-md-9">
+                    <b>{{ profile.get_hexa_lane_type_display }} {{ profile.hexa_lane_name }}</b>
+                </div>
+            </div>
+
+            {% if profile.hexa_additional_address %}
+                <div class="row">
+                    <div class="col-md-3">Complément</div>
+                    <div class="col-md-9">
+                        <b>{{ profile.hexa_additional_address }}</b>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-3">Commune</div>
+                <div class="col-md-9">
+                    <p class="mb-0">
+                        <b>{{ profile.hexa_post_code }} {{ profile.hexa_commune.name }}</b>
+                    </p>
+                    <p>
+                        <small><i>(code INSEE : {{ profile.hexa_commune.code }})</i></small>
+                    </p>
+                </div>
+            </div>
         </div>
     {% endif %}
 </div>
 
-<div class="alert alert-warning">
-    {% if profile.hexa_address_filled %}
+{% if profile.hexa_address_filled %}
+    <div class="alert alert-important">
         <p>
-            Merci de bien vouloir vérifier que <b>les deux adresses ci-dessus correspondent</b>.
+            Merci de bien vouloir vérifier <b>l'adresse qui sera envoyée à l'ASP</b>.
         </p>
         <ul>
             <li>
-                Si c'est le cas, vous pouvez passer à l'étape suivante en cliquant sur le bouton <b>"Continuer"</b> en bas de page.
+                Si elle est correcte, vous pouvez passer à l'étape suivante en cliquant sur le bouton <b>"Continuer"</b> en bas de page.
             </li>
             <li>
-                Si elles ne correspondent pas, veuillez modifier l'adresse à l'aide du formulaire ci-dessous, puis cliquez
+                Si elle ne correspond pas, veuillez la modifier à l'aide du formulaire ci-dessous, puis cliquez
                 sur le bouton <b>"Modifier l'adresse du salarié"</b>.
             </li>
         </ul>
-        <p>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</p>
-    {% else %}
+        <p>
+            <b>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</b>
+        </p>
+    </div>
+{% else %}
+    <div class="alert alert-danger">
         <p>
             <b>L'adresse du salarié n'a pu être vérifiée automatiquement.</b>
         </p>
@@ -73,9 +106,9 @@
             <li>une erreur temporaire de géolocalisation,</li>
             <li>une adresse introuvable (code postal ou voie erronée).</li>
         </ul>
-        <p>Merci de bien vouloir ressaisir l'adresse du salarié dans le formulaire ci-dessous.</p>
-    {% endif %}
-</div>
+        <p>Merci de bien vouloir saisir l'adresse du salarié dans le formulaire ci-dessous.</p>
+    </div>
+{% endif %}
 
 <form method="post" action="{% url "employee_record_views:create_step_2" job_application.id %}">
     {% csrf_token %}
