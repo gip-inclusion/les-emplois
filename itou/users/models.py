@@ -1141,7 +1141,7 @@ class JobSeekerProfile(models.Model):
         result, error = format_address(self.user)
 
         if error:
-            raise AddressLookupError(error)
+            raise ValidationError(error)
 
         # Fill matching fields
         self.hexa_lane_type = result.get("lane_type")
@@ -1156,7 +1156,11 @@ class JobSeekerProfile(models.Model):
         insee_code = result.get("insee_code")
 
         # This may raise an asp.exceptions.UnknownCommuneError : let it crash if needed
-        self.hexa_commune = Commune.by_insee_code(insee_code)
+        try:
+            self.hexa_commune = Commune.by_insee_code(insee_code)
+        except AddressLookupError:
+            raise ValidationError(f"Impossible de trouver la commune correspondate: code INSEE {insee_code}")
+
         self.save()
 
         return self
