@@ -343,7 +343,11 @@ class CommuneQuerySet(PeriodQuerySet):
 
     def by_insee_code_and_period(self, insee_code, period):
         "Lookup a Commune object by INSEE code and valid at the given period"
-        return self.filter(code=insee_code, start_date__lte=period).filter((Q(end_date=None) | Q(end_date__gt=period)))
+        return (
+            self.filter(code=insee_code, start_date__lte=period)
+            .filter((Q(end_date=None) | Q(end_date__gt=period)))
+            .get()
+        )
 
 
 class Commune(PrettyPrintMixin, AbstractPeriod):
@@ -374,22 +378,22 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
         Raises `UnknownCommuneError` if code is not found in ASP ref.
         """
         try:
-            return Commune.objects.current().get(code=insee_code)
+            return Commune.objects.by_insee_code(insee_code)
         except Commune.DoesNotExist as ex:
             raise UnknownCommuneError(f"Code INSEE {insee_code} inconnu dans le référentiel ASP") from ex
 
     @staticmethod
-    def by_insee_code_and_period(insee_code: str, period: dt.date):
+    def by_insee_code_and_period(insee_code: str, point_in_time: dt.date):
         """Get a commune at a given point in time.
         Raises `CommuneUnknowInPeriodError` if not found.
         """
-        result = Commune.objects.by_insee_code_and_period(insee_code, period).get()
-        if not result:
+        try:
+            return Commune.objects.by_insee_code_and_period(insee_code, point_in_time)
+        except Commune.DoesNotExist as ex:
             raise CommuneUnknownInPeriodError(
                 f"Période inconnue dans le référentiel ASP pour le code INSEE {insee_code} "
-                f"en date du {period:%d-%m-%Y}"
-            )
-        return result
+                f"en date du {point_in_time:%d-%m-%Y}"
+            ) from ex
 
     @cached_property
     def department_code(self):

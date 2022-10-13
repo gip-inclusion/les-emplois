@@ -5,10 +5,7 @@ from django.db.models import Count
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.encoding import escape_uri_path
-from django.utils.safestring import mark_safe
 
-from itou.asp.exceptions import UnknownCommuneError
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -160,54 +157,16 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     """
     job_application = can_create_employee_record(request, job_application_id)
     form = NewEmployeeRecordStep1Form(data=request.POST or None, instance=job_application.job_seeker)
-    step = 1
 
     if request.method == "POST" and form.is_valid():
         form.save()
-
-        # Create jobseeker_profile if needed
-        employee = job_application.job_seeker
-        profile, _ = JobSeekerProfile.objects.get_or_create(user=employee)
-
-        try:
-            if employee.post_code and employee.address_line_1:
-                # Try a geo lookup of the address
-                profile.update_hexa_address()
-        except ValidationError:
-            # Can occur if employee address is badly formatted and is not found by geoloc API
-            profile.clear_hexa_address()
-            messages.error(
-                request,
-                mark_safe(
-                    f"L'adresse de <b>{employee.get_full_name()}</b> comporte un plusieurs éléments incorrects. "
-                    f"Merci de la vérifier et de la modifier au besoin :<br>"
-                    f"<ul>"
-                    f"<li>adresse : {employee.address_line_1}</li>"
-                    f"<li>complément : {employee.address_line_2}</li>"
-                    f"<li>code postal : {employee.post_code}</li>"
-                    f"<li>commune : {employee.city}</li>"
-                    f"</ul>"
-                    f"Vous pouvez au besoin modifier cette addresse en cliquant "
-                    f"<a href='"
-                    f"{reverse('dashboard:edit_job_seeker_info', kwargs={'job_application_id': job_application.pk})}"
-                    f"'><b>sur ce lien.</b></a>"
-                ),
-            )
-        except UnknownCommuneError:
-            # Can occur if INSEE code of employee address is unknown in ASP commune refs.
-            # At this point the infamous "METZ workaround" is a solution.
-            profile.clear_hexa_address()
-            messages.error(
-                request, f"Impossible de déterminer le code INSEE pour l'adresse de {employee.get_full_name()}"
-            )
-        else:
-            return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.pk,)))
+        return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.pk,)))
 
     context = {
         "job_application": job_application,
         "form": form,
         "steps": STEPS,
-        "step": step,
+        "step": 1,
     }
 
     return render(request, template_name, context)
@@ -222,43 +181,43 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     """
     job_application = can_create_employee_record(request, job_application_id)
     job_seeker = job_application.job_seeker
-
-    if not job_seeker.has_jobseeker_profile:
-        raise PermissionDenied
-
-    # Conditions:
-    # - employee record is in an updatable state (if exists)
-    # - target job_application / employee record must be linked to given SIAE
-    # - a job seeker profile must exist (created in step 1)
-    # - if there is no HEXA address (no geolocation), allow manual input for address details
-
-    profile = job_seeker.jobseeker_profile
+    profile, _ = JobSeekerProfile.objects.get_or_create(user=job_seeker)
+    address_filled = job_seeker.post_code and job_seeker.address_line_1
     form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=profile)
-    maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_seeker.geocoding_address}")
-    step = 2
-    address_updated_by_user = bool(request.GET.get("address_updated_by_user", False))
 
-    if request.method == "POST" and form.is_valid():
-        form.save()
+    # Perform a geolocation of the user address if possible:
+    # - success : prefill form with geolocated data
+    # - failure : display actual address and let user fill the form
+    if not profile.hexa_address_filled and address_filled:
+        try:
+            # Attempt to create a job seeker profile with an address prefilled
+            profile.update_hexa_address()
+        except ValidationError:
+            # Not a big deal anymore, let user fill address form
+            profile.clear_hexa_address()
 
-        # Retry until we're good
-        return HttpResponseRedirect(
-            reverse(
-                "employee_record_views:create_step_2",
-                args=(job_application.id,),
+    # At this point, a job seeker profile was created
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse(
+                    "employee_record_views:create_step_2",
+                    args=(job_application.id,),
+                )
             )
-            + "?address_updated_by_user=true"
-        )
+        else:
+            profile.clear_hexa_address()
 
     context = {
         "job_application": job_application,
         "form": form,
         "profile": profile,
+        "address_filled": address_filled,
         "job_seeker": job_seeker,
-        "address_updated_by_user": address_updated_by_user,
-        "maps_url": maps_url,
         "steps": STEPS,
-        "step": step,
+        "step": 2,
     }
 
     return render(request, template_name, context)
@@ -274,6 +233,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     job_application = can_create_employee_record(request, job_application_id)
     job_seeker = job_application.job_seeker
 
+    # At this point, a job seeker profile must have been created
     if not job_seeker.has_jobseeker_profile:
         raise PermissionDenied
 
@@ -282,7 +242,6 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     if not profile.hexa_address_filled:
         raise PermissionDenied
 
-    step = 3
     form = NewEmployeeRecordStep3Form(data=request.POST or None, instance=profile)
 
     if request.method == "POST" and form.is_valid():
@@ -314,7 +273,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         "form": form,
         "is_registered_to_pole_emploi": bool(job_application.job_seeker.pole_emploi_id),
         "steps": STEPS,
-        "step": step,
+        "step": 3,
     }
 
     return render(request, template_name, context)
@@ -332,7 +291,6 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     if not job_application.job_seeker.has_jobseeker_profile:
         raise PermissionDenied
 
-    step = 4
     employee_record = (
         EmployeeRecord.objects.full_fetch()
         .exclude(status=Status.DISABLED)
@@ -349,7 +307,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
         "job_application": job_application,
         "form": form,
         "steps": STEPS,
-        "step": step,
+        "step": 4,
     }
 
     return render(request, template_name, context)
@@ -367,7 +325,6 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     if not job_application.job_seeker.has_jobseeker_profile:
         raise PermissionDenied
 
-    step = 5
     employee_record = get_object_or_404(
         EmployeeRecord.objects.full_fetch().exclude(status=Status.DISABLED), job_application=job_application
     )
@@ -381,7 +338,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         "employee_record": employee_record,
         "job_application": job_application,
         "steps": STEPS,
-        "step": step,
+        "step": 5,
     }
 
     return render(request, template_name, context)
