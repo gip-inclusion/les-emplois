@@ -11,11 +11,12 @@
         {# Dynamic breadcrumbs #}
         {% for breadcrumb_label, breadcrumb_url in breadcrumbs.items %}
             {% if forloop.last %}
-                <li class="breadcrumb-item active" aria-current="page"></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ breadcrumb_label }}</li>
             {% else %}
-                <li class="breadcrumb-item"></li>
+                <li class="breadcrumb-item">
+                    <a href="{{ breadcrumb_url }}" title="{{ breadcrumb_label }}">{{ breadcrumb_label }}</a>
+                </li>
             {% endif %}
-            <a href="{{ breadcrumb_url }}" title="{{ breadcrumb_label }}">{{ breadcrumb_label }}</a>
         {% endfor %}
     </ol>
 </nav>
