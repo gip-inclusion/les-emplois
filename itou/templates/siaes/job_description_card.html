@@ -10,29 +10,34 @@
 {% endblock %}
 
 {% block content %}
-    <div class="d-block rounded-lg shadow-lg p-3 p-lg-5">
+    <div class="c-box">
         {% include "siaes/includes/_job_description_details.html" %}
         <hr>
-        <div class="text-right">
+        <div>
             {% if can_update_job_description %}
-                <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" arial-label="Modifier la fiche de poste">
-                    Modifier
-                </a>
-                <a href="{% url "siaes_views:job_description_list" %}" class="btn btn-sm btn-primary" title="Retour vers la liste des postes">
-                    Fermer
-                </a>
+                <div class="row mb-4">
+                    <div class="col">
+                        <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" arial-label="Modifier la fiche de poste">
+                            Modifier
+                        </a>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{% url "siaes_views:job_description_list" %}" class="btn btn-sm btn-primary" title="Retour vers la liste des postes">
+                            Fermer
+                        </a>
+                    </div>
+                </div>
             {% else %}
-                <div class="row">
-                    <div class="col-auto pt-2 text-left">
-                        <a href="#job_description_link" data-toggle="collapse" title="Partager cette fiche métier">Partager cette fiche métier</a>
+                <div class="row mb-4">
+                    <div class="col">
+                        <a href="#job_description_link" class="btn btn-sm btn-outline-primary" data-toggle="collapse" title="Partager cette fiche métier">Partager cette fiche métier</a>
                         <div class="collapse pt-2" id="job_description_link">
-                            <p>Copiez-collez le lien ci-dessous :</p>
-                            <input type="text" class="form-control" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}" onClick="this.select()">
+                            <p class="small mb-1">Copiez-collez le lien ci-dessous :</p>
+                            <input type="text" class="form-control form-control-sm" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}" onClick="this.select()">
                         </div>
                     </div>
-
                     {% if job.is_active and not siae.block_job_applications %}
-                        <div class="col text-right">
+                        <div class="col-auto">
                             <a href="{% url "apply:start" siae_pk=siae.pk %}?job_description_id={{ job.pk }}"
                                class="matomo-event btn btn-sm btn-primary"
                                data-matomo-category="candidature"
@@ -47,19 +52,22 @@
 
                 {% if others_active_jobs and not siae.block_job_applications %}
                     <hr>
-                    <div class="pt-4 text-left">
-                        <h2 class="h1">Consulter le(s) recrutement(s) en cours dans cette structure</h2>
-                        <ul class="list-group list-group-flush">
-                            {% for other_job in others_active_jobs %}
-                                {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    <h2 class="h2">
+                        Consulter le{{ others_active_jobs|pluralize }} recrutement{{ others_active_jobs|pluralize }} en cours dans cette structure
+                    </h2>
+                    <ul class="list-group list-group-flush mb-4">
+                        {% for other_job in others_active_jobs %}
+                            {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
+                        {% endfor %}
+                    </ul>
                 {% endif %}
 
                 {% if back_url %}
                     <hr>
-                    <a href="{{ back_url }}" class="btn btn-sm btn-outline-primary" title="Retour à la page précédente">Retour</a>
+                    <a href="{{ back_url }}" class="btn btn-link btn-ico pl-0" title="Retour à l'étape précédente">
+                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                        <span>Retour</span>
+                    </a>
                 {% endif %}
             {% endif %}
         </div>
