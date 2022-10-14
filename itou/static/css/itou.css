@@ -467,15 +467,53 @@ Usage:
     width: 150px;
 }
 
-.progress-bar-initial {
+/* step 1/5 */
+.progress-bar-20 {
+    width: 20%;
+}
+
+/* step 1/4 */
+.progress-bar-25 {
+    width: 25%;
+}
+
+/* step 1/3 */
+.progress-bar-33 {
     width: 33%;
 }
 
-.progress-bar-intermediate {
+/* step 2/5 */
+.progress-bar-40 {
+    width: 40%;
+}
+
+/* step 2/4 */
+.progress-bar-50 {
+    width: 50%;
+}
+
+/* step 3/5 */
+.progress-bar-60 {
+    width: 60%;
+}
+
+/* step 2/3 */
+.progress-bar-66 {
     width: 66%;
 }
 
-.progress-bar-final {
+/* step 3/4 */
+.progress-bar-75 {
+    width: 75%;
+}
+
+/* step 4/5 */
+.progress-bar-80 {
+    width: 80%;
+}
+
+/* final step */
+.progress-bar-100 {
     width: 100%;
 }
 
