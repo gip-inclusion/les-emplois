@@ -28,7 +28,7 @@
                                 {% endif %}
                             </b>
                         </p>
-                        <div id="informations" {% if form.is_bound %}style="display: none;"{% endif %} data-swap-element-with=".c-form">
+                        <div id="informations" {% if form.is_bound %}class="d-none"{% endif %} data-swap-element-with=".c-form">
                             <div class="card c-card c-card--noshadow border-bottom p-3">
                                 <div class="card-header d-flex flex-row align-items-center">
                                     <h2 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_full_name }}</h2>
@@ -64,7 +64,7 @@
                             </div>
                         </div>
                         {% if not request.user.is_job_seeker %}
-                            <div class="c-form c-card--noshadow border-bottom" {% if not form.is_bound %}style="display: none;"{% endif %} data-swap-element-with="#informations">
+                            <div class="c-form c-card--noshadow border-bottom {% if not form.is_bound %}d-none{% endif %}" data-swap-element-with="#informations">
                                 <h2 class="mb-5">{{ job_application.job_seeker.get_full_name }}</h2>
 
                                 <form method="post" class="js-enable-submit-when-valid">
