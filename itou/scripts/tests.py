@@ -241,7 +241,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
     See users.management.commands.import_ai_employees.
     """
 
-    fixtures = ["test_asp_INSEE_communes_small.json"]
+    fixtures = ["test_asp_INSEE_communes_factory.json"]
 
     @property
     def command(self):

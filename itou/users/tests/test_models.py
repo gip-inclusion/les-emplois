@@ -87,6 +87,13 @@ class ManagerTest(TestCase):
 
 
 class ModelTest(TestCase):
+
+    # Needed for `asp.Country` and 'asp.Commune' factories
+    fixtures = [
+        "test_asp_INSEE_communes_factory.json",
+        "test_asp_INSEE_countries_factory",
+    ]
+
     def test_prescriber_of_authorized_organization(self):
         prescriber = PrescriberFactory()
 
@@ -402,7 +409,7 @@ class ModelTest(TestCase):
         self.assertIsNone(job_seeker.clean())
 
         # France and Commune filled
-        job_seeker = JobSeekerFactory(born_in_france=True)
+        job_seeker = JobSeekerFactory()
         job_seeker.birth_country = asp.CountryFranceFactory()
         job_seeker.birth_place = asp.CommuneFactory()
         self.assertIsNone(job_seeker.clean())
@@ -807,21 +814,18 @@ class JobSeekerProfileModelTest(TestCase):
     Job seeker profile is extra-data from the ASP and EmployeeRecord domains
     """
 
-    fixtures = ["test_asp_INSEE_communes_small.json"]
+    fixtures = ["test_asp_INSEE_communes_factory.json"]
 
     def setUp(self):
         self.profile = JobSeekerProfileFactory()
         user = self.profile.user
         user.title = None
 
-        # FIXME Crap, must find a better way of creating fixture
-        asp.MockedCommuneFactory()
         data = BAN_GEOCODING_API_RESULTS_MOCK[0]
 
         user.address_line_1 = data.get("address_line_1")
 
     def test_job_seeker_details(self):
-
         # No title on User
         with self.assertRaises(ValidationError):
             self.profile.clean_model()

@@ -52,20 +52,45 @@ class UserFactory(factory.django.DjangoModelFactory):
     phone = factory.Faker("phone_number", locale="fr_FR")
 
 
+class PrescriberFactory(UserFactory):
+    is_prescriber = True
+
+
+class SiaeStaffFactory(UserFactory):
+    is_siae_staff = True
+
+
+class LaborInspectorFactory(UserFactory):
+    is_labor_inspector = True
+
+
+# `JobSeeker` and `JobSeekerProfile` factories are mainly used for employee record testing
+
+# In order to use these factories, you must load these fixtures:
+# - `test_asp_INSEE_communes_factory.json`
+# - `test_asp_INSEE_countries_factory.json`
+# in your Django unit tests (set `fixtures` field).
+
+
 class JobSeekerFactory(UserFactory):
     title = random.choice(Title.values)
     is_job_seeker = True
     pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
 
     class Params:
-        # Birth place and birth country removed from default:
-        # only created when creating a new job seeker profile (employee records)
+        # Reminder : ASP models are "read-only", they must not be saved.
+        # These traits must not be used with a `CREATE` strategy,
+        # or they will try to create new Country or Commune objects in DB.
+        # Use `BUILD` strategy or `build()` method when creating these traits.
+        # They are currently only used to test employee records, which is
+        # the only part relying on ASP reference files / models.
         with_birth_place = factory.Trait(birth_place=factory.SubFactory(CommuneFactory))
         with_birth_country = factory.Trait(birth_country=factory.SubFactory(CountryFactory))
         born_in_france = factory.Trait(
             with_birth_place=True,
             birth_country=factory.SubFactory(CountryFranceFactory),
         )
+        with_profile = factory.Trait(profile=factory.RelatedFactory("itou.users.factories.JobSeekerProfileFactory"))
 
     @factory.lazy_attribute
     def nir(self):
@@ -111,6 +136,9 @@ class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
         self.insee_code = address.get("insee_code")
         self.city = address.get("city")
 
+        self.birth_place = CommuneFactory.build()
+        self.birth_country = CountryFranceFactory.build()
+
 
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -127,17 +155,8 @@ class JobSeekerProfileWithHexaAddressFactory(JobSeekerProfileFactory):
     # will avoid many mocks and convolutions during testing.
     hexa_lane_type = random.choice(LaneType.values)
     hexa_lane_name = factory.Faker("street_address", locale="fr_FR")
-    hexa_commune = factory.SubFactory(CommuneFactory)
     hexa_post_code = factory.Faker("postalcode")
 
-
-class PrescriberFactory(UserFactory):
-    is_prescriber = True
-
-
-class SiaeStaffFactory(UserFactory):
-    is_siae_staff = True
-
-
-class LaborInspectorFactory(UserFactory):
-    is_labor_inspector = True
+    @factory.post_generation
+    def _build_commune(self, create, extracted, **kwargs):
+        self.hexa_commune = CommuneFactory.build()

@@ -65,7 +65,7 @@
     "fields": {
       "code": "13200",
       "name": "MARSEILLE",
-      "start_date": "2000-01-01",
+      "start_date": "1900-01-01",
       "end_date": null
     }
   },

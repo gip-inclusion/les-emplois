@@ -160,10 +160,7 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     Suitable for employee records tests
     """
 
-    job_seeker = factory.SubFactory(
-        JobSeekerWithMockedAddressFactory,
-        born_in_france=True,
-    )
+    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory)
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
 
     @factory.post_generation
@@ -172,4 +169,5 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
             # Simple build, do nothing.
             return
         # Create a profile for current user
-        JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker).save()
+        # JobSeekerProfileWithHexaAddressFactory.build(user=self.job_seeker).save()
+        JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker)

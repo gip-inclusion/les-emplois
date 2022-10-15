@@ -1,73 +1,93 @@
-import datetime
 import random
+from typing import Dict, List
 
 import factory
 
 from itou.asp import models
 
 
-_sample_europe_countries = [
-    {"code": "101", "name": "DANEMARK", "group": "2"},
-    {"code": "111", "name": "BULGARIE", "group": "2"},
-    {"code": "135", "name": "PAYS-BAS", "group": "2"},
-]
+# These factories are basically wrappers around real model objects inserted via fixtures.
+# `Country` and `Commune` objects can be used `as-is` but it is easier to use them with factories
+# as other factories are depending on them.
 
-_sample_outside_europe_countries = [
-    {"code": "212", "name": "AFGHANISTAN", "group": "3"},
-    {"code": "436", "name": "BAHAMAS", "group": "3"},
-    {"code": "324", "name": "CONGO", "group": "3"},
-]
+# In order to use these factories, you must load these fixtures:
+# - `test_asp_INSEE_communes_factory.json`
+# - `test_asp_INSEE_countries_factory.json`
+# in your Django unit tests (set `fixtures` field).
 
-_sample_france = [
-    {"code": "714", "name": "BORA-BORA", "group": "1"},
-    {"code": "812", "name": "KOUMAC", "group": "1"},
-    {"code": "737", "name": "PUKAPUKA", "group": "1"},
-]
+_COMMUNES_CODES = ["64483", "97108", "97107", "37273", "13200", "67152", "85146"]
 
-_sample_communes = [
-    {"code": "64483", "name": "SAINT-JEAN-DE-LUZ"},
-    {"code": "97108", "name": "CAPESTERRE-DE-MARIE-GALANT"},
-    {"code": "97107", "name": "CAPESTERRE-BELLE-EAU"},
-    {"code": "37273", "name": "VILLE-AUX-DAMES"},
-    {"code": "13200", "name": "MARSEILLE"},
-    {"code": "67152", "name": "GEISPOLSHEIM"},
-    {"code": "85146", "name": "MONTAIGU"},
-]
+_FRANCE_CODES = ["100"]
+_OTHER_FRANCE_CODES = ["714", "737", "812"]
+_EUROPE_COUNTRIES_CODES = ["101", "111", "135"]
+_OUTSIDE_EUROPE_COUNTRIES_CODES = ["212", "324", "436"]
 
 
-class CountryFactory(factory.django.DjangoModelFactory):
+class AbstractCountryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Country
         django_get_or_create = ("code",)
+        abstract = True
+        strategy = factory.BUILD_STRATEGY
 
-    code, name, group = random.choice(_sample_europe_countries).values()
+    code = name = pk = None
+
+    @staticmethod
+    def _codes_for_zone(zone: str) -> List[Dict]:
+        match zone:
+            case "france":
+                codes = _FRANCE_CODES
+            case "other_france":
+                codes = _OTHER_FRANCE_CODES
+            case "europe":
+                codes = _EUROPE_COUNTRIES_CODES
+            case "outside_europe":
+                codes = _OUTSIDE_EUROPE_COUNTRIES_CODES
+            case "all":
+                codes = _FRANCE_CODES + _OTHER_FRANCE_CODES + _EUROPE_COUNTRIES_CODES + _OUTSIDE_EUROPE_COUNTRIES_CODES
+            case _:
+                raise Exception(f"Unregistered zone: '{zone}'")
+        return models.Country.objects.filter(code__in=codes).values()
+
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        if zone := kwargs.get("zone"):
+            # If `zone` is given, replace by a random country values from given zone
+            kwargs = random.choice(cls._codes_for_zone(zone))
+        return kwargs
 
 
-class CountryFranceFactory(CountryFactory):
-    code, name, group = "100", "FRANCE", "1"
+class CountryFactory(AbstractCountryFactory):
+    class Meta:
+        model = models.Country
+
+    zone = "all"
 
 
-class CountryCollectiviteOutremerFactory(CountryFactory):
-    """
-    Parts or regions of France having their own INSEE country code
+class CountryOutsideEuropeFactory(AbstractCountryFactory):
+    class Meta:
+        model = models.Country
 
-    Most of them are "Collectivités d'Outre-Mer"
-    """
-
-    code, name, group = random.choice(_sample_france).values()
+    zone = "outside_europe"
 
 
-class CountryEuropeFactory(CountryFactory):
-    code, name, group = random.choice(_sample_europe_countries).values()
+class CountryEuropeFactory(AbstractCountryFactory):
+    class Meta:
+        model = models.Country
+
+    zone = "europe"
 
 
-class CountryOutsideEuropeFactory(CountryFactory):
-    code, name, group = random.choice(_sample_outside_europe_countries).values()
+class CountryFranceFactory(AbstractCountryFactory):
+    class Meta:
+        model = models.Country
+
+    zone = "france"
 
 
 class CommuneFactory(factory.django.DjangoModelFactory):
     """Factory for ASP INSEE commune:
-    - if `code` or `name` are build parameters, object values will result of a lookup in `_sample_communes`
+    - if `code` or `name` are build parameters, object values will taken from the given commune (if available)
     - otherwise, fields `code` and `name` will be set from a randomly picked sample commune
     """
 
@@ -79,58 +99,14 @@ class CommuneFactory(factory.django.DjangoModelFactory):
             "end_date",
         )
 
-    # FIXME: may cause issues in testing validity periods
-    start_date = datetime.date(2000, 1, 1)
-    end_date = None
-
-    # Skipping definition of `code` and `name` fields
-    # will be set in `_adjust_kwargs`
-
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
         # Allow creation with parameters `code` or `name` (first matched)
         # either field must be a match in `_sample_communes`
         match kwargs:
             case {"code": code}:
-                for item in _sample_communes:
-                    if item["code"] == code:
-                        kwargs["name"] = item["name"]
+                return models.Commune.objects.filter(code=code).values()[0]
             case {"name": name}:
-                for item in _sample_communes:
-                    if item["name"] == name:
-                        kwargs["code"] = item["code"]
+                return models.Commune.objects.filter(name=name).values()[0]
             case _:
-                code, name = random.choice(_sample_communes).values()
-                kwargs["code"] = code
-                kwargs["name"] = name
-
-        return kwargs
-
-    @classmethod
-    def _adjust_kwargs(cls, **kwargs):
-        # Allow creation with parameters `code` or `name` (first matched)
-        # either field must be a match in `_sample_communes`
-        match kwargs:
-            case {"code": code}:
-                for item in _sample_communes:
-                    if item["code"] == code:
-                        kwargs["name"] = item["name"]
-            case {"name": name}:
-                for item in _sample_communes:
-                    if item["name"] == name:
-                        kwargs["code"] = item["code"]
-            case _:
-                code, name = random.choice(_sample_communes).values()
-                kwargs["code"] = code
-                kwargs["name"] = name
-
-        return kwargs
-
-
-# FIXME: unreliable and confusing
-class MockedCommuneFactory(CommuneFactory):
-    """
-    A factory with a specific code for mock testing
-    """
-
-    code, name = _sample_communes[-1].values()
+                return random.choice(models.Commune.objects.filter(code__in=_COMMUNES_CODES).values())

@@ -1,0 +1,102 @@
+[
+  {
+    "model": "asp.Country",
+    "pk": 91,
+    "fields": {
+      "code": 100,
+      "name": "FRANCE",
+      "group": 1,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 126,
+    "fields": {
+      "code": 135,
+      "name": "PAYS-BAS",
+      "group": 2,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 92,
+    "fields": {
+      "code": 101,
+      "name": "DANEMARK",
+      "group": 2,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 102,
+    "fields": {
+      "code": 111,
+      "name": "BULGARIE",
+      "group": 2,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 152,
+    "fields": {
+      "code": 212,
+      "name": "AFGHANISTAN",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 214,
+    "fields": {
+      "code": 312,
+      "name": "CONGO (REPUBLIQUE DEMOCRATIQUE)",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 301,
+    "fields": {
+      "code": 436,
+      "name": "BAHAMAS",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 12,
+    "fields": {
+      "code": 714,
+      "name": "BORA-BORA",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 68,
+    "fields": {
+      "code": 812,
+      "name": "KOUMAC",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 35,
+    "fields": {
+      "code": 737,
+      "name": "PUKAPUKA",
+      "group": 1,
+      "department": 98
+    }
+  }
+]

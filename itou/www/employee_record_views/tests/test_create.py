@@ -2,31 +2,30 @@ from unittest import mock
 
 from django.urls import reverse
 
-from itou.asp.models import Commune, Country
+from itou.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.tests.common import EmployeeRecordFixtureTest
-from itou.job_applications.factories import (
-    JobApplicationWithApprovalNotCancellableFactory,
-    JobApplicationWithCompleteJobSeekerProfileFactory,
-    JobApplicationWithJobSeekerProfileFactory,
-)
+from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMockedAddressFactory
-from itou.utils.mocks.address_format import get_random_insee_code, mock_get_geocoding_data
+from itou.utils.mocks.address_format import mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
 
 
 # Helper functions
-def get_sample_form_data(user):
-    return {
+def _get_user_form_data(user):
+    form_data = {
         "title": "M",
         "first_name": user.first_name,
         "last_name": user.last_name,
         "birthdate": user.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-        "birth_country": 91,  # France
-        "insee_commune_code": get_random_insee_code(),
     }
+    if user.birth_country:
+        form_data["birth_country"] = user.birth_country_id
+    if user.birth_place:
+        form_data["insee_commune_code"] = user.birth_place.code
+    return form_data
 
 
 class AbstractCreateEmployeeRecordTest(EmployeeRecordFixtureTest):
@@ -49,23 +48,16 @@ class AbstractCreateEmployeeRecordTest(EmployeeRecordFixtureTest):
             to_siae=self.siae,
             job_seeker_with_address=True,
         )
-        self.job_seeker = self.job_application.job_seeker
 
-    def login_response(self):
-        self.client.force_login(self.user)
-        return self.client.get(self.url)
+        self.job_seeker = self.job_application.job_seeker
 
     # Bypass each step with minimum viable data
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def pass_step_1(self, _mock):
+    def pass_step_1(self):
         self.client.force_login(self.user)
         url = reverse("employee_record_views:create", args=(self.job_application.id,))
         target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
-        data = get_sample_form_data((self.job_seeker))
+        data = _get_user_form_data(self.job_seeker)
         response = self.client.post(url, data=data)
 
         self.assertRedirects(response, target_url)
@@ -142,6 +134,8 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
     def setUp(self):
         super().setUp()
+        self.job_seeker = JobSeekerWithAddressFactory.build(born_in_france=True)
+
         self.url = reverse("employee_record_views:create", args=(self.job_application.pk,))
         self.target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
 
@@ -172,17 +166,13 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Fin du contrat : <b>Non renseigné")
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_title(self, _mock):
+    def test_title(self):
         # Job seeker / employee must have a title
 
         self.client.force_login(self.user)
         self.client.get(self.url)
 
-        data = get_sample_form_data(self.job_seeker)
+        data = _get_user_form_data(self.job_seeker)
         data.pop("title")
 
         response = self.client.post(self.url, data=data)
@@ -193,11 +183,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
         self.assertRedirects(response, self.target_url)
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_bad_birthplace(self, _mock):
+    def test_bad_birthplace(self):
         # If birth country is France, a commune (INSEE) is mandatory
         # otherwise, only a country is mandatory
 
@@ -205,7 +191,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.force_login(self.user)
         self.client.get(self.url)
 
-        data = get_sample_form_data(self.job_seeker)
+        data = _get_user_form_data(self.job_seeker)
         data.pop("birth_country")
 
         # Missing birth country
@@ -213,22 +199,18 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.assertEqual(200, response.status_code)
 
         # France as birth country without commune
-        data["birth_country"] = 91  # France
-        data["insee_commune_code"] = ""
+        data["birth_country"] = CountryFranceFactory().pk
+        data.pop("insee_commune_code")
         response = self.client.post(self.url, data=data)
 
         self.assertEqual(200, response.status_code)
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_good_birthplace(self, _mock):
+    def test_birthplace_in_france(self):
         self.client.force_login(self.user)
         self.client.get(self.url)
 
-        data = get_sample_form_data(self.job_seeker)
-        data["insee_commune_code"] = get_random_insee_code()
+        data = _get_user_form_data(self.job_seeker)
+        data["insee_commune_code"] = CommuneFactory().code
         response = self.client.post(self.url, data=data)
 
         # Redirects must go to step 2
@@ -237,9 +219,16 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         # Default test values are ok
         self.assertRedirects(response, target_url)
 
+    def test_birthplace_outside_of_france(self):
+        self.client.force_login(self.user)
+        self.client.get(self.url)
+
         # Set a country different from France
-        data["insee_commune_code"] = ""
-        data["birth_country"] = 92  # Denmark
+        data = _get_user_form_data(self.job_seeker)
+        data.pop("insee_commune_code")
+        data["birth_country"] = CountryOutsideEuropeFactory().pk
+
+        target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
         response = self.client.post(self.url, data=data)
 
         self.assertRedirects(response, target_url)
@@ -251,9 +240,10 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.force_login(self.user)
         self.client.get(self.url)
 
-        # No geoloc mock used, and basic factoriy with simple address
-        data = get_sample_form_data(JobSeekerWithAddressFactory())
-        data["insee_commune_code"] = get_random_insee_code()
+        # No geoloc mock used, basic factory with:
+        # - simple / fake address
+        # - birth place and country
+        data = _get_user_form_data(JobSeekerWithAddressFactory.build(born_in_france=True))
         response = self.client.post(self.url, data=data)
 
         # Redirects must go to step 2
@@ -263,75 +253,76 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
 
 class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
-    """
-    Test employee (HEXA) address
-    """
-
     def setUp(self):
         super().setUp()
-
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
-            to_siae=self.siae,
-        )
-        self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
+        self.client.force_login(self.user)
 
     def test_access_granted(self):
-        # Pass step 1
         self.pass_step_1()
-
-        # Must pass
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_job_seeker_without_address(self):
+        # Job seeker has no address filled (which should not happen without admin operation)
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.siae)
+
+        response = self.client.get(self.url)
+        url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
+        self.assertContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
-    def test_valid_address(self, _mock):
-        # Most HEXA address tests are done in user profile
-
-        # Pass step 1
-        self.pass_step_1()
-
-        # Accept address provided by mock and pass to step 3
+    def test_job_seeker_address_geolocated(self, _mock):
+        # Accept geolocated address provided by mock and pass to step 3
+        response = self.client.get(self.url)
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
 
-    def test_invalid_address(self):
-        # Was using a mock (or not using it actually), but a proper factory will do
-        self.job_application = JobApplicationWithJobSeekerProfileFactory(
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
+        self.assertNotContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
+
+    def test_job_seeker_address_not_geolocated(self):
+        # Job seeker has an address filled but can't be geolocated
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker_with_address=True,
+            job_seeker=JobSeekerWithAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
 
-        # Pass step 1
-        self.pass_step_1()
+        self.assertFalse(self.job_seeker.has_jobseeker_profile)
 
-        self.assertFalse(self.job_seeker.jobseeker_profile.hexa_address_filled)
+        # Changed job application: new URL
+        self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
 
-        # Try to force the way
+        # Check that when lookup fails, user is properly notified
+        # to input employee address manually
+        self.assertContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
+        self.assertNotContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
+
+        # Force the way without a profile should raise a PermissionDenied
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
 
-    def test_update_with_bad_address(self):
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_form_with_bad_job_seeker_address(self):
         # If HEXA address is valid, user can still change it
         # but it must be a valid one, otherwise the previous address is discarded
-        self.job_application = JobApplicationWithJobSeekerProfileFactory(
-            to_siae=self.siae,
-            job_seeker_with_address=True,
-        )
-        self.job_seeker = self.job_application.job_seeker
-
-        # Pass step 1
-        self.pass_step_1()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
 
         # Set an invalid address
         data = {
@@ -341,7 +332,6 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
             "insee_commune_code": "xxx",
         }
 
-        # And update it
         response = self.client.post(self.url, data=data)
 
         self.assertEqual(response.status_code, 200)
@@ -349,9 +339,6 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
     def test_address_updated_by_user(self):
         # User can now update the geolocated address if invalid
-
-        # Pass step 1
-        self.pass_step_1()
 
         test_data = {
             "hexa_lane_number": "15",
@@ -431,20 +418,6 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         data["hexa_additional_address"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, 200)
-
-    def test_failed_geoloc(self):
-        # Check that when address geo lookup fails, user is properly notified
-        # to input employee address manually
-
-        self.client.force_login(self.user)
-        self.client.get(self.url)
-
-        # No geoloc mock used, and basic factory with simple address
-        self.job_seeker = JobSeekerWithAddressFactory()
-
-        response = self.pass_step_1()
-
-        self.assertContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
 
 
 class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
@@ -596,13 +569,13 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             approval=self.job_application.approval,
         )
         # Get a test commune from fixtures
-        commune = Commune.by_insee_code(get_random_insee_code())
+        commune = CommuneFactory()
 
         dup_job_application.job_seeker.jobseeker_profile.education_level = "00"
         dup_job_application.job_seeker.jobseeker_profile.commune = commune
         dup_job_application.job_seeker.birth_place = commune
 
-        dup_job_application.job_seeker.birth_country = Country.objects.filter(code=Country._CODE_FRANCE).first()
+        dup_job_application.job_seeker.birth_country = CountryFranceFactory()
         dup_job_application.save()
 
         employee_record = EmployeeRecord.from_job_application(dup_job_application)
