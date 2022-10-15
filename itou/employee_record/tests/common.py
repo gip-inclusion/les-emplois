@@ -7,8 +7,8 @@ from django.test import TestCase
 class EmployeeRecordFixtureTest(TestCase):
     # "Use the fixture, Luke!"
     fixtures = [
-        "test_asp_INSEE_communes_small.json",
-        "test_asp_INSEE_countries.json",
+        "test_asp_INSEE_communes_factory.json",
+        "test_asp_INSEE_countries_factory.json",
     ]
 
 

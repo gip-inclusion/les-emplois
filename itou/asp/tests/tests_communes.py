@@ -7,7 +7,7 @@ from itou.asp.models import Commune
 
 class _CommuneTest(TestCase):
     # Test fixture(s) to be checked
-    fixtures = ["test_asp_INSEE_communes_small.json"]
+    fixtures = ["test_asp_INSEE_communes_factory.json"]
 
 
 class CommunesFixtureTest(_CommuneTest):
