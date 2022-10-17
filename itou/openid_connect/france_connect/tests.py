@@ -53,6 +53,7 @@ def mock_oauth_dance(test_class, expected_route="dashboard:index"):
     url = reverse("france_connect:callback")
     response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
     test_class.assertRedirects(response, reverse(expected_route))
+    return response
 
 
 @override_settings(
