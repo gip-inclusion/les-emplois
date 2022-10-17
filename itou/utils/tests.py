@@ -11,6 +11,7 @@ from unittest import mock
 
 import faker
 import httpx
+import pytest
 import respx
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -1419,6 +1420,7 @@ class JSONTest(TestCase):
             self.assertEqual(loads(s), expected)
 
 
+@pytest.mark.no_django_db
 class TestPaginator:
     def test_paginator_unique_page(self):
         object_list = range(10)
