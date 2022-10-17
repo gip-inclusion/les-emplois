@@ -70,7 +70,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         now = timezone.now()
         approval = ApprovalFactory(
             with_jobapplication=True,
-            jobapplication_set=[JobApplicationFactory(state=JobApplicationWorkflow.STATE_CANCELLED)],
+            with_jobapplication__state=JobApplicationWorkflow.STATE_CANCELLED,
         )
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
@@ -84,15 +84,10 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         now = timezone.now()
         respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
         respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_OK)
-        job_seeker = JobSeekerFactory()
-        # FIXME(vperron): use all those factories instead of the `with_jobapplication` trait
-        # so that I can generate a SIAE that has a non-EI kind. For now all the SiaeFactory
-        # generate EI only, and I spent already way too much time fixing stuff around in this PR.
-        # I'm pretty sure that making it a FuzzyChoice will break a bazillion tests, so I'll keep
-        # it for later.
-        siae = SiaeFactory(kind=SiaeKind.ACIPHC)
-        approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(to_siae=siae, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        approval = ApprovalFactory(
+            with_jobapplication=True,
+            with_jobapplication__to_siae__kind=SiaeKind.ACIPHC,
+        )
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
