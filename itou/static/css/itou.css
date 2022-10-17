@@ -539,3 +539,13 @@ Usage:
 #welcoming_tour .carousel-indicators li.active {
     background-color: #000638;
 }
+
+/* HTMX
+--------------------------------------------------------------------------- */
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator {
+    display: inline-block;
+}
