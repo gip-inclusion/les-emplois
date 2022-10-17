@@ -298,7 +298,7 @@ class SiaeSignupViewsExceptionsTest(TestCase):
         response = self.client.get(url)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual("Vous ne pouvez pas rejoindre une SIAE avec ce compte.", str(messages[0]))
+        self.assertEqual("Vous ne pouvez pas rejoindre une SIAE avec ce compte.", messages[0].message)
         self.assertRedirects(response, reverse("home:hp"))
 
         # Check `User` state.

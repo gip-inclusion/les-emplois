@@ -126,7 +126,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         # Signup should have failed : as the email used in IC isn't the one from the invitation
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertIn("ne correspond pas à l’adresse e-mail de l’invitation", str(messages[0]))
+        self.assertIn("ne correspond pas à l’adresse e-mail de l’invitation", messages[0].message)
         self.assertEqual(response.wsgi_request.get_full_path(), previous_url)
         self.assertFalse(User.objects.filter(email=invitation.email).exists())
 
