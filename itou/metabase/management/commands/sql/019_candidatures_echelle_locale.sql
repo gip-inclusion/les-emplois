@@ -10,10 +10,11 @@ with candidatures_p as (
     from
         candidatures
 ),
-org_prescripteur as ( /* On récupère l'id et le dept des organismes prescripteurs */
+org_prescripteur as ( /* On récupère l'id et le dept des organismes prescripteurs afin de filtrer selon le département de l'agence PE associée */
 	select
 		org.id as id_org,
-		org.nom_département as dept_org  /*bien mettre nom département et pas département */
+		org.nom_département as dept_org,  /*bien mettre nom département et pas département */
+		org.région as région_org 
 	from
 		organisations org
 ),
@@ -119,6 +120,7 @@ select
     nom_org_prescripteur,
     Nom_prénom_conseiller_pe,
     dept_org,
+    région_org,
     injection_ai,
     ville,
     nom_epci,
