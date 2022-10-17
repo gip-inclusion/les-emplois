@@ -926,7 +926,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         error_message = "Un compte employeur existe déjà avec cette adresse e-mail"
-        self.assertIn(error_message, str(messages[0]))
+        self.assertIn(error_message, messages[0].message)
 
         user = User.objects.get(email=OIDC_USERINFO["email"])
         self.assertNotEqual(user.first_name, OIDC_USERINFO["given_name"])
@@ -984,7 +984,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         self.assertEqual(len(messages), 1)
         self.assertIn(
             "est différente de celle que vous avez indiquée précédemment",
-            str(messages[0]),
+            messages[0].message,
         )
 
         # Organization
