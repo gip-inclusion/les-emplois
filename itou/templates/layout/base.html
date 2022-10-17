@@ -16,6 +16,8 @@
 
         {# https://metatags.io #}
         <meta name="title" content="Les emplois de l'inclusion">
+        {# Project uses custom styles for indicators, CSP compatibility #}
+        <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
         {# https://metatags.io Open Graph / Facebook #}
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
@@ -180,9 +182,9 @@
                 <script src="{% static "vendor/htmx-1.8.2/ext/debug.js" %}"></script>
                 <script src="{% static "vendor/htmx-1.8.2/ext/event-header.js" %}"></script>
             {% endif %}
+            <script src="{% static "js/htmx_handlers.js" %}"></script>
             <script src="{% static "js/city_autocomplete_field.js" %}"></script>
             <script src="{% static "js/commune_autocomplete_field.js" %}"></script>
-            <script src="{% static "js/configure_jobs.js" %}"></script>
             <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
             <script src="{% static 'js/utils.js'%}"></script>
             <script src="{% static "js/duet_date_picker_widget.js" %}"></script>

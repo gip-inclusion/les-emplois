@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.views.decorators.http import require_safe
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
@@ -77,6 +78,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 
 
 @login_required
+@require_safe
 def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
     siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
     job_descriptions = (
