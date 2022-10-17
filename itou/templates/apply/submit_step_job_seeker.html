@@ -1,15 +1,16 @@
 {% extends "apply/submit_base_two_columns.html" %}
 {% load bootstrap4 %}
 {% load format_filters %}
+{% load static %}
 
 {% block left_column %}
-    <form method="post" action="" class="js-prevent-multiple-submit">
+    <form method="post" action="" class="js-prevent-multiple-submit js-format-nir">
         <div class="card c-card p-3">
             <div class="card-body">
                 {% if nir %}
                     <div class="form-group form-group-required">
                         <label for="id_nir">Numéro de sécurité sociale du candidat</label>
-                        <input type="nir" name="nir" class="form-control" title="" required="" id="id_nir" disabled value="{{ nir|format_nir }}">
+                        <input id="id_nir" name="nir" class="form-control" disabled value="{{ nir }}">
                     </div>
                 {% endif %}
 
@@ -93,6 +94,7 @@
 {% endblock %}
 
 {% block script %}
+    <script src="{% static 'js/split_nir.js' %}"></script>
     {% if preview_mode %}
         {# Show the confirmation modal after submitting the form. #}
         <script type="text/javascript">
