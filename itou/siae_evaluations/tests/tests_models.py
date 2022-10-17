@@ -970,7 +970,6 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluated_job_application.should_select_criteria,
         )
         del evaluated_job_application.state
-        del evaluated_job_application.should_select_criteria
 
         editable_status = [
             evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
@@ -984,7 +983,6 @@ class EvaluatedJobApplicationModelTest(TestCase):
                         evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
                         evaluated_job_application.should_select_criteria,
                     )
-                    del evaluated_job_application.should_select_criteria
 
         not_editable_status = [
             state
@@ -999,7 +997,6 @@ class EvaluatedJobApplicationModelTest(TestCase):
                         evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
                         evaluated_job_application.should_select_criteria,
                     )
-                    del evaluated_job_application.should_select_criteria
 
         # REVIEWED
         evaluated_siae = evaluated_job_application.evaluated_siae
@@ -1011,7 +1008,6 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluated_job_application.should_select_criteria,
         )
         del evaluated_job_application.state
-        del evaluated_job_application.should_select_criteria
 
         for state in [
             state
@@ -1024,7 +1020,6 @@ class EvaluatedJobApplicationModelTest(TestCase):
                         evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
                         evaluated_job_application.should_select_criteria,
                     )
-                    del evaluated_job_application.should_select_criteria
 
     def test_save_selected_criteria(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()

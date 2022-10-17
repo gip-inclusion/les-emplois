@@ -320,7 +320,7 @@ class EvaluatedSiae(models.Model):
     def __str__(self):
         return f"{self.siae}"
 
-    @cached_property
+    @property
     def can_review(self):
         if self.reviewed_at is None:
             return self.state in {
@@ -546,7 +546,7 @@ class EvaluatedJobApplication(models.Model):
         ):
             return evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
 
-    @cached_property
+    @property
     def should_select_criteria(self):
         if self.state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
             return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
