@@ -17,29 +17,26 @@ from itou.users.factories import JobSeekerFactory
 fake = Faker("fr_FR")
 
 
-def _create_job_application(self, create, extracted, **kwargs):
-    if not create:
-        return
-    if extracted:
-        for job_application in extracted:
-            self.jobapplication_set.add(job_application)
-    else:
-        from itou.job_applications.factories import JobApplicationFactory  # pylint: disable=import-outside-toplevel
-
-        self.jobapplication_set.add(JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED))
-
-
 class ApprovalFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Approval
-
-    class Params:
-        with_jobapplication = factory.Trait(jobapplication_set=factory.PostGeneration(_create_job_application))
 
     user = factory.SubFactory(JobSeekerFactory)
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
     start_at = datetime.date.today()
     end_at = factory.LazyAttribute(lambda obj: Approval.get_default_end_date(obj.start_at))
+
+    @factory.post_generation
+    def with_jobapplication(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            from itou.job_applications.factories import (
+                JobApplicationFactory,  # pylint: disable=import-outside-toplevel
+            )
+
+            state = kwargs.pop("state", JobApplicationWorkflow.STATE_ACCEPTED)
+            self.jobapplication_set.add(JobApplicationFactory(state=state, job_seeker=self.user, **kwargs))
 
 
 class SuspensionFactory(factory.django.DjangoModelFactory):
