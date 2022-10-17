@@ -17,6 +17,12 @@ class TooManyKindsException(Exception):
         super().__init__(*args)
 
 
+class MultipleUsersFoundException(Exception):
+    def __init__(self, users, *args):
+        self.users = users
+        super().__init__(*args)
+
+
 class OIDConnectQuerySet(models.QuerySet):
     def cleanup(self, at=None):
         at = at if at else timezone.now() - OIDC_STATE_EXPIRATION
@@ -116,6 +122,11 @@ class OIDConnectUserData:
                 # on this behaviour. No need to do a fancy bypass if it's never used.
                 user = User.objects.create_user(**user_data_dict)
                 created = True
+        else:
+            # If we can find another user with self.email then the code will crash when updating the first user.
+            other_user = User.objects.exclude(pk=user.pk).filter(email=self.email).first()
+            if other_user:
+                raise MultipleUsersFoundException([user, other_user])
 
         if not created:
             for key, value in user_data_dict.items():

@@ -13,7 +13,7 @@ from django.utils.http import urlencode
 from itou.utils.constants import ITOU_SESSION_NIR_KEY
 from itou.utils.urls import get_absolute_url
 
-from ..models import TooManyKindsException
+from ..models import MultipleUsersFoundException, TooManyKindsException
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
@@ -132,6 +132,14 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
             return HttpResponseRedirect(reverse("login:siae_staff"))
         if e.user.is_labor_inspector:
             return HttpResponseRedirect(reverse("login:labor_inspector"))
+    except MultipleUsersFoundException as e:
+        return _redirect_to_job_seeker_login_on_error(
+            "Vous avez deux comptes sur la plateforme et nous detectons un conflit d'email : "
+            f"{e.users[0].email} et {e.users[1].email}."
+            "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
+            "<a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>.",
+            request=request,
+        )
 
     nir = request.session.get(ITOU_SESSION_NIR_KEY)
     if nir:
