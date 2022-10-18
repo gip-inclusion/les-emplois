@@ -51,13 +51,6 @@ dépendances sont bien à jour.
 $ make venv
 ```
 
-La variable d’environnement `DJANGO_SECRET_KEY` doit avoir une valeur. Par
-exemple, à l’aide de :
-
-```sh
-export DJANGO_SECRET_KEY=$(openssl rand -base64 42)
-```
-
 Dans un Virtualenv, vous pouvez utiliser les commandes Django habituelles
 (`./manage.py`) mais également certaines recettes du Makefile, celles-ci
 seront lancées directement dans votre venv si `USE_VENV=1` est utilisé.
