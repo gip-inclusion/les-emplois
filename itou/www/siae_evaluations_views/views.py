@@ -172,6 +172,7 @@ def institution_evaluated_job_application(
         evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
         evaluated_siae__evaluation_campaign__ended_at=None,
     )
+    evaluated_siae = evaluated_job_application.evaluated_siae
 
     back_url = (
         get_safe_url(
@@ -192,12 +193,28 @@ def institution_evaluated_job_application(
         evaluated_job_application.save(update_fields=["labor_inspector_explanation"])
         return HttpResponseRedirect(back_url)
 
+    if not evaluated_siae.reviewed_at:
+        # “Phase amiable”.
+        review_in_progress = any(
+            eval_admin_crit.submitted_at
+            for eval_admin_crit in evaluated_job_application.evaluated_administrative_criteria.all()
+        )
+    else:
+        review_in_progress = (
+            # “Phase contradictoire”.
+            not evaluated_siae.final_reviewed_at
+            and any(
+                eval_admin_crit.submitted_at and eval_admin_crit.submitted_at > evaluated_siae.reviewed_at
+                for eval_admin_crit in evaluated_job_application.evaluated_administrative_criteria.all()
+            )
+        )
     context = {
         "evaluated_job_application": evaluated_job_application,
         # note vincentporte: Can't find why additionnal queries are made to access `EvaluatedSiae` `state`
         # cached_property when iterating over `EvaluatedAdministrativeCriteria` in template.
         # Tried to push `EvaluatedSiae` instance in context without benefical results. weird.
-        "evaluated_siae": evaluated_job_application.evaluated_siae,
+        "evaluated_siae": evaluated_siae,
+        "can_edit_proof": review_in_progress,
         "form": form,
         "back_url": back_url,
     }

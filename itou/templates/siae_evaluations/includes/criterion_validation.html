@@ -12,7 +12,7 @@
                     <i class="ri-share-box-line"></i>
                 </a>
             </div>
-            {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
+            {% if can_edit_proof %}
                 {% if evaluated_administrative_criteria.review_state == 'PENDING' %}
                     <div class="col-lg-2 col-md-2 col-9">
                         <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'accept' %}">
