@@ -689,6 +689,12 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
 
 class InstitutionEvaluatedJobApplicationViewTest(TestCase):
+    btn_modifier_html = """
+        <button class="btn btn-outline-primary btn-sm float-right" title="Modifier l'état de ce justificatif">
+            Modifier
+        </button>
+    """
+
     def setUp(self):
         membership = InstitutionMembershipFactory()
         self.user = membership.user
@@ -754,6 +760,50 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             )
             + f"#{evaluated_job_application.pk}",
         )
+
+    def test_get_before_new_criteria_submitted(self):
+        now = timezone.now()
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__evaluations_asked_at=now - relativedelta(days=10),
+            evaluated_siae__evaluation_campaign__institution=self.institution,
+            evaluated_siae__reviewed_at=now - relativedelta(days=3),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            uploaded_at=now - relativedelta(days=2),
+            # Not submitted.
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_job_application",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+            )
+        )
+        self.assertNotContains(response, self.btn_modifier_html, html=True)
+
+    def test_can_modify_during_adversarial_stage_review(self):
+        now = timezone.now()
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__evaluations_asked_at=now - relativedelta(days=10),
+            evaluated_siae__evaluation_campaign__institution=self.institution,
+            evaluated_siae__reviewed_at=now - relativedelta(days=3),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            uploaded_at=now - relativedelta(days=2),
+            submitted_at=now - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_job_application",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+            )
+        )
+        self.assertContains(response, self.btn_modifier_html, html=True, count=1)
 
     def test_does_not_show_evaluations_from_previous_campaigns(self):
         evaluated_siae = EvaluatedSiaeFactory(accepted=True, evaluation_campaign__institution=self.institution)
