@@ -38,7 +38,7 @@ _sample_communes = [
 class CountryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Country
-        strategy = factory.BUILD_STRATEGY
+        django_get_or_create = ("code",)
 
     code, name, group = random.choice(_sample_europe_countries).values()
 
@@ -73,7 +73,11 @@ class CommuneFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.Commune
-        strategy = factory.BUILD_STRATEGY
+        django_get_or_create = (
+            "code",
+            "start_date",
+            "end_date",
+        )
 
     # FIXME: may cause issues in testing validity periods
     start_date = datetime.date(2000, 1, 1)
