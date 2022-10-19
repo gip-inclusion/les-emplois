@@ -377,6 +377,10 @@ class EvaluatedSiae(models.Model):
             connection = mail.get_connection()
             connection.send_messages([email])
 
+    @property
+    def evaluation_is_final(self):
+        return bool(self.final_reviewed_at or self.evaluation_campaign.ended_at)
+
     # fixme vincentporte : to refactor. move all get_email_to_siae_xxx() method to emails.py in siae model
     def get_email_to_siae_selected(self):
         to = self.siae.active_admin_members.values_list("email", flat=True)
@@ -460,10 +464,20 @@ class EvaluatedSiae(models.Model):
             # at least one evaluated_administrative_criteria proof is not uploaded
             or any_evaluated_admin_crit_matches(lambda crit: crit.proof_url == "")
         ):
-            return evaluation_enums.EvaluatedSiaeState.PENDING
+            return (
+                # SIAE did not submit proof.
+                evaluation_enums.EvaluatedSiaeState.REFUSED
+                if self.evaluation_is_final
+                else evaluation_enums.EvaluatedSiaeState.PENDING
+            )
 
         if any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at is None):
-            return evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
+            return (
+                # SIAE did not submit proof.
+                evaluation_enums.EvaluatedSiaeState.REFUSED
+                if self.evaluation_is_final
+                else evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
+            )
 
         # After a "bug" in production where the DDETS could not verify job applications,
         # it has been decided that if we were in the unlikely case that any criteria was still PENDING,
@@ -472,9 +486,20 @@ class EvaluatedSiae(models.Model):
             eval_job_app.state == evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
             for eval_job_app in self.evaluated_job_applications.all()
         ):
-            return evaluation_enums.EvaluatedSiaeState.SUBMITTED
+            return (
+                # DDETS did not review proof.
+                evaluation_enums.EvaluatedSiaeState.ACCEPTED
+                if self.evaluation_is_final
+                else evaluation_enums.EvaluatedSiaeState.SUBMITTED
+            )
 
         if self.reviewed_at and self.final_reviewed_at is None:
+            if self.evaluation_is_final:
+                # Campaign closed, otherwise self.final_reviewed_at would be set.
+                if any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at > self.reviewed_at):
+                    return evaluation_enums.EvaluatedSiaeState.ACCEPTED
+                # Adversarial phase, new proofs not submitted.
+                return evaluation_enums.EvaluatedSiaeState.REFUSED
             return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
 
         if any_evaluated_admin_crit_matches(
@@ -484,6 +509,16 @@ class EvaluatedSiae(models.Model):
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
             ]
         ):
+            if self.evaluation_is_final:
+                if (
+                    not self.reviewed_at
+                    or not self.final_reviewed_at
+                    and any_evaluated_admin_crit_matches(
+                        lambda crit: crit.submitted_at and crit.submitted_at > self.reviewed_at
+                    )
+                ):
+                    # User submitted proofs that were not reviewed, accept them.
+                    return evaluation_enums.EvaluatedSiaeState.ACCEPTED
             return evaluation_enums.EvaluatedSiaeState.REFUSED
         return evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
