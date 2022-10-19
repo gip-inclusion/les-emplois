@@ -1,13 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core import mail
 from django.db import transaction
-from django.db.models import Min
+from django.db.models import Min, Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
 from django.utils import text, timezone
 from django.utils.safestring import mark_safe
+from django.views import generic
 from django.views.decorators.http import require_POST
 
 from itou.siae_evaluations import enums as evaluation_enums
@@ -23,6 +25,7 @@ from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaOfJobApplicationForm
 from itou.www.siae_evaluations_views.forms import (
+    InstitutionEvaluatedSiaeNotifyForm,
     LaborExplanationForm,
     SetChosenPercentForm,
     SubmitEvaluatedAdministrativeCriteriaProofForm,
@@ -159,6 +162,65 @@ def institution_evaluated_siae_detail(
         ),
     }
     return render(request, template_name, context)
+
+
+class InstitutionEvaluatedSiaeNotifyView(LoginRequiredMixin, generic.UpdateView):
+    model = EvaluatedSiae
+    form_class = InstitutionEvaluatedSiaeNotifyForm
+    template_name = "siae_evaluations/institution_evaluated_siae_notify.html"
+    context_object_name = "evaluated_siae"
+    pk_url_kwarg = "evaluated_siae_pk"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.institution = get_current_institution_or_404(self.request)
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .viewable()
+            .filter(
+                Q(evaluation_campaign__ended_at__isnull=False) | Q(final_reviewed_at__isnull=False),
+                pk=self.kwargs["evaluated_siae_pk"],
+                evaluation_campaign__institution=self.institution,
+                notified_at=None,
+            )
+            .select_related("evaluation_campaign", "siae")
+        )
+
+    def form_valid(self, form):
+        messages.success(self.request, f"{self.object} a bien été notifiée de la sanction.")
+        email = self.object.get_email_to_siae_sanctioned()
+        connection = mail.get_connection()
+        connection.send_messages([email])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": self.object.evaluation_campaign_id},
+        )
+
+
+@login_required
+def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
+    allowed_viewers = {
+        "institution": (get_current_institution_or_404, "evaluation_campaign__institution"),
+        "siae": (get_current_siae_or_404, "siae"),
+    }
+    viewer_or_404, filter_lookup = allowed_viewers[viewer_type]
+    viewer = viewer_or_404(request)
+    evaluated_siae = get_object_or_404(
+        EvaluatedSiae.objects.filter(
+            pk=evaluated_siae_pk,
+            **{filter_lookup: viewer},
+        )
+        .exclude(notified_at=None)
+        .select_related("evaluation_campaign")
+    )
+    context = {"evaluated_siae": evaluated_siae}
+    return render(request, "siae_evaluations/evaluated_siae_sanction.html", context)
 
 
 @login_required

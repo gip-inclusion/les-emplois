@@ -5,11 +5,13 @@
     <div class="col-lg-3 col-md-3 col-4">
         <p class="small mb-0">
             {% if evaluated_siae.evaluation_is_final %}
-                <p class="badge{% if evaluated_siae.state == "ACCEPTED" %} badge-success{% else %} badge-danger{% endif %} float-right">
+                <p class="badge badge-pill{% if evaluated_siae.state == "ACCEPTED" %} badge-success{% elif evaluated_siae.state == "NOTIFICATION_PENDING" %} badge-accent-03 text-primary{% else %} badge-danger{% endif %} float-right">
                     {% if evaluated_siae.state == "ACCEPTED" %}
-                        Résultat positif
+                        <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
                     {% elif evaluated_siae.state == "REFUSED" %}
-                        Résultat négatif
+                        <i class="ri-close-circle-line mr-1"></i> Résultat négatif
+                    {% elif evaluated_siae.state == "NOTIFICATION_PENDING" %}
+                        <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
                     {% else %}
                         Non contrôlée
                     {% endif %}

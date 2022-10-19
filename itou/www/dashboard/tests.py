@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.test import TestCase, override_settings
@@ -23,12 +24,14 @@ from itou.job_applications.notifications import (
 )
 from itou.prescribers import factories as prescribers_factories
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
+    SiaeMembershipFactory,
     SiaePendingGracePeriodFactory,
     SiaeWithMembershipAndJobsFactory,
 )
@@ -239,6 +242,83 @@ class DashboardViewTest(TestCase):
                 kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
             ),
         )
+
+    def test_dashboard_siae_evaluation_campaign_notifications(self):
+        membership = SiaeMembershipFactory()
+        evaluated_siae_with_final_decision = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Final decision reached",
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            siae=membership.siae,
+            notified_at=timezone.now(),
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat. Séparé de son chat pendant une journée.",
+        )
+        EvaluatedSiaeFactory(
+            evaluation_campaign__name="In progress",
+            siae=membership.siae,
+            evaluation_campaign__evaluations_asked_at=timezone.now(),
+        )
+        EvaluatedSiaeFactory(
+            evaluation_campaign__name="Not notified",
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            siae=membership.siae,
+        )
+        evaluated_siae_campaign_closed = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Just closed",
+            complete=True,
+            siae=membership.siae,
+            evaluation_campaign__ended_at=timezone.now() - relativedelta(days=4),
+            notified_at=timezone.now(),
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.MISSING_PROOF,
+            notification_text="Journée de formation.",
+        )
+        # Long closed.
+        EvaluatedSiaeFactory(
+            evaluation_campaign__name="Long closed",
+            complete=True,
+            siae=membership.siae,
+            evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
+            notified_at=timezone.now(),
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+
+        self.client.force_login(membership.user)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(
+            response,
+            'Contrôle a posteriori <span class="badge badge-accent-03 text-primary">Nouveau</span>',
+            count=1,
+        )
+        self.assertContains(
+            response,
+            f"""
+            <li class="card-text mb-3">
+                <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_with_final_decision.pk}/">
+                    Voir le résultat du contrôle “Final decision reached”
+                </a>
+            </li>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            f"""
+            <li class="card-text mb-3">
+                <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_campaign_closed.pk}/">
+                    Voir le résultat du contrôle “Just closed”
+                </a>
+            </li>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertNotContains(response, "Long closed")
+        self.assertNotContains(response, "Not notified")
+        self.assertNotContains(response, "In progress")
 
     def test_dashboard_siae_evaluations_siae_access(self):
         # preset for incoming new pages

@@ -50,6 +50,14 @@ class EvaluatedSiaeState(models.TextChoices):
     ACCEPTED = "ACCEPTED"
     REFUSED = "REFUSED"
     ADVERSARIAL_STAGE = "ADVERSARIAL_STAGE"
+    NOTIFICATION_PENDING = "NOTIFICATION_PENDING"
+
+
+class EvaluatedSiaeNotificationReason(models.TextChoices):
+    DELAY = ("DELAY", "Non respect des délais")
+    INVALID_PROOF = ("INVALID_PROOF", "Pièce justificative incorrecte")
+    MISSING_PROOF = ("MISSING_PROOF", "Pièce justificative manquante")
+    OTHER = ("OTHER", "Autre")
 
 
 class EvaluatedAdministrativeCriteriaState(models.TextChoices):

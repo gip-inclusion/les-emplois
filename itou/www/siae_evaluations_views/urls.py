@@ -19,6 +19,23 @@ urlpatterns = [
         name="institution_evaluated_siae_detail",
     ),
     path(
+        "institution_evaluated_siae_notify/<int:evaluated_siae_pk>/",
+        views.InstitutionEvaluatedSiaeNotifyView.as_view(),
+        name="institution_evaluated_siae_notify",
+    ),
+    path(
+        "institution_evaluated_siae_sanction/<int:evaluated_siae_pk>/",
+        views.evaluated_siae_sanction,
+        {"viewer_type": "institution"},
+        name="institution_evaluated_siae_sanction",
+    ),
+    path(
+        "evaluated_siae_sanction/<int:evaluated_siae_pk>/",
+        views.evaluated_siae_sanction,
+        {"viewer_type": "siae"},
+        name="siae_sanction",
+    ),
+    path(
         "institution_evaluated_job_application/<int:evaluated_job_application_pk>/",
         views.institution_evaluated_job_application,
         name="institution_evaluated_job_application",

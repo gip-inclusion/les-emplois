@@ -114,7 +114,7 @@
                                     <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
                                         Contrôler cette auto-prescription
                                     </a>
-                                {% elif evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ADVERSARIAL_STAGE" %}
+                                {% elif evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ADVERSARIAL_STAGE" or evaluated_siae.state == "NOTIFICATION_PENDING" %}
                                     <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
                                         Revoir ses justificatifs
                                     </a>

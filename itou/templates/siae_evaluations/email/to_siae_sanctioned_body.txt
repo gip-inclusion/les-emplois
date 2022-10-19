@@ -1,0 +1,10 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+Le résultat de la campagne de contrôle a posteriori “{{ evaluation_campaign.name }}” est disponible.
+Rendez-vous sur le tableau de bord de {{ siae.kind }} {{ siae.name }} ID-{{ siae.pk }}, à la rubrique « Voir le résultat du contrôle “{{ evaluation_campaign.name }}” ».
+{{ dashboard_url }}
+
+Cordialement,
+{% endblock %}

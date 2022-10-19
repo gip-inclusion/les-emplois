@@ -4,7 +4,12 @@ from django.forms import widgets
 from django.utils import timezone
 
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
+from itou.siae_evaluations.models import (
+    EvaluatedAdministrativeCriteria,
+    EvaluatedJobApplication,
+    EvaluatedSiae,
+    EvaluationCampaign,
+)
 
 
 class SetChosenPercentForm(forms.ModelForm):
@@ -86,3 +91,34 @@ class LaborExplanationForm(forms.ModelForm):
             self.fields["labor_inspector_explanation"].disabled = True
         if instance.labor_inspector_explanation:
             self.initial["labor_inspector_explanation"] = instance.labor_inspector_explanation
+
+
+class InstitutionEvaluatedSiaeNotifyForm(forms.ModelForm):
+    notification_reason = forms.ChoiceField(
+        choices=evaluation_enums.EvaluatedSiaeNotificationReason.choices,
+        widget=forms.RadioSelect(),
+        required=True,
+        label="Raison principale",
+    )
+
+    class Meta:
+        model = EvaluatedSiae
+        fields = ["notification_reason", "notification_text"]
+        widgets = {
+            "notification_text": forms.Textarea(
+                attrs={
+                    "placeholder": (
+                        "Merci de renseigner ici les raisons qui ont mené à un contrôle a posteriori des "
+                        "auto-prescriptions non conforme."
+                    ),
+                },
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["notification_text"].required = True
+
+    def save(self, commit=True):
+        self.instance.notified_at = timezone.now()
+        return super().save(commit=commit)
