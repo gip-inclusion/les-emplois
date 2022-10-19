@@ -391,6 +391,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
 class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
     control_text = "Lorsque vous aurez contrôlé"
+    submit_text = "Valider"
 
     def setUp(self):
         membership = InstitutionMembershipFactory()
@@ -431,6 +432,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.submit_text)
 
     def test_recently_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
@@ -466,6 +468,39 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             count=1,
         )
         self.assertNotContains(response, self.control_text)
+        self.assertNotContains(response, self.submit_text)
+
+    def test_recently_closed_campaign_with_in_progress_evaluation(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            ended_at=timezone.now(),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=2),
+            submitted_at=timezone.now() - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        assert response.status_code == 200
+        self.assertContains(
+            response,
+            '<p class="badge badge-danger float-right">Problème constaté</p>',
+            html=True,
+            count=1,
+        )
+        self.assertNotContains(response, self.control_text)
+        self.assertNotContains(response, self.submit_text)
 
     def test_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
@@ -502,13 +537,13 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             "siae_evaluations_views:institution_evaluated_siae_validation",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        validation_button_disabled = """
+        validation_button_disabled = f"""
             <button class="btn btn-outline-primary disabled btn-sm float-right">
-                Valider
+                {self.submit_text}
             </button>"""
-        validation_button = """
+        validation_button = f"""
             <button class="btn btn-primary btn-sm float-right">
-                Valider
+                {self.submit_text}
             </button>"""
         back_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",

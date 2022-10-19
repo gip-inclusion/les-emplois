@@ -96,7 +96,7 @@
                 </div>
             </div>
 
-            {% if evaluated_siae.can_review %}
+            {% if not evaluated_siae.evaluation_campaign.ended_at and evaluated_siae.can_review %}
                 <div class="row">
                     <div class="col-8">
                         <p>
