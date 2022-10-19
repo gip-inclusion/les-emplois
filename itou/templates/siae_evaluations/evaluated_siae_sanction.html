@@ -1,0 +1,38 @@
+{% extends "layout/content.html" %}
+
+{% block title %}
+    Résultat de la campagne de contrôle a posteriori {{ evaluated_siae.evaluation_campaign }}{{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h1>Résultat de la campagne de contrôle a posteriori {{ evaluated_siae.evaluation_campaign.name }}</h1>
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                <b>Résultat :</b> <b class="text-danger">Négatif</b>
+                            </p>
+                            <p>
+                                <b>Raison principale :</b> <b class="text-info">{{ evaluated_siae.get_notification_reason_display }}</b>
+                            </p>
+                            <p>
+                                <b>Commentaire de votre DDETS</b>
+                                <div class="card">
+                                    <div class="card-body">{{ evaluated_siae.notification_text }}</div>
+                                </div>
+                            </p>
+                        </div>
+                        <div class="card-body">
+                            <a class="btn btn-primary float-right" href="{% url "dashboard:index" %}">Revenir au tableau de bord</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

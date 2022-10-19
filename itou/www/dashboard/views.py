@@ -3,9 +3,11 @@ from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from itou.employee_record.enums import Status
@@ -14,6 +16,7 @@ from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
+from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae
 from itou.utils import constants as global_constants
@@ -32,6 +35,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     num_rejected_employee_records = 0
     active_campaigns = []
     campaign_in_progress = False
+    evaluated_siae_notifications = EvaluatedSiae.objects.none()
 
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
@@ -41,6 +45,15 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
         can_show_employee_records = current_org.can_use_employee_record
         active_campaigns = EvaluatedSiae.objects.for_siae(current_org).in_progress()
+        evaluated_siae_notifications = (
+            EvaluatedSiae.objects.for_siae(current_org)
+            .exclude(notified_at=None)
+            .filter(
+                Q(evaluation_campaign__ended_at=None)
+                | Q(evaluation_campaign__ended_at__gte=timezone.now() - CAMPAIGN_VIEWABLE_DURATION)
+            )
+            .select_related("evaluation_campaign")
+        )
 
         job_applications_categories = [
             {
@@ -105,6 +118,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "num_rejected_employee_records": num_rejected_employee_records,
         "active_campaigns": active_campaigns,
         "campaign_in_progress": campaign_in_progress,
+        "evaluated_siae_notifications": evaluated_siae_notifications,
         "precriber_kind_pe": PrescriberOrganizationKind.PE,
         "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
     }

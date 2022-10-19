@@ -36,19 +36,29 @@
                                 {% include "siae_evaluations/includes/siae_infos.html" with evaluated_siae=evaluated_siae %}
                             </div>
                             <div class="card-body">
-                                <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}" class="btn btn-outline-primary btn-sm float-right">
-                                    {% if evaluated_siae.evaluation_is_final %}
-                                        Voir le résultat
-                                    {% else %}
-                                        {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
-                                            Contrôler cette SIAE
-                                        {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
-                                            Revoir ses justificatifs
-                                        {% else %}
-                                            Voir
-                                        {% endif %}
+                                <div class="float-right">
+                                    {% if evaluated_siae.state == "REFUSED" and evaluated_siae.notified_at %}
+                                        <a class="btn btn-outline-primary btn-sm mr-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_sanction" evaluated_siae.pk %}">Voir la notification de sanction</a>
                                     {% endif %}
-                                </a>
+                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}" class="btn btn-outline-primary btn-sm">
+                                        {% if evaluated_siae.evaluation_is_final %}
+                                            Voir le résultat
+                                        {% else %}
+                                            {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
+                                                Contrôler cette SIAE
+                                            {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
+                                                Revoir ses justificatifs
+                                            {% else %}
+                                                Voir
+                                            {% endif %}
+                                        {% endif %}
+                                    </a>
+                                    {% if evaluated_siae.state == "NOTIFICATION_PENDING" %}
+                                        <a class="btn btn-primary btn-sm ml-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify" evaluated_siae.pk %}">
+                                            <i class="ri-notification-4-line"></i> Notifier le résultat
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>

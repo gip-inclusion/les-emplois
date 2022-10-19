@@ -1,0 +1,31 @@
+{% extends "layout/content.html" %}
+
+{% load bootstrap4 %}
+
+{% block title %}Notifier la sanction du contrôle pour {{ evaluated_siae }}{{ block.super }}{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-12">
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h1>
+                        Notifier la sanction du contrôle pour <span class="text-muted">{{ evaluated_siae }}</span>
+                    </h1>
+                    <h2>
+                        Résultat de la campagne : <b class="text-danger">Négatif</b>
+                    </h2>
+                    {% bootstrap_form_errors form type="all" %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        <a class="btn btn-link" href="{% url "siae_evaluations_views:institution_evaluated_siae_list" evaluated_siae.evaluation_campaign_id %}">
+                            Revenir à la liste
+                        </a>
+                        <button class="btn btn-primary float-right">Envoyer ce résultat</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

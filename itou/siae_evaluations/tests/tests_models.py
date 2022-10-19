@@ -634,6 +634,15 @@ class EvaluatedSiaeModelTest(TestCase):
         # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at, with final_reviewed_at
         evaluated_siae.final_reviewed_at = fake_now
         evaluated_siae.save(update_fields=["final_reviewed_at"])
+        self.assertEqual(evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING, evaluated_siae.state)
+        del evaluated_siae.state
+
+        # with review_state REFUSED_2, reviewed, submitted_at after
+        # reviewed_at, with final_reviewed_at, with notified_at
+        evaluated_siae.notified_at = fake_now
+        evaluated_siae.notification_reason = evaluation_enums.EvaluatedSiaeNotificationReason.MISSING_PROOF
+        evaluated_siae.notification_text = "Le document n’a pas été transmis."
+        evaluated_siae.save(update_fields=["notified_at", "notification_reason", "notification_text"])
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
         del evaluated_siae.state
 
@@ -653,7 +662,18 @@ class EvaluatedSiaeModelTest(TestCase):
         review_time = fake_now - relativedelta(days=1)
         evaluated_siae.reviewed_at = review_time
         evaluated_siae.final_reviewed_at = review_time
-        evaluated_siae.save(update_fields=["final_reviewed_at", "reviewed_at"])
+        evaluated_siae.notified_at = None
+        evaluated_siae.notification_reason = None
+        evaluated_siae.notification_text = ""
+        evaluated_siae.save(
+            update_fields=[
+                "final_reviewed_at",
+                "reviewed_at",
+                "notified_at",
+                "notification_reason",
+                "notification_text",
+            ]
+        )
         self.assertGreater(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
         del evaluated_siae.state
@@ -783,11 +803,33 @@ class EvaluatedSiaeModelTest(TestCase):
 
     def test_state_on_closed_campaign_no_criteria(self):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=timezone.now())
+        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
+
+    def test_state_on_closed_campaign_no_criteria_notified(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__ended_at=timezone.now() - relativedelta(days=1),
+            notified_at=timezone.now(),
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="Invalide",
+        )
         assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
     def test_state_on_closed_campaign_criteria_not_submitted(self):
         evaluated_job_app = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=1),
+        )
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
+
+    def test_state_on_closed_campaign_criteria_not_submitted_notified(self):
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now() - relativedelta(days=1),
+            evaluated_siae__notified_at=timezone.now(),
+            evaluated_siae__notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            evaluated_siae__notification_text="Invalide",
         )
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_app,
@@ -826,6 +868,9 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_job_app = EvaluatedJobApplicationFactory(
             evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=3),
             evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+            evaluated_siae__notified_at=timezone.now(),
+            evaluated_siae__notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            evaluated_siae__notification_text="Invalide",
         )
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_app,
@@ -857,6 +902,22 @@ class EvaluatedSiaeModelTest(TestCase):
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=2),
             submitted_at=timezone.now() - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
+
+    def test_state_on_closed_campaign_criteria_refused_review_validated_notified(self):
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=5),
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now() - relativedelta(days=1),
+            evaluated_siae__notified_at=timezone.now(),
+            evaluated_siae__notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            evaluated_siae__notification_text="Invalide",
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=8),
+            submitted_at=timezone.now() - relativedelta(days=7),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
         assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED

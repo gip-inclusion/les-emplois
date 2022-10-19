@@ -1,9 +1,11 @@
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.messages.storage.base import Message
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
+from freezegun import freeze_time
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionMembershipFactory
@@ -249,7 +251,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a href="{url}" class="btn btn-outline-primary btn-sm float-right">
+            <a href="{url}" class="btn btn-outline-primary btn-sm">
               Voir le résultat
             </a>
             """,
@@ -257,6 +259,203 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+
+    def test_siae_refused_can_be_notified(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            evaluation_campaign__institution=self.institution,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            )
+        )
+        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+        notify_url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_notify",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        self.assertContains(
+            response,
+            f"""
+            <a class="btn btn-primary btn-sm ml-1" href="{notify_url}">
+                <i class="ri-notification-4-line"></i> Notifier le résultat
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_detail",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        self.assertContains(
+            response,
+            f'<a href="{url}" class="btn btn-outline-primary btn-sm">Voir le résultat</a>',
+            html=True,
+            count=1,
+        )
+
+    def test_siae_incomplete_refused_can_be_notified(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=10),
+            evaluation_campaign__ended_at=timezone.now(),
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            )
+        )
+        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+        notify_url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_notify",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        self.assertContains(
+            response,
+            f"""
+            <a class="btn btn-primary btn-sm ml-1" href="{notify_url}">
+                <i class="ri-notification-4-line"></i> Notifier le résultat
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_detail",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        self.assertContains(
+            response,
+            f'<a href="{url}" class="btn btn-outline-primary btn-sm">Voir le résultat</a>',
+            html=True,
+            count=1,
+        )
+
+    def test_siae_incomplete_refused_can_be_notified_after_review(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=10),
+            evaluation_campaign__ended_at=timezone.now(),
+            reviewed_at=timezone.now() - relativedelta(weeks=4),
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            )
+        )
+        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+        notify_url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_notify",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        self.assertContains(
+            response,
+            f"""
+            <a class="btn btn-primary btn-sm ml-1" href="{notify_url}">
+                <i class="ri-notification-4-line"></i> Notifier le résultat
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_detail",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        self.assertContains(
+            response,
+            f'<a href="{url}" class="btn btn-outline-primary btn-sm">Voir le résultat</a>',
+            html=True,
+            count=1,
+        )
+
+    def test_notified_siae(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            evaluation_campaign__institution=self.institution,
+            notified_at=timezone.now(),
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            )
+        )
+        self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-danger float-right">
+                <i class="ri-close-circle-line mr-1"></i> Résultat négatif
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+        sanction_url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_sanction",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_detail",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        self.assertContains(
+            response,
+            f"""
+            <a class="btn btn-outline-primary btn-sm mr-1" href="{sanction_url}">
+                Voir la notification de sanction
+            </a>
+            <a class="btn btn-outline-primary btn-sm" href="{url}">
+                Voir le résultat
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
@@ -821,8 +1020,38 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
-        self.assertContains(response, message)
+        self.assertNotContains(response, message)
         self.assertNotContains(response, self.control_text)
+        self.assertContains(response, '<p class="badge badge-danger float-right">Problème constaté</p>', count=1)
+
+    def test_notification_pending_show_view_evaluated_admin_criteria(self):
+        self.client.force_login(self.user)
+        evaluated_siae = EvaluatedSiaeFactory(
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            evaluation_campaign__institution=self.institution,
+        )
+        evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
+        evaluated_job_application_url = reverse(
+            "siae_evaluations_views:institution_evaluated_job_application",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            f"""
+            <a href="{evaluated_job_application_url}" class="btn btn-outline-primary btn-sm float-right">
+                Revoir ses justificatifs
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_job_seeker_infos_for_institution_state(self):
         en_attente = "En attente"
@@ -921,6 +1150,215 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         ):
             response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+
+class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
+    def test_access_other_institution(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        user = membership.user
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            # Evaluation of another institution.
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        )
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        assert response.status_code == 404
+
+    def test_access_incomplete_on_active_campaign(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        user = membership.user
+        evaluated_siae = EvaluatedSiaeFactory.create()
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        assert response.status_code == 404
+
+    def test_access_notified_institution(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        user = membership.user
+        institution = membership.institution
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            evaluation_campaign__institution=institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notified_at=timezone.now(),
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        assert response.status_code == 404
+
+    def test_access_final_refused_control_active_campaign(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        user = membership.user
+        institution = membership.institution
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            evaluation_campaign__institution=institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        )
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
+
+    def test_access_incomplete_evaluation_closed_campaign(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        user = membership.user
+        institution = membership.institution
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            evaluation_campaign__institution=institution,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
+            evaluation_campaign__ended_at=timezone.now(),
+        )
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
+
+    def test_access_long_closed_campaign(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        user = membership.user
+        institution = membership.institution
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            evaluation_campaign__institution=institution,
+            evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
+        )
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        assert response.status_code == 404
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        user = membership.user
+        institution = membership.institution
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            siae=siae_membership.siae,
+            evaluation_campaign__institution=institution,
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
+            evaluation_campaign__ended_at=timezone.now() - relativedelta(hours=1),
+        )
+        self.client.force_login(user)
+        text = (
+            "Votre chat a mangé le justificatif, vous devrez suivre une formation protection contre les risques "
+            "félins."
+        )
+        response = self.client.post(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+            data={
+                "notification_reason": "MISSING_PROOF",
+                "notification_text": text,
+            },
+        )
+        assert list(messages.get_messages(response.wsgi_request)) == [
+            Message(messages.SUCCESS, "Les petits jardins a bien été notifiée de la sanction."),
+        ]
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "MISSING_PROOF"
+        assert evaluated_siae.notification_text == text
+        [email] = mail.outbox
+        assert email.to == ["siae@mailinator.com"]
+        assert email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
+        assert "Le résultat de la campagne de contrôle a posteriori “Campagne 2022” est disponible." in email.body
+        assert "Voir le résultat du contrôle “Campagne 2022”" in email.body
+        assert "http://127.0.0.1:8000/dashboard/\n" in email.body
+
+    def test_post_missing_data(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        user = membership.user
+        institution = membership.institution
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            siae__name="Les petits jardins",
+            evaluation_campaign__institution=institution,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
+            evaluation_campaign__ended_at=timezone.now() - relativedelta(hours=1),
+        )
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+            data={
+                "notification_reason": "invalid data",
+                "notification_text": "",
+            },
+        )
+        placeholder = (
+            "Merci de renseigner ici les raisons qui ont mené à un contrôle a posteriori des auto-prescriptions "
+            "non conforme."
+        )
+        self.assertContains(
+            response,
+            f"""
+            <div class="form-group is-invalid form-group-required">
+                <label for="id_notification_text">Commentaire</label>
+                <textarea name="notification_text" cols="40" rows="10"
+                    placeholder="{placeholder}"
+                    class="form-control is-invalid"
+                    title=""
+                    required
+                    id="id_notification_text">
+                </textarea>
+                <div class="invalid-feedback">Ce champ est obligatoire.</div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            '<div class="form-group is-invalid form-group-required"><label>Raison principale</label>',
+            count=1,
+        )
+        self.assertContains(
+            response,
+            '<div class="invalid-feedback">Sélectionnez un choix valide. invalid data n’en fait pas partie.</div>',
+            count=1,
+        )
 
 
 class InstitutionEvaluatedJobApplicationViewTest(TestCase):

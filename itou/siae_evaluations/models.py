@@ -291,7 +291,10 @@ class EvaluatedSiaeQuerySet(models.QuerySet):
         return self.filter(siae=siae)
 
     def in_progress(self):
-        return self.exclude(evaluation_campaign__evaluations_asked_at=None).filter(evaluation_campaign__ended_at=None)
+        return self.exclude(evaluation_campaign__evaluations_asked_at=None).filter(
+            evaluation_campaign__ended_at=None,
+            final_reviewed_at=None,
+        )
 
     def viewable(self):
         return self.filter(evaluation_campaign__in=EvaluationCampaign.objects.viewable())
@@ -320,6 +323,17 @@ class EvaluatedSiae(models.Model):
     # Refused documents from the phase amiable can be uploaded again, a second
     # refusal is final (phase contradictoire).
     final_reviewed_at = models.DateTimeField(verbose_name="Contrôle définitif le", blank=True, null=True)
+
+    # After a refused evaluation, the SIAE is notified of sanctions.
+    notified_at = models.DateTimeField(verbose_name="notifiée le", blank=True, null=True)
+    notification_reason = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        choices=evaluation_enums.EvaluatedSiaeNotificationReason.choices,
+        verbose_name="raison principale",
+    )
+    notification_text = models.TextField(blank=True, null=True, verbose_name="commentaire")
 
     objects = EvaluatedSiaeManager.from_queryset(EvaluatedSiaeQuerySet)()
 
@@ -426,6 +440,18 @@ class EvaluatedSiae(models.Model):
         body = "siae_evaluations/email/to_siae_adversarial_stage_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def get_email_to_siae_sanctioned(self):
+        to = self.siae.active_admin_members.values_list("email", flat=True)
+        dashboard_url = reverse("dashboard:index")
+        context = {
+            "evaluation_campaign": self.evaluation_campaign,
+            "siae": self.siae,
+            "dashboard_url": (f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}" + dashboard_url),
+        }
+        subject = "siae_evaluations/email/to_siae_sanctioned_subject.txt"
+        body = "siae_evaluations/email/to_siae_sanctioned_body.txt"
+        return get_email_message(to, context, subject, body)
+
     # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
     # to emails.py in institution model
     def get_email_to_institution_submitted_by_siae(self):
@@ -453,6 +479,12 @@ class EvaluatedSiae(models.Model):
                 for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
             )
 
+        NOTIFICATION_PENDING_OR_REFUSED = (
+            evaluation_enums.EvaluatedSiaeState.REFUSED
+            if self.notified_at
+            else evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
+        )
+
         if (
             # edge case, evaluated_siae has no evaluated_job_application
             len(self.evaluated_job_applications.all()) == 0
@@ -466,7 +498,7 @@ class EvaluatedSiae(models.Model):
         ):
             return (
                 # SIAE did not submit proof.
-                evaluation_enums.EvaluatedSiaeState.REFUSED
+                NOTIFICATION_PENDING_OR_REFUSED
                 if self.evaluation_is_final
                 else evaluation_enums.EvaluatedSiaeState.PENDING
             )
@@ -474,7 +506,7 @@ class EvaluatedSiae(models.Model):
         if any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at is None):
             return (
                 # SIAE did not submit proof.
-                evaluation_enums.EvaluatedSiaeState.REFUSED
+                NOTIFICATION_PENDING_OR_REFUSED
                 if self.evaluation_is_final
                 else evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
             )
@@ -499,7 +531,7 @@ class EvaluatedSiae(models.Model):
                 if any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at > self.reviewed_at):
                     return evaluation_enums.EvaluatedSiaeState.ACCEPTED
                 # Adversarial phase, new proofs not submitted.
-                return evaluation_enums.EvaluatedSiaeState.REFUSED
+                return NOTIFICATION_PENDING_OR_REFUSED
             return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
 
         if any_evaluated_admin_crit_matches(
@@ -519,6 +551,7 @@ class EvaluatedSiae(models.Model):
                 ):
                     # User submitted proofs that were not reviewed, accept them.
                     return evaluation_enums.EvaluatedSiaeState.ACCEPTED
+                return NOTIFICATION_PENDING_OR_REFUSED
             return evaluation_enums.EvaluatedSiaeState.REFUSED
         return evaluation_enums.EvaluatedSiaeState.ACCEPTED
 

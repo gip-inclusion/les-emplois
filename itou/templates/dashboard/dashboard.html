@@ -497,7 +497,7 @@
                 </div>
             </div>
 
-            {% if active_campaigns %}
+            {% if active_campaigns or evaluated_siae_notifications %}
                 <div class="card c-card has-links-inside">
                     <p class="h4 card-header">
                         Contrôle a posteriori <span class="badge badge-accent-03 text-primary">Nouveau</span>
@@ -512,6 +512,13 @@
                                     </a>
                                     {# note vincentporte: static icon, will be displayed dynamically later.#}
                                     <i class="ri-error-warning-fill ri-lg mr-1 text-danger"></i>
+                                </li>
+                            {% endfor %}
+                            {% for evaluated_siae in evaluated_siae_notifications %}
+                                <li class="card-text mb-3">
+                                    <a href="{% url "siae_evaluations_views:siae_sanction" evaluated_siae.pk %}">
+                                        Voir le résultat du contrôle “{{ evaluated_siae.evaluation_campaign.name }}”
+                                    </a>
                                 </li>
                             {% endfor %}
                         </ul>
