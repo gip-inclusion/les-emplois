@@ -82,7 +82,14 @@ TABLE.add_columns(
     ]
 )
 
-TABLE.add_columns(get_address_columns(comment_suffix=" de la structure"))
+
+def get_parent_siae(siae):
+    if siae.convention and siae.source == Siae.SOURCE_USER_CREATED:
+        return siae.convention.siaes.get(source=Siae.SOURCE_ASP)
+    return siae
+
+
+TABLE.add_columns(get_address_columns(comment_suffix=" de la structure", custom_fn=get_parent_siae))
 
 TABLE.add_columns(
     [

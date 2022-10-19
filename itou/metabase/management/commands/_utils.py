@@ -123,33 +123,33 @@ def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_
     ]
 
 
-def get_address_columns(name_suffix="", comment_suffix=""):
+def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
     return [
         {
             "name": f"adresse_ligne_1{name_suffix}",
             "type": "varchar",
             "comment": f"Première ligne adresse{comment_suffix}",
-            "fn": lambda o: o.address_line_1,
+            "fn": lambda o: custom_fn(o).address_line_1,
         },
         {
             "name": f"adresse_ligne_2{name_suffix}",
             "type": "varchar",
             "comment": f"Seconde ligne adresse{comment_suffix}",
-            "fn": lambda o: o.address_line_2,
+            "fn": lambda o: custom_fn(o).address_line_2,
         },
         {
             "name": f"code_postal{name_suffix}",
             "type": "varchar",
             "comment": f"Code postal{comment_suffix}",
-            "fn": lambda o: o.post_code,
+            "fn": lambda o: custom_fn(o).post_code,
         },
         {
             "name": f"ville{name_suffix}",
             "type": "varchar",
             "comment": f"Ville{comment_suffix}",
-            "fn": lambda o: o.city,
+            "fn": lambda o: custom_fn(o).city,
         },
-    ] + get_department_and_region_columns(name_suffix, comment_suffix)
+    ] + get_department_and_region_columns(name_suffix, comment_suffix, custom_fn)
 
 
 def get_establishment_last_login_date_column():
