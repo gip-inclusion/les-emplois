@@ -4,7 +4,7 @@
     </div>
     <div class="col-lg-3 col-md-3 col-4">
         <p class="small mb-0">
-            {% if evaluated_siae.final_reviewed_at %}
+            {% if evaluated_siae.evaluation_is_final %}
                 <p class="badge{% if evaluated_siae.state == "ACCEPTED" %} badge-success{% else %} badge-danger{% endif %} float-right">
                     {% if evaluated_siae.state == "ACCEPTED" %}
                         Résultat positif

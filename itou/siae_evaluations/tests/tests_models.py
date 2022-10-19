@@ -559,7 +559,7 @@ class EvaluatedSiaeQuerySetTest(TestCase):
 class EvaluatedSiaeModelTest(TestCase):
     def test_state_unitary(self):
         fake_now = timezone.now()
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=fake_now)
 
         ## unit tests
         # no evaluated_job_application
@@ -660,7 +660,7 @@ class EvaluatedSiaeModelTest(TestCase):
 
     def test_state_integration(self):
         fake_now = timezone.now()
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=fake_now)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory.create_batch(
             3,
@@ -780,6 +780,98 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
         del evaluated_siae.state
+
+    def test_state_on_closed_campaign_no_criteria(self):
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=timezone.now())
+        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
+
+    def test_state_on_closed_campaign_criteria_not_submitted(self):
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=1),
+        )
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
+
+    def test_state_on_closed_campaign_criteria_submitted(self):
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=2),
+            submitted_at=timezone.now() - relativedelta(days=1),
+        )
+        # Was not reviewed by the institution, assume valid (following rules in
+        # most administrations).
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+
+    def test_state_on_closed_campaign_criteria_submitted_after_review(self):
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=3),
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=2),
+            submitted_at=timezone.now() - relativedelta(days=1),
+        )
+        # Was not reviewed by the institution, assume valid (following rules in
+        # most administrations).
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+
+    def test_state_on_closed_campaign_criteria_uploaded_after_review(self):
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=3),
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=2),
+            # Not submitted.
+        )
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
+
+    def test_state_on_closed_campaign_criteria_refused_review_not_validated(self):
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=2),
+            submitted_at=timezone.now() - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+        # Was not reviewed by the institution, assume valid (following rules in
+        # most administrations).
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+
+    def test_state_on_closed_campaign_criteria_refused_review_validated(self):
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__reviewed_at=timezone.now(),
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=2),
+            submitted_at=timezone.now() - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
+
+    def test_state_on_closed_campaign_criteria_accepted(self):
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=2),
+            submitted_at=timezone.now() - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
     def test_review(self):
         fake_now = timezone.now()
