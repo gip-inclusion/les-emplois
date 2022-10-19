@@ -27,7 +27,15 @@ class SearchSiaeTest(TestCase):
         SiaeFactory(department="75", coords=paris_city.coords, post_code="75002")
 
         # Filter on city
-        response = self.client.get(self.url, {"city": city_slug})
+        with self.assertNumQueries(
+            1  # select the city
+            + 1  # fetch spatial reference 4321
+            + 1  # fetch initial SIAES (to extract the filters afterwards)
+            + 1  # count the number of results for pagination
+            + 1  # actual select of the SIAEs, with related objects and annotated distance
+            + 1  # prefetch active job descriptions
+        ):
+            response = self.client.get(self.url, {"city": city_slug})
 
         self.assertContains(response, "Employeurs solidaires à 25 km du centre de Paris (75)")
         self.assertContains(response, "2 résultats sur 2")
@@ -133,6 +141,28 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(response, "1 résultat sur 1")
         self.assertContains(response, "Offres clauses sociales")
+
+    def test_is_popular(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        city = create_city_saint_andre()
+        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
+        job = SiaeJobDescriptionFactory(siae=siae)
+        JobApplicationFactory.create_batch(20, to_siae=siae, selected_jobs=[job], state="new")
+        response = self.client.get(self.url, {"city": city.slug})
+        self.assertNotContains(response, """20+<span class="ml-1">candidatures</span>""", html=True)
+
+        JobApplicationFactory(to_siae=siae, selected_jobs=[job], state="new")
+        response = self.client.get(self.url, {"city": city.slug})
+        self.assertContains(
+            response,
+            """
+            <span class="badge badge-sm badge-pill badge-pilotage text-primary">
+                <i class="ri-group-line mr-1"></i>
+                20+<span class="ml-1">candidatures</span>
+            </span>
+            """,
+            html=True,
+        )
 
 
 class SearchPrescriberTest(TestCase):

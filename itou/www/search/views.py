@@ -1,12 +1,13 @@
 from collections import defaultdict
 
 from django.contrib.gis.db.models.functions import Distance
+from django.db.models import Prefetch
 from django.shortcuts import render
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
+from itou.siaes.models import Siae, SiaeJobDescription
 from itou.utils.pagination import pager
 from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
 
@@ -64,7 +65,15 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             siaes_step_1
             # Convert km to m (injected in SQL query)
             .annotate(distance=Distance("coords", city.coords) / 1000)
-            .prefetch_job_description_through()
+            .prefetch_related(
+                Prefetch(
+                    lookup="job_description_through",
+                    queryset=SiaeJobDescription.objects.with_annotation_is_popular().filter(
+                        siae__in=siaes_step_1, is_active=True
+                    ),
+                    to_attr="active_job_descriptions",
+                )
+            )
             # For sorting let's put siaes in only 2 buckets (boolean has_active_members).
             # If we sort naively by `-_total_active_members` we would show
             # siaes with 10 members (where 10 is the max), then siaes
