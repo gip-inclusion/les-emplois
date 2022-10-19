@@ -253,9 +253,10 @@ class Command(BaseCommand):
         """
         queryset = (
             Siae.objects.active()
+            .select_related("convention")
             .prefetch_related(
                 "members",
-                "convention",
+                "convention__siaes",
                 "siaemembership_set",
                 "job_applications_received",
                 "job_applications_received__logs",
