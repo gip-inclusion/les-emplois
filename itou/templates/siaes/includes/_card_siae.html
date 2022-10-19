@@ -24,6 +24,13 @@
         <p class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-0">
             <span class="align-self-start">
                 <span class="badge badge-sm badge-pill badge-primary">à {{ siae.distance|floatformat:"-1"|default:"12" }} km</span>
+                {% comment %}
+                The "default" distance of 12 kms above seems a little weird.
+                Having a default distance to any point does not make a lot of sense, either we have one between point A and B, or nothing.
+                But it seems that this template is used when an SIAE looks at itself, and the "distance" span is displayed as well.
+                We should have a chat someday with the designers to remove it, as it is probably confusing to just say 12kms from
+                no given point, all the time.
+                {% endcomment %}
                 <span class="text-muted fs-sm ml-1">de votre lieu de recherche.</span>
             </span>
             {% if jobs_descriptions %}
