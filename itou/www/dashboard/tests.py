@@ -155,7 +155,7 @@ class DashboardViewTest(TestCase):
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertContains(response, "Prolonger ou suspendre un agrément émis par Pôle emploi")
+                self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
                 self.assertContains(response, "Déclarer une embauche")
 
         for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS]:
@@ -165,7 +165,7 @@ class DashboardViewTest(TestCase):
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertNotContains(response, "Prolonger ou suspendre un agrément émis par Pôle emploi")
+                self.assertNotContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
                 self.assertNotContains(response, "Déclarer une embauche")
 
     def test_dashboard_can_create_siae_antenna(self):
@@ -289,7 +289,8 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(
             response,
-            'Contrôle a posteriori <span class="badge badge-accent-03 text-primary">Nouveau</span>',
+            "Contrôle a posteriori "
+            '<span class="badge badge-pill badge-sm badge-accent-02 text-primary">Nouveau</span>',
             count=1,
         )
         self.assertContains(
