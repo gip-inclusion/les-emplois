@@ -4,6 +4,7 @@ Specific widgets used in forms.
 import datetime
 
 from django import forms
+from django.contrib.gis.forms import widgets as gis_widgets
 
 from itou.utils.validators import get_max_birthdate, get_min_birthdate
 
@@ -97,3 +98,12 @@ class MultipleSwitchCheckboxWidget(forms.CheckboxSelectMultiple):
     """
 
     option_template_name = "utils/widgets/switch_checkbox_option.html"
+
+
+class OSMWidget(gis_widgets.OSMWidget):
+    # https://docs.djangoproject.com/en/4.1/ref/contrib/gis/forms-api/#widget-classes
+    # We copied the html to include the nonce attribute
+    # We need to set the widget in the admin formfield_for_dbfield function
+    # because widget render does not access to the request context
+    # (see itou.utils.admin.ItouGISMixin)
+    template_name = "utils/widgets/csp_proof_openlayers-osm.html"
