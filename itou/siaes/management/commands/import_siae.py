@@ -18,7 +18,7 @@ from django.core import mail
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.siaes.management.commands._import_siae.convention import (
     check_convention_data_consistency,
     get_creatable_conventions,
@@ -314,18 +314,6 @@ class Command(BaseCommand):
             af.delete()
 
     @timeit
-    def check_aciphc_data_consistency(self):
-        """
-        ACIPHC is a tricky siae kind, part of ELIBILIGITY_REQUIRED_KINDS but not of SiaeWithConventionKind
-        Let's keep an eye on it.
-        """
-        aciphc_query = Siae.objects.filter(kind=SiaeKind.ACIPHC).select_related("convention")
-        for siae in aciphc_query:
-            assert siae.source in [Siae.SOURCE_STAFF_CREATED, Siae.SOURCE_USER_CREATED]
-            assert siae.convention is None
-        self.stdout.write(f"checked {aciphc_query.count()} ACIPHC siaes")
-
-    @timeit
     def handle(self, **options):
         self.fatal_errors = 0
 
@@ -347,7 +335,6 @@ class Command(BaseCommand):
         # Final checks.
         check_convention_data_consistency()
         self.check_whether_signup_is_possible_for_all_siaes()
-        self.check_aciphc_data_consistency()
 
         if self.fatal_errors >= 1:
             raise RuntimeError(
