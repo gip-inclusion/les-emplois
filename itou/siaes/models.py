@@ -26,7 +26,7 @@ class SiaeQuerySet(OrganizationQuerySet):
         # See `self.with_count_recent_received_job_apps`.
         has_active_convention = Exists(SiaeConvention.objects.filter(id=OuterRef("convention_id"), is_active=True))
         return (
-            # GEIQ, EA, EATT, ACIPHC... have no convention logic and thus are always active.
+            # GEIQ, EA, EATT, ... have no convention logic and thus are always active.
             # `~` means NOT, similarly to dataframes.
             ~Q(kind__in=SIAE_WITH_CONVENTION_KINDS)
             # Staff created siaes are always active until eventually
@@ -196,7 +196,8 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     # https://code.travail.gouv.fr/code-du-travail/l5132-4
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
-    ELIGIBILITY_REQUIRED_KINDS = SIAE_WITH_CONVENTION_KINDS + [SiaeKind.ACIPHC]
+    # FIXME(celinems)
+    ELIGIBILITY_REQUIRED_KINDS = SIAE_WITH_CONVENTION_KINDS
 
     # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently
@@ -285,7 +286,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     @property
     def is_active(self):
         if not self.should_have_convention:
-            # GEIQ, EA, EATT, OPCS, ACIPHC... have no convention logic and thus are always active.
+            # GEIQ, EA, EATT, OPCS, ... have no convention logic and thus are always active.
             return True
         if self.source == Siae.SOURCE_STAFF_CREATED:
             # Staff created siaes are always active until eventually
@@ -422,7 +423,7 @@ class Siae(AddressMixin, OrganizationAbstract):
         if not self.has_admin(user):
             return False
         if not self.should_have_convention:
-            # AF interfaces only makes sense for SIAE, not for GEIQ EA ACIPHC etc.
+            # AF interfaces only makes sense for SIAE, not for GEIQ, EA, etc.
             return False
         if self.source not in [self.SOURCE_ASP, self.SOURCE_USER_CREATED]:
             # AF interfaces do not make sense for staff created siaes, which

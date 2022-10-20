@@ -1019,7 +1019,6 @@ class Prolongation(models.Model):
             if not self.declared_by_siae or self.declared_by_siae.kind not in [
                 siae_enums.SiaeKind.AI,
                 siae_enums.SiaeKind.ACI,
-                siae_enums.SiaeKind.ACIPHC,
             ]:
                 raise ValidationError(f"Le motif « {self.get_reason_display()} » est réservé aux AI et ACI.")
 

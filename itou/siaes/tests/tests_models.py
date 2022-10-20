@@ -88,7 +88,7 @@ class SiaeModelTest(TestCase):
         self.assertTrue(siae.is_subject_to_eligibility_rules)
 
     def test_should_have_convention(self):
-        siae = SiaeFactory(kind=SiaeKind.ACIPHC)
+        siae = SiaeFactory(kind=SiaeKind.GEIQ)
         self.assertFalse(siae.should_have_convention)
 
         siae = SiaeFactory(kind=SiaeKind.EI)

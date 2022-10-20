@@ -42,8 +42,8 @@ class DeclareProlongationForm(forms.ModelForm):
             item for item in self.fields["reason"].choices if item[0] != Prolongation.Reason.HEALTH_CONTEXT
         ]
 
-        # `PARTICULAR_DIFFICULTIES` is allowed only for AI, ACI and ACIPHC.
-        if self.siae.kind not in [SiaeKind.AI, SiaeKind.ACI, SiaeKind.ACIPHC]:
+        # `PARTICULAR_DIFFICULTIES` is allowed only for AI and ACI.
+        if self.siae.kind not in [SiaeKind.AI, SiaeKind.ACI]:
             self.fields["reason"].choices = [
                 item
                 for item in self.fields["reason"].choices

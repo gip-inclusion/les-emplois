@@ -145,7 +145,6 @@ class DashboardViewTest(TestCase):
             SiaeKind.EITI,
             SiaeKind.ACI,
             SiaeKind.ETTI,
-            SiaeKind.ACIPHC,
         ]:
             with self.subTest(f"should display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)

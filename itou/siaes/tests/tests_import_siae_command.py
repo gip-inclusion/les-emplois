@@ -142,18 +142,6 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         )
         self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI))
 
-    def test_check_convention_data_consistency_aciphc_edge_case(self):
-        SIRET = "41294123900011"
-        user_created_siae = SiaeFactory(
-            siret=SIRET,
-            kind=SiaeKind.ACIPHC,
-            source=Siae.SOURCE_USER_CREATED,
-            convention__siret_signature=SIRET,
-            convention__kind=SiaeKind.ACI,
-        )
-        SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.ACI, convention=user_created_siae.convention)
-        self.mod.check_convention_data_consistency()
-
     def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
         instance = lazy_import_siae_command()
         SiaeFactory(auth_email="tadaaa")
