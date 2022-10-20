@@ -1,8 +1,6 @@
 import datetime
 
 from django.contrib import admin, messages
-from django.contrib.gis import forms as gis_forms
-from django.contrib.gis.db import models as gis_models
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
@@ -13,7 +11,7 @@ from import_export.fields import Field
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.siaes import models
 from itou.siaes.admin_forms import SiaeAdminForm
-from itou.utils.admin import PkSupportRemarkInline
+from itou.utils.admin import ItouGISMixin, PkSupportRemarkInline
 from itou.utils.apis.exceptions import GeocodingDataError
 
 
@@ -136,7 +134,7 @@ class SiaeResource(resources.ModelResource):
 
 
 @admin.register(models.Siae)
-class SiaeAdmin(ExportActionMixin, OrganizationAdmin):
+class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
     resource_class = SiaeResource
     form = SiaeAdminForm
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
@@ -196,10 +194,6 @@ class SiaeAdmin(ExportActionMixin, OrganizationAdmin):
     )
     search_fields = ("pk", "siret", "name", "city", "department", "post_code", "address_line_1")
     inlines = (SiaeMembersInline, JobsInline, PkSupportRemarkInline)
-    formfield_overrides = {
-        # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/forms-api/#widget-classes
-        gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
-    }
 
     def get_export_filename(self, request, queryset, file_format):
         return f"Entreprises-{now().strftime('%Y-%m-%d')}.{file_format.get_extension()}"

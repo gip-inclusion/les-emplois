@@ -1,6 +1,4 @@
 from django.contrib import admin, messages
-from django.contrib.gis import forms as gis_forms
-from django.contrib.gis.db import models as gis_models
 from django.core.exceptions import PermissionDenied
 from django.utils.timezone import now
 
@@ -8,7 +6,7 @@ from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.admin import PkSupportRemarkInline
+from itou.utils.admin import ItouGISMixin, PkSupportRemarkInline
 from itou.utils.apis.exceptions import GeocodingDataError
 
 
@@ -75,7 +73,7 @@ class PrescriberOrganizationMembersInline(MembersInline):
 
 
 @admin.register(PrescriberOrganization)
-class PrescriberOrganizationAdmin(OrganizationAdmin):
+class PrescriberOrganizationAdmin(ItouGISMixin, OrganizationAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 
@@ -167,10 +165,6 @@ class PrescriberOrganizationAdmin(OrganizationAdmin):
         "post_code",
         "address_line_1",
     )
-    formfield_overrides = {
-        # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/forms-api/#widget-classes
-        gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
-    }
 
     def get_queryset(self, request):
         # OrganizationAdmin adds some useful annotations.
