@@ -594,11 +594,6 @@ class FilterJobApplicationsForm(forms.Form):
 
         if data.get("states"):
             filters["state__in"] = data.get("states")
-        if data.get("pass_iae_suspended"):
-            # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
-            filters["has_suspended_approval"] = True
-        if data.get("pass_iae_active"):
-            filters["has_active_approval"] = True
         if data.get("eligibility_validated"):
             filters["last_jobseeker_eligibility_diagnosis__isnull"] = False
         if data.get("start_date"):
@@ -640,8 +635,6 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
 
     job_seekers = forms.MultipleChoiceField(required=False, label="Nom du candidat", widget=Select2MultipleWidget)
 
-    pass_iae_suspended = forms.BooleanField(label="PASS IAE suspendu", required=False)
-    pass_iae_active = forms.BooleanField(label="PASS IAE actif", required=False)
     criteria = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple)
     eligibility_validated = forms.BooleanField(label="Éligibilité validée", required=False)
     departments = forms.MultipleChoiceField(

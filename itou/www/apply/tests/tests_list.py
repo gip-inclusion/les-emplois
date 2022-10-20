@@ -3,14 +3,9 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.approvals.factories import SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
-from itou.job_applications.factories import (
-    JobApplicationSentByJobSeekerFactory,
-    JobApplicationSentByPrescriberFactory,
-    JobApplicationWithApprovalFactory,
-)
+from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationSentByPrescriberFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
@@ -307,56 +302,6 @@ class ProcessListSiaeTest(ProcessListTest):
 
         self.assertEqual(len(applications), 8)
         self.assertIn(applications[0].sender_prescriber_organization.id, senders_ids)
-
-    def test_view__filtered_by_pass_state(self):
-        """
-        Eddie wants to see applications with a suspended or in progress IAE PASS.
-        """
-        now = timezone.now()
-        yesterday = (now - timezone.timedelta(days=1)).date()
-        self.client.force_login(self.eddie_hit_pit)
-
-        params = urlencode(
-            {
-                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
-                "pass_iae_active": True,
-            },
-            True,
-        )
-        response = self.client.get(f"{self.siae_base_url}?{params}")
-        self.assertEqual(len(response.context["job_applications_page"].object_list), 0)
-
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
-            hiring_start_at=yesterday,
-            approval__start_at=yesterday,
-            to_siae=self.hit_pit,
-        )
-        response = self.client.get(f"{self.siae_base_url}?{params}")
-        applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 1)
-        self.assertIn(job_application, applications)
-
-        params = urlencode(
-            {
-                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
-                "pass_iae_suspended": True,
-            },
-            True,
-        )
-        response = self.client.get(f"{self.siae_base_url}?{params}")
-        self.assertEqual(len(response.context["job_applications_page"].object_list), 0)
-
-        SuspensionFactory(
-            approval=job_application.approval,
-            start_at=yesterday,
-            end_at=now + timezone.timedelta(days=2),
-        )
-        response = self.client.get(f"{self.siae_base_url}?{params}")
-
-        applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 1)
-        self.assertIn(job_application, applications)
 
     def test_view__filtered_by_eligibility_validated(self):
         """

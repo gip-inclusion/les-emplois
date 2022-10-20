@@ -237,12 +237,7 @@ class JobApplicationQuerySet(models.QuerySet):
             "to_siae__convention",
         ).prefetch_related("selected_jobs__appellation")
 
-        qs = (
-            qs.with_has_suspended_approval()
-            .with_is_pending_for_too_long()
-            .with_has_active_approval()
-            .with_last_jobseeker_eligibility_diagnosis()
-        )
+        qs = qs.with_is_pending_for_too_long().with_last_jobseeker_eligibility_diagnosis()
 
         # Adding an annotation by selected criterion
         for criterion in criteria:
