@@ -58,31 +58,32 @@ class ContractType(models.TextChoices):
     @classmethod
     def choices_for_siae(cls, siae):
         choices = None
-        # TODO(celinems): Use Python 3.10 match / case syntax when this version will be available on our project.
-        if siae.kind == SiaeKind.GEIQ:
-            choices = [cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        elif siae.kind in [SiaeKind.EA, SiaeKind.EATT]:
-            choices = [
-                cls.PERMANENT,
-                cls.FIXED_TERM,
-                cls.TEMPORARY,
-                cls.FIXED_TERM_TREMPLIN,
-                cls.APPRENTICESHIP,
-                cls.PROFESSIONAL_TRAINING,
-                cls.OTHER,
-            ]
-        elif siae.kind == SiaeKind.EITI:
-            choices = [cls.BUSINESS_CREATION, cls.OTHER]
-        elif siae.kind == SiaeKind.OPCS:
-            choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        elif siae.kind in [SiaeKind.ACI, SiaeKind.EI, SiaeKind.AI, SiaeKind.ETTI]:
-            # SIAE_WITH_CONVENTION_KINDS but without EITI.
-            choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        else:
-            choices = list(cls)
-            # These are only for ACI from ACI_CONVERGENCE_SIRET_WHITELIST
-            choices.remove(cls.FIXED_TERM_I_PHC)
-            choices.remove(cls.FIXED_TERM_I_CVG)
+
+        match siae.kind:
+            case SiaeKind.GEIQ:
+                choices = [cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
+            case SiaeKind.EA | SiaeKind.EATT:
+                choices = [
+                    cls.PERMANENT,
+                    cls.FIXED_TERM,
+                    cls.TEMPORARY,
+                    cls.FIXED_TERM_TREMPLIN,
+                    cls.APPRENTICESHIP,
+                    cls.PROFESSIONAL_TRAINING,
+                    cls.OTHER,
+                ]
+            case SiaeKind.EITI:
+                choices = [cls.BUSINESS_CREATION, cls.OTHER]
+            case SiaeKind.OPCS:
+                choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
+            case SiaeKind.ACI | SiaeKind.EI | SiaeKind.AI | SiaeKind.ETTI:
+                # SIAE_WITH_CONVENTION_KINDS but without EITI.
+                choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
+            case _:
+                choices = list(cls)
+                # These are only for ACI from ACI_CONVERGENCE_SIRET_WHITELIST
+                choices.remove(cls.FIXED_TERM_I_PHC)
+                choices.remove(cls.FIXED_TERM_I_CVG)
 
         if siae.kind == SiaeKind.ACI and siae.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST:
             choices[-1:-1] = [
