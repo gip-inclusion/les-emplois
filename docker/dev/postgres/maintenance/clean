@@ -3,7 +3,7 @@
 ### Delete backup files older than 7 days.
 ###
 ### Usage:
-###     $ docker-compose -f <environment>.yml (exec |run --rm) postgres clean
+###     $ docker compose -f <environment>.yml (exec |run --rm) postgres clean
 
 set -o errexit
 set -o pipefail
