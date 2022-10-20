@@ -18,6 +18,7 @@ from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
@@ -718,7 +719,7 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
         super().__init__(job_applications_qs, *args, **kwargs)
         self.fields["sender_organizations"].choices += self.get_sender_organization_choices()
 
-        if siae.kind not in siae.ELIGIBILITY_REQUIRED_KINDS:
+        if siae.kind not in SIAE_WITH_CONVENTION_KINDS:
             del self.fields["eligibility_validated"]
 
     def get_qs_filters(self):

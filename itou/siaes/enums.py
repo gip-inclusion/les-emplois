@@ -76,7 +76,7 @@ class ContractType(models.TextChoices):
         elif siae.kind == SiaeKind.OPCS:
             choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
         elif siae.kind in [SiaeKind.ACI, SiaeKind.EI, SiaeKind.AI, SiaeKind.ETTI]:
-            # Siae.ELIGIBILITY_REQUIRED_KINDS but without EITI.
+            # SIAE_WITH_CONVENTION_KINDS but without EITI.
             choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
         else:
             choices = list(cls)

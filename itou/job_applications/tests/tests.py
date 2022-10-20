@@ -40,7 +40,7 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
@@ -116,7 +116,7 @@ class JobApplicationModelTest(TestCase):
         self.assertTrue(job_application.can_display_approval)
 
         # SIAE not subject to eligibility rules.
-        not_eligible_kinds = [kind for kind in SiaeKind if kind not in Siae.ELIGIBILITY_REQUIRED_KINDS]
+        not_eligible_kinds = [kind for kind in SiaeKind if kind not in SIAE_WITH_CONVENTION_KINDS]
         not_eligible_siae = SiaeFactory(kind=not_eligible_kinds[0])
         job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
         self.assertFalse(job_application.can_display_approval)
