@@ -76,7 +76,7 @@ Lors des mises à jour Python (par ex. ajout d'un package à Django), vous devez
 reconstruire (*rebuild*) votre image Docker en exécutant la commande suivante :
 
 ```sh
-docker-compose up --build
+docker compose up --build
 ```
 
 #### Effacer l'ancienne base de données
@@ -89,7 +89,7 @@ docker volume rm itou_postgres_data
 docker volume rm itou_postgres_data_backup
 
 # ou
-docker-compose down -v
+docker compose down -v
 ```
 
 #### Lancer le serveur de développement
@@ -98,13 +98,13 @@ docker-compose down -v
 $ make run
 
 # Équivalent de :
-$ docker-compose up
+$ docker compose up
 ```
 
 Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/issues/4677#issuecomment-320804194) type `ipdb` :
 
 ```sh
-$ docker-compose run --service-ports django
+$ docker compose run --service-ports django
 ```
 
 ### Accéder au serveur de développement

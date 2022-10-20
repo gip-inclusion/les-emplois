@@ -26,7 +26,7 @@ endif
 
 # Run Docker images
 run:
-	docker-compose up
+	docker compose up
 
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 	$(PYTHON_VERSION) -m venv $@
@@ -168,13 +168,13 @@ psql_to_csv:
 .PHONY: postgres_backup postgres_backups_cp_locally postgres_backups_list postgres_backup_restore postgres_restore_latest_backup postgres_backups_clean postgres_dump_cities
 
 postgres_backup:
-	docker-compose exec postgres backup
+	docker compose exec postgres backup
 
 postgres_backups_cp_locally:
 	docker cp itou_postgres:/backups ~/Desktop/backups
 
 postgres_backups_list:
-	docker-compose exec postgres backups
+	docker compose exec postgres backups
 
 # - Note: Django must be stopped to avoid a "database "itou" is being accessed by other users" error.
 # make postgres_backup_restore FILE=backup_2019_10_08T12_33_00.sql.gz
@@ -184,9 +184,9 @@ postgres_backups_list:
 postgres_backup_restore:
 	# Copy the backup file in the container first.
 	# Example: docker cp FILE itou_postgres:/backups/
-	docker-compose up -d --no-deps postgres && \
-	docker-compose exec postgres restore $(FILE) && \
-	docker-compose stop
+	docker compose up -d --no-deps postgres && \
+	docker compose exec postgres restore $(FILE) && \
+	docker compose stop
 
 # Download last prod backup and inject it locally.
 # ----------------------------------------------------
@@ -197,7 +197,7 @@ postgres_restore_latest_backup: ./scripts/import-latest-db-backup.sh
 	./scripts/import-latest-db-backup.sh
 
 postgres_backups_clean:
-	docker-compose exec postgres clean
+	docker compose exec postgres clean
 
 postgres_dump_cities:
 	docker exec -ti itou_postgres bash -c "pg_dump --no-owner --no-privileges --data-only -d itou -t cities_city > /backups/cities.sql"

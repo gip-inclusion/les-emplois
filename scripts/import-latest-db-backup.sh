@@ -21,7 +21,7 @@ ITOU_DB_BACKUP_PATH=$PATH_TO_ITOU_BACKUPS/backups/$ITOU_DB_BACKUP_NAME
 
 echo "Going to inject ITOU_DB_BACKUP_PATH=$ITOU_DB_BACKUP_PATH"
 
-docker cp $ITOU_DB_BACKUP_PATH itou_postgres:/backups && docker-compose -f docker-compose.yml down && make postgres_backup_restore FILE=$ITOU_DB_BACKUP_NAME; echo "Ignore warnings above."
+docker cp $ITOU_DB_BACKUP_PATH itou_postgres:/backups && docker compose down && make postgres_backup_restore FILE=$ITOU_DB_BACKUP_NAME; echo "Ignore warnings above."
 
 cat << EOF
 
