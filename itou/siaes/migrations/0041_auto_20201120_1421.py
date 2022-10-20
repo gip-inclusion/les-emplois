@@ -21,7 +21,7 @@ from django.db import migrations
 #     "My Financial Annexes" interface.
 #     """
 #     siae_query = Siae.objects.filter(
-#         kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS, source=Siae.SOURCE_USER_CREATED, convention__isnull=True
+#         kind__in=SIAE_WITH_CONVENTION_KINDS, source=Siae.SOURCE_USER_CREATED, convention__isnull=True
 #     )
 #     total = siae_query.count()
 #     print("-" * 80)

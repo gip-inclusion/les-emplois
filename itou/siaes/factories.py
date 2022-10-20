@@ -8,7 +8,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.users.factories import SiaeStaffFactory
 
 
@@ -75,12 +75,10 @@ class SiaeFactory(factory.django.DjangoModelFactory):
 
     class Params:
         subject_to_eligibility = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice(models.Siae.ELIGIBILITY_REQUIRED_KINDS),
+            kind=factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS),
         )
         not_subject_to_eligibility = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice(
-                [kind for kind in SiaeKind if kind not in models.Siae.ELIGIBILITY_REQUIRED_KINDS]
-            ),
+            kind=factory.fuzzy.FuzzyChoice([kind for kind in SiaeKind if kind not in SIAE_WITH_CONVENTION_KINDS]),
         )
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Siae.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(

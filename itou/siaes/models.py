@@ -194,11 +194,6 @@ class Siae(AddressMixin, OrganizationAbstract):
     # These kinds of SIAE can use employee record app to send data to ASP
     ASP_EMPLOYEE_RECORD_KINDS = [SiaeKind.EI, SiaeKind.ACI, SiaeKind.AI, SiaeKind.ETTI]
 
-    # https://code.travail.gouv.fr/code-du-travail/l5132-4
-    # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
-    # FIXME(celinems)
-    ELIGIBILITY_REQUIRED_KINDS = SIAE_WITH_CONVENTION_KINDS
-
     # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently
     # e.g. each time a SIAE moves to a new location.
@@ -336,7 +331,7 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     @property
     def is_subject_to_eligibility_rules(self):
-        return self.kind in self.ELIGIBILITY_REQUIRED_KINDS
+        return self.kind in SIAE_WITH_CONVENTION_KINDS
 
     @property
     def should_have_convention(self):
