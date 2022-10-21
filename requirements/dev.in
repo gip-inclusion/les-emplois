@@ -1,6 +1,6 @@
 -r base.in
 
-pip-tools==6.8.0  # https://github.com/jazzband/pip-tools/
+pip-tools==6.9.0  # https://github.com/jazzband/pip-tools/
 
 ipdb==0.13.9  # https://github.com/gotcha/ipdb
 
@@ -9,37 +9,37 @@ ipdb==0.13.9  # https://github.com/gotcha/ipdb
 tblib==1.7.0  # https://github.com/ionelmc/python-tblib
 
 # Werkzeug is required to use django-extensions's runserver_plus.
-Werkzeug==2.1.2 # https://github.com/pallets/werkzeug
+Werkzeug==2.2.2 # https://github.com/pallets/werkzeug
 
 jedi==0.18.1 # https://github.com/davidhalter/jedi
 
 # Code quality
 # ------------------------------------------------------------------------------
-black==22.6.0  # https://github.com/psf/black
-flake8==4.0.1  # https://github.com/PyCQA/flake8
+black==22.10.0  # https://github.com/psf/black
+flake8==5.0.4  # https://github.com/PyCQA/flake8
 isort==5.10.1  # https://github.com/timothycrosley/isort
-pylint==2.14.5  # https://github.com/PyCQA/pylint
+pylint==2.15.4  # https://github.com/PyCQA/pylint
 pylint-django==2.5.3  # https://github.com/PyCQA/pylint-django
 pre-commit==2.20.0  # https://github.com/pre-commit/pre-commit
-coverage==6.4.2  # https://github.com/nedbat/coveragepy
-djlint==1.17.2  # https://www.djlint.com
+coverage==6.5.0  # https://github.com/nedbat/coveragepy
+djlint==1.19.2  # https://www.djlint.com
 
 # Django
 # ------------------------------------------------------------------------------
 factory-boy==3.2.1  # https://github.com/FactoryBoy/factory_boy
 
-django-debug-toolbar==3.5.0  # https://github.com/jazzband/django-debug-toolbar
+django-debug-toolbar==3.7.0  # https://github.com/jazzband/django-debug-toolbar
 django-extensions==3.2.1  # https://github.com/django-extensions/django-extensions
 django-admin-logs==1.0.2  # https://pypi.org/project/django-admin-logs/
 
 # Test & Mock
 # ------------------------------------------------------------------------------
 freezegun==1.2.2  # https://github.com/spulec/freezegun
-requests-mock==1.9.3  # https://github.com/jamielennox/requests-mock
-respx==0.19.2  # https://lundberg.github.io/respx/
-pytest==7.1.2  # https://github.com/pytest-dev/pytest
+requests-mock==1.10.0  # https://github.com/jamielennox/requests-mock
+respx==0.20.0  # https://lundberg.github.io/respx/
+pytest==7.1.3  # https://github.com/pytest-dev/pytest
 pytest-django== 4.5.2 # https://github.com/pytest-dev/pytest-django/
-pytest-xdist  # https://pypi.org/project/pytest-xdist/
+pytest-xdist==2.5.0  # https://pypi.org/project/pytest-xdist/
 
 # Data extracts
 # ------------------------------------------------------------------------------
