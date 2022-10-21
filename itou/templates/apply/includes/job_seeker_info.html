@@ -46,9 +46,19 @@
 </ul>
 {% if job_application.has_editable_job_seeker %}
     <p>
-        <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary">
-            Modifier les informations personnelles
-        </a>
+        {% if with_matomo_event %}
+            <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
+               class="btn btn-outline-primary matomo-event"
+               data-matomo-category="salaries"
+               data-matomo-action="clic"
+               data-matomo-option="modfifier-les-informations-personnelles">
+                Modifier les informations personnelles
+            </a>
+        {% else %}
+            <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary">
+                Modifier les informations personnelles
+            </a>
+        {% endif %}
     </p>
 {% else %}
     <p>Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.</p>

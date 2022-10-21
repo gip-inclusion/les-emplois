@@ -36,7 +36,7 @@
                 <a class="btn btn-outline-primary float-right matomo-event"
                    data-matomo-action="telechargement-pdf"
                    data-matomo-category="agrement"
-                   data-matomo-option="details-candidature"
+                   data-matomo-option="detail-agrement"
                    href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
                    target="_blank">
                     Afficher le PASS IAE
@@ -54,7 +54,7 @@
                 <hr class="my-4">
                 <h3>Informations personnelles</h3>
                 {# TODO(alaurent) It would be great to remove the use for job_application here #}
-                {% include "apply/includes/job_seeker_info.html" %}
+                {% include "apply/includes/job_seeker_info.html" with with_matomo_event=True %}
                 {# Eligibility ------------------------------------------------------------------------- #}
                 {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
             </div>
