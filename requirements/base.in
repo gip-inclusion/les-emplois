@@ -1,5 +1,5 @@
 Pillow==9.2.0  # https://github.com/python-pillow/Pillow
-psycopg2==2.9.3  # https://github.com/psycopg/psycopg2
+psycopg2==2.9.4  # https://github.com/psycopg/psycopg2
 requests==2.28.1  # https://github.com/psf/requests
 python-dateutil==2.8.2  # https://pypi.org/project/python-dateutil/
 openpyxl==3.0.10  # https://openpyxl.readthedocs.io/en/stable/
@@ -7,7 +7,7 @@ openpyxl==3.0.10  # https://openpyxl.readthedocs.io/en/stable/
 # lxml improves performance of Excel file generation with openpyxl
 lxml==4.9.1  # https://lxml.de/
 
-Unidecode==1.3.4  # https://github.com/avian2/unidecode
+Unidecode==1.3.6  # https://github.com/avian2/unidecode
 
 # Django
 # ------------------------------------------------------------------------------
@@ -24,10 +24,10 @@ django-anymail==8.6  # https://github.com/anymail/django-anymail
 django-xworkflows==1.0.0  # https://github.com/rbarrois/django_xworkflows
 
 # DRF (Django Rest Framework)
-djangorestframework==3.13.1  # https://www.django-rest-framework.org/
+djangorestframework==3.14.0  # https://www.django-rest-framework.org/
 
 # DRF-Spectacular (Django Rest Framework Spectacular, open API schema browser)
-drf-spectacular==0.22.1  # https://github.com/tfranzel/drf-spectacular
+drf-spectacular==0.24.2  # https://github.com/tfranzel/drf-spectacular
 
 # Django filter (filtering/ordering of API results)
 django-filter==22.1 # https://django-filter.readthedocs.io/en/stable/
@@ -36,10 +36,10 @@ django-filter==22.1 # https://django-filter.readthedocs.io/en/stable/
 # ------------------------------------------------------------------------------
 
 # Bootstrap 4 for Django
-django-bootstrap4==22.1  # https://github.com/zostera/django-bootstrap4
+django-bootstrap4==22.2  # https://github.com/zostera/django-bootstrap4
 
 # Enhance select fields in forms with jQuery Select plugin
-django-select2==7.10.0  # https://github.com/codingjoe/django-select2
+django-select2==7.10.1  # https://github.com/codingjoe/django-select2
 
 # Render Markdown in HTML
 markdown==3.4.1  # https://github.com/Python-Markdown/markdown
@@ -94,7 +94,7 @@ uritemplate==4.1.1  # https://github.com/python-hyper/uritemplate
 pyyaml==6.0  # https://github.com/yaml/pyyaml
 
 # For automatic export/import of models in the admin
-django-import-export==2.8.0
+django-import-export==3.0.1  # https://github.com/django-import-export/django-import-export
 
 # To impersonate users from the admin
 django-hijack==3.2.1  # https://github.com/django-hijack/django-hijack
@@ -106,4 +106,4 @@ python-dotenv==0.21.0
 # ------------------------------------------------------------------------------
 uwsgi==2.0.20  # https://github.com/unbit/uwsgi
 sentry-sdk==1.9.0  # https://github.com/getsentry/sentry-python
-elastic-apm==6.10.1  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
+elastic-apm==6.12.0  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
