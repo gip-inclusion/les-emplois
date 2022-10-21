@@ -6,6 +6,7 @@ from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from itou.geo.models import QPV
 from itou.institutions.models import InstitutionMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
@@ -171,7 +172,11 @@ class ItouUserAdmin(UserAdmin):
         "last_login",
     )
     list_display_links = ("pk", "email")
-    list_filter = UserAdmin.list_filter + (KindFilter, CreatedByProxyFilter, "identity_provider")
+    list_filter = UserAdmin.list_filter + (
+        KindFilter,
+        CreatedByProxyFilter,
+        "identity_provider",
+    )
     ordering = ("-id",)
     raw_id_fields = (
         "created_by",
@@ -182,7 +187,12 @@ class ItouUserAdmin(UserAdmin):
         "pk",
         "nir",
     )
-    readonly_fields = ("pk", "jobseeker_hash_id", "identity_provider")
+    readonly_fields = (
+        "pk",
+        "jobseeker_hash_id",
+        "identity_provider",
+        "address_in_qpv",
+    )
 
     fieldsets = UserAdmin.fieldsets + (
         (
@@ -202,6 +212,7 @@ class ItouUserAdmin(UserAdmin):
                     "post_code",
                     "department",
                     "city",
+                    "address_in_qpv",
                     "is_job_seeker",
                     "is_prescriber",
                     "is_siae_staff",
@@ -237,6 +248,19 @@ class ItouUserAdmin(UserAdmin):
     @admin.display(description="id ITOU obfusqué")
     def jobseeker_hash_id(self, obj):
         return obj.jobseeker_hash_id
+
+    @admin.display(description="Adresse en QPV")
+    def address_in_qpv(self, obj):
+        # DO NOT PUT THIS FIELD IN 'list_display' : dynamically computed, only for detail page
+        if not obj.coords or obj.geocoding_score < 0.8:
+            # Under this geocoding score, we can't assert the quality of this field
+            return "Adresse non-géolocalisée"
+
+        if qpv := QPV.in_qpv(obj, geom_field="coords"):
+            url = reverse("admin:geo_qpv_change", args=[qpv.pk])
+            return mark_safe(f'<a href="{url}">{qpv}</a>')
+
+        return "Adresse hors QPV"
 
     def get_queryset(self, request):
         """

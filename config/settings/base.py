@@ -79,6 +79,7 @@ LOCAL_APPS = [
     "itou.asp",
     "itou.employee_record",
     "itou.siae_evaluations",
+    "itou.geo",
     "itou.www.apply",
     "itou.www.approvals_views",
     "itou.www.autocomplete",
