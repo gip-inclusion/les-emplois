@@ -120,5 +120,7 @@
 
 {% block script %}
     {{ block.super }}
+    <!-- Needed to use Select2MultipleWidget. -->
+    {{ filters_form.media.js }}
     <script src='{% static "js/job_applications_filters.js" %}'></script>
 {% endblock %}
