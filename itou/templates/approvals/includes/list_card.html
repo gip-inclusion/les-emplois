@@ -23,7 +23,9 @@
 
     <div class="card-footer bg-light">
         <div class="text-right">
-            <a class="btn btn-outline-primary bg-white" href="{% url 'approvals:detail' pk=approval.id %}">Voir son profil</a>
+            <a class="btn btn-outline-primary bg-white matomo-event" href="{% url 'approvals:detail' pk=approval.id %}" data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="details-salarie">
+                Voir son profil
+            </a>
         </div>
     </div>
 </div>

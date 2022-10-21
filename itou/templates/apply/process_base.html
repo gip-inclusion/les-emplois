@@ -31,7 +31,11 @@
                         </p>
                     </div>
                     <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                        <a class="btn btn-emploi" href="{% url 'approvals:detail' pk=job_application.approval.id %}">
+                        <a class="btn btn-emploi matomo-event"
+                           href="{% url 'approvals:detail' pk=job_application.approval.id %}"
+                           data-matomo-category="salaries"
+                           data-matomo-action="clic"
+                           data-matomo-option="detail-salarie-depuis-candidature">
                             Accéder au Profil salarié
                         </a>
                     </div>

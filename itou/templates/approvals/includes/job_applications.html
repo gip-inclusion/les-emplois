@@ -57,6 +57,12 @@
         {% endwith %}
     </div>
     <div class="card-footer text-right bg-light">
-        <a href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}" class="btn btn-sm btn-outline-primary bg-white">Voir sa candidature</a>
+        <a href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}"
+           class="btn btn-sm btn-outline-primary bg-white matomo-event"
+           data-matomo-category="salaries"
+           data-matomo-action="clic"
+           data-matomo-option="detail-candidature">
+            Voir sa candidature
+        </a>
     </div>
 </div>
