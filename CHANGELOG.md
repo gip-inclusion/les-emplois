@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## [51] - 2022-10-24
+
+### Ajouté
+- Contrôle a posteriori : Nouvelle option pour se retirer de la campagne
+- Contrôle a posteriori : Autorise la modification des justificatifs pendant la revue de la phase contradictoire
+- Contrôle a posteriori : Mode lecture seule pour les campagnes terminées
+- Fiches salariés : Transmission de la date de fin pour les PASS IAE sans fiches salariés
+- API : Exposition d'un lien vers la page de la structure sur les emplois pour l'API data.inclusion
+
+### Modifié
+- Fiches salariés : La géolocalisation est réalisée à l'étape 2 au lieu de l'étape 1 du parcours
+- Correction du formatage du NIR lors du dépôt de candidature
+- UI : Ajustement du bandeau Dora dans le tableau de bord
+- Inscription : Gestion de l'erreur en cas de changement d'email sur France Connect qui rentre en conflit sur les emplois
+- UI : Maj du theme itou vers la v0.5.2
+- UI : Initialise les sélecteurs de date JS une fois par page
+- UI : Remplacement des ressources JS/CSS servies par CDN par des ressources servies localement.
+
 ## [50] - 2022-10-10
 
 ### Ajouté
