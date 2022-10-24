@@ -286,7 +286,7 @@ class User(AbstractUser, AddressMixin):
     objects = ItouUserManager()
 
     def __str__(self):
-        return str(self.email)
+        return f"{self.get_full_name()} ({self.email})"
 
     def clean(self):
         """
