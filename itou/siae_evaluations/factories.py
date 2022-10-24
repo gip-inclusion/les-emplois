@@ -5,7 +5,7 @@ from django.utils import timezone
 from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.factories import InstitutionFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.siae_evaluations import enums as evaluation_enums, models
+from itou.siae_evaluations import models
 from itou.siaes.factories import SiaeFactory
 
 
@@ -34,7 +34,7 @@ class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
         model = models.EvaluatedSiae
 
     class Params:
-        accepted = factory.Trait(
+        complete = factory.Trait(
             evaluation_campaign=factory.SubFactory(
                 EvaluationCampaignFactory,
                 evaluations_asked_at=factory.LazyFunction(lambda: timezone.now() - relativedelta(weeks=12)),
@@ -43,7 +43,7 @@ class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
             job_app=factory.RelatedFactory(
                 "itou.siae_evaluations.factories.EvaluatedJobApplicationFactory",
                 factory_related_name="evaluated_siae",
-                accepted=True,
+                complete=True,
             ),
             reviewed_at=factory.LazyFunction(timezone.now),
             final_reviewed_at=factory.LazyFunction(timezone.now),
@@ -58,7 +58,7 @@ class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
         model = models.EvaluatedJobApplication
 
     class Params:
-        accepted = factory.Trait(
+        complete = factory.Trait(
             criteria=factory.RelatedFactory(
                 "itou.siae_evaluations.factories.EvaluatedAdministrativeCriteriaFactory",
                 factory_related_name="evaluated_job_application",
@@ -70,7 +70,6 @@ class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
                     lambda siae: siae.factory_parent.evaluated_siae.evaluation_campaign.ended_at
                     - relativedelta(days=5)
                 ),
-                review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
             )
         )
 
