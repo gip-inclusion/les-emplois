@@ -13,15 +13,11 @@
     }
   }
 
-  function optOutToggle() {
-    const ratioSection = document.getElementById("ratio-select");
-    document.getElementById("id_opt_out").addEventListener("change", function (e) {
-      ratioSection.classList.toggle("d-none", e.target.checked);
-      showConfirm = !e.target.checked;
-    })
-  }
-
   function initConfirmModal() {
+    document.getElementById("id_opt_out").addEventListener("change", function (e) {
+      showConfirm = !e.target.checked;
+    });
+
     document.getElementById("ratio-form").addEventListener("submit", function (e) {
       const text = "Le ratio sélectionné ne sera plus modifiable pour cette campagne de contrôle. Confirmez-vous son enregistrement ?";
       if (showConfirm && !window.confirm(text)) {
@@ -35,6 +31,5 @@
   }
 
   initSlider();
-  optOutToggle();
   initConfirmModal();
 })()

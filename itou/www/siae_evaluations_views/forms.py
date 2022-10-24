@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from django.forms import widgets
 from django.utils import timezone
 
 from itou.siae_evaluations import enums as evaluation_enums
@@ -7,7 +8,18 @@ from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, Evalua
 
 
 class SetChosenPercentForm(forms.ModelForm):
-    opt_out = forms.BooleanField(label="Je choisis de ne pas débuter le contrôle", required=False)
+    opt_out = forms.BooleanField(
+        label="Je choisis de ne pas débuter le contrôle",
+        required=False,
+        widget=widgets.CheckboxInput(
+            attrs={
+                "aria-expanded": "true",
+                "aria-controls": "ratio-select",
+                "data-target": "#ratio-select",
+                "data-toggle": "collapse",
+            }
+        ),
+    )
 
     class Meta:
         model = EvaluationCampaign
