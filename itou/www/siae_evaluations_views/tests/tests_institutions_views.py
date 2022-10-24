@@ -230,7 +230,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
     def test_recently_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
-            accepted=True,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
         )
         self.client.force_login(self.user)
@@ -259,7 +260,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
     def test_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
-            accepted=True,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
@@ -444,7 +446,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
     def test_recently_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
-            accepted=True,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
@@ -585,7 +588,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
     def test_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
-            accepted=True,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
@@ -998,7 +1002,11 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_recently_closed_campaign(self):
-        evaluated_siae = EvaluatedSiaeFactory(accepted=True, evaluation_campaign__institution=self.institution)
+        evaluated_siae = EvaluatedSiaeFactory(
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
+            evaluation_campaign__institution=self.institution,
+        )
         job_app = evaluated_siae.evaluated_job_applications.get()
         self.client.force_login(self.user)
         response = self.client.get(
@@ -1025,7 +1033,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
     def test_post_recently_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
-            accepted=True,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
@@ -1041,7 +1050,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
     def test_access_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
-            accepted=True,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
@@ -1127,7 +1137,11 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertContains(response, self.btn_modifier_html, html=True, count=1)
 
     def test_evaluations_from_previous_campaigns_read_only(self):
-        evaluated_siae = EvaluatedSiaeFactory(accepted=True, evaluation_campaign__institution=self.institution)
+        evaluated_siae = EvaluatedSiaeFactory(
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
+            evaluation_campaign__institution=self.institution,
+        )
         past_job_application = evaluated_siae.evaluated_job_applications.get()
 
         self.client.force_login(self.user)
@@ -1155,7 +1169,11 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
 
     def test_post_to_evaluations_from_previous_campaigns(self):
-        evaluated_siae = EvaluatedSiaeFactory(accepted=True, evaluation_campaign__institution=self.institution)
+        evaluated_siae = EvaluatedSiaeFactory(
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
+            evaluation_campaign__institution=self.institution,
+        )
         past_job_application = evaluated_siae.evaluated_job_applications.get()
 
         self.client.force_login(self.user)
@@ -1295,7 +1313,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
     def test_post_on_closed_campaign(self):
         self.client.force_login(self.user)
         evaluated_siae = EvaluatedSiaeFactory(
-            accepted=True,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
