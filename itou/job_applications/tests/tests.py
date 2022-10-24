@@ -379,23 +379,6 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertTrue(hasattr(qs, "has_suspended_approval"))
         self.assertFalse(qs.has_suspended_approval)
 
-    def test_with_has_active_approval(self):
-        job_app = JobApplicationSentByJobSeekerFactory()
-        qs = JobApplication.objects.with_has_suspended_approval().with_has_active_approval().get(pk=job_app.pk)
-        self.assertTrue(hasattr(qs, "has_active_approval"))
-        self.assertFalse(qs.has_active_approval)
-
-        job_app = JobApplicationWithApprovalFactory()
-        qs = JobApplication.objects.with_has_suspended_approval().with_has_active_approval().get(pk=job_app.pk)
-        self.assertTrue(hasattr(qs, "has_active_approval"))
-        self.assertTrue(qs.has_active_approval)
-
-        job_app = JobApplicationWithApprovalFactory()
-        SuspensionFactory(approval=job_app.approval)
-        qs = JobApplication.objects.with_has_suspended_approval().with_has_active_approval().get(pk=job_app.pk)
-        self.assertTrue(hasattr(qs, "has_active_approval"))
-        self.assertFalse(qs.has_active_approval)
-
     def test_with_last_change(self):
         job_app = JobApplicationSentByJobSeekerFactory()
         qs = JobApplication.objects.with_last_change().get(pk=job_app.pk)
@@ -490,7 +473,6 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertTrue(hasattr(qs, "selected_jobs"))
         self.assertTrue(hasattr(qs, "has_suspended_approval"))
         self.assertTrue(hasattr(qs, "is_pending_for_too_long"))
-        self.assertTrue(hasattr(qs, "has_active_approval"))
         self.assertTrue(hasattr(qs, "last_jobseeker_eligibility_diagnosis"))
         self.assertTrue(hasattr(qs, f"last_eligibility_diagnosis_criterion_{level1_criterion.pk}"))
         self.assertTrue(hasattr(qs, f"last_eligibility_diagnosis_criterion_{level2_criterion.pk}"))
