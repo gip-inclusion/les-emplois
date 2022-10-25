@@ -6,11 +6,15 @@
         </p>
         <hr>
         <p class="h2">
-            <a href="{% url 'siaes_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}">
+            {% if no_link_on_display_name %}
                 {{ siae.display_name }}
-            </a>
+            {% else %}
+                <a href="{% url 'siaes_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}">
+                    {{ siae.display_name }}
+                </a>
+            {% endif %}
         </p>
         {# Display non-user-edited name too. #}
-        <address class="card-subtitle fs-lg font-weight-bold text-secondary">{{ siae.address_on_one_line }}</address>
+        <address class="fs-lg">{{ siae.address_on_one_line }}</address>
     </div>
 </div>
