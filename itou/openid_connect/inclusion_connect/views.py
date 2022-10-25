@@ -95,7 +95,11 @@ def inclusion_connect_authorize(request):
         ic_session["channel"] = channel
         request.session.modified = True
 
-    return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
+    if request.GET.get("register"):
+        base_url = constants.INCLUSION_CONNECT_ENDPOINT_REGISTER
+    else:
+        base_url = constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE
+    return HttpResponseRedirect(f"{base_url}?{urlencode(data)}")
 
 
 def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
