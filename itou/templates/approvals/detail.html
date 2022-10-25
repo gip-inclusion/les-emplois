@@ -66,14 +66,6 @@
         <div class="card-body">
             <div class="card-text">
                 <h2>Candidatures de ce salarié</h2>
-                <div class="alert alert-info">
-                    <p>
-                        <i class="ri-information-line ri-xl text-info"></i> <b>Dates de contrat</b>
-                    </p>
-                    <p class="mb-0">
-                        Toutes les modifications concernant la date de début du contrat de travail continuent de se faire sur la candidature acceptée.
-                    </p>
-                </div>
                 <hr class="my-4">
                 {% for job_application_for_card in all_job_applications %}
                     {% include "approvals/includes/job_applications.html" with job_application=job_application_for_card %}
