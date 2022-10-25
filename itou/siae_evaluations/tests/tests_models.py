@@ -492,7 +492,7 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         date = timezone.now().date()
         email = evaluation_campaign.get_email_to_institution_ratio_to_select(date)
 
-        self.assertEqual(email.to, list(institution.active_members))
+        self.assertEqual(email.to, list(u.email for u in institution.active_members))
         self.assertIn(reverse("dashboard:index"), email.body)
         self.assertIn(
             f"Le choix du taux de SIAE à contrôler est possible jusqu’au {dateformat.format(date, 'd E Y')}",
@@ -505,7 +505,7 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(siae=siae)
         email = evaluated_siae.get_email_to_siae_selected()
 
-        self.assertEqual(email.to, list(evaluated_siae.siae.active_admin_members))
+        self.assertEqual(email.to, list(u.email for u in evaluated_siae.siae.active_admin_members))
         self.assertEqual(
             email.subject,
             (
@@ -525,7 +525,7 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(institution=institution, evaluations_asked_at=fake_now)
 
         email = evaluation_campaign.get_email_to_institution_selected_siae()
-        self.assertEqual(email.to, list(institution.active_members))
+        self.assertEqual(email.to, list(u.email for u in institution.active_members))
         self.assertIn(dateformat.format(fake_now + relativedelta(weeks=6), "d E Y"), email.body)
         self.assertIn(dateformat.format(evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body)
         self.assertIn(dateformat.format(evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body)
@@ -842,7 +842,7 @@ class EvaluatedSiaeModelTest(TestCase):
 
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), len(evaluated_siae.siae.active_admin_members))
-        self.assertEqual(email.to[0].email, evaluated_siae.siae.active_admin_members.first().email)
+        self.assertEqual(email.to[0], evaluated_siae.siae.active_admin_members.first().email)
         self.assertIn(evaluated_siae.siae.kind, email.subject)
         self.assertIn(evaluated_siae.siae.name, email.subject)
         self.assertIn(str(evaluated_siae.siae.id), email.subject)
@@ -868,7 +868,7 @@ class EvaluatedSiaeModelTest(TestCase):
 
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), len(evaluated_siae.siae.active_admin_members))
-        self.assertEqual(email.to[0].email, evaluated_siae.siae.active_admin_members.first().email)
+        self.assertEqual(email.to[0], evaluated_siae.siae.active_admin_members.first().email)
         self.assertIn(evaluated_siae.siae.kind, email.subject)
         self.assertIn(evaluated_siae.siae.name, email.subject)
         self.assertIn(str(evaluated_siae.siae.id), email.subject)
@@ -890,7 +890,7 @@ class EvaluatedSiaeModelTest(TestCase):
 
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), len(evaluated_siae.siae.active_admin_members))
-        self.assertEqual(email.to[0].email, evaluated_siae.siae.active_admin_members.first().email)
+        self.assertEqual(email.to[0], evaluated_siae.siae.active_admin_members.first().email)
         self.assertIn(evaluated_siae.siae.kind, email.subject)
         self.assertIn(evaluated_siae.siae.name, email.subject)
         self.assertIn(str(evaluated_siae.siae.id), email.subject)

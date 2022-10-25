@@ -264,7 +264,7 @@ class EvaluationCampaign(models.Model):
     # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
     # to emails.py in institution model
     def get_email_to_institution_ratio_to_select(self, ratio_selection_end_at):
-        to = self.institution.active_members
+        to = self.institution.active_members.values_list("email", flat=True)
         context = {
             "ratio_selection_end_at": ratio_selection_end_at,
             "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
@@ -274,7 +274,7 @@ class EvaluationCampaign(models.Model):
         return get_email_message(to, context, subject, body)
 
     def get_email_to_institution_selected_siae(self):
-        to = self.institution.active_members
+        to = self.institution.active_members.values_list("email", flat=True)
         context = {
             # end_date for eligible siaes to return their documents of proofs is 6 weeks after notification
             "end_date": self.evaluations_asked_at + relativedelta(weeks=6),
@@ -379,7 +379,7 @@ class EvaluatedSiae(models.Model):
 
     # fixme vincentporte : to refactor. move all get_email_to_siae_xxx() method to emails.py in siae model
     def get_email_to_siae_selected(self):
-        to = self.siae.active_admin_members
+        to = self.siae.active_admin_members.values_list("email", flat=True)
         evaluated_siae_url = reverse(
             "siae_evaluations_views:siae_job_applications_list",
             kwargs={"evaluated_siae_pk": self.pk},
@@ -396,14 +396,14 @@ class EvaluatedSiae(models.Model):
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_reviewed(self, adversarial=False):
-        to = self.siae.active_admin_members
+        to = self.siae.active_admin_members.values_list("email", flat=True)
         context = {"evaluation_campaign": self.evaluation_campaign, "siae": self.siae, "adversarial": adversarial}
         subject = "siae_evaluations/email/to_siae_reviewed_subject.txt"
         body = "siae_evaluations/email/to_siae_reviewed_body.txt"
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_refused(self):
-        to = self.siae.active_admin_members
+        to = self.siae.active_admin_members.values_list("email", flat=True)
         context = {
             "evaluation_campaign": self.evaluation_campaign,
             "siae": self.siae,
@@ -413,7 +413,7 @@ class EvaluatedSiae(models.Model):
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_adversarial_stage(self):
-        to = self.siae.active_admin_members
+        to = self.siae.active_admin_members.values_list("email", flat=True)
         context = {
             "evaluation_campaign": self.evaluation_campaign,
             "siae": self.siae,
@@ -425,7 +425,7 @@ class EvaluatedSiae(models.Model):
     # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
     # to emails.py in institution model
     def get_email_to_institution_submitted_by_siae(self):
-        to = self.evaluation_campaign.institution.active_members
+        to = self.evaluation_campaign.institution.active_members.values_list("email", flat=True)
         context = {
             "siae": self.siae,
             "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
