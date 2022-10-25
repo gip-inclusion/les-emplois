@@ -7,13 +7,15 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import pandas as pd
 from django.conf import settings
 from django.core import mail
-from django.test import TransactionTestCase
+from django.test import TransactionTestCase, override_settings
 from django.urls import reverse
 
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2MembershipsFactory
+from itou.siaes.management.commands._import_siae.utils import anonymize_fluxiae_df
 from itou.siaes.models import Siae
 
 
@@ -198,3 +200,13 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             ],
             [mail.subject for mail in mail.outbox],
         )
+
+
+@override_settings(METABASE_HASH_SALT="foobar2000")
+def test_hashed_approval_number():
+    df = pd.DataFrame(data={"salarie_agrement": ["999992012369", None, ""]})
+    anonymize_fluxiae_df(df)
+    assert df.hash_numéro_pass_iae[0] == "314b2d285803a46c89e09ba9ad4e23a52f2e823ad28343cdff15be0cb03fee4a"
+    assert df.hash_numéro_pass_iae[1] == "8e728c4578281ea0b6a7817e50a0f6d50c995c27f02dd359d67427ac3d86e019"
+    assert df.hash_numéro_pass_iae[2] == "6cc868860cee823f0ffe0b3498bb4ebda51baa1b7858e2022f6590b0bd86c31c"
+    assert "salarie_agrement" not in df

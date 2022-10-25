@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import os
 from functools import lru_cache
@@ -298,3 +299,7 @@ class MetabaseTable:
         assert len(matching_columns) == 1
         fn = matching_columns[0]["fn"]
         return fn(input)
+
+
+def hash_content(content):
+    return hashlib.sha256(f"{content}{settings.METABASE_HASH_SALT}".encode("utf-8")).hexdigest()
