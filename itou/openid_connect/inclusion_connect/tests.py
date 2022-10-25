@@ -47,9 +47,9 @@ def mock_oauth_dance(
     login_hint=None,
     user_info_email=None,
     channel=None,
+    register=True,
 ):
     assert user_kind, "Letting this filed empty is not allowed"
-    respx.get(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE).respond(302)
     # Authorize params depend on user kind.
     authorize_params = {
         "user_kind": user_kind,
@@ -57,12 +57,19 @@ def mock_oauth_dance(
         "next_url": next_url,
         "login_hint": login_hint,
         "channel": channel,
+        "register": register,
     }
     authorize_params = {k: v for k, v in authorize_params.items() if v}
 
     # Calling this view is mandatory to start a new session.
     authorize_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(authorize_params)}"
-    test_class.client.get(authorize_url)
+    response = test_class.client.get(authorize_url)
+    if register:
+        assert response.url.startswith(
+            "https://inclusion.connect.fake/realms/foobar/protocol/openid-connect/registrations"
+        )
+    else:
+        assert response.url.startswith("https://inclusion.connect.fake/realms/foobar/protocol/openid-connect/auth")
 
     # User is logged out from IC when an error happens during the oauth dance.
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
@@ -282,6 +289,17 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         # Don't use assertRedirects to avoid fetching the last URL.
         response = self.client.get(url, follow=False)
         self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
+        self.assertIn(constants.INCLUSION_CONNECT_SESSION_KEY, self.client.session)
+
+    def test_authorize_endpoint_for_registration(self):
+        url = reverse("inclusion_connect:authorize")
+        with self.assertRaises(KeyError):
+            response = self.client.get(url, follow=False)
+
+        url = f"{reverse('inclusion_connect:authorize')}?user_kind={KIND_PRESCRIBER}&register=true"
+        # Don't use assertRedirects to avoid fetching the last URL.
+        response = self.client.get(url, follow=False)
+        self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_REGISTER))
         self.assertIn(constants.INCLUSION_CONNECT_SESSION_KEY, self.client.session)
 
     def test_authorize_endpoint_with_params(self):
