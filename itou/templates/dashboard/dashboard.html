@@ -189,7 +189,7 @@
     <div class="card-deck mt-3">
 
         {% if user.is_staff %}
-            <div class="card">
+            <div class="card c-card has-links-inside">
                 <h5 class="card-header">Admin</h5>
                 <div class="card-body">
                     <p class="card-text mb-3">
@@ -202,7 +202,7 @@
 
         {% if user.is_job_seeker %}
 
-            <div class="card">
+            <div class="card c-card has-links-inside">
                 <p class="h4 card-header">Candidatures</p>
                 <div class="card-body">
                     <ul class="list-unstyled">
@@ -219,7 +219,7 @@
             </div>
 
             {% if user.latest_common_approval %}
-                <div class="card">
+                <div class="card c-card has-links-inside">
                     <p class="h4 card-header">Numéro d'agrément</p>
                     <div class="card-body">
                         <ul class="list-unstyled">
@@ -259,7 +259,7 @@
         {% if user.is_prescriber %}
 
             {% if current_prescriber_organization %}
-                <div class="card">
+                <div class="card c-card has-links-inside">
                     <p class="h4 card-header">
                         Organisation <span class="ml-1 badge badge-secondary">{{ current_prescriber_organization.kind }} - ID {{ current_prescriber_organization.id }}</span>
                     </p>
@@ -314,7 +314,7 @@
                 </div>
             {% endif %}
 
-            <div class="card">
+            <div class="card c-card has-links-inside">
                 <p class="h4 card-header">
                     Candidatures
                 </p>
@@ -344,7 +344,7 @@
                 </div>
 
                 {% if can_view_stats_ddets and active_campaigns %}
-                    <div class="card">
+                    <div class="card c-card has-links-inside">
                         <p class="h4 card-header">
                             Contrôle a posteriori
                             {% if campaign_in_progress %}<span class="badge badge-accent-03 text-primary">Nouveau</span>{% endif %}
@@ -378,7 +378,7 @@
 
         {% if user.is_siae_staff %}
 
-            <div class="card">
+            <div class="card c-card has-links-inside">
                 <p class="h4 card-header">
                     Ma structure
                     <span class="ml-1 badge badge-secondary">{{ current_siae.kind }} - ID {{ current_siae.id }}</span>
@@ -432,7 +432,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card c-card has-links-inside">
                 <p class="h4 card-header">
                     Mes candidatures
                 </p>
@@ -498,7 +498,7 @@
             </div>
 
             {% if active_campaigns %}
-                <div class="card">
+                <div class="card c-card has-links-inside">
                     <p class="h4 card-header">
                         Contrôle a posteriori <span class="badge badge-accent-03 text-primary">Nouveau</span>
                     </p>
@@ -523,7 +523,7 @@
         {# end of if user.is_siae_staff #}
 
         {% if user.is_labor_inspector %}
-            <div class="card">
+            <div class="card c-card has-links-inside">
                 <p class="h4 card-header">
                     Organisation <span class="ml-1 badge badge-secondary">{{ current_institution.kind }} - ID {{ current_institution.id }}</span>
                 </p>
@@ -542,7 +542,7 @@
 
         {% if can_view_stats_dashboard_widget %}
 
-            <div class="card">
+            <div class="card c-card has-links-inside">
                 <p class="h4 card-header">
                     Statistiques et pilotage
                 </p>
@@ -627,7 +627,7 @@
         {% endif %}
 
         {% if can_view_stats_ddets and active_campaigns %}
-            <div class="card">
+            <div class="card c-card has-links-inside">
                 <p class="h4 card-header">
                     Contrôle a posteriori
                     {% if campaign_in_progress %}<span class="badge badge-accent-03 text-primary">Nouveau</span>{% endif %}
