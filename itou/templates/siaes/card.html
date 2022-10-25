@@ -5,56 +5,58 @@
 {% block title %}{{ siae.display_name }}{{ block.super }}{% endblock %}
 
 {% block content %}
-    <div class="card c-card mt-4 p-3">
-        <div class="card-body">
+    <div class="c-box">
+        {% include "siaes/includes/_siae_info.html" with no_link_on_display_name=1 %}
 
-            {% include "siaes/includes/_siae_info.html" %}
+        {% if siae.description %}
+            <p class="h3 mb-1">Son activité</p>
+            {{ siae.description | linebreaks }}
+        {% endif %}
 
-            {% if siae.description %}
-                <p class="h3 mb-1">Son activité</p>
-                {{ siae.description | linebreaks }}
-            {% endif %}
+        {% if siae.provided_support %}
+            <p class="h3 mb-1">L'accompagnement proposé</p>
+            {{ siae.provided_support | linebreaks }}
+        {% endif %}
 
-            {% if siae.provided_support %}
-                <p class="h3 mb-1">L'accompagnement proposé</p>
-                {{ siae.provided_support | linebreaks }}
-            {% endif %}
+        {% if siae.email or siae.phone or siae.website %}
+            {% include "siaes/includes/_siae_details.html" %}
+        {% endif %}
 
-            {% if siae.email or siae.phone or siae.website %}
-                {% include "siaes/includes/_siae_details.html" %}
-            {% endif %}
+        {% if siae.block_job_applications and siae.count_active_job_descriptions == 0 %}
+            <span class="badge badge-pill badge-warning">Pas de recrutement en cours</span>
+        {% endif %}
 
-            {% if siae.block_job_applications and siae.count_active_job_descriptions == 0 %}
-                <span class="badge badge-pill badge-warning">Pas de recrutement en cours</span>
-            {% endif %}
+        {% if jobs_descriptions %}
+            <hr>
+            {% include "siaes/includes/_list_siae_jobs.html" with siae=siae jobs_descriptions=jobs_descriptions %}
+        {% endif %}
 
-            {% if jobs_descriptions %}
-                <hr>
-                {% include "siaes/includes/_list_siae_jobs.html" with siae=siae jobs_descriptions=jobs_descriptions %}
-            {% endif %}
+        {% if siae.count_active_job_descriptions > 0 and not siae.block_job_applications %}
+            <hr>
+            {% include "siaes/includes/_list_siae_actives_jobs.html" with jobs_descriptions=jobs_descriptions %}
+        {% endif %}
 
-            {% if siae.count_active_job_descriptions > 0 and not siae.block_job_applications %}
-                <hr>
-                {% include "siaes/includes/_list_siae_actives_jobs.html" with jobs_descriptions=jobs_descriptions %}
-            {% endif %}
-
-            {% if not siae.block_job_applications %}
-                <hr class="mb-3 mb-lg-5">
-                <p class="text-with-btn">
-                    <span class="h4">Cette structure vous intéresse ?</span>
-                    <a class="btn btn-primary float-right"
+        {% if not siae.block_job_applications %}
+            <hr>
+            <div class="row align-items-center mb-4">
+                <div class="col">
+                    <span class="h4 mb-0">Cette structure vous intéresse ?</span>
+                </div>
+                <div class="col-auto">
+                    <a class="btn btn-primary"
                        href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
                        title="Proposer votre candidature auprès de l'employeur solidaire {{ siae.display_name }}">
                         Proposer votre candidature
                     </a>
-                </p>
-            {% endif %}
-        </div>
+                </div>
+            </div>
+        {% endif %}
+        {% if back_url %}
+            <hr>
+            <a href="{{ back_url }}" class="btn btn-link btn-ico pl-0" title="Retour à l'étape précédente">
+                <i class="ri-arrow-go-back-line ri-lg"></i>
+                <span>Retour</span>
+            </a>
+        {% endif %}
     </div>
-
-    {% if back_url %}
-        <p class="mt-4">
-            <a href="{{ back_url }}">Retour</a>
-        </p>
-    {% endif %}
 {% endblock %}
