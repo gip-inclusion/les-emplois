@@ -27,10 +27,11 @@ from itou.siaes.management.commands._import_siae.convention import (
 )
 from itou.siaes.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
 from itou.siaes.management.commands._import_siae.siae import build_siae, should_siae_be_created
-from itou.siaes.management.commands._import_siae.utils import could_siae_be_deleted, timeit
+from itou.siaes.management.commands._import_siae.utils import could_siae_be_deleted
 from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW
 from itou.siaes.models import Siae, SiaeConvention
+from itou.utils.python import timeit
 
 
 class Command(BaseCommand):

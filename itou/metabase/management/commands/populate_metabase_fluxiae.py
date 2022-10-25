@@ -64,7 +64,8 @@ from django.core.management.base import BaseCommand
 from itou.metabase import constants
 from itou.metabase.management.commands._dataframes import store_df
 from itou.metabase.management.commands._utils import build_final_tables, enable_sql_logging
-from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
+from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames
+from itou.utils.python import timeit
 from itou.utils.slack import send_slack_message
 
 

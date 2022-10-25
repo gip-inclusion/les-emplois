@@ -11,7 +11,7 @@ having to complete a long `populate_metabase_itou` command which takes several h
 from django.core.management.base import BaseCommand
 
 from itou.metabase.management.commands._utils import build_final_tables
-from itou.siaes.management.commands._import_siae.utils import timeit
+from itou.utils.python import timeit
 
 
 class Command(BaseCommand):
