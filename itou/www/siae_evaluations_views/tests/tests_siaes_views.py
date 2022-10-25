@@ -691,7 +691,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         )
         self.assertEqual(
             email.to[0],
-            evaluated_job_application.evaluated_siae.evaluation_campaign.institution.active_members.first(),
+            evaluated_job_application.evaluated_siae.evaluation_campaign.institution.active_members.first().email,
         )
 
     def test_campaign_is_ended(self):
