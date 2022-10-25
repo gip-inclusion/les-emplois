@@ -7,6 +7,7 @@
 # Global tasks.
 # =============================================================================
 PYTHON_VERSION := python3.10
+PGDATABASE ?= itou
 ifeq ($(shell uname -s),Linux)
 	REQUIREMENTS_PATH := requirements/dev.txt
 else
@@ -76,7 +77,7 @@ django_admin:
 # After migrate
 ifeq ($(USE_VENV),1)
 populate_db_with_cities:
-	psql -d itou --quiet --file itou/fixtures/postgres/cities.sql
+	psql -d $(PGDATABASE) --quiet --file itou/fixtures/postgres/cities.sql
 else
 populate_db_with_cities:
 	docker cp itou/fixtures/postgres/* itou_postgres:/backups/
