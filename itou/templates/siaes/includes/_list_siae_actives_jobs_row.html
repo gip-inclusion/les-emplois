@@ -1,25 +1,29 @@
 {% comment %} takes 2 arguments: job=<SiaeJobDescription> is_appended=<Bool> {% endcomment %}
 
-<li class="list-group-item list-group-item-action p-2{% if is_appended %} border-top{% endif %}">
+<li class="list-group-item list-group-item-action px-0 py-2 {% if is_appended %}border-top{% endif %}">
     <a class="d-flex flex-wrap align-items-center text-decoration-none matomo-event"
        href="{% if job.pk %}{{ job.get_absolute_url }}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
        data-matomo-category="candidature"
        data-matomo-action="clic"
        data-matomo-option="clic-metiers">
-        <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
-        {% if job.is_popular %}
-            <span class="badge badge-sm badge-pill badge-pilotage text-primary">
-                <i class="ri-group-line mr-1"></i>
-                {{ job.POPULAR_THRESHOLD }}+<span class="ml-1">candidatures</span>
-            </span>
-        {% endif %}
-        <span class="ml-auto fs-sm text-nowrap">
-            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-            {% if job.location %}
-                {{ job.location }}
-            {% else %}
-                {{ job.siae.city|title }} ({{ job.siae.department }})
+        <div class="d-inline">
+            <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
+            {% if job.is_popular %}
+                <span class="badge badge-sm badge-pill badge-pilotage text-primary">
+                    <i class="ri-group-line mr-1"></i>
+                    {{ job.POPULAR_THRESHOLD }}+<span class="ml-1">candidatures</span>
+                </span>
             {% endif %}
-        </span>
+        </div>
+        <div class="d-inline ml-lg-auto">
+            <span class="fs-sm text-nowrap">
+                <i class="ri-map-pin-2-line ri-sm"></i>
+                {% if job.location %}
+                    {{ job.location }}
+                {% else %}
+                    {{ job.siae.city|title }} ({{ job.siae.department }})
+                {% endif %}
+            </span>
+        </div>
     </a>
 </li>

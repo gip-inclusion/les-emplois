@@ -496,6 +496,16 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_active=True)
 
+    def within(self, point, distance_km):
+        return self.filter(
+            Q(location__isnull=False, location__coords__dwithin=(point, D(km=distance_km)))
+            | Q(
+                location__isnull=True,
+                siae__coords__isnull=False,
+                siae__coords__dwithin=(point, D(km=distance_km)),
+            )
+        )
+
 
 class SiaeJobDescription(models.Model):
     """
