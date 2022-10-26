@@ -4,11 +4,12 @@ import string
 import factory.fuzzy
 from django.utils import timezone
 
+from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.users.factories import SiaeStaffFactory
 
 
@@ -169,3 +170,18 @@ class SiaeConventionAfterGracePeriodFactory(SiaeConventionFactory):
 
 class SiaeAfterGracePeriodFactory(SiaeFactory):
     convention = factory.SubFactory(SiaeConventionAfterGracePeriodFactory)
+
+
+class SiaeJobDescriptionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.SiaeJobDescription
+
+    appellation = factory.LazyAttribute(lambda obj: Appellation.objects.order_by("?").first())
+    siae = factory.SubFactory(SiaeFactory)
+    custom_name = factory.Faker("job", locale="fr_FR")
+    description = factory.Faker("sentence", locale="fr_FR")
+    contract_type = factory.fuzzy.FuzzyChoice(ContractType.values)
+    other_contract_type = factory.Faker("word", locale="fr_FR")
+    location = factory.LazyAttribute(lambda obj: City.objects.order_by("?").first())
+    profile_description = factory.Faker("sentence", locale="fr_FR")
+    market_context_description = factory.Faker("sentence", locale="fr_FR")
