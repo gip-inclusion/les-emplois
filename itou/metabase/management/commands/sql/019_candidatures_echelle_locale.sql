@@ -70,6 +70,7 @@ select
     délai_de_réponse,
     extract (DAY FROM délai_de_réponse) as temps_de_reponse,
     délai_prise_en_compte,
+    extract (DAY FROM délai_prise_en_compte) as temps_de_prise_en_compte,
     candidatures_p.département_structure,
     état,
     id_anonymisé,
