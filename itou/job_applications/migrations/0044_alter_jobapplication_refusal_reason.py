@@ -30,6 +30,7 @@ class Migration(migrations.Migration):
                         "L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion",
                     ),
                     ("no_position", "Pas de recrutement en cours"),
+                    ("duplicate", "Candidature en doublon"),
                     ("other", "Autre (détails dans le message ci-dessous)"),
                     ("approval_expiration_too_close", "La date de fin du PASS IAE / agrément est trop proche"),
                     ("unavailable", "Candidat indisponible ou non intéressé par le poste"),
