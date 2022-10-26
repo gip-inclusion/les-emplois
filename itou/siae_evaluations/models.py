@@ -442,6 +442,13 @@ class EvaluatedSiae(models.Model):
         # and evaluated_administrative_criteria before being called,
         # to prevent tons of additionnal queries in db.
 
+        def any_evaluated_admin_crit_matches(filter_func):
+            return any(
+                filter_func(eval_admin_crit)
+                for eval_job_app in self.evaluated_job_applications.all()
+                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+            )
+
         if (
             # edge case, evaluated_siae has no evaluated_job_application
             len(self.evaluated_job_applications.all()) == 0
@@ -451,19 +458,11 @@ class EvaluatedSiae(models.Model):
                 for evaluated_job_application in self.evaluated_job_applications.all()
             )
             # at least one evaluated_administrative_criteria proof is not uploaded
-            or any(
-                eval_admin_crit.proof_url == ""
-                for eval_job_app in self.evaluated_job_applications.all()
-                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
-            )
+            or any_evaluated_admin_crit_matches(lambda crit: crit.proof_url == "")
         ):
             return evaluation_enums.EvaluatedSiaeState.PENDING
 
-        if any(
-            eval_admin_crit.submitted_at is None
-            for eval_job_app in self.evaluated_job_applications.all()
-            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
-        ):
+        if any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at is None):
             return evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
 
         # After a "bug" in production where the DDETS could not verify job applications,
@@ -478,14 +477,12 @@ class EvaluatedSiae(models.Model):
         if self.reviewed_at and self.final_reviewed_at is None:
             return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
 
-        if any(
-            eval_admin_crit.review_state
+        if any_evaluated_admin_crit_matches(
+            lambda crit: crit.review_state
             in [
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
             ]
-            for eval_job_app in self.evaluated_job_applications.all()
-            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
         ):
             return evaluation_enums.EvaluatedSiaeState.REFUSED
         return evaluation_enums.EvaluatedSiaeState.ACCEPTED
