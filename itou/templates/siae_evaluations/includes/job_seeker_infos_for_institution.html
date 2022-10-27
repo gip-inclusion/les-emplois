@@ -15,7 +15,15 @@
                 <p class="badge badge-pilotage float-right">Nouveaux justificatifs à traiter</p>
             {% elif state == "SUBMITTED" %}
                 <p class="badge badge-pilotage float-right">À traiter</p>
-            {% elif not evaluated_siae.reviewed_at and state == "REFUSED" or state == "REFUSED_2" %}
+            {% elif state == "REFUSED_2" or evaluated_siae.evaluation_is_final and state == "REFUSED" %}
+                {# Final refusal #}
+                <p class="badge badge-danger float-right">Problème constaté</p>
+            {% elif not evaluated_siae.reviewed_at and state == "REFUSED" %}
+                {% comment %}
+                    Show “Problème constaté” until the review is submitted, which starts the “phase contradictoire”
+                    (tracked by the reviewed_at field).
+                     After review, refused job applications fall through to “Phase contradictoire - En attente”.
+                {% endcomment %}
                 <p class="badge badge-danger float-right">Problème constaté</p>
             {% elif state == "ACCEPTED" %}
                 <p class="badge badge-success float-right">Validé</p>

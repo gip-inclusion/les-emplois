@@ -18,6 +18,7 @@ from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
@@ -598,7 +599,10 @@ class FilterJobApplicationsForm(forms.Form):
             # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
             filters["has_suspended_approval"] = True
         if data.get("pass_iae_active"):
-            filters["has_active_approval"] = True
+            # Simplification of CommonApprovalQuerySet.valid_lookup()
+            filters["approval__end_at__gte"] = timezone.now().date()
+            # The date is not enough to know if an approval is valid or not
+            filters["has_suspended_approval"] = False
         if data.get("eligibility_validated"):
             filters["last_jobseeker_eligibility_diagnosis__isnull"] = False
         if data.get("start_date"):
@@ -715,7 +719,7 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
         super().__init__(job_applications_qs, *args, **kwargs)
         self.fields["sender_organizations"].choices += self.get_sender_organization_choices()
 
-        if siae.kind not in siae.ELIGIBILITY_REQUIRED_KINDS:
+        if siae.kind not in SIAE_WITH_CONVENTION_KINDS:
             del self.fields["eligibility_validated"]
 
     def get_qs_filters(self):

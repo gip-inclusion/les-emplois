@@ -63,9 +63,9 @@ from itou.metabase.management.commands._utils import (
     get_active_siae_pks,
 )
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.management.commands._import_siae.utils import timeit
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
+from itou.utils.python import timeit
 from itou.utils.slack import send_slack_message
 
 
@@ -253,9 +253,10 @@ class Command(BaseCommand):
         """
         queryset = (
             Siae.objects.active()
+            .select_related("convention")
             .prefetch_related(
                 "members",
-                "convention",
+                "convention__siaes",
                 "siaemembership_set",
                 "job_applications_received",
                 "job_applications_received__logs",

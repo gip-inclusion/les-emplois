@@ -12,7 +12,13 @@
             <div class="row mt-3">
                 <div class="col-12">
 
-                    <h1 class="h1">Contrôler les pièces justificatives</h1>
+                    <h1 class="h1">
+                        {% if evaluated_siae.evaluation_is_final %}
+                            Pièces justificatives
+                        {% else %}
+                            Contrôler les pièces justificatives
+                        {% endif %}
+                    </h1>
 
                     {# messages #}
                     {% if show_notified %}
@@ -40,6 +46,23 @@
                         </div>
                     {% endif %}
 
+                    {% if campaign_closed_before_final_evaluation %}
+                        {% if evaluated_siae.state == "ACCEPTED" %}
+                            <div class="alert alert-warning">
+                                {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
+                                validé avant la fin de la campagne “{{ evaluated_siae.evaluation_campaign.name }}”, le
+                                résultat du contrôle est <b class="text-success">positif</b>.
+                            </div>
+                        {% else %}
+                            {# REFUSED #}
+                            <div class="alert alert-warning">
+                                {{ evaluated_siae|capfirst }} n’a pas soumis de justificatifs avant la fin de la
+                                campagne “{{ evaluated_siae.evaluation_campaign.name }}”, le résultat du contrôle est
+                                <b class="text-danger">négatif</b>.
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
                     <h3 class="h3">
                         Liste des auto-prescriptions de <span class="text-muted">{{ evaluated_siae }}</span>
                     </h3>
@@ -49,7 +72,7 @@
                             {{ evaluated_siae.siae.phone|format_phone }}
                         </a>
                     </p>
-                    {% if not evaluated_siae.evaluation_campaign.ended_at %}
+                    {% if not evaluated_siae.evaluation_is_final %}
                         <div class="row">
                             <div class="col-8">
                                 <p>
@@ -81,7 +104,13 @@
                             </div>
 
                             <div class="card-body">
-                                {% if evaluated_siae.state == "SUBMITTED" %}
+                                {% if evaluated_siae.evaluation_is_final %}
+                                    {% if evaluated_job_application.state == "UPLOADED" or evaluated_job_application.state == "SUBMITTED" or evaluated_job_application.state == "ACCEPTED" or evaluated_job_application.state == "REFUSED" or evaluated_job_application.state == "REFUSED_2" %}
+                                        <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
+                                            Revoir ses justificatifs
+                                        </a>
+                                    {% endif %}
+                                {% elif evaluated_job_application.state == "SUBMITTED" %}
                                     <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
                                         Contrôler cette auto-prescription
                                     </a>
@@ -96,7 +125,7 @@
                 </div>
             </div>
 
-            {% if not evaluated_siae.evaluation_campaign.ended_at and evaluated_siae.can_review %}
+            {% if not evaluated_siae.evaluation_is_final and evaluated_siae.can_review %}
                 <div class="row">
                     <div class="col-8">
                         <p>

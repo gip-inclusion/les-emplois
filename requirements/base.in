@@ -44,6 +44,9 @@ django-select2==7.10.0  # https://github.com/codingjoe/django-select2
 # Render Markdown in HTML
 markdown==3.4.1  # https://github.com/Python-Markdown/markdown
 
+# Easy JS
+django-htmx==1.12.2
+
 # Data management
 # ------------------------------------------------------------------------------
 
@@ -104,6 +107,6 @@ python-dotenv==0.21.0
 
 # Production requirements
 # ------------------------------------------------------------------------------
-uwsgi==2.0.20  # https://github.com/unbit/uwsgi
+uwsgi==2.0.21  # https://github.com/unbit/uwsgi
 sentry-sdk==1.9.0  # https://github.com/getsentry/sentry-python
-elastic-apm==6.10.1  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
+elastic-apm==6.13.0  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html

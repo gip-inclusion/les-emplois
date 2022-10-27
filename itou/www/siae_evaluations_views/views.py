@@ -84,7 +84,7 @@ def institution_evaluated_siae_list(
     evaluated_siaes = get_list_or_404(
         EvaluatedSiae.objects.viewable()
         # select related `siae`` because of __str__() method of EvaluatedSiae
-        .select_related("siae")
+        .select_related("evaluation_campaign", "siae")
         .prefetch_related(
             "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
         )
@@ -132,6 +132,9 @@ def institution_evaluated_siae_detail(
     context = {
         "evaluated_siae": evaluated_siae,
         "back_url": back_url,
+        "campaign_closed_before_final_evaluation": (
+            evaluation_campaign.ended_at and not evaluated_siae.final_reviewed_at
+        ),
         "show_notified": (
             not evaluation_campaign.ended_at
             and evaluated_siae.reviewed_at
@@ -193,8 +196,7 @@ def institution_evaluated_job_application(
 
     form = LaborExplanationForm(instance=evaluated_job_application, data=request.POST or None)
     if request.method == "POST":
-        campaign_closed = evaluated_job_application.evaluated_siae.evaluation_campaign.ended_at
-        if campaign_closed:
+        if evaluated_job_application.evaluated_siae.evaluation_is_final:
             raise Http404
         if form.is_valid():
             evaluated_job_application.labor_inspector_explanation = form.cleaned_data["labor_inspector_explanation"]
@@ -298,6 +300,7 @@ def siae_job_applications_list(
     evaluated_siae = get_object_or_404(
         EvaluatedSiae.objects.filter(pk=evaluated_siae_pk, siae=siae, evaluation_campaign__ended_at=None)
         .exclude(evaluation_campaign__evaluations_asked_at=None)
+        .select_related("evaluation_campaign")
         .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
     )
 

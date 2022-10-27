@@ -15,7 +15,7 @@ concerned:
 
 JobApplication.objects.filter(
     state="accepted",
-    to_siae__kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS,
+    to_siae__kind__in=SIAE_WITH_CONVENTION_KINDS,
     approval__isnull=True,
     eligibility_diagnosis__isnull=True,
     hiring_without_approval=True,
@@ -26,7 +26,7 @@ JobApplication.objects.filter(
 
 JobApplication.objects.filter(
     state="accepted",
-    to_siae__kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS,
+    to_siae__kind__in=SIAE_WITH_CONVENTION_KINDS,
     approval__isnull=True,
     eligibility_diagnosis__isnull=True,
     hiring_without_approval=False,
@@ -37,7 +37,7 @@ JobApplication.objects.filter(
 
 JobApplication.objects.filter(
     state="accepted",
-    to_siae__kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS,
+    to_siae__kind__in=SIAE_WITH_CONVENTION_KINDS,
     approval__number__startswith=Approval.ASP_ITOU_PREFIX,
     eligibility_diagnosis__isnull=True,
     hiring_without_approval=False,

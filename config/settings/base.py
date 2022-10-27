@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "drf_spectacular",
     "django_filters",
+    "django_htmx",
     "import_export",
     "hijack",
     "hijack.contrib.admin",
@@ -101,7 +102,7 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
-DJANGO_MIDDLEWARE = [
+DJANGO_MIDDLEWARES = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -109,15 +110,19 @@ DJANGO_MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+THIRD_PARTY_MIDDLEWARES = [
+    "django_htmx.middleware.HtmxMiddleware",
     "hijack.middleware.HijackUserMiddleware",
 ]
 
-ITOU_MIDDLEWARE = [
+ITOU_MIDDLEWARES = [
     "itou.utils.new_dns.middleware.NewDnsRedirectMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
 ]
 
-MIDDLEWARE = DJANGO_MIDDLEWARE + ITOU_MIDDLEWARE
+MIDDLEWARE = DJANGO_MIDDLEWARES + THIRD_PARTY_MIDDLEWARES + ITOU_MIDDLEWARES
 
 ROOT_URLCONF = "config.urls"
 
@@ -405,6 +410,8 @@ METABASE_PASSWORD = os.getenv("METABASE_PASSWORD")
 # Embedding signed Metabase dashboard
 METABASE_SITE_URL = os.getenv("METABASE_SITE_URL")
 METABASE_SECRET_KEY = os.getenv("METABASE_SECRET_KEY")
+
+METABASE_HASH_SALT = os.getenv("METABASE_HASH_SALT")
 
 ASP_ITOU_PREFIX = "99999"
 

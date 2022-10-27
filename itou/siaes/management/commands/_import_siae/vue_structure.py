@@ -13,7 +13,8 @@ It contains almost all data to build a siae from scratch with 2 exceptions:
 """
 import numpy as np
 
-from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, remap_columns, timeit
+from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, remap_columns
+from itou.utils.python import timeit
 from itou.utils.validators import validate_naf, validate_siret
 
 

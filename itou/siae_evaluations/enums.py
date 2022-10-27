@@ -10,8 +10,7 @@ class EvaluationChosenPercent:
 
 
 class EvaluationSiaesKind:
-    # SiaeKind.AI will be eligible for Evaluation from 2022
-    Evaluable = [SiaeKind.EI, SiaeKind.ACI, SiaeKind.ETTI]
+    Evaluable = [SiaeKind.AI, SiaeKind.EI, SiaeKind.ACI, SiaeKind.ETTI]
 
 
 class EvaluationJobApplicationsBoundariesNumber:

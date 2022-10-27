@@ -155,16 +155,6 @@ class JobApplicationQuerySet(models.QuerySet):
         has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
         return self.annotate(has_suspended_approval=Exists(has_suspended_approval))
 
-    def with_has_active_approval(self):
-        has_valid_approval = Approval.objects.filter(pk=OuterRef("approval")).valid()
-        return self.annotate(
-            has_active_approval=Case(
-                When(Exists(has_valid_approval), has_suspended_approval=False, then=True),
-                default=False,
-                output_field=BooleanField(),
-            )
-        )
-
     def with_last_change(self):
         return self.annotate(last_change=Greatest("created_at", Max("logs__timestamp")))
 
@@ -238,10 +228,7 @@ class JobApplicationQuerySet(models.QuerySet):
         ).prefetch_related("selected_jobs__appellation")
 
         qs = (
-            qs.with_has_suspended_approval()
-            .with_is_pending_for_too_long()
-            .with_has_active_approval()
-            .with_last_jobseeker_eligibility_diagnosis()
+            qs.with_has_suspended_approval().with_is_pending_for_too_long().with_last_jobseeker_eligibility_diagnosis()
         )
 
         # Adding an annotation by selected criterion

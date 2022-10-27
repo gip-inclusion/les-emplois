@@ -40,9 +40,6 @@ clever service link-addon c1-deployment-config --alias $APP_NAME
 clever service link-addon c1-imports-config --alias $APP_NAME
 clever service link-addon c1-prod-database-encrypted  --alias $APP_NAME
 
-# This has to be enforced at at least deployment time (issue between uwsgi build & Python 3.10 on Clever machines)
-clever env set CPUCOUNT 1 --alias $APP_NAME
-
 clever deploy --alias $APP_NAME --branch master_clever --force
 
 cat << EOF

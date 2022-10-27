@@ -32,6 +32,7 @@ class RefusalReason(models.TextChoices):
         "L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion",
     )
     NO_POSITION = "no_position", "Pas de recrutement en cours"
+    DUPLICATE = "duplicate", "Candidature en doublon"
     OTHER = "other", "Autre (détails dans le message ci-dessous)"
 
     # Hidden reasons kept for history.

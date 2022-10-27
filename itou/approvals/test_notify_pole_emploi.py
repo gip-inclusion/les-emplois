@@ -86,7 +86,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae__kind=SiaeKind.ACIPHC,
+            with_jobapplication__to_siae__kind=SiaeKind.ACI,
         )
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
@@ -101,7 +101,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
                 "numSIRETsiae": approval.jobapplication_set.first().to_siae.siret,
                 "origineCandidature": "PRES",
                 "statutReponsePassIAE": "A",
-                "typeSIAE": 837,
+                "typeSIAE": 836,
             },
         )
         self.assertEqual(approval.pe_notification_status, "notification_success")

@@ -35,8 +35,8 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     to_siae = factory.SubFactory(SiaeFactory, with_membership=True)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
-    hiring_start_at = datetime.now(timezone.utc).date()
-    hiring_end_at = datetime.now(timezone.utc).date() + relativedelta(years=2)
+    hiring_start_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date())
+    hiring_end_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() + relativedelta(years=2))
     resume_link = "https://server.com/rockie-balboa.pdf"
 
     @factory.post_generation
@@ -134,8 +134,8 @@ class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory
 
 
 class JobApplicationWithApprovalNotCancellableFactory(JobApplicationWithApprovalFactory):
-    hiring_start_at = datetime.now(timezone.utc).date() - relativedelta(days=5)
-    hiring_end_at = datetime.now(timezone.utc).date() + relativedelta(years=2, days=-5)
+    hiring_start_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() - relativedelta(days=5))
+    hiring_end_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() + relativedelta(years=2, days=-5))
 
 
 class JobApplicationWithJobSeekerProfileFactory(JobApplicationWithApprovalNotCancellableFactory):

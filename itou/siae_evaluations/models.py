@@ -264,7 +264,7 @@ class EvaluationCampaign(models.Model):
     # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
     # to emails.py in institution model
     def get_email_to_institution_ratio_to_select(self, ratio_selection_end_at):
-        to = self.institution.active_members
+        to = self.institution.active_members.values_list("email", flat=True)
         context = {
             "ratio_selection_end_at": ratio_selection_end_at,
             "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
@@ -274,7 +274,7 @@ class EvaluationCampaign(models.Model):
         return get_email_message(to, context, subject, body)
 
     def get_email_to_institution_selected_siae(self):
-        to = self.institution.active_members
+        to = self.institution.active_members.values_list("email", flat=True)
         context = {
             # end_date for eligible siaes to return their documents of proofs is 6 weeks after notification
             "end_date": self.evaluations_asked_at + relativedelta(weeks=6),
@@ -377,9 +377,13 @@ class EvaluatedSiae(models.Model):
             connection = mail.get_connection()
             connection.send_messages([email])
 
+    @property
+    def evaluation_is_final(self):
+        return bool(self.final_reviewed_at or self.evaluation_campaign.ended_at)
+
     # fixme vincentporte : to refactor. move all get_email_to_siae_xxx() method to emails.py in siae model
     def get_email_to_siae_selected(self):
-        to = self.siae.active_admin_members
+        to = self.siae.active_admin_members.values_list("email", flat=True)
         evaluated_siae_url = reverse(
             "siae_evaluations_views:siae_job_applications_list",
             kwargs={"evaluated_siae_pk": self.pk},
@@ -396,14 +400,14 @@ class EvaluatedSiae(models.Model):
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_reviewed(self, adversarial=False):
-        to = self.siae.active_admin_members
+        to = self.siae.active_admin_members.values_list("email", flat=True)
         context = {"evaluation_campaign": self.evaluation_campaign, "siae": self.siae, "adversarial": adversarial}
         subject = "siae_evaluations/email/to_siae_reviewed_subject.txt"
         body = "siae_evaluations/email/to_siae_reviewed_body.txt"
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_refused(self):
-        to = self.siae.active_admin_members
+        to = self.siae.active_admin_members.values_list("email", flat=True)
         context = {
             "evaluation_campaign": self.evaluation_campaign,
             "siae": self.siae,
@@ -413,7 +417,7 @@ class EvaluatedSiae(models.Model):
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_adversarial_stage(self):
-        to = self.siae.active_admin_members
+        to = self.siae.active_admin_members.values_list("email", flat=True)
         context = {
             "evaluation_campaign": self.evaluation_campaign,
             "siae": self.siae,
@@ -425,7 +429,7 @@ class EvaluatedSiae(models.Model):
     # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
     # to emails.py in institution model
     def get_email_to_institution_submitted_by_siae(self):
-        to = self.evaluation_campaign.institution.active_members
+        to = self.evaluation_campaign.institution.active_members.values_list("email", flat=True)
         context = {
             "siae": self.siae,
             "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
@@ -442,6 +446,13 @@ class EvaluatedSiae(models.Model):
         # and evaluated_administrative_criteria before being called,
         # to prevent tons of additionnal queries in db.
 
+        def any_evaluated_admin_crit_matches(filter_func):
+            return any(
+                filter_func(eval_admin_crit)
+                for eval_job_app in self.evaluated_job_applications.all()
+                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+            )
+
         if (
             # edge case, evaluated_siae has no evaluated_job_application
             len(self.evaluated_job_applications.all()) == 0
@@ -451,20 +462,22 @@ class EvaluatedSiae(models.Model):
                 for evaluated_job_application in self.evaluated_job_applications.all()
             )
             # at least one evaluated_administrative_criteria proof is not uploaded
-            or any(
-                eval_admin_crit.proof_url == ""
-                for eval_job_app in self.evaluated_job_applications.all()
-                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+            or any_evaluated_admin_crit_matches(lambda crit: crit.proof_url == "")
+        ):
+            return (
+                # SIAE did not submit proof.
+                evaluation_enums.EvaluatedSiaeState.REFUSED
+                if self.evaluation_is_final
+                else evaluation_enums.EvaluatedSiaeState.PENDING
             )
-        ):
-            return evaluation_enums.EvaluatedSiaeState.PENDING
 
-        if any(
-            eval_admin_crit.submitted_at is None
-            for eval_job_app in self.evaluated_job_applications.all()
-            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
+        if any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at is None):
+            return (
+                # SIAE did not submit proof.
+                evaluation_enums.EvaluatedSiaeState.REFUSED
+                if self.evaluation_is_final
+                else evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
+            )
 
         # After a "bug" in production where the DDETS could not verify job applications,
         # it has been decided that if we were in the unlikely case that any criteria was still PENDING,
@@ -473,20 +486,39 @@ class EvaluatedSiae(models.Model):
             eval_job_app.state == evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
             for eval_job_app in self.evaluated_job_applications.all()
         ):
-            return evaluation_enums.EvaluatedSiaeState.SUBMITTED
+            return (
+                # DDETS did not review proof.
+                evaluation_enums.EvaluatedSiaeState.ACCEPTED
+                if self.evaluation_is_final
+                else evaluation_enums.EvaluatedSiaeState.SUBMITTED
+            )
 
         if self.reviewed_at and self.final_reviewed_at is None:
+            if self.evaluation_is_final:
+                # Campaign closed, otherwise self.final_reviewed_at would be set.
+                if any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at > self.reviewed_at):
+                    return evaluation_enums.EvaluatedSiaeState.ACCEPTED
+                # Adversarial phase, new proofs not submitted.
+                return evaluation_enums.EvaluatedSiaeState.REFUSED
             return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
 
-        if any(
-            eval_admin_crit.review_state
+        if any_evaluated_admin_crit_matches(
+            lambda crit: crit.review_state
             in [
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
             ]
-            for eval_job_app in self.evaluated_job_applications.all()
-            for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
         ):
+            if self.evaluation_is_final:
+                if (
+                    not self.reviewed_at
+                    or not self.final_reviewed_at
+                    and any_evaluated_admin_crit_matches(
+                        lambda crit: crit.submitted_at and crit.submitted_at > self.reviewed_at
+                    )
+                ):
+                    # User submitted proofs that were not reviewed, accept them.
+                    return evaluation_enums.EvaluatedSiaeState.ACCEPTED
             return evaluation_enums.EvaluatedSiaeState.REFUSED
         return evaluation_enums.EvaluatedSiaeState.ACCEPTED
 

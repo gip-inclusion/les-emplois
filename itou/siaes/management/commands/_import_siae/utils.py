@@ -6,45 +6,19 @@ Various helpers shared by the import_siae, import_geiq and import_ea_eatt script
 import csv
 import gzip
 import os
-from functools import wraps
-from time import time
 
 import pandas as pd
 from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.metabase.management.commands._utils import hash_content
 from itou.siaes.models import Siae
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-SHOW_IMPORT_SIAE_METHOD_TIMER = True
-
-
-def timeit(f):
-    """
-    Quick and dirty method timer (as a decorator).
-    Could not make it work easily with the `import_siae.Command` class.
-    Thus dirty becauses uses `print` instead of `self.log`.
-
-    Maybe later we can use this builtin timer instead:
-    https://docs.python.org/3/library/timeit.html#python-interface
-    """
-
-    @wraps(f)
-    def wrap(*args, **kw):
-        ts = time()
-        result = f(*args, **kw)
-        te = time()
-        msg = f"Method {f.__name__} took {te - ts:.2f} seconds to complete"
-        if SHOW_IMPORT_SIAE_METHOD_TIMER:
-            print(msg)
-        return result
-
-    return wrap
 
 
 def get_fluxiae_referential_filenames():
@@ -269,6 +243,9 @@ def anonymize_fluxiae_df(df):
     """
     if "salarie_date_naissance" in df.columns.tolist():
         df["salarie_annee_naissance"] = df.salarie_date_naissance.str[-4:].astype(int)
+
+    if "salarie_agrement" in df.columns.tolist():
+        df["hash_numéro_pass_iae"] = df["salarie_agrement"].apply(hash_content)
 
     # Any column having any of these keywords inside its name will be dropped.
     # E.g. if `courriel` is a deletable keyword, then columns named `referent_courriel`,

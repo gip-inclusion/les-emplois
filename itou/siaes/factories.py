@@ -8,13 +8,12 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.users.factories import SiaeStaffFactory
 
 
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
 
-NOW = timezone.now()
 GRACE_PERIOD = timezone.timedelta(days=models.SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
 ONE_DAY = timezone.timedelta(days=1)
 ONE_MONTH = timezone.timedelta(days=30)
@@ -29,8 +28,8 @@ class SiaeFinancialAnnexFactory(factory.django.DjangoModelFactory):
     # e.g. EI59V182019A1M1
     number = factory.fuzzy.FuzzyText(length=6, chars=string.digits, prefix="EI59V", suffix="A1M1")
     state = models.SiaeFinancialAnnex.STATE_VALID
-    start_at = NOW - ONE_MONTH
-    end_at = NOW + ONE_MONTH
+    start_at = factory.LazyFunction(lambda: timezone.now() - ONE_MONTH)
+    end_at = factory.LazyFunction(lambda: timezone.now() + ONE_MONTH)
 
 
 class SiaeConventionFactory(factory.django.DjangoModelFactory):
@@ -75,12 +74,10 @@ class SiaeFactory(factory.django.DjangoModelFactory):
 
     class Params:
         subject_to_eligibility = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice(models.Siae.ELIGIBILITY_REQUIRED_KINDS),
+            kind=factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS),
         )
         not_subject_to_eligibility = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice(
-                [kind for kind in SiaeKind if kind not in models.Siae.ELIGIBILITY_REQUIRED_KINDS]
-            ),
+            kind=factory.fuzzy.FuzzyChoice([kind for kind in SiaeKind if kind not in SIAE_WITH_CONVENTION_KINDS]),
         )
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Siae.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
@@ -154,7 +151,7 @@ class SiaeConventionPendingGracePeriodFactory(SiaeConventionFactory):
     """
 
     is_active = False
-    deactivated_at = NOW - GRACE_PERIOD + ONE_DAY
+    deactivated_at = factory.LazyFunction(lambda: timezone.now() - GRACE_PERIOD + ONE_DAY)
 
 
 class SiaePendingGracePeriodFactory(SiaeFactory):
@@ -167,7 +164,7 @@ class SiaeConventionAfterGracePeriodFactory(SiaeConventionFactory):
     """
 
     is_active = False
-    deactivated_at = NOW - GRACE_PERIOD - ONE_DAY
+    deactivated_at = factory.LazyFunction(lambda: timezone.now() - GRACE_PERIOD - ONE_DAY)
 
 
 class SiaeAfterGracePeriodFactory(SiaeFactory):

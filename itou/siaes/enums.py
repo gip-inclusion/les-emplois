@@ -6,12 +6,6 @@ class SiaeKind(models.TextChoices):
     EI = "EI", "Entreprise d'insertion"  # Regroupées au sein de la fédération des entreprises d'insertion.
     AI = "AI", "Association intermédiaire"
     ACI = "ACI", "Atelier chantier d'insertion"
-
-    # When an ACI does PHC ("Premières Heures en Chantier"), we have both an ACI created by
-    # the SIAE ASP import (plus its ACI antenna) and an ACIPHC created by our staff (plus its ACIPHC antenna).
-    # The first one is managed by ASP data, the second one is managed by our staff.
-    ACIPHC = "ACIPHC", "Atelier chantier d'insertion premières heures en chantier"
-
     ETTI = "ETTI", "Entreprise de travail temporaire d'insertion"
     EITI = "EITI", "Entreprise d'insertion par le travail indépendant"
     GEIQ = "GEIQ", "Groupement d'employeurs pour l'insertion et la qualification"
@@ -64,44 +58,38 @@ class ContractType(models.TextChoices):
     @classmethod
     def choices_for_siae(cls, siae):
         choices = None
-        # TODO(celinems): Use Python 3.10 match / case syntax when this version will be available on our project.
-        if siae.kind == SiaeKind.GEIQ:
-            choices = [cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        elif siae.kind in [SiaeKind.EA, SiaeKind.EATT]:
-            choices = [
-                cls.PERMANENT,
-                cls.FIXED_TERM,
-                cls.TEMPORARY,
-                cls.FIXED_TERM_TREMPLIN,
-                cls.APPRENTICESHIP,
-                cls.PROFESSIONAL_TRAINING,
-                cls.OTHER,
-            ]
-        elif siae.kind == SiaeKind.EITI:
-            choices = [cls.BUSINESS_CREATION, cls.OTHER]
-        elif siae.kind == SiaeKind.OPCS:
-            choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        elif siae.kind == SiaeKind.ACI:
-            choices = [
-                cls.FIXED_TERM_I,
-                cls.FIXED_TERM_USAGE,
-                cls.TEMPORARY,
-                cls.PROFESSIONAL_TRAINING,
-                cls.OTHER,
-            ]
-            if siae.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST:
-                choices[-1:-1] = [
-                    cls.FIXED_TERM_I_PHC,
-                    cls.FIXED_TERM_I_CVG,
+
+        match siae.kind:
+            case SiaeKind.GEIQ:
+                choices = [cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
+            case SiaeKind.EA | SiaeKind.EATT:
+                choices = [
+                    cls.PERMANENT,
+                    cls.FIXED_TERM,
+                    cls.TEMPORARY,
+                    cls.FIXED_TERM_TREMPLIN,
+                    cls.APPRENTICESHIP,
+                    cls.PROFESSIONAL_TRAINING,
+                    cls.OTHER,
                 ]
-        elif siae.kind in [SiaeKind.ACIPHC, SiaeKind.EI, SiaeKind.AI, SiaeKind.ETTI]:
-            # Siae.ELIGIBILITY_REQUIRED_KINDS but without EITI.
-            choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-        else:
-            choices = list(cls)
-            # These are only for ACI from ACI_CONVERGENCE_SIRET_WHITELIST
-            choices.remove(cls.FIXED_TERM_I_PHC)
-            choices.remove(cls.FIXED_TERM_I_CVG)
+            case SiaeKind.EITI:
+                choices = [cls.BUSINESS_CREATION, cls.OTHER]
+            case SiaeKind.OPCS:
+                choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
+            case SiaeKind.ACI | SiaeKind.EI | SiaeKind.AI | SiaeKind.ETTI:
+                # SIAE_WITH_CONVENTION_KINDS but without EITI.
+                choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
+            case _:
+                choices = list(cls)
+                # These are only for ACI from ACI_CONVERGENCE_SIRET_WHITELIST
+                choices.remove(cls.FIXED_TERM_I_PHC)
+                choices.remove(cls.FIXED_TERM_I_CVG)
+
+        if siae.kind == SiaeKind.ACI and siae.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST:
+            choices[-1:-1] = [
+                cls.FIXED_TERM_I_PHC,
+                cls.FIXED_TERM_I_CVG,
+            ]
 
         return cls._choices_from_enums_list(choices)
 
@@ -117,7 +105,6 @@ def siae_kind_to_pe_type_siae(siae_kind):
         SiaeKind.EI: 838,
         SiaeKind.AI: 837,
         SiaeKind.ACI: 836,
-        SiaeKind.ACIPHC: 837,
         SiaeKind.ETTI: 839,
         SiaeKind.EITI: 840,
         SiaeKind.GEIQ: 838,

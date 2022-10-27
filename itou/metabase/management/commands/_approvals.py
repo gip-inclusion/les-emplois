@@ -1,3 +1,4 @@
+import functools
 from datetime import datetime
 
 from django.conf import settings
@@ -8,18 +9,22 @@ from itou.metabase.management.commands._utils import (
     get_ai_stock_approval_pks,
     get_department_and_region_columns,
     get_hiring_siae,
+    hash_content,
 )
 from itou.prescribers.models import PrescriberOrganization
 
 
 POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE = datetime(2018, 1, 1)
 
-# Preload association for best performance and to avoid having to make
-# PoleEmploiApproval.pe_structure_code a foreign key.
-CODE_SAFIR_TO_PE_ORG = {
-    org.code_safir_pole_emploi: org
-    for org in PrescriberOrganization.objects.filter(code_safir_pole_emploi__isnull=False).all()
-}
+
+@functools.cache
+def get_code_safir_to_pe_org():
+    # Preload association for best performance and to avoid having to make
+    # PoleEmploiApproval.pe_structure_code a foreign key.
+    return {
+        org.code_safir_pole_emploi: org
+        for org in PrescriberOrganization.objects.filter(code_safir_pole_emploi__isnull=False).all()
+    }
 
 
 def get_siae_from_approval(approval):
@@ -39,7 +44,7 @@ def get_siae_or_pe_org_from_approval(approval):
         return get_siae_from_approval(approval)
     assert isinstance(approval, PoleEmploiApproval)
     code_safir = approval.pe_structure_code
-    pe_org = CODE_SAFIR_TO_PE_ORG.get(code_safir)
+    pe_org = get_code_safir_to_pe_org().get(code_safir)
     return pe_org
 
 
@@ -115,6 +120,12 @@ TABLE.add_columns(
             "type": "boolean",
             "comment": "Provient des injections AI",
             "fn": lambda o: o.pk in get_ai_stock_approval_pks() if isinstance(o, Approval) else False,
+        },
+        {
+            "name": "hash_numéro_pass_iae",
+            "type": "varchar",
+            "comment": "Version obfusquée du PASS IAE ou d'agrément",
+            "fn": lambda o: hash_content(o.number),
         },
     ]
 )

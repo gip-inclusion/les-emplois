@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import os
 from functools import lru_cache
@@ -17,8 +18,8 @@ from itou.metabase.management.commands._database_tables import (
     get_new_table_name,
     switch_table_atomically,
 )
-from itou.siaes.management.commands._import_siae.utils import timeit
 from itou.siaes.models import Siae
+from itou.utils.python import timeit
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -123,33 +124,33 @@ def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_
     ]
 
 
-def get_address_columns(name_suffix="", comment_suffix=""):
+def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
     return [
         {
             "name": f"adresse_ligne_1{name_suffix}",
             "type": "varchar",
             "comment": f"Première ligne adresse{comment_suffix}",
-            "fn": lambda o: o.address_line_1,
+            "fn": lambda o: custom_fn(o).address_line_1,
         },
         {
             "name": f"adresse_ligne_2{name_suffix}",
             "type": "varchar",
             "comment": f"Seconde ligne adresse{comment_suffix}",
-            "fn": lambda o: o.address_line_2,
+            "fn": lambda o: custom_fn(o).address_line_2,
         },
         {
             "name": f"code_postal{name_suffix}",
             "type": "varchar",
             "comment": f"Code postal{comment_suffix}",
-            "fn": lambda o: o.post_code,
+            "fn": lambda o: custom_fn(o).post_code,
         },
         {
             "name": f"ville{name_suffix}",
             "type": "varchar",
             "comment": f"Ville{comment_suffix}",
-            "fn": lambda o: o.city,
+            "fn": lambda o: custom_fn(o).city,
         },
-    ] + get_department_and_region_columns(name_suffix, comment_suffix)
+    ] + get_department_and_region_columns(name_suffix, comment_suffix, custom_fn)
 
 
 def get_establishment_last_login_date_column():
@@ -298,3 +299,7 @@ class MetabaseTable:
         assert len(matching_columns) == 1
         fn = matching_columns[0]["fn"]
         return fn(input)
+
+
+def hash_content(content):
+    return hashlib.sha256(f"{content}{settings.METABASE_HASH_SALT}".encode("utf-8")).hexdigest()

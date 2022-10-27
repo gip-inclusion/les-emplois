@@ -4,7 +4,7 @@ from django.db.models import Q
 
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.models import Siae
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 
 
 # The support team sometimes fixes issues by generating a PASS, filling out the necessary information,
@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
                 eligibility_diagnosis=None,
                 approval__number__startswith=Approval.ASP_ITOU_PREFIX,
-                to_siae__kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS,
+                to_siae__kind__in=SIAE_WITH_CONVENTION_KINDS,
             )
             .exclude(
                 Q(approval__created_by__isnull=True)

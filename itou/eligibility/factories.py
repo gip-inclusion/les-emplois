@@ -13,7 +13,7 @@ class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EligibilityDiagnosis
 
-    created_at = factory.LazyAttribute(lambda obj: timezone.now())
+    created_at = factory.LazyFunction(timezone.now)
     author = factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first())
     author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
     author_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory, authorized=True)
@@ -26,7 +26,7 @@ class EligibilityDiagnosisMadeBySiaeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EligibilityDiagnosis
 
-    created_at = factory.LazyAttribute(lambda obj: timezone.now())
+    created_at = factory.LazyFunction(timezone.now)
     author = factory.LazyAttribute(lambda obj: obj.author_siae.members.first())
     author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
     author_siae = factory.SubFactory(SiaeFactory, with_membership=True)

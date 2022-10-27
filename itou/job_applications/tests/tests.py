@@ -40,7 +40,7 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
@@ -116,7 +116,7 @@ class JobApplicationModelTest(TestCase):
         self.assertTrue(job_application.can_display_approval)
 
         # SIAE not subject to eligibility rules.
-        not_eligible_kinds = [kind for kind in SiaeKind if kind not in Siae.ELIGIBILITY_REQUIRED_KINDS]
+        not_eligible_kinds = [kind for kind in SiaeKind if kind not in SIAE_WITH_CONVENTION_KINDS]
         not_eligible_siae = SiaeFactory(kind=not_eligible_kinds[0])
         job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
         self.assertFalse(job_application.can_display_approval)
@@ -379,23 +379,6 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertTrue(hasattr(qs, "has_suspended_approval"))
         self.assertFalse(qs.has_suspended_approval)
 
-    def test_with_has_active_approval(self):
-        job_app = JobApplicationSentByJobSeekerFactory()
-        qs = JobApplication.objects.with_has_suspended_approval().with_has_active_approval().get(pk=job_app.pk)
-        self.assertTrue(hasattr(qs, "has_active_approval"))
-        self.assertFalse(qs.has_active_approval)
-
-        job_app = JobApplicationWithApprovalFactory()
-        qs = JobApplication.objects.with_has_suspended_approval().with_has_active_approval().get(pk=job_app.pk)
-        self.assertTrue(hasattr(qs, "has_active_approval"))
-        self.assertTrue(qs.has_active_approval)
-
-        job_app = JobApplicationWithApprovalFactory()
-        SuspensionFactory(approval=job_app.approval)
-        qs = JobApplication.objects.with_has_suspended_approval().with_has_active_approval().get(pk=job_app.pk)
-        self.assertTrue(hasattr(qs, "has_active_approval"))
-        self.assertFalse(qs.has_active_approval)
-
     def test_with_last_change(self):
         job_app = JobApplicationSentByJobSeekerFactory()
         qs = JobApplication.objects.with_last_change().get(pk=job_app.pk)
@@ -490,7 +473,6 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertTrue(hasattr(qs, "selected_jobs"))
         self.assertTrue(hasattr(qs, "has_suspended_approval"))
         self.assertTrue(hasattr(qs, "is_pending_for_too_long"))
-        self.assertTrue(hasattr(qs, "has_active_approval"))
         self.assertTrue(hasattr(qs, "last_jobseeker_eligibility_diagnosis"))
         self.assertTrue(hasattr(qs, f"last_eligibility_diagnosis_criterion_{level1_criterion.pk}"))
         self.assertTrue(hasattr(qs, f"last_eligibility_diagnosis_criterion_{level2_criterion.pk}"))
