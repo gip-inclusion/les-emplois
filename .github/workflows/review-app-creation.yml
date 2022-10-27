@@ -111,6 +111,4 @@ jobs:
         $CLEVER_CLI env set SKIP_FIXTURES true
 
     - name: 🚀 Deploy to Clever Cloud
-      env:
-        CPUCOUNT: 1
       run: $CLEVER_CLI deploy --branch $BRANCH --force
