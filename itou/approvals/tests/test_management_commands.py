@@ -23,26 +23,45 @@ class ExportPEApiRejectionsTestCase(TestCase):
             pe_notification_exit_code="FOOBAR",
             user__last_name="Pers,e",
             user__first_name='Jul"ie',
+            with_jobapplication=True,
+            with_jobapplication__to_siae__department=42,
         )
         stdout = io.StringIO()
         management.call_command("export_pe_api_rejections", stdout=stdout, stderr=io.StringIO())
         self.assertEqual(
             stdout.getvalue(),
-            "numero,date_notification,code_echec,nir,pole_emploi_id,nom_naissance,prenom,date_naissance\n"
-            + ",".join(
-                map(
-                    str,
-                    [
-                        approval.number,
-                        "2022-08-31 00:00:00+00:00",
-                        "FOOBAR",
-                        approval.user.nir,
-                        approval.user.pole_emploi_id,
-                        '"Pers,e"',
-                        '"Jul""ie"',
-                        approval.user.birthdate,
-                    ],
-                )
-            )
-            + "\n",
+            "\n".join(
+                [
+                    ",".join(
+                        [
+                            "numero",
+                            "date_notification",
+                            "code_echec",
+                            "nir",
+                            "pole_emploi_id",
+                            "nom_naissance",
+                            "prenom",
+                            "date_naissance",
+                            "siae_departement",
+                        ]
+                    ),
+                    ",".join(
+                        map(
+                            str,
+                            [
+                                approval.number,
+                                "2022-08-31 00:00:00+00:00",
+                                "FOOBAR",
+                                approval.user.nir,
+                                approval.user.pole_emploi_id,
+                                '"Pers,e"',
+                                '"Jul""ie"',
+                                approval.user.birthdate,
+                                42,
+                            ],
+                        )
+                    ),
+                    "",  # Trailing newline
+                ]
+            ),
         )

@@ -37,10 +37,13 @@ class Command(BaseCommand):
                     "nom_naissance",
                     "prenom",
                     "date_naissance",
+                    "siae_departement",
                 ],
             )
 
         for approval in rejected_approvals:
+            # Use the same logic that Approval.notify_pole_emploi() to get the SIAE using the PASS.
+            siae = approval.jobapplication_set.accepted().order_by("-created_at").first().to_siae
             writer.writerow(
                 [
                     approval.number,
@@ -51,5 +54,6 @@ class Command(BaseCommand):
                     approval.user.last_name,
                     approval.user.first_name,
                     approval.user.birthdate,
+                    siae.department,
                 ],
             )
