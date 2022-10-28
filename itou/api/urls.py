@@ -5,6 +5,7 @@ from rest_framework.authtoken import views as auth_views
 
 from itou.api.data_inclusion_api.views import DataInclusionStructureView
 
+from .applicants_api.views import ApplicantsView
 from .employee_record_api.viewsets import (
     DummyEmployeeRecordViewSet,
     EmployeeRecordUpdateNotificationViewSet,
@@ -27,7 +28,6 @@ router.register(
 )
 router.register(r"dummy-employee-records", DummyEmployeeRecordViewSet, basename="dummy-employee-records")
 router.register(r"siaes", SiaeViewSet, basename="siaes")
-
 
 urlpatterns = [
     # TokenAuthentication endpoint to get token from login/password.
@@ -53,4 +53,5 @@ urlpatterns += router.urls
 
 urlpatterns += [
     path("structures/", DataInclusionStructureView.as_view(), name="structures-list"),
+    path("candidats/", ApplicantsView.as_view(), name="applicants-list"),
 ]
