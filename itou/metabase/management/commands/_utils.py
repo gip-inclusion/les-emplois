@@ -6,7 +6,6 @@ from operator import attrgetter
 
 from django.conf import settings
 from django.utils import timezone
-from django.utils.crypto import salted_hmac
 from psycopg2 import sql
 
 from itou.approvals.models import Approval
@@ -64,14 +63,6 @@ def chunks(items, n):
     """
     for i in range(0, len(items), n):
         yield items[i : i + n]
-
-
-def anonymize(value, salt):
-    """
-    Use a salted hash to anonymize sensitive ids,
-    mainly job_seeker id and job_application id.
-    """
-    return salted_hmac(salt, value, secret=settings.SECRET_KEY).hexdigest()
 
 
 def get_first_membership_join_date(memberships):

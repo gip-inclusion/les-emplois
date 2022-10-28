@@ -54,13 +54,13 @@ from itou.metabase.management.commands._database_tables import (
 )
 from itou.metabase.management.commands._dataframes import get_df_from_rows, store_df
 from itou.metabase.management.commands._utils import (
-    anonymize,
     build_final_tables,
     chunked_queryset,
     compose,
     convert_boolean_to_int,
     enable_sql_logging,
     get_active_siae_pks,
+    hash_content,
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
@@ -340,9 +340,7 @@ class Command(BaseCommand):
                     row = OrderedDict()
 
                     row["id_fiche_de_poste"] = jd.pk
-                    row["id_anonymisé_candidature"] = anonymize(
-                        ja.pk, salt=_job_applications.JOB_APPLICATION_PK_ANONYMIZATION_SALT
-                    )
+                    row["id_anonymisé_candidature"] = hash_content(ja.pk)
 
                     rows.append(row)
             if self.dry_run and len(rows) >= 1000:

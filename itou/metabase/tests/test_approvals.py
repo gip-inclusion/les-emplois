@@ -23,7 +23,10 @@ def test_hashed_approval_number():
     )
 
 
-@override_settings(SECRET_KEY="foobar2022")
+@override_settings(METABASE_HASH_SALT="foobar2000")
 def test_id_candidat_anonymisé():
-    approval = ApprovalFactory(user__pk=18)
-    assert TABLE.get(column_name="id_candidat_anonymisé", input=approval) == "4532819e6f4be94d2716bb5d5c6f61e7fd8bc4e3"
+    approval = ApprovalFactory(user__pk=123456)
+    assert (
+        TABLE.get(column_name="id_candidat_anonymisé", input=approval)
+        == "24be2dc555f5db9a3348fa2290204ce75b7a9240a8049cfe0ff6c445dc63956f"
+    )

@@ -8,11 +8,11 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
     MetabaseTable,
-    anonymize,
     get_ai_stock_job_seeker_pks,
     get_choice,
     get_department_and_region_columns,
     get_hiring_siae,
+    hash_content,
 )
 
 
@@ -181,7 +181,7 @@ TABLE.add_columns(
             "name": "id_anonymisé",
             "type": "varchar",
             "comment": "ID anonymisé du candidat",
-            "fn": lambda o: anonymize(o.id, salt="job_seeker.id"),
+            "fn": lambda o: hash_content(o.id),
         },
         {
             "name": "sexe_selon_nir",

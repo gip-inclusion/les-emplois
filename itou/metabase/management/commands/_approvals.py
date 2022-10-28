@@ -6,7 +6,6 @@ from django.conf import settings
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.metabase.management.commands._utils import (
     MetabaseTable,
-    anonymize,
     get_ai_stock_approval_pks,
     get_department_and_region_columns,
     get_hiring_siae,
@@ -81,7 +80,7 @@ TABLE.add_columns(
             "name": "id_candidat_anonymisé",
             "type": "varchar",
             "comment": "ID anonymisé du candidat",
-            "fn": lambda o: anonymize(o.user.pk, salt="job_seeker.id"),
+            "fn": lambda o: hash_content(o.user.pk),
         },
         {
             "name": "id_structure",

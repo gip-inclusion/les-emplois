@@ -2,15 +2,12 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
     MetabaseTable,
-    anonymize,
     get_ai_stock_approval_pks,
     get_choice,
     get_department_and_region_columns,
+    hash_content,
 )
 from itou.prescribers.enums import PrescriberOrganizationKind
-
-
-JOB_APPLICATION_PK_ANONYMIZATION_SALT = "job_application.id"
 
 
 # Reword the original SenderKind.SENDER_KIND_CHOICES
@@ -127,7 +124,7 @@ TABLE.add_columns(
             "name": "id_anonymisé",
             "type": "varchar",
             "comment": "ID anonymisé de la candidature",
-            "fn": lambda o: anonymize(o.pk, salt=JOB_APPLICATION_PK_ANONYMIZATION_SALT),
+            "fn": lambda o: hash_content(o.pk),
         },
         {
             "name": "date_candidature",
@@ -183,7 +180,7 @@ TABLE.add_columns(
             "name": "id_candidat_anonymisé",
             "type": "varchar",
             "comment": "ID anonymisé du candidat",
-            "fn": lambda o: anonymize(o.job_seeker_id, salt="job_seeker.id"),
+            "fn": lambda o: hash_content(o.job_seeker_id),
         },
         {
             "name": "id_structure",
