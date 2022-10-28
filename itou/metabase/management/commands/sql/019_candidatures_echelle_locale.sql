@@ -119,7 +119,7 @@ select
     safir_org_prescripteur,
     id_org_prescripteur,
     nom_org_prescripteur,
-    Nom_prénom_conseiller_pe,
+    nom_prénom_conseiller,
     dept_org,
     région_org,
     injection_ai,

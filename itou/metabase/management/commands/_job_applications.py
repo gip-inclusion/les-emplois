@@ -71,9 +71,9 @@ def get_ja_sender_organization_safir(ja):
     return None
 
 
-def get_ja_sender_full_name_if_pe(ja):
+def get_ja_sender_full_name_if_pe_or_spip(ja):
     org = ja.sender_prescriber_organization
-    if org and org.kind == PrescriberOrganizationKind.PE:
+    if org and org.kind in [PrescriberOrganizationKind.PE, PrescriberOrganizationKind.SPIP]:
         return f"{ja.sender.last_name.upper()} {ja.sender.first_name}"
     return None
 
@@ -241,10 +241,10 @@ TABLE.add_columns(
             "fn": get_ja_sender_organization_safir,
         },
         {
-            "name": "nom_prénom_conseiller_pe",
+            "name": "nom_prénom_conseiller",
             "type": "varchar",
-            "comment": "Nom prénom du conseiller PE",
-            "fn": get_ja_sender_full_name_if_pe,
+            "comment": "Nom prénom du conseiller PE ou SPIP",
+            "fn": get_ja_sender_full_name_if_pe_or_spip,
         },
         {
             "name": "date_embauche",

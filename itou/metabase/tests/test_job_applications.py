@@ -28,7 +28,7 @@ class MetabaseJobApplicationTest(TestCase):
     def test_ja_sent_by_pe(self):
         ja = JobApplicationSentByPrescriberPoleEmploiFactory()
         self.assertEqual(
-            TABLE.get(column_name="nom_prénom_conseiller_pe", input=ja),
+            TABLE.get(column_name="nom_prénom_conseiller", input=ja),
             f"{ja.sender.last_name.upper()} {ja.sender.first_name}",
         )
         self.assertEqual(
@@ -37,10 +37,20 @@ class MetabaseJobApplicationTest(TestCase):
         )
         self.assertEqual(len(ja.sender_prescriber_organization.code_safir_pole_emploi), 5)
 
-    def test_ja_sent_by_non_pe_prescriber_organization(self):
+    def test_ja_sent_by_spip(self):
+        ja = JobApplicationSentByPrescriberOrganizationFactory(
+            sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP
+        )
+        self.assertEqual(
+            TABLE.get(column_name="nom_prénom_conseiller", input=ja),
+            f"{ja.sender.last_name.upper()} {ja.sender.first_name}",
+        )
+        self.assertEqual(TABLE.get(column_name="safir_org_prescripteur", input=ja), None)
+
+    def test_ja_sent_by_exotic_prescriber_organization(self):
         ja = JobApplicationSentByPrescriberOrganizationFactory(
             sender_prescriber_organization__kind=PrescriberOrganizationKind.CHRS
         )
         self.assertNotEqual(ja.sender_prescriber_organization.kind, PrescriberOrganizationKind.PE)
-        self.assertEqual(TABLE.get(column_name="nom_prénom_conseiller_pe", input=ja), None)
+        self.assertEqual(TABLE.get(column_name="nom_prénom_conseiller", input=ja), None)
         self.assertEqual(TABLE.get(column_name="safir_org_prescripteur", input=ja), None)
