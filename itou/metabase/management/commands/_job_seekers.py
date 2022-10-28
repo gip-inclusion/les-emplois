@@ -184,6 +184,12 @@ TABLE.add_columns(
             "fn": lambda o: hash_content(o.id),
         },
         {
+            "name": "hash_nir",
+            "type": "varchar",
+            "comment": "Version obfusquée du NIR",
+            "fn": lambda o: hash_content(o.nir) if o.nir else None,
+        },
+        {
             "name": "sexe_selon_nir",
             "type": "varchar",
             "comment": "Sexe du candidat selon le NIR",
