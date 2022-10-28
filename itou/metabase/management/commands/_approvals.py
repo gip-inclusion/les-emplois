@@ -6,6 +6,7 @@ from django.conf import settings
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.metabase.management.commands._utils import (
     MetabaseTable,
+    anonymize,
     get_ai_stock_approval_pks,
     get_department_and_region_columns,
     get_hiring_siae,
@@ -76,6 +77,12 @@ TABLE.add_columns(
         {"name": "date_début", "type": "date", "comment": "Date de début", "fn": lambda o: o.start_at},
         {"name": "date_fin", "type": "date", "comment": "Date de fin", "fn": lambda o: o.end_at},
         {"name": "durée", "type": "interval", "comment": "Durée", "fn": lambda o: o.end_at - o.start_at},
+        {
+            "name": "id_candidat_anonymisé",
+            "type": "varchar",
+            "comment": "ID anonymisé du candidat",
+            "fn": lambda o: anonymize(o.user.pk, salt="job_seeker.id"),
+        },
         {
             "name": "id_structure",
             "type": "integer",

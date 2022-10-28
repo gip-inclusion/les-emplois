@@ -21,3 +21,9 @@ def test_hashed_approval_number():
         TABLE.get(column_name="hash_numéro_pass_iae", input=approval)
         == "6cc868860cee823f0ffe0b3498bb4ebda51baa1b7858e2022f6590b0bd86c31c"
     )
+
+
+@override_settings(SECRET_KEY="foobar2022")
+def test_id_candidat_anonymisé():
+    approval = ApprovalFactory(user__pk=18)
+    assert TABLE.get(column_name="id_candidat_anonymisé", input=approval) == "4532819e6f4be94d2716bb5d5c6f61e7fd8bc4e3"
