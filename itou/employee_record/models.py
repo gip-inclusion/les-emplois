@@ -10,7 +10,7 @@ from rest_framework.authtoken.admin import User
 from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeKind
 from itou.job_applications.enums import SenderKind
-from itou.siaes.models import Siae, SiaeFinancialAnnex
+from itou.siaes.models import Siae, SiaeConvention, SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
 
@@ -474,11 +474,17 @@ class EmployeeRecord(models.Model):
         if not self.is_orphan:
             raise CloningError(f"This employee record is not an orphan {self.status=},{self.asp_id=}")
 
+        try:
+            convention = SiaeConvention.objects.get(asp_id=asp_id)
+        except SiaeConvention.DoesNotExist:
+            raise CloningError(f"Unable to find SIAE convention for asp_id: {asp_id}")
+
         # Cleanup clone fields
         er_copy = EmployeeRecord.objects.get(pk=self.pk)
         er_copy.pk = None
         er_copy.created_at = timezone.now()
-        er_copy.asp_id = asp_id
+        er_copy.asp_id = convention.asp_id
+        er_copy.siret = convention.siret_signature
         er_copy.status = Status.READY
         er_copy.asp_batch_file = None
         er_copy.asp_batch_line_number = None
@@ -491,11 +497,12 @@ class EmployeeRecord(models.Model):
         except Exception as ex:
             raise CloningError(
                 f"Can't persist employee record clone. "
-                f"Duplicate asp_ip / approval number pair ? ({self.asp_id=}, {self.approval_number=})"
+                f"Duplicate asp_ip / approval number pair ? ({er_copy.asp_id=}, {er_copy.approval_number=})"
             ) from ex
 
-        # Disable current object to acoid conflicts
-        self.update_as_disabled()
+        # Disable current object to avoid conflicts
+        if self.status != Status.DISABLED:
+            self.update_as_disabled()
 
         return er_copy
 
@@ -654,8 +661,13 @@ class EmployeeRecord(models.Model):
 
     @property
     def is_orphan(self):
-        """Orphan employee records are PROCESSED and have different stored and actual `asp_id` fields."""
-        return self.status == Status.PROCESSED and self.job_application.to_siae.convention.asp_id != self.asp_id
+        """Orphan employee records are:
+        - `PROCESSED` or `DISABLED` (after preflight)
+        - have different stored and actual `asp_id` fields."""
+        return (
+            self.status in [Status.PROCESSED, Status.DISABLED]
+            and self.job_application.to_siae.convention.asp_id != self.asp_id
+        )
 
     @staticmethod
     def siret_from_asp_source(siae):

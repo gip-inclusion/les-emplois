@@ -177,11 +177,18 @@ class EmployeeRecordModelTest(EmployeeRecordFixtureTest):
     def test_clone_orphan(self):
         # Check employee record clone features and properties
         good_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+        disabled_employee_record = EmployeeRecordWithProfileFactory(status=Status.DISABLED)
         bad_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
-        previous_asp_id = good_employee_record.asp_id
 
+        previous_asp_id = good_employee_record.asp_id
         good_employee_record.asp_id += 1
+        good_employee_record.siret = "99999999999999"
         good_employee_record.save()
+
+        previous_disabled_asp_id = disabled_employee_record.asp_id
+        disabled_employee_record.asp_id += 1
+        disabled_employee_record.siret = "99999999999999"
+        disabled_employee_record.save()
 
         self.assertTrue(good_employee_record.is_orphan)
 
@@ -190,12 +197,26 @@ class EmployeeRecordModelTest(EmployeeRecordFixtureTest):
         self.assertNotEqual(good_employee_record.created_at, clone.created_at)
         self.assertEqual(Status.READY, clone.status)
         self.assertEqual(previous_asp_id, clone.asp_id)
+        self.assertEqual(clone.job_application.to_siae.convention.siret_signature, clone.siret)
         self.assertIsNone(clone.asp_batch_file)
         self.assertIsNone(clone.asp_batch_line_number)
         self.assertIsNone(clone.asp_processing_code)
         self.assertIn(EmployeeRecord.ASP_CLONE_MESSAGE, clone.asp_processing_label)
         self.assertEqual(Status.DISABLED, good_employee_record.status)
         self.assertIsNone(clone.archived_json)
+
+        bad_asp_id = disabled_employee_record.asp_id + 1
+        with self.assertRaisesMessage(
+            CloningError,
+            f"Unable to find SIAE convention for asp_id: {bad_asp_id}",
+        ):
+            # No such convention ID
+            disabled_employee_record.clone_orphan(bad_asp_id)
+
+        # Cloning in DISABLED state must work
+        disabled_employee_record.clone_orphan(previous_disabled_asp_id)
+
+        self.assertIs(disabled_employee_record.is_orphan, True)
 
         # Check conditions are required
 
