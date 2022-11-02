@@ -1,10 +1,12 @@
 import datetime
+import functools
 import random
 import string
 
 import factory
 import factory.fuzzy
 from allauth.account import models as allauth_models
+from django.contrib.auth.hashers import make_password
 
 from itou.asp.factories import CommuneFactory, CountryFactory, CountryFranceFactory
 from itou.asp.models import AllocationDuration, EducationLevel, LaneType
@@ -16,6 +18,11 @@ from itou.utils.validators import validate_nir
 
 
 DEFAULT_PASSWORD = "P4ssw0rd!***"
+
+
+@functools.cache
+def default_password():
+    return make_password(DEFAULT_PASSWORD)
 
 
 def _verify_emails_for_user(self, create, extracted, **kwargs):
@@ -47,7 +54,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     email = factory.Sequence("email{0}@domain.com".format)
-    password = factory.PostGenerationMethodCall("set_password", DEFAULT_PASSWORD)
+    password = factory.LazyFunction(default_password)
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     phone = factory.Faker("phone_number", locale="fr_FR")
 
