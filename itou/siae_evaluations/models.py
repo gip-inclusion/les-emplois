@@ -17,6 +17,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siaes.models import Siae
 from itou.users.enums import KIND_SIAE_STAFF
+from itou.utils import constants as global_constants
 from itou.utils.emails import get_email_message, send_email_messages
 
 from .constants import CAMPAIGN_VIEWABLE_DURATION
@@ -345,6 +346,8 @@ class EvaluatedSiae(models.Model):
     )
     notification_text = models.TextField(blank=True, null=True, verbose_name="commentaire")
 
+    reminder_sent_at = models.DateTimeField(verbose_name="rappel envoyé le", null=True, blank=True)
+
     objects = EvaluatedSiaeManager.from_queryset(EvaluatedSiaeQuerySet)()
 
     class Meta:
@@ -420,6 +423,22 @@ class EvaluatedSiae(models.Model):
         }
         subject = "siae_evaluations/email/to_siae_selected_subject.txt"
         body = "siae_evaluations/email/to_siae_selected_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def get_email_to_siae_notify_before_adversarial_stage(self):
+        to = self.siae.active_admin_members.values_list("email", flat=True)
+        job_app_list_url = reverse(
+            "siae_evaluations_views:siae_job_applications_list",
+            kwargs={"evaluated_siae_pk": self.pk},
+        )
+        context = {
+            "evaluation_campaign": self.evaluation_campaign,
+            "siae": self.siae,
+            "evaluated_job_app_list_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{job_app_list_url}",
+            "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
+        }
+        subject = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_subject.txt"
+        body = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_body.txt"
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_reviewed(self, adversarial=False):
