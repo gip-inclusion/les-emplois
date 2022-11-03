@@ -309,35 +309,6 @@
                         {% endif %}
                     </ul>
                 </div>
-
-                {% if can_view_stats_ddets and active_campaigns %}
-                    <div class="card c-card has-links-inside">
-                        <p class="h4 card-header">
-                            Contrôle a posteriori
-                            {% if campaign_in_progress %}<span class="badge badge-accent-03 text-primary">Nouveau</span>{% endif %}
-                        </p>
-                        <div class="card-body">
-                            <ul class="list-unstyled">
-                                {% for active_campaign in active_campaigns %}
-                                    {% if active_campaign.evaluations_asked_at %}
-                                        <li class="card-text mb-3">
-                                            <i class="ri-file-copy-2-line ri-lg mr-1"></i>
-                                            <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' active_campaign.pk %}">
-                                                {{ active_campaign.name }}
-                                            </a>
-                                        </li>
-                                    {% else %}
-                                        <li class="card-text mb-3">
-                                            <i class="ri-pulse-line ri-lg mr-1"></i>
-                                            <a href="{% url 'siae_evaluations_views:samples_selection' %}">{{ active_campaign|capfirst }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-
-                            </ul>
-                        </div>
-                    </div>
-                {% endif %}
             </div>
 
         {% endif %}
@@ -619,7 +590,7 @@
                             {% else %}
                                 <li class="card-text mb-3">
                                     <i class="ri-pulse-line ri-lg mr-1"></i>
-                                    <a href="{% url 'siae_evaluations_views:samples_selection' %}">Sélectionner l'échantillon</a>
+                                    <a href="{% url 'siae_evaluations_views:samples_selection' %}">{{ active_campaign.name|capfirst }}</a>
                                 </li>
                             {% endif %}
                         {% endfor %}
