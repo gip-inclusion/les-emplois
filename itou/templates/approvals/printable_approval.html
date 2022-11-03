@@ -85,7 +85,7 @@
 
         <div class="row justify-content-center no-print">
             <div class="mt-5 mb-2">
-                <button class="btn btn-primary btn-primary-lg btn-ico" href="#" onclick="window.print();return false;">
+                <button id="printButton" class="btn btn-primary btn-primary-lg btn-ico" href="#">
                     <i class="ri-printer-line ri-xl"></i>
                     <span>Imprimer ce PASS IAE</span>
                 </button>
@@ -98,3 +98,11 @@
         </div>
     </div>
 {% endblock %}
+
+{% block script %}
+    <script nonce="{{ CSP_NONCE }}">
+        document.getElementById("printButton").addEventListener("click", function print(){
+          window.print();
+        });
+    </script>
+{% endblock script %}
