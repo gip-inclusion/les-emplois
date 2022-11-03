@@ -13,9 +13,9 @@ from itou.siaes.management.commands._import_siae.utils import (
     get_filename,
     remap_columns,
     sync_structures,
-    timeit,
 )
 from itou.siaes.models import Siae
+from itou.utils.python import timeit
 from itou.utils.validators import validate_siret
 
 
