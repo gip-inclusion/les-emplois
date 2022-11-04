@@ -1,12 +1,23 @@
-function submitFiltersForm() {
-    $("#js-approvals-filters-form").submit();
-}
-$("#js-approvals-filters-form :input").change(submitFiltersForm);
-$("duet-date-picker").on("duetChange", submitFiltersForm);
+(function() {
+  const filtersToggleBtn = document.getElementById("js-approvals-filters-button");
+  const filtersForm = document.getElementById("js-approvals-filters-form");
 
-// If the Filtres button is present, the associated card should be collapsed on display.
-if ($("#js-approvals-filters-button").is(":visible")) {
-    // The button should be always visible now (on windows resize)
-    $("#js-approvals-filters-button").removeClass("d-md-none");
-    $('#js-approvals-filters-form').collapse();
-}
+  function submitFiltersForm() {
+    filtersForm.submit();
+  }
+  $("#js-approvals-filters-form :input").change(submitFiltersForm);
+
+  function showFilters() {
+    // The filters toggle button is only displayed on small viewports.
+    return window.getComputedStyle(filtersToggleBtn).getPropertyValue("display") === "none";
+  }
+
+  function autoCollapseForm() {
+    filtersForm.classList.toggle("show", showFilters());
+  }
+
+  $(document).ready(function () {
+    autoCollapseForm()
+    window.addEventListener("resize", autoCollapseForm);
+  });
+})();
