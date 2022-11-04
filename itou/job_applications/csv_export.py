@@ -1,5 +1,7 @@
 import csv
 
+from itou.job_applications.enums import SenderKind
+
 
 JOB_APPLICATION_CSV_HEADERS = [
     "Nom candidat",
@@ -63,6 +65,20 @@ def _get_eligibility_status(job_application):
     return eligibility
 
 
+def _get_readable_sender_kind(job_application):
+    """
+    Converts itou internal prescriber kinds into something readable
+    """
+    kind = "Candidature spontanée"
+    if job_application.sender_kind == SenderKind.SIAE_STAFF:
+        kind = "Auto-prescription"
+    elif job_application.sender_kind == SenderKind.PRESCRIBER:
+        kind = "Orienteur"
+        if job_application.is_sent_by_authorized_prescriber:
+            kind = "Prescripteur habilité"
+    return kind
+
+
 def _job_application_as_dict(job_application):
     """
     The main CSV export mthod: it converts a JobApplication into a CSV array data
@@ -90,7 +106,7 @@ def _job_application_as_dict(job_application):
         "Nom structure employeur": siae.display_name,
         "Type employeur": siae.kind,
         "Métiers": _get_selected_jobs(job_application),
-        "Source de la candidature": job_application.display_sender_kind,
+        "Source de la candidature": _get_readable_sender_kind(job_application),
         "Nom organisation prescripteur": _get_prescriber_orgname(job_application),
         "Nom utilisateur prescripteur": _get_prescriber_username(job_application),
         "Date de la candidature": _format_date(job_application.created_at),
