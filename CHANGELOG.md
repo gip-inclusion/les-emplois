@@ -1,5 +1,32 @@
 # Journal des modifications
 
+## [52] - 2022-11-04
+
+### Ajouté
+- API : Ajout de l'API candidats
+- API : Exposition d'un lien vers la page de la structure sur les emplois pour l'API data.inclusion
+- Ajouts divers Metabase (régions, hash du numéro de PASS)
+- Candidatures : ajout du motif de refus "dupliqué"
+- Contrôle a posteriori : Ajout du parcours de sanctions
+- Contrôle a posteriori : Mode lecture seule pour les campagnes terminées
+- Fiches salariés : Transmission de la date de fin pour les PASS IAE sans fiches salariés
+- Technique : ajout de HTMX
+
+### Modifié
+- Contrôle a posteriori : inclusion des AI pour 2022, améliorations d'affichage
+- Contrôle a posteriori : les SIAE évaluées sont dans un état finalisé à la clôture de la campagne
+- Correction d'affichage diverses
+- Exports des rejets d'API PE : ajout du département
+- Fiches salarié : vérification de la convention et rafraichissement du SIRET lors d'un clonage
+- Metabase : utiliser l'adresse de la structure parente pour les antennes
+- Tableau de bord: retrait de la bannière vers le pilotage
+- Technique : Améliorations de performance notables (tests, admin, filtres de candidatures)
+- Technique : Mise à jour de django, uWSGI & elasticapm
+
+### Retiré
+- Siae : retrait du type ACIPHC
+
+
 ## [51] - 2022-10-24
 
 ### Ajouté
