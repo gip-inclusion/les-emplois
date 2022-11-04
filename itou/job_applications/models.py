@@ -699,20 +699,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             JobApplicationWorkflow.STATE_POSTPONED,
         ]
 
-    @property
-    def display_sender_kind(self):
-        """
-        Converts itou internal prescriber kinds into something readable
-        """
-        kind = "Candidature spontanée"
-        if self.sender_kind == SenderKind.SIAE_STAFF:
-            kind = "Auto-prescription"
-        elif self.sender_kind == SenderKind.PRESCRIBER:
-            kind = "Orienteur"
-            if self.is_sent_by_authorized_prescriber:
-                kind = "Prescripteur habilité"
-        return kind
-
     def get_sender_kind_display(self):
         # Override default getter since we want to separate Orienteur and Prescripteur
         if self.sender_kind == SenderKind.PRESCRIBER and (
