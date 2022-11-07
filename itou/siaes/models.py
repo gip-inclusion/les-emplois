@@ -494,7 +494,12 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
         return self.order_by("-updated_at", "-created_at")
 
     def active(self):
-        return self.filter(is_active=True)
+        subquery = Subquery(
+            Siae.objects.filter(
+                pk=OuterRef("siae"),
+            ).active()
+        )
+        return self.annotate(is_siae_active=Exists(subquery)).filter(is_active=True, is_siae_active=True)
 
     def within(self, point, distance_km):
         return self.filter(

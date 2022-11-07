@@ -10,10 +10,12 @@ from django.utils import timezone
 
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.jobs.factories import create_test_romes_and_appellations
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
+    SiaeJobDescriptionFactory,
     SiaePendingGracePeriodFactory,
     SiaeWith2MembershipsFactory,
     SiaeWith4MembershipsFactory,
@@ -333,11 +335,13 @@ class SiaeQuerySetTest(TestCase):
 
 class SiaeJobDescriptionQuerySetTest(TestCase):
     def setUp(self):
-        self.siae = SiaeFactory(with_jobs=True)
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        super().setUp()
 
     def test_with_annotation_is_popular(self):
+        siae = SiaeFactory(with_jobs=True)
         job_seeker = JobSeekerFactory()  # We don't care if it's always the same
-        siae_job_descriptions = self.siae.job_description_through.all()
+        siae_job_descriptions = siae.job_description_through.all()
 
         # Test attribute presence
         siae_job_description = SiaeJobDescription.objects.with_annotation_is_popular().first()
@@ -346,7 +350,7 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         # Test popular threshold: popular job description
         popular_job_description = siae_job_descriptions[0]
         for _ in range(SiaeJobDescription.POPULAR_THRESHOLD + 1):
-            JobApplicationFactory(to_siae=self.siae, selected_jobs=[popular_job_description], job_seeker=job_seeker)
+            JobApplicationFactory(to_siae=siae, selected_jobs=[popular_job_description], job_seeker=job_seeker)
 
         self.assertTrue(
             SiaeJobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
@@ -354,7 +358,7 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
 
         # Test popular threshold: unpopular job description
         unpopular_job_description = siae_job_descriptions[1]
-        JobApplicationFactory(to_siae=self.siae, selected_jobs=[unpopular_job_description])
+        JobApplicationFactory(to_siae=siae, selected_jobs=[unpopular_job_description])
 
         self.assertFalse(
             SiaeJobDescription.objects.with_annotation_is_popular().get(pk=unpopular_job_description.pk).is_popular
@@ -367,7 +371,7 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
 
         JobApplicationFactory.create_batch(
             threshold_exceeded,
-            to_siae=self.siae,
+            to_siae=siae,
             job_seeker=job_seeker,
             selected_jobs=[popular_job_description],
             state=JobApplicationWorkflow.STATE_ACCEPTED,
@@ -376,11 +380,23 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         self.assertFalse(SiaeJobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular)
 
     def test_with_job_applications_count(self):
-        job_description = self.siae.job_description_through.first()
-        JobApplicationFactory(to_siae=self.siae, selected_jobs=[job_description])
+        siae = SiaeFactory(with_jobs=True)
+        job_description = siae.job_description_through.first()
+        JobApplicationFactory(to_siae=siae, selected_jobs=[job_description])
         siae_job_description = SiaeJobDescription.objects.with_job_applications_count().get(pk=job_description.pk)
         self.assertTrue(hasattr(siae_job_description, "job_applications_count"))
         self.assertEqual(siae_job_description.job_applications_count, 1)
+
+    def test_is_active(self):
+        siae = SiaeFactory(kind=SiaeKind.EI, convention=None)
+        job = SiaeJobDescriptionFactory(siae=siae, is_active=False)
+        assert SiaeJobDescription.objects.active().count() == 0
+        job.is_active = True
+        job.save(update_fields=["is_active"])
+        assert SiaeJobDescription.objects.active().count() == 0
+        siae.kind = SiaeKind.GEIQ
+        siae.save(update_fields=["kind"])
+        assert SiaeJobDescription.objects.active().count() == 1
 
 
 class SiaeContractTypeTest(TestCase):
