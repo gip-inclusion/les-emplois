@@ -28,9 +28,14 @@ from itou.www.approvals_views.forms import (
 class ApprovalBaseViewMixin(LoginRequiredMixin):
     model = Approval
 
+    def __init__(self):
+        super().__init__()
+        self.siae = None
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.siae = get_current_siae_or_404(request)
+        if request.user.is_authenticated:
+            self.siae = get_current_siae_or_404(request)
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -87,7 +92,8 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.form = ApprovalForm(self.siae.pk, self.request.GET)
+        if self.siae:
+            self.form = ApprovalForm(self.siae.pk, self.request.GET)
 
     def get_queryset(self):
         form_filters = []
