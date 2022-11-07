@@ -1,13 +1,18 @@
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.approvals.factories import ApprovalFactory, SuspensionFactory
 from itou.siaes.factories import SiaeFactory
 
 
 class TestApprovalsListView:
+    def test_anonymous_user(self, client):
+        url = reverse("approvals:list")
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
+
     def test_list_view(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()

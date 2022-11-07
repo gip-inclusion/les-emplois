@@ -1,7 +1,7 @@
 from unittest import mock
 
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
@@ -12,6 +12,12 @@ from itou.prescribers.factories import PrescriberOrganizationFactory
 
 
 class TestApprovalDetailView:
+    def test_anonymous_user(self, client):
+        approval = ApprovalFactory()
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
+
     def test_detail_view(self, client):
         approval = ApprovalFactory()
         job_application = JobApplicationFactory(
