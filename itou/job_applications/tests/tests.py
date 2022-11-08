@@ -552,6 +552,12 @@ class JobApplicationQuerySetTest(TestCase):
             approval=job_app.approval,
         )
         self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+        # ...and with an employee record already existing for that employee
+        EmployeeRecordFactory(
+            job_application__to_siae=job_app.to_siae,
+            approval_number=job_app.approval.number,
+        )
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(

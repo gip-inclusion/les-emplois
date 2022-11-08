@@ -28,7 +28,7 @@ class EmployeeRecordFactory(factory.django.DjangoModelFactory):
             return
 
         self.siret = self.job_application.to_siae.siret
-        self.approval_number = self.job_application.approval.number
+        self.approval_number = self.approval_number or self.job_application.approval.number
         self.asp_id = self.job_application.to_siae.convention.asp_id
 
 

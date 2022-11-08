@@ -16,6 +16,7 @@ from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import RefusalReason, SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.siaes.models import Siae
@@ -314,6 +315,11 @@ class JobApplicationQuerySet(models.QuerySet):
                 has_prolongation=Exists(
                     Prolongation.objects.filter(declared_by_siae=OuterRef("to_siae"), approval=OuterRef("approval"))
                 ),
+                employee_record_exists=Exists(
+                    EmployeeRecord.objects.filter(
+                        job_application__to_siae=OuterRef("to_siae"), approval_number=OuterRef("approval__number")
+                    )
+                ),
             )
             .filter(
                 # Must be linked to an approval with a Suspension or a Prolongation
@@ -330,6 +336,8 @@ class JobApplicationQuerySet(models.QuerySet):
                 # Limit to recent approvals as the older ones will already have been handled by the support.
                 # The date was chosen arbitrarily, don't mind it too much :).
                 approval__created_at__gte="2022-01-01",
+                # Exclude the job application if an employee record with the same SIAE and approval already exists.
+                employee_record_exists=False,
             )
         )
 
