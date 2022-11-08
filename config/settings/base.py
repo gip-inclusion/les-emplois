@@ -559,3 +559,6 @@ HIJACK_ALLOWED_USER_EMAILS = [s.lower() for s in os.getenv("HIJACK_ALLOWED_USER_
 
 EXPORT_DIR = os.getenv("SCRIPT_EXPORT_PATH", f"{ROOT_DIR}/exports")
 IMPORT_DIR = os.getenv("SCRIPT_IMPORT_PATH", f"{ROOT_DIR}/imports")
+
+MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL")
+MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")

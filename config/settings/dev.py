@@ -85,3 +85,10 @@ if os.getenv("SQL_DEBUG", "False") == "True":
         "handlers": ["console"],
         "propagate": False,
     }
+
+# use almost the same settings for metabase as base PG.
+METABASE_HOST = os.getenv("PGHOST", "127.0.0.1")  # noqa: F405
+METABASE_PORT = os.getenv("PGPORT", "5432")  # noqa: F405
+METABASE_USER = os.getenv("PGUSER", "postgres")  # noqa: F405o
+METABASE_PASSWORD = os.getenv("PGPASSWORD", "password")  # noqa: F405
+METABASE_DATABASE = os.getenv("PGDATABASE", "metabase")  # noqa: F405

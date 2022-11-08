@@ -12,6 +12,7 @@ from django.core.management.base import BaseCommand
 
 from itou.metabase.management.commands._utils import build_final_tables
 from itou.utils.python import timeit
+from itou.utils.slack import send_slack_message
 
 
 class Command(BaseCommand):
@@ -38,6 +39,8 @@ class Command(BaseCommand):
 
     @timeit
     def handle(self, dry_run=False, **options):
+        send_slack_message(":rocket: Démarrage de la mise à jour des tables SQL secondaires")
         build_final_tables(dry_run=dry_run)
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
+        send_slack_message(":white_check_mark: Mise à jour des tables SQL secondaires terminée")
