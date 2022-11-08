@@ -14,6 +14,7 @@ with fdp_structures as (
     select 
         (current_date - fdp.date_création) as delai_mise_en_ligne,
         fdp.département_employeur as département_structure,
+        fdp.région_employeur as région_structure,
         fdp.id_employeur as id_structure,
         fdp.nom_département_employeur as nom_département_structure,
         s.nom as nom_structure, /* On récupère les infos via la table structure pour éviter des lignes vides lors de la recupération des infos candidatures */
@@ -51,6 +52,7 @@ candidatures_recues_par_fiche_de_poste as (
         (date_embauche - date_candidature) as delai_embauche, /* nous donne un délai en jours */
         c.délai_prise_en_compte,
         fdp_s.département_structure,
+        fdp_s.région_structure,
         c.id_anonymisé as id_candidature_anonymisé,
         c.id_candidat_anonymisé ,
         fdp_s.id_structure,
@@ -60,7 +62,6 @@ candidatures_recues_par_fiche_de_poste as (
         fdp_s.nom_structure,
         c.origine as origine_candidature,
         c.origine_détaillée as origine_détaillée_candidature,
-        c.région_structure,
         c.safir_org_prescripteur,
         fdp_s.type_structure ,
         c.état as état_candidature,
