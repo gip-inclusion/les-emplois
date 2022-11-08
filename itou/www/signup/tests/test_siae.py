@@ -277,6 +277,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             + 1  # SELECT the conventions for those siaes
             + 1  # prefetch memberships
             + 1  # prefetch users associated with those memberships
+            + 4  # select CSRF session then savepoints + insert CSRF session
         ):
             response = self.client.get(url, {"siren": "402191662"})
         self.assertEqual(response.status_code, 200)
