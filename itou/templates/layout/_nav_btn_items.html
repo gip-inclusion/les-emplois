@@ -124,7 +124,10 @@
                     <div class="dropdown-divider"></div>
                 </li>
                 <li>
-                    <a class="dropdown-item text-danger" id="js-logout" href="{% url 'account_logout' %}">Déconnexion</a>
+                    <form method="post" action="{% url 'account_logout' %}">
+                        {% csrf_token %}
+                        <button class="dropdown-item text-danger">Déconnexion</button>
+                    </form>
                 </li>
             </ul>
         </div>
