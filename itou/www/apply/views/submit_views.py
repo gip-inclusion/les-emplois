@@ -713,7 +713,7 @@ class ApplicationJobsView(ApplicationBaseView):
             "form": self.form,
             "job_descriptions_by_pk": job_descriptions_by_pk,
             "progress": 25,
-            "full_content_width": True,
+            "full_content_width": bool(job_descriptions_by_pk),
         }
 
 
