@@ -509,35 +509,6 @@ class EmployeeRecord(models.Model):
         return er_copy
 
     @property
-    def is_archived(self):
-        """
-        Once in final state (PROCESSED), an employee record is archived.
-        See model save() and clean() method.
-        """
-        return self.status == Status.PROCESSED and self.archived_json is not None
-
-    @property
-    def is_updatable(self):
-        """
-        Once in final state (PROCESSED), an EmployeeRecord is not updatable anymore.
-
-        Check this property before using save()
-
-        If an employee record is archived or in SENT status, updating and using save()
-        will throw a ValidationError
-
-        An EmployeeRecord object must not be updated when it has been sent to ASP (waiting for validation)
-        except via specific business methods
-
-        See model save() and clean() method.
-        """
-        return self.status not in [Status.SENT, Status.READY] and not self.is_archived
-
-    @property
-    def is_processed_as_duplicate(self):
-        return self.archived_json is None and self.processed_as_duplicate
-
-    @property
     def can_be_disabled(self):
         return self.status in self.CAN_BE_DISABLED_STATES
 
