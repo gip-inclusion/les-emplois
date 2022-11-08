@@ -38,29 +38,14 @@
 
         </div>
 
+        <hr class="my-5">
         {% buttons %}
-            {% if job_application.to_siae.is_subject_to_eligibility_rules %}
-                <h4 class="h3 text-center mt-5">Obtention d'un PASS IAE</h4>
-                <p class="text-center pt-2">Dans le cadre de cette embauche, souhaitez-vous obtenir un PASS IAE ?</p>
-                <div class="form-group">
-                    <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#confirmModal">
-                        Oui, j'ai besoin d'une aide au poste
-                    </button>
-                </div>
-                <div class="my-4 mx-5 justify-content-center">
-                    <p class="text-center">
-                        <b>Contrat de professionnalisation ?</b>
-                        Demande d'aide une fois le PASS IAE délivré !
-                    </p>
-                </div>
-                <hr class="my-4">
-            {% else %}
-                <button type="button" class="btn btn-success btn-block mt-5 mb-3" data-toggle="modal" data-target="#confirmModal">
-                    Je l'embauche
+            <div class="text-right mb-4">
+                <a class="btn btn-outline-primary bg-white" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
+                <button type="button" class="btn btn-primary btn-ico" data-toggle="modal" data-target="#confirmModal">
+                    <i class="ri-check-line ri-xl"></i><span class=".btn .btn-ico"></span>Valider l’embauche
                 </button>
-            {% endif %}
-
-            <a class="btn btn-outline-secondary btn-block" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
+            </div>
         {% endbuttons %}
         <div class="modal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
             <div class="modal-dialog">
