@@ -158,7 +158,7 @@ class ApprovalAdmin(admin.ModelAdmin):
     )
 
     def get_form(self, request, obj=None, **kwargs):
-        if self.has_change_permission(request, obj) or self.has_add_permission(request, obj):
+        if self.has_change_permission(request, obj) or self.has_add_permission(request):
             # When a user has only the "view" permission it seems that ModelForm.fields is empty,
             # ApprovalAdminForm wants to modify that attribute which result in a KeyError,
             # so we return the custom form only for user with the "change" permission.
