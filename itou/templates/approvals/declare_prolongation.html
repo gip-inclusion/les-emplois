@@ -115,9 +115,9 @@
             function ajust_form_according_reason() {
                 const value = $('input[name="reason"]:checked').val();
                 if (reasons_not_need_prescriber_opinion.includes(value)) {
-                    $('#js-field-email').hide("slidedown").find('.form-group').removeClass("form-group-required");
+                    $('#js-field-email').hide({}).find('.form-group').removeClass("form-group-required");
                 } else {
-                    $('#js-field-email').show("slideup").find('.form-group').addClass("form-group-required");
+                    $('#js-field-email').show({}).find('.form-group').addClass("form-group-required");
                 }
 
                 if (value in reasons_max_durations) {
