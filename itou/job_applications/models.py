@@ -4,7 +4,6 @@ import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, Subquery, When
@@ -20,7 +19,7 @@ from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_
 from itou.job_applications.enums import RefusalReason, SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.siaes.models import Siae
-from itou.utils.emails import get_email_message
+from itou.utils.emails import get_email_message, send_email_messages
 from itou.utils.urls import get_absolute_url
 
 
@@ -810,8 +809,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if self.sender_kind == self.SENDER_KIND_PRESCRIBER:
             emails.append(self.get_email_transfer_prescriber(transferred_by, self.transferred_from, target_siae))
 
-        connection = mail.get_connection()
-        connection.send_messages(emails)
+        send_email_messages(emails)
 
     def get_eligibility_diagnosis(self):
         """
@@ -901,8 +899,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             )
 
         # Send emails in batch.
-        connection = mail.get_connection()
-        connection.send_messages(emails)
+        send_email_messages(emails)
 
         if self.approval:
             self.approval_number_sent_by_email = True
@@ -919,11 +916,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):
         # Send notification.
-        connection = mail.get_connection()
         emails = [self.email_refuse_for_job_seeker]
         if self.is_sent_by_proxy:
             emails.append(self.email_refuse_for_proxy)
-        connection.send_messages(emails)
+        send_email_messages(emails)
 
     @xwf_models.transition()
     def cancel(self, *args, **kwargs):
@@ -947,9 +943,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Send notification.
         user = kwargs.get("user")
-        connection = mail.get_connection()
-        emails = [self.email_cancel(cancelled_by=user)]
-        connection.send_messages(emails)
+        send_email_messages([self.email_cancel(cancelled_by=user)])
 
     @xwf_models.transition()
     def render_obsolete(self, *args, **kwargs):

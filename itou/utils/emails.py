@@ -46,3 +46,8 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
         subject=subject,
         body=get_email_text_template(body, context),
     )
+
+
+def send_email_messages(email_messages):
+    with mail.get_connection() as connection:
+        connection.send_messages(email_messages)

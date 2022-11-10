@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core import mail
 from django.db import transaction
 from django.db.models import Min, Q
 from django.http import Http404, HttpResponseRedirect
@@ -19,6 +18,7 @@ from itou.siae_evaluations.models import (
     EvaluatedSiae,
     EvaluationCampaign,
 )
+from itou.utils.emails import send_email_messages
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.storage.s3 import S3Upload
@@ -192,8 +192,7 @@ class InstitutionEvaluatedSiaeNotifyView(LoginRequiredMixin, generic.UpdateView)
     def form_valid(self, form):
         messages.success(self.request, f"{self.object} a bien été notifiée de la sanction.")
         email = self.object.get_email_to_siae_sanctioned()
-        connection = mail.get_connection()
-        connection.send_messages([email])
+        send_email_messages([email])
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -532,8 +531,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
 
         # note vincentporte : misconception. This view should be called with one evaluated_siae
         # check this impact when calling this view with evaluated_siae.pk in params
-        connection = mail.get_connection()
-        connection.send_messages([evaluated_siae.get_email_to_institution_submitted_by_siae()])
+        send_email_messages([evaluated_siae.get_email_to_institution_submitted_by_siae()])
 
         messages.success(
             request,

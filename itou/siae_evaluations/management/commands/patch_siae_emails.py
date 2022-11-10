@@ -1,8 +1,7 @@
-from django.core import mail
 from django.core.management.base import BaseCommand
 
 from itou.siae_evaluations.models import EvaluatedSiae
-from itou.utils.emails import get_email_message
+from itou.utils.emails import get_email_message, send_email_messages
 
 
 def get_email_patch_siae(to):
@@ -28,7 +27,4 @@ class Command(BaseCommand):
             for evsiae in EvaluatedSiae.objects.filter(evaluation_campaign__name=evaluation_campaign_name)
             if evsiae.state in ["PENDING", "SUBMITTABLE"]
         )
-        emails = (get_email_patch_siae(evsiae.siae.active_admin_members) for evsiae in evsiaes)
-
-        connection = mail.get_connection()
-        connection.send_messages(emails)
+        send_email_messages(get_email_patch_siae(evsiae.siae.active_admin_members) for evsiae in evsiaes)

@@ -2,7 +2,6 @@ import functools
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
@@ -18,7 +17,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siaes.models import Siae
 from itou.users.enums import KIND_SIAE_STAFF
-from itou.utils.emails import get_email_message
+from itou.utils.emails import get_email_message, send_email_messages
 
 from .constants import CAMPAIGN_VIEWABLE_DURATION
 
@@ -76,12 +75,10 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_s
 
     # Send notification.
     if evaluation_campaign_list:
-        connection = mail.get_connection()
-        emails = [
+        send_email_messages(
             evaluation_campaign.get_email_to_institution_ratio_to_select(ratio_selection_end_at)
             for evaluation_campaign in evaluation_campaign_list
-        ]
-        connection.send_messages(emails)
+        )
 
     return len(evaluation_campaign_list)
 
@@ -240,10 +237,9 @@ class EvaluationCampaign(models.Model):
                 ]
             )
 
-            connection = mail.get_connection()
             emails = [evaluated_siae.get_email_to_siae_selected() for evaluated_siae in evaluated_siaes]
             emails += [self.get_email_to_institution_selected_siae()]
-            connection.send_messages(emails)
+            send_email_messages(emails)
 
     def transition_to_adversarial_phase(self):
         (
@@ -388,8 +384,7 @@ class EvaluatedSiae(models.Model):
                 (REFUSED, False): self.get_email_to_siae_refused,
                 (ADVERSARIAL_STAGE, True): self.get_email_to_siae_adversarial_stage,
             }[(self.state, adversarial_stage)]()
-            connection = mail.get_connection()
-            connection.send_messages([email])
+            send_email_messages([email])
 
     @property
     def evaluation_is_final(self):
