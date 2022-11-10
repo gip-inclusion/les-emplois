@@ -120,6 +120,7 @@ THIRD_PARTY_MIDDLEWARES = [
 ITOU_MIDDLEWARES = [
     "itou.utils.new_dns.middleware.NewDnsRedirectMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
+    "itou.www.middleware.never_cache",
 ]
 
 MIDDLEWARE = DJANGO_MIDDLEWARES + THIRD_PARTY_MIDDLEWARES + ITOU_MIDDLEWARES
