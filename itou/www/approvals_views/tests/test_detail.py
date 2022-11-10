@@ -1,14 +1,14 @@
-from unittest import mock
-
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.approvals.factories import ApprovalFactory
+from itou.approvals.factories import ApprovalFactory, SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.factories import PrescriberOrganizationFactory
+from itou.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
 
 
 class TestApprovalDetailView:
@@ -64,30 +64,49 @@ class TestApprovalDetailView:
     def test_suspend_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()
-        siae_member = job_application.to_siae.members.first()
+        siae = job_application.to_siae
+        siae_member = siae.members.first()
         client.force_login(siae_member)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        with mock.patch("itou.approvals.models.Approval.can_be_suspended_by_siae", return_value=True):
-            response = client.get(url)
-            assertContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))
-        with mock.patch("itou.approvals.models.Approval.can_be_suspended_by_siae", return_value=False):
-            response = client.get(url)
-            assertNotContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))
+        assert approval.can_be_suspended_by_siae(siae)
+        response = client.get(url)
+        assertContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))
+
+        SuspensionFactory(
+            approval=approval,
+            start_at=timezone.localdate() - relativedelta(days=1),
+            end_at=timezone.localdate() + relativedelta(days=1),
+        )
+        # Clear cached property
+        del approval.can_be_suspended
+        del approval.is_suspended
+        assert not approval.can_be_suspended_by_siae(siae)
+        response = client.get(url)
+        assertNotContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))
 
     def test_prolongation_button(self, client):
-        approval = ApprovalFactory(with_jobapplication=True)
+        approval = ApprovalFactory(
+            with_jobapplication=True,
+            end_at=timezone.localdate() + relativedelta(months=2),
+        )
         job_application = approval.jobapplication_set.get()
-        siae_member = job_application.to_siae.members.first()
+        siae = job_application.to_siae
+        siae_member = siae.members.first()
         client.force_login(siae_member)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        with mock.patch("itou.approvals.models.Approval.can_be_prolonged_by_siae", return_value=True):
-            response = client.get(url)
-            assertContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
-        with mock.patch("itou.approvals.models.Approval.can_be_prolonged_by_siae", return_value=False):
-            response = client.get(url)
-            assertNotContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
+        assert approval.can_be_prolonged_by_siae(siae)
+        response = client.get(url)
+        assertContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
+
+        approval.end_at = timezone.localdate() + relativedelta(months=4)
+        approval.save()
+        # Clear cached property
+        del approval.can_be_prolonged
+        assert not approval.can_be_prolonged_by_siae(siae)
+        response = client.get(url)
+        assertNotContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
 
     def test_edit_user_info_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
@@ -95,18 +114,18 @@ class TestApprovalDetailView:
         siae_member = job_application.to_siae.members.first()
         client.force_login(siae_member)
 
+        user_info_allowed = "Modifier les informations personnelles"
+        user_info_not_allowed = "Vous ne pouvez pas modifier ses informations"
+
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        with mock.patch(
-            "itou.job_applications.models.JobApplication.has_editable_job_seeker",
-            property(mock.Mock(return_value=True)),
-        ):
-            response = client.get(url)
-            assertContains(response, "Modifier les informations personnelles")
-            assertNotContains(response, "Vous ne pouvez pas modifier ses informations")
-        with mock.patch(
-            "itou.job_applications.models.JobApplication.has_editable_job_seeker",
-            property(mock.Mock(return_value=False)),
-        ):
-            response = client.get(url)
-            assertNotContains(response, "Modifier les informations personnelles")
-            assertContains(response, "Vous ne pouvez pas modifier ses informations")
+        assert not job_application.has_editable_job_seeker
+        response = client.get(url)
+        assertNotContains(response, user_info_allowed)
+        assertContains(response, user_info_not_allowed)
+
+        job_application.job_seeker.created_by = PrescriberFactory()
+        job_application.job_seeker.save()
+        assert job_application.has_editable_job_seeker
+        response = client.get(url)
+        assertContains(response, user_info_allowed)
+        assertNotContains(response, user_info_not_allowed)
