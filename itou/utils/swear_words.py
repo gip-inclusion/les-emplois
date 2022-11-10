@@ -1,4 +1,4 @@
-from functools import lru_cache
+import functools
 
 from django.template.defaultfilters import slugify
 
@@ -459,11 +459,11 @@ FRENCH_SWEAR_WORDS_CONTAINED_IN_CITY_NAMES = {
 }
 
 
-@lru_cache(maxsize=None)
+@functools.cache
 def get_city_swear_words():
     return FRENCH_SWEAR_WORDS - FRENCH_SWEAR_WORDS_CONTAINED_IN_CITY_NAMES
 
 
-@lru_cache(maxsize=None)
+@functools.cache
 def get_city_swear_words_slugs():
     return {slugify(word) for word in get_city_swear_words()}

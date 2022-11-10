@@ -1,7 +1,7 @@
+import functools
 import hashlib
 import logging
 import os
-from functools import lru_cache
 from operator import attrgetter
 
 from django.conf import settings
@@ -179,7 +179,7 @@ def _get_ai_stock_approvals():
     )
 
 
-@lru_cache(maxsize=1)
+@functools.cache
 def get_ai_stock_approval_pks():
     """
     As of June 2022 we have exactly 71205 approvals from the AI stock and exactly the same number of job seekers.
@@ -189,12 +189,12 @@ def get_ai_stock_approval_pks():
     return _get_ai_stock_approvals().values_list("pk", flat=True).distinct()
 
 
-@lru_cache(maxsize=1)
+@functools.cache
 def get_ai_stock_job_seeker_pks():
     return _get_ai_stock_approvals().values_list("user_id", flat=True).distinct()
 
 
-@lru_cache(maxsize=1)
+@functools.cache
 def get_active_siae_pks():
     """
     Load once and for all the list of all active siae pks in memory and reuse them multiple times in various
