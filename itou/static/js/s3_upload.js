@@ -73,23 +73,20 @@ window.s3UploadInit = function s3UploadInit({
 
   const dropzone = new Dropzone(dropzoneSelector, dropzoneConfig);
 
-  // Display a help message when the user tries to
-  // submit the form during file transfer.
-  submitButton.tooltip({ title: "Veuillez attendre la fin du transfert" });
-  // Enable it later, during file transfer.
-  submitButton.tooltip("disable");
-
   // Events
   dropzone.on("addedfile", function (file) {
-    submitButton.tooltip("enable");
+    submitButton.prepend(
+      `<div class="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+        <span class="sr-only">Veuillez attendre la fin du transfert</span>
+      </div>`);
     submitButton.prop("disabled", true);
     submitButton.addClass("btn-secondary");
   });
 
   // Called when the upload was either successful or erroneous.
   dropzone.on("complete", function (file) {
-    submitButton.tooltip("disable");
     submitButton.prop("disabled", false);
+    submitButton.find(".spinner-border").remove();
     submitButton.removeClass("btn-secondary");
   });
 
