@@ -14,7 +14,6 @@ and thus we need a proper tool to manage columns by their
 name instead of hardcoding column numbers as in `field = row[42]`.
 
 """
-from django.core import mail
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
@@ -31,6 +30,7 @@ from itou.siaes.management.commands._import_siae.utils import could_siae_be_dele
 from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW
 from itou.siaes.models import Siae, SiaeConvention
+from itou.utils.emails import send_email_messages
 from itou.utils.python import timeit
 
 
@@ -256,9 +256,7 @@ class Command(BaseCommand):
             siae.save()
         self.stdout.write("--- end of CSV output of all creatable_siaes ---")
 
-        activate_your_account_emails = (siae.activate_your_account_email() for siae in creatable_siaes)
-        connection = mail.get_connection()
-        connection.send_messages(activate_your_account_emails)
+        send_email_messages(siae.activate_your_account_email() for siae in creatable_siaes)
 
         self.stdout.write(f"{len(creatable_siaes)} structures will be created")
         self.stdout.write(f"{len([s for s in creatable_siaes if s.coords])} structures will have geolocation")
