@@ -242,15 +242,19 @@ class EvaluationCampaign(models.Model):
             send_email_messages(emails)
 
     def transition_to_adversarial_phase(self):
-        (
+        force_review_on_siaes = (
             EvaluatedSiae.objects.filter(evaluation_campaign=self, reviewed_at__isnull=True)
             # this is equivalent to removing any EvaluatedSiae in the SUBMITTED state.
             # it's also not DRY, but efficient.
             .exclude(
                 # pylint-disable=line-too-long
                 evaluated_job_applications__evaluated_administrative_criteria__review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING  # noqa: E501
-            ).update(reviewed_at=timezone.now())
+            ).select_related("evaluation_campaign__institution")
         )
+        send_email_messages(
+            evaluated_siae.get_email_to_siae_forced_to_adversarial_stage() for evaluated_siae in force_review_on_siaes
+        )
+        force_review_on_siaes.update(reviewed_at=timezone.now())
 
     def close(self):
         if not self.ended_at:
@@ -423,6 +427,21 @@ class EvaluatedSiae(models.Model):
         }
         subject = "siae_evaluations/email/to_siae_refused_subject.txt"
         body = "siae_evaluations/email/to_siae_refused_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def get_email_to_siae_forced_to_adversarial_stage(self):
+        to = self.siae.active_admin_members.values_list("email", flat=True)
+        auto_prescription_url = reverse(
+            "siae_evaluations_views:siae_job_applications_list",
+            kwargs={"evaluated_siae_pk": self.pk},
+        )
+        context = {
+            "evaluation_campaign": self.evaluation_campaign,
+            "siae": self.siae,
+            "auto_prescription_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{auto_prescription_url}",
+        }
+        subject = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_subject.txt"
+        body = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_body.txt"
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_adversarial_stage(self):
