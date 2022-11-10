@@ -1,6 +1,8 @@
 {% comment %} takes 1 argument: jobs_descriptions=<List of SiaeJobDescription> {% endcomment %}
 
-<p class="h5 text-uppercase">{{ jobs_descriptions|length }} recrutement{{ jobs_descriptions|pluralize }} en cours</p>
+<p class="fs-sm text-secondary">
+    <b>{{ jobs_descriptions|length }} recrutement{{ jobs_descriptions|pluralize }} en cours</b>
+</p>
 
 <ul class="list-group list-group-flush">
     {% for job in jobs_descriptions|slice:":5" %}

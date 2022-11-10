@@ -64,6 +64,8 @@ def etablissement_get_or_error(siret):
     except httpx.HTTPStatusError as e:
         if e.response.status_code == httpx.codes.BAD_REQUEST:
             error = f"Erreur dans le format du SIRET : « {siret} »."
+        elif e.response.status_code == httpx.codes.FORBIDDEN:
+            error = "Cette entreprise a exercé son droit d'opposition auprès de l'INSEE."
         elif e.response.status_code == httpx.codes.NOT_FOUND:
             error = f"SIRET « {siret} » non reconnu."
         else:

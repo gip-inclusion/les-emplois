@@ -968,6 +968,14 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(result, (None, "Erreur dans le format du SIRET : « 26570134200148 »."))
 
     @respx.mock
+    def test_etablissement_get_or_error_with_other_http_forbidden_error(self):
+        self.siret_endpoint.respond(403)
+
+        result = api_entreprise.etablissement_get_or_error("26570134200148")
+
+        self.assertEqual(result, (None, "Cette entreprise a exercé son droit d'opposition auprès de l'INSEE."))
+
+    @respx.mock
     def test_etablissement_get_or_error_with_other_http_not_found_error(self):
         self.siret_endpoint.respond(404)
 
