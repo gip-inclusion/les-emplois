@@ -446,8 +446,8 @@ class EvaluationCampaignManagerTest(TestCase):
     def test_transition_to_adversarial_phase(self):
         fake_now = timezone.now()
         EvaluatedSiaeFactory()  # will be ignored
-        campaign = EvaluationCampaignFactory()
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae__name="Les petits jardins")
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         evaluated_administrative_criterion = EvaluatedAdministrativeCriteriaFactory(
             submitted_at=fake_now,
@@ -471,6 +471,31 @@ class EvaluationCampaignManagerTest(TestCase):
         self.assertEqual(1, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
         evaluated_siae.refresh_from_db()
         self.assertIsNotNone(evaluated_siae.reviewed_at)
+
+        [email] = mail.outbox
+        assert email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
+        print(email.body)
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Sauf erreur de notre part, vous n’avez pas transmis les justificatifs dans le cadre du contrôle a "
+            "posteriori sur vos embauches réalisées en auto-prescription.\n\n"
+            "La DDETS 1 ne peut donc pas faire de contrôle, par conséquent vous entrez dans une phase dite "
+            "contradictoire de 6 semaines (durant laquelle il vous faut transmettre les justificatifs demandés) et "
+            "qui se clôturera sur une décision (validation ou sanction pouvant aller jusqu’à un retrait d’aide au "
+            "poste) conformément à l’instruction N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative à la mise en "
+            "œuvre opérationnelle du contrôle a posteriori des recrutements en auto-prescription prévu par les "
+            "articles R. 5132-1-12 à R. 5132-1-17 du code du travail.\n\n"
+            "Pour transmettre les justificatifs, rendez-vous sur le tableau de bord de "
+            f"EI Les petits jardins ID-{evaluated_siae.siae_id} à la rubrique “Justifier mes auto-prescriptions”.\n"
+            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae.pk}/\n\n"
+            "En cas de besoin, vous pouvez consulter ce mode d’emploi.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
 
     def test_close(self):
         evaluation_campaign = EvaluationCampaignFactory()
