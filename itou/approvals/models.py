@@ -730,40 +730,39 @@ class Suspension(models.Model):
                 }
             )
 
-        if hasattr(self, "approval"):
-            # The start of a suspension must be contained in its approval boundaries.
-            if not self.start_in_approval_boundaries:
-                raise ValidationError(
-                    {
-                        "start_at": (
-                            f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
-                            f"{self.approval.start_at.strftime('%d/%m/%Y')} - "
-                            f"{self.approval.end_at.strftime('%d/%m/%Y')}."
-                        )
-                    }
-                )
+        # The start of a suspension must be contained in its approval boundaries.
+        if not self.start_in_approval_boundaries:
+            raise ValidationError(
+                {
+                    "start_at": (
+                        f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
+                        f"{self.approval.start_at.strftime('%d/%m/%Y')} - "
+                        f"{self.approval.end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
 
-            referent_date = self.created_at.date() if self.pk else None
-            next_min_start_at = self.next_min_start_at(self.approval, self.pk, referent_date, False)
-            if next_min_start_at and self.start_at < next_min_start_at:
-                raise ValidationError(
-                    {"start_at": (f"La date de début minimum est : {next_min_start_at.strftime('%d/%m/%Y')}.")}
-                )
+        referent_date = self.created_at.date() if self.pk else None
+        next_min_start_at = self.next_min_start_at(self.approval, self.pk, referent_date, False)
+        if next_min_start_at and self.start_at < next_min_start_at:
+            raise ValidationError(
+                {"start_at": (f"La date de début minimum est : {next_min_start_at.strftime('%d/%m/%Y')}.")}
+            )
 
-            # A suspension cannot overlap another one for the same SIAE.
-            # This check is enforced by a constraint at the database level but
-            # still required here to avoid a 500 server error "IntegrityError"
-            # during form validation.
-            if self.get_overlapping_suspensions().exists():
-                overlap = self.get_overlapping_suspensions().first()
-                raise ValidationError(
-                    {
-                        "start_at": (
-                            f"La période chevauche une suspension déjà existante pour ce PASS IAE "
-                            f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
-                        )
-                    }
-                )
+        # A suspension cannot overlap another one for the same SIAE.
+        # This check is enforced by a constraint at the database level but
+        # still required here to avoid a 500 server error "IntegrityError"
+        # during form validation.
+        if self.get_overlapping_suspensions().exists():
+            overlap = self.get_overlapping_suspensions().first()
+            raise ValidationError(
+                {
+                    "start_at": (
+                        f"La période chevauche une suspension déjà existante pour ce PASS IAE "
+                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
 
     @property
     def duration(self):
@@ -1045,36 +1044,34 @@ class Prolongation(models.Model):
         ):
             raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
 
-        if hasattr(self, "approval"):
+        # Avoid blocking updates in admin by limiting this check to only new instances.
+        if not self.pk and self.start_at != self.get_start_at(self.approval):
+            raise ValidationError(
+                "La date de début doit être la même que la date de fin du PASS IAE "
+                f"« {self.approval.end_at.strftime('%d/%m/%Y')} »."
+            )
 
-            # Avoid blocking updates in admin by limiting this check to only new instances.
-            if not self.pk and self.start_at != self.get_start_at(self.approval):
-                raise ValidationError(
-                    "La date de début doit être la même que la date de fin du PASS IAE "
-                    f"« {self.approval.end_at.strftime('%d/%m/%Y')} »."
+        # A prolongation cannot overlap another one for the same SIAE.
+        # This check is enforced by a constraint at the database level but
+        # still required here to avoid a 500 server error "IntegrityError"
+        # during form validation.
+        if self.get_overlapping_prolongations().exists():
+            overlap = self.get_overlapping_prolongations().first()
+            raise ValidationError(
+                (
+                    f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
+                    f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
                 )
+            )
 
-            # A prolongation cannot overlap another one for the same SIAE.
-            # This check is enforced by a constraint at the database level but
-            # still required here to avoid a 500 server error "IntegrityError"
-            # during form validation.
-            if self.get_overlapping_prolongations().exists():
-                overlap = self.get_overlapping_prolongations().first()
-                raise ValidationError(
-                    (
-                        f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
-                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
-                    )
+        if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
+            raise ValidationError(
+                (
+                    f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
+                    f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
+                    f'pour le motif "{self.get_reason_display()}".'
                 )
-
-            if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
-                raise ValidationError(
-                    (
-                        f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
-                        f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
-                        f'pour le motif "{self.get_reason_display()}".'
-                    )
-                )
+            )
 
     @property
     def duration(self):
