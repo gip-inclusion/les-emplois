@@ -80,7 +80,7 @@ TABLE.add_columns(
             "name": "id_candidat_anonymisé",
             "type": "varchar",
             "comment": "ID anonymisé du candidat",
-            "fn": lambda o: hash_content(o.user.pk),
+            "fn": lambda o: hash_content(o.user.pk) if isinstance(o, Approval) else None,
         },
         {
             "name": "id_structure",

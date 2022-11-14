@@ -1,6 +1,6 @@
 from django.test import override_settings
 
-from itou.approvals.factories import ApprovalFactory
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.metabase.management.commands._approvals import TABLE
 
 
@@ -30,3 +30,8 @@ def test_id_candidat_anonymisé():
         TABLE.get(column_name="id_candidat_anonymisé", input=approval)
         == "24be2dc555f5db9a3348fa2290204ce75b7a9240a8049cfe0ff6c445dc63956f"
     )
+
+
+def test_id_candidat_anonymisé_for_pe_approval():
+    pe_approval = PoleEmploiApprovalFactory()
+    assert TABLE.get(column_name="id_candidat_anonymisé", input=pe_approval) is None
