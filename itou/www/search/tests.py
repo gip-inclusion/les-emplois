@@ -328,7 +328,6 @@ class JobDescriptionSearchViewTest(TestCase):
         assert list(siaes_results) == [job2, job1, job3]
 
     def test_is_popular(self):
-        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
         job = SiaeJobDescriptionFactory(siae=siae)
