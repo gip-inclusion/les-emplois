@@ -191,7 +191,7 @@ class SearchPrescriberTest(TestCase):
         self.assertContains(response, "<b>1</b> résultat", html=True)
 
 
-class SearchJobDescriptionTest(TestCase):
+class JobDescriptionSearchViewTest(TestCase):
     def setUp(self):
         # FIXME(vperron): this should probably be done ONCE with the initialization of any test DB,
         # which would also fix the constant calling of this with every test that uses SiaeFactory,
