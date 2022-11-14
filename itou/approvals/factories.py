@@ -73,7 +73,6 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
             return
         authorized_prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         self.validated_by = authorized_prescriber_org.members.first()
-        self.save()
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
