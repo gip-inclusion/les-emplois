@@ -65,10 +65,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Check IC will redirect to the correct url
-        encoded_siae_id = siae.get_encoded_siae_id()
         token = siae.get_token()
-        previous_url = reverse("signup:siae_user", args=(encoded_siae_id, token))
-        next_url = reverse("signup:siae_join", args=(encoded_siae_id, token))
+        previous_url = reverse("signup:siae_user", args=(siae.pk, token))
+        next_url = reverse("signup:siae_join", args=(siae.pk, token))
         params = {
             "user_kind": KIND_SIAE_STAFF,
             "previous_url": previous_url,
@@ -130,10 +129,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Check IC will redirect to the correct url
-        encoded_siae_id = siae.get_encoded_siae_id()
         token = siae.get_token()
-        previous_url = reverse("signup:siae_user", args=(encoded_siae_id, token))
-        next_url = reverse("signup:siae_join", args=(encoded_siae_id, token))
+        previous_url = reverse("signup:siae_user", args=(siae.pk, token))
+        next_url = reverse("signup:siae_join", args=(siae.pk, token))
         params = {
             "user_kind": KIND_SIAE_STAFF,
             "previous_url": previous_url,
@@ -293,9 +291,8 @@ class SiaeSignupViewsExceptionsTest(TestCase):
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
 
         # Skip IC process and jump to joining the SIAE.
-        encoded_siae_id = siae.get_encoded_siae_id()
         token = siae.get_token()
-        url = reverse("signup:siae_join", args=(encoded_siae_id, token))
+        url = reverse("signup:siae_join", args=(siae.pk, token))
 
         response = self.client.get(url)
         messages = list(get_messages(response.wsgi_request))

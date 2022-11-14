@@ -83,10 +83,9 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_new_employer_sees_welcoming_tour(self):
         siae = SiaeFactory(with_membership=True)
-        encoded_siae_id = siae.get_encoded_siae_id()
         token = siae.get_token()
-        previous_url = reverse("signup:siae_user", args=(encoded_siae_id, token))
-        next_url = reverse("signup:siae_join", args=(encoded_siae_id, token))
+        previous_url = reverse("signup:siae_user", args=(siae.pk, token))
+        next_url = reverse("signup:siae_join", args=(siae.pk, token))
         response = mock_oauth_dance(
             self,
             KIND_SIAE_STAFF,
