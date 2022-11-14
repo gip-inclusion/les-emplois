@@ -2,9 +2,9 @@ import datetime
 import uuid
 from unittest import mock
 
-import django.core.exceptions
 import faker
 from dateutil.relativedelta import relativedelta
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import resolve, reverse
 from django.utils import timezone
@@ -1095,10 +1095,11 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         other_job_seeker = JobSeekerFactory(nir=dummy_job_seeker_profile.user.nir)
 
-        expected_message = "Un objet Utilisateur avec ce champ NIR existe déjà."
-        with self.assertRaisesMessage(django.core.exceptions.ValidationError, expected_message):
-            response = self.client.post(next_url)
-        self.assertTrue(response.status_code, 200)
+        response = self.client.post(next_url)
+        [message] = list(get_messages(response.wsgi_request))
+        assert message.tags == "error"
+        assert message.message == "Un objet Utilisateur avec ce champ NIR existe déjà."
+        self.assertRedirects(response, reverse("dashboard:index"))
 
         # Remove that extra job seeker and proceed with "normal" flow
         # ----------------------------------------------------------------------
