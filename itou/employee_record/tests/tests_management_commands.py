@@ -17,12 +17,12 @@ from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
-# There is no need to create 700 employee records for a single batch
-# so this class var is changed to 1 for tests, otherwise download operation is not triggered.
 from ...approvals.factories import ProlongationFactory, SuspensionFactory
 from .common import ManagementCommandTestCase
 
 
+# There is no need to create 700 employee records for a single batch
+# so this class var is changed to 1 for tests, otherwise download operation is not triggered.
 @mock.patch("itou.employee_record.models.EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS", new=1)
 @override_settings(ASP_FS_SFTP_HOST="foobar.com", ASP_FS_SFTP_USER="django_tests")
 class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
