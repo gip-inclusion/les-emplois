@@ -160,6 +160,10 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         response = self.client.get("/accounts/profile/")
         self.assertRedirects(response, reverse("dashboard:index"))
 
+    def test_redirect_to_dashboard_anonymous(self):
+        response = self.client.get("/accounts/profile/")
+        self.assertRedirects(response, reverse("account_login"))
+
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_job_seeker_signup_with_nir_with_pe_connect(self, mock_login_signal):
         # Complete signup with NIR is tested in JobSeekerSignupTest.test_job_seeker_nir

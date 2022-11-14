@@ -9,6 +9,7 @@ from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView, OAu
 from allauth.utils import get_request_param
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from requests import RequestException
 
 from itou.allauth_adapters.peamu.adapter import PEAMUOAuth2Adapter
@@ -59,8 +60,9 @@ class PEAMUOAuth2CallbackView(OAuth2CallbackView):
 
 
 def redirect_to_dashboard_view(request):
-    redirect_url = get_adapter().get_login_redirect_url(request)
-    return HttpResponseRedirect(redirect_url)
+    return HttpResponseRedirect(
+        get_adapter().get_login_redirect_url(request) if request.user.is_authenticated else reverse("account_login")
+    )
 
 
 oauth2_login = OAuth2LoginView.adapter_view(PEAMUOAuth2Adapter)
