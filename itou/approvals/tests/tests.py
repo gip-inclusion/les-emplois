@@ -966,6 +966,13 @@ class SuspensionModelTest(TestCase):
         min_start_at = Suspension.next_min_start_at(job_application_4.approval)
         self.assertEqual(min_start_at, today - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS))
 
+    def test_next_min_start_date_without_job_application(self):
+        today = timezone.localdate()
+        approval = ApprovalFactory()
+        siae = SiaeFactory()
+        suspension = Suspension(approval=approval, siae=siae, start_at=today, end_at=today)
+        suspension.clean()
+
 
 class SuspensionModelTestTrigger(TestCase):
     def test_save(self):
