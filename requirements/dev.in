@@ -4,10 +4,6 @@ pip-tools==6.8.0  # https://github.com/jazzband/pip-tools/
 
 ipdb==0.13.9  # https://github.com/gotcha/ipdb
 
-# tblib is used to avoid parallel tests to crash hard if an exception occurs.
-# https://code.djangoproject.com/ticket/25497#comment:6
-tblib==1.7.0  # https://github.com/ionelmc/python-tblib
-
 jedi==0.18.1 # https://github.com/davidhalter/jedi
 
 # Code quality
