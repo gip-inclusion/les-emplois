@@ -815,8 +815,10 @@ class Suspension(models.Model):
         if referent_date is None:
             referent_date = datetime.date.today()
 
-        # Default starting date. Can be empty, see below.
-        start_at = approval.user.last_accepted_job_application.hiring_start_at
+        start_at = None
+        last_accepted_job_application = approval.user.last_accepted_job_application
+        if last_accepted_job_application:
+            start_at = last_accepted_job_application.hiring_start_at
 
         # Start at overrides to handle edge cases.
         if approval.last_old_suspension(pk_suspension):
@@ -824,14 +826,14 @@ class Suspension(models.Model):
 
         if with_retroactivity_limitation:
             start_at_threshold = referent_date - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
-            # At this point, `start_at` can be undefined if:
+            # At this point, `start_at` can be None if:
             # - hiring start date has not been filled in last accepted job application,
             # - there is no previous suspension for this approval.
             # Hence a more defensive approach.
             if not start_at or start_at < start_at_threshold:
                 return start_at_threshold
 
-        # FIXME: at this point start_at can still be undefined if `with_retroactivity_limitation` is `False`
+        # FIXME: at this point start_at can still be None if `with_retroactivity_limitation` is `False`
         return start_at
 
 
