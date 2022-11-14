@@ -212,17 +212,25 @@ class SiaeBaseView(View):
     def __init__(self):
         super().__init__()
         self.siae = None
-        self.encoded_siae_id = None
         self.token = None
 
     def setup(self, request, *args, **kwargs):
-        self.encoded_siae_id = kwargs["encoded_siae_id"]
         self.token = kwargs["token"]
         super().setup(request, *args, **kwargs)
 
-    def dispatch(self, request, *args, **kwargs):
-        siae_id = int(urlsafe_base64_decode(self.encoded_siae_id))
-        self.siae = Siae.objects.active().filter(pk=siae_id).first()
+    def dispatch(self, request, *args, siae_id, **kwargs):
+        # TODO(FF): After a week on production (magic link validity), remove
+        # fallback logic to decode the siae_id and specify the parameter as
+        # siae_id:int in the urls.
+        try:
+            siae_id = int(siae_id)
+        except ValueError:
+            siae_id = urlsafe_base64_decode(siae_id)
+            try:
+                siae_id = int(siae_id)
+            except ValueError:
+                siae_id = None
+        self.siae = None if siae_id is None else Siae.objects.active().filter(pk=siae_id).get()
         if self.siae is None or not siae_signup_token_generator.check_token(siae=self.siae, token=self.token):
             messages.warning(
                 request,
@@ -245,7 +253,7 @@ class SiaeUserView(SiaeBaseView, TemplateView):
         ic_params = {
             "user_kind": KIND_SIAE_STAFF,
             "previous_url": self.request.get_full_path(),
-            "next_url": reverse("signup:siae_join", args=(self.encoded_siae_id, self.token)),
+            "next_url": reverse("signup:siae_join", args=(self.siae.pk, self.token)),
         }
         inclusion_connect_url = (
             f"{reverse('inclusion_connect:authorize')}?{urlencode(ic_params)}"

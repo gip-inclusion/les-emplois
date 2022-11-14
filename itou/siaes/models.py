@@ -7,8 +7,6 @@ from django.db.models import BooleanField, Case, Count, Exists, OuterRef, Prefet
 from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
@@ -344,12 +342,7 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     @property
     def signup_magic_link(self):
-        return reverse(
-            "signup:siae_user", kwargs={"encoded_siae_id": self.get_encoded_siae_id(), "token": self.get_token()}
-        )
-
-    def get_encoded_siae_id(self):
-        return urlsafe_base64_encode(force_bytes(self.pk))
+        return reverse("signup:siae_user", kwargs={"siae_id": self.pk, "token": self.get_token()})
 
     def get_token(self):
         return siae_signup_token_generator.make_token(self)

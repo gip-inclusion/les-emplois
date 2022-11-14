@@ -80,6 +80,6 @@ urlpatterns = [
     ),
     # SIAE.
     path("siae/select", views.siae_select, name="siae_select"),
-    path("siae/<str:encoded_siae_id>/<str:token>", views.SiaeUserView.as_view(), name="siae_user"),
-    path("siae/join/<str:encoded_siae_id>/<str:token>", views.SiaeJoinView.as_view(), name="siae_join"),
+    path("siae/<str:siae_id>/<str:token>", views.SiaeUserView.as_view(), name="siae_user"),
+    path("siae/join/<str:siae_id>/<str:token>", views.SiaeJoinView.as_view(), name="siae_join"),
 ]
