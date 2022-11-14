@@ -174,7 +174,8 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
                 # En attendant on ne pourra pas trier par arrondissement pour ces offres.
             elif job_description.siae.department:
                 department = job_description.siae.department
-            departments.add(department)
+            if department:
+                departments.add(department)
 
         if departments:
             departments = sorted(departments)
