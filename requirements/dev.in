@@ -8,9 +8,6 @@ ipdb==0.13.9  # https://github.com/gotcha/ipdb
 # https://code.djangoproject.com/ticket/25497#comment:6
 tblib==1.7.0  # https://github.com/ionelmc/python-tblib
 
-# Werkzeug is required to use django-extensions's runserver_plus.
-Werkzeug==2.1.2 # https://github.com/pallets/werkzeug
-
 jedi==0.18.1 # https://github.com/davidhalter/jedi
 
 # Code quality
