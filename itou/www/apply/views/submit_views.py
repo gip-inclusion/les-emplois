@@ -570,16 +570,19 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        profile = JobSeekerProfile(
-            user=User.create_job_seeker_by_proxy(self.sender, **self._get_user_data_from_session()),
-            **self._get_profile_data_from_session(),
-        )
-        profile.save()
+        try:
+            user = User.create_job_seeker_by_proxy(self.sender, **self._get_user_data_from_session())
+        except ValidationError as e:
+            messages.error(request, " ".join(e.messages))
+            url = reverse("dashboard:index")
+        else:
+            profile = JobSeekerProfile(user=user, **self._get_profile_data_from_session())
+            profile.save()
 
-        self.apply_session.set("job_seeker_pk", profile.user.pk)
-        self.job_seeker_session.delete()  # Point of no return
-
-        return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}))
+            self.apply_session.set("job_seeker_pk", profile.user.pk)
+            self.job_seeker_session.delete()  # Point of no return
+            url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk})
+        return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
