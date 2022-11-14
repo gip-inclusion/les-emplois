@@ -348,3 +348,12 @@ class SearchJobDescriptionTest(TestCase):
             """,
             html=True,
         )
+
+    def test_no_department(self):
+        st_andre = create_city_saint_andre()
+        siae_without_dpt = SiaeFactory(department="", coords=st_andre.coords, post_code="44117", kind=SiaeKind.AI)
+        siae = SiaeFactory(department="44", coords=st_andre.coords, post_code="44117", kind=SiaeKind.AI)
+        SiaeJobDescriptionFactory(siae=siae_without_dpt, location=None)
+        SiaeJobDescriptionFactory(siae=siae)
+        response = self.client.get(self.url, {"city": st_andre.slug})
+        assert response.status_code == 200
