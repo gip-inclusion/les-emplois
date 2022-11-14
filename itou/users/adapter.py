@@ -11,7 +11,7 @@ from itou.utils.urls import get_absolute_url, get_safe_url
 class UserAdapter(DefaultAccountAdapter):
     """
     Overrides standard allauth adapter:
-        * provides additionnal context to some emails sent via allauth
+        * provides additional context to some emails sent via allauth
         * handles redirections after allauth actions
 
     Activation of this adapter is done in project settings with:
