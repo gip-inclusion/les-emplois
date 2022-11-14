@@ -1308,7 +1308,7 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         post_data = {"email": job_seeker.email, "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
-        self.assertTrue(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertIn(
             "Le<b> numéro de sécurité sociale</b> renseigné (141068078200557) "
             "est déjà utilisé par un autre candidat sur la Plateforme.",
@@ -1325,7 +1325,7 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         )
 
         response = self.client.post(next_url, data=post_data, follow=True)
-        self.assertTrue(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(0, len(list(response.context["messages"])))
 
         # Make sure the job seeker NIR is now filled in.
