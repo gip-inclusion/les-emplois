@@ -281,7 +281,7 @@ def institution_evaluated_job_application(
         )
     context = {
         "evaluated_job_application": evaluated_job_application,
-        # note vincentporte: Can't find why additionnal queries are made to access `EvaluatedSiae` `state`
+        # note vincentporte: Can't find why additional queries are made to access `EvaluatedSiae` `state`
         # cached_property when iterating over `EvaluatedAdministrativeCriteria` in template.
         # Tried to push `EvaluatedSiae` instance in context without benefical results. weird.
         "evaluated_siae": evaluated_siae,

@@ -6,7 +6,7 @@ from itou.siae_evaluations import enums as evaluation_enums
 def evaluated_job_application_state(job_app):
     # assuming the EvaluatedJobApplication instance is fully hydrated
     # with its evaluated_administrative_criteria before being called,
-    # to prevent tons of additionnal queries in db.
+    # to prevent tons of additional queries in db.
     if len(job_app.evaluated_administrative_criteria.all()) == 0:
         return evaluation_enums.EvaluatedJobApplicationsState.PENDING
 

@@ -484,7 +484,7 @@ class EvaluatedSiae(models.Model):
 
         # assuming the EvaluatedSiae instance is fully hydrated with its evaluated_job_applications
         # and evaluated_administrative_criteria before being called,
-        # to prevent tons of additionnal queries in db.
+        # to prevent tons of additional queries in db.
 
         def any_evaluated_admin_crit_matches(filter_func):
             return any(
@@ -608,7 +608,7 @@ class EvaluatedJobApplication(models.Model):
 
         # assuming the EvaluatedJobApplication instance is fully hydrated
         # with its evaluated_administrative_criteria before being called,
-        # to prevent tons of additionnal queries in db.
+        # to prevent tons of additional queries in db.
         if len(self.evaluated_administrative_criteria.all()) == 0:
             return evaluation_enums.EvaluatedJobApplicationsState.PENDING
 
