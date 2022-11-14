@@ -6,32 +6,32 @@
             </div>
             <div class="h5">
                 <a href="" class="js-prevent-default">Choisissez un fichier</a> ou <b>glissez ici</b>.
-                </div>
-                <div class="small">Taille maximale : {{ s3_upload.config.max_file_size }} Mo</div>
-                <div class="small">Type de fichier : PDF</div>
             </div>
+            <div class="small">Taille maximale : {{ s3_upload.config.max_file_size }} Mo</div>
+            <div class="small">Type de fichier : PDF</div>
         </div>
     </div>
+</div>
 
 
-    <p class="small mt-0">
-        <i class="ri-question-line mr-1"></i>
-        Ce fichier n'est pas un PDF ?
-        <a href="{{ ITOU_COMMUNITY_URL }}/doc/emplois/postuler-pour-un-candidat-prescrire/#ajouter-un-cv-a-la-candidature"
-           target="_blank"
-           rel="noopener"
-           class="matomo-event"
-           matomo-category="ajout-fichier-candidature"
-           matomo-action="clic"
-           matomo-option="clic-sur-lien-aide-pdf"
-           title="Découvrez comment le convertir (ouverture dans un nouvel onglet)">
-            Découvrez comment le convertir.
-        </a>
-    </p>
-    <noscript>
-        <div class="alert alert-danger" role="status">
-            <p class="mb-0">
-                JavaScript n'est pas activé. Il est nécessaire de réactiver JavaScript pour activer la fonctionnalité envoi de CV.
-            </p>
-        </div>
-    </noscript>
+<p class="small mt-0">
+    <i class="ri-question-line mr-1"></i>
+    Ce fichier n'est pas un PDF ?
+    <a href="{{ ITOU_COMMUNITY_URL }}/doc/emplois/postuler-pour-un-candidat-prescrire/#ajouter-un-cv-a-la-candidature"
+       target="_blank"
+       rel="noopener"
+       class="matomo-event"
+       matomo-category="ajout-fichier-candidature"
+       matomo-action="clic"
+       matomo-option="clic-sur-lien-aide-pdf"
+       title="Découvrez comment le convertir (ouverture dans un nouvel onglet)">
+        Découvrez comment le convertir.
+    </a>
+</p>
+<noscript>
+    <div class="alert alert-danger" role="status">
+        <p class="mb-0">
+            JavaScript n'est pas activé. Il est nécessaire de réactiver JavaScript pour activer la fonctionnalité envoi de CV.
+        </p>
+    </div>
+</noscript>
