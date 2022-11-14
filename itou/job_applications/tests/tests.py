@@ -570,6 +570,24 @@ class JobApplicationQuerySetTest(TestCase):
         )
         self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
+    def test_eligible_job_applications_with_a_suspended_or_extended_approval_older_than_cutoff(self):
+        job_app = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            hiring_start_at=None,
+        )
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+        SuspensionFactory(
+            siae=job_app.to_siae,
+            approval=job_app.approval,
+            created_at="2001-01-01",
+        )
+        ProlongationFactory(
+            declared_by_siae=job_app.to_siae,
+            approval=job_app.approval,
+            created_at="2001-01-01",
+        )
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,

@@ -316,11 +316,23 @@ class JobApplicationQuerySet(models.QuerySet):
         return (
             self.accepted()
             .annotate(
-                has_suspension=Exists(
-                    Suspension.objects.filter(siae=OuterRef("to_siae"), approval=OuterRef("approval"))
+                has_recent_suspension=Exists(
+                    Suspension.objects.filter(
+                        siae=OuterRef("to_siae"),
+                        approval=OuterRef("approval"),
+                        # Limit to recent suspension as the older ones will already have been handled by the support.
+                        # The date was chosen arbitrarily, don't mind it too much :).
+                        created_at__gte=timezone.make_aware(datetime.datetime(2022, 1, 1)),
+                    )
                 ),
-                has_prolongation=Exists(
-                    Prolongation.objects.filter(declared_by_siae=OuterRef("to_siae"), approval=OuterRef("approval"))
+                has_recent_prolongation=Exists(
+                    Prolongation.objects.filter(
+                        declared_by_siae=OuterRef("to_siae"),
+                        approval=OuterRef("approval"),
+                        # Limit to recent prolongation as the older ones will already have been handled by the support.
+                        # The date was chosen arbitrarily, don't mind it too much :).
+                        created_at__gte=timezone.make_aware(datetime.datetime(2022, 1, 1)),
+                    )
                 ),
                 employee_record_exists=Exists(
                     EmployeeRecord.objects.filter(
@@ -330,7 +342,7 @@ class JobApplicationQuerySet(models.QuerySet):
             )
             .filter(
                 # Must be linked to an approval with a Suspension or a Prolongation
-                Q(has_suspension=True) | Q(has_prolongation=True),
+                Q(has_recent_suspension=True) | Q(has_recent_prolongation=True),
                 # Only for that SIAE
                 to_siae=siae,
                 # Hiring structure must be one of those kinds
@@ -340,9 +352,6 @@ class JobApplicationQuerySet(models.QuerySet):
                 create_employee_record=True,
                 # There must be **NO** employee record linked in this part
                 employee_record__isnull=True,
-                # Limit to recent approvals as the older ones will already have been handled by the support.
-                # The date was chosen arbitrarily, don't mind it too much :).
-                approval__created_at__gte="2022-01-01",
                 # Exclude the job application if an employee record with the same SIAE and approval already exists.
                 employee_record_exists=False,
             )
