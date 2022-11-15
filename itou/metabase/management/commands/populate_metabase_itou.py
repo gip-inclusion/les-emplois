@@ -36,6 +36,7 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMEN
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
 from itou.metabase import constants
+from itou.metabase.db import MetabaseDatabaseCursor
 from itou.metabase.management.commands import (
     _approvals,
     _insee_codes,
@@ -46,7 +47,6 @@ from itou.metabase.management.commands import (
     _rome_codes,
     _siaes,
 )
-from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_tables import (
     get_dry_table_name,
     get_new_table_name,

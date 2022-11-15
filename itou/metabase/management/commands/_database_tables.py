@@ -3,7 +3,7 @@ Helper methods for manipulating tables used by both populate_metabase_itou and p
 """
 from psycopg2 import sql
 
-from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
+from itou.metabase.db import MetabaseDatabaseCursor
 
 
 def get_new_table_name(table_name):

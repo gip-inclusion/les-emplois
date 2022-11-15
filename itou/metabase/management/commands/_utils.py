@@ -11,7 +11,7 @@ from psycopg2 import sql
 from itou.approvals.models import Approval
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
+from itou.metabase.db import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_tables import (
     get_dry_table_name,
     get_new_table_name,
