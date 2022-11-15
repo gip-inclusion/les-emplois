@@ -1,5 +1,0 @@
--r ./base.in
-
-uwsgi==2.0.20  # https://github.com/unbit/uwsgi
-sentry-sdk==1.9.0  # https://github.com/getsentry/sentry-python
-elastic-apm==6.10.1  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
