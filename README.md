@@ -9,30 +9,17 @@
 
 ### Définition des variables d'environnement
 
-Commencez par copier le gabarit du fichier de configuration Django prévu pour le
-développement :
-
-    cp config/settings/dev.py.template config/settings/dev.py
-
 Les valeurs par défaut de `dev.py` permettent de lancer un environnement fonctionnel.
 
 Cependant, il est recommandé d'en prendre connaissance pour noter par exemple
 que les emails ne sont pas réellement envoyés mais que leur contenu est
 simplement écrit dans la sortie standard.
 
-Le reste de la configuration se fait avec des variables d'environnement. Deux
-fichiers de configuration, `dev.env` et `secrets.env` doivent être créés :
+Le reste de la configuration se fait avec des variables d'environnement.
 
-    cp envs/dev.env.template envs/dev.env
-    cp envs/secrets.env.template envs/secrets.env
-
-Le fichier `dev.env` contient les variables d'environnement dont la valeur peut
-être partagée et pour lesquelles la valeur définie par défaut est viable pour un
-environnement de développement.
-
-À l'inverse, le fichier `secrets.env` regroupe les variables propres à votre
-environnement et par nature « sensible ». Ces variables n'ont donc pas de valeur
-par défaut viable et doivent donc être configurées par vos soins.
+Celles concernant notre hébergeur CleverCloud sont définis au niveau du déploiement et
+de l'app CleverCloud tandis que les autres paramètres applicatifs indépendants du PaaS
+sont définis dans le projet `itou-secrets`.
 
 ### Psycopg
 
