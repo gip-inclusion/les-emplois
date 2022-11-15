@@ -38,9 +38,9 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
             self.siae = get_current_siae_or_404(request)
 
     def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        context_data["siae"] = self.siae
-        return context_data
+        context = super().get_context_data(**kwargs)
+        context["siae"] = self.siae
+        return context
 
     # TODO(alaurent) : An Employee model linked to the siae, Approval and JobSeeker would make things easier here
     def get_job_application(self, approval):
@@ -62,15 +62,15 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
     template_name = "approvals/detail.html"
 
     def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        context_data["approval_can_be_suspended_by_siae"] = self.object.can_be_suspended_by_siae(self.siae)
-        context_data["hire_by_other_siae"] = not self.object.user.last_hire_was_made_by_siae(self.siae)
-        context_data["approval_can_be_prolonged_by_siae"] = self.object.can_be_prolonged_by_siae(self.siae)
+        context = super().get_context_data(**kwargs)
+        context["approval_can_be_suspended_by_siae"] = self.object.can_be_suspended_by_siae(self.siae)
+        context["hire_by_other_siae"] = not self.object.user.last_hire_was_made_by_siae(self.siae)
+        context["approval_can_be_prolonged_by_siae"] = self.object.can_be_prolonged_by_siae(self.siae)
         job_application = self.get_job_application(self.object)
-        context_data["job_application"] = job_application
+        context["job_application"] = job_application
         if job_application:
-            context_data["eligibility_diagnosis"] = job_application.get_eligibility_diagnosis()
-        context_data["all_job_applications"] = (
+            context["eligibility_diagnosis"] = job_application.get_eligibility_diagnosis()
+        context["all_job_applications"] = (
             JobApplication.objects.filter(
                 job_seeker=self.object.user,
                 to_siae=self.siae,
@@ -78,7 +78,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
             .select_related("sender")
             .prefetch_related("selected_jobs")
         )
-        return context_data
+        return context
 
 
 class ApprovalListView(ApprovalBaseViewMixin, ListView):
@@ -102,10 +102,10 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         return super().get_queryset().filter(*form_filters)
 
     def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        context_data["filters_form"] = self.form
-        context_data["filters_counter"] = self.form.get_filters_counter()
-        return context_data
+        context = super().get_context_data(**kwargs)
+        context["filters_form"] = self.form
+        context["filters_counter"] = self.form.get_filters_counter()
+        return context
 
 
 @login_required
