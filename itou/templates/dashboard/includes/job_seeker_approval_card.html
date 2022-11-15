@@ -1,0 +1,34 @@
+<div class="col mb-3 mb-md-5">
+    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
+        <p class="h4 card-header">Numéro d'agrément</p>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li class="card-text mb-3">
+                    {% include "approvals/includes/status.html" with common_approval=user.latest_common_approval %}
+                </li>
+                {% if user.has_common_approval_in_waiting_period %}
+                    <li class="card-text mb-3">
+                        {% if user.has_valid_diagnosis %}
+                            <p>
+                                Un prescripteur habilité a réalisé un diagnostic d'éligibilité. <b>Vous pouvez commencer un nouveau parcours.</b>
+                            </p>
+                        {% else %}
+                            <small>
+                                {% comment %}
+                                This text is a duplicata from an alert that is in the apply views. But I have rather
+                                repeating it there instead of injecting it using a context processor or template context.
+                                There is no strong reason that this test should be exactly the same as the one when an
+                                error is raised in the apply views by the way, they could evolve differently.
+                                {% endcomment %}
+                                Vous avez terminé un parcours il y a moins de deux ans.
+                                <br>
+                                Pour prétendre à nouveau à un parcours en structure d'insertion par l'activité économique vous devez rencontrer un prescripteur
+                                habilité : Pôle emploi, Mission Locale, CAP Emploi, etc.
+                            </small>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>

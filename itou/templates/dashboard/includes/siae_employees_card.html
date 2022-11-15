@@ -1,0 +1,43 @@
+<div class="col mb-3 mb-md-5">
+    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
+        <p class="h4 card-header">
+            Salariés <span class="badge badge-pill badge-sm badge-accent-02 text-primary">Nouveau</span>
+        </p>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                {% comment %}
+                NOTE(vperron):
+                We currently do not allow OPCS users to apply for an offer.
+                We will have to discuss this matter further with AVE, but it has been
+                decided that it probably did not make much sense initially.
+                {% endcomment %}
+                <li class="card-text mb-3">
+                    <i class="ri-login-box-line ri-lg mr-1"></i>
+                    <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">Déclarer une embauche</a>
+                </li>
+
+                <li class="card-text mb-3">
+                    <i class="ri-contacts-book-line ri-lg mr-1"></i>
+                    <a href="{% url 'approvals:list' %}" class="matomo-event" data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="gestion-des-salaries-et-pass-iae">
+                        Gestion des salariés et PASS IAE
+                    </a>
+                </li>
+
+                {% if can_show_employee_records %}
+                    <li class="card-text mb-3">
+                        <i class="ri-article-line ri-lg mr-1"></i>
+                        <a href="{% url 'employee_record_views:list' %}?status=NEW">Gérer mes fiches salarié (ASP)</a>
+                        {% if num_rejected_employee_records %}
+                            <span class="badge badge-pill badge-sm badge-danger">{{ num_rejected_employee_records }}</span>
+                        {% endif %}
+                    </li>
+                {% endif %}
+
+                <li class="card-text mb-3">
+                    <i class="ri-time-line ri-lg mr-1"></i>
+                    <a href="{% url 'approvals:pe_approval_search' %}">Prolonger/suspendre un agrément émis par Pôle emploi</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

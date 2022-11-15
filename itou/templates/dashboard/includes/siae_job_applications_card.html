@@ -1,0 +1,24 @@
+<div class="col mb-3 mb-md-5">
+    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
+        <p class="h4 card-header">Candidatures</p>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                {% for category in job_applications_categories %}
+                    <li class="card-text mb-3">
+                        <span class="badge badge-pill badge-sm {{ category.badge }}">{{ category.counter }}</span>
+                        <a href="{{ category.url }}">{{ category.name }}</a>
+                    </li>
+                {% endfor %}
+                <li class="card-text mb-3">
+                    <i class="ri-file-user-line ri-lg mr-1"></i>
+                    <a href="{% url 'apply:list_for_siae' %}">Voir toutes les candidatures</a>
+                </li>
+
+                <li class="card-text mb-3">
+                    <i class="ri-download-line ri-lg mr-1"></i>
+                    <a href="{% url 'apply:list_for_siae_exports' %}">Export des candidatures</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

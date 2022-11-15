@@ -1,0 +1,50 @@
+<div class="col mb-3 mb-md-5">
+
+    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
+        <p class="h4 card-header">
+            Structure
+            <span class="ml-1 badge badge-pill badge-sm badge-secondary">{{ current_siae.kind }} - ID {{ current_siae.id }}</span>
+        </p>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li class="card-text mb-3">
+                    <i class="ri-eye-line ri-lg mr-1"></i>
+                    <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">Voir la fiche publique</a>
+                </li>
+                {% if user_is_siae_admin %}
+                    <li class="card-text mb-3">
+                        <i class="ri-settings-5-line ri-lg mr-1"></i>
+                        <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}">Modifier les informations</a>
+                    </li>
+                {% endif %}
+                <li class="card-text mb-3">
+                    <i class="ri-briefcase-line ri-lg mr-1"></i>
+                    <a class="title-with-badge" href="{% url 'siaes_views:job_description_list' %}" title="Gérer les métiers et recrutements">
+                        Gérer les métiers et recrutements
+                    </a>
+                </li>
+                {% if current_siae.is_active %}
+                    <li class="card-text mb-3">
+                        <i class="ri-team-line ri-lg mr-1"></i>
+                        <a href="{% url 'siaes_views:members' %}">Gérer des collaborateurs</a>
+                    </li>
+                {% endif %}
+                {% if can_create_siae_antenna %}
+                    <li class="card-text mb-3">
+                        <i class="ri-add-box-line ri-lg mr-1"></i>
+                        <a href="{% url 'siaes_views:create_siae' %}">Créer/rejoindre une autre structure</a>
+                    </li>
+                {% endif %}
+                {% if can_show_financial_annexes %}
+                    <li class="card-text mb-3">
+                        <i class="ri-folder-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'siaes_views:show_financial_annexes' %}">Mes annexes financières</a>
+                        {% if not current_siae.is_active %}
+                            <span class="badge badge-pill badge-sm badge-danger">Action requise</span>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>

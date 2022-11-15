@@ -1,0 +1,13 @@
+<div class="col mb-3 mb-md-5">
+    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
+        <p class="h4 card-header">
+            Organisation <span class="ml-1 badge badge-pill badge-sm badge-secondary">{{ current_institution.kind }} - ID {{ current_institution.id }}</span>
+        </p>
+        <div class="card-body">
+            <p class="card-text">
+                <i class="ri-group-line ri-lg mr-1"></i>
+                <a href="{% url 'institutions_views:members' %}">Gérer vos collaborateurs</a>
+            </p>
+        </div>
+    </div>
+</div>
