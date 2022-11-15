@@ -27,6 +27,18 @@ jobs:
           --health-retries 5
 
     steps:
+    - name: 🐘 Non-durable PostgreSQL
+      run: |
+        psql <<SQL
+          ALTER SYSTEM SET fsync=off;
+          ALTER SYSTEM SET synchronous_commit=off;
+          ALTER SYSTEM SET full_page_writes=off;
+        SQL
+        docker kill --signal=SIGHUP ${{ job.services.postgres.id }}
+      env:
+        PGPASSWORD: password
+        PGHOST: localhost
+        PGUSER: postgres
     - uses: actions/checkout@v3
     - name: 🌍 Install spatial libraries
       run: sudo apt-get update && sudo apt-get install binutils build-essential libproj-dev gdal-bin
