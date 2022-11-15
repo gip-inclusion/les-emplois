@@ -414,18 +414,18 @@ METABASE_HASH_SALT = os.getenv("METABASE_HASH_SALT")
 ASP_ITOU_PREFIX = "99999"
 
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(
-    os.environ.get("PILOTAGE_DASHBOARDS_WHITELIST", "[63, 90, 32, 52, 54, 116, 43, 136, 140, 129, 150]")
+    os.getenv("PILOTAGE_DASHBOARDS_WHITELIST", "[63, 90, 32, 52, 54, 116, 43, 136, 140, 129, 150]")
 )
 
 # Only ACIs given by Convergence France may access some contracts
-ACI_CONVERGENCE_SIRET_WHITELIST = json.loads(os.environ.get("ACI_CONVERGENCE_SIRET_WHITELIST", "[]"))
+ACI_CONVERGENCE_SIRET_WHITELIST = json.loads(os.getenv("ACI_CONVERGENCE_SIRET_WHITELIST", "[]"))
 
 # Specific stats are progressively being deployed to more and more departments and specific users.
 # Kept as a setting to not let User PKs in clear in the code.
 STATS_SIAE_USER_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 
 # Slack notifications sent by Metabase cronjobs.
-SLACK_CRON_WEBHOOK_URL = os.environ.get("SLACK_CRON_WEBHOOK_URL")
+SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
 REDIS_URL = os.getenv("REDIS_URL")  # pay attention, prod & staging share the same redis but != DB
 REDIS_DB = os.getenv("REDIS_DB")
