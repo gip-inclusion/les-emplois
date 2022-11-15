@@ -3,7 +3,7 @@
 {% load format_filters %}
 
 {% block title %}
-    Attestation de délivrance d'agrément pour {{ job_seeker.get_full_name|title }}.
+    Attestation de délivrance d'agrément pour {{ approval.user.get_full_name|title }}.
     {{ block.super }}
 {% endblock %}
 
@@ -47,8 +47,8 @@
 
             <span class="d-block">délivré par les emplois de l'inclusion</span>
 
-            {% if job_seeker.pole_emploi_id %}
-                <span class="d-block">Identifiant Pôle emploi : {{ job_seeker.pole_emploi_id }}</span>
+            {% if approval.user.pole_emploi_id %}
+                <span class="d-block">Identifiant Pôle emploi : {{ approval.user.pole_emploi_id }}</span>
             {% endif %}
 
         </section>
@@ -72,7 +72,7 @@
 
                 {% endif %}
 
-                la situation sociale et professionnelle de {{ job_seeker.get_full_name|title }}
+                la situation sociale et professionnelle de {{ approval.user.get_full_name|title }}
                 et de votre promesse d'embauche, les emplois de l'inclusion vous délivrent
                 un PASS IAE pour un parcours d'insertion par l'activité économique,
                 conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail.
