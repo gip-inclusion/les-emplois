@@ -1,0 +1,28 @@
+<div class="col mb-3 mb-md-5">
+    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
+        <p class="h4 card-header">
+            Contrôle a posteriori <span class="badge badge-pill badge-sm badge-accent-02 text-primary">Nouveau</span>
+        </p>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                {% for evaluated_siae in active_campaigns %}
+                    <li class="card-text mb-3">
+                        <i class="ri-file-copy-2-line ri-lg mr-1"></i>
+                        <a href="{% url 'siae_evaluations_views:siae_job_applications_list' evaluated_siae.pk %}">
+                            Justifier mes auto-prescriptions
+                        </a>
+                        {# note vincentporte: static icon, will be displayed dynamically later.#}
+                        <i class="ri-error-warning-fill ri-lg mr-1 text-danger"></i>
+                    </li>
+                {% endfor %}
+                {% for evaluated_siae in evaluated_siae_notifications %}
+                    <li class="card-text mb-3">
+                        <a href="{% url "siae_evaluations_views:siae_sanction" evaluated_siae.pk %}">
+                            Voir le résultat du contrôle “{{ evaluated_siae.evaluation_campaign.name }}”
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>

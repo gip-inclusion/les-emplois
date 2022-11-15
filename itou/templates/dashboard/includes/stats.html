@@ -1,0 +1,81 @@
+<div class="col mb-3 mb-md-5">
+    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
+        <p class="h4 card-header">Statistiques et pilotage</p>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                {% if can_view_stats_siae_etp %}
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_siae_etp' %}">Voir les données de ma structure (extranet ASP)</a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_siae_hiring %}
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_siae_hiring' %}">Voir les données de recrutement de mes structures (Plateforme de l'inclusion)</a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_cd %}
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_cd' %}">Voir les données IAE de mon département</a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_pe %}
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_pe_delay_main' %}">Voir les données du délai d'entrée en IAE</a>
+                    </li>
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_pe_conversion_main' %}">Voir les données du taux de transformation</a>
+                    </li>
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_pe_state_main' %}">Voir les données de l’état des candidatures orientées</a>
+                    </li>
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_pe_tension' %}">Voir les données des fiches de poste en tension</a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_ddets %}
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_ddets_iae' %}">Voir les données IAE de mon département</a>
+                    </li>
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_ddets_hiring' %}">Voir les données facilitation de l'embauche</a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_dreets %}
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_dreets_iae' %}">Voir les données IAE de ma région</a>
+                    </li>
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_dreets_hiring' %}">Voir les données facilitation de l'embauche</a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_dgefp %}
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_dgefp_iae' %}">Voir les données IAE France entière</a>
+                    </li>
+                    <li class="card-text mb-3">
+                        <i class="ri-line-chart-line ri-lg mr-1"></i>
+                        <a href="{% url 'stats:stats_dgefp_diagnosis_control' %}">Voir les données du contrôle a posteriori (version bêta)</a>
+                    </li>
+                {% endif %}
+                <li class="card-text mb-3">
+                    <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" title="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)">
+                        Accéder aux tableaux de bord publics
+                    </a>
+                    <i class="ri-external-link-line ri-lg mr-1"></i>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
