@@ -181,30 +181,18 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         employee_record.refresh_from_db()
         self.assertEqual(employee_record.status, Status.READY)
 
-    @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_archive_employee_records(self, _mock):
+    def test_archive_employee_records(self):
         """
         Check archiving old processed employee records
         """
-        # Create an old PROCESSED employee record
-        filename = "RIAE_FS_20210819100001.json"
-        self.employee_record.update_as_sent(filename, 1)
-        process_code, process_message = (
-            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
-            "La ligne de la fiche salarié a été enregistrée avec succès.",
-        )
-        self.employee_record.update_as_processed(process_code, process_message, "{}")
 
         # Fake a date older than archiving delay
+        self.employee_record.status = Status.PROCESSED
         self.employee_record.processed_at = timezone.now() - timezone.timedelta(
             days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
         )
+        self.employee_record.save()
 
-        self.employee_record.update_as_archived()
         self.call_command(archive=True)
         self.employee_record.refresh_from_db()
 

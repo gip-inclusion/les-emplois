@@ -322,35 +322,33 @@ class Command(EmployeeRecordTransferCommand):
         archive=False,
         **_,
     ):
-        if not settings.ASP_FS_SFTP_HOST:
-            self.stdout.write("Your environment is missing ASP_FS_SFTP_HOST to run this command.")
-            return
-
         if preflight:
             self.stdout.write("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecord)
-            # No other operations are allowed after a preflight
-            return
-
-        self.asp_test = asp_test
-
-        if self.asp_test:
-            self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
-
-        with self.get_sftp_connection() as sftp:
-            user = settings.ASP_FS_SFTP_USER
-            self.stdout.write(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}")
-            self.stdout.write(f"Current dir: {sftp.pwd}")
-
-            # Send files
-            if upload:
-                self.upload(sftp, dry_run)
-
-            # Fetch results from ASP
-            if download:
-                self.download(sftp, dry_run)
-
-        if archive:
+        elif archive:
             self.archive(dry_run)
+        elif upload or download:
+            if not settings.ASP_FS_SFTP_HOST:
+                self.stdout.write("Your environment is missing ASP_FS_SFTP_HOST to run this command.")
+                return
 
-        self.stdout.write("Employee records processing done")
+            self.asp_test = asp_test
+            if asp_test:
+                self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
+
+            with self.get_sftp_connection() as sftp:
+                user = settings.ASP_FS_SFTP_USER
+                self.stdout.write(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}")
+                self.stdout.write(f"Current dir: {sftp.pwd}")
+
+                # Send files
+                if upload:
+                    self.upload(sftp, dry_run)
+
+                # Fetch results from ASP
+                if download:
+                    self.download(sftp, dry_run)
+
+            self.stdout.write("Employee records processing done")
+        else:
+            self.stdout.write("No valid options (upload, download, archive or preflight) were given")
