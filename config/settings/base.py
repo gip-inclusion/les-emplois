@@ -324,6 +324,7 @@ ITOU_ENVIRONMENT = os.getenv("ITOU_ENVIRONMENT", "PROD")
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = os.getenv("ITOU_FQDN", "emplois.inclusion.beta.gouv.fr")
 ITOU_EMAIL_CONTACT = os.getenv("ITOU_EMAIL_CONTACT", "assistance@inclusion.beta.gouv.fr")
+API_EMAIL_CONTACT = os.getenv("API_EMAIL_CONTACT", "api@inclusion.beta.gouv.fr")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gouv.fr")
 
 

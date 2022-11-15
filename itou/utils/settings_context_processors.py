@@ -22,6 +22,7 @@ def expose_settings(request):
 
     return {
         "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
+        "API_EMAIL_CONTACT": settings.API_EMAIL_CONTACT,
         "BASE_TEMPLATE": base_template,
         "ITOU_ASSISTANCE_URL": assistance_url,
         "ITOU_COMMUNITY_URL": global_constants.ITOU_COMMUNITY_URL,
