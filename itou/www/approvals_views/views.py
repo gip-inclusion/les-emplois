@@ -6,7 +6,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, TemplateView
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.job_applications.enums import SenderKind
@@ -108,65 +108,60 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         return context
 
 
-@login_required
-def display_printable_approval(request, approval_id, template_name="approvals/printable_approval.html"):
-    siae = get_current_siae_or_404(request)
+class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
+    template_name = "approvals/printable_approval.html"
 
-    queryset = Approval.objects.select_related("user")
-    approval = get_object_or_404(queryset, pk=approval_id)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    job_applications_queryset = JobApplication.objects.select_related("eligibility_diagnosis")
-    job_application = get_object_or_404(
-        job_applications_queryset,
-        job_seeker=approval.user,
-        state=JobApplicationWorkflow.STATE_ACCEPTED,
-        to_siae=siae,
-        approval=approval,
-    )
+        queryset = Approval.objects.select_related("user")
+        approval = get_object_or_404(queryset, pk=self.kwargs["approval_id"])
 
-    # TODO(alaurent) We could probably just use "if not siae.is_subject_to_eligibility_rules"
-    # Fix this when refactoring the database
-    if not job_application.can_display_approval:
-        # Message only visible in DEBUG
-        raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
+        job_application = self.get_job_application(approval)
 
-    diagnosis = job_application.get_eligibility_diagnosis()
-    diagnosis_author = None
-    diagnosis_author_org = None
-    diagnosis_author_org_name = None
+        # TODO(alaurent) We could probably just use "if not siae.is_subject_to_eligibility_rules"
+        # Fix this when refactoring the database
+        if not job_application.can_display_approval:
+            # Message only visible in DEBUG
+            raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
 
-    if diagnosis:
-        diagnosis_author = diagnosis.author.get_full_name()
-        diagnosis_author_org = diagnosis.author_prescriber_organization or diagnosis.author_siae
-        if diagnosis_author_org:
-            diagnosis_author_org_name = diagnosis_author_org.display_name
+        diagnosis = job_application.get_eligibility_diagnosis()
+        diagnosis_author = None
+        diagnosis_author_org = None
+        diagnosis_author_org_name = None
 
-    if not diagnosis and approval.originates_from_itou:
-        # On November 30th, 2021, AI were delivered a PASS IAE
-        # without a diagnosis for all of their employees.
-        # We want to raise an error if the approval of the pass originates from our side, but
-        # is not from the AI stock, as it should not happen.
-        # We may have to add conditions there in case of new mass imports.
-        if not approval.is_from_ai_stock:
-            # Keep track of job applications without a proper eligibility diagnosis because
-            # it shouldn't happen.
-            # If this occurs too much we may have to change `can_display_approval()`
-            # and investigate a lot more about what's going on.
-            # See also migration `0035_link_diagnoses.py`.
-            raise Exception(
-                f"Job application={job_application.pk} comes from itou, "
-                "had no eligibility diagnosis and also was not mass-imported."
-            )
+        if diagnosis:
+            diagnosis_author = diagnosis.author.get_full_name()
+            diagnosis_author_org = diagnosis.author_prescriber_organization or diagnosis.author_siae
+            if diagnosis_author_org:
+                diagnosis_author_org_name = diagnosis_author_org.display_name
 
-    context = {
-        "approval": approval,
-        "itou_assistance_url": global_constants.ITOU_ASSISTANCE_URL,
-        "diagnosis_author": diagnosis_author,
-        "diagnosis_author_org_name": diagnosis_author_org_name,
-        "siae": siae,
-        "job_seeker": approval.user,
-    }
-    return render(request, template_name, context)
+        if not diagnosis and approval.originates_from_itou:
+            # On November 30th, 2021, AI were delivered a PASS IAE
+            # without a diagnosis for all of their employees.
+            # We want to raise an error if the approval of the pass originates from our side, but
+            # is not from the AI stock, as it should not happen.
+            # We may have to add conditions there in case of new mass imports.
+            if not approval.is_from_ai_stock:
+                # Keep track of job applications without a proper eligibility diagnosis because
+                # it shouldn't happen.
+                # If this occurs too much we may have to change `can_display_approval()`
+                # and investigate a lot more about what's going on.
+                # See also migration `0035_link_diagnoses.py`.
+                raise Exception(
+                    f"Job application={job_application.pk} comes from itou, "
+                    "had no eligibility diagnosis and also was not mass-imported."
+                )
+
+        context.update(
+            {
+                "approval": approval,
+                "itou_assistance_url": global_constants.ITOU_ASSISTANCE_URL,
+                "diagnosis_author": diagnosis_author,
+                "diagnosis_author_org_name": diagnosis_author_org_name,
+            }
+        )
+        return context
 
 
 @login_required
