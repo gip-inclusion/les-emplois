@@ -314,8 +314,8 @@ class Command(EmployeeRecordTransferCommand):
 
     def handle(
         self,
-        upload=True,
-        download=True,
+        upload=False,
+        download=False,
         preflight=False,
         dry_run=False,
         asp_test=False,
