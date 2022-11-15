@@ -282,22 +282,20 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
 
     def test_authorize_endpoint(self):
         url = reverse("inclusion_connect:authorize")
-        with self.assertRaises(KeyError):
-            response = self.client.get(url, follow=False)
+        response = self.client.get(url, follow=False)
+        self.assertRedirects(response, reverse("home:hp"))
 
         url = f"{reverse('inclusion_connect:authorize')}?user_kind={KIND_PRESCRIBER}"
-        # Don't use assertRedirects to avoid fetching the last URL.
         response = self.client.get(url, follow=False)
         self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
         self.assertIn(constants.INCLUSION_CONNECT_SESSION_KEY, self.client.session)
 
     def test_authorize_endpoint_for_registration(self):
         url = reverse("inclusion_connect:authorize")
-        with self.assertRaises(KeyError):
-            response = self.client.get(url, follow=False)
+        response = self.client.get(url, follow=False)
+        self.assertRedirects(response, reverse("home:hp"))
 
         url = f"{reverse('inclusion_connect:authorize')}?user_kind={KIND_PRESCRIBER}&register=true"
-        # Don't use assertRedirects to avoid fetching the last URL.
         response = self.client.get(url, follow=False)
         self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_REGISTER))
         self.assertIn(constants.INCLUSION_CONNECT_SESSION_KEY, self.client.session)

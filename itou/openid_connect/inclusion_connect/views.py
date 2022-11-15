@@ -59,7 +59,7 @@ def _redirect_to_login_page_on_error(error_msg, request=None):
     if request:
         messages.error(request, "Une erreur technique est survenue. Merci de recommencer.")
     logger.error(error_msg)
-    return HttpResponseRedirect(reverse("login:job_seeker"))
+    return HttpResponseRedirect(reverse("home:hp"))
 
 
 def inclusion_connect_authorize(request):
@@ -68,7 +68,7 @@ def inclusion_connect_authorize(request):
     previous_url = request.GET.get("previous_url", reverse("home:hp"))
     next_url = request.GET.get("next_url")
     if not user_kind:
-        raise KeyError("User kind missing.")
+        return _redirect_to_login_page_on_error(error_msg="User kind missing.")
 
     ic_session = InclusionConnectSession(user_kind=user_kind, previous_url=previous_url, next_url=next_url)
     request = ic_session.bind_to_request(request)
@@ -89,7 +89,7 @@ def inclusion_connect_authorize(request):
     channel = request.GET.get("channel")
     if login_hint:
         if not channel:
-            raise KeyError("channel is missing when login_hint is present.")
+            return _redirect_to_login_page_on_error(error_msg="channel is missing when login_hint is present.")
         data["login_hint"] = login_hint
         ic_session["user_email"] = login_hint
         ic_session["channel"] = channel
