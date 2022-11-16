@@ -236,7 +236,7 @@ class SearchJobDescriptionTest(TestCase):
         city = create_city_saint_andre()
         SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.AI)
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.AI]})
+        response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.AI, SiaeKind.ETTI]})
         self.assertContains(response, "(1 résultat)")
 
         response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.EI]})
