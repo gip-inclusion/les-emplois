@@ -29,7 +29,7 @@ class ExportPEApiRejectionsTestCase(TestCase):
         stdout = io.StringIO()
         management.call_command("export_pe_api_rejections", stdout=stdout, stderr=io.StringIO())
         self.assertEqual(
-            stdout.getvalue(),
+            open("exports/2022-09-13-00-00-00-export_pe_api_rejections.csv").read(),
             "\n".join(
                 [
                     ",".join(
