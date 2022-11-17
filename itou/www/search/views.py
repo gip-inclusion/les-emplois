@@ -50,7 +50,7 @@ class EmployerSearchBaseView(FormView):
         job_descriptions = (
             SiaeJobDescription.objects.active()
             .within(city.coords, distance)
-            .select_related("location")
+            .select_related("siae", "location")
             .exclude(siae__block_job_applications=True)
             .annotate(
                 distance=Case(

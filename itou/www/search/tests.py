@@ -217,8 +217,7 @@ class JobDescriptionSearchViewTest(TestCase):
             1  # select the city
             + 1  # fetch initial job descriptions to add to the form fields
             + 2  # count the number of results for siaes & job descriptions
-            + 1  # select the job descriptions pager
-            + 1  # prefetch active job descriptions
+            + 1  # select the job descriptions for the page
             + NUM_CSRF_SESSION_REQUESTS
         ):
             response = self.client.get(self.url, {"city": city_slug})
