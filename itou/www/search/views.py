@@ -59,6 +59,9 @@ class EmployerSearchBaseView(FormView):
                 )
             )
         )
+
+        self.add_form_choices(form, siaes, job_descriptions)
+
         if kinds:
             siaes = siaes.filter(kind__in=kinds)
             job_descriptions = job_descriptions.filter(siae__kind__in=kinds)
@@ -78,8 +81,6 @@ class EmployerSearchBaseView(FormView):
 
         if districts:
             siaes = siaes.filter(post_code__in=districts)
-
-        self.add_form_choices(form, siaes, job_descriptions)
 
         context.update(
             {

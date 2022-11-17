@@ -294,6 +294,7 @@ class SearchJobDescriptionTest(TestCase):
         self.assertContains(response, "2 résultats")
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
+        self.assertContains(response, "56 - Morbihan")  # the other department is still visible in the filters
 
         # 100 km and 56
         response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
