@@ -290,7 +290,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(
             response,
             "Contrôle a posteriori "
-            '<span class="badge badge-pill badge-sm badge-important text-primary">Nouveau</span>',
+            '<span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>',
             count=1,
         )
         self.assertContains(
