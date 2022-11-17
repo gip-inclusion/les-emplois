@@ -31,7 +31,7 @@ run:
 
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 	$(PYTHON_VERSION) -m venv $@
-	$@/bin/pip install -r $^
+	$@/bin/pip install --use-pep517 -r $^
 ifeq ($(shell uname -s),Linux)
 	$@/bin/pip-sync $^
 endif
