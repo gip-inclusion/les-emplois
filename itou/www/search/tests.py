@@ -9,7 +9,7 @@ from itou.job_applications.factories import JobApplicationFactory
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberOrganizationFactory
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.www.testing import NUM_CSRF_SESSION_REQUESTS
 
@@ -355,3 +355,56 @@ class JobDescriptionSearchViewTest(TestCase):
         SiaeJobDescriptionFactory(siae=siae)
         response = self.client.get(self.url, {"city": st_andre.slug})
         assert response.status_code == 200
+
+    def test_contract_type(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        city = create_city_saint_andre()
+        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
+        job1 = SiaeJobDescriptionFactory(siae=siae, contract_type=ContractType.APPRENTICESHIP)
+        job2 = SiaeJobDescriptionFactory(siae=siae, contract_type=ContractType.BUSINESS_CREATION)
+
+        inactive_siae = SiaeFactory(
+            department="45", coords=city.coords, post_code="44117", kind=SiaeKind.EI, convention=None
+        )
+        job3 = SiaeJobDescriptionFactory(siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP)
+
+        # no filter: returns everything.
+        response = self.client.get(
+            self.url,
+            {"city": city.slug},
+        )
+        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, capfirst(job1.display_name), html=True)
+        self.assertContains(response, capfirst(job2.display_name), html=True)
+        self.assertNotContains(response, capfirst(job3.display_name), html=True)
+
+        # pass both contract types, should have the same result.
+        response = self.client.get(
+            self.url,
+            {"city": city.slug, "contract_types": [ContractType.APPRENTICESHIP, ContractType.BUSINESS_CREATION]},
+        )
+        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, capfirst(job1.display_name), html=True)
+        self.assertContains(response, capfirst(job2.display_name), html=True)
+        self.assertNotContains(response, capfirst(job3.display_name), html=True)
+
+        # filter it down.
+        response = self.client.get(
+            self.url,
+            {"city": city.slug, "contract_types": [ContractType.APPRENTICESHIP]},
+        )
+        with open("x.html", "w", encoding="utf-8") as f:
+            f.write(response.content.decode("utf-8"))
+        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, capfirst(job1.display_name), html=True)
+        self.assertNotContains(response, capfirst(job2.display_name), html=True)
+        self.assertNotContains(response, capfirst(job3.display_name), html=True)
+
+        response = self.client.get(
+            self.url,
+            {"city": city.slug, "contract_types": [ContractType.OTHER]},
+        )
+        self.assertContains(response, "Aucun résultat")
+        self.assertNotContains(response, capfirst(job1.display_name), html=True)
+        self.assertNotContains(response, capfirst(job2.display_name), html=True)
+        self.assertNotContains(response, capfirst(job3.display_name), html=True)

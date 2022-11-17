@@ -11,7 +11,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.utils.pagination import pager
-from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
+from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
 
 
 class EmployerSearchBaseView(FormView):
@@ -34,11 +34,15 @@ class EmployerSearchBaseView(FormView):
         city = form.cleaned_data["city"]
         distance = form.cleaned_data["distance"]
         kinds = form.cleaned_data["kinds"]
+        # in the case of SIAEs, keep the filter from the URL if present.
+        # this enables not losing the count while changing tabs.
+        contract_types = form.cleaned_data.get("contract_types", self.request.GET.getlist("contract_types", []))
         context = {
             "form": form,
             "city": city,
             "distance": distance,
             "kinds_query": urlencode({"kinds": kinds}, doseq=True),
+            "contract_types_query": urlencode({"contract_types": contract_types}, doseq=True),
             "ea_eatt_kinds": [SiaeKind.EA, SiaeKind.EATT],
         }
 
@@ -65,6 +69,9 @@ class EmployerSearchBaseView(FormView):
         if kinds:
             siaes = siaes.filter(kind__in=kinds)
             job_descriptions = job_descriptions.filter(siae__kind__in=kinds)
+
+        if contract_types:
+            job_descriptions = job_descriptions.filter(contract_type__in=contract_types)
 
         departments = self.request.GET.getlist("departments")
 
@@ -159,6 +166,9 @@ class EmployerSearchView(EmployerSearchBaseView):
 
 
 class JobDescriptionSearchView(EmployerSearchBaseView):
+
+    form_class = JobDescriptionSearchForm
+
     def add_form_choices(self, form, _siaes, job_descriptions):
         departments = set()
         for job_description in job_descriptions:

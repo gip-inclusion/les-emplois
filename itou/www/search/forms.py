@@ -4,7 +4,7 @@ from django.utils.datastructures import MultiValueDict
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import ContractType, SiaeKind
 
 
 class SiaeSearchForm(forms.Form):
@@ -90,6 +90,25 @@ class SiaeSearchForm(forms.Form):
             choices=choices,
             widget=forms.CheckboxSelectMultiple(),
         )
+
+
+class JobDescriptionSearchForm(SiaeSearchForm):
+
+    CONTRACT_TYPE_CHOICES = sorted(
+        [(k, v) for k, v in ContractType.choices if k not in (ContractType.OTHER, ContractType.BUSINESS_CREATION)],
+        key=lambda d: d[1],
+    ) + [
+        (ContractType.BUSINESS_CREATION, ContractType.BUSINESS_CREATION.label),
+        (ContractType.OTHER, ContractType.OTHER.label),
+        ("", "Contrat non précisé"),
+    ]
+
+    contract_types = forms.MultipleChoiceField(
+        label="Types de contrats",
+        choices=CONTRACT_TYPE_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
 
 
 class PrescriberSearchForm(forms.Form):
