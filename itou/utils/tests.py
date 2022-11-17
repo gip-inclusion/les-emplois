@@ -373,7 +373,7 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_birthdate, datetime.date(1899, 12, 31))
         validate_birthdate(datetime.date(1900, 1, 1))
         # Max.
-        max_date = datetime.datetime.now().date() - relativedelta(years=16)
+        max_date = timezone.localdate() - relativedelta(years=16)
         self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=1))
         self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=365))
         self.assertRaises(ValidationError, validate_birthdate, max_date)
@@ -1239,7 +1239,7 @@ class SupportRemarkAdminViewsTest(TestCase):
         user = UserFactory()
         self.client.force_login(user)
 
-        today = timezone.now().date()
+        today = timezone.localdate()
         job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         approval = job_app.approval
 

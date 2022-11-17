@@ -190,7 +190,7 @@ class SuspensionForm(forms.ModelForm):
         # with `set_default_end_date` input
         self.fields["end_at"].required = False
 
-        today = timezone.now().date()
+        today = timezone.localdate()
         if self.instance.pk:
             referent_date = self.instance.created_at.date()
             suspension_pk = self.instance.pk

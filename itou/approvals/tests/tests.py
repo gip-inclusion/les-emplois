@@ -39,11 +39,11 @@ from itou.utils import constants as global_constants
 
 class CommonApprovalQuerySetTest(TestCase):
     def test_valid_for_pole_emploi_approval_model(self):
-        start_at = timezone.now().date() - relativedelta(years=1)
+        start_at = timezone.localdate() - relativedelta(years=1)
         end_at = start_at + relativedelta(years=1)
         PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
 
-        start_at = timezone.now().date() - relativedelta(years=5)
+        start_at = timezone.localdate() - relativedelta(years=5)
         end_at = start_at + relativedelta(years=2)
         PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
 
@@ -51,11 +51,11 @@ class CommonApprovalQuerySetTest(TestCase):
         self.assertEqual(1, PoleEmploiApproval.objects.valid().count())
 
     def test_valid_for_approval_model(self):
-        start_at = timezone.now().date() - relativedelta(years=1)
+        start_at = timezone.localdate() - relativedelta(years=1)
         end_at = start_at + relativedelta(years=1)
         ApprovalFactory(start_at=start_at, end_at=end_at)
 
-        start_at = timezone.now().date() - relativedelta(years=5)
+        start_at = timezone.localdate() - relativedelta(years=5)
         end_at = start_at + relativedelta(years=2)
         ApprovalFactory(start_at=start_at, end_at=end_at)
 
@@ -65,31 +65,31 @@ class CommonApprovalQuerySetTest(TestCase):
     def test_valid(self):
 
         # Start today, end in 2 years.
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
 
         # End today.
-        end_at = timezone.now().date()
+        end_at = timezone.localdate()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
 
         # Ended 1 year ago.
-        end_at = timezone.now().date() - relativedelta(years=1)
+        end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(Approval.objects.filter(id=approval.id).valid().exists())
 
         # Ended yesterday.
-        end_at = timezone.now().date() - relativedelta(days=1)
+        end_at = timezone.localdate() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(Approval.objects.filter(id=approval.id).valid().exists())
 
         # In the future.
-        start_at = timezone.now().date() + relativedelta(years=2)
+        start_at = timezone.localdate() + relativedelta(years=2)
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
@@ -113,15 +113,15 @@ class CommonApprovalQuerySetTest(TestCase):
         self.assertFalse(approval.can_be_deleted)
 
     def test_starts_date_filters_for_approval_model(self):
-        start_at = timezone.now().date() - relativedelta(years=1)
+        start_at = timezone.localdate() - relativedelta(years=1)
         end_at = start_at + relativedelta(years=1)
         approval_past = ApprovalFactory(start_at=start_at, end_at=end_at)
 
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
         end_at = start_at + relativedelta(years=2)
         approval_today = ApprovalFactory(start_at=start_at, end_at=end_at)
 
-        start_at = timezone.now().date() + relativedelta(years=2)
+        start_at = timezone.localdate() + relativedelta(years=2)
         end_at = start_at + relativedelta(years=2)
         approval_future = ApprovalFactory(start_at=start_at, end_at=end_at)
 
@@ -140,35 +140,35 @@ class CommonApprovalMixinTest(TestCase):
         self.assertEqual(approval.waiting_period_end, expected)
 
     def test_is_in_progress(self):
-        start_at = timezone.now().date() - relativedelta(days=10)
+        start_at = timezone.localdate() - relativedelta(days=10)
         approval = ApprovalFactory(start_at=start_at)
         self.assertTrue(approval.is_in_progress)
 
     def test_waiting_period(self):
 
         # End is tomorrow.
-        end_at = timezone.now().date() + relativedelta(days=1)
+        end_at = timezone.localdate() + relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid())
         self.assertFalse(approval.is_in_waiting_period)
 
         # End is today.
-        end_at = timezone.now().date()
+        end_at = timezone.localdate()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid())
         self.assertFalse(approval.is_in_waiting_period)
 
         # End is yesterday.
-        end_at = timezone.now().date() - relativedelta(days=1)
+        end_at = timezone.localdate() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid())
         self.assertTrue(approval.is_in_waiting_period)
 
         # Ended since more than WAITING_PERIOD_YEARS.
-        end_at = timezone.now().date() - relativedelta(years=Approval.WAITING_PERIOD_YEARS, days=1)
+        end_at = timezone.localdate() - relativedelta(years=Approval.WAITING_PERIOD_YEARS, days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid())
@@ -193,8 +193,8 @@ class CommonApprovalMixinTest(TestCase):
 class ApprovalModelTest(TestCase):
     def test_clean(self):
         approval = ApprovalFactory()
-        approval.start_at = timezone.now().date()
-        approval.end_at = timezone.now().date() - datetime.timedelta(days=365 * 2)
+        approval.start_at = timezone.localdate()
+        approval.end_at = timezone.localdate() - datetime.timedelta(days=365 * 2)
         with self.assertRaises(ValidationError):
             approval.save()
 
@@ -243,25 +243,25 @@ class ApprovalModelTest(TestCase):
     def test_is_valid(self):
 
         # Start today, end in 2 years.
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid())
 
         # End today.
-        end_at = timezone.now().date()
+        end_at = timezone.localdate()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid())
 
         # Ended 1 year ago.
-        end_at = timezone.now().date() - relativedelta(years=1)
+        end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid())
 
         # Ended yesterday.
-        end_at = timezone.now().date() - relativedelta(days=1)
+        end_at = timezone.localdate() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid())
@@ -277,12 +277,12 @@ class ApprovalModelTest(TestCase):
         user = JobSeekerFactory()
 
         # Ended 1 year ago.
-        end_at = timezone.now().date() - relativedelta(years=1)
+        end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval1 = ApprovalFactory(start_at=start_at, end_at=end_at, user=user)
 
         # Start today, end in 2 years.
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
         end_at = start_at + relativedelta(years=2)
         approval2 = ApprovalFactory(start_at=start_at, end_at=end_at, user=user)
 
@@ -340,7 +340,7 @@ class ApprovalModelTest(TestCase):
         # With an existing valid `Approval`.
 
         user = JobSeekerFactory()
-        valid_approval = ApprovalFactory(user=user, start_at=timezone.now().date() - relativedelta(days=1))
+        valid_approval = ApprovalFactory(user=user, start_at=timezone.localdate() - relativedelta(days=1))
         approval = user.get_or_create_approval()
         self.assertTrue(isinstance(approval, Approval))
         self.assertEqual(approval, valid_approval)
@@ -359,7 +359,7 @@ class ApprovalModelTest(TestCase):
         self.assertTrue(approval.is_from_ai_stock)
 
     def test_is_open_to_application_process_with_suspension(self):
-        today = timezone.now().date()
+        today = timezone.localdate()
         approval_start_at = today - relativedelta(months=3)
         reasons_to_not_open_process = [
             reason.value for reason in Suspension.Reason if reason.value not in Suspension.REASONS_ALLOWING_UNSUSPEND
@@ -391,13 +391,13 @@ class ApprovalModelTest(TestCase):
             approval.delete()
 
     def test_can_be_unsuspended_without_suspension(self):
-        today = timezone.now().date()
+        today = timezone.localdate()
         approval_start_at = today - relativedelta(months=3)
         approval = ApprovalFactory(start_at=approval_start_at)
         self.assertFalse(approval.can_be_unsuspended)
 
     def test_last_in_progress_suspension(self):
-        today = timezone.now().date()
+        today = timezone.localdate()
         approval_start_at = today - relativedelta(months=3)
         approval = ApprovalFactory(start_at=approval_start_at)
         SuspensionFactory(
@@ -414,7 +414,7 @@ class ApprovalModelTest(TestCase):
         self.assertEqual(suspension.pk, approval.last_in_progress_suspension.pk)
 
     def test_last_in_progress_without_suspension_in_progress(self):
-        today = timezone.now().date()
+        today = timezone.localdate()
         approval_start_at = today - relativedelta(months=3)
         approval = ApprovalFactory(start_at=approval_start_at)
         SuspensionFactory(
@@ -426,7 +426,7 @@ class ApprovalModelTest(TestCase):
 
     @freeze_time("2022-09-17")
     def test_unsuspend_valid(self):
-        today = timezone.now().date()
+        today = timezone.localdate()
         approval_start_at = datetime.date(2022, 6, 17)
         suspension_start_date = datetime.date(2022, 7, 17)
         suspension_end_date = datetime.date(2022, 12, 17)
@@ -452,7 +452,7 @@ class ApprovalModelTest(TestCase):
 
     @freeze_time("2022-09-17")
     def test_unsuspend_invalid(self):
-        today = timezone.now().date()
+        today = timezone.localdate()
         approval_start_at = datetime.date(2022, 6, 17)
         suspension_start_date = datetime.date(2022, 7, 17)
         suspension_end_date = datetime.date(2022, 12, 17)
@@ -477,7 +477,7 @@ class ApprovalModelTest(TestCase):
                 self.assertEqual(suspension.end_at, suspension_end_date)
 
     def test_unsuspend_the_day_suspension_starts(self):
-        today = timezone.now().date()
+        today = timezone.localdate()
         approval = ApprovalFactory(start_at=today - relativedelta(months=3))
         suspension = SuspensionFactory(
             approval=approval,
@@ -549,7 +549,7 @@ class PoleEmploiApprovalModelTest(TestCase):
         self.assertEqual(pole_emploi_approval.number_with_spaces, expected)
 
     def test_is_valid(self):
-        now_date = timezone.now().date() - relativedelta(months=1)
+        now_date = timezone.localdate() - relativedelta(months=1)
         now = datetime.datetime(year=now_date.year, month=now_date.month, day=now_date.day)
 
         with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
@@ -803,13 +803,13 @@ class CustomApprovalAdminViewsTest(TestCase):
 
 class SuspensionQuerySetTest(TestCase):
     def test_in_progress(self):
-        start_at = timezone.now().date()  # Starts today so it's in progress.
+        start_at = timezone.localdate()  # Starts today so it's in progress.
         expected_num = 5
         SuspensionFactory.create_batch(expected_num, start_at=start_at)
         self.assertEqual(expected_num, Suspension.objects.in_progress().count())
 
     def test_not_in_progress(self):
-        start_at = timezone.now().date() - relativedelta(years=1)
+        start_at = timezone.localdate() - relativedelta(years=1)
         end_at = start_at + relativedelta(months=6)
         expected_num = 3
         SuspensionFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
@@ -817,11 +817,11 @@ class SuspensionQuerySetTest(TestCase):
 
     def test_old(self):
         # Starting today.
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
         SuspensionFactory.create_batch(2, start_at=start_at)
         self.assertEqual(0, Suspension.objects.old().count())
         # Old.
-        start_at = timezone.now().date() - relativedelta(years=1)
+        start_at = timezone.localdate() - relativedelta(years=1)
         end_at = Suspension.get_max_end_at(start_at)
         expected_num = 3
         SuspensionFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
@@ -830,7 +830,7 @@ class SuspensionQuerySetTest(TestCase):
 
 class SuspensionModelTest(TestCase):
     def test_clean(self):
-        today = timezone.now().date()
+        today = timezone.localdate()
         start_at = today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS * 2)
         end_at = start_at + relativedelta(months=2)
         approval = ApprovalFactory.build(start_at=start_at, end_at=end_at)
@@ -857,19 +857,19 @@ class SuspensionModelTest(TestCase):
 
     def test_duration(self):
         expected_duration = datetime.timedelta(days=2)
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
         end_at = start_at + expected_duration
         suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
         self.assertEqual(suspension.duration, expected_duration)
 
     def test_start_in_future(self):
-        start_at = timezone.now().date() + relativedelta(days=10)
+        start_at = timezone.localdate() + relativedelta(days=10)
         # Build provides a local object without saving it to the database.
         suspension = SuspensionFactory.build(start_at=start_at)
         self.assertTrue(suspension.start_in_future)
 
     def test_start_in_approval_boundaries(self):
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
         end_at = start_at + relativedelta(days=10)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         # Build provides a local object without saving it to the database.
@@ -895,13 +895,13 @@ class SuspensionModelTest(TestCase):
         self.assertFalse(suspension.start_in_approval_boundaries)
 
     def test_is_in_progress(self):
-        start_at = timezone.now().date() - relativedelta(days=10)
+        start_at = timezone.localdate() - relativedelta(days=10)
         # Build provides a local object without saving it to the database.
         suspension = SuspensionFactory.build(start_at=start_at)
         self.assertTrue(suspension.is_in_progress)
 
     def test_get_overlapping_suspensions(self):
-        start_at = timezone.now().date() - relativedelta(days=10)
+        start_at = timezone.localdate() - relativedelta(days=10)
         approval = ApprovalFactory(start_at=start_at)
         suspension1 = SuspensionFactory(approval=approval, start_at=start_at)
 
@@ -973,7 +973,7 @@ class SuspensionModelTestTrigger(TestCase):
         Test `trigger_update_approval_end_at` with SQL INSERT.
         An approval's `end_at` is automatically pushed forward when it's suspended.
         """
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
@@ -988,7 +988,7 @@ class SuspensionModelTestTrigger(TestCase):
         Test `trigger_update_approval_end_at` with SQL DELETE.
         An approval's `end_at` is automatically pushed back when it's suspended.
         """
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
@@ -1008,7 +1008,7 @@ class SuspensionModelTestTrigger(TestCase):
         An approval's `end_at` is automatically pushed back and forth when
         one of its suspension is saved, then edited to be shorter.
         """
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
@@ -1036,13 +1036,13 @@ class SuspensionModelTestTrigger(TestCase):
 
 class ProlongationQuerySetTest(TestCase):
     def test_in_progress(self):
-        start_at = timezone.now().date()  # Starts today so it's in progress.
+        start_at = timezone.localdate()  # Starts today so it's in progress.
         expected_num = 5
         ProlongationFactory.create_batch(expected_num, start_at=start_at)
         self.assertEqual(expected_num, Prolongation.objects.in_progress().count())
 
     def test_not_in_progress(self):
-        start_at = timezone.now().date() - relativedelta(years=1)
+        start_at = timezone.localdate() - relativedelta(years=1)
         end_at = start_at + relativedelta(months=6)
         expected_num = 3
         ProlongationFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
@@ -1130,7 +1130,7 @@ class ProlongationModelTestTrigger(TestCase):
         Test `trigger_update_approval_end_at_for_prolongation` with SQL INSERT.
         An approval's `end_at` is automatically pushed forward when it is prolongated.
         """
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
@@ -1146,7 +1146,7 @@ class ProlongationModelTestTrigger(TestCase):
         An approval's `end_at` is automatically pushed back when its prolongation
         is deleted.
         """
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
@@ -1166,7 +1166,7 @@ class ProlongationModelTestTrigger(TestCase):
         An approval's `end_at` is automatically pushed back and forth when
         one of its valid prolongation is saved, then edited to be shorter.
         """
-        start_at = timezone.now().date()
+        start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at)
         initial_approval_duration = approval.duration

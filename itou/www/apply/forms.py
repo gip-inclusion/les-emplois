@@ -600,7 +600,7 @@ class FilterJobApplicationsForm(forms.Form):
             filters["has_suspended_approval"] = True
         if data.get("pass_iae_active"):
             # Simplification of CommonApprovalQuerySet.valid_lookup()
-            filters["approval__end_at__gte"] = timezone.now().date()
+            filters["approval__end_at__gte"] = timezone.localdate()
             # The date is not enough to know if an approval is valid or not
             filters["has_suspended_approval"] = False
         if data.get("eligibility_validated"):

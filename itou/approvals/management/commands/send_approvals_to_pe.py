@@ -24,7 +24,7 @@ class Command(BaseCommand):
         parser.add_argument("--delay", action="store", dest="delay", default=0, type=int, choices=range(0, 5))
 
     def handle(self, wet_run=False, delay=0, **options):
-        today = timezone.now().date()
+        today = timezone.localdate()
         queryset = (
             approvals_models.Approval.objects.filter(
                 # we will ignore any approval that starts after today anyway.
