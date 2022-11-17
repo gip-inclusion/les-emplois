@@ -1,4 +1,4 @@
--r base.in
+-r base.txt
 
 pip-tools  # https://github.com/jazzband/pip-tools/
 
