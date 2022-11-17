@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
-from django.db.models import Count, F, Q
+from django.db.models import Count, Exists, F, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -264,6 +264,10 @@ class EvaluationCampaign(models.Model):
         if not self.ended_at:
             self.ended_at = timezone.now()
             self.save(update_fields=["ended_at"])
+            send_email_messages(
+                evaluated_siae.get_email_to_siae_refused_no_proofs()
+                for evaluated_siae in self.evaluated_siaes.did_not_send_proof()
+            )
 
     # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
     # to emails.py in institution model
@@ -309,6 +313,16 @@ class EvaluatedSiaeQuerySet(models.QuerySet):
 
     def viewable(self):
         return self.filter(evaluation_campaign__in=EvaluationCampaign.objects.viewable())
+
+    def did_not_send_proof(self):
+        return self.exclude(
+            Exists(
+                EvaluatedAdministrativeCriteria.objects.filter(
+                    evaluated_job_application__evaluated_siae=OuterRef("pk"),
+                    submitted_at__isnull=False,
+                )
+            )
+        )
 
 
 class EvaluatedSiaeManager(models.Manager):
@@ -481,6 +495,16 @@ class EvaluatedSiae(models.Model):
         }
         subject = "siae_evaluations/email/to_siae_adversarial_stage_subject.txt"
         body = "siae_evaluations/email/to_siae_adversarial_stage_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def get_email_to_siae_refused_no_proofs(self):
+        to = self.siae.active_admin_members.values_list("email", flat=True)
+        context = {
+            "evaluation_campaign": self.evaluation_campaign,
+            "siae": self.siae,
+        }
+        subject = "siae_evaluations/email/to_siae_refused_no_proofs_subject.txt"
+        body = "siae_evaluations/email/to_siae_refused_no_proofs_body.txt"
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_sanctioned(self):
