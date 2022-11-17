@@ -7,6 +7,7 @@ from itou.cities.factories import create_city_guerande, create_city_saint_andre,
 from itou.cities.models import City
 from itou.job_applications.factories import JobApplicationFactory
 from itou.jobs.factories import create_test_romes_and_appellations
+from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
@@ -303,9 +304,11 @@ class SearchJobDescriptionTest(TestCase):
         guerande = create_city_guerande()
 
         siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350")
-        job1 = SiaeJobDescriptionFactory(siae=siae)
-        job2 = SiaeJobDescriptionFactory(siae=siae)
-        job3 = SiaeJobDescriptionFactory(siae=siae)
+        appellations = Appellation.objects.all()
+        # get a different appellation for every job description, since they share the same SIAE
+        job1 = SiaeJobDescriptionFactory(siae=siae, appellation=appellations[0])
+        job2 = SiaeJobDescriptionFactory(siae=siae, appellation=appellations[1])
+        job3 = SiaeJobDescriptionFactory(siae=siae, appellation=appellations[2])
 
         response = self.client.get(self.url, {"city": guerande.slug})
         siaes_results = response.context["results_page"]
