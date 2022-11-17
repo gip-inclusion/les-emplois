@@ -249,11 +249,14 @@ class EvaluationCampaign(models.Model):
             .exclude(
                 # pylint-disable=line-too-long
                 evaluated_job_applications__evaluated_administrative_criteria__review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING  # noqa: E501
-            ).select_related("evaluation_campaign__institution")
+            ).select_related("evaluation_campaign__institution", "siae")
         )
-        send_email_messages(
+        emails = [
             evaluated_siae.get_email_to_siae_forced_to_adversarial_stage() for evaluated_siae in force_review_on_siaes
-        )
+        ]
+        if force_review_on_siaes:
+            emails.append(self.get_email_to_institution_forced_to_adversarial_stage(force_review_on_siaes))
+        send_email_messages(emails)
         force_review_on_siaes.update(reviewed_at=timezone.now())
 
     def close(self):
@@ -283,6 +286,13 @@ class EvaluationCampaign(models.Model):
         }
         subject = "siae_evaluations/email/to_institution_selected_siae_subject.txt"
         body = "siae_evaluations/email/to_institution_selected_siae_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def get_email_to_institution_forced_to_adversarial_stage(self, evaluated_siaes):
+        to = self.institution.active_members.values_list("email", flat=True)
+        context = {"evaluated_siaes": evaluated_siaes}
+        subject = "siae_evaluations/email/to_institution_siaes_forced_to_adversarial_stage_subject.txt"
+        body = "siae_evaluations/email/to_institution_siaes_forced_to_adversarial_stage_body.txt"
         return get_email_message(to, context, subject, body)
 
 
