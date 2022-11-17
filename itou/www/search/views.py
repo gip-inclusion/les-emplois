@@ -1,4 +1,5 @@
 from collections import defaultdict
+from urllib.parse import urlencode
 
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, F, Prefetch, Q, When
@@ -37,7 +38,7 @@ class EmployerSearchBaseView(FormView):
             "form": form,
             "city": city,
             "distance": distance,
-            "kinds_query": "&".join(f"kinds={kind}" for kind in kinds),
+            "kinds_query": urlencode({"kinds": kinds}, doseq=True),
             "ea_eatt_kinds": [SiaeKind.EA, SiaeKind.EATT],
         }
 
