@@ -53,13 +53,17 @@ Arguments:
 
     <ul class="list-unstyled pl-2 border-left approval-left-border">
 
-        {# Validity. #}
-        <li{% if not common_approval.is_suspended %} class="text-success"{% endif %}>
-            Valide du {{ common_approval.start_at|date:"d/m/Y" }} au {{ common_approval.end_at|date:"d/m/Y" }}
+        <li>Date de début : {{ common_approval.start_at|date:"d/m/Y" }}</li>
+        <li>
+            Date de fin prévisionnelle : {{ common_approval.end_at|date:"d/m/Y" }}
+            <i class="ri-information-line ri-xl" data-toggle="tooltip" title="La date de fin prévisionnelle est amenée à évoluer si le PASS IAE est prolongé ou suspendu."></i>
         </li>
-
-        {# Delivery date. #}
-        <li>Délivrance : le {{ common_approval.start_at|date:"d/m/Y" }}</li>
+        <li>
+            Reliquat : <span{% if common_approval.remainder %} class="text-success"{% endif %}>{{ common_approval.remainder.days }} jours restants</span>
+            <i class="ri-information-line ri-xl"
+               data-toggle="tooltip"
+               title="Le reliquat est calculé sur la base d'un nombre de jours calendaires : il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+        </li>
 
         {% if common_approval.is_pass_iae %}
             {# Suspensions history. #}
