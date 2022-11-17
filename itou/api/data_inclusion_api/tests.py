@@ -74,6 +74,11 @@ class DataInclusionSiaeStructureTest(APITestCase):
                     "date_maj": _str_with_tz(siae.updated_at),
                     "antenne": False,
                     "lien_source": f"http://testserver{reverse('siaes_views:card', kwargs={'siae_id': siae.pk})}",
+                    "horaires_ouverture": "",
+                    "accessibilite": "",
+                    "labels_nationaux": [],
+                    "labels_autres": [],
+                    "thematiques": [],
                 }
             ],
         )
@@ -110,7 +115,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
 
     def test_list_structures_antenne_with_user_created_and_999(self):
         siae_1 = SiaeFactory(siret="10000000000001")
-        siae_2 = SiaeFactory(siret="10000000000002", convention=siae_1.convention)
+        siae_2 = SiaeFactory(siret="10000000000002", source=Siae.SOURCE_ASP, convention=siae_1.convention)
         siae_3 = SiaeFactory(siret="10000000099991", source=Siae.SOURCE_USER_CREATED, convention=siae_1.convention)
 
         response = self.authenticated_client.get(
@@ -137,6 +142,21 @@ class DataInclusionSiaeStructureTest(APITestCase):
                 assert structure_data["siret"] == siret
                 assert structure_data["antenne"] == antenne
 
+    def test_list_structures_siret_with_999_and_no_other_siret_available(self):
+        siae = SiaeFactory(siret="10000000099991", source=Siae.SOURCE_USER_CREATED)
+
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "siae"},
+        )
+        self.assertEqual(response.status_code, 200)
+
+        structure_data_list = response.json()["results"]
+        assert len(structure_data_list) == 1
+
+        assert structure_data_list[0]["siret"] == siae.siret[:9]  # fake nic is removed
+
     def test_list_structures_duplicated_siret(self):
         siae_1 = SiaeFactory(siret="10000000000001", kind=SiaeKind.ACI)
         siae_2 = SiaeFactory(siret=siae_1.siret, kind=SiaeKind.EI)
@@ -152,7 +172,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
 
         for siae, siret, antenne in [
             # both structures will be marked as antennes, bc it is impossible to know
-            # from data if one can be thought as an antenne of the over and if so, which
+            # from data if one can be thought as an antenne of the other and if so, which
             # one is the antenne
             (siae_1, siae_1.siret, True),
             (siae_2, siae_2.siret, True),
@@ -242,6 +262,11 @@ class DataInclusionPrescriberStructureTest(APITestCase):
                     "date_maj": _str_with_tz(orga.created_at),
                     "antenne": False,
                     "lien_source": f"http://testserver{reverse('prescribers_views:card', kwargs={'org_id': orga.pk})}",
+                    "horaires_ouverture": "",
+                    "accessibilite": "",
+                    "labels_nationaux": [],
+                    "labels_autres": [],
+                    "thematiques": [],
                 }
             ],
         )

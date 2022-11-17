@@ -32,6 +32,11 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
     date_maj = serializers.SerializerMethodField()
     antenne = serializers.SerializerMethodField()
     lien_source = serializers.SerializerMethodField()
+    horaires_ouverture = serializers.ReadOnlyField(default="")
+    accessibilite = serializers.ReadOnlyField(default="")
+    labels_nationaux = serializers.ReadOnlyField(default=[])
+    labels_autres = serializers.ReadOnlyField(default=[])
+    thematiques = serializers.ReadOnlyField(default=[])
 
     class Meta:
         model = Siae
@@ -57,6 +62,11 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
             "date_maj",
             "antenne",
             "lien_source",
+            "horaires_ouverture",
+            "accessibilite",
+            "labels_nationaux",
+            "labels_autres",
+            "thematiques",
         ]
         read_only_fields = fields
 
@@ -81,6 +91,8 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
             # default to siren
             return obj.siret[:9]
 
+        # If the siae source is other than SOURCE_USER_CREATED,
+        # then its siret **should** be valid.
         return obj.siret
 
     def get_presentation_resume(self, obj) -> str:
@@ -95,10 +107,7 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
         if obj.source == Siae.SOURCE_USER_CREATED and re.search(r"999\d\d$", obj.siret) is not None:
             return True
 
-        if Siae.objects.filter(siret=obj.siret).count() >= 2:
-            return True
-
-        return False
+        return Siae.objects.filter(siret=obj.siret).count() >= 2
 
     def get_date_maj(self, obj) -> str:
         dt = obj.updated_at or obj.created_at
@@ -132,6 +141,11 @@ class PrescriberOrgStructureSerializer(serializers.ModelSerializer):
     date_maj = serializers.SerializerMethodField()
     antenne = serializers.ReadOnlyField(default=False)
     lien_source = serializers.SerializerMethodField()
+    horaires_ouverture = serializers.ReadOnlyField(default="")
+    accessibilite = serializers.ReadOnlyField(default="")
+    labels_nationaux = serializers.ReadOnlyField(default=[])
+    labels_autres = serializers.ReadOnlyField(default=[])
+    thematiques = serializers.ReadOnlyField(default=[])
 
     class Meta:
         model = PrescriberOrganization
@@ -157,6 +171,11 @@ class PrescriberOrgStructureSerializer(serializers.ModelSerializer):
             "date_maj",
             "antenne",
             "lien_source",
+            "horaires_ouverture",
+            "accessibilite",
+            "labels_nationaux",
+            "labels_autres",
+            "thematiques",
         ]
         read_only_fields = fields
 
