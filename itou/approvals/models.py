@@ -94,6 +94,29 @@ class CommonApprovalMixin(models.Model):
     def duration(self):
         return self.end_at - self.start_at
 
+    def _get_obj_remainder(self, obj):
+        """
+        Return the remaining time on a object with start_at and end_at dete fields
+        A.k.a an Approval, a Suspension or a Prolongation
+        """
+        return max(obj.end_at - timezone.localdate(), datetime.timedelta(0)) - max(
+            obj.start_at - timezone.localdate(), datetime.timedelta(0)
+        )
+
+    @property
+    def remainder(self):
+        """
+        Return the remaining time of an Approval, we don't count future suspended preriods.
+        """
+        result = self._get_obj_remainder(self)
+        if hasattr(self, "suspension_set"):
+            # PoleEmploiApprovals don't have suspensions
+            result -= sum(
+                (self._get_obj_remainder(suspension) for suspension in self.suspension_set.all()),
+                datetime.timedelta(0),
+            )
+        return result
+
 
 class CommonApprovalQuerySet(models.QuerySet):
     """

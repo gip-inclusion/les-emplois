@@ -530,6 +530,56 @@ class ApprovalModelTest(TestCase):
         self.assertEqual(suspended_approval.state, ApprovalStatus.SUSPENDED)
         self.assertEqual(suspended_approval.get_state_display(), "Valide (suspendu)")
 
+    @freeze_time("2022-11-22")
+    def test_remainder(self):
+        approval = ApprovalFactory(
+            start_at=datetime.date(2021, 3, 25),
+            end_at=datetime.date(2023, 3, 24),
+        )
+        self.assertEqual(approval.remainder, datetime.timedelta(days=122))
+
+        # Futur prolongation
+        ProlongationFactory(
+            approval=approval,
+            start_at=datetime.date(2023, 3, 20),
+            end_at=datetime.date(2023, 3, 24),
+        )
+        # Past prolongation
+        ProlongationFactory(
+            approval=approval,
+            start_at=datetime.date(2021, 3, 25),
+            end_at=datetime.date(2021, 3, 30),
+        )
+        # Ongoing prolongation
+        ProlongationFactory(
+            approval=approval,
+            start_at=datetime.date(2021, 11, 1),
+            end_at=datetime.date(2021, 12, 1),
+        )
+        # Prolongations change the approval end_date, so it doesn't change the remainder
+        self.assertEqual(approval.remainder, datetime.timedelta(days=122))
+
+        # Futur suspension
+        SuspensionFactory(
+            approval=approval,
+            start_at=datetime.date(2023, 3, 20),
+            end_at=datetime.date(2023, 3, 24),
+        )
+        # Past suspension
+        SuspensionFactory(
+            approval=approval,
+            start_at=datetime.date(2021, 3, 25),
+            end_at=datetime.date(2021, 3, 30),
+        )
+        # Ongoing suspension
+        SuspensionFactory(
+            approval=approval,
+            start_at=datetime.date(2022, 11, 1),
+            end_at=datetime.date(2022, 12, 1),
+        )
+        # Substract to remainder the relaining suspension time
+        self.assertEqual(approval.remainder, datetime.timedelta(days=109))
+
 
 class PoleEmploiApprovalModelTest(TestCase):
     def test_format_name_as_pole_emploi(self):
@@ -570,6 +620,14 @@ class PoleEmploiApprovalModelTest(TestCase):
             end_at = start_at + relativedelta(years=2)
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
             self.assertTrue(approval.is_valid())
+
+    @freeze_time("2022-11-22")
+    def test_remainder(self):
+        pole_emploi_approval = PoleEmploiApprovalFactory(
+            start_at=datetime.date(2021, 3, 25),
+            end_at=datetime.date(2023, 3, 24),
+        )
+        self.assertEqual(pole_emploi_approval.remainder, datetime.timedelta(days=122))
 
 
 class PoleEmploiApprovalManagerTest(TestCase):
