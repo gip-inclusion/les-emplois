@@ -1,0 +1,16 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+Vous trouverez ci-dessous la liste des SIAE qui n’ont transmis aucun justificatif dans le cadre du contrôle a posteriori :
+
+{% for evaluated_siae in evaluated_siaes %}
+- {{ evaluated_siae.siae.kind }} {{ evaluated_siae.siae.name }} ID-{{ evaluated_siae.siae_id }}
+{% endfor %}
+
+Ces structures n’ayant pas transmis les justificatifs dans le délai des 6 semaines passent automatiquement en phase contradictoire et disposent à nouveau de 6 semaines pour se manifester.
+
+N’hésitez pas à les contacter afin de comprendre les éventuelles difficultés rencontrées pour transmettre les justificatifs.
+
+Cordialement,
+{% endblock %}

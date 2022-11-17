@@ -472,10 +472,9 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluated_siae.refresh_from_db()
         self.assertIsNotNone(evaluated_siae.reviewed_at)
 
-        [email] = mail.outbox
-        assert email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
-        print(email.body)
-        assert email.body == (
+        [siae_email, institution_email] = mail.outbox
+        assert siae_email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
+        assert siae_email.body == (
             "Bonjour,\n\n"
             "Sauf erreur de notre part, vous n’avez pas transmis les justificatifs dans le cadre du contrôle a "
             "posteriori sur vos embauches réalisées en auto-prescription.\n\n"
@@ -489,6 +488,27 @@ class EvaluationCampaignManagerTest(TestCase):
             f"EI Les petits jardins ID-{evaluated_siae.siae_id} à la rubrique “Justifier mes auto-prescriptions”.\n"
             f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae.pk}/\n\n"
             "En cas de besoin, vous pouvez consulter ce mode d’emploi.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+
+        assert institution_email.subject == (
+            "[Contrôle a posteriori] "
+            "Liste des SIAE n’ayant pas transmis les justificatifs de leurs auto-prescriptions"
+        )
+        assert institution_email.body == (
+            "Bonjour,\n\n"
+            "Vous trouverez ci-dessous la liste des SIAE qui n’ont transmis aucun justificatif dans le cadre du "
+            "contrôle a posteriori :\n\n"
+            f"- EI Les petits jardins ID-{evaluated_siae.siae_id}\n\n"
+            "Ces structures n’ayant pas transmis les justificatifs dans le délai des 6 semaines passent "
+            "automatiquement en phase contradictoire et disposent à nouveau de 6 semaines pour se manifester.\n\n"
+            "N’hésitez pas à les contacter afin de comprendre les éventuelles difficultés rencontrées pour "
+            "transmettre les justificatifs.\n\n"
             "Cordialement,\n\n"
             "---\n"
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
