@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.utils.html import escape
 from django.utils.http import urlencode
 
-from itou.approvals.models import Approval, Prolongation
+from itou.approvals.models import Prolongation
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -23,17 +23,13 @@ class ApprovalProlongationTest(TestCase):
         self.prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         self.prescriber = self.prescriber_organization.members.first()
 
-        today = timezone.now().date()
-
-        # Set "now" to be "after" the day approval is open to prolongation.
-        approval_end_at = (
-            today + relativedelta(months=Approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS) - relativedelta(days=1)
-        )
+        today = timezone.localdate()
         self.job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=1),
-            approval__end_at=approval_end_at,
+            approval__start_at=today - relativedelta(months=12),
+            approval__end_at=today + relativedelta(months=2),
         )
         self.siae = self.job_application.to_siae
         self.siae_user = self.job_application.to_siae.members.first()

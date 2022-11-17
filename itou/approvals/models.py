@@ -198,7 +198,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
     # The period of time during which it is possible to prolong a PASS IAE.
-    IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS = 3
+    IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_START = 12
+    IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_END = 3
 
     # Error messages.
     ERROR_PASS_IAE_SUSPENDED_FOR_USER = (
@@ -391,9 +392,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     @property
     def is_open_to_prolongation(self):
-        now = timezone.now().date()
-        lower_bound = self.end_at - relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS)
-        upper_bound = self.end_at + relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS)
+        now = timezone.localdate()
+        lower_bound = self.start_at + relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_START)
+        upper_bound = self.end_at + relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_END)
         return lower_bound <= now <= upper_bound
 
     @cached_property
