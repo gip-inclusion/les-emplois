@@ -88,6 +88,7 @@ class TestApprovalDetailView:
     def test_prolongation_button(self, client):
         approval = ApprovalFactory(
             with_jobapplication=True,
+            start_at=timezone.localdate() - relativedelta(months=12),
             end_at=timezone.localdate() + relativedelta(months=2),
         )
         job_application = approval.jobapplication_set.get()
@@ -100,7 +101,7 @@ class TestApprovalDetailView:
         response = client.get(url)
         assertContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
 
-        approval.end_at = timezone.localdate() + relativedelta(months=4)
+        approval.end_at = timezone.localdate() - relativedelta(months=4)
         approval.save()
         # Clear cached property
         del approval.can_be_prolonged

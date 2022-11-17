@@ -289,31 +289,34 @@ class ApprovalModelTest(TestCase):
         self.assertFalse(approval1.is_last_for_user)
         self.assertTrue(approval2.is_last_for_user)
 
+    @freeze_time("2022-11-17")
     def test_is_open_to_prolongation(self):
-
-        today = timezone.now().date()
-
-        # Ensure that "now" is "before" the period open to prolongations.
-        end_at = (
-            today + relativedelta(months=Approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS) + relativedelta(days=5)
+        # Ensure that "now" is "before" the period open to prolongations (12 months after approval start)
+        approval = ApprovalFactory(
+            start_at=datetime.date(2021, 11, 18),
+            end_at=datetime.date(2023, 11, 17),
         )
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_open_to_prolongation)
 
         # Ensure "now" is in the period open to prolongations.
-        # Even if the approval ended 1 month ago, users are allowed to prolong it up to 3 months after the end.
-        end_at = today - relativedelta(months=1)
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        approval = ApprovalFactory(
+            start_at=datetime.date(2021, 11, 17),
+            end_at=datetime.date(2023, 11, 16),
+        )
+        self.assertTrue(approval.is_open_to_prolongation)
+
+        # until 3 month after the end date, users are allowed to prolong it up to 3 months after the end.
+        approval = ApprovalFactory(
+            start_at=datetime.date(2020, 8, 18),
+            end_at=datetime.date(2022, 8, 17),
+        )
         self.assertTrue(approval.is_open_to_prolongation)
 
         # Ensure "now" is "after" the period open to prolongations.
-        end_at = (
-            today - relativedelta(months=Approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS) - relativedelta(days=5)
+        approval = ApprovalFactory(
+            start_at=datetime.date(2020, 8, 17),
+            end_at=datetime.date(2022, 8, 16),
         )
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_open_to_prolongation)
 
     def test_get_or_create_from_valid(self):
