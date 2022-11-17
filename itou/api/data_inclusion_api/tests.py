@@ -3,6 +3,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
 from itou.prescribers.factories import PrescriberOrganizationFactory
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeConventionFactory, SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import PrescriberFactory, SiaeStaffFactory
@@ -40,8 +41,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_list_structures(self):
-        siae = SiaeFactory()
-        antenne = SiaeFactory(source=Siae.SOURCE_USER_CREATED, convention=siae.convention)
+        siae = SiaeFactory(siret="10000000000001")
 
         response = self.authenticated_client.get(
             self.url,
@@ -72,35 +72,99 @@ class DataInclusionSiaeStructureTest(APITestCase):
                     "latitude": siae.latitude,
                     "source": siae.source,
                     "date_maj": _str_with_tz(siae.updated_at),
-                    "structure_parente": None,
+                    "antenne": False,
                     "lien_source": f"http://testserver{reverse('siaes_views:card', kwargs={'siae_id': siae.pk})}",
-                },
-                {
-                    "id": str(antenne.uid),
-                    "typologie": antenne.kind.value,
-                    "nom": antenne.display_name,
-                    "siret": antenne.siret,
-                    "rna": "",
-                    "presentation_resume": "",
-                    "presentation_detail": "",
-                    "site_web": antenne.website,
-                    "telephone": antenne.phone,
-                    "courriel": antenne.email,
-                    "code_postal": antenne.post_code,
-                    "code_insee": "",
-                    "commune": antenne.city,
-                    "adresse": antenne.address_line_1,
-                    "complement_adresse": antenne.address_line_2,
-                    "longitude": antenne.longitude,
-                    "latitude": antenne.latitude,
-                    "source": antenne.source,
-                    "date_maj": _str_with_tz(antenne.updated_at),
-                    # Antenne references parent structure
-                    "structure_parente": str(siae.uid),
-                    "lien_source": f"http://testserver{reverse('siaes_views:card', kwargs={'siae_id': antenne.pk})}",
-                },
+                }
             ],
         )
+
+    def test_list_structures_antenne_with_user_created_with_proper_siret(self):
+        siae_1 = SiaeFactory(siret="10000000000001")
+        siae_2 = SiaeFactory(siret="10000000000002", convention=siae_1.convention)
+        siae_3 = SiaeFactory(siret="10000000000003", source=Siae.SOURCE_USER_CREATED, convention=siae_1.convention)
+
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "siae"},
+        )
+        self.assertEqual(response.status_code, 200)
+
+        structure_data_list = response.json()["results"]
+
+        for siae, siret, antenne in [
+            (siae_1, siae_1.siret, False),
+            (siae_2, siae_2.siret, False),
+            # siae is user created, but it has its own siret
+            # so it is not an antenne according to data.inclusion
+            (siae_3, siae_3.siret, False),
+        ]:
+            structure_data = next(
+                (structure_data for structure_data in structure_data_list if structure_data["id"] == str(siae.uid)),
+                None,
+            )
+            with self.subTest(siret=siae.siret):
+                assert structure_data is not None
+                assert structure_data["siret"] == siret
+                assert structure_data["antenne"] == antenne
+
+    def test_list_structures_antenne_with_user_created_and_999(self):
+        siae_1 = SiaeFactory(siret="10000000000001")
+        siae_2 = SiaeFactory(siret="10000000000002", convention=siae_1.convention)
+        siae_3 = SiaeFactory(siret="10000000099991", source=Siae.SOURCE_USER_CREATED, convention=siae_1.convention)
+
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "siae"},
+        )
+        self.assertEqual(response.status_code, 200)
+
+        structure_data_list = response.json()["results"]
+
+        for siae, siret, antenne in [
+            (siae_1, siae_1.siret, False),
+            (siae_2, siae_2.siret, False),
+            # siret is replaced with parent siret
+            (siae_3, siae_1.siret, True),
+        ]:
+            structure_data = next(
+                (structure_data for structure_data in structure_data_list if structure_data["id"] == str(siae.uid)),
+                None,
+            )
+            with self.subTest(siret=siae.siret):
+                assert structure_data is not None
+                assert structure_data["siret"] == siret
+                assert structure_data["antenne"] == antenne
+
+    def test_list_structures_duplicated_siret(self):
+        siae_1 = SiaeFactory(siret="10000000000001", kind=SiaeKind.ACI)
+        siae_2 = SiaeFactory(siret=siae_1.siret, kind=SiaeKind.EI)
+
+        response = self.authenticated_client.get(
+            self.url,
+            format="json",
+            data={"type": "siae"},
+        )
+        self.assertEqual(response.status_code, 200)
+
+        structure_data_list = response.json()["results"]
+
+        for siae, siret, antenne in [
+            # both structures will be marked as antennes, bc it is impossible to know
+            # from data if one can be thought as an antenne of the over and if so, which
+            # one is the antenne
+            (siae_1, siae_1.siret, True),
+            (siae_2, siae_2.siret, True),
+        ]:
+            structure_data = next(
+                (structure_data for structure_data in structure_data_list if structure_data["id"] == str(siae.uid)),
+                None,
+            )
+            with self.subTest(siret=siae.siret):
+                assert structure_data is not None
+                assert structure_data["siret"] == siret
+                assert structure_data["antenne"] == antenne
 
     def test_list_structures_description_longer_than_280(self):
         siae = SiaeFactory(description="a" * 300)
@@ -176,7 +240,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
                     "latitude": orga.latitude,
                     "source": "",
                     "date_maj": _str_with_tz(orga.created_at),
-                    "structure_parente": None,
+                    "antenne": False,
                     "lien_source": f"http://testserver{reverse('prescribers_views:card', kwargs={'org_id': orga.pk})}",
                 }
             ],
