@@ -959,7 +959,7 @@ class JobSeekerProfileModelTest(TestCase):
 
 def user_with_approval_in_waiting_period():
     user = JobSeekerFactory()
-    end_at = timezone.now().date() - relativedelta(days=30)
+    end_at = timezone.localdate() - relativedelta(days=30)
     start_at = end_at - relativedelta(years=2)
     ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
     return user
@@ -1060,7 +1060,7 @@ class LatestApprovalTestCase(TestCase):
 
     def test_status_with_valid_approval(self):
         user = JobSeekerFactory()
-        approval = ApprovalFactory(user=user, start_at=timezone.now().date() - relativedelta(days=1))
+        approval = ApprovalFactory(user=user, start_at=timezone.localdate() - relativedelta(days=1))
         self.assertFalse(user.has_no_common_approval)
         self.assertTrue(user.has_valid_common_approval)
         self.assertFalse(user.has_common_approval_in_waiting_period)
@@ -1075,7 +1075,7 @@ class LatestApprovalTestCase(TestCase):
 
     def test_status_approval_with_elapsed_waiting_period(self):
         user = JobSeekerFactory()
-        end_at = timezone.now().date() - relativedelta(years=3)
+        end_at = timezone.localdate() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         self.assertTrue(user.has_no_common_approval)
@@ -1166,7 +1166,7 @@ class LatestApprovalTestCase(TestCase):
 
     def test_latest_common_approval_is_pe_approval_if_approval_is_expired(self):
         user = JobSeekerFactory()
-        end_at = timezone.now().date() - relativedelta(years=3)
+        end_at = timezone.localdate() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
         # expired approval
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
@@ -1175,7 +1175,7 @@ class LatestApprovalTestCase(TestCase):
 
     def test_latest_common_approval_is_pe_approval_edge_case(self):
         user = JobSeekerFactory()
-        end_at = timezone.now().date() - relativedelta(days=10)
+        end_at = timezone.localdate() - relativedelta(days=10)
         start_at = end_at - relativedelta(years=2)
         # approval in waiting period
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
@@ -1184,7 +1184,7 @@ class LatestApprovalTestCase(TestCase):
 
     def test_latest_common_approval_is_none_if_both_expired(self):
         user = JobSeekerFactory()
-        end_at = timezone.now().date() - relativedelta(years=3)
+        end_at = timezone.localdate() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         PoleEmploiApprovalFactory(nir=user.nir, start_at=start_at, end_at=end_at)

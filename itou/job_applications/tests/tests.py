@@ -309,8 +309,8 @@ class JobApplicationModelTest(TestCase):
 
         # test approval is invalid
         job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
-        job_application.approval.start_at = timezone.now().date() - relativedelta(year=1)
-        job_application.approval.end_at = timezone.now().date() - relativedelta(month=1)
+        job_application.approval.start_at = timezone.localdate() - relativedelta(year=1)
+        job_application.approval.end_at = timezone.localdate() - relativedelta(month=1)
         self.assertFalse(job_application.is_waiting_for_employee_record_creation)
 
         # test SIAE cannot use Employee_Record

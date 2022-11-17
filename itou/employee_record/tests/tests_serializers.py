@@ -72,8 +72,8 @@ class EmployeeRecordAddressSerializerTest(EmployeeRecordFixtureTest):
 class EmployeeRecordUpdateNotificationSerializerTest(EmployeeRecordFixtureTest):
     def test_notification_serializer(self):
         # High-level : just check basic information
-        start_at = timezone.now().date()
-        end_at = timezone.now().date() + timedelta(weeks=52)
+        start_at = timezone.localdate()
+        end_at = timezone.localdate() + timedelta(weeks=52)
         employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
         approval = employee_record.approval
         approval.start_at = start_at
@@ -100,8 +100,8 @@ class EmployeeRecordUpdateNotificationSerializerTest(EmployeeRecordFixtureTest):
         # This is the same serializer used for employee record batches.
         # Previously not tested, killing 2 birds with 1 stone.
 
-        start_at = timezone.now().date()
-        end_at = timezone.now().date() + timedelta(weeks=52)
+        start_at = timezone.localdate()
+        end_at = timezone.localdate() + timedelta(weeks=52)
 
         # Add some EmployeeRecordUpdateNotification objects
         for idx in range(10):

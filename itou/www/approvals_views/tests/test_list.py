@@ -109,7 +109,7 @@ class TestApprovalsListView:
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_siae.pk}))
 
     def test_approval_state_filters(self, client):
-        now = timezone.now().date()
+        now = timezone.localdate()
         siae = SiaeFactory(with_membership=True)
 
         expired_approval = ApprovalFactory(

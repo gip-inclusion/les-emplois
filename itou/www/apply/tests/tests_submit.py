@@ -314,7 +314,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         Apply as jobseeker to a SIAE (not a GEIQ) with an approval in waiting period.
         Waiting period cannot be bypassed.
         """
-        now_date = timezone.now().date() - relativedelta(months=1)
+        now_date = timezone.localdate() - relativedelta(months=1)
         now = timezone.datetime(
             year=now_date.year, month=now_date.month, day=now_date.day, tzinfo=datetime.timezone.utc
         )

@@ -534,7 +534,7 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         institution = InstitutionWith2MembershipFactory()
         evaluation_campaign = EvaluationCampaignFactory(institution=institution)
 
-        date = timezone.now().date()
+        date = timezone.localdate()
         email = evaluation_campaign.get_email_to_institution_ratio_to_select(date)
 
         self.assertEqual(email.to, list(u.email for u in institution.active_members))

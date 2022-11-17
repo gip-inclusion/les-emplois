@@ -81,7 +81,7 @@ def get_min_birthdate():
 
 
 def get_max_birthdate():
-    return timezone.now().date() - relativedelta(years=16)
+    return timezone.localdate() - relativedelta(years=16)
 
 
 def validate_birthdate(birthdate):
