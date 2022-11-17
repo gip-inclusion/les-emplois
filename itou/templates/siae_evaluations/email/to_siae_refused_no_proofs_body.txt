@@ -1,0 +1,14 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+Sauf erreur de notre part, vous n’avez pas transmis les justificatifs demandés dans le cadre du contrôle a posteriori sur vos embauches réalisées en auto-prescription entre le {{ evaluation_campaign.evaluated_period_start_at|date:"d E Y" }} et le {{ evaluation_campaign.evaluated_period_end_at|date:"d E Y" }}.
+
+La {{ evaluation_campaign.institution }} ne peut donc pas faire de contrôle, par conséquent votre résultat concernant cette procédure est négatif (vous serez alerté des sanctions éventuelles concernant votre SIAE prochainement) conformément à l’instruction N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative à la mise en œuvre opérationnelle du contrôle a posteriori des recrutements en auto-prescription prévu par les articles R. 5132-1-12 à R. 5132-1-17 du code du travail.
+
+Pour plus d’informations, vous pouvez vous rapprocher de la {{ evaluation_campaign.institution }}.
+
+Si vous avez déjà pris contact avec votre DDETS, merci de ne pas tenir compte de ce courriel.
+
+Cordialement,
+{% endblock %}

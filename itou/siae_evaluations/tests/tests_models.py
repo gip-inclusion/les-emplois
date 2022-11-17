@@ -1,3 +1,4 @@
+import datetime
 from unittest import mock
 
 from dateutil.relativedelta import relativedelta
@@ -518,15 +519,50 @@ class EvaluationCampaignManagerTest(TestCase):
         )
 
     def test_close(self):
-        evaluation_campaign = EvaluationCampaignFactory()
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution__name="DDETS 01",
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 9, 30),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae__name="Les petits jardins",
+            evaluation_campaign=evaluation_campaign,
+        )
         self.assertIsNone(evaluation_campaign.ended_at)
 
         evaluation_campaign.close()
         self.assertIsNotNone(evaluation_campaign.ended_at)
         ended_at = evaluation_campaign.ended_at
 
+        [email] = mail.outbox
+        assert email.subject == (
+            "[Contrôle a posteriori] "
+            f"Absence de réponse de la structure EI Les petits jardins ID-{evaluated_siae.siae_id}"
+        )
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Sauf erreur de notre part, vous n’avez pas transmis les justificatifs demandés dans le cadre du contrôle "
+            "a posteriori sur vos embauches réalisées en auto-prescription entre le 01 Janvier 2022 et le 30 "
+            "Septembre 2022.\n\n"
+            "La DDETS 01 ne peut donc pas faire de contrôle, par conséquent votre résultat concernant cette procédure "
+            "est négatif (vous serez alerté des sanctions éventuelles concernant votre SIAE prochainement) "
+            "conformément à l’instruction N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative à la mise en œuvre "
+            "opérationnelle du contrôle a posteriori des recrutements en auto-prescription prévu par les articles "
+            "R. 5132-1-12 à R. 5132-1-17 du code du travail.\n\n"
+            "Pour plus d’informations, vous pouvez vous rapprocher de la DDETS 01.\n\n"
+            "Si vous avez déjà pris contact avec votre DDETS, merci de ne pas tenir compte de ce courriel.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+
         evaluation_campaign.close()
         self.assertEqual(ended_at, evaluation_campaign.ended_at)
+        # No new mail.
+        assert len(mail.outbox) == 1
 
 
 class EvaluationCampaignEmailMethodsTest(TestCase):

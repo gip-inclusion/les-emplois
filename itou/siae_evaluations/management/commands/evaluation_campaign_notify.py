@@ -1,9 +1,8 @@
 from dateutil.relativedelta import relativedelta
 from django.core.management import BaseCommand
-from django.db.models import Exists, OuterRef
 from django.utils import timezone
 
-from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluationCampaign
+from itou.siae_evaluations.models import EvaluationCampaign
 from itou.utils.emails import send_email_messages
 
 
@@ -16,15 +15,8 @@ class Command(BaseCommand):
         ).select_related("institution"):
             emails = []
             evaluated_siaes = (
-                campaign.evaluated_siaes.filter(reviewed_at=None, reminder_sent_at=None)
-                .exclude(
-                    Exists(
-                        EvaluatedAdministrativeCriteria.objects.filter(
-                            evaluated_job_application__evaluated_siae=OuterRef("pk"),
-                            submitted_at__isnull=False,
-                        )
-                    )
-                )
+                campaign.evaluated_siaes.did_not_send_proof()
+                .filter(reviewed_at=None, reminder_sent_at=None)
                 .select_related("evaluation_campaign__institution", "siae__convention")
             )
             for evaluated_siae in evaluated_siaes:
