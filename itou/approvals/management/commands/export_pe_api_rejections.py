@@ -27,7 +27,7 @@ class Command(BaseCommand):
         )
 
         if not rejected_approvals:
-            self.stdout.write("No rejected approvels")
+            self.stdout.write("No rejected approvals")
             return
 
         log_datetime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
