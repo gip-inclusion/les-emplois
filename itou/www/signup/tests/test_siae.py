@@ -148,7 +148,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             next_url=next_url,
         )
         response = self.client.get(response.url)
-        # Check user is redirected to the welcoming tour
+        # Check user is redirected to the dashboard
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # Check `User` state.
