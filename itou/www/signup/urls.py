@@ -23,9 +23,14 @@ urlpatterns = [
         name="facilitator_search",
     ),
     path(
-        "facilitator/signup",
-        views.FacilitatorSignupView.as_view(),
-        name="facilitator_signup",
+        "facilitator/user",
+        views.FacilitatorUserView.as_view(),
+        name="facilitator_user",
+    ),
+    path(
+        "facilitator/join",
+        views.FacilitatorJoinView.as_view(),
+        name="facilitator_join",
     ),
     # Prescriber.
     path(

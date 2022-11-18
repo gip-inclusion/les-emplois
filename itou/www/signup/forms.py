@@ -7,7 +7,6 @@ from django.utils.safestring import mark_safe
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.models import SiaeMembership
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
@@ -349,54 +348,3 @@ class PrescriberCheckPEemail(forms.Form):
         if not email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
             raise ValidationError("L'adresse e-mail doit être une adresse Pôle emploi.")
         return email
-
-
-class FacilitatorSignupForm(SignupForm, FullnameFormMixin):
-
-    email = forms.EmailField(
-        label="E-mail",
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "type": "email",
-                "placeholder": "jeandupont@exemple.com",
-                "autocomplete": "off",
-            }
-        ),
-    )
-
-    field_order = [
-        "last_name",
-        "first_name",
-        "email",
-        "password1",
-        "password2",
-    ]
-
-    def __init__(self, *args, **kwargs):
-        self.siae = kwargs.pop("siae")
-        super().__init__(*args, **kwargs)
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-
-    def save(self, request):
-        self.cleaned_data["username"] = User.generate_unique_username()  # copied from elsewhere
-        user = super().save(request)
-
-        # Not very smooth because of the 2nd save(), but the only way to do it better is to:
-        # - add a hidden, read-only field as "is_siae_staff" in the form, ensuring it's not modified
-        # - set it an initial value in the form as well
-        # - decompose the other fields with django-bootstrap (instead of just rendering the form) to
-        #   exclude it
-        # That's the method used in other forms, and at least it's more concise. Sorry, but "perf last".
-        user.is_siae_staff = True
-        user.save(update_fields=["is_siae_staff"])
-
-        self.siae.auth_email = user.email
-        self.siae.created_by = user
-        self.siae.save()
-
-        membership = SiaeMembership(user=user, siae=self.siae)
-        membership.is_admin = True  # by construction, this user is the first of the SIAE.
-        membership.save()
-
-        return user
