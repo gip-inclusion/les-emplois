@@ -41,8 +41,9 @@ venv: $(VIRTUAL_ENV)
 
 PIP_COMPILE_FLAGS := --upgrade --allow-unsafe --generate-hashes
 compile-deps: $(VIRTUAL_ENV)
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
+	# Launch pip-compile from inside ./requirements directory to behave like dependabot
+	cd requirements && pip-compile $(PIP_COMPILE_FLAGS) -o base.txt base.in
+	cd requirements && pip-compile $(PIP_COMPILE_FLAGS) -o dev.txt dev.in
 
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
