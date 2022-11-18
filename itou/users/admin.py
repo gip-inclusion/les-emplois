@@ -182,7 +182,7 @@ class ItouUserAdmin(UserAdmin):
         "pk",
         "nir",
     )
-    readonly_fields = ("pk", "jobseeker_hash_id")
+    readonly_fields = ("pk", "username", "jobseeker_hash_id", "identity_provider")
 
     fieldsets = UserAdmin.fieldsets + (
         (
@@ -259,6 +259,8 @@ class ItouUserAdmin(UserAdmin):
         rof = super().get_readonly_fields(request, obj)
         if not request.user.is_superuser:
             rof += ("is_staff", "is_superuser", "groups", "user_permissions")
+        if obj and obj.has_sso_provider:
+            rof += ("first_name", "last_name", "email")
         return rof
 
 
