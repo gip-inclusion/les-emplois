@@ -32,6 +32,7 @@ class ItouCurrentOrganizationMiddleware:
             request.path in [reverse("account_logout"), *login_routes],
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
             request.path.startswith("/signup/siae/join"),  # siae staff about to join an siae
+            request.path.startswith("/signup/facilitator/join"),  # facilitator about to join an siae
         ]
         if any(skip_middleware_conditions):
             return self.get_response(request)

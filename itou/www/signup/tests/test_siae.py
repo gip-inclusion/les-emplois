@@ -1,9 +1,7 @@
-import uuid
 from unittest import mock
 
 import httpx
 import respx
-from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.contrib.messages import get_messages
 from django.core import mail
@@ -17,11 +15,13 @@ from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTe
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
+from itou.siaes.models import Siae
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
 from itou.www.testing import NUM_CSRF_SESSION_REQUESTS
 
@@ -191,68 +191,55 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         )
         response = self.client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_called_once()
-        self.assertRedirects(response, reverse("signup:facilitator_signup"))
+        self.assertRedirects(response, reverse("signup:facilitator_user"))
 
         # Checks that the SIRET and  the enterprise name are present in the second step
         response = self.client.post(url, data=post_data, follow=True)
         self.assertContains(response, "Centre communal")
-        self.assertContains(response, "26570134200148")
+        self.assertContains(response, format_siret(FAKE_SIRET))
 
         # Now, we're on the second page.
-        url = reverse("signup:facilitator_signup")
-        post_data = {
-            "first_name": "The",
-            "last_name": "Joker",
-            "email": "batman@robin.fr",
-            "password1": DEFAULT_PASSWORD,
-            "password2": DEFAULT_PASSWORD,
+        url = reverse("signup:facilitator_user")
+        self.assertContains(response, "inclusion_connect_button.svg")
+
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:facilitator_user")
+        next_url = reverse("signup:facilitator_join")
+        params = {
+            "user_kind": KIND_SIAE_STAFF,
+            "previous_url": previous_url,
+            "next_url": next_url,
         }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
 
-        # Assert the correct redirection
-        response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        response = mock_oauth_dance(
+            self,
+            KIND_SIAE_STAFF,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        response = self.client.get(response.url)
+        # Check user is redirected to the welcoming tour
+        self.assertRedirects(response, reverse("welcoming_tour:index"))
+        # Check user sees the siae staff tour
+        response = self.client.get(response.url)
+        self.assertContains(response, "Publiez vos offres, augmentez votre visibilité")
 
-        # Try creating the user again
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(200, response.status_code)
-        self.assertContains(response, "Un autre utilisateur utilise déjà cette adresse e-mail.")
+        user = User.objects.get(email=OIDC_USERINFO["email"])
 
         # Check `User` state.
-        user = User.objects.get(email=post_data["email"])
-        self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)
         self.assertFalse(user.is_prescriber)
         self.assertTrue(user.is_siae_staff)
+        self.assertTrue(user.is_active)
+        siae = Siae.objects.get(siret=FAKE_SIRET)
+        self.assertTrue(siae.has_admin(user))
+        self.assertEqual(1, siae.members.count())
 
-        # Check `EmailAddress` state.
-        self.assertEqual(user.emailaddress_set.count(), 1)
-        user_email = user.emailaddress_set.first()
-        self.assertFalse(user_email.verified)
-
-        # Check sent email.
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertIn("Confirmez votre adresse e-mail", email.subject)
-        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], user.email)
-
-        # User cannot log in until confirmation.
-        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
-        url = reverse("account_login")
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("account_email_verification_sent"))
-
-        # Confirm email + auto login.
-        confirmation_token = EmailConfirmationHMAC(user_email).key
-        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-        response = self.client.post(confirm_email_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("welcoming_tour:index"))
-        user_email = user.emailaddress_set.first()
-        self.assertTrue(user_email.verified)
+        # No sent email.
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_facilitator_base_signup_process(self):
         url = reverse("signup:siae_select")
