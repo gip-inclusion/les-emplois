@@ -26,7 +26,6 @@ django-admin-logs  # https://pypi.org/project/django-admin-logs/
 # Test & Mock
 # ------------------------------------------------------------------------------
 freezegun  # https://github.com/spulec/freezegun
-requests-mock  # https://github.com/jamielennox/requests-mock
 respx  # https://lundberg.github.io/respx/
 pytest  # https://github.com/pytest-dev/pytest
 pytest-django # https://github.com/pytest-dev/pytest-django/

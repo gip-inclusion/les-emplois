@@ -1,6 +1,6 @@
 import logging
 
-import requests
+import httpx
 from django.conf import settings
 from django.db import transaction
 from django.forms.models import model_to_dict
@@ -35,7 +35,7 @@ def _call_api(api_path, token):
     For further processing, returning something else than `None` is considered a success
     """
     url = f"{settings.API_ESD['BASE_URL']}/{api_path}"
-    response = requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=settings.REQUESTS_TIMEOUT)
+    response = httpx.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=settings.REQUESTS_TIMEOUT)
     if response.status_code == 200:
         result = response.json()
         # logger.debug(f"CALL {url}: {result}")

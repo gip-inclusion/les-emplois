@@ -6,14 +6,14 @@ https://gist.github.com/devStepsize/b1b795309a217d24566dcc0ad136f784
 """
 import json
 
-import requests
+import httpx
 from django.conf import settings
 
 
 def send_slack_message(text="Hello world :wave:"):
     if not settings.SLACK_CRON_WEBHOOK_URL:
         return
-    response = requests.post(
+    response = httpx.post(
         url=settings.SLACK_CRON_WEBHOOK_URL,
         data=json.dumps({"text": text}),
         headers={"Content-Type": "application/json"},
