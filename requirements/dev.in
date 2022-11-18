@@ -33,9 +33,3 @@ respx  # https://lundberg.github.io/respx/
 pytest  # https://github.com/pytest-dev/pytest
 pytest-django # https://github.com/pytest-dev/pytest-django/
 pytest-xdist  # https://pypi.org/project/pytest-xdist/
-
-# Data extracts
-# ------------------------------------------------------------------------------
-# xlwt is required for pandas.to_excel used in diagnosis_control.py script (see private repo)
-# very convenient to store a dataframe as an excel file
-xlwt  # https://pypi.org/project/xlwt/
