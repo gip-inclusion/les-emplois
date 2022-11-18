@@ -1,6 +1,7 @@
 import json
 
-import requests_mock
+import httpx
+import respx
 from django.conf import settings
 from django.test import TestCase, override_settings
 
@@ -72,35 +73,45 @@ _API_KEYS = [
 ]
 
 
-def _status_ok(m):
-    m.get(_url_for_key(pec.ESD_USERINFO_API), text=json.dumps(_RESP_USER_INFO))
-    m.get(_url_for_key(pec.ESD_BIRTHDATE_API), text=json.dumps(_RESP_USER_BIRTHDATE))
-    m.get(_url_for_key(pec.ESD_STATUS_API), text=json.dumps(_RESP_USER_STATUS))
-    m.get(_url_for_key(pec.ESD_COORDS_API), text=json.dumps(_RESP_USER_COORDS))
-    m.get(_url_for_key(pec.ESD_COMPENSATION_API), text=json.dumps(_RESP_COMPENSATION))
+def _mock_status_ok():
+    respx.get(_url_for_key(pec.ESD_USERINFO_API)).mock(
+        httpx.Response(status_code=200, text=json.dumps(_RESP_USER_INFO))
+    )
+    respx.get(_url_for_key(pec.ESD_BIRTHDATE_API)).mock(
+        httpx.Response(status_code=200, text=json.dumps(_RESP_USER_BIRTHDATE))
+    )
+    respx.get(_url_for_key(pec.ESD_STATUS_API)).mock(
+        httpx.Response(status_code=200, text=json.dumps(_RESP_USER_STATUS))
+    )
+    respx.get(_url_for_key(pec.ESD_COORDS_API)).mock(
+        httpx.Response(status_code=200, text=json.dumps(_RESP_USER_COORDS))
+    )
+    respx.get(_url_for_key(pec.ESD_COMPENSATION_API)).mock(
+        httpx.Response(status_code=200, text=json.dumps(_RESP_COMPENSATION))
+    )
 
 
-def _status_partial(m):
-    _status_ok(m)
-    m.get(_url_for_key(pec.ESD_COMPENSATION_API), text="", status_code=503)
-    m.get(_url_for_key(pec.ESD_BIRTHDATE_API), text="", status_code=503)
+def _mock_status_partial():
+    _mock_status_ok()
+    respx.get(_url_for_key(pec.ESD_COMPENSATION_API)).mock(httpx.Response(text="", status_code=503))
+    respx.get(_url_for_key(pec.ESD_BIRTHDATE_API)).mock(httpx.Response(text="", status_code=503))
 
 
-def _status_failed(m):
+def _mock_status_failed():
     for api_k in _API_KEYS:
-        m.get(_url_for_key(api_k), text="", status_code=500)
+        respx.get(_url_for_key(api_k)).mock(httpx.Response(text="", status_code=500))
 
 
-@requests_mock.Mocker()
 @override_settings(
     API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
 )
 class ExternalDataImportTest(TestCase):
-    def test_status_ok(self, m):
+    @respx.mock
+    def test_status_ok(self):
         user = JobSeekerFactory()
 
         # Mock all PE APIs
-        _status_ok(m)
+        _mock_status_ok()
 
         result = import_user_pe_data(user, FOO_TOKEN)
         self.assertEqual(result.status, ExternalDataImport.STATUS_OK)
@@ -113,9 +124,10 @@ class ExternalDataImportTest(TestCase):
         self.assertEqual(6 + 1, len(report.get("fields_updated")))  # all the fields + history
         self.assertEqual(12, len(report.get("fields_fetched")))
 
-    def test_status_partial(self, m):
+    @respx.mock
+    def test_status_partial(self):
         user = JobSeekerFactory()
-        _status_partial(m)
+        _mock_status_partial()
 
         result = import_user_pe_data(user, FOO_TOKEN)
         self.assertEqual(result.status, ExternalDataImport.STATUS_PARTIAL)
@@ -130,9 +142,10 @@ class ExternalDataImportTest(TestCase):
         self.assertEqual(9, len(report.get("fields_fetched")))
         self.assertEqual(2, len(report.get("fields_failed")))
 
-    def test_status_failed(self, m):
+    @respx.mock
+    def test_status_failed(self):
         user = JobSeekerFactory()
-        _status_failed(m)
+        _mock_status_failed()
 
         result = import_user_pe_data(user, FOO_TOKEN)
         self.assertEqual(result.status, ExternalDataImport.STATUS_FAILED)
@@ -143,13 +156,13 @@ class ExternalDataImportTest(TestCase):
         self.assertEqual(0, len(report.get("fields_failed")))
 
 
-@requests_mock.Mocker()
 @override_settings(
     API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
 )
 class JobSeekerExternalDataTest(TestCase):
-    def test_import_ok(self, m):
-        _status_ok(m)
+    @respx.mock
+    def test_import_ok(self):
+        _mock_status_ok()
 
         user = JobSeekerFactory()
 
@@ -187,8 +200,9 @@ class JobSeekerExternalDataTest(TestCase):
         self.assertEqual(birthdate, user.birthdate)
         self.assertEqual(user.external_data_source_history[0]["source"], IdentityProvider.PE_CONNECT.value)
 
-    def test_import_partial(self, m):
-        _status_partial(m)
+    @respx.mock
+    def test_import_partial(self):
+        _mock_status_partial()
 
         user = JobSeekerFactory()
         import_user_pe_data(user, FOO_TOKEN)
@@ -205,8 +219,9 @@ class JobSeekerExternalDataTest(TestCase):
         self.assertNotEqual(str(user.birthdate), "1970-01-01")
         self.assertEqual(user.external_data_source_history[0]["source"], IdentityProvider.PE_CONNECT.value)
 
-    def test_import_failed(self, m):
-        _status_failed(m)
+    @respx.mock
+    def test_import_failed(self):
+        _mock_status_failed()
 
         user = JobSeekerFactory()
         import_user_pe_data(user, FOO_TOKEN)
@@ -217,8 +232,9 @@ class JobSeekerExternalDataTest(TestCase):
         self.assertIsNone(data.is_pe_jobseeker)
         self.assertIsNone(data.has_minimal_social_allowance)
 
-    def test_has_external_data(self, m):
-        _status_ok(m)
+    @respx.mock
+    def test_has_external_data(self):
+        _mock_status_ok()
 
         user1 = JobSeekerFactory()
         user2 = JobSeekerFactory()
