@@ -6,7 +6,7 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "pip"
-    directory: "/requirements"
+    directory: "/"
     schedule:
       interval: "weekly"
     commit-message:
