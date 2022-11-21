@@ -308,6 +308,31 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         self.assertIn(quote(email), response.url)
         self.assertEqual(self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["user_email"], email)
 
+    def test_resume_endpoint_no_session(self):
+        url = f"{reverse('inclusion_connect:resume_registration')}"
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse("home:hp"))
+
+    @respx.mock
+    def test_resume_endpoint_with_already_finished_registration(self):
+        mock_oauth_dance(self, KIND_PRESCRIBER)
+        url = f"{reverse('inclusion_connect:resume_registration')}"
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse("home:hp"))
+
+    def test_resume_endpoint(self):
+        # Fill up session with authorize view
+        email = "porthos@touspourun.com"
+        params = {"login_hint": email, "user_kind": KIND_PRESCRIBER, "channel": "invitation"}
+        url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+        response = self.client.get(url, follow=False)
+        self.assertEqual(InclusionConnectState.objects.count(), 1)
+
+        url = f"{reverse('inclusion_connect:resume_registration')}"
+        response = self.client.get(url, follow=False)
+        self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
+        self.assertEqual(InclusionConnectState.objects.count(), 2)
+
     ####################################
     ######### Callback tests ###########
     ####################################
