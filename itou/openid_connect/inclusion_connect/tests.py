@@ -7,6 +7,7 @@ from urllib.parse import quote, urlencode
 import httpx
 import respx
 from django.contrib import auth
+from django.contrib.messages import get_messages
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -312,6 +313,9 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url)
         self.assertRedirects(response, reverse("home:hp"))
+        [message] = list(get_messages(response.wsgi_request))
+        assert message.tags == "error"
+        assert message.message == "Impossible de reprendre la création de compte."
 
     @respx.mock
     def test_resume_endpoint_with_already_finished_registration(self):
@@ -319,6 +323,9 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url)
         self.assertRedirects(response, reverse("home:hp"))
+        [message] = list(get_messages(response.wsgi_request))
+        assert message.tags == "error"
+        assert message.message == "Impossible de reprendre la création de compte."
 
     def test_resume_endpoint(self):
         # Fill up session with authorize view
