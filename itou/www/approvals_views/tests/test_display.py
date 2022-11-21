@@ -5,8 +5,10 @@ from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.approvals.factories import ApprovalFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
+from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import UserFactory
 from itou.utils import constants as global_constants
 
@@ -53,6 +55,17 @@ class TestDisplayApproval(TestCase):
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
+
+    def test_no_display_approval_no_job_applications(self, *args, **kwargs):
+        approval = ApprovalFactory()
+        siae_member = SiaeMembershipFactory().user
+        self.client.force_login(siae_member)
+
+        response = self.client.get(
+            reverse("approvals:display_printable_approval", kwargs={"approval_id": approval.pk})
+        )
+
+        self.assertEqual(response.status_code, 404)
 
     def test_display_approval_even_if_diagnosis_is_missing(self, *args, **kwargs):
         # An approval has been delivered but it does not come from Itou.
