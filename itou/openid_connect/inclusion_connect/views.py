@@ -120,6 +120,7 @@ def inclusion_connect_resume_registration(request):
     # If there's a token in the session then the user already came back to the callback view : nothing to resume.
     # If there's no session then the user never started a registration on this device : nothing to resume either.
     if not ic_session or ic_session["token"]:
+        messages.error(request, "Impossible de reprendre la création de compte.")
         return HttpResponseRedirect(reverse("home:hp"))
     data = generate_inclusion_params_from_session(ic_session)
     return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
