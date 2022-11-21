@@ -27,6 +27,13 @@ jobs:
       uses: actions/checkout@v3
       with:
         ref: ${{ env.DEPLOY_BRANCH }}
+        # env.DEPLOY_BRANCH is master_clever, which is not the default branch
+        # (master). fetch-depth defaults to a shallow clone of the default
+        # branch, which does not include the tip of env.DEPLOY_BRANCH.
+        # Instead, use 0 to fetch all history for all branches and tags. That’s
+        # more than necessary, but the action does not currently allow to
+        # checkout a single other branch.
+        fetch-depth: 0  # Fetch all history for all branches and tags.
 
     # Daily.
     - name: 🏷 Setup app name (daily scan)

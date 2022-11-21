@@ -62,6 +62,24 @@ def _redirect_to_login_page_on_error(error_msg, request=None):
     return HttpResponseRedirect(reverse("home:hp"))
 
 
+def generate_inclusion_params_from_session(ic_session):
+    redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
+    signed_csrf = InclusionConnectState.create_signed_csrf_token()
+    data = {
+        "response_type": "code",
+        "client_id": constants.INCLUSION_CONNECT_CLIENT_ID,
+        "redirect_uri": redirect_uri,
+        "scope": constants.INCLUSION_CONNECT_SCOPES,
+        "state": signed_csrf,
+        "nonce": crypto.get_random_string(length=12),
+        "from": "emplois",  # Display a "Les emplois" logo on the connection page.
+    }
+    login_hint = ic_session.get("user_email")
+    if login_hint is not None:
+        data["login_hint"] = login_hint
+    return data
+
+
 def inclusion_connect_authorize(request):
     # Start a new session.
     user_kind = request.GET.get("user_kind")
@@ -74,32 +92,37 @@ def inclusion_connect_authorize(request):
     request = ic_session.bind_to_request(request)
     ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
 
-    redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
-    signed_csrf = InclusionConnectState.create_signed_csrf_token()
-    data = {
-        "response_type": "code",
-        "client_id": constants.INCLUSION_CONNECT_CLIENT_ID,
-        "redirect_uri": redirect_uri,
-        "scope": constants.INCLUSION_CONNECT_SCOPES,
-        "state": signed_csrf,
-        "nonce": crypto.get_random_string(length=12),
-        "from": "emplois",  # Display a "Les emplois" logo on the connection page.
-    }
     login_hint = request.GET.get("login_hint")
     channel = request.GET.get("channel")
     if login_hint:
         if not channel:
             return _redirect_to_login_page_on_error(error_msg="channel is missing when login_hint is present.")
-        data["login_hint"] = login_hint
         ic_session["user_email"] = login_hint
         ic_session["channel"] = channel
         request.session.modified = True
+
+    data = generate_inclusion_params_from_session(ic_session)
 
     if request.GET.get("register"):
         base_url = constants.INCLUSION_CONNECT_ENDPOINT_REGISTER
     else:
         base_url = constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE
     return HttpResponseRedirect(f"{base_url}?{urlencode(data)}")
+
+
+def inclusion_connect_resume_registration(request):
+    """
+    Used for users that didn't received the validation e-mail from Inclusion Connect.
+    This view will allow them to resume the account creation flow.
+    The only way to get the URL is to get it from the support team.
+    """
+    ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
+    # If there's a token in the session then the user already came back to the callback view : nothing to resume.
+    # If there's no session then the user never started a registration on this device : nothing to resume either.
+    if not ic_session or ic_session["token"]:
+        return HttpResponseRedirect(reverse("home:hp"))
+    data = generate_inclusion_params_from_session(ic_session)
+    return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
 
 
 def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
