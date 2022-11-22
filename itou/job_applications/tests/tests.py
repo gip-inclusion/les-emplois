@@ -517,14 +517,25 @@ class JobApplicationQuerySetTest(TestCase):
             job_application=job_app,
             asp_id=job_app.to_siae.convention.asp_id,
             approval_number=job_app.approval.number,
-            status=Status.PROCESSED,
+            status=Status.NEW,
         )
+        self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+        employee_record.status = Status.PROCESSED
+        employee_record.save()
         self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
         # After employee record is disabled
         employee_record.update_as_disabled()
         self.assertEqual(employee_record.status, Status.DISABLED)
         self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+
+        # Create a second job application to the same SIAE and for the same approval
+        second_job_app = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            to_siae=job_app.to_siae,
+            approval=job_app.approval,
+        )
+        self.assertNotIn(second_job_app, JobApplication.objects.eligible_as_employee_record(second_job_app.to_siae))
 
         # No employee record, but with a suspension
         job_app = JobApplicationWithApprovalFactory(
@@ -565,6 +576,7 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
         # ...and with an employee record already existing for that employee
         EmployeeRecordFactory(
+            status=Status.READY,
             job_application__to_siae=job_app.to_siae,
             approval_number=job_app.approval.number,
         )

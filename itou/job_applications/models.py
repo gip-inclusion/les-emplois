@@ -334,11 +334,6 @@ class JobApplicationQuerySet(models.QuerySet):
                         created_at__gte=timezone.make_aware(datetime.datetime(2022, 1, 1)),
                     )
                 ),
-                employee_record_exists=Exists(
-                    EmployeeRecord.objects.filter(
-                        job_application__to_siae=OuterRef("to_siae"), approval_number=OuterRef("approval__number")
-                    )
-                ),
             )
             .filter(
                 # Must be linked to an approval with a Suspension or a Prolongation
@@ -352,8 +347,6 @@ class JobApplicationQuerySet(models.QuerySet):
                 create_employee_record=True,
                 # There must be **NO** employee record linked in this part
                 employee_record__isnull=True,
-                # Exclude the job application if an employee record with the same SIAE and approval already exists.
-                employee_record_exists=False,
             )
         )
 
@@ -385,10 +378,21 @@ class JobApplicationQuerySet(models.QuerySet):
             self._eligible_job_applications_with_a_suspended_or_extended_approval(siae),
         )
 
+        # Return the approvals that are already linked to an employee records of the SIAE (ASP ID)
+        approvals_to_exclude = (
+            EmployeeRecord.objects.filter(
+                asp_id=siae.convention.asp_id,
+            )
+            # We need to exclude NEW employee records otherwise we are shooting ourselves in the foot by excluding
+            # job applications selected in `._eligible_job_applications_with_employee_record()`
+            .exclude(status__in=[employeerecord_enums.Status.NEW]).values("approval_number")
+        )
+
         # TIP: you can't filter on a UNION of querysets,
         # but you can convert it as a subquery and then order and filter it
         return (
             self.filter(pk__in=eligible_job_applications.values("id"))
+            .exclude(approval__number__in=approvals_to_exclude)
             .select_related("to_siae", "to_siae__convention", "approval", "job_seeker")
             .prefetch_related("employee_record", "approval__suspension_set", "approval__prolongation_set")
             .order_by("-hiring_start_at")
