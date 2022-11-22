@@ -2,7 +2,6 @@ from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.test import TestCase
 from django.urls import reverse
 
 from itou.approvals.factories import ApprovalFactory
@@ -11,6 +10,7 @@ from itou.job_applications.models import JobApplication
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import UserFactory
 from itou.utils import constants as global_constants
+from itou.utils.test import TestCase
 
 
 @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)

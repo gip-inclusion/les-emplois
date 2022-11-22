@@ -1,9 +1,9 @@
 from django.core import mail
-from django.test import TestCase
 
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNotification
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
+from itou.utils.test import TestCase
 
 
 class NotificationsBaseClassTest(TestCase):

@@ -4,7 +4,7 @@ from unittest import mock
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -23,6 +23,7 @@ from itou.siaes.factories import (
 )
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.factories import JobSeekerFactory
+from itou.utils.test import TestCase
 
 
 class SiaeFactoriesTest(TestCase):

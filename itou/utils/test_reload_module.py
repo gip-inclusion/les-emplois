@@ -1,7 +1,9 @@
 import sys
 
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import override_settings
+
+from itou.utils.test import TestCase
 
 from .testing import reload_module
 

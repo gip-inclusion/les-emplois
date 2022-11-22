@@ -1,6 +1,7 @@
 import pytest
-from django.test import TestCase
 from django.test.client import Client
+
+from itou.utils.test import TestCase
 
 
 class HtmxClient(Client):

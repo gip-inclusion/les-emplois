@@ -1,11 +1,11 @@
 from unittest import mock
 
 from django.contrib.gis.geos import GEOSGeometry
-from django.test import TestCase
 
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.test import TestCase
 
 
 class UtilsGeocodingTest(TestCase):

@@ -1,6 +1,5 @@
 from django.core import mail
 from django.shortcuts import reverse
-from django.test import TestCase
 from django.utils import timezone
 from django.utils.html import escape
 
@@ -8,6 +7,7 @@ from itou.invitations.models import SiaeStaffInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.factories import JobSeekerFactory, UserFactory
+from itou.utils.test import TestCase
 from itou.www.invitations_views.forms import SiaeStaffInvitationForm
 
 

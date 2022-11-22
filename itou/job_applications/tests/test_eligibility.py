@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django.utils.timezone import timedelta
 
 import itou.employee_record.enums as er_enums
@@ -8,6 +7,7 @@ from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithoutApprovalFactory
 from itou.job_applications.models import JobApplication
 from itou.siaes.factories import SiaeFactory
+from itou.utils.test import TestCase
 
 
 class EmployeeRecordEligibilityTest(TestCase):

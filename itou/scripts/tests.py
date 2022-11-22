@@ -9,7 +9,7 @@ import pandas
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import management
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval, PoleEmploiApproval
@@ -43,6 +43,7 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
+from itou.utils.test import TestCase
 
 
 TEST_FILE_PATH = "itou/scripts/liste-agrements-22_03-fake.xlsx"

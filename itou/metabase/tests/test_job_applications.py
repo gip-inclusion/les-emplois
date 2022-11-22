@@ -1,5 +1,3 @@
-from django.test import TestCase
-
 from itou.job_applications.enums import RefusalReason
 from itou.job_applications.factories import (
     JobApplicationFactory,
@@ -8,6 +6,7 @@ from itou.job_applications.factories import (
 )
 from itou.metabase.management.commands._job_applications import TABLE
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.utils.test import TestCase
 
 
 class MetabaseJobApplicationTest(TestCase):

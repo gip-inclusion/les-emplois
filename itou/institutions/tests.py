@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from itou.institutions.factories import InstitutionWith2MembershipFactory, InstitutionWithMembershipFactory
+from itou.utils.test import TestCase
 
 
 class InstitutionModelTest(TestCase):

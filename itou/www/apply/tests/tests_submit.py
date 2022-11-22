@@ -5,7 +5,6 @@ from unittest import mock
 import faker
 from dateutil.relativedelta import relativedelta
 from django.contrib.messages import get_messages
-from django.test import TestCase
 from django.urls import resolve, reverse
 from django.utils import timezone
 
@@ -25,6 +24,7 @@ from itou.users.models import User
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.storage.testing import S3AccessingTestCase
+from itou.utils.test import TestCase
 
 
 fake = faker.Faker(locale="fr_FR")

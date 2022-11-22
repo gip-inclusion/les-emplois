@@ -3,13 +3,14 @@ import datetime
 import httpx
 import respx
 from django.core.exceptions import ValidationError
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
 from itou.users.enums import IdentityProvider
 from itou.users.factories import UserFactory
 from itou.users.models import User
+from itou.utils.test import TestCase
 from itou.utils.testing import reload_module
 
 from ..constants import OIDC_STATE_EXPIRATION

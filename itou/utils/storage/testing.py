@@ -1,4 +1,6 @@
-from django.test import TestCase, override_settings
+from django.test import override_settings
+
+from itou.utils.test import TestCase
 
 
 # The apply tests do use the S3 resource since part of the process consists in uploading a document.

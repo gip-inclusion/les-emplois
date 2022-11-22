@@ -1,6 +1,5 @@
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
-from django.test import TestCase
 from django.urls import reverse
 
 from itou.cities.models import City
@@ -10,6 +9,7 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import SiaeJobDescription
+from itou.utils.test import TestCase
 from itou.www.siaes_views.views import ITOU_SESSION_CURRENT_PAGE_KEY, ITOU_SESSION_JOB_DESCRIPTION_KEY
 
 

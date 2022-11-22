@@ -1,8 +1,7 @@
-from django.test import TestCase
-
 from itou.geo.enums import ZRRStatus
 from itou.geo.factories import ZRRFactory
 from itou.geo.models import ZRR
+from itou.utils.test import TestCase
 
 
 class ZRRModelTest(TestCase):

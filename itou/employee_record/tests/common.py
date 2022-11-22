@@ -1,7 +1,8 @@
 from io import StringIO
 
 from django.core import management
-from django.test import TestCase
+
+from itou.utils.test import TestCase
 
 
 class EmployeeRecordFixtureTest(TestCase):

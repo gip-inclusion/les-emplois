@@ -1,11 +1,10 @@
-from django.test import TestCase
-
 from itou.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentBySiaeFactory,
 )
 from itou.users.factories import JobSeekerFactory
+from itou.utils.test import TestCase
 from itou.www.apply import forms as apply_forms
 
 

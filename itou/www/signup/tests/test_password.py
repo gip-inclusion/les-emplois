@@ -2,11 +2,11 @@ from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 from django.utils.http import urlencode
 
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.utils.test import TestCase
 
 
 class PasswordResetTest(TestCase):

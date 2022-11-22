@@ -6,7 +6,6 @@ from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 
@@ -37,6 +36,7 @@ from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
+from itou.utils.test import TestCase
 
 
 def create_batch_of_job_applications(siae):

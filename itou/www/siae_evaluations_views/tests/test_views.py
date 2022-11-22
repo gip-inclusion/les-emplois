@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
@@ -6,6 +5,7 @@ from itou.institutions.factories import InstitutionMembershipFactory
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory
 from itou.siaes.factories import SiaeMembershipFactory
+from itou.utils.test import TestCase
 
 
 class EvaluatedSiaeSanctionViewTest(TestCase):

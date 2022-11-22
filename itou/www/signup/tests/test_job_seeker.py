@@ -4,7 +4,7 @@ import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.core import mail
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
@@ -14,6 +14,7 @@ from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dan
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.test import TestCase
 from itou.utils.testing import reload_module
 from itou.www.signup.forms import JobSeekerSituationForm
 

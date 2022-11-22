@@ -6,10 +6,11 @@ from io import StringIO
 import respx
 from django.conf import settings
 from django.core import management
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from httpx import Response
 
 from itou.users.factories import JobSeekerWithAddressFactory
+from itou.utils.test import TestCase
 
 
 def mock_ban_api(user_id):

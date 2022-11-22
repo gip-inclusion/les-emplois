@@ -2,7 +2,6 @@ from itertools import product
 from unittest.mock import patch
 
 from dateutil.relativedelta import relativedelta
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -23,6 +22,7 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerWithAddressFactory
 from itou.users.models import User
 from itou.utils.templatetags.format_filters import format_nir
+from itou.utils.test import TestCase
 from itou.utils.widgets import DuetDatePickerWidget
 
 

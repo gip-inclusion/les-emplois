@@ -2,7 +2,6 @@
 from unittest import mock
 
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
@@ -17,6 +16,7 @@ from itou.siaes.factories import (
 from itou.siaes.models import Siae
 from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.test import TestCase
 
 
 class CardViewTest(TestCase):

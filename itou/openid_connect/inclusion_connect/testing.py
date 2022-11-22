@@ -1,5 +1,6 @@
-from django.test import TestCase, override_settings
+from django.test import override_settings
 
+from itou.utils.test import TestCase
 from itou.utils.testing import reload_module
 
 from . import constants

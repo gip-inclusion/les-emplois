@@ -5,13 +5,13 @@ import unittest
 
 from django.contrib.auth.models import Group
 from django.core.management import call_command
-from django.test import TestCase
 
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
+from itou.utils.test import TestCase
 
 
 @unittest.skipUnless(os.getenv("CI", False), "It is a long management command and normally not subject to change!")

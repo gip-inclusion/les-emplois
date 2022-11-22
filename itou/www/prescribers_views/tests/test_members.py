@@ -1,5 +1,4 @@
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 
 from itou.prescribers.factories import (
@@ -7,6 +6,7 @@ from itou.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
+from itou.utils.test import TestCase
 
 
 class MembersTest(TestCase):

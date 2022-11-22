@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail.message import EmailMessage
 from django.http import HttpResponse
 from django.template import Context, Template
-from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
@@ -44,6 +44,7 @@ from itou.utils.perms.user import get_user_info
 from itou.utils.sync import yield_sync_diff
 from itou.utils.tasks import sanitize_mailjet_recipients
 from itou.utils.templatetags import dict_filters, format_filters
+from itou.utils.test import TestCase
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import get_absolute_url, get_external_link_markup, get_safe_url, get_tally_form_url
 from itou.utils.validators import (

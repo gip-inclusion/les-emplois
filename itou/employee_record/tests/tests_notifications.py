@@ -1,12 +1,12 @@
 from datetime import timedelta
 
-from django.test import TestCase
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.utils.test import TestCase
 
 
 class EmployeeRecordUpdateNotificationTest(TestCase):

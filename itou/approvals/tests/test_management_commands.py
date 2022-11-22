@@ -2,10 +2,10 @@ import datetime
 import io
 
 from django.core import management
-from django.test import TestCase
 from freezegun import freeze_time
 
 from itou.approvals.factories import ApprovalFactory
+from itou.utils.test import TestCase
 
 
 class ExportPEApiRejectionsTestCase(TestCase):

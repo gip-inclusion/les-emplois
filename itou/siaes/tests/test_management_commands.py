@@ -1,11 +1,11 @@
 import io
 
 from django.core import management
-from django.test import TestCase
 
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory
 from itou.siaes import factories as siaes_factories
 from itou.siaes.enums import SiaeKind
+from itou.utils.test import TestCase
 
 
 class MoveSiaeDataTest(TestCase):
