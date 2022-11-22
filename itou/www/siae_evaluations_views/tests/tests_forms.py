@@ -1,7 +1,8 @@
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.utils import timezone
 
 from itou.siae_evaluations.factories import EvaluatedJobApplicationFactory
+from itou.utils.test import TestCase
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SubmitEvaluatedAdministrativeCriteriaProofForm
 
 

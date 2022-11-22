@@ -1,6 +1,5 @@
 from dateutil.relativedelta import relativedelta
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
@@ -22,6 +21,7 @@ from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.storage.testing import S3AccessingTestCase
+from itou.utils.test import TestCase
 
 
 # fixme vincentporte : convert this method into factory

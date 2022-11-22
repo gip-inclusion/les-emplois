@@ -5,7 +5,7 @@ import respx
 from django.conf import settings
 from django.contrib.messages import get_messages
 from django.core import mail
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -22,6 +22,7 @@ from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
+from itou.utils.test import TestCase
 from itou.utils.urls import get_tally_form_url
 from itou.www.testing import NUM_CSRF_SESSION_REQUESTS
 

@@ -11,7 +11,7 @@ from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, transaction
 from django.template.defaultfilters import title
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -35,6 +35,7 @@ from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, UserFactory
 from itou.utils import constants as global_constants
+from itou.utils.test import TestCase
 
 
 class CommonApprovalQuerySetTest(TestCase):

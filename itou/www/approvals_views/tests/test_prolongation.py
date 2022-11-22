@@ -1,6 +1,5 @@
 from dateutil.relativedelta import relativedelta
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
@@ -9,6 +8,7 @@ from django.utils.http import urlencode
 from itou.approvals.models import Prolongation
 from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from itou.utils.test import TestCase
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import DeclareProlongationForm
 

@@ -2,7 +2,6 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.messages.storage.base import Message
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
@@ -24,6 +23,7 @@ from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.templatetags.format_filters import format_approval_number
+from itou.utils.test import TestCase
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
 

@@ -1,5 +1,5 @@
 from django.template.defaultfilters import capfirst
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase
 from django.utils import timezone
 
 from itou.invitations.factories import (
@@ -10,6 +10,7 @@ from itou.invitations.factories import (
 )
 from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
 from itou.users.factories import UserFactory
+from itou.utils.test import TestCase
 
 
 class SiaeStaffInvitationQuerySetTest(TestCase):

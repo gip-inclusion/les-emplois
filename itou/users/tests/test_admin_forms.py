@@ -1,10 +1,10 @@
 from django.forms.models import model_to_dict
-from django.test import TestCase
 
 from itou.approvals.factories import ApprovalFactory
 from itou.users.admin_forms import UserAdminForm
 from itou.users.enums import IdentityProvider
 from itou.users.factories import JobSeekerFactory
+from itou.utils.test import TestCase
 
 
 class UserAdminFormTest(TestCase):

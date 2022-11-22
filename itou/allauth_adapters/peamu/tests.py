@@ -8,7 +8,7 @@ from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.tests import OAuth2TestsMixin
 from allauth.tests import MockedResponse
 from django.core import mail
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
@@ -16,6 +16,7 @@ from itou.users import enums as users_enums
 from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.test import TestCase
 
 
 @override_settings(

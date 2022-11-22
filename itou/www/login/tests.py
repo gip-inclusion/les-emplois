@@ -1,6 +1,6 @@
 import respx
 from django.contrib.messages import get_messages
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 
@@ -17,6 +17,7 @@ from itou.users.factories import (
     SiaeStaffFactory,
     UserFactory,
 )
+from itou.utils.test import TestCase
 from itou.utils.testing import reload_module
 from itou.www.login.forms import ItouLoginForm
 

@@ -1,11 +1,11 @@
 import json
 
-from django.test import TestCase
 from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.siaes.factories import SiaeFactory
+from itou.utils.test import TestCase
 
 
 class JobsAutocompleteTest(TestCase):

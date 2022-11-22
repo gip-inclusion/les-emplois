@@ -2,7 +2,6 @@ from unittest import mock
 
 from django import forms
 from django.contrib.gis.geos import Point
-from django.test import TestCase
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
@@ -14,6 +13,7 @@ from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.test import TestCase
 
 
 class UtilsAddressMixinTest(TestCase):

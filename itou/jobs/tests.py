@@ -1,7 +1,6 @@
-from django.test import TestCase
-
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation, Rome
+from itou.utils.test import TestCase
 
 
 class FixturesTest(TestCase):

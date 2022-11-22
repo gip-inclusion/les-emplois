@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import get_current_timezone
 
@@ -23,6 +23,7 @@ from itou.prescribers.management.commands.merge_organizations import organizatio
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import UserFactory
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
+from itou.utils.test import TestCase
 
 
 class PrescriberOrganizationManagerTest(TestCase):

@@ -10,7 +10,7 @@ from django.core import mail, management
 from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.template.defaultfilters import title
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -45,6 +45,7 @@ from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
+from itou.utils.test import TestCase
 
 
 @override_settings(

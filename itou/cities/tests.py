@@ -1,7 +1,6 @@
-from django.test import TestCase
-
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
+from itou.utils.test import TestCase
 
 
 class FixturesTest(TestCase):

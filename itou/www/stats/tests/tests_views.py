@@ -1,5 +1,7 @@
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
+
+from itou.utils.test import TestCase
 
 
 class StatsViewTest(TestCase):

@@ -1,9 +1,8 @@
 import datetime
 
-from django.test import TestCase
-
 from itou.asp.models import Commune
 from itou.users.factories import UserFactory
+from itou.utils.test import TestCase
 
 
 class _CommuneTest(TestCase):

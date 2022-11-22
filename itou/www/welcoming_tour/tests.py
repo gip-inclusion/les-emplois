@@ -2,7 +2,6 @@ import respx
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 
 from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
@@ -12,6 +11,7 @@ from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.test import TestCase
 
 
 def get_confirm_email_url(request, email):

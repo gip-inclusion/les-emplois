@@ -3,7 +3,6 @@ import json
 import httpx
 import respx
 from django.core.cache import cache
-from django.test import TestCase
 from freezegun import freeze_time
 
 from itou.job_applications.factories import JobApplicationFactory
@@ -15,6 +14,7 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIException,
 )
 from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
+from itou.utils.test import TestCase
 
 
 class PoleEmploiAPIClientTest(TestCase):

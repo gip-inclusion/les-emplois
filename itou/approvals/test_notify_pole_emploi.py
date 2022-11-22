@@ -6,7 +6,7 @@ from unittest.mock import patch
 import httpx
 import respx
 from django.core import management
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
@@ -22,6 +22,7 @@ from itou.utils.mocks.pole_emploi import (
     API_RECHERCHE_MANY_RESULTS,
     API_RECHERCHE_RESULT_KNOWN,
 )
+from itou.utils.test import TestCase
 
 
 @override_settings(

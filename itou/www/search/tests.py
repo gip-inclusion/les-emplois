@@ -1,6 +1,5 @@
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst
-from django.test import TestCase
 from django.urls import reverse
 
 from itou.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
@@ -11,6 +10,7 @@ from itou.jobs.models import Appellation, Rome
 from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
+from itou.utils.test import TestCase
 from itou.www.testing import NUM_CSRF_SESSION_REQUESTS
 
 

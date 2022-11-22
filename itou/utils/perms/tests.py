@@ -1,7 +1,8 @@
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 
 from itou.users.factories import UserFactory
+from itou.utils.test import TestCase
 
 
 class UserHijackPermTestCase(TestCase):

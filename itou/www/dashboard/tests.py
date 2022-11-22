@@ -4,7 +4,7 @@ from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -36,6 +36,7 @@ from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberF
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags.format_filters import format_approval_number
+from itou.utils.test import TestCase
 from itou.www.dashboard.forms import EditUserEmailForm
 
 

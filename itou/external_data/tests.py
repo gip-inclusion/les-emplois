@@ -3,11 +3,12 @@ import json
 import httpx
 import respx
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import override_settings
 
 import itou.external_data.apis.pe_connect as pec
 from itou.users.enums import IdentityProvider
 from itou.users.factories import JobSeekerFactory
+from itou.utils.test import TestCase
 
 from .apis.pe_connect import import_user_pe_data
 from .models import ExternalDataImport, RejectedEmailEventData

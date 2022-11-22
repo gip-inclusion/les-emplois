@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -16,6 +15,7 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
+from itou.utils.test import TestCase
 from itou.utils.widgets import DuetDatePickerWidget
 
 

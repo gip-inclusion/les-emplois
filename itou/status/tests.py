@@ -5,9 +5,10 @@ from unittest import mock
 import factory
 from django import urls
 from django.core import management
-from django.test import TestCase
 from django.utils import timezone
 from faker import Faker
+
+from itou.utils.test import TestCase
 
 from . import factories, models, probes
 from .management.commands import run_status_probes

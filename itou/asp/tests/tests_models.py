@@ -1,12 +1,11 @@
 from unittest import mock
 
-from django.test import TestCase
-
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.common_apps.address.format import format_address
 from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK
+from itou.utils.test import TestCase
 
 
 def _users_with_mock_address(idx):

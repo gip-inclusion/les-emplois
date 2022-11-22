@@ -1,5 +1,4 @@
 from dateutil.relativedelta import relativedelta
-from django.test import TestCase
 from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -10,6 +9,7 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.utils.perms.user import UserInfo
+from itou.utils.test import TestCase
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
 
 

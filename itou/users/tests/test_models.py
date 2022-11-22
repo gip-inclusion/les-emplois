@@ -7,7 +7,6 @@ from unittest import mock
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.test import TestCase
 from django.utils import timezone
 
 import itou.asp.factories as asp
@@ -38,6 +37,7 @@ from itou.users.factories import (
 )
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
+from itou.utils.test import TestCase
 
 
 class ManagerTest(TestCase):

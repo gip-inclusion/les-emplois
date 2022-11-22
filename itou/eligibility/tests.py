@@ -1,7 +1,6 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
-from django.test import TestCase
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
@@ -18,6 +17,7 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
+from itou.utils.test import TestCase
 
 
 class EligibilityDiagnosisQuerySetTest(TestCase):

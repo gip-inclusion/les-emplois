@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
-from django.test import TestCase
 from django.utils.html import escape
 
 from itou.invitations.factories import PrescriberWithOrgSentInvitationFactory
@@ -22,6 +21,7 @@ from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberF
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.test import TestCase
 
 
 POST_DATA = {

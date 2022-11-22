@@ -1,9 +1,9 @@
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 
 from itou.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
+from itou.utils.test import TestCase
 
 
 class PrescribersOrganizationAdminMembersManagementTest(TestCase):

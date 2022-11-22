@@ -1,6 +1,5 @@
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.test import TestCase
 from django.utils import timezone
 
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
@@ -13,6 +12,7 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from itou.users.factories import UserFactory
+from itou.utils.test import TestCase
 
 
 class JobApplicationTransferModelTest(TestCase):

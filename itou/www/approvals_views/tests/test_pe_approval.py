@@ -1,5 +1,4 @@
 from django.contrib.messages import get_messages
-from django.test import TestCase
 from django.urls import reverse
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
@@ -9,6 +8,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
+from itou.utils.test import TestCase
 
 
 class PoleEmploiApprovalSearchTest(TestCase):
