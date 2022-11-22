@@ -615,6 +615,11 @@ class JobApplicationQuerySetTest(TestCase):
         job_application.refuse(job_application.sender)  # 2 transitions, still no accept
         self.assertIsNone(JobApplication.objects.with_accepted_at().first().accepted_at)
 
+    def test_with_accepted_at_for_accepted_with_no_transition(self):
+        JobApplicationSentBySiaeFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_application = JobApplication.objects.with_accepted_at().first()
+        self.assertEqual(job_application.accepted_at, job_application.created_at)
+
 
 class JobApplicationNotificationsTest(TestCase):
     @classmethod
