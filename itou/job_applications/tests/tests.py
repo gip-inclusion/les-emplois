@@ -591,12 +591,12 @@ class JobApplicationQuerySetTest(TestCase):
         SuspensionFactory(
             siae=job_app.to_siae,
             approval=job_app.approval,
-            created_at="2001-01-01",
+            created_at=timezone.make_aware(datetime.datetime(2001, 1, 1)),
         )
         ProlongationFactory(
             declared_by_siae=job_app.to_siae,
             approval=job_app.approval,
-            created_at="2001-01-01",
+            created_at=timezone.make_aware(datetime.datetime(2001, 1, 1)),
         )
         self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
