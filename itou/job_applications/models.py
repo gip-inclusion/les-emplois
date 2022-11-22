@@ -170,6 +170,13 @@ class JobApplicationQuerySet(models.QuerySet):
         return self.annotate(
             accepted_at=Case(
                 When(created_from_pe_approval=True, then=F("created_at")),
+                # A job_application created at the accepted status, still accepted
+                When(
+                    created_from_pe_approval=False,
+                    state=JobApplicationWorkflow.STATE_ACCEPTED,
+                    logs__isnull=True,
+                    then=F("created_at"),
+                ),
                 When(created_from_pe_approval=False, then=created_at_from_transition),
             )
         )
