@@ -6,9 +6,9 @@ from allauth.account.models import EmailAddress, EmailConfirmation
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.tests import OAuth2TestsMixin
-from allauth.tests import MockedResponse, TestCase
+from allauth.tests import MockedResponse
 from django.core import mail
-from django.test import override_settings
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider

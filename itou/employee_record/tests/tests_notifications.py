@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.test.testcases import TestCase
+from django.test import TestCase
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
