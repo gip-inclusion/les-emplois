@@ -32,8 +32,8 @@
                     <div class="col">
                         <a href="#job_description_link" class="btn btn-sm btn-outline-primary" data-toggle="collapse" title="Partager cette fiche métier">Partager cette fiche métier</a>
                         <div class="collapse pt-2" id="job_description_link">
-                            <p class="small mb-1">Copiez-collez le lien ci-dessous :</p>
-                            <input type="text" class="form-control form-control-sm" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}" onClick="this.select()">
+                            <p class="small mb-1">Cliquez sur le lien ci-dessous pour le copier:</p>
+                            <input type="text" class="form-control form-control-sm" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}">
                         </div>
                     </div>
                     {% if job.is_active and not siae.block_job_applications %}
@@ -64,4 +64,15 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script nonce="{{ CSP_NONCE }}">
+        document.getElementById('job_description_link').addEventListener("click", function select(event){
+            var input = event.target;
+            input.select();
+            navigator.clipboard.writeText(input.value);
+        });
+    </script>
 {% endblock %}
