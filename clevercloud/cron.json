@@ -1,9 +1,11 @@
 [
   "*/5 * * * * $ROOT/clevercloud/status-probes.sh",
-  "1 0 * * * $ROOT/clevercloud/update-prescriber-organization-with-api-entreprise.sh",
+  "1 0 * * * $ROOT/clevercloud/run_management_command.sh update_prescriber_organization_with_api_entreprise --verbosity 2",
   "25 8-18/2 * * 1-5 $ROOT/clevercloud/download_employee_records.sh",
   "55 8-18/2 * * 1-5 $ROOT/clevercloud/upload_employee_records.sh",
   "5 23 * * 1-5 $ROOT/clevercloud/archive_employee_records.sh",
   "0 * * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
-  "0 12 * * * $ROOT/clevercloud/evaluation_campaign_notifications.sh"
+  "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
+  "0 0 * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files c1-prod --daily",
+  "0 0 1 * * $ROOT/clevercloud/run_management_command.sh scan_s3_files c1-prod"
 ]
