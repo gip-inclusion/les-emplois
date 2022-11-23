@@ -5,6 +5,7 @@ from django.db.models import Count
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.decorators.http import require_safe
 
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.enums import Status
@@ -21,6 +22,8 @@ from itou.www.employee_record_views.forms import (
     NewEmployeeRecordStep4,
     SelectEmployeeRecordStatusForm,
 )
+
+from .enums import EmployeeRecordOrder
 
 
 # Labels and steps for multi-steps component
@@ -52,14 +55,14 @@ STEPS = [
 
 
 @login_required
+@require_safe
 def list_employee_records(request, template_name="employee_record/list.html"):
     siae = get_current_siae_or_404(request)
 
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    form = SelectEmployeeRecordStatusForm(data=request.GET or None)
-    status = Status.NEW
+    form = SelectEmployeeRecordStatusForm(data=request.GET)
 
     # Employee records are created with a job application object
     # At this stage, new job applications / hirings do not have
@@ -98,18 +101,29 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         (employee_record_badges.get(Status.DISABLED, 0), "emploi-lightest"),
     ]
 
-    # Override defaut value (NEW status)
     # See comment above on `employee_records_list` var
-    if form.is_valid():
-        status = form.cleaned_data["status"]
+    form.full_clean()  # We do not use is_valid to validate each field independently
+    status = Status(form.cleaned_data.get("status") or Status.NEW)
+    order_by = EmployeeRecordOrder(form.cleaned_data.get("order") or EmployeeRecordOrder.HIRING_START_AT_DESC)
+
+    job_application_order_by = {
+        EmployeeRecordOrder.NAME_ASC: ("job_seeker__last_name", "job_seeker__first_name"),
+        EmployeeRecordOrder.NAME_DESC: ("-job_seeker__last_name", "-job_seeker__first_name"),
+        EmployeeRecordOrder.HIRING_START_AT_ASC: ("hiring_start_at",),
+        EmployeeRecordOrder.HIRING_START_AT_DESC: ("-hiring_start_at",),
+    }[order_by]
+    employee_record_order_by = tuple(
+        f"-job_application__{order_by_item[1:]}" if order_by_item[0] == "-" else f"job_application__{order_by_item}"
+        for order_by_item in job_application_order_by
+    )
 
     # Not needed every time (not pulled-up), and DRY here
-    base_query = EmployeeRecord.objects.full_fetch()
+    base_query = EmployeeRecord.objects.full_fetch().order_by(*employee_record_order_by)
     has_outdated_date = False
 
     if status == Status.NEW:
         # Browse to get only the linked employee record in "new" state
-        data = eligibible_job_applications
+        data = eligibible_job_applications.order_by(*job_application_order_by)
         for item in data:
             item.has_outdated_date = (
                 item.approval.suspension_set.filter(siae=siae).exists()
@@ -127,7 +141,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     elif status == Status.SENT:
         data = base_query.sent_for_siae(siae)
     elif status == Status.REJECTED:
-        data = EmployeeRecord.objects.rejected_for_siae(siae)
+        data = EmployeeRecord.objects.rejected_for_siae(siae).order_by(*employee_record_order_by)
     elif status == Status.PROCESSED:
         data = base_query.processed_for_siae(siae)
     elif status == Status.DISABLED:
@@ -143,6 +157,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "navigation_pages": navigation_pages,
         "feature_availability_date": EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
         "has_outdated_date": has_outdated_date,
+        "ordered_by_label": order_by.label,
     }
 
     return render(request, template_name, context)
