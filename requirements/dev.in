@@ -29,4 +29,5 @@ freezegun  # https://github.com/spulec/freezegun
 respx  # https://lundberg.github.io/respx/
 pytest  # https://github.com/pytest-dev/pytest
 pytest-django # https://github.com/pytest-dev/pytest-django/
+pytest-mock  # https://github.com/pytest-dev/pytest-mock/
 pytest-xdist  # https://pypi.org/project/pytest-xdist/
