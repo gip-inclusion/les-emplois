@@ -11,6 +11,8 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget
 
+from .enums import EmployeeRecordOrder
+
 
 # Endpoint for INSEE communes autocomplete
 COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
@@ -35,6 +37,14 @@ class SelectEmployeeRecordStatusForm(forms.Form):
         widget=forms.RadioSelect(),
         choices=STATUS_CHOICES,
         initial=Status.NEW,
+        required=False,
+    )
+
+    order = forms.ChoiceField(
+        widget=forms.RadioSelect(),
+        choices=EmployeeRecordOrder.choices,
+        initial=EmployeeRecordOrder.HIRING_START_AT_DESC,
+        required=False,
     )
 
 

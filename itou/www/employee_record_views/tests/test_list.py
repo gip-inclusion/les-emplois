@@ -1,4 +1,6 @@
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from django.utils import timezone
 
 from itou.employee_record import factories as employee_record_factories
 from itou.employee_record.enums import Status
@@ -133,3 +135,136 @@ class ListEmployeeRecordsTest(EmployeeRecordFixtureTest):
                 self.assertContains(response, f"Erreur {err_code}")
                 self.assertNotContains(response, err_message)
                 self.assertContains(response, custom_err_message)
+
+    def _check_employee_record_order(self, url, first_job_seeker, second_job_seeker):
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_text = response.content.decode(response.charset)
+        # The index method raises ValueError if the value isn't found
+        first_job_seeker_position = response_text.index(first_job_seeker.get_full_name().title())
+        second_job_seeker_position = response_text.index(second_job_seeker.get_full_name().title())
+        assert first_job_seeker_position < second_job_seeker_position
+
+    def test_new_employee_records_sorted(self):
+        """
+        Check if new employee records / job applications are correctly sorted
+        """
+        self.client.force_login(self.user)
+
+        job_applicationA = JobApplicationWithApprovalNotCancellableFactory(
+            to_siae=self.siae, job_seeker__last_name="Aaaaa", hiring_start_at=timezone.now() - relativedelta(days=15)
+        )
+        job_applicationZ = JobApplicationWithApprovalNotCancellableFactory(
+            to_siae=self.siae, job_seeker__last_name="Zzzzz", hiring_start_at=timezone.now() - relativedelta(days=10)
+        )
+
+        # Zzzzz's hiring start is more recent
+        self._check_employee_record_order(self.url, job_applicationZ.job_seeker, job_applicationA.job_seeker)
+
+        # order with -hiring_start_at is the default
+        self._check_employee_record_order(
+            self.url + "?order=-hiring_start_at", job_applicationZ.job_seeker, job_applicationA.job_seeker
+        )
+        self._check_employee_record_order(
+            self.url + "?order=hiring_start_at", job_applicationA.job_seeker, job_applicationZ.job_seeker
+        )
+
+        # Zzzzz after Aaaaa
+        self._check_employee_record_order(
+            self.url + "?order=name", job_applicationA.job_seeker, job_applicationZ.job_seeker
+        )
+        self._check_employee_record_order(
+            self.url + "?order=-name", job_applicationZ.job_seeker, job_applicationA.job_seeker
+        )
+
+    def test_rejected_employee_records_sorted(self):
+        self.client.force_login(self.user)
+
+        recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
+            job_application__to_siae=self.siae,
+            job_application__job_seeker__last_name="Aaaaa",
+            job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
+        )
+        recordZ = employee_record_factories.EmployeeRecordWithProfileFactory(
+            job_application__to_siae=self.siae,
+            job_application__job_seeker__last_name="Zzzzz",
+            job_application__hiring_start_at=timezone.now() - relativedelta(days=10),
+        )
+        for i, record in enumerate((recordA, recordZ)):
+            record.update_as_ready()
+            record.update_as_sent(f"RIAE_FS_2021041013000{i}.json", 1)
+            record.update_as_rejected("0012", "JSON Invalide")
+
+        # Zzzzz's hiring start is more recent
+        self._check_employee_record_order(
+            self.url + "?status=REJECTED", recordZ.job_application.job_seeker, recordA.job_application.job_seeker
+        )
+
+        # order with -hiring_start_at is the default
+        self._check_employee_record_order(
+            self.url + "?status=REJECTED&order=-hiring_start_at",
+            recordZ.job_application.job_seeker,
+            recordA.job_application.job_seeker,
+        )
+        self._check_employee_record_order(
+            self.url + "?status=REJECTED&order=hiring_start_at",
+            recordA.job_application.job_seeker,
+            recordZ.job_application.job_seeker,
+        )
+
+        # Zzzzz after Aaaaa
+        self._check_employee_record_order(
+            self.url + "?status=REJECTED&order=name",
+            recordA.job_application.job_seeker,
+            recordZ.job_application.job_seeker,
+        )
+        self._check_employee_record_order(
+            self.url + "?status=REJECTED&order=-name",
+            recordZ.job_application.job_seeker,
+            recordA.job_application.job_seeker,
+        )
+
+    def test_ready_employee_records_sorted(self):
+        self.client.force_login(self.user)
+
+        recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
+            job_application__to_siae=self.siae,
+            job_application__job_seeker__last_name="Aaaaa",
+            job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
+        )
+        recordZ = employee_record_factories.EmployeeRecordWithProfileFactory(
+            job_application__to_siae=self.siae,
+            job_application__job_seeker__last_name="Zzzzz",
+            job_application__hiring_start_at=timezone.now() - relativedelta(days=10),
+        )
+        for record in (recordA, recordZ):
+            record.update_as_ready()
+
+        # Zzzzz's hiring start is more recent
+        self._check_employee_record_order(
+            self.url + "?status=READY", recordZ.job_application.job_seeker, recordA.job_application.job_seeker
+        )
+
+        # order with -hiring_start_at is the default
+        self._check_employee_record_order(
+            self.url + "?status=READY&order=-hiring_start_at",
+            recordZ.job_application.job_seeker,
+            recordA.job_application.job_seeker,
+        )
+        self._check_employee_record_order(
+            self.url + "?status=READY&order=hiring_start_at",
+            recordA.job_application.job_seeker,
+            recordZ.job_application.job_seeker,
+        )
+
+        # Zzzzz after Aaaaa
+        self._check_employee_record_order(
+            self.url + "?status=READY&order=name",
+            recordA.job_application.job_seeker,
+            recordZ.job_application.job_seeker,
+        )
+        self._check_employee_record_order(
+            self.url + "?status=READY&order=-name",
+            recordZ.job_application.job_seeker,
+            recordA.job_application.job_seeker,
+        )

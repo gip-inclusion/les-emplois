@@ -12,6 +12,11 @@
         $("#status-filter-form-group :input").change(function() {
             $("#status-filter-form").submit();
         });
+        $("#order-form-group :input").click(function(event) {
+            // Fill the hidden order input of the form
+            $("#id_order").val(event.target.value);
+            $("#status-filter-form").submit();
+        });
     </script>
 {% endblock %}
 
@@ -23,6 +28,7 @@
 
     <div class="mt-3">
         <div class="row">
+
             <div class="col-sm-3">
                 <div class="card-deck">
                     <div class="card">
@@ -46,6 +52,8 @@
                                         </div>
                                     {% endfor %}
                                 </div>
+                                {# Filled via jQuery #}
+                                {{ form.order.as_hidden }}
                             </form>
                         </div>
                     </div>
@@ -138,6 +146,21 @@
                     </div>
                 {% endif %}
 
+                <div class="row justify-content-end">
+                    <div class="col-12 col-sm-auto">
+                        <span class="font-weight-bold mr-2">Trier par</span>
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ ordered_by_label }}
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" id="order-form-group">
+                            {% for order_value, order_label in form.order.field.choices %}
+                                <button class="dropdown-item {% if order_value == form.order.value %}active{% endif %}" type="button" value="{{ order_value }}">
+                                    {{ order_label }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
                 {# "Real" employee records objects #}
                 <div class="employee-records-list">
                     {% if employee_records_list %}
