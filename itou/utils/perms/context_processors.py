@@ -4,6 +4,10 @@ from django.urls import reverse
 from itou.utils import constants as global_constants
 
 
+def join_keys_str(collection):
+    return ";".join(str(o.pk) for o in collection)
+
+
 def sort_organizations(collection):
     return sorted(collection, key=lambda o: (o.kind, o.display_name))
 
@@ -50,6 +54,7 @@ def get_context_siae(user, siae_pk):
         if membership.siae_id == siae_pk:
             matomo_context.update(
                 {
+                    "account_current_siae_id": siae_pk,
                     "account_sub_type": "employer_admin" if membership.is_admin else "employer_not_admin",
                 }
             )
@@ -60,6 +65,7 @@ def get_context_siae(user, siae_pk):
                 }
             )
     context["user_siaes"] = sort_organizations(siaes)
+    matomo_context["account_siae_ids"] = join_keys_str(context["user_siaes"])
     return context, matomo_context
 
 
@@ -81,6 +87,7 @@ def get_context_prescriber(user, prescriber_org_pk):
             org = membership.organization
             matomo_context.update(
                 {
+                    "account_current_prescriber_org_id": org.pk,
                     "account_sub_type": "prescriber_with_authorized_org"
                     if org.is_authorized
                     else "prescriber_with_unauthorized_org",
@@ -93,6 +100,7 @@ def get_context_prescriber(user, prescriber_org_pk):
                 }
             )
     context["user_prescriberorganizations"] = sort_organizations(prescriber_orgs)
+    matomo_context["account_organization_ids"] = join_keys_str(context["user_prescriberorganizations"])
     return context, matomo_context
 
 
@@ -114,6 +122,7 @@ def get_context_institution(user, institution_pk):
             institution = membership.institution
             matomo_context.update(
                 {
+                    "account_current_institution_id": institution.pk,
                     "account_sub_type": "inspector_admin" if membership.is_admin else "inspector_not_admin",
                 }
             )
@@ -125,6 +134,7 @@ def get_context_institution(user, institution_pk):
             )
 
     context["user_institutions"] = sort_organizations(institutions)
+    matomo_context["account_institution_ids"] = join_keys_str(context["user_institutions"])
     return context, matomo_context
 
 
