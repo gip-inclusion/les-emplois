@@ -6,7 +6,6 @@ import importlib
 import json
 import logging
 import uuid
-from collections import OrderedDict
 from unittest import mock
 
 import faker
@@ -91,25 +90,6 @@ def get_response_for_middlewaremixin(request):
 
 
 class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
-    """Test `itou.utils.perms.context_processors.get_current_organization_and_perms` processor."""
-
-    @property
-    def default_result(self):
-        return {
-            "current_prescriber_organization": None,
-            "current_siae": None,
-            "current_institution": None,
-            "user_is_prescriber_org_admin": False,
-            "user_is_siae_admin": False,
-            "user_is_institution_admin": False,
-            "user_siaes": [],
-            "user_prescriberorganizations": [],
-            "user_institutions": [],
-            "matomo_custom_variables": OrderedDict(
-                [("is_authenticated", "yes"), ("account_type", None), ("account_sub_type", None)]
-            ),
-        }
-
     def go_to_dashboard(self, user, establishment_session_key, establishment_pk):
         factory = RequestFactory()
         request = factory.get("/")
@@ -133,15 +113,16 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = self.default_result | {
+            assert result == {
                 "current_siae": siae,
                 "user_is_siae_admin": True,
                 "user_siaes": [siae],
-                "matomo_custom_variables": OrderedDict(
-                    [("is_authenticated", "yes"), ("account_type", "employer"), ("account_sub_type", "employer_admin")]
-                ),
+                "matomo_custom_variables": {
+                    "is_authenticated": "yes",
+                    "account_type": "employer",
+                    "account_sub_type": "employer_admin",
+                },
             }
-            self.assertDictEqual(expected, result)
 
     def test_siae_multiple_memberships(self):
         # Specify name to ensure alphabetical sorting order.
@@ -161,20 +142,16 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-
-            expected = self.default_result | {
+            assert result == {
                 "current_siae": siae2,
-                "user_siaes": [siae1, siae2],
                 "user_is_siae_admin": False,
-                "matomo_custom_variables": OrderedDict(
-                    [
-                        ("is_authenticated", "yes"),
-                        ("account_type", "employer"),
-                        ("account_sub_type", "employer_not_admin"),
-                    ]
-                ),
+                "user_siaes": [siae1, siae2],
+                "matomo_custom_variables": {
+                    "is_authenticated": "yes",
+                    "account_type": "employer",
+                    "account_sub_type": "employer_not_admin",
+                },
             }
-            self.assertDictEqual(expected, result)
 
     def test_prescriber_organization_one_membership(self):
         organization = PrescriberOrganizationWithMembershipFactory()
@@ -189,19 +166,16 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = self.default_result | {
+            assert result == {
                 "current_prescriber_organization": organization,
                 "user_prescriberorganizations": [organization],
                 "user_is_prescriber_org_admin": True,
-                "matomo_custom_variables": OrderedDict(
-                    [
-                        ("is_authenticated", "yes"),
-                        ("account_type", "prescriber"),
-                        ("account_sub_type", "prescriber_with_unauthorized_org"),
-                    ]
-                ),
+                "matomo_custom_variables": {
+                    "is_authenticated": "yes",
+                    "account_type": "prescriber",
+                    "account_sub_type": "prescriber_with_unauthorized_org",
+                },
             }
-            self.assertDictEqual(expected, result)
 
     def test_prescriber_organization_multiple_membership(self):
         # Specify name to ensure alphabetical sorting order.
@@ -220,19 +194,16 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = self.default_result | {
+            assert result == {
                 "current_prescriber_organization": organization1,
                 "user_prescriberorganizations": [organization1, organization2],
                 "user_is_prescriber_org_admin": True,
-                "matomo_custom_variables": OrderedDict(
-                    [
-                        ("is_authenticated", "yes"),
-                        ("account_type", "prescriber"),
-                        ("account_sub_type", "prescriber_with_unauthorized_org"),
-                    ]
-                ),
+                "matomo_custom_variables": {
+                    "is_authenticated": "yes",
+                    "account_type": "prescriber",
+                    "account_sub_type": "prescriber_with_unauthorized_org",
+                },
             }
-            self.assertDictEqual(expected, result)
 
     def test_labor_inspector_one_institution(self):
         institution = InstitutionWithMembershipFactory()
@@ -247,19 +218,16 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = self.default_result | {
+            assert result == {
                 "current_institution": institution,
                 "user_institutions": [institution],
                 "user_is_institution_admin": True,
-                "matomo_custom_variables": OrderedDict(
-                    [
-                        ("is_authenticated", "yes"),
-                        ("account_type", "labor_inspector"),
-                        ("account_sub_type", "inspector_admin"),
-                    ]
-                ),
+                "matomo_custom_variables": {
+                    "is_authenticated": "yes",
+                    "account_type": "labor_inspector",
+                    "account_sub_type": "inspector_admin",
+                },
             }
-            self.assertDictEqual(expected, result)
 
     def test_labor_inspector_multiple_institutions(self):
         # Specify name to ensure alphabetical sorting order.
@@ -278,19 +246,16 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
-            expected = self.default_result | {
+            assert result == {
                 "current_institution": institution2,
                 "user_institutions": [institution1, institution2],
                 "user_is_institution_admin": False,
-                "matomo_custom_variables": OrderedDict(
-                    [
-                        ("is_authenticated", "yes"),
-                        ("account_type", "labor_inspector"),
-                        ("account_sub_type", "inspector_not_admin"),
-                    ]
-                ),
+                "matomo_custom_variables": {
+                    "is_authenticated": "yes",
+                    "account_type": "labor_inspector",
+                    "account_sub_type": "inspector_not_admin",
+                },
             }
-            self.assertDictEqual(expected, result)
 
 
 class UtilsGeocodingTest(TestCase):
