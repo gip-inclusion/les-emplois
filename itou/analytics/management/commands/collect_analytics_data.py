@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
+from ... import employee_record
 from ...models import Datum
 
 
@@ -30,7 +31,9 @@ class Command(BaseCommand):
 
     @staticmethod
     def _get_data(before):
-        return {}
+        return {
+            **employee_record.collect_analytics_data(before),
+        }
 
     def show_data(self, data):
         for code, value in data.items():
