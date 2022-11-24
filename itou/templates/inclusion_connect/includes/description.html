@@ -18,10 +18,16 @@
 <div class="bg-emploi-lighter p-5 text-center">
     <img class="img-fluid" alt="" src="{% static 'img/inclusion_connect/inclusion_connect_logo.svg' %}">
     <p class="mt-3">Vous pouvez utiliser le même identifiant et le même mot de passe pour les services suivants :</p>
-    <div class="d-flex justify-content-between">
-        <img src="{% static 'img/logos_chantiers/emplois.svg' %}" class="w-100 px-2" alt="logo des emplois de l'inclusion">
-        <img src="{% static 'img/logos_chantiers/rdv_solidarite.svg' %}" class="w-75 px-2" alt="logo de rendez-vous solidarité">
-        <img src="{% static 'img/logos_chantiers/dora.svg' %}" class="w-50 px-5" alt="logo du projet Dora">
+    <div class="d-flex justify-content-center align-items-center">
+        <span class="w-33">
+            <img src="{% static 'img/logos_chantiers/emplois.svg' %}" class="img-fluid img-fitcover" alt="logo des emplois de l'inclusion" loading="lazy">
+        </span>
+        <span class="w-33 px-lg-2">
+            <img src="{% static 'img/logos_chantiers/rdv_solidarite.svg' %}" class="img-fluid img-fitcover" alt="logo de rendez-vous solidarité" loading="lazy">
+        </span>
+        <span class="w-33 px-lg-6">
+            <img src="{% static 'img/logos_chantiers/dora.svg' %}" class="img-fluid img-fitcover" alt="logo du projet Dora" loading="lazy">
+        </span>
         {% comment %} <img src="{% static 'img/logos_chantiers/communaute.svg' %}" class="w-100 px-2" alt="logo de la communauté de l'inclusion"> {% endcomment %}
     </div>
 
