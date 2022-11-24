@@ -73,8 +73,8 @@ class TestManagementCommand:
         call_command("evaluation_campaign_notify")
         stdout, stderr = capsys.readouterr()
         assert sorted(stdout.splitlines()) == [
-            "Emailed reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1.",
-            "Emailed reminders to 2 SIAE which did not submit proofs to DDETS 02 - Campagne 1.",
+            "Emailed first reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1.",
+            "Emailed first reminders to 2 SIAE which did not submit proofs to DDETS 02 - Campagne 1.",
         ]
         assert stderr == ""
         # EvaluatedSiae are not ordered.
@@ -140,7 +140,7 @@ class TestManagementCommand:
         call_command("evaluation_campaign_notify")
         stdout, stderr = capsys.readouterr()
         assert stdout.splitlines() == [
-            "Emailed reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1."
+            "Emailed first reminders to 1 SIAE which did not submit proofs to DDETS 01 - Campagne 1."
         ]
         assert stderr == ""
         [mail] = mailoutbox
@@ -267,7 +267,9 @@ class TestManagementCommand:
 
         call_command("evaluation_campaign_notify")
         stdout, stderr = capsys.readouterr()
-        assert stdout == "Emailed reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test.\n"
+        assert (
+            stdout == "Emailed first reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test.\n"
+        )
         assert stderr == ""
         mail1, mail2 = mailoutbox
         if mail1.body > mail2.body:
@@ -307,3 +309,133 @@ class TestManagementCommand:
             f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_not_submitted.pk}/"
             in mail2.body
         )
+
+    # Campaign started on 2022-07-11.
+    @freeze_time("2023-01-18 11:11:11")
+    def test_second_notification_for_siaes_without_proofs(self, capsys, mailoutbox):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6, days=30),
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 9, 30),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+
+        adversarial_phase_start = timezone.now() - relativedelta(days=30)
+        evaluated_siae_no_answer = EvaluatedSiaeFactory.create(
+            evaluation_campaign=campaign,
+            siae__name="les petits jardins",
+            siae__convention__siret_signature="00000000000032",
+            reviewed_at=adversarial_phase_start,
+            # Reminder before adversarial phase.
+            reminder_sent_at=adversarial_phase_start - relativedelta(days=30),
+        )
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_answer)
+
+        evaluated_siae_reviewed_quickly = EvaluatedSiaeFactory.create(
+            evaluation_campaign=campaign,
+            siae__name="trier pour la planète",
+            siae__convention__siret_signature="12345678900012",
+            reviewed_at=timezone.now() - relativedelta(weeks=9),
+        )
+        job_app_reviewed_quickly = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_reviewed_quickly)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=job_app_reviewed_quickly,
+            # Re-uploaded proofs.
+            uploaded_at=timezone.now() - relativedelta(weeks=1, days=1),
+            # Did not submit new proofs.
+            submitted_at=timezone.now() - relativedelta(weeks=9),
+        )
+
+        evaluated_siae_resubmitted = EvaluatedSiaeFactory.create(
+            evaluation_campaign=campaign,
+            siae__name="ultim’emploi",
+            siae__convention__siret_signature="11111111100011",
+            reviewed_at=timezone.now() - relativedelta(weeks=9),
+        )
+        job_app_resubmitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_resubmitted)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=job_app_resubmitted,
+            uploaded_at=timezone.now() - relativedelta(minutes=1),
+            submitted_at=timezone.now(),
+        )
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert (
+            stdout
+            == "Emailed second reminders to 2 SIAE which did not submit proofs to DDETS 01 - Campagne de test.\n"
+        )
+        assert stderr == ""
+        # EvaluatedSiae are not ordered, email order is not deterministic.
+        mail1, mail2 = mailoutbox
+        if mail1.body > mail2.body:
+            # EvaluatedSiae are not ordered, email order is not deterministic.
+            mail2, mail1 = mail1, mail2
+        assert mail1.subject == (
+            "Contrôle a posteriori des auto-prescriptions : "
+            "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 01"
+        )
+        assert (
+            f"Nous vous rappelons que votre structure EI les petits jardins ID-{evaluated_siae_no_answer.siae_id} "
+            "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
+            "en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
+            "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
+            "enregistrés lors de ces embauches.\n"
+            "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
+            "19 décembre 2022.\n\n"
+            "Ce délai comprend la transmission de vos justificatifs ET le contrôle effectué par votre DDETS.\n"
+            "Attention : si vous transmettez vos justificatifs en dernière minute, la DDETS risque de ne pas avoir le "
+            "temps de valider ou invalider vos justificatifs ; auquel cas, le contrôle sera automatiquement clôturé "
+            "avec un résultat négatif.\n\n" in mail1.body
+        )
+        assert (
+            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_answer.pk}/"
+            in mail1.body
+        )
+        assert mail2.subject == (
+            "Contrôle a posteriori des auto-prescriptions : "
+            "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 01"
+        )
+        assert (
+            "Nous vous rappelons que votre structure EI trier pour la planète ID-"
+            f"{evaluated_siae_reviewed_quickly.siae_id} (SIRET : 12345678900012) est soumise à la procédure de "
+            "contrôle a posteriori sur les embauches réalisées en auto-prescription "
+            "du 1 janvier 2022 au 30 septembre 2022.\n\n"
+            "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
+            "enregistrés lors de ces embauches.\n"
+            "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
+            "19 décembre 2022.\n\n"
+            "Ce délai comprend la transmission de vos justificatifs ET le contrôle effectué par votre DDETS.\n"
+            "Attention : si vous transmettez vos justificatifs en dernière minute, la DDETS risque de ne pas avoir le "
+            "temps de valider ou invalider vos justificatifs ; auquel cas, le contrôle sera automatiquement clôturé "
+            "avec un résultat négatif.\n\n" in mail2.body
+        )
+        assert (
+            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_reviewed_quickly.pk}/"
+            in mail2.body
+        )
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_second_notification_does_not_notify_twice(self, capsys, mailoutbox):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6, days=30),
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 9, 30),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        adversarial_phase_start = timezone.now() - relativedelta(days=30)
+        evaluated_siae_no_answer = EvaluatedSiaeFactory.create(
+            evaluation_campaign=campaign,
+            siae__name="les petits jardins",
+            siae__convention__siret_signature="00000000000032",
+            reviewed_at=adversarial_phase_start,
+            reminder_sent_at=adversarial_phase_start + relativedelta(days=30),
+        )
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_answer)
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == ""
+        assert stderr == ""
+        assert mailoutbox == []

@@ -501,6 +501,23 @@ class EvaluatedSiae(models.Model):
         body = "siae_evaluations/email/to_siae_adversarial_stage_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def get_email_to_siae_notify_before_campaign_close(self):
+        to = self.siae.active_admin_members.values_list("email", flat=True)
+        job_app_list_url = reverse(
+            "siae_evaluations_views:siae_job_applications_list",
+            kwargs={"evaluated_siae_pk": self.pk},
+        )
+        context = {
+            "adversarial_stage_start": self.evaluation_campaign.adversarial_stage_start_date,
+            "evaluation_campaign": self.evaluation_campaign,
+            "siae": self.siae,
+            "evaluated_job_app_list_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{job_app_list_url}",
+            "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
+        }
+        subject = "siae_evaluations/email/to_siae_notify_before_campaign_close_subject.txt"
+        body = "siae_evaluations/email/to_siae_notify_before_campaign_close_body.txt"
+        return get_email_message(to, context, subject, body)
+
     def get_email_to_siae_refused_no_proofs(self):
         to = self.siae.active_admin_members.values_list("email", flat=True)
         context = {
