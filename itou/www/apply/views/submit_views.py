@@ -768,10 +768,12 @@ class ApplicationEligibilityView(ApplicationBaseView):
 
     def get_context_data(self, **kwargs):
         new_expires_at_if_updated = timezone.now() + relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS)
+
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "new_expires_at_if_updated": new_expires_at_if_updated,
             "progress": 50,
+            "job_seeker": self.job_seeker,
             "back_url": reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
         }
 

@@ -4,8 +4,11 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.template.defaultfilters import slugify
+from django.utils.functional import cached_property
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
+from itou.geo.models import QPV, ZRR
 from itou.utils.apis.exceptions import AddressLookupError, GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.validators import validate_post_code
@@ -107,6 +110,37 @@ class AddressMixin(models.Model):
             return None
         fields = [self.address_line_1, f"{self.post_code} {self.city}"]
         return ", ".join([field for field in fields if field])
+
+    @property
+    def city_slug(self):
+        """For cities.city matching / search"""
+        return slugify(f"{self.city}-{self.department}")
+
+    @cached_property
+    def address_in_qpv(self):
+        try:
+            if QPV.in_qpv(self, geom_field="coords"):
+                return self.address_on_one_line
+        except ValueError as ex:
+            logger.warning(f"Unable to detect QPV: {ex}")
+        return None
+
+    @cached_property
+    def zrr_city_name(self):
+        try:
+            # Avoid circular import
+            from itou.cities.models import City
+
+            # There's currently no direct link between User.city and Cities.City
+            city = City.objects.get(slug=self.city_slug)
+        except City.DoesNotExist:
+            logger.warning(f"Can't match INSEE code:  city '{self.city}' has no match in 'Cities.City' model")
+        else:
+            if ZRR.objects.in_zrr().filter(insee_code=city.code_insee):
+                return city.name, False
+            elif ZRR.objects.partially_in_zrr().filter(insee_code=city.code_insee):
+                return city.name, True
+        return None
 
     def set_coords(self, address, post_code=None):
         try:

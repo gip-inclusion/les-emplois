@@ -1,6 +1,10 @@
+import logging
 from typing import Optional
 
 from django.contrib.gis.geos import GEOSGeometry
+
+
+logger = logging.getLogger(__name__)
 
 
 def coords_to_geometry(lat, lon) -> Optional[GEOSGeometry]:

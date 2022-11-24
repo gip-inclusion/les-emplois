@@ -1,0 +1,46 @@
+<div class="alert alert-info mb-5" role="status">
+    <div class="row">
+        <div class="col-auto pr-0">
+            <i class="ri-information-line ri-xl"></i>
+        </div>
+        <div class="col">
+            <p>
+                <strong>Critère(s) détecté(s)</strong> :
+            </p>
+            <p>
+                <ul>
+                    {% if job_seeker.address_in_qpv %}
+                        <li>
+                            <strong>Résident QPV</strong> : l'adresse
+                            {% if current_siae %}
+                                déclarée pour le
+                            {% else %}
+                                du
+                            {% endif %}
+                            candidat "{{ job_seeker.address_in_qpv }}" est en QPV.
+                        </li>
+                    {% endif %}
+                    {% if job_seeker.zrr_city_name %}
+                        {% with city_name=job_seeker.zrr_city_name.0 partially_in_zrr=job_seeker.zrr_city_name.1 %}
+                            <li>
+                                {% if partially_in_zrr %}
+                                    <strong>Commune partiellement en ZRR</strong> : la commune de "{{ city_name }}" est partiellement classée en ZRR.
+                                {% else %}
+                                    <strong>Résident en ZRR</strong> : la commune de "{{ city_name }}" est classée en ZRR.
+                                {% endif %}
+                            </li>
+
+                        {% endwith %}
+                    {% endif %}
+                </ul>
+            </p>
+            <p>Vous pouvez cocher ce(s) critère(s) dans la liste ci-dessous.</p>
+            {% if current_siae %}
+                <p>
+                    <strong>Important :</strong> ce message d'information ne permet pas de certifier ces critères en cas de contrôle.
+                    Vous devez conserver les justificatifs mentionnés ci-dessous.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
