@@ -63,6 +63,16 @@ adherents_emmaus as (
         inner join structures s
             on s.siret = ria."SIRET"
     where ria."Réseau IAE" = 'Emmaus'
+),
+adherents_unai as (
+    select
+        distinct (ria."SIRET") as siret,
+        ria."Réseau IAE" as reseau_unai,
+        s.id as id_structure
+    from reseau_iae_adherents ria
+        inner join structures s
+            on s.siret = ria."SIRET"
+    where ria."Réseau IAE" = 'Unai'
 )
 select
     date_candidature,
@@ -136,13 +146,17 @@ select
         else 'Non'
     end reseau_emmaus,
     case
-        when adherents_coorace.reseau_coorace= 'Coorace' then 'Oui'
+        when adherents_coorace.reseau_coorace = 'Coorace' then 'Oui'
         else 'Non'
     end reseau_coorace,
     case
-        when adherents_fei.reseau_fei= 'FEI' then 'Oui'
+        when adherents_fei.reseau_fei = 'FEI' then 'Oui'
         else 'Non'
-    end reseau_fei
+    end reseau_fei,
+    case
+        when adherents_unai.reseau_unai = 'Unai' then 'Oui'
+        else 'Non'
+    end reseau_unai
 from
     candidatures_p
         left join bassin_emploi
@@ -153,5 +167,7 @@ from
             on adherents_coorace.id_structure = candidatures_p.id_structure
         left join adherents_fei
             on adherents_fei.id_structure = candidatures_p.id_structure
+        left join adherents_unai
+            on adherents_unai.id_structure = candidatures_p.id_structure    
         left join org_prescripteur
         	on org_prescripteur.id_org = candidatures_p.id_org_prescripteur
