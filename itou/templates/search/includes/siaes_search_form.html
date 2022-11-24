@@ -1,7 +1,7 @@
 {% load bootstrap4 %}
 
 {% bootstrap_form_errors form type="all" %}
-<div class="row no-gutters my-3 itou-banner-blue{% if align == 'center' %} justify-content-sm-center{% endif %}">
+<div class="row no-gutters my-3{% if align == 'center' %} justify-content-sm-center{% endif %}">
     <div class="col-12 col-md mb-2">
         {{ form.city }}
         <div class="input-group">
