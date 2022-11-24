@@ -23,5 +23,5 @@ class RomeAdmin(admin.ModelAdmin):
 @admin.register(models.Appellation)
 class AppellationAdmin(admin.ModelAdmin):
     list_display = ("code", "name")
-    search_fields = ("code", "name")
+    search_fields = ("code", "name", "rome__code")
     raw_id_fields = ("rome",)
