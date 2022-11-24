@@ -1,4 +1,0 @@
-{% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-Date butoir du contrôle a posteriori
-{% endblock %}
