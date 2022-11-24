@@ -116,6 +116,8 @@ class EvaluationCampaign(models.Model):
     - during the evaluated period (ie : from 01.01.2021 to 31.12.2021).
     """
 
+    ADVERSARIAL_STAGE_START_DELTA = relativedelta(weeks=6)
+
     name = models.CharField(verbose_name="Nom de la campagne d'évaluation", max_length=100, blank=False, null=False)
 
     # dates of execution of the campaign
@@ -166,6 +168,10 @@ class EvaluationCampaign(models.Model):
     def clean(self):
         if self.evaluated_period_end_at <= self.evaluated_period_start_at:
             raise ValidationError("La date de début de la période contrôlée doit être antérieure à sa date de fin.")
+
+    @property
+    def adversarial_stage_start_date(self):
+        return self.evaluations_asked_at.date() + EvaluationCampaign.ADVERSARIAL_STAGE_START_DELTA
 
     def eligible_job_applications(self):
         # accepted job_applications with self-approval made by hiring siae.
@@ -284,8 +290,7 @@ class EvaluationCampaign(models.Model):
     def get_email_to_institution_selected_siae(self):
         to = self.institution.active_members.values_list("email", flat=True)
         context = {
-            # end_date for eligible siaes to return their documents of proofs is 6 weeks after notification
-            "end_date": self.evaluations_asked_at + relativedelta(weeks=6),
+            "end_date": self.adversarial_stage_start_date,
             "evaluated_period_start_at": self.evaluated_period_start_at,
             "evaluated_period_end_at": self.evaluated_period_end_at,
         }
@@ -428,11 +433,10 @@ class EvaluatedSiae(models.Model):
             "siae_evaluations_views:siae_job_applications_list",
             kwargs={"evaluated_siae_pk": self.pk},
         )
-        start_of_adversarial_phase = self.evaluation_campaign.evaluations_asked_at.date() + relativedelta(weeks=6)
         context = {
             "campaign": self.evaluation_campaign,
             "siae": self.siae,
-            "end_date": start_of_adversarial_phase,
+            "end_date": self.evaluation_campaign.adversarial_stage_start_date,
             "url": (f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}" + evaluated_siae_url),
         }
         subject = "siae_evaluations/email/to_siae_selected_subject.txt"
