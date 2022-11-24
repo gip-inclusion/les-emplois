@@ -9,7 +9,8 @@ from django.utils.html import escape
 
 from itou.cities.factories import create_city_vannes
 from itou.jobs.factories import create_test_romes_and_appellations
-from itou.siaes.enums import SiaeKind
+from itou.jobs.models import Appellation
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import (
     SiaeConventionFactory,
     SiaeFactory,
@@ -24,6 +25,9 @@ from itou.utils.test import TestCase
 
 
 class CardViewTest(TestCase):
+    OTHER_TAB_ID = "autres-metiers"
+    APPLY = "Proposer une candidature"
+
     @classmethod
     def setUpTestData(cls):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
@@ -31,7 +35,6 @@ class CardViewTest(TestCase):
 
     def test_card(self):
         siae = SiaeFactory(with_membership=True)
-        job_description = SiaeJobDescriptionFactory(siae=siae, custom_name="Plaquiste")
         url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         assert response.status_code == 200
@@ -39,28 +42,46 @@ class CardViewTest(TestCase):
         self.assertContains(response, escape(siae.display_name))
         self.assertContains(response, siae.email)
         self.assertContains(response, siae.phone)
+        self.assertNotContains(response, self.OTHER_TAB_ID)
+        self.assertContains(response, self.APPLY)
+
+    def test_card_no_active_jobs(self):
+        siae = SiaeFactory(name="les petits jardins")
+        job_description = SiaeJobDescriptionFactory(
+            siae=siae,
+            custom_name="Plaquiste",
+            location=self.vannes,
+            contract_type=ContractType.PERMANENT,
+            is_active=False,
+        )
+        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        response = self.client.get(url)
         self.assertContains(
             response,
-            f"""
-            <p class="fs-sm text-secondary">
-                <b>1 recrutement en cours</b>
-            </p>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item list-group-item-action px-0 py-2 ">
-                    <a class="d-flex flex-wrap align-items-center text-decoration-none matomo-event"
-                       href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card"
-                       data-matomo-category="candidature"
-                       data-matomo-action="clic"
-                       data-matomo-option="clic-metiers">
-                        <div class="d-inline">
-                            <span class="font-weight-bold mr-1 mr-md-2">Plaquiste</span>
-                        </div>
-                        <div class="d-inline ml-lg-auto">
-                            <span class="fs-sm text-nowrap">
-                                <i class="ri-map-pin-2-line ri-sm"></i>
-                                Vannes (56)
-                            </span>
-                        </div>
+            """
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a id="recrutements-en-cours-tab"
+                       class="nav-link active"
+                       role="tab"
+                       href="#recrutements-en-cours"
+                       data-toggle="tab"
+                       aria-selected="true"
+                       aria-controls="#recrutements-en-cours"
+                    >
+                       Recrutements en cours <span class="badge badge-pill badge-primary text-white ml-2">0</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a id="autres-metiers-tab"
+                       class="nav-link"
+                       role="tab"
+                       href="#autres-metiers"
+                       data-toggle="tab"
+                       aria-selected="false"
+                       aria-controls="#autres-metiers"
+                    >
+                       Autre métier exercé <span class="badge badge-pill badge-info-light text-dark ml-2">1</span>
                     </a>
                 </li>
             </ul>
@@ -68,6 +89,356 @@ class CardViewTest(TestCase):
             html=True,
             count=1,
         )
+        self.assertContains(
+            response,
+            f"""
+            <div class="tab-content">
+                <div id="recrutements-en-cours"
+                     class="tab-pane fade active show"
+                     aria-labelled-by="recrutements-en-cours-tab"
+                     role="tab-panel">
+                    <p>Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                </div>
+                <div id="{self.OTHER_TAB_ID}"
+                     class="tab-pane fade"
+                     aria-labelled-by="autres-metiers-tab"
+                     role="tab-panel">
+                    <ul class="list-group list-group-flush list-group-link">
+                        <li class="list-group-item list-group-item-action">
+                        <div class="d-flex align-items-center">
+                        <div>
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                            <a href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card"
+                               class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                               data-matomo-category="candidature"
+                               data-matomo-action="clic"
+                               data-matomo-option="clic-metiers">
+                                Plaquiste
+                            </a>
+                        </div>
+                        <span class="fs-sm mt-1 d-flex align-items-center">
+                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                                Vannes (56)
+                        </span>
+                    </div>
+                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
+                    </div>
+                    </div>
+                    </li>
+                    </ul>
+                </div>
+                <div class="clearfix">
+                    <a class="btn btn-primary float-right mt-3"
+                       href="/apply/{siae.pk}/start"
+                       title="Proposer une candidature auprès de l'employeur solidaire Les petits jardins">
+                        <i class="ri-draft-line"></i>
+                        Proposer une candidature
+                    </a>
+                </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(response, self.APPLY)
+
+    def test_card_no_other_jobs(self):
+        siae = SiaeFactory(name="les petits jardins")
+        job_description = SiaeJobDescriptionFactory(
+            siae=siae,
+            custom_name="Plaquiste",
+            location=self.vannes,
+            contract_type=ContractType.PERMANENT,
+        )
+        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            """
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a id="recrutements-en-cours-tab"
+                       class="nav-link active"
+                       role="tab"
+                       href="#recrutements-en-cours"
+                       data-toggle="tab"
+                       aria-selected="true"
+                       aria-controls="#recrutements-en-cours">
+                        Recrutement en cours <span class="badge badge-primary badge-pill text-white ml-2">1</span>
+                    </a>
+                </li>
+            </ul>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            f"""
+            <div class="tab-content">
+                <div id="recrutements-en-cours"
+                     class="tab-pane fade active show"
+                     aria-labelled-by="recrutements-en-cours-tab"
+                     role="tab-panel">
+                    <ul class="list-group list-group-flush list-group-link">
+                    <li class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                    <div>
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                            <a href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card"
+                               class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                               data-matomo-category="candidature"
+                               data-matomo-action="clic"
+                               data-matomo-option="clic-metiers">
+                                Plaquiste
+                            </a>
+                        </div>
+                        <span class="fs-sm mt-1 d-flex align-items-center">
+                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                                Vannes (56)
+                        </span>
+                    </div>
+                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
+                    </div>
+                    </div>
+                    </li>
+                    </ul>
+                </div>
+                <div class="clearfix">
+                    <a class="btn btn-primary float-right mt-3"
+                       href="/apply/{siae.pk}/start"
+                       title="Proposer une candidature auprès de l'employeur solidaire Les petits jardins">
+                        <i class="ri-draft-line"></i>
+                        Proposer une candidature
+                    </a>
+                </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(response, self.APPLY)
+
+    def test_card_active_and_other_jobs(self):
+        siae = SiaeFactory(name="les petits jardins")
+        # Job appellation must be different, the factory picks one at random.
+        app1, app2 = Appellation.objects.filter(code__in=["12001", "12007"]).order_by("code")
+        active_job_description = SiaeJobDescriptionFactory(
+            siae=siae,
+            custom_name="Plaquiste",
+            location=self.vannes,
+            contract_type=ContractType.PERMANENT,
+            appellation=app1,
+        )
+        other_job_description = SiaeJobDescriptionFactory(
+            siae=siae,
+            custom_name="Peintre",
+            location=self.vannes,
+            contract_type=ContractType.PERMANENT,
+            appellation=app2,
+            is_active=False,
+        )
+        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            """
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a id="recrutements-en-cours-tab"
+                       class="nav-link active"
+                       role="tab"
+                       href="#recrutements-en-cours"
+                       data-toggle="tab"
+                       aria-selected="true"
+                       aria-controls="#recrutements-en-cours">
+                        Recrutement en cours <span class="badge badge-primary badge-pill text-white ml-2">1</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a id="autres-metiers-tab"
+                       class="nav-link"
+                       role="tab"
+                       href="#autres-metiers"
+                       data-toggle="tab"
+                       aria-selected="false"
+                       aria-controls="#autres-metiers"
+                    >
+                       Autre métier exercé <span class="badge badge-pill badge-info-light text-dark ml-2">1</span>
+                    </a>
+                </li>
+            </ul>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            f"""
+            <div class="tab-content">
+                <div id="recrutements-en-cours"
+                     class="tab-pane fade active show"
+                     aria-labelled-by="recrutements-en-cours-tab"
+                     role="tab-panel">
+                    <ul class="list-group list-group-flush list-group-link">
+                    <li class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                    <div>
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                            <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                               href="/siae/job_description/{active_job_description.pk}/card?back_url=/siae/{siae.pk}/card"
+                               data-matomo-category="candidature"
+                               data-matomo-action="clic"
+                               data-matomo-option="clic-metiers">
+                                Plaquiste
+                            </a>
+                        </div>
+                        <span class="fs-sm mt-1 d-flex align-items-center">
+                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                                Vannes (56)
+                        </span>
+                    </div>
+                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
+                    </div>
+                    </div>
+                    </li>
+                    </ul>
+                </div>
+                <div id="{self.OTHER_TAB_ID}"
+                     class="tab-pane fade"
+                     aria-labelled-by="autres-metiers-tab"
+                     role="tab-panel">
+                    <ul class="list-group list-group-flush list-group-link">
+                        <li class="list-group-item list-group-item-action">
+                        <div class="d-flex align-items-center">
+                        <div>
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                            <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                               href="/siae/job_description/{other_job_description.pk}/card?back_url=/siae/{siae.pk}/card"
+                               data-matomo-category="candidature"
+                               data-matomo-action="clic"
+                               data-matomo-option="clic-metiers">
+                                Peintre
+                            </a>
+                        </div>
+                        <span class="fs-sm mt-1 d-flex align-items-center">
+                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                                Vannes (56)
+                        </span>
+                    </div>
+                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
+                    </div>
+                    </div>
+                    </li>
+                    </ul>
+                </div>
+                <div class="clearfix">
+                    <a class="btn btn-primary float-right mt-3"
+                       href="/apply/{siae.pk}/start"
+                       title="Proposer une candidature auprès de l'employeur solidaire Les petits jardins">
+                        <i class="ri-draft-line"></i>
+                        Proposer une candidature
+                    </a>
+                </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(response, self.APPLY)
+
+    def test_block_job_applications(self):
+        siae = SiaeFactory(block_job_applications=True)
+        job_description = SiaeJobDescriptionFactory(
+            siae=siae,
+            custom_name="Plaquiste",
+            location=self.vannes,
+            contract_type=ContractType.PERMANENT,
+        )
+        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            """
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a id="recrutements-en-cours-tab"
+                       class="nav-link active"
+                       role="tab"
+                       href="#recrutements-en-cours"
+                       data-toggle="tab"
+                       aria-selected="true"
+                       aria-controls="#recrutements-en-cours"
+                    >
+                       Recrutements en cours <span class="badge badge-pill badge-primary text-white ml-2">0</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a id="autres-metiers-tab"
+                       class="nav-link"
+                       role="tab"
+                       href="#autres-metiers"
+                       data-toggle="tab"
+                       aria-selected="false"
+                       aria-controls="#autres-metiers"
+                    >
+                       Autre métier exercé <span class="badge badge-pill badge-info-light text-dark ml-2">1</span>
+                    </a>
+                </li>
+            </ul>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            f"""
+            <div class="tab-content">
+                <div id="recrutements-en-cours"
+                     class="tab-pane fade active show"
+                     aria-labelled-by="recrutements-en-cours-tab"
+                     role="tab-panel">
+                    <p>Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                </div>
+                <div id="{self.OTHER_TAB_ID}"
+                     class="tab-pane fade"
+                     aria-labelled-by="autres-metiers-tab"
+                     role="tab-panel">
+                    <ul class="list-group list-group-flush list-group-link">
+                        <li class="list-group-item list-group-item-action">
+                        <div class="d-flex align-items-center">
+                        <div>
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                            <a href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card"
+                               class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                               data-matomo-category="candidature"
+                               data-matomo-action="clic"
+                               data-matomo-option="clic-metiers">
+                                Plaquiste
+                            </a>
+                        </div>
+                        <span class="fs-sm mt-1 d-flex align-items-center">
+                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                                Vannes (56)
+                        </span>
+                    </div>
+                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
+                    </div>
+                    </div>
+                    </li>
+                    </ul>
+                </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertNotContains(response, self.APPLY)
 
 
 class JobDescriptionCardViewTest(TestCase):

@@ -5,13 +5,9 @@
         </p>
         <hr>
         <p class="h2">
-            {% if no_link_on_display_name %}
+            <a href="{% url 'siaes_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}">
                 {{ siae.display_name }}
-            {% else %}
-                <a href="{% url 'siaes_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}">
-                    {{ siae.display_name }}
-                </a>
-            {% endif %}
+            </a>
         </p>
         {# Display non-user-edited name too. #}
         <address class="fs-lg">{{ siae.address_on_one_line }}</address>

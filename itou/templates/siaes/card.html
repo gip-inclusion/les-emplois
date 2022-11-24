@@ -1,55 +1,136 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load format_filters %}
 {% load static %}
 
 {% block title %}{{ siae.display_name }}{{ block.super }}{% endblock %}
 
 {% block content %}
-    <div class="c-box">
-        {% include "siaes/includes/_siae_info.html" with no_link_on_display_name=1 %}
+    <div class="row">
+        <div class="col-12 col-lg-8 mb-4">
+            <h1>{{ siae.display_name }}</h1>
+        </div>
+        {% if siae.description or siae.provided_support %}
+            <div class="col-12 col-lg-8 mb-4 order-2 order-lg-1">
+                <div class="c-box">
+                    {% if siae.description %}
+                        <h2>Son activité</h2>
+                        {{ siae.description | linebreaks }}
+                    {% endif %}
 
-        {% if siae.description %}
-            <p class="h3 mb-1">Son activité</p>
-            {{ siae.description | linebreaks }}
-        {% endif %}
-
-        {% if siae.provided_support %}
-            <p class="h3 mb-1">L'accompagnement proposé</p>
-            {{ siae.provided_support | linebreaks }}
-        {% endif %}
-
-        {% if siae.email or siae.phone or siae.website %}
-            {% include "siaes/includes/_siae_details.html" %}
-        {% endif %}
-
-        {% if siae.block_job_applications and siae.count_active_job_descriptions == 0 %}
-            <span class="badge badge-pill badge-warning">Pas de recrutement en cours</span>
-        {% endif %}
-
-        {% if jobs_descriptions %}
-            <hr>
-            {% include "siaes/includes/_list_siae_jobs.html" with siae=siae jobs_descriptions=jobs_descriptions %}
-        {% endif %}
-
-        {% if siae.count_active_job_descriptions > 0 and not siae.block_job_applications %}
-            <hr>
-            {% include "siaes/includes/_list_siae_actives_jobs.html" with jobs_descriptions=jobs_descriptions %}
-        {% endif %}
-
-        {% if not siae.block_job_applications %}
-            <hr>
-            <div class="row align-items-center mb-4">
-                <div class="col">
-                    <span class="h4 mb-0">Cette structure vous intéresse ?</span>
-                </div>
-                <div class="col-auto">
-                    <a class="btn btn-primary"
-                       href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                       title="Proposer votre candidature auprès de l'employeur solidaire {{ siae.display_name }}">
-                        Proposer votre candidature
-                    </a>
+                    {% if siae.provided_support %}
+                        <h2>L'accompagnement proposé</h2>
+                        {{ siae.provided_support | linebreaks }}
+                    {% endif %}
                 </div>
             </div>
         {% endif %}
+        <div class="col-12 col-lg-4 order-1 order-lg-2">
+            <h1 class="sr-only">Actions rapides</h1>
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% if not siae.block_job_applications %}
+                        <a class="btn btn-primary w-100"
+                           href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
+                           title="Proposer une candidature auprès de l'employeur solidaire {{ siae.display_name }}">
+                            <i class="ri-draft-line"></i>
+                            Proposer une candidature
+                        </a>
+                    {% endif %}
+                    {% if active_jobs_descriptions or other_jobs_descriptions %}
+                        <a href="#metiers" class="btn btn-outline-primary d-block w-100 mt-2">Voir les métiers</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="card-title mb-4">
+                        <h1 class="h2">Coordonnées</h1>
+                    </div>
+                    <p class="card-text">
+                        <ul class="list-unstyled">
+                            <li class="my-3">
+                                <div class="d-flex align-items-start">
+                                    <i class="ri-map-pin-2-line ri-xl mr-2"></i>
+                                    <address class="font-weight-bold m-0">{{ siae.address_on_one_line }}</address>
+                                </div>
+                            </li>
+
+                            {% if siae.email %}
+                                <li class="my-3">
+                                    <i class="ri-mail-line ri-xl mr-2"></i>
+                                    <a title="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
+                                </li>
+                            {% endif %}
+
+                            {% if siae.phone %}
+                                <li class="my-3">
+                                    <i class="ri-phone-line ri-xl mr-2"></i>
+                                    <a title="Contact téléphonique" href="tel:{{ siae.phone }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
+                                </li>
+                            {% endif %}
+
+                            {% if siae.website %}
+                                <li class="my-3">
+                                    <i class="ri-global-line ri-xl mr-2"></i>
+                                    <a title="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="metiers" class="row s-tabs-01">
+        <h1 class="sr-only">Métiers</h1>
+        <div class="col-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-toggle="tab" aria-selected="true" aria-controls="#recrutements-en-cours">
+                        Recrutement{{ active_jobs_descriptions|pluralize }} en cours <span class="badge badge-primary badge-pill text-white ml-2">{{ active_jobs_descriptions|length }}</span>
+                    </a>
+                </li>
+                {% if other_jobs_descriptions %}
+                    <li class="nav-item" role="presentation">
+                        <a id="autres-metiers-tab" class="nav-link" role="tab" href="#autres-metiers" data-toggle="tab" aria-selected="false" aria-controls="#autres-metiers">
+                            Autre{{ other_jobs_descriptions|pluralize }} métier{{ other_jobs_descriptions|pluralize }} exercé{{ other_jobs_descriptions|pluralize }} <span class="badge badge-pill badge-info-light text-dark ml-2">{{ other_jobs_descriptions|length }}</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+            <div class="tab-content">
+                <div id="recrutements-en-cours" class="tab-pane fade active show" aria-labelled-by="recrutements-en-cours-tab" role="tab-panel">
+                    {% if active_jobs_descriptions %}
+                        <ul class="list-group list-group-flush list-group-link">
+                            {% for job in active_jobs_descriptions %}
+                                {% include "siaes/includes/_siae_jobdescription.html" %}
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                    {% endif %}
+                </div>
+                {% if other_jobs_descriptions %}
+                    <div id="autres-metiers" class="tab-pane fade" aria-labelled-by="autres-metiers-tab" role="tab-panel">
+                        <ul class="list-group list-group-flush list-group-link">
+                            {% for job in other_jobs_descriptions %}
+                                {% include "siaes/includes/_siae_jobdescription.html" %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% if not siae.block_job_applications %}
+                    <div class="clearfix">
+                        <a class="btn btn-primary float-right mt-3"
+                           href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
+                           title="Proposer une candidature auprès de l'employeur solidaire {{ siae.display_name }}">
+                            <i class="ri-draft-line"></i>
+                            Proposer une candidature
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 {% endblock %}
