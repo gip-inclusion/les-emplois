@@ -474,6 +474,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         "job_application": job_application,
         "form_administrative_criteria": form_administrative_criteria,
         "form_confirm_eligibility": form_confirm_eligibility,
+        "job_seeker": job_application.job_seeker,
     }
     return render(request, template_name, context)
 

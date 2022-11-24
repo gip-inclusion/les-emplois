@@ -33,6 +33,10 @@
 
     <h2 class="h1">Critères d'éligibilité</h2>
 
+    {% if job_seeker.address_in_qpv or job_seeker.zrr_city_name %}
+        {% include "apply/includes/known_criteria.html" %}
+    {% endif %}
+
     {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
     {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
 
