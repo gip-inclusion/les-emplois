@@ -766,7 +766,7 @@ class FacilitatorBaseMixin:
 
     def _get_session_siae(self):
         org_data = self.request.session[ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
-        self.siae = Siae(
+        self.siae_to_create = Siae(
             kind=SiaeKind.OPCS,
             source=Siae.SOURCE_USER_CREATED,
             siret=org_data["siret"],
@@ -820,19 +820,22 @@ class FacilitatorUserView(FacilitatorBaseMixin, TemplateView):
         )
         return super().get_context_data(**kwargs) | {
             "inclusion_connect_url": inclusion_connect_url,
-            "siae": self.siae,
+            "siae": self.siae_to_create,
         }
 
 
 class FacilitatorJoinView(FacilitatorBaseMixin, View):
+    @transaction.atomic()
     def get(self, request, *args, **kwargs):
-        self.siae.auth_email = request.user.email
-        self.siae.created_by = request.user
-        self.siae.save()
+        self.siae_to_create.auth_email = request.user.email
+        self.siae_to_create.created_by = request.user
+        self.siae_to_create.save()
 
-        membership = SiaeMembership(user=request.user, siae=self.siae)
-        membership.is_admin = True  # by construction, this user is the first of the SIAE.
-        membership.save()
+        SiaeMembership.objects.create(
+            user=request.user,
+            siae=self.siae_to_create,
+            is_admin=True,  # by construction, this user is the first of the SIAE.
+        )
 
         # redirect to post login page.
         next_url = get_adapter(request).get_login_redirect_url(request)
