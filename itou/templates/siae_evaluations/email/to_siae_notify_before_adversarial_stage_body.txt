@@ -38,4 +38,6 @@ Vous serez notifié(e) par e-mail lorsque la DDETS aura vérifié vos justificat
 Voir le mode d’emploi : {{ itou_community_url }}/doc/emplois/controle-a-posteriori-pour-les-siae/
 
 En cas de question sur les critères ou les justificatifs vous devez vous adresser uniquement à votre DDETS.
+
+Cordialement,
 {% endblock %}
