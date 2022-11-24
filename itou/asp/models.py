@@ -1,9 +1,11 @@
 import datetime as dt
 import re
 
+from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.functional import cached_property
 from unidecode import unidecode
 
@@ -365,6 +367,14 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
 
     code = models.CharField(max_length=5, verbose_name="Code commune INSEE", db_index=True)
     name = models.CharField(max_length=50, verbose_name="Nom de la commune")
+
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="Créé par",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
 
     objects = CommuneQuerySet.as_manager()
 
