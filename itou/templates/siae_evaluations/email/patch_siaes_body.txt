@@ -1,9 +1,0 @@
-{% extends "layout/base_email_text_body.txt" %}
-{% block body %}
-Bonjour,
-
-Contrairement à ce qui était mentionné dans le dernier message, la date limite de dépôt des pièces justificatives reste bien le 21 juin.
-Avec nos excuses pour ce désagrément.
-
-Cordialement,
-{% endblock %}
