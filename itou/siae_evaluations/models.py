@@ -428,11 +428,11 @@ class EvaluatedSiae(models.Model):
             "siae_evaluations_views:siae_job_applications_list",
             kwargs={"evaluated_siae_pk": self.pk},
         )
+        start_of_adversarial_phase = self.evaluation_campaign.evaluations_asked_at.date() + relativedelta(weeks=6)
         context = {
             "campaign": self.evaluation_campaign,
             "siae": self.siae,
-            # end_date for eligible siaes to return their documents of proofs is 6 weeks after notification
-            "end_date": timezone.now() + relativedelta(weeks=6),
+            "end_date": start_of_adversarial_phase,
             "url": (f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}" + evaluated_siae_url),
         }
         subject = "siae_evaluations/email/to_siae_selected_subject.txt"

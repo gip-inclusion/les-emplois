@@ -583,7 +583,7 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
 
     def test_get_email_to_siae_selected(self):
         siae = SiaeWith2MembershipsFactory()
-        evaluated_siae = EvaluatedSiaeFactory(siae=siae)
+        evaluated_siae = EvaluatedSiaeFactory(siae=siae, evaluation_campaign__evaluations_asked_at=timezone.now())
         email = evaluated_siae.get_email_to_siae_selected()
 
         self.assertEqual(email.to, list(u.email for u in evaluated_siae.siae.active_admin_members))
