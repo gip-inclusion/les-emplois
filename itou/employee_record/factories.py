@@ -19,17 +19,9 @@ class EmployeeRecordFactory(factory.django.DjangoModelFactory):
         model = EmployeeRecord
 
     job_application = factory.SubFactory(JobApplicationWithApprovalNotCancellableFactory)
-    asp_id = factory.fuzzy.FuzzyInteger(10000)
-
-    @factory.post_generation
-    def set_job_seeker_profile(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-
-        self.siret = self.job_application.to_siae.siret
-        self.approval_number = self.approval_number or self.job_application.approval.number
-        self.asp_id = self.job_application.to_siae.convention.asp_id
+    asp_id = factory.SelfAttribute(".job_application.to_siae.convention.asp_id")
+    approval_number = factory.SelfAttribute(".job_application.approval.number")
+    siret = factory.SelfAttribute(".job_application.to_siae.siret")
 
 
 class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
