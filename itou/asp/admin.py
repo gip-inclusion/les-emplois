@@ -1,6 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 
 from itou.asp import models
+from itou.utils.admin import PkSupportRemarkInline
 
 
 class PeriodFilter(admin.SimpleListFilter):
@@ -50,6 +51,21 @@ class CommuneAdmin(ASPModelAdmin):
         "name",
         "code",
     ]
+    raw_id_fields = ("created_by",)
+    readonly_fields = ("created_by", "created_at")
+    inlines = (PkSupportRemarkInline,)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.created_by = request.user
+
+        if not models.Commune.objects.filter(code=form.cleaned_data["code"]).exists():
+            messages.error(
+                request,
+                "Le code INSEE n'existe pas encore dans la table. "
+                "Les fiches salarié utilisant ce code seront probablement rejetée par l'ASP.",
+            )
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.Department)
