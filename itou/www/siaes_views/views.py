@@ -397,12 +397,25 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
-    queryset = Siae.objects.prefetch_job_description_through().with_count_active_job_descriptions()
-
-    siae = get_object_or_404(queryset, pk=siae_id)
-    jobs_descriptions = siae.job_description_through.all()
+    siae = get_object_or_404(Siae, pk=siae_id)
+    jobs_descriptions = SiaeJobDescription.objects.filter(siae=siae).select_related("appellation", "location")
     back_url = get_safe_url(request, "back_url")
-    context = {"siae": siae, "back_url": back_url, "jobs_descriptions": jobs_descriptions}
+    active_jobs_descriptions = []
+    if siae.block_job_applications:
+        other_jobs_descriptions = jobs_descriptions
+    else:
+        other_jobs_descriptions = []
+        for job_desc in jobs_descriptions:
+            if job_desc.is_active:
+                active_jobs_descriptions.append(job_desc)
+            else:
+                other_jobs_descriptions.append(job_desc)
+    context = {
+        "siae": siae,
+        "back_url": back_url,
+        "active_jobs_descriptions": active_jobs_descriptions,
+        "other_jobs_descriptions": other_jobs_descriptions,
+    }
     return render(request, template_name, context)
 
 
