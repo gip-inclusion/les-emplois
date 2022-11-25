@@ -13,4 +13,4 @@ cat clevercloud/uwsgi.ini \
 | sed "s/__HARAKIRI__/$HARAKIRI/g" \
 | sed "s/__CC_PYTHON_MODULE__/$CC_PYTHON_MODULE/g" \
 | sed "s/__WORKERS__/${WSGI_WORKERS:-2}/g" \
-> uwsgi.ini
+> itou_uwsgi.ini
