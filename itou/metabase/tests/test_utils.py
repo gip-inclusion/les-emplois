@@ -5,8 +5,7 @@ from itou.users.factories import JobSeekerFactory
 
 
 def test_get_qpv_job_seeker_pks():
-    for code in ["QP093028"]:
-        QPVFactory(code=code)
+    QPVFactory(code="QP093028")
 
     # Somewhere in QPV QP093028 (Aubervilliers)
     job_seeker_in_qpv = JobSeekerFactory(coords=coords_to_geometry("48.917735", "2.387311"))
