@@ -32,14 +32,14 @@ sentry_logging = LoggingIntegration(
 )
 
 
-def sentry_init(dsn):
+def sentry_init(dsn, traces_sample_rate):
     sentry_sdk.init(
         dsn=dsn,
         integrations=[sentry_logging, DjangoIntegration()],
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         # We recommend adjusting this value in production.
-        traces_sample_rate=0,
+        traces_sample_rate=traces_sample_rate,
         # Associate users (ID+email+username+IP) to errors.
         # https://docs.sentry.io/platforms/python/django/
         send_default_pii=True,
