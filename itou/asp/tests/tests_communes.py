@@ -1,8 +1,9 @@
-import datetime as dt
+import datetime
 
 from django.test import TestCase
 
 from itou.asp.models import Commune
+from itou.users.factories import UserFactory
 
 
 class _CommuneTest(TestCase):
@@ -17,7 +18,7 @@ class CommunesFixtureTest(_CommuneTest):
     ## Total number of entries in the file
     _NUMBER_OF_ENTRIES = 50
     # No commune registered before this date (end_date)
-    _PERIOD_MIN_DATE = dt.date(1900, 1, 1)
+    _PERIOD_MIN_DATE = datetime.date(1900, 1, 1)
 
     def test_small_test_fixture_structure(self):
         commune_set = Commune.objects.all()
@@ -70,3 +71,20 @@ class CommuneModelTest(_CommuneTest):
             with self.subTest():
                 result = Commune.by_insee_code(commune.code)
                 self.assertEqual(result.code, commune.code)
+
+    def test_by_insee_code_and_period(self):
+        user = UserFactory()
+        commune = Commune.objects.first()
+
+        # Manually add a Commune as we did to split
+        # SAINT-DENIS/STE-CLOTILDE code=97411
+        Commune.objects.create(
+            code=commune.code,
+            name="Autre nom",
+            start_date=commune.start_date,
+            created_by=user,
+        )
+        # Look for the same commune (one day after commune.start_date should still be in the commune period)
+        # We should not raise a Commune.MultipleObjectsReturned because we exclude mannually created objects
+        result = Commune.by_insee_code_and_period(commune.code, commune.start_date + datetime.timedelta(days=1))
+        self.assertEqual(result.code, commune.code)
