@@ -10,10 +10,11 @@ from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.asp.models import RSAAllocation
-from itou.cities.factories import create_test_cities
+from itou.cities.factories import create_city_in_zrr, create_test_cities
 from itou.cities.models import City
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.geo.factories import ZRRFactory
 from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
@@ -638,6 +639,10 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
+        # test ZRR / QPV template loading
+        city = create_city_in_zrr()
+        ZRRFactory(insee_code=city.code_insee)
+
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
         self.client.force_login(user)
@@ -730,14 +735,14 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
         post_data = {
             "address_line_1": dummy_job_seeker_profile.user.address_line_1,
-            "post_code": self.city.post_codes[0],
-            "city_slug": self.city.slug,
-            "city": self.city.name,
+            "post_code": city.post_codes[0],
+            "city_slug": city.slug,
+            "city": city.name,
             "phone": dummy_job_seeker_profile.user.phone,
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
+        expected_job_seeker_session["user"] |= post_data | {"department": "12", "address_line_2": ""}
         self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
 
         next_url = reverse(
@@ -831,6 +836,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae))
+        self.assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
         response = self.client.post(next_url, {"level_1_1": True})
         self.assertEqual(response.status_code, 302)

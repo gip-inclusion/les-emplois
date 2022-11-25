@@ -10,7 +10,9 @@ from django.contrib.auth.hashers import make_password
 
 from itou.asp.factories import CommuneFactory, CountryFactory, CountryFranceFactory
 from itou.asp.models import AllocationDuration, EducationLevel, LaneType
+from itou.cities.factories import create_city_in_zrr, create_city_partially_in_zrr
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.geo.factories import QPVFactory, ZRRFactory
 from itou.users import models
 from itou.users.enums import Title
 from itou.utils.mocks.address_format import get_random_geocoding_api_result
@@ -120,10 +122,53 @@ class JobSeekerFactory(UserFactory):
 
 
 class JobSeekerWithAddressFactory(JobSeekerFactory):
+    class Params:
+        with_address_in_qpv = factory.Trait(
+            address_line_1="Rue du turfu",
+            post_code="93300",
+            city="Aubervilliers",
+            coords="POINT (2.387311 48.917735)",
+            geocoding_score=0.99,
+        )
+        with_city_in_zrr = factory.Trait(
+            address_line_1="Rue paumée",
+            post_code="12260",
+            city="Balaguier d'Olt",
+        )
+        with_city_partially_in_zrr = factory.Trait(
+            address_line_1="Rue exotique",
+            post_code="97429",
+            city="Petite-Île",
+        )
+        without_geoloc = factory.Trait(
+            coords=None,
+            geocoding_score=None,
+        )
+
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
     post_code = factory.Faker("postalcode")
     city = factory.Faker("city", locale="fr_FR")
+
+    coords = "POINT(0 0)"
+    geocoding_score = 0.5
+
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        # Using ZRR or QPV means that we must have some factories / data ready beforehand
+        # Did not find a better way to do Traits additional setup...
+        if kwargs.get("with_address_in_qpv"):
+            QPVFactory(code="QP093028")  # Aubervilliers : in QPV
+
+        if kwargs.get("with_city_in_zrr"):
+            ZRRFactory(insee_code="12018")
+            create_city_in_zrr()
+
+        if kwargs.get("with_city_partially_in_zrr"):
+            ZRRFactory(insee_code="97405")
+            create_city_partially_in_zrr()
+
+        return kwargs
 
 
 class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
