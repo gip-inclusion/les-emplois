@@ -39,7 +39,7 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
         return out.getvalue(), err.getvalue()
 
     def test_update_dry_run(self):
-        JobSeekerWithAddressFactory(is_active=True)
+        JobSeekerWithAddressFactory(is_active=True, without_geoloc=True)
 
         out, _ = self.run_command("update")
 
@@ -49,7 +49,7 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
 
     @respx.mock
     def test_update_wet_run(self):
-        user = JobSeekerWithAddressFactory(is_active=True)
+        user = JobSeekerWithAddressFactory(is_active=True, without_geoloc=True)
 
         mock_ban_api(user.pk)
 

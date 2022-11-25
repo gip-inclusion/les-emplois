@@ -87,3 +87,25 @@ def create_city_vannes():
         post_codes=["56000"],
         code_insee="56000",
     )
+
+
+def create_city_in_zrr():
+    return City.objects.create(
+        name="Balaguier d'Olt",
+        slug="balaguier-dolt-12",
+        department="12",
+        post_codes=["12260"],
+        code_insee="12018",
+        coords=Point(1.9768, 44.5206),
+    )
+
+
+def create_city_partially_in_zrr():
+    return City.objects.create(
+        name="Petite-Île",
+        slug="petite-ile-974",
+        department="974",
+        post_codes=["97429"],
+        code_insee="97405",
+        coords=Point(55.5761, -21.3389),
+    )

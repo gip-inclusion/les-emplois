@@ -15,7 +15,11 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from itou.job_applications.factories import (
+    JobApplicationFactory,
+    JobApplicationSentByJobSeekerFactory,
+    JobApplicationSentByPrescriberOrganizationFactory,
+)
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
@@ -582,10 +586,11 @@ class ProcessViewsTest(TestCase):
 
     def test_eligibility(self, *args, **kwargs):
         """Test eligibility."""
-
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker=JobSeekerWithAddressFactory(with_address_in_qpv=True),
         )
+
         self.assertTrue(job_application.state.is_processing)
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
@@ -602,6 +607,7 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
         # Ensure that a manual confirmation is mandatory.
         post_data = {"confirm": "false"}
@@ -658,7 +664,7 @@ class ProcessViewsTest(TestCase):
         in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
         siae = SiaeFactory(with_membership=True)
         siae_user = siae.members.first()
-        job_application = JobApplicationSentByJobSeekerFactory(to_siae=siae)
+        job_application = JobApplicationSentByJobSeekerFactory(to_siae=siae, job_seeker=JobSeekerWithAddressFactory())
 
         # Right states
         for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:

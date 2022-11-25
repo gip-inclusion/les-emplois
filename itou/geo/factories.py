@@ -38,6 +38,14 @@ class ZRRFactory(factory.django.DjangoModelFactory):
 
     insee_code = status = None
 
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        if insee_code := kwargs["insee_code"]:
+            [zrr] = filter(lambda zrr: zrr[0] == insee_code, ZRRS)
+            return {"insee_code": zrr[0], "status": zrr[1]}
+        # If no params, return a random commune in ZRR
+        return _params_for_zrr_status(ZRRStatus.IN_ZRR)
+
 
 QPVS = [
     (
