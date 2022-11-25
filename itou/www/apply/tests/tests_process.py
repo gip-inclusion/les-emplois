@@ -16,11 +16,7 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.factories import (
-    JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
-    JobApplicationSentByJobSeekerFactory,
-    JobApplicationWithApprovalFactory,
-)
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
@@ -38,7 +34,7 @@ class ProcessViewsTest(TestCase):
     def test_details_for_siae(self, *args, **kwargs):
         """Display the details of a job application."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         siae = job_application.to_siae
         siae_user = siae.members.first()
         self.client.force_login(siae_user)
@@ -77,8 +73,8 @@ class ProcessViewsTest(TestCase):
     def test_details_for_siae_hidden(self, *args, **kwargs):
         """A hidden job_application is not displayed."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            job_seeker__is_job_seeker=True, hidden_for_siae=True
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, job_seeker__is_job_seeker=True, hidden_for_siae=True
         )
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
@@ -90,7 +86,7 @@ class ProcessViewsTest(TestCase):
     def test_details_for_siae_as_prescriber(self, *args, **kwargs):
         """As a prescriber, I cannot access the job_applications details for SIAEs."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         prescriber = job_application.sender_prescriber_organization.members.first()
 
         self.client.force_login(prescriber)
@@ -102,7 +98,7 @@ class ProcessViewsTest(TestCase):
     def test_details_for_prescriber(self, *args, **kwargs):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, with_approval=True)
         prescriber = job_application.sender_prescriber_organization.members.first()
 
         self.client.force_login(prescriber)
@@ -116,7 +112,7 @@ class ProcessViewsTest(TestCase):
     def test_details_for_prescriber_as_siae(self, *args, **kwargs):
         """As a SIAE user, I cannot access the job_applications details for prescribers."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
 
@@ -127,7 +123,7 @@ class ProcessViewsTest(TestCase):
     def test_process(self, *args, **kwargs):
         """Ensure that the `process` transition is triggered."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
 
@@ -142,8 +138,8 @@ class ProcessViewsTest(TestCase):
     def test_refuse(self, *args, **kwargs):
         """Ensure that the `refuse` transition is triggered."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
         )
         self.assertTrue(job_application.state.is_processing)
         siae_user = job_application.to_siae.members.first()
@@ -167,8 +163,8 @@ class ProcessViewsTest(TestCase):
     def test_postpone(self, *args, **kwargs):
         """Ensure that the `postpone` transition is triggered."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
         )
         self.assertTrue(job_application.state.is_processing)
         siae_user = job_application.to_siae.members.first()
@@ -311,8 +307,8 @@ class ProcessViewsTest(TestCase):
         today = timezone.localdate()
         # the old job of job seeker
         job_seeker_user = JobSeekerWithAddressFactory()
-        old_job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        old_job_application = JobApplicationFactory(
+            with_approval=True,
             job_seeker=job_seeker_user,
             # Ensure that the old_job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=100),
@@ -585,8 +581,8 @@ class ProcessViewsTest(TestCase):
     def test_eligibility(self, *args, **kwargs):
         """Test eligibility."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
         )
         self.assertTrue(job_application.state.is_processing)
         siae_user = job_application.to_siae.members.first()
@@ -643,8 +639,10 @@ class ProcessViewsTest(TestCase):
     def test_eligibility_for_siae_not_subject_to_eligibility_rules(self, *args, **kwargs):
         """Test eligibility for an Siae not subject to eligibility rules."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=SiaeKind.GEIQ
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            to_siae__kind=SiaeKind.GEIQ,
         )
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
@@ -681,7 +679,7 @@ class ProcessViewsTest(TestCase):
 
     def test_cancel(self, *args, **kwargs):
         # Hiring date is today: cancellation should be possible.
-        job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_application = JobApplicationFactory(with_approval=True)
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
@@ -703,8 +701,8 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_application.state.is_cancelled)
 
     def test_cannot_cancel(self, *args, **kwargs):
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        job_application = JobApplicationFactory(
+            with_approval=True,
             hiring_start_at=timezone.localdate() + relativedelta(days=1),
         )
         siae_user = job_application.to_siae.members.first()
@@ -759,8 +757,8 @@ class ProcessViewsTest(TestCase):
     def test_archive(self, *args, **kwargs):
         """Ensure that when an SIAE archives a job_application, the hidden_for_siae flag is updated."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_CANCELLED
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_CANCELLED
         )
         self.assertTrue(job_application.state.is_cancelled)
         siae_user = job_application.to_siae.members.first()
@@ -795,7 +793,7 @@ class ProcessTemplatesTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         """Set up data for the whole TestCase."""
-        cls.job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        cls.job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         cls.siae_user = cls.job_application.to_siae.members.first()
 
         kwargs = {"job_application_id": cls.job_application.pk}
@@ -963,8 +961,10 @@ class ProcessTransferJobApplicationTest(TestCase):
         # must not be able to transfer a job application to another SIAE
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            to_siae=siae, state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_siae=siae,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
         )
 
         self.client.force_login(user)
@@ -979,11 +979,11 @@ class ProcessTransferJobApplicationTest(TestCase):
         # to another SIAE
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        job_application_1 = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            to_siae=siae, state=JobApplicationWorkflow.STATE_NEW
+        job_application_1 = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, to_siae=siae, state=JobApplicationWorkflow.STATE_NEW
         )
-        job_application_2 = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            to_siae=siae, state=JobApplicationWorkflow.STATE_ACCEPTED
+        job_application_2 = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, to_siae=siae, state=JobApplicationWorkflow.STATE_ACCEPTED
         )
 
         self.client.force_login(user)
@@ -1004,8 +1004,10 @@ class ProcessTransferJobApplicationTest(TestCase):
         other_siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         other_siae.members.add(user)
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            to_siae=siae, state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_siae=siae,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
         )
 
         self.assertEqual(2, user.siaemembership_set.count())
@@ -1024,8 +1026,10 @@ class ProcessTransferJobApplicationTest(TestCase):
         other_siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         other_siae.members.add(user)
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            to_siae=siae, state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_siae=siae,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
         )
         transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
 

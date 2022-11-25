@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.factories import InstitutionFactory
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory
 from itou.siae_evaluations import models
 from itou.siaes.factories import SiaeFactory
 
@@ -75,7 +75,7 @@ class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
 
     evaluated_siae = factory.SubFactory(EvaluatedSiaeFactory)
     job_application = factory.SubFactory(
-        JobApplicationWithApprovalFactory,
+        JobApplicationFactory,
         to_siae=factory.SelfAttribute("..evaluated_siae.siae"),
     )
 

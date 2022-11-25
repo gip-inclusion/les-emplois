@@ -9,11 +9,7 @@ from django.test import TestCase
 
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.factories import (
-    JobApplicationSentByJobSeekerFactory,
-    JobApplicationWithApprovalFactory,
-    JobApplicationWithEligibilityDiagnosis,
-)
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
 
@@ -40,7 +36,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationWithApprovalFactory(job_seeker__nir=None, **kwargs)
+        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__nir=None, **kwargs)
         user1 = job_app1.job_seeker
 
         self.assertIsNone(user1.nir)
@@ -49,7 +45,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         self.assertEqual(1, user1.eligibility_diagnoses.count())
 
         # Create `user2`.
-        job_app2 = JobApplicationWithEligibilityDiagnosis(job_seeker__nir=None, **kwargs)
+        job_app2 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir=None, **kwargs)
         user2 = job_app2.job_seeker
 
         self.assertIsNone(user2.nir)
@@ -58,7 +54,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         self.assertEqual(1, user2.eligibility_diagnoses.count())
 
         # Create `user3`.
-        job_app3 = JobApplicationWithEligibilityDiagnosis(**kwargs)
+        job_app3 = JobApplicationFactory(with_eligibility_diagnosis=True, **kwargs)
         user3 = job_app3.job_seeker
         expected_nir = user3.nir
 
@@ -116,7 +112,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         self.assertEqual(job_app2.sender, user2)
 
         # Create `user3` through a job application sent by a prescriber.
-        job_app3 = JobApplicationWithEligibilityDiagnosis(job_seeker__nir=None, **kwargs)
+        job_app3 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir=None, **kwargs)
         user3 = job_app3.job_seeker
         self.assertNotEqual(job_app3.sender, user3)
         job_app3_sender = job_app3.sender  # The sender is a prescriber.

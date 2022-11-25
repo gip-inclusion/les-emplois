@@ -30,6 +30,26 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
 
     class Params:
         job_seeker_with_address = factory.Trait(job_seeker=factory.SubFactory(JobSeekerWithMockedAddressFactory))
+        with_approval = factory.Trait(
+            state=models.JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=factory.SubFactory(ApprovalFactory, user=factory.SelfAttribute("..job_seeker")),
+            with_eligibility_diagnosis=True,
+        )
+        with_eligibility_diagnosis = factory.Trait(
+            eligibility_diagnosis=factory.SubFactory(
+                EligibilityDiagnosisFactory,
+                job_seeker=factory.SelfAttribute("..job_seeker"),
+                author=factory.SelfAttribute("..sender"),
+            ),
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        sent_by_authorized_prescriber_organisation = factory.Trait(
+            sender_prescriber_organization=factory.SubFactory(
+                PrescriberOrganizationWithMembershipFactory, authorized=True
+            ),
+            sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
+            sender_kind=SenderKind.PRESCRIBER,
+        )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
     to_siae = factory.SubFactory(SiaeFactory, with_membership=True)
@@ -95,35 +115,11 @@ class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationSentByPres
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
 
-class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplicationSentByPrescriberFactory):
-    """Generates a JobApplication() object sent by a prescriber member of an authorized organization."""
-
-    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory, authorized=True)
-    sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
-
-
 class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationSentByPrescriberFactory):
     """Generates a JobApplication() object sent by a prescriber member of Pôle emploi organization."""
 
     sender_prescriber_organization = factory.SubFactory(PrescriberPoleEmploiWithMembershipFactory)
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
-
-
-class JobApplicationWithEligibilityDiagnosis(JobApplicationSentByAuthorizedPrescriberOrganizationFactory):
-    """Generates a JobApplication() object with an EligibilityDiagnosis() object."""
-
-    eligibility_diagnosis = factory.SubFactory(
-        EligibilityDiagnosisFactory,
-        job_seeker=factory.SelfAttribute("..job_seeker"),
-        author=factory.SelfAttribute("..sender"),
-    )
-
-
-class JobApplicationWithApprovalFactory(JobApplicationWithEligibilityDiagnosis):
-    """Generates a JobApplication() object with an Approval() object."""
-
-    state = models.JobApplicationWorkflow.STATE_ACCEPTED
-    approval = factory.SubFactory(ApprovalFactory, user=factory.SelfAttribute("..job_seeker"))
 
 
 class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory):
@@ -133,7 +129,8 @@ class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory
     hiring_without_approval = True
 
 
-class JobApplicationWithApprovalNotCancellableFactory(JobApplicationWithApprovalFactory):
+class JobApplicationWithApprovalNotCancellableFactory(JobApplicationFactory):
+    with_approval = True
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() - relativedelta(days=5))
     hiring_end_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() + relativedelta(years=2, days=-5))
 

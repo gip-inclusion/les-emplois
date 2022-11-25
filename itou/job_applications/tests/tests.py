@@ -26,12 +26,10 @@ from itou.job_applications.csv_export import generate_csv_export
 from itou.job_applications.enums import RefusalReason, SenderKind
 from itou.job_applications.factories import (
     JobApplicationFactory,
-    JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationSentBySiaeFactory,
-    JobApplicationWithApprovalFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
@@ -79,8 +77,8 @@ class JobApplicationModelTest(TestCase):
 
     @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_accepted_by(self, notification_mock):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
         )
         user = job_application.to_siae.members.first()
         job_application.accept(user=user)
@@ -100,7 +98,7 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationSentBySiaeFactory()
         self.assertFalse(job_application.is_sent_by_authorized_prescriber)
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         self.assertTrue(job_application.is_sent_by_authorized_prescriber)
 
     @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
@@ -112,17 +110,17 @@ class JobApplicationModelTest(TestCase):
         - an approval exists (ie is not in the process of being delivered),
         - the job_application has been accepted.
         """
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(with_approval=True)
         self.assertTrue(job_application.can_display_approval)
 
         # SIAE not subject to eligibility rules.
         not_eligible_kinds = [kind for kind in SiaeKind if kind not in SIAE_WITH_CONVENTION_KINDS]
         not_eligible_siae = SiaeFactory(kind=not_eligible_kinds[0])
-        job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
+        job_application = JobApplicationFactory(with_approval=True, to_siae=not_eligible_siae)
         self.assertFalse(job_application.can_display_approval)
 
         # Application is not accepted.
-        job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_OBSOLETE)
+        job_application = JobApplicationFactory(with_approval=True, state=JobApplicationWorkflow.STATE_OBSOLETE)
         self.assertFalse(job_application.can_display_approval)
 
         # Application accepted but without approval.
@@ -136,7 +134,7 @@ class JobApplicationModelTest(TestCase):
 
         # `hiring_start_at` must be set in order to pass the `can_be_cancelled` condition
         # called by `can_display_approval`.
-        job_application = JobApplicationWithApprovalFactory(approval=ended_approval, hiring_start_at=start)
+        job_application = JobApplicationFactory(with_approval=True, approval=ended_approval, hiring_start_at=start)
         self.assertTrue(job_application.can_display_approval)
 
     def test_can_be_cancelled(self):
@@ -146,27 +144,27 @@ class JobApplicationModelTest(TestCase):
         AI stock.
         """
         today = datetime.date.today()
-        job_application_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
+        job_application_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
         # Can be cancelled with a related employee record in NEW, READY, REJECTED status
         EmployeeRecordFactory(job_application=job_application_ok, status=Status.NEW)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
-        job_application_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
+        job_application_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
         EmployeeRecordFactory(job_application=job_application_ok, status=Status.READY)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
-        job_application_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
+        job_application_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
         EmployeeRecordFactory(job_application=job_application_ok, status=Status.REJECTED)
         self.assertTrue(job_application_ok.can_be_cancelled)
 
         # Can't be cancelled with a related employee record in PROCESSED or SENT status
-        job_application_not_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
+        job_application_not_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
         EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.SENT)
         self.assertFalse(job_application_not_ok.can_be_cancelled)
 
-        job_application_not_ok = JobApplicationWithApprovalFactory(hiring_start_at=today)
+        job_application_not_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
         EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.PROCESSED)
         self.assertFalse(job_application_not_ok.can_be_cancelled)
 
@@ -227,25 +225,27 @@ class JobApplicationModelTest(TestCase):
         self.assertFalse(job_application.candidate_has_employee_record)
 
         # test job_application has one Approval and no EmployeeRecord
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(with_approval=True)
         self.assertFalse(job_application.candidate_has_employee_record)
 
         # test job_application has one Approval and one EmployeeRecord
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(
+            with_approval=True,
+        )
         EmployeeRecordFactory(job_application=job_application)
         self.assertTrue(job_application.candidate_has_employee_record)
 
         # test job_application has one Approval and no EmployeeRecord
         # but an EmployeeRecord already exists for the same approval.number
         # and the same Siae
-        job_application1 = JobApplicationWithApprovalFactory()
+        job_application1 = JobApplicationFactory(with_approval=True)
         EmployeeRecordFactory(
             job_application=job_application1,
             asp_id=job_application1.to_siae.convention.asp_id,
             approval_number=job_application1.approval.number,
         )
-        job_application2 = JobApplicationWithApprovalFactory(
-            approval=job_application1.approval, to_siae=job_application1.to_siae
+        job_application2 = JobApplicationFactory(
+            with_approval=True, approval=job_application1.approval, to_siae=job_application1.to_siae
         )
         self.assertTrue(job_application1.candidate_has_employee_record)
         self.assertTrue(job_application2.candidate_has_employee_record)
@@ -253,20 +253,20 @@ class JobApplicationModelTest(TestCase):
         # test job_application has one Approval and no EmployeeRecord
         # but an EmployeeRecord already exists for the same approval.number
         # in an other Siae
-        job_application1 = JobApplicationWithApprovalFactory()
+        job_application1 = JobApplicationFactory(with_approval=True)
         EmployeeRecordFactory(
             job_application=job_application1,
             asp_id=job_application1.to_siae.convention.asp_id,
             approval_number=job_application1.approval.number,
         )
-        job_application2 = JobApplicationWithApprovalFactory(approval=job_application1.approval)
+        job_application2 = JobApplicationFactory(with_approval=True, approval=job_application1.approval)
         self.assertTrue(job_application1.candidate_has_employee_record)
         self.assertFalse(job_application2.candidate_has_employee_record)
 
     def test_is_waiting_for_employee_record_creation(self):
 
         today = datetime.date.today()
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(with_approval=True)
         to_siae = job_application.to_siae
 
         # test application with missing hiring_start_at (it’s an optional)
@@ -327,21 +327,21 @@ class JobApplicationModelTest(TestCase):
 
         # test Employee_Record doesn't exists,
         # but an other EmployeeRecord exists for the same Approval and the same Siae
-        job_application1 = JobApplicationWithApprovalFactory()
+        job_application1 = JobApplicationFactory(with_approval=True)
         EmployeeRecordFactory(
             job_application=job_application1,
             asp_id=job_application1.to_siae.convention.asp_id,
             approval_number=job_application1.approval.number,
         )
-        job_application2 = JobApplicationWithApprovalFactory(
-            approval=job_application1.approval, to_siae=job_application1.to_siae
+        job_application2 = JobApplicationFactory(
+            with_approval=True, approval=job_application1.approval, to_siae=job_application1.to_siae
         )
         self.assertFalse(job_application1.is_waiting_for_employee_record_creation)
         self.assertFalse(job_application2.is_waiting_for_employee_record_creation)
 
     def test_get_sender_kind_display(self):
         items = [
-            [JobApplicationSentByAuthorizedPrescriberOrganizationFactory(), "Prescripteur"],
+            [JobApplicationFactory(sent_by_authorized_prescriber_organisation=True), "Prescripteur"],
             [JobApplicationSentByPrescriberOrganizationFactory(), "Orienteur"],
             [JobApplicationSentBySiaeFactory(), "Employeur (SIAE)"],
             [JobApplicationSentByJobSeekerFactory(), "Demandeur d'emploi"],
@@ -428,13 +428,13 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertFalse(qs.is_pending_for_too_long)
 
     def test_with_last_jobseeker_eligibility_diagnosis(self):
-        job_app = JobApplicationWithApprovalFactory()
+        job_app = JobApplicationFactory(with_approval=True)
         diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
         qs = JobApplication.objects.with_last_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
         self.assertEqual(qs.last_jobseeker_eligibility_diagnosis, diagnosis.pk)
 
     def test_with_last_eligibility_diagnosis_criterion(self):
-        job_app = JobApplicationWithApprovalFactory()
+        job_app = JobApplicationFactory(with_approval=True)
         diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
@@ -459,7 +459,7 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertFalse(getattr(qs, f"last_eligibility_diagnosis_criterion_{level1_other_criterion.pk}"))
 
     def test_with_list_related_data(self):
-        job_app = JobApplicationWithApprovalFactory()
+        job_app = JobApplicationFactory(with_approval=True)
         diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
@@ -538,8 +538,8 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertNotIn(second_job_app, JobApplication.objects.eligible_as_employee_record(second_job_app.to_siae))
 
         # No employee record, but with a suspension
-        job_app = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        job_app = JobApplicationFactory(
+            with_approval=True,
             hiring_start_at=None,
         )
         self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
@@ -549,7 +549,8 @@ class JobApplicationQuerySetTest(TestCase):
         )
         self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
         # No employee record, but with a prolongation
-        job_app = JobApplicationWithApprovalFactory(
+        job_app = JobApplicationFactory(
+            with_approval=True,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=None,
         )
@@ -560,7 +561,8 @@ class JobApplicationQuerySetTest(TestCase):
         )
         self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
         # No employee record, but with a prolongation and a suspension
-        job_app = JobApplicationWithApprovalFactory(
+        job_app = JobApplicationFactory(
+            with_approval=True,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=None,
         )
@@ -583,7 +585,8 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
     def test_eligible_job_applications_with_a_suspended_or_extended_approval_older_than_cutoff(self):
-        job_app = JobApplicationWithApprovalFactory(
+        job_app = JobApplicationFactory(
+            with_approval=True,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=None,
         )
@@ -658,7 +661,8 @@ class JobApplicationNotificationsTest(TestCase):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
 
     def test_new_for_siae(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
             selected_jobs=Appellation.objects.all(),
         )
         email = NewQualifiedJobAppEmployersNotification(job_application=job_application).email
@@ -684,8 +688,8 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.resume_link, email.body)
 
     def test_new_for_prescriber(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            selected_jobs=Appellation.objects.all()
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, selected_jobs=Appellation.objects.all()
         )
         email = job_application.email_new_for_prescriber
         # To.
@@ -764,7 +768,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.answer, email.body)
 
     def test_accept_for_proxy(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         email = job_application.email_accept_for_proxy
         # To.
         self.assertNotIn(job_application.to_siae.email, email.to)
@@ -785,13 +789,15 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.sender_prescriber_organization.accept_survey_url, email.body)
 
     def test_accept_for_proxy_without_hiring_end_at(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(hiring_end_at=None)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, hiring_end_at=None)
         email = job_application.email_accept_for_proxy
         self.assertIn("Date de fin du contrat : Non renseigné", email.body)
 
     def test_accept_trigger_manual_approval(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED, hiring_start_at=datetime.date.today()
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            hiring_start_at=datetime.date.today(),
         )
         accepted_by = job_application.to_siae.members.first()
         email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
@@ -815,8 +821,11 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk]), email.body)
 
     def test_accept_trigger_manual_approval_without_hiring_end_at(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED, hiring_start_at=datetime.date.today(), hiring_end_at=None
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            hiring_start_at=datetime.date.today(),
+            hiring_end_at=None,
         )
         accepted_by = job_application.to_siae.members.first()
         email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
@@ -825,7 +834,8 @@ class JobApplicationNotificationsTest(TestCase):
     def test_refuse(self):
 
         # When sent by authorized prescriber.
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
             refusal_reason=RefusalReason.DID_NOT_COME,
             answer_to_prescriber="Le candidat n'est pas venu.",
         )
@@ -860,8 +870,11 @@ class JobApplicationNotificationsTest(TestCase):
     def test_email_deliver_approval(self):
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_ACCEPTED, approval=approval
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=approval,
         )
         accepted_by = job_application.to_siae.members.first()
         email = job_application.email_deliver_approval(accepted_by)
@@ -890,15 +903,19 @@ class JobApplicationNotificationsTest(TestCase):
     def test_email_deliver_approval_without_hiring_end_at(self):
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_ACCEPTED, approval=approval, hiring_end_at=None
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=approval,
+            hiring_end_at=None,
         )
         accepted_by = job_application.to_siae.members.first()
         email = job_application.email_deliver_approval(accepted_by)
         self.assertIn("Se terminant le : Non renseigné", email.body)
 
     def test_email_deliver_approval_when_subject_to_eligibility_rules(self):
-        job_application = JobApplicationWithApprovalFactory(to_siae__subject_to_eligibility=True)
+        job_application = JobApplicationFactory(with_approval=True, to_siae__subject_to_eligibility=True)
 
         email = job_application.email_deliver_approval(job_application.to_siae.members.first())
 
@@ -909,7 +926,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn("PASS IAE", email.body)
 
     def test_email_deliver_approval_when_not_subject_to_eligibility_rules(self):
-        job_application = JobApplicationWithApprovalFactory(to_siae__not_subject_to_eligibility=True)
+        job_application = JobApplicationFactory(with_approval=True, to_siae__not_subject_to_eligibility=True)
 
         email = job_application.email_deliver_approval(job_application.to_siae.members.first())
 
@@ -924,7 +941,8 @@ class JobApplicationNotificationsTest(TestCase):
             nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
         approval = ApprovalFactory(user=job_seeker)
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
             job_seeker=job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
             approval=approval,
@@ -945,7 +963,8 @@ class JobApplicationNotificationsTest(TestCase):
         job_seeker = JobSeekerFactory(
             nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
             job_seeker=job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
@@ -961,8 +980,8 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_cancel(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_ACCEPTED
         )
 
         cancellation_user = job_application.to_siae.active_members.first()
@@ -1315,8 +1334,8 @@ class JobApplicationWorkflowTest(TestCase):
         """
         Accept a job application sent by an authorized prescriber.
         """
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         self.assertNotEqual(job_application.job_seeker.pole_emploi_id, "")
@@ -1348,8 +1367,10 @@ class JobApplicationWorkflowTest(TestCase):
             pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
         )
         self.assertTrue(approval.is_in_waiting_period)
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            job_seeker=user, state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            job_seeker=user,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         self.assertNotEqual(job_application.job_seeker.pole_emploi_id, "")
@@ -1447,8 +1468,10 @@ class JobApplicationWorkflowTest(TestCase):
         """
         No approval should be delivered for an employer not subject to eligibility rules.
         """
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=SiaeKind.GEIQ
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            to_siae__kind=SiaeKind.GEIQ,
         )
         job_application.accept(user=job_application.to_siae.members.first())
         self.assertFalse(job_application.to_siae.is_subject_to_eligibility_rules)
@@ -1511,7 +1534,7 @@ class JobApplicationWorkflowTest(TestCase):
             notify_mock.assert_not_called()
 
     def test_cancel_delete_linked_approval(self, *args, **kwargs):
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(with_approval=True)
         self.assertEqual(job_application.job_seeker.approvals.count(), 1)
         self.assertEqual(JobApplication.objects.filter(approval=job_application.approval).count(), 1)
 
@@ -1526,9 +1549,9 @@ class JobApplicationWorkflowTest(TestCase):
     def test_cancel_do_not_delete_linked_approval(self, *args, **kwargs):
 
         # The approval is linked to two accepted job applications
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(with_approval=True)
         approval = job_application.approval
-        JobApplicationWithApprovalFactory(approval=approval, job_seeker=job_application.job_seeker)
+        JobApplicationFactory(with_approval=True, approval=approval, job_seeker=job_application.job_seeker)
 
         self.assertEqual(job_application.job_seeker.approvals.count(), 1)
         self.assertEqual(JobApplication.objects.filter(approval=approval).count(), 2)
@@ -1545,7 +1568,7 @@ class JobApplicationWorkflowTest(TestCase):
         today = datetime.date.today()
 
         # Linked employee record with blocking status
-        job_application = JobApplicationWithApprovalFactory(hiring_start_at=(today - relativedelta(days=365)))
+        job_application = JobApplicationFactory(with_approval=True, hiring_start_at=(today - relativedelta(days=365)))
         cancellation_user = job_application.to_siae.active_members.first()
         EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
@@ -1554,8 +1577,8 @@ class JobApplicationWorkflowTest(TestCase):
             job_application.cancel(user=cancellation_user)
 
         # Wrong state
-        job_application = JobApplicationWithApprovalFactory(
-            hiring_start_at=today, state=JobApplicationWorkflow.STATE_NEW
+        job_application = JobApplicationFactory(
+            with_approval=True, hiring_start_at=today, state=JobApplicationWorkflow.STATE_NEW
         )
         cancellation_user = job_application.to_siae.active_members.first()
         with self.assertRaises(xwf_models.AbortTransition):
@@ -1812,8 +1835,11 @@ class DisplayMissingEligibilityDiagnosesCommandTest(TestCase):
     def test_nominal(self):
         stdout = io.StringIO()
         user = UserFactory(email="batman@batcave.org")
-        ja = JobApplicationWithApprovalFactory(
-            eligibility_diagnosis=None, state="accepted", approval__number="XXXXX1234567", approval__created_by=user
+        ja = JobApplicationFactory(
+            with_approval=True,
+            eligibility_diagnosis=None,
+            approval__number="XXXXX1234567",
+            approval__created_by=user,
         )
         management.call_command("display_missing_eligibility_diagnoses", stdout=stdout)
         self.assertEqual(

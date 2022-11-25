@@ -9,7 +9,7 @@ from freezegun import freeze_time
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionMembershipFactory
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.factories import (
@@ -44,7 +44,8 @@ def create_evaluated_siae_consistent_datas(evaluation_campaign):
         job_seeker, user_info, administrative_criteria=[administrative_criteria]
     )
 
-    job_application = JobApplicationWithApprovalFactory(
+    job_application = JobApplicationFactory(
+        with_approval=True,
         to_siae=siae,
         sender_siae=siae,
         eligibility_diagnosis=eligibility_diagnosis,

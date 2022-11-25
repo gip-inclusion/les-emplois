@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplication
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.utils.widgets import DuetDatePickerWidget
@@ -25,17 +25,20 @@ class EditContractTest(TestCase):
 
         # JA with creation of a new approval
         tomorrow = (timezone.now() + relativedelta(days=1)).date()
-        self.job_application_1 = JobApplicationWithApprovalFactory(
-            to_siae=siae1, hiring_start_at=tomorrow, approval__start_at=tomorrow
+        self.job_application_1 = JobApplicationFactory(
+            with_approval=True, to_siae=siae1, hiring_start_at=tomorrow, approval__start_at=tomorrow
         )
 
         # JA with an old approval
         delta = relativedelta(months=23)
-        self.old_job_application = JobApplicationWithApprovalFactory(to_siae=siae2, created_at=timezone.now() - delta)
+        self.old_job_application = JobApplicationFactory(
+            with_approval=True, to_siae=siae2, created_at=timezone.now() - delta
+        )
         approval = self.old_job_application.approval
         approval.start_at = self.old_job_application.created_at.date()
 
-        self.job_application_2 = JobApplicationWithApprovalFactory(
+        self.job_application_2 = JobApplicationFactory(
+            with_approval=True,
             to_siae=siae2,
             job_seeker=self.old_job_application.job_seeker,
             approval=approval,

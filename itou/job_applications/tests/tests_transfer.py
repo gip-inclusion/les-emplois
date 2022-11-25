@@ -9,7 +9,6 @@ from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentBySiaeFactory,
-    JobApplicationWithEligibilityDiagnosis,
 )
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
@@ -78,7 +77,7 @@ class JobApplicationTransferModelTest(TestCase):
         lambda_user = UserFactory(is_siae_staff=False)
         target_siae.members.add(origin_user)
 
-        job_application = JobApplicationWithEligibilityDiagnosis(to_siae=origin_siae)
+        job_application = JobApplicationFactory(with_eligibility_diagnosis=True, to_siae=origin_siae)
 
         # Conditions hould be covered by previous test, but does not hurt (and tests raise)
         with self.assertRaises(ValidationError):

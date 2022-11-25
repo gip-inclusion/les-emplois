@@ -8,8 +8,7 @@ from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.factories import JobApplicationFactory
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import SuspensionForm
 
@@ -22,8 +21,8 @@ class ApprovalSuspendViewTest(TestCase):
 
         today = timezone.localdate()
 
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        job_application = JobApplicationFactory(
+            with_approval=True,
             hiring_start_at=today - relativedelta(days=1),
         )
 
@@ -84,8 +83,8 @@ class ApprovalSuspendViewTest(TestCase):
 
         today = timezone.localdate()
 
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        job_application = JobApplicationFactory(
+            with_approval=True,
             hiring_start_at=today - relativedelta(days=1),
         )
 
@@ -120,8 +119,8 @@ class ApprovalSuspendViewTest(TestCase):
         today = timezone.localdate()
         start_at = today + relativedelta(days=1)
 
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        job_application = JobApplicationFactory(
+            with_approval=True,
             hiring_start_at=today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS + 1),
         )
 
@@ -143,8 +142,8 @@ class ApprovalSuspendViewTest(TestCase):
 
         today = timezone.localdate()
 
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        job_application = JobApplicationFactory(
+            with_approval=True,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=1),
         )
@@ -191,8 +190,8 @@ class ApprovalSuspendViewTest(TestCase):
 
         today = timezone.localdate()
 
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        job_application = JobApplicationFactory(
+            with_approval=True,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=1),
         )

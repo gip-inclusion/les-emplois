@@ -12,7 +12,7 @@ from itou.employee_record.factories import EmployeeRecordFactory, EmployeeRecord
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.employee_record.tests.common import EmployeeRecordFixtureTest
 from itou.job_applications.factories import (
-    JobApplicationWithApprovalFactory,
+    JobApplicationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
     JobApplicationWithJobSeekerProfileFactory,
@@ -48,7 +48,7 @@ class EmployeeRecordModelTest(EmployeeRecordFixtureTest):
         ]:
             with self.subTest(state):
                 with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED):
-                    job_application = JobApplicationWithApprovalFactory(state=state)
+                    job_application = JobApplicationFactory(with_approval=True, state=state)
                     EmployeeRecord.from_job_application(job_application)
 
     def test_creation_without_approval(self):
