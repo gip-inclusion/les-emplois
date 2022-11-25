@@ -10,7 +10,13 @@ from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
-from itou.siaes.enums import SIAE_WITH_CONVENTION_CHOICES, SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
+from itou.siaes.enums import (
+    SIAE_WITH_CONVENTION_CHOICES,
+    SIAE_WITH_CONVENTION_KINDS,
+    ContractType,
+    JobSource,
+    SiaeKind,
+)
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.urls import get_absolute_url, get_tally_form_url
@@ -549,6 +555,14 @@ class SiaeJobDescription(models.Model):
 
     is_qpv_mandatory = models.BooleanField(verbose_name="Une clause QPV est nécessaire pour ce poste", default=False)
     market_context_description = models.TextField(verbose_name="Contexte du marché", blank=True)
+
+    source_id = models.CharField(verbose_name="ID dans le référentiel source", blank=True, max_length=255)
+    source_kind = models.CharField(
+        verbose_name="Source de la donnée",
+        choices=JobSource.choices,
+        max_length=30,
+        default=JobSource.LOCAL,
+    )
 
     objects = models.Manager.from_queryset(SiaeJobDescriptionQuerySet)()
 

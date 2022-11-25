@@ -111,3 +111,8 @@ def siae_kind_to_pe_type_siae(siae_kind):
         SiaeKind.EA: 838,
         SiaeKind.EATT: 840,
     }.get(siae_kind)
+
+
+class JobSource(models.TextChoices):
+    LOCAL = "LOCAL", "Les Emplois de l'Inclusion"
+    PE_API = "PE_API", "API Pôle Emploi"
