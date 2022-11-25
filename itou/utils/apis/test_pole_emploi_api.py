@@ -118,3 +118,28 @@ class PoleEmploiAPIClientTest(TestCase):
         with self.assertRaises(PoleEmploiAPIException):
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
         self.assertEqual(ctx.exception.error_code, "http_error")
+
+    @respx.mock
+    def test_referentiel(self):
+        respx.get("https://api.pe.fake/offresdemploi/v2/referentiel/naturesContrats").respond(
+            200, json=pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+        )
+        assert self.api_client.referentiel("naturesContrats") == pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+
+    @respx.mock
+    def test_offres(self):
+        respx.get(
+            "https://api.pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-1"
+        ).respond(
+            206,  # test code 206 as we already know that 200 is tested through the other tests
+            json={"resultats": pole_emploi_api_mocks.API_OFFRES},
+        )
+        assert self.api_client.offres(natureContrat="FT", range="0-1") == pole_emploi_api_mocks.API_OFFRES
+
+    @respx.mock
+    def test_appellations(self):
+        respx.get("https://api.pe.fake/rome/v1/appellation?champs=code,libelle,metier(code)").respond(
+            200,
+            json=pole_emploi_api_mocks.API_APPELLATIONS,
+        )
+        assert self.api_client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS

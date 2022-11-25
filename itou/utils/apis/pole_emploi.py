@@ -40,7 +40,16 @@ API_CLIENT_EMPTY_NIR_BAD_RESPONSE = "empty_nir"
 API_TIMEOUT_SECONDS = 60  # this API is pretty slow, let's give it a chance
 
 # Pole Emploi also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
-AUTHORIZED_SCOPES = ["api_rechercheindividucertifiev1", "rechercherIndividuCertifie", "passIAE", "api_maj-pass-iaev1"]
+AUTHORIZED_SCOPES = [
+    "api_maj-pass-iaev1",
+    "api_offresdemploiv2",
+    "api_rechercheindividucertifiev1",
+    "api_romev1",
+    "nomenclatureRome",
+    "o2dsoffre",
+    "passIAE",
+    "rechercherIndividuCertifie",
+]
 API_MAJ_PASS_SUCCESS = "S000"
 API_RECH_INDIVIDU_SUCCESS = "S001"
 DATE_FORMAT = "%Y-%m-%d"
@@ -111,11 +120,13 @@ class PoleEmploiApiClient:
     def _headers(self):
         return {"Authorization": self.token, "Content-Type": "application/json"}
 
-    def _request(self, url, data):
+    def _request(self, url, data=None, params=None, method="POST"):
         try:
             self._refresh_token()
-            response = httpx.post(url, json=data, headers=self._headers, timeout=API_TIMEOUT_SECONDS)
-            if response.status_code != 200:
+            response = httpx.request(
+                method, url, params=params, json=data, headers=self._headers, timeout=API_TIMEOUT_SECONDS
+            )
+            if response.status_code not in (200, 206):
                 raise PoleEmploiAPIException(response.status_code)
             data = response.json()
             return data
@@ -179,3 +190,19 @@ class PoleEmploiApiClient:
         code_sortie = data.get("codeSortie")
         if code_sortie != API_MAJ_PASS_SUCCESS:
             raise PoleEmploiAPIBadResponse(code_sortie)
+
+    def referentiel(self, code):
+        url = f"{self.base_url}/offresdemploi/v2/referentiel/{code}"
+        return self._request(url, method="GET")
+
+    def offres(self, typeContrat="", natureContrat="", range=None):
+        url = f"{self.base_url}/offresdemploi/v2/offres/search"
+        params = {"typeContrat": typeContrat, "natureContrat": natureContrat}
+        if range:
+            params["range"] = range
+        data = self._request(url, params=params, method="GET")
+        return data["resultats"]
+
+    def appellations(self):
+        url = f"{self.base_url}/rome/v1/appellation?champs=code,libelle,metier(code)"
+        return self._request(url, method="GET")
