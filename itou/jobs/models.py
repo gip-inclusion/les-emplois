@@ -7,6 +7,7 @@ from django.db import models
 
 
 class Rome(models.Model):
+    updated_at = models.DateTimeField(auto_now=True)
     code = models.CharField(verbose_name="Code ROME", max_length=5, primary_key=True)
     name = models.CharField(verbose_name="Nom", max_length=255, db_index=True)
 
@@ -56,6 +57,7 @@ class Appellation(models.Model):
     - etc.
     """
 
+    updated_at = models.DateTimeField(auto_now=True)
     code = models.CharField(verbose_name="Code", max_length=6, primary_key=True)
     name = models.CharField(verbose_name="Nom", max_length=255, db_index=True)
     rome = models.ForeignKey(Rome, on_delete=models.CASCADE, null=True, related_name="appellations")
