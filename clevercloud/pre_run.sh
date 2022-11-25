@@ -5,6 +5,8 @@ git pull
 cd -
 sops -d secrets-vault/c1/$ITOU_ENVIRONMENT.enc.env > .env
 
+pwd
+
 cat clevercloud/uwsgi.ini \
 | sed "s/__APP_HOME__/$APP_HOME/g" \
 | sed "s/__HARAKIRI__/$HARAKIRI/g" \
