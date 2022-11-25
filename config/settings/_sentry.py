@@ -2,7 +2,9 @@ import logging
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.httpx import HttpxIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
+from sentry_sdk.integrations.redis import RedisIntegration
 
 
 def strip_sentry_sensitive_data(event, _hint):
@@ -35,7 +37,7 @@ sentry_logging = LoggingIntegration(
 def sentry_init(dsn, traces_sample_rate):
     sentry_sdk.init(
         dsn=dsn,
-        integrations=[sentry_logging, DjangoIntegration()],
+        integrations=[sentry_logging, DjangoIntegration(), HttpxIntegration(), RedisIntegration()],
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         # We recommend adjusting this value in production.
