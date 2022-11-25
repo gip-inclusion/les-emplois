@@ -1,12 +1,9 @@
-import pytest
-
 from itou.geo.factories import QPVFactory
 from itou.geo.utils import coords_to_geometry
 from itou.metabase.management.commands._utils import get_qpv_job_seeker_pks
 from itou.users.factories import JobSeekerFactory
 
 
-@pytest.mark.django_db
 def test_get_qpv_job_seeker_pks():
     for code in ["QP093028"]:
         QPVFactory(code=code)
