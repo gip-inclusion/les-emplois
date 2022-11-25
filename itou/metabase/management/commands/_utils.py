@@ -18,6 +18,7 @@ from itou.metabase.management.commands._database_tables import (
     switch_table_atomically,
 )
 from itou.siaes.models import Siae
+from itou.users.models import User
 from itou.utils.python import timeit
 
 
@@ -204,6 +205,26 @@ def get_active_siae_pks():
     and better performance.
     """
     return [siae_pk for siae_pk in Siae.objects.active().values_list("pk", flat=True)]
+
+
+@functools.cache
+def get_qpv_job_seeker_pks():
+    """
+    Load once and for all the list of all job seeker pks which are located in a QPV zone.
+
+    The alternative would have been to naively compute `QPV.in_qpv(u, geom_field="coords")` for each and every one
+    of the ~700k job seekers, which would have resulted in a undesirable deluge of 700k micro SQL requests.
+
+    Unfortunately we failed so far at finding a clean ORM friendly way to do this in a single SQL request.
+    """
+    qpv_job_seekers = User.objects.raw(
+        # Takes only ~2s on local dev.
+        "SELECT uu.id FROM users_user uu INNER JOIN geo_qpv gq ON ST_Contains(gq.geometry, uu.coords::geometry)"
+    )
+    # A list of ~100k integers is permanently loaded in memory. It is fortunately not a very high volume of data.
+    # Objects returned by `raw` are defered which means their fields are not preloaded unless they have been
+    # explicitely specified in the SQL request. We did specify and thus preload `id` fields.
+    return [job_seeker.pk for job_seeker in qpv_job_seekers]
 
 
 def chunked_queryset(queryset, chunk_size=10000):

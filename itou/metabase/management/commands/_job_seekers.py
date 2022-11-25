@@ -1,4 +1,3 @@
-import functools
 from datetime import date, timedelta
 from functools import partial
 from operator import attrgetter
@@ -13,9 +12,9 @@ from itou.metabase.management.commands._utils import (
     get_choice,
     get_department_and_region_columns,
     get_hiring_siae,
+    get_qpv_job_seeker_pks,
     hash_content,
 )
-from itou.users.models import User
 
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
@@ -176,31 +175,11 @@ def get_birth_month_from_nir(job_seeker):
     return None
 
 
-@functools.cache
-def _get_qpv_job_seeker_pks():
-    """
-    Load once and for all the list of all job seeker pks which are located in a QPV zone.
-
-    The alternative would have been to naively compute `QPV.in_qpv(u, geom_field="coords")` for each and every one
-    of the ~700k job seekers, which would have resulted in a undesirable deluge of 700k micro SQL requests.
-
-    Unfortunately we failed so far at finding a clean ORM friendly way to do this in a single SQL request.
-    """
-    qpv_job_seekers = User.objects.raw(
-        # Takes only ~2s on local dev.
-        "SELECT uu.id FROM users_user uu INNER JOIN geo_qpv gq ON ST_Contains(gq.geometry, uu.coords::geometry)"
-    )
-    # A list of ~100k integers is permanently loaded in memory. It is fortunately not a very high volume of data.
-    # Objects returned by `raw` are defered which means their fields are not preloaded unless they have been
-    # explicitely specified in the SQL request. We did specify and thus preload `id` fields.
-    return [job_seeker.pk for job_seeker in qpv_job_seekers]
-
-
 def get_job_seeker_qpv_info(job_seeker):
     if not job_seeker.coords or job_seeker.geocoding_score < 0.8:
         # Under this geocoding score, we can't assert the quality of the QPV information.
         return "Adresse non-géolocalisée"
-    if job_seeker.pk in _get_qpv_job_seeker_pks():
+    if job_seeker.pk in get_qpv_job_seeker_pks():
         return "Adresse en QPV"
     return "Adresse hors QPV"
 
