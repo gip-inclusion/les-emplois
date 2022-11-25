@@ -7,36 +7,8 @@ from django.db import models
 
 
 class Rome(models.Model):
-    """
-    A ROME.
-    Data is provided by django-admin commands `generate_romes` and `import_romes`.
-    """
-
-    RIASEC_REALISTIC = "R"
-    RIASEC_INVESTIGATIVE = "I"
-    RIASEC_ARTISTIC = "A"
-    RIASEC_SOCIAL = "S"
-    RIASEC_ENTERPRISING = "E"
-    RIASEC_CONVENTIONAL = "C"
-
-    RIASEC_CHOICES = (
-        (RIASEC_REALISTIC, "Réaliste"),
-        (RIASEC_INVESTIGATIVE, "Investigateur"),
-        (RIASEC_ARTISTIC, "Artistique"),
-        (RIASEC_SOCIAL, "Social"),
-        (RIASEC_ENTERPRISING, "Entreprenant"),
-        (RIASEC_CONVENTIONAL, "Conventionnel"),
-    )
-
     code = models.CharField(verbose_name="Code ROME", max_length=5, primary_key=True)
     name = models.CharField(verbose_name="Nom", max_length=255, db_index=True)
-    riasec_major = models.CharField(
-        verbose_name="RIASEC Majeur", max_length=1, choices=RIASEC_CHOICES, default=RIASEC_REALISTIC
-    )
-    riasec_minor = models.CharField(
-        verbose_name="RIASEC Mineur", max_length=1, choices=RIASEC_CHOICES, default=RIASEC_REALISTIC
-    )
-    code_isco = models.CharField(verbose_name="Code ROME", max_length=4)
 
     class Meta:
         verbose_name = "ROME"

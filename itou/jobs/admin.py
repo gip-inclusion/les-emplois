@@ -15,7 +15,6 @@ class AppellationsInline(admin.TabularInline):
 @admin.register(models.Rome)
 class RomeAdmin(admin.ModelAdmin):
     list_display = ("code", "name")
-    list_filter = ("riasec_major", "riasec_minor")
     search_fields = ("code", "name")
     inlines = (AppellationsInline,)
 
