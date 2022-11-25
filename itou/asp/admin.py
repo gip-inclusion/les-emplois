@@ -47,6 +47,7 @@ class ASPModelAdmin(admin.ModelAdmin):
 
 @admin.register(models.Commune)
 class CommuneAdmin(ASPModelAdmin):
+    list_display = ("pk", "code", "name", "start_date", "end_date", "created_by")
     search_fields = [
         "name",
         "code",
