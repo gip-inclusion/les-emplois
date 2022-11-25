@@ -347,6 +347,9 @@ class CommuneQuerySet(PeriodQuerySet):
         "Lookup a Commune object by INSEE code and valid at the given period"
         return (
             self.filter(code=insee_code, start_date__lte=period)
+            # Don't check for manually created Communes since we split multiples
+            # Commune with the same INSEE as SAINT-DENIS/STE_CLOTILDE
+            .filter(created_by__isnull=True)
             .filter((Q(end_date=None) | Q(end_date__gt=period)))
             .get()
         )
