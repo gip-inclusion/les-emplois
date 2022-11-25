@@ -331,10 +331,16 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gou
 
 
 _sentry_dsn = os.getenv("SENTRY_DSN")
+try:
+    _sentry_traces_sample_rate = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", ""))
+except ValueError:
+    _sentry_traces_sample_rate = 0
+
+
 if _sentry_dsn:
     from ._sentry import sentry_init
 
-    sentry_init(dsn=_sentry_dsn)
+    sentry_init(dsn=_sentry_dsn, traces_sample_rate=_sentry_traces_sample_rate)
 
 SHOW_TEST_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in ("DEMO", "REVIEW-APP")
 
