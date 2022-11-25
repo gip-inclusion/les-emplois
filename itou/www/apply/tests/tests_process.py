@@ -98,7 +98,7 @@ class ProcessViewsTest(TestCase):
     def test_details_for_prescriber(self, *args, **kwargs):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, with_approval=True)
+        job_application = JobApplicationFactory(with_approval=True)
         prescriber = job_application.sender_prescriber_organization.members.first()
 
         self.client.force_login(prescriber)
@@ -108,6 +108,8 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # Job seeker nir is displayed
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
+        # Approval is displayed
+        self.assertContains(response, "PASS IAE (agrément) disponible")
 
     def test_details_for_prescriber_as_siae(self, *args, **kwargs):
         """As a SIAE user, I cannot access the job_applications details for prescribers."""
