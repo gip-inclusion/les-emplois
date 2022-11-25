@@ -7,9 +7,9 @@ from itou.approvals.factories import SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.factories import (
+    JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
-    JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.factories import create_test_romes_and_appellations
@@ -326,7 +326,8 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(f"{self.siae_base_url}?{params}")
         self.assertEqual(len(response.context["job_applications_page"].object_list), 0)
 
-        job_application = JobApplicationWithApprovalFactory(
+        job_application = JobApplicationFactory(
+            with_approval=True,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=yesterday,
             approval__start_at=yesterday,

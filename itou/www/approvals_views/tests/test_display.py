@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from itou.approvals.factories import ApprovalFactory
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplication
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import UserFactory
@@ -16,7 +16,7 @@ from itou.utils import constants as global_constants
 @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
 class TestDisplayApproval(TestCase):
     def test_display_job_app_approval(self, *args, **kwargs):
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(with_approval=True)
 
         siae_member = job_application.to_siae.members.first()
         self.client.force_login(siae_member)
@@ -33,7 +33,7 @@ class TestDisplayApproval(TestCase):
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
     def test_display_approval_multiple_job_applications(self, *args, **kwargs):
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(with_approval=True)
         JobApplicationFactory(
             job_seeker=job_application.job_seeker,
             approval=job_application.approval,
@@ -70,8 +70,8 @@ class TestDisplayApproval(TestCase):
     def test_display_approval_even_if_diagnosis_is_missing(self, *args, **kwargs):
         # An approval has been delivered but it does not come from Itou.
         # Therefore, the linked diagnosis exists but is not in our database.
-        job_application = JobApplicationWithApprovalFactory(
-            eligibility_diagnosis=None, approval__number="625741810181"
+        job_application = JobApplicationFactory(
+            with_approval=True, eligibility_diagnosis=None, approval__number="625741810181"
         )
 
         siae_member = job_application.to_siae.members.first()
@@ -93,7 +93,8 @@ class TestDisplayApproval(TestCase):
         # See itou.users.management.commands.import_ai_employees.
         approval_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
         approval_created_by = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-        job_application = JobApplicationWithApprovalFactory(
+        job_application = JobApplicationFactory(
+            with_approval=True,
             eligibility_diagnosis=None,
             approval__created_at=approval_created_at,
             approval__created_by=approval_created_by,
@@ -118,7 +119,7 @@ class TestDisplayApproval(TestCase):
         Given an existing job application with an approval delivered by Itou but no
         diagnosis, when trying to display it as printable, then it raises an error.
         """
-        job_application = JobApplicationWithApprovalFactory(eligibility_diagnosis=None)
+        job_application = JobApplicationFactory(with_approval=True, eligibility_diagnosis=None)
 
         siae_member = job_application.to_siae.members.first()
         self.client.force_login(siae_member)

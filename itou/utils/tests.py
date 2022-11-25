@@ -35,8 +35,7 @@ from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae, SiaeMembership
@@ -1120,14 +1119,14 @@ class PoleEmploiAPIClientTest(TestCase):
         Nominal scenario: an approval is **accepted**
         HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae does not raise.
         """
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(with_approval=True)
         respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_OK)
         # we really don't care about the arguments there
         self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
 
     @respx.mock
     def test_mise_a_jour_pass_iae_failure(self):
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(with_approval=True)
         # non-S001 codeSortie
         respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_ERROR)
         with self.assertRaises(PoleEmploiAPIBadResponse):
@@ -1217,7 +1216,7 @@ class SupportRemarkAdminViewsTest(TestCase):
         self.client.force_login(user)
 
         today = timezone.localdate()
-        job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_app = JobApplicationFactory(with_approval=True)
         approval = job_app.approval
 
         suspension = SuspensionFactory(

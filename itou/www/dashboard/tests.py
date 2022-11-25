@@ -13,11 +13,7 @@ from itou.approvals.factories import ApprovalFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.institutions.factories import InstitutionMembershipFactory
-from itou.job_applications.factories import (
-    JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
-    JobApplicationSentByPrescriberFactory,
-    JobApplicationWithApprovalFactory,
-)
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
@@ -106,14 +102,14 @@ class DashboardViewTest(TestCase):
         self.assertEqual(response.context["num_rejected_employee_records"], 0)
 
         # create rejected job applications
-        job_application = JobApplicationWithApprovalFactory(to_siae=siae)
+        job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
         # You can't create 2 employee records with the same job application
         # Factories were allowing it until a recent fix was applied
-        job_application = JobApplicationWithApprovalFactory(to_siae=siae)
+        job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
 
-        other_job_application = JobApplicationWithApprovalFactory(to_siae=other_siae)
+        other_job_application = JobApplicationFactory(with_approval=True, to_siae=other_siae)
         EmployeeRecordFactory(job_application=other_job_application, status=Status.REJECTED)
 
         session = self.client.session
@@ -530,7 +526,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertEqual(job_seeker.address_line_2, post_data["address_line_2"])
 
     def test_edit_by_prescriber(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         user = job_application.sender
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
@@ -543,7 +539,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_edit_by_prescriber_of_organization(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         prescriber = job_application.sender
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).

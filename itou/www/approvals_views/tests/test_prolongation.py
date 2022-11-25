@@ -7,8 +7,7 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 
 from itou.approvals.models import Prolongation
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import DeclareProlongationForm
@@ -24,8 +23,8 @@ class ApprovalProlongationTest(TestCase):
         self.prescriber = self.prescriber_organization.members.first()
 
         today = timezone.localdate()
-        self.job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        self.job_application = JobApplicationFactory(
+            with_approval=True,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today - relativedelta(days=1),
             approval__start_at=today - relativedelta(months=12),

@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
@@ -204,7 +204,8 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
             + [AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()],
         )
 
-        job_application = JobApplicationWithApprovalFactory(
+        job_application = JobApplicationFactory(
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             eligibility_diagnosis=eligibility_diagnosis,
@@ -228,7 +229,8 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
 
-                job_application = JobApplicationWithApprovalFactory(
+                job_application = JobApplicationFactory(
+                    with_approval=True,
                     to_siae=siae,
                     sender_siae=siae,
                     hiring_start_at=timezone.now() - relativedelta(months=2),

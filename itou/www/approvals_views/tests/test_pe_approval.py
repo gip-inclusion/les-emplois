@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.factories import JobSeekerFactory
@@ -22,9 +22,9 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.siae = SiaeFactory(with_membership=True)
         self.siae_user = self.siae.members.first()
         if with_job_application:
-            self.job_application = JobApplicationWithApprovalFactory(
+            self.job_application = JobApplicationFactory(
+                with_approval=True,
                 to_siae=self.siae,
-                state=JobApplicationWorkflow.STATE_ACCEPTED,
                 approval__number=self.pe_approval.number,
             )
             self.approval = self.job_application.approval
@@ -118,8 +118,8 @@ class PoleEmploiApprovalSearchTest(TestCase):
         # that belongs to another siae.
         job_seeker = JobSeekerFactory()
         pe_approval = PoleEmploiApprovalFactory()
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        job_application = JobApplicationFactory(
+            with_approval=True,
             approval__number=pe_approval.number,
             approval__user=job_seeker,
             job_seeker=job_seeker,
@@ -151,7 +151,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         """
         The search for PE approval screen as job seeker is not authorized
         """
-        job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_application = JobApplicationFactory(with_approval=True)
         self.client.force_login(job_application.job_seeker)
 
         response = self.client.get(self.url)
@@ -160,7 +160,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
 
 class PoleEmploiApprovalSearchUserTest(TestCase):
     def setUp(self):
-        self.job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        self.job_application = JobApplicationFactory(with_approval=True)
         self.siae = self.job_application.to_siae
         self.siae_user = self.job_application.to_siae.members.first()
         self.approval = self.job_application.approval
@@ -194,7 +194,7 @@ class PoleEmploiApprovalSearchUserTest(TestCase):
 
 class PoleEmploiApprovalCreateTest(TestCase):
     def setUp(self):
-        self.job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        self.job_application = JobApplicationFactory(with_approval=True)
         self.siae = self.job_application.to_siae
         self.siae_user = self.job_application.to_siae.members.first()
         self.approval = self.job_application.approval
@@ -250,8 +250,9 @@ class PoleEmploiApprovalCreateTest(TestCase):
         """
         When the PoleEmploiApproval has already been imported, we are redirected to its page
         """
-        self.job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED, approval=ApprovalFactory(number=self.pe_approval.number[:12])
+        self.job_application = JobApplicationFactory(
+            with_approval=True,
+            approval=ApprovalFactory(number=self.pe_approval.number[:12]),
         )
 
         initial_approval_count = Approval.objects.count()

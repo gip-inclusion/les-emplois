@@ -25,8 +25,8 @@ from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNo
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import (
+    JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
-    JobApplicationWithApprovalFactory,
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -95,7 +95,7 @@ class CommonApprovalQuerySetTest(TestCase):
         self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
 
     def test_can_be_deleted(self):
-        job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_app = JobApplicationFactory(with_approval=True)
         approval = job_app.approval
         self.assertTrue(approval.can_be_deleted)
 
@@ -107,9 +107,7 @@ class CommonApprovalQuerySetTest(TestCase):
         job_app.save()
         self.assertFalse(approval.can_be_deleted)
 
-        JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED, job_seeker=job_app.job_seeker, approval=job_app.approval
-        )
+        JobApplicationFactory(with_approval=True, job_seeker=job_app.job_seeker, approval=job_app.approval)
         self.assertFalse(approval.can_be_deleted)
 
     def test_starts_date_filters_for_approval_model(self):
@@ -724,7 +722,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
 
         self.client.force_login(user)
 
-        job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_app = JobApplicationFactory(with_approval=True)
         approval = job_app.approval
 
         url = reverse("admin:approvals_approval_change", args=[approval.pk])
@@ -825,7 +823,9 @@ class CustomApprovalAdminViewsTest(TestCase):
 
     def test_employee_record_status(self):
         # test employee record exists
-        job_application = JobApplicationWithApprovalFactory()
+        job_application = JobApplicationFactory(
+            with_approval=True,
+        )
         EmployeeRecordFactory(job_application=job_application)
         employee_record_id = EmployeeRecord.objects.get(job_application_id=job_application.id).id
         msg = JobApplicationInline.employee_record_status(self, job_application)
@@ -835,7 +835,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         today = datetime.date.today()
         for siae_kind in Siae.ASP_EMPLOYEE_RECORD_KINDS:
             eligible_siae = SiaeFactory(kind=siae_kind)
-            job_application = JobApplicationWithApprovalFactory(to_siae=eligible_siae, hiring_start_at=today)
+            job_application = JobApplicationFactory(with_approval=True, to_siae=eligible_siae, hiring_start_at=today)
             self.assertIn(
                 "Fiche salarié en attente de creation",
                 JobApplicationInline.employee_record_status(self, job_application),
@@ -852,7 +852,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         ## can_use_employee_record
         for siae_kind in [siae_kind for siae_kind in SiaeKind if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS]:
             not_eligible_siae = SiaeFactory(kind=siae_kind)
-            job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
+            job_application = JobApplicationFactory(with_approval=True, to_siae=not_eligible_siae)
             self.assertIn(
                 "Pas de fiche salarié crée pour cette candidature",
                 JobApplicationInline.employee_record_status(self, job_application),
@@ -1001,10 +1001,14 @@ class SuspensionModelTest(TestCase):
         today = timezone.localdate()
         start_at = today - relativedelta(days=10)
 
-        job_application_1 = JobApplicationWithApprovalFactory(hiring_start_at=today)
-        job_application_2 = JobApplicationWithApprovalFactory(hiring_start_at=start_at)
-        job_application_3 = JobApplicationWithApprovalFactory(hiring_start_at=start_at, created_from_pe_approval=True)
-        job_application_4 = JobApplicationWithApprovalFactory(hiring_start_at=None, created_from_pe_approval=True)
+        job_application_1 = JobApplicationFactory(with_approval=True, hiring_start_at=today)
+        job_application_2 = JobApplicationFactory(with_approval=True, hiring_start_at=start_at)
+        job_application_3 = JobApplicationFactory(
+            with_approval=True, hiring_start_at=start_at, created_from_pe_approval=True
+        )
+        job_application_4 = JobApplicationFactory(
+            with_approval=True, hiring_start_at=None, created_from_pe_approval=True
+        )
 
         # TODO: must be checked with PO
         # - empty hiring start date

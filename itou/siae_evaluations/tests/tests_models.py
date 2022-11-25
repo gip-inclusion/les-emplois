@@ -13,7 +13,7 @@ from django.utils import dateformat, timezone
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import (
@@ -40,8 +40,9 @@ from itou.utils.perms.user import UserInfo
 
 
 def create_batch_of_job_applications(siae):
-    JobApplicationWithApprovalFactory.create_batch(
+    JobApplicationFactory.create_batch(
         evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+        with_approval=True,
         to_siae=siae,
         sender_siae=siae,
         eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
@@ -213,7 +214,8 @@ class EvaluationCampaignManagerTest(TestCase):
         siae2 = SiaeFactory(department="14")
 
         # Job Application without approval
-        JobApplicationWithApprovalFactory(
+        JobApplicationFactory(
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             hiring_start_at=timezone.now() - relativedelta(months=2),
@@ -222,7 +224,8 @@ class EvaluationCampaignManagerTest(TestCase):
 
         # Job Application outside institution department
         siae12 = SiaeFactory(department="12")
-        JobApplicationWithApprovalFactory(
+        JobApplicationFactory(
+            with_approval=True,
             to_siae=siae12,
             sender_siae=siae,
             eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
@@ -236,7 +239,8 @@ class EvaluationCampaignManagerTest(TestCase):
         for kind in [k for k in SiaeKind if k not in evaluation_enums.EvaluationSiaesKind.Evaluable]:
             with self.subTest(kind=kind):
                 siae_wrong_kind = SiaeFactory(department="14", kind=kind)
-                JobApplicationWithApprovalFactory(
+                JobApplicationFactory(
+                    with_approval=True,
                     to_siae=siae_wrong_kind,
                     sender_siae=siae_wrong_kind,
                     eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
@@ -246,7 +250,8 @@ class EvaluationCampaignManagerTest(TestCase):
                 self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
 
         # Job Application not accepted
-        JobApplicationWithApprovalFactory(
+        JobApplicationFactory(
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
@@ -257,7 +262,8 @@ class EvaluationCampaignManagerTest(TestCase):
         self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
 
         # Job Application not in period
-        JobApplicationWithApprovalFactory(
+        JobApplicationFactory(
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
@@ -267,7 +273,8 @@ class EvaluationCampaignManagerTest(TestCase):
         self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
 
         # Eligibility Diagnosis not made by Siae_staff
-        JobApplicationWithApprovalFactory(
+        JobApplicationFactory(
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER,
@@ -277,7 +284,8 @@ class EvaluationCampaignManagerTest(TestCase):
         self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
 
         # Eligibility Diagnosis made by an other siae (not the on of the job application)
-        JobApplicationWithApprovalFactory(
+        JobApplicationFactory(
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
@@ -287,7 +295,8 @@ class EvaluationCampaignManagerTest(TestCase):
         self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
 
         # the eligible job application
-        JobApplicationWithApprovalFactory(
+        JobApplicationFactory(
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
@@ -312,7 +321,8 @@ class EvaluationCampaignManagerTest(TestCase):
 
         # siae1 got 1 job application
         siae1 = SiaeFactory(department="14")
-        JobApplicationWithApprovalFactory(
+        JobApplicationFactory(
+            with_approval=True,
             to_siae=siae1,
             sender_siae=siae1,
             eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
@@ -413,8 +423,9 @@ class EvaluationCampaignManagerTest(TestCase):
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker, user_info, administrative_criteria=[criteria1]
         )
-        JobApplicationWithApprovalFactory.create_batch(
+        JobApplicationFactory.create_batch(
             evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             eligibility_diagnosis=eligibility_diagnosis,

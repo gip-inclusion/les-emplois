@@ -12,7 +12,7 @@ from itou.eligibility.factories import (
     ExpiredEligibilityDiagnosisMadeBySiaeFactory,
 )
 from itou.eligibility.models import AdministrativeCriteria, AdministrativeCriteriaQuerySet, EligibilityDiagnosis
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
@@ -408,14 +408,16 @@ class AdministrativeCriteriaModelTest(TestCase):
             job_seeker, user_info, administrative_criteria=[criteria1]
         )
 
-        job_application1 = JobApplicationWithApprovalFactory(
+        job_application1 = JobApplicationFactory(
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
 
-        job_application2 = JobApplicationWithApprovalFactory(
+        job_application2 = JobApplicationFactory(
+            with_approval=True,
             to_siae=siae,
             sender_siae=siae,
             hiring_start_at=timezone.now() - relativedelta(months=2),

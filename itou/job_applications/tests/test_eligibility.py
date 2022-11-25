@@ -5,7 +5,7 @@ import itou.employee_record.enums as er_enums
 import itou.siaes.enums as siae_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
-from itou.job_applications.factories import JobApplicationWithApprovalFactory, JobApplicationWithoutApprovalFactory
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithoutApprovalFactory
 from itou.job_applications.models import JobApplication
 from itou.siaes.factories import SiaeFactory
 
@@ -22,8 +22,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         # Hiring SIAE is the expected SIAE
         siae_good = SiaeFactory()
         siae_bad = SiaeFactory()
-        eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae_good)
-        non_eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae_bad)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_good)
+        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_bad)
 
         self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae_good))
         self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae_good))
@@ -31,8 +31,8 @@ class EmployeeRecordEligibilityTest(TestCase):
     def test_existing_employee_record(self):
         # A job application must not have any employee record linked if newly created
         siae = SiaeFactory()
-        non_eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae)
-        eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae)
+        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
         EmployeeRecordWithProfileFactory(job_application=non_eligible_job_application, status=er_enums.Status.READY)
 
         self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
@@ -44,8 +44,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         siae_bad = SiaeFactory(kind=siae_enums.SiaeKind.EATT)
         # job application created with a fake approval
         # to avoid filtering criteria with empty approval
-        non_eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae_bad)
-        eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae_good)
+        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_bad)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_good)
 
         self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae_bad))
         self.assertNotIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae_bad))
@@ -53,8 +53,10 @@ class EmployeeRecordEligibilityTest(TestCase):
     def test_admin_validation(self):
         # Employee record creation can be blocked via admin for a given job application
         siae = SiaeFactory()
-        non_eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae, create_employee_record=False)
-        eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae, create_employee_record=True)
+        non_eligible_job_application = JobApplicationFactory(
+            with_approval=True, to_siae=siae, create_employee_record=False
+        )
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae, create_employee_record=True)
 
         self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
         self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
@@ -64,8 +66,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         bad_ts = EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE - timedelta(days=1)
         good_ts = EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE + timedelta(days=1)
         siae = SiaeFactory()
-        non_eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae, hiring_start_at=bad_ts)
-        eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae, hiring_start_at=good_ts)
+        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae, hiring_start_at=bad_ts)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae, hiring_start_at=good_ts)
 
         self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
         self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
@@ -75,7 +77,7 @@ class EmployeeRecordEligibilityTest(TestCase):
         siae = SiaeFactory()
 
         non_eligible_job_application = JobApplicationWithoutApprovalFactory(to_siae=siae)
-        eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
 
         self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
         self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
@@ -88,8 +90,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         # must be displayed to users for update / completion tasks.
         # This about displaying "unfinished" and uncomplete employee records.
         siae = SiaeFactory()
-        non_eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae)
-        eligible_job_application = JobApplicationWithApprovalFactory(to_siae=siae)
+        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
         EmployeeRecordWithProfileFactory(job_application=non_eligible_job_application, status=er_enums.Status.READY)
         EmployeeRecordWithProfileFactory(job_application=eligible_job_application, status=er_enums.Status.NEW)
 
