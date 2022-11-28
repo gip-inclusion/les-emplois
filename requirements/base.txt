@@ -47,9 +47,9 @@ beautifulsoup4==4.11.1 \
     --hash=sha256:58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30 \
     --hash=sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693
     # via django-bootstrap4
-boto3==1.24.32 \
-    --hash=sha256:021f2a71cbcd75c87724b7dfbf28a691f07899345047f6bc999ef646d97461df \
-    --hash=sha256:cb1f1d443672a65e23756cc712d060222e53e68d0700af60b4d904125d9186db
+boto3==1.24.78 \
+    --hash=sha256:d141f18d0ec63bc89e0f3d24f269b4f2e18377f1c5e39c56152d4cfd8e6c6ff7 \
+    --hash=sha256:da672d9133852dbb36ce9cd156dffcb28a2dc098af1731791ab614969a34f9f5
     # via -r requirements/base.in
 botocore==1.27.78 \
     --hash=sha256:b45ae0680699ce100386ac1478e03fd3f29ef22d6bfb5a19169ffee6e67c5293 \
