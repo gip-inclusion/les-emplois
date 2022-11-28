@@ -340,16 +340,19 @@ class PrescriberType(models.TextChoices):
 
 
 class CommuneQuerySet(PeriodQuerySet):
+    def asp_imported(self):
+        # Don't check for manually created Communes since we split multiples
+        # Commune with the same INSEE as SAINT-DENIS/STE_CLOTILDE
+        return self.filter(created_by=None)
+
     def by_insee_code(self, insee_code: str):
-        return Commune.objects.current().get(code=insee_code)
+        return self.asp_imported().current().filter(code=insee_code).get()
 
     def by_insee_code_and_period(self, insee_code, period):
         "Lookup a Commune object by INSEE code and valid at the given period"
         return (
-            self.filter(code=insee_code, start_date__lte=period)
-            # Don't check for manually created Communes since we split multiples
-            # Commune with the same INSEE as SAINT-DENIS/STE_CLOTILDE
-            .filter(created_by__isnull=True)
+            self.asp_imported()
+            .filter(code=insee_code, start_date__lte=period)
             .filter((Q(end_date=None) | Q(end_date__gt=period)))
             .get()
         )
