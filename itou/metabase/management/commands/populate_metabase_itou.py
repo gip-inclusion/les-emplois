@@ -28,7 +28,6 @@ from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
 from django.utils import timezone
 from psycopg2 import extras as psycopg2_extras, sql
-from tqdm import tqdm
 
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.cities.models import City
@@ -231,29 +230,27 @@ class Command(BaseCommand):
             self.commit()
 
             if extra_object:
-                # Insert extra object without counter/tqdm for simplicity.
                 self.inject_chunk(table_columns=table.columns, chunk=[extra_object], new_table_name=new_table_name)
 
-            with tqdm(total=total_rows) as progress_bar:
-                for queryset in querysets:
-                    injections = 0
-                    total_injections = queryset.count()
-                    if self.dry_run:
-                        total_injections = min(total_injections, METABASE_DRY_RUN_ROWS_PER_QUERYSET)
+            for queryset in querysets:
+                injections = 0
+                total_injections = queryset.count()
+                if self.dry_run:
+                    total_injections = min(total_injections, METABASE_DRY_RUN_ROWS_PER_QUERYSET)
 
-                    # Insert rows by batch of METABASE_INSERT_BATCH_SIZE.
-                    for chunk_qs in chunked_queryset(queryset, chunk_size=METABASE_INSERT_BATCH_SIZE):
-                        injections_left = total_injections - injections
-                        if injections_left == 0:
-                            break  # During a dry run stop as soon as we have injected enough rows.
-                        if chunk_qs.count() > injections_left:
-                            chunk_qs = chunk_qs[:injections_left]
-                        self.inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
-                        injections += chunk_qs.count()
-                        progress_bar.update(chunk_qs.count())
+                # Insert rows by batch of METABASE_INSERT_BATCH_SIZE.
+                for chunk_qs in chunked_queryset(queryset, chunk_size=METABASE_INSERT_BATCH_SIZE):
+                    injections_left = total_injections - injections
+                    if injections_left == 0:
+                        break  # During a dry run stop as soon as we have injected enough rows.
+                    if chunk_qs.count() > injections_left:
+                        chunk_qs = chunk_qs[:injections_left]
+                    self.inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
+                    injections += chunk_qs.count()
+                    self.stdout.write(f"count={injections} of total={total_rows} written")
 
-                    # Trigger garbage collection to optimize memory use.
-                    gc.collect()
+                # Trigger garbage collection to optimize memory use.
+                gc.collect()
 
             # Swap new and old table nicely to minimize downtime.
             self.cur.execute(
@@ -347,7 +344,7 @@ class Command(BaseCommand):
         paginator = Paginator(queryset, chunk_size)
 
         rows = []
-        for page_idx in tqdm(range(1, paginator.num_pages + 1)):
+        for page_idx in range(1, paginator.num_pages + 1):
             for ja in paginator.page(page_idx).object_list:
                 for jd in ja.selected_jobs.all():
                     # We want to preserve the order of columns.
@@ -357,6 +354,7 @@ class Command(BaseCommand):
                     row["id_anonymisé_candidature"] = hash_content(ja.pk)
 
                     rows.append(row)
+            self.stdout.write(f"selected_jobs: page_idx={page_idx} of total={paginator.num_pages} processed")
             if self.dry_run and len(rows) >= 1000:
                 break
 
@@ -420,7 +418,7 @@ class Command(BaseCommand):
         self.stdout.write(f"Preparing content for {table_name} table...")
 
         rows = []
-        for dpt_code, dpt_name in tqdm(DEPARTMENTS.items()):
+        for dpt_code, dpt_name in DEPARTMENTS.items():
             # We want to preserve the order of columns.
             row = OrderedDict()
 
