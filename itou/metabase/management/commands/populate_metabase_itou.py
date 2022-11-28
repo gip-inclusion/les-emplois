@@ -114,9 +114,6 @@ class Command(BaseCommand):
         self.commit()
 
     def inject_chunk(self, table_columns, chunk, new_table_name):
-        """
-        Insert chunk of objects into table.
-        """
         insert_query = sql.SQL("insert into {new_table_name} ({fields}) values %s").format(
             new_table_name=sql.Identifier(new_table_name),
             fields=sql.SQL(",").join(
@@ -247,9 +244,6 @@ class Command(BaseCommand):
             self.stdout.write("")
 
     def populate_siaes(self):
-        """
-        Populate siaes table with various statistics.
-        """
         queryset = (
             Siae.objects.active()
             .select_related("convention")
@@ -267,9 +261,6 @@ class Command(BaseCommand):
         self.populate_table(table=_siaes.TABLE, queryset=queryset)
 
     def populate_job_descriptions(self):
-        """
-        Populate job descriptions with various statistics.
-        """
         queryset = (
             SiaeJobDescription.objects.select_related(
                 "siae",
@@ -299,9 +290,6 @@ class Command(BaseCommand):
         )
 
     def populate_job_applications(self):
-        """
-        Populate job applications table with various statistics.
-        """
         queryset = (
             JobApplication.objects.select_related(
                 "to_siae", "sender", "sender_siae", "sender_prescriber_organization", "approval"
@@ -401,9 +389,6 @@ class Command(BaseCommand):
         self.populate_table(table=_insee_codes.TABLE, queryset=queryset)
 
     def populate_departments(self):
-        """
-        Populate department codes, department names and region names.
-        """
         table_name = "departements"
         self.stdout.write(f"Preparing content for {table_name} table...")
 
