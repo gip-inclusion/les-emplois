@@ -65,18 +65,53 @@ class CommunesFixtureTest(_CommuneTest):
 
 class CommuneModelTest(_CommuneTest):
     def test_by_insee_code(self):
-        current_communes = Commune.objects.current()
+        old_commune = Commune(
+            code=99999,
+            name="ENNUI-SUR-BLASÉ",
+            start_date=datetime.datetime(1940, 1, 1),
+            end_date=datetime.datetime(2021, 12, 31),
+        )
+        new_commune = Commune(code=99999, name="ENNUI-SUR-BLASÉ", start_date=datetime.datetime(2022, 1, 1))
+        Commune.objects.bulk_create([old_commune, new_commune])
 
-        for commune in current_communes:
-            with self.subTest():
-                result = Commune.by_insee_code(commune.code)
-                self.assertEqual(result.code, commune.code)
+        result = Commune.by_insee_code(99999)
+        self.assertEqual(new_commune, result)
+
+    def test_by_insee_code_ignore_manually_created(self):
+        user = UserFactory()
+        commune = Commune.objects.current().first()
+        # Manually add a Commune as we did to duplicate an existing Commune
+        # SAINT-DENIS/STE-CLOTILDE code=97411
+        Commune.objects.create(
+            code=commune.code,
+            name="Autre nom",
+            start_date=commune.start_date,
+            created_by=user,
+        )
+        result = Commune.by_insee_code(commune.code)
+        self.assertEqual(result, commune)
 
     def test_by_insee_code_and_period(self):
+        old_commune = Commune(
+            code=99999,
+            name="ENNUI-SUR-BLASÉ",
+            start_date=datetime.datetime(1940, 1, 1),
+            end_date=datetime.datetime(2021, 12, 31),
+        )
+        new_commune = Commune(code=99999, name="ENNUI-SUR-BLASÉ", start_date=datetime.datetime(2022, 1, 1))
+        Commune.objects.bulk_create([old_commune, new_commune])
+
+        result = Commune.by_insee_code_and_period(99999, datetime.datetime(1988, 4, 28))
+        self.assertEqual(old_commune, result)
+
+        result = Commune.by_insee_code_and_period(99999, datetime.datetime(2022, 11, 28))
+        self.assertEqual(new_commune, result)
+
+    def test_by_insee_code_and_period_ignore_manually_created(self):
         user = UserFactory()
         commune = Commune.objects.first()
 
-        # Manually add a Commune as we did to split
+        # Manually add a Commune as we did to duplicate an existing Commune
         # SAINT-DENIS/STE-CLOTILDE code=97411
         Commune.objects.create(
             code=commune.code,
@@ -87,4 +122,4 @@ class CommuneModelTest(_CommuneTest):
         # Look for the same commune (one day after commune.start_date should still be in the commune period)
         # We should not raise a Commune.MultipleObjectsReturned because we exclude mannually created objects
         result = Commune.by_insee_code_and_period(commune.code, commune.start_date + datetime.timedelta(days=1))
-        self.assertEqual(result.code, commune.code)
+        self.assertEqual(result, commune)
