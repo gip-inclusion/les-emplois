@@ -7,6 +7,8 @@ sops -d secrets-vault/c1/$ITOU_ENVIRONMENT.enc.env > .env
 
 pwd
 
+echo "Hello xafer"
+
 # Use @ instead of usual / in first sed to avoid the need to escape $APP_HOME
 cat clevercloud/uwsgi.ini \
 | sed "s@__APP_HOME__@$APP_HOME@g" \
@@ -14,3 +16,5 @@ cat clevercloud/uwsgi.ini \
 | sed "s/__CC_PYTHON_MODULE__/$CC_PYTHON_MODULE/g" \
 | sed "s/__WORKERS__/${WSGI_WORKERS:-2}/g" \
 > itou_uwsgi.ini
+
+echo "itou_uwsgi created"
