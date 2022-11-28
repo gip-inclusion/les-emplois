@@ -89,10 +89,28 @@ class Command(BaseCommand):
 
     help = "Populate metabase database."
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.MODE_TO_OPERATION = {
+            "siaes": self.populate_siaes,
+            "job_descriptions": self.populate_job_descriptions,
+            "organizations": self.populate_organizations,
+            "job_seekers": self.populate_job_seekers,
+            "job_applications": self.populate_job_applications,
+            "selected_jobs": self.populate_selected_jobs,
+            "approvals": self.populate_approvals,
+            "rome_codes": self.populate_rome_codes,
+            "insee_codes": self.populate_insee_codes,
+            "departments": self.populate_departments,
+            "final_tables": self.build_final_tables,
+            "data_inconsistencies": self.report_data_inconsistencies,
+        }
+
     def add_arguments(self, parser):
         parser.add_argument(
             "--dry-run", dest="dry_run", action="store_true", help="Populate alternate tables with sample data"
         )
+        parser.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
 
     def commit(self):
         """
@@ -431,34 +449,11 @@ class Command(BaseCommand):
     def build_final_tables(self):
         build_final_tables(dry_run=self.dry_run)
 
-    def populate_metabase_itou(self):
-        if not self.dry_run:
-            send_slack_message(
-                ":rocket: Début de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"
-            )
-
-        self.populate_siaes()
-        self.populate_job_descriptions()
-        self.populate_organizations()
-        self.populate_job_seekers()
-        self.populate_job_applications()
-        self.populate_selected_jobs()
-        self.populate_approvals()
-        self.populate_rome_codes()
-        self.populate_insee_codes()
-        self.populate_departments()
-        self.build_final_tables()
-        self.report_data_inconsistencies()
-
-        if not self.dry_run:
-            send_slack_message(
-                ":white_check_mark: Fin de la mise à jour quotidienne de Metabase avec les"
-                " dernières données C1 :white_check_mark:"
-            )
-
     @timeit
-    def handle(self, dry_run=False, **options):
+    def handle(self, mode, dry_run=False, **options):
         self.dry_run = dry_run
-        self.populate_metabase_itou()
-        self.stdout.write("-" * 80)
-        self.stdout.write("Done.")
+        if not self.dry_run:
+            send_slack_message(f":rocket: Mise à jour Metabase mode={mode}")
+        self.MODE_TO_OPERATION[mode]()
+        if not self.dry_run:
+            send_slack_message(f":white_check_mark: Fin de la mise à jour Metabase mode={mode}")
