@@ -99,6 +99,7 @@ LOCAL_APPS = [
     "itou.status",
     "itou.antivirus",
     "itou.scripts",
+    "itou.settings_viewer",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
