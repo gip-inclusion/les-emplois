@@ -99,54 +99,41 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
 
-    def commit(self):
+    def populate_table(self, table, querysets=None, extra_object=None):
         """
-        A single final commit freezes the itou-metabase-db temporarily, making our GUI unable to connect to the db
-        during this commit.
+        About commits: a single final commit freezes the itou-metabase-db temporarily, making
+        our GUI unable to connect to the db during this commit.
 
-        This is why we instead do small and frequent commits, so that the db stays available throughout the script.
+        This is why we instead do small and frequent commits, so that the db stays available
+        throughout the script.
 
-        Note that psycopg2 will always automatically open a new transaction when none is open. Thus it will open
-        a new one after each such commit.
+        Note that psycopg2 will always automatically open a new transaction when none is open.
+        Thus it will open a new one after each such commit.
         """
-        self.conn.commit()
-
-    def cleanup_tables(self, table_name):
-        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
-        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(table_name))))
-        self.commit()
-
-    def inject_chunk(self, table_columns, chunk, new_table_name):
-        insert_query = sql.SQL("insert into {new_table_name} ({fields}) values %s").format(
-            new_table_name=sql.Identifier(new_table_name),
-            fields=sql.SQL(",").join(
-                [sql.Identifier(c["name"]) for c in table_columns],
-            ),
-        )
-        dataset = [[c["fn"](o) for c in table_columns] for o in chunk]
-        psycopg2_extras.execute_values(self.cur, insert_query, dataset, template=None)
-        self.commit()
-
-    def populate_table(self, table, queryset=None, querysets=None, extra_object=None):
-        """
-        Generic method to populate each table.
-        Create table with a temporary name, add column comments,
-        inject content and finally swap with the target table.
-        """
-        if queryset is not None:
-            assert not querysets
-            querysets = [queryset]
-            queryset = None
 
         table_name = table.name
         new_table_name = get_new_table_name(table_name)
         old_table_name = get_old_table_name(table_name)
 
         with MetabaseDatabaseCursor() as (cur, conn):
-            self.cur = cur
-            self.conn = conn
 
-            self.cleanup_tables(table_name)
+            def drop_old_and_new_tables(table_name):
+                cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
+                cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(table_name))))
+                conn.commit()
+
+            def inject_chunk(table_columns, chunk, new_table_name):
+                insert_query = sql.SQL("insert into {new_table_name} ({fields}) values %s").format(
+                    new_table_name=sql.Identifier(new_table_name),
+                    fields=sql.SQL(",").join(
+                        [sql.Identifier(c["name"]) for c in table_columns],
+                    ),
+                )
+                dataset = [[c["fn"](o) for c in table_columns] for o in chunk]
+                psycopg2_extras.execute_values(cur, insert_query, dataset, template=None)
+                conn.commit()
+
+            drop_old_and_new_tables(table_name)
 
             total_rows = sum([queryset.count() for queryset in querysets])
 
@@ -181,9 +168,8 @@ class Command(BaseCommand):
                     [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table.columns]
                 ),
             )
-            self.cur.execute(create_table_query)
-
-            self.commit()
+            cur.execute(create_table_query)
+            conn.commit()
 
             # Add comments on table columns.
             for c in table.columns:
@@ -195,12 +181,12 @@ class Command(BaseCommand):
                     column_name=sql.Identifier(column_name),
                     column_comment=sql.Literal(column_comment),
                 )
-                self.cur.execute(comment_query)
+                cur.execute(comment_query)
 
-            self.commit()
+            conn.commit()
 
             if extra_object:
-                self.inject_chunk(table_columns=table.columns, chunk=[extra_object], new_table_name=new_table_name)
+                inject_chunk(table_columns=table.columns, chunk=[extra_object], new_table_name=new_table_name)
 
             for queryset in querysets:
                 injections = 0
@@ -213,7 +199,7 @@ class Command(BaseCommand):
                         break  # During a dry run stop as soon as we have injected enough rows.
                     if chunk_qs.count() > injections_left:
                         chunk_qs = chunk_qs[:injections_left]
-                    self.inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
+                    inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
                     injections += chunk_qs.count()
                     self.stdout.write(f"count={injections} of total={total_rows} written")
 
@@ -221,19 +207,18 @@ class Command(BaseCommand):
                 gc.collect()
 
             # Swap new and old table nicely to minimize downtime.
-            self.cur.execute(
+            cur.execute(
                 sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
                     sql.Identifier(table_name), sql.Identifier(old_table_name)
                 )
             )
-            self.cur.execute(
+            cur.execute(
                 sql.SQL("ALTER TABLE {} RENAME TO {}").format(
                     sql.Identifier(new_table_name), sql.Identifier(table_name)
                 )
             )
-            self.commit()
-            self.cleanup_tables(table_name)
-            self.stdout.write("")
+            conn.commit()
+            drop_old_and_new_tables(table_name)
 
     def populate_siaes(self):
         queryset = (
@@ -250,7 +235,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table=_siaes.TABLE, queryset=queryset)
+        self.populate_table(table=_siaes.TABLE, querysets=[queryset])
 
     def populate_job_descriptions(self):
         queryset = (
@@ -263,7 +248,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table=_job_descriptions.TABLE, queryset=queryset)
+        self.populate_table(table=_job_descriptions.TABLE, querysets=[queryset])
 
     def populate_organizations(self):
         """
@@ -277,7 +262,7 @@ class Command(BaseCommand):
 
         self.populate_table(
             table=_organizations.TABLE,
-            queryset=queryset,
+            querysets=[queryset],
             extra_object=_organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
         )
 
@@ -291,7 +276,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table=_job_applications.TABLE, queryset=queryset)
+        self.populate_table(table=_job_applications.TABLE, querysets=[queryset])
 
     def populate_selected_jobs(self):
         """
@@ -367,17 +352,17 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table=_job_seekers.TABLE, queryset=queryset)
+        self.populate_table(table=_job_seekers.TABLE, querysets=[queryset])
 
     def populate_rome_codes(self):
         queryset = Rome.objects.all()
 
-        self.populate_table(table=_rome_codes.TABLE, queryset=queryset)
+        self.populate_table(table=_rome_codes.TABLE, querysets=[queryset])
 
     def populate_insee_codes(self):
         queryset = City.objects.all()
 
-        self.populate_table(table=_insee_codes.TABLE, queryset=queryset)
+        self.populate_table(table=_insee_codes.TABLE, querysets=[queryset])
 
     def populate_departments(self):
         table_name = "departements"
