@@ -326,8 +326,8 @@ httpx==0.23.0 \
     --hash=sha256:42974f577483e1e932c3cdc3cd2303e883cbfba17fe228b0f63589764d7b9c4b \
     --hash=sha256:f28eac771ec9eb4866d3fb4ab65abd42d38c424739e80c08d8d20570de60b0ef
     # via -r requirements/base.in
-huey==2.4.3 \
-    --hash=sha256:4fa2f6055d581778c3bcf93fc8c9ce87aecc2a345d5ff35bd955da152c02ef37
+huey==2.4.4 \
+    --hash=sha256:6a27a7862a7a982c0508ad4e548d95765e3b0d97093a51106f07540837a09c86
     # via -r requirements/base.in
 idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
