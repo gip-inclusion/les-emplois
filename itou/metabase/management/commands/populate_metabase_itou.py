@@ -23,7 +23,6 @@ Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for 
 import gc
 from collections import OrderedDict
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -448,10 +447,6 @@ class Command(BaseCommand):
         build_final_tables(dry_run=self.dry_run)
 
     def populate_metabase_itou(self):
-        if not settings.ALLOW_POPULATING_METABASE:
-            self.stdout.write("Populating metabase is not allowed in this environment.")
-            return
-
         if not self.dry_run:
             send_slack_message(
                 ":rocket: Début de la mise à jour quotidienne de Metabase avec les dernières données C1 :rocket:"

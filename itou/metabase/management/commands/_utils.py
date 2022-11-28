@@ -1,6 +1,5 @@
 import functools
 import hashlib
-import logging
 import os
 from operator import attrgetter
 

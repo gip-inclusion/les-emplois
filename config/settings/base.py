@@ -415,12 +415,6 @@ INCLUSION_CONNECT_CLIENT_SECRET = os.getenv("INCLUSION_CONNECT_CLIENT_SECRET")
 
 TALLY_URL = os.getenv("TALLY_URL")
 
-# Metabase should only ever be populated:
-# - from a fast machine (by clever cloud cronjob or manually by Supportix)
-# - from local dev with latest production dataset (by experienced Metabase developers only)
-# but not from prod, demo, staging or review apps.
-ALLOW_POPULATING_METABASE = ITOU_ENVIRONMENT in ("FAST-MACHINE", "DEV")
-
 METABASE_HOST = os.getenv("METABASE_HOST")
 METABASE_PORT = os.getenv("METABASE_PORT")
 METABASE_DATABASE = os.getenv("METABASE_DATABASE")

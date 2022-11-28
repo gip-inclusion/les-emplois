@@ -111,10 +111,6 @@ class Command(BaseCommand):
 
     @timeit
     def populate_metabase_fluxiae(self):
-        if not settings.ALLOW_POPULATING_METABASE:
-            self.stdout.write("Populating metabase is not allowed in this environment.")
-            return
-
         if not self.dry_run:
             send_slack_message(
                 ":rocket: Début de la mise à jour hebdomadaire de Metabase avec les dernières données FluxIAE :rocket:"
