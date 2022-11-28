@@ -1,8 +1,5 @@
 from functools import wraps
-from time import time
-
-
-DISPLAY_TIMER = True
+from time import perf_counter
 
 
 class Sentinel:
@@ -24,12 +21,9 @@ def timeit(f):
 
     @wraps(f)
     def wrap(*args, **kw):
-        ts = time()
+        ts = perf_counter()
         result = f(*args, **kw)
-        te = time()
-        msg = f"Method {f.__name__} took {te - ts:.2f} seconds to complete"
-        if DISPLAY_TIMER:
-            print(msg)
+        print(f"timeit: method={f.__name__} completed in seconds={perf_counter() - ts:.2f}")
         return result
 
     return wrap
