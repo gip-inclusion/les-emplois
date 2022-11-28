@@ -114,7 +114,7 @@ def mock_oauth_dance(
         user_info["email"] = user_info_email
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
-    csrf_signed = InclusionConnectState.create_signed_csrf_token()
+    csrf_signed = client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"]
     url = reverse("inclusion_connect:callback")
     response = client.get(url, data={"code": "123", "state": csrf_signed})
     # If a expected_redirect_url was provided, check it redirects there
@@ -348,7 +348,10 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
         assert f"login_hint={quote(email)}" in response.url
-        assert self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["user_email"] == email
+        ic_state = InclusionConnectState.get_from_csrf(
+            self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"]
+        )
+        assert ic_state.data["user_email"] == email
 
     def test_resume_endpoint_no_session(self):
         url = f"{reverse('inclusion_connect:resume_registration')}"
@@ -369,17 +372,89 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         email = "porthos@touspourun.com"
         params = {"user_email": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+        with freeze_time("2023-06-05 11:47"):
+            response = self.client.get(url, follow=False)
+        initial_state = InclusionConnectState.objects.get()
+
+        url = f"{reverse('inclusion_connect:resume_registration')}"
+        with freeze_time("2023-06-07 11:47"):
+            response = self.client.get(url, follow=False)
+            assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
+
+            assert initial_state.is_valid() is False
+            new_state = InclusionConnectState.objects.exclude(pk=initial_state.pk).get()
+            assert new_state.is_valid() is True
+
+    def test_resume_endpoint_cleaned_state(self):
+        email = "porthos@touspourun.com"
+        params = {"user_email": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
+        url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
-        assert InclusionConnectState.objects.count() == 1
+        InclusionConnectState.objects.all().delete()
+
+        url = f"{reverse('inclusion_connect:resume_registration')}"
+        response = self.client.get(url)
+        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
+
+    def test_resume_endpoint_backward_compatibility(self):
+        # Fill up session with authorize view
+        session = self.client.session
+        session[constants.INCLUSION_CONNECT_SESSION_KEY] = {
+            "previous_url": None,
+            "next_url": None,
+            "user_email": None,
+            "user_kind": UserKind.PRESCRIBER,
+            "channel": None,
+            "state": None,
+            "token": None,
+            "key": constants.INCLUSION_CONNECT_SESSION_KEY,
+        }
+        session.save()
 
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url, follow=False)
-        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
-        assert InclusionConnectState.objects.count() == 2
+        self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
+        self.assertEqual(InclusionConnectState.objects.count(), 1)
 
     ####################################
     ######### Callback tests ###########
     ####################################
+    @respx.mock
+    def test_callback_backward_compatibility(self):
+        # Fill up session with authorize view
+        session = self.client.session
+        session[constants.INCLUSION_CONNECT_SESSION_KEY] = {
+            "previous_url": None,
+            "next_url": None,
+            "user_email": None,
+            "user_kind": UserKind.PRESCRIBER,
+            "channel": None,
+            "state": None,
+            "token": None,
+            "key": constants.INCLUSION_CONNECT_SESSION_KEY,
+        }
+        session.save()
+
+        token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+        respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(
+            return_value=httpx.Response(200, json=OIDC_USERINFO)
+        )
+        csrf_signed = InclusionConnectState.create_signed_csrf_token()
+        url = reverse("inclusion_connect:callback")
+        self.client.get(url, data={"code": "123", "state": csrf_signed})
+
+        # User was created
+        self.assertEqual(User.objects.count(), 1)
+        user = User.objects.get(email=OIDC_USERINFO["email"])
+        self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
+        self.assertEqual(user.last_name, OIDC_USERINFO["family_name"])
+        self.assertEqual(user.username, OIDC_USERINFO["sub"])
+        self.assertTrue(user.has_sso_provider)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+        self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
+
     @respx.mock
     def test_callback_prescriber_created(self):
         ### User does not exist.
@@ -595,7 +670,7 @@ class InclusionConnectSessionTest(InclusionConnectBaseTestCase):
         ic_session = InclusionConnectSession()
         assert ic_session.key == constants.INCLUSION_CONNECT_SESSION_KEY
 
-        expected_keys = ["token", "state", "previous_url", "next_url", "user_email", "user_kind", "request"]
+        expected_keys = ["token", "state"]
         ic_session_dict = ic_session.asdict()
         for key in expected_keys:
             with self.subTest(key):
