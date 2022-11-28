@@ -33,15 +33,11 @@ USER_DATA_CLASSES = {
 
 
 @dataclasses.dataclass
-class InclusionConnectSession:
-    token: str = None
-    state: str = None
+class InclusionConnectStateData:
     previous_url: str = None
     next_url: str = None
     user_email: str = None
     user_kind: str = None
-    request: str = None
-    key: str = constants.INCLUSION_CONNECT_SESSION_KEY
     channel: str = None
     # Tells us where did the user came from so that we can adapt
     # error messages in the callback view.
@@ -49,10 +45,19 @@ class InclusionConnectSession:
     def asdict(self):
         return dataclasses.asdict(self)
 
+
+@dataclasses.dataclass
+class InclusionConnectSession:
+    key: str = constants.INCLUSION_CONNECT_SESSION_KEY
+    token: str = None
+    state: str = None
+
+    def asdict(self):
+        return dataclasses.asdict(self)
+
     def bind_to_request(self, request):
         request.session[self.key] = dataclasses.asdict(self)
         request.session.has_changed = True
-        return request
 
 
 def _redirect_to_login_page_on_error(error_msg, request=None):
@@ -62,19 +67,18 @@ def _redirect_to_login_page_on_error(error_msg, request=None):
     return HttpResponseRedirect(reverse("home:hp"))
 
 
-def generate_inclusion_params_from_session(ic_session):
-    redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
-    signed_csrf = InclusionConnectState.create_signed_csrf_token()
+def generate_inclusion_params(ic_data):
+    signed_csrf = InclusionConnectState.create_signed_csrf_token(data=ic_data)
     data = {
         "response_type": "code",
         "client_id": constants.INCLUSION_CONNECT_CLIENT_ID,
-        "redirect_uri": redirect_uri,
+        "redirect_uri": get_absolute_url(reverse("inclusion_connect:callback")),
         "scope": constants.INCLUSION_CONNECT_SCOPES,
         "state": signed_csrf,
         "nonce": crypto.get_random_string(length=12),
         "from": "emplois",  # Display a "Les emplois" logo on the connection page.
     }
-    login_hint = ic_session.get("user_email")
+    login_hint = ic_data.get("user_email")
     if login_hint is not None:
         data["login_hint"] = login_hint
     return data
@@ -88,20 +92,20 @@ def inclusion_connect_authorize(request):
     if not user_kind:
         return _redirect_to_login_page_on_error(error_msg="User kind missing.")
 
-    ic_session = InclusionConnectSession(user_kind=user_kind, previous_url=previous_url, next_url=next_url)
-    request = ic_session.bind_to_request(request)
-    ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
+    ic_data = InclusionConnectStateData(user_kind=user_kind, previous_url=previous_url, next_url=next_url)
 
     login_hint = request.GET.get("login_hint")
     channel = request.GET.get("channel")
     if login_hint:
         if not channel:
             return _redirect_to_login_page_on_error(error_msg="channel is missing when login_hint is present.")
-        ic_session["user_email"] = login_hint
-        ic_session["channel"] = channel
+        ic_data.user_email = login_hint
+        ic_data.channel = channel
         request.session.modified = True
 
-    data = generate_inclusion_params_from_session(ic_session)
+    data = generate_inclusion_params(ic_data.asdict())
+    ic_session = InclusionConnectSession(state=data["state"])
+    ic_session.bind_to_request(request)
 
     if request.GET.get("register"):
         base_url = constants.INCLUSION_CONNECT_ENDPOINT_REGISTER
@@ -122,17 +126,25 @@ def inclusion_connect_resume_registration(request):
     if not ic_session or ic_session["token"]:
         messages.error(request, "Impossible de reprendre la création de compte.")
         return HttpResponseRedirect(reverse("home:hp"))
-    data = generate_inclusion_params_from_session(ic_session)
+
+    # TODO(alaurent) Remove after a few hours
+    # Backward compatibility:
+    if "next_url" in ic_session:
+        data = generate_inclusion_params(ic_session)
+        return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
+
+    ic_state = InclusionConnectState.get_from_csrf(ic_session["state"])
+    data = generate_inclusion_params(ic_state.data)
     return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
 
 
 def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
     code = request.GET.get("code")
     state = request.GET.get("state")
-    if code is None or not InclusionConnectState.is_valid(state):
+    ic_state = InclusionConnectState.get_from_csrf(state)
+    if code is None or not ic_state or not ic_state.is_valid():
         return _redirect_to_login_page_on_error(error_msg="Missing code or invalid state.", request=request)
 
-    ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
     token_redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
 
     data = {
@@ -160,8 +172,12 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
 
     # Keep token_data["id_token"] to logout from IC.
     # At this step, we can update the user's fields in DB and create a session if required.
+    ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
+    # FIXME(alaurent) Add a test
+    if ic_session is None:
+        ic_session = InclusionConnectSession(state=state)
+        ic_session.bind_to_request(request)
     ic_session["token"] = token_data["id_token"]
-    ic_session["state"] = state
     request.session.modified = True
 
     # A token has been provided so it's time to fetch associated user infos
@@ -184,10 +200,15 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         # 'sub' is the unique identifier from Inclusion Connect, we need that to match a user later on.
         return _redirect_to_login_page_on_error(error_msg="Sub parameter missing.", request=request)
 
-    user_kind = ic_session["user_kind"]
+    # TODO(alaurent) Remove after a few hours
+    # Backward compatibility:
+    if "next_url" in ic_session:
+        ic_state.data = ic_session
+
+    user_kind = ic_state.data["user_kind"]
     is_successful = True
     ic_user_data = USER_DATA_CLASSES[user_kind].from_user_info(user_data)
-    ic_session_email = ic_session.get("user_email")
+    ic_session_email = ic_state.data.get("user_email")
 
     if ic_session_email and ic_session_email != ic_user_data.email:
         errors = {
@@ -222,7 +243,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
 
     if not is_successful:
         logout_url_params = {
-            "redirect_url": ic_session["previous_url"],
+            "redirect_url": ic_state.data["previous_url"],
         }
         next_url = f"{reverse('inclusion_connect:logout')}?{urlencode(logout_url_params)}"
         return HttpResponseRedirect(next_url)
@@ -230,7 +251,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     # Because we have more than one Authentication backend in our settings, we need to specify
     # the one we want to use in login
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-    next_url = ic_session["next_url"] or get_adapter(request).get_login_redirect_url(request)
+    next_url = ic_state.data["next_url"] or get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(next_url)
 
 

@@ -14,6 +14,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.users import enums as users_enums
@@ -21,7 +22,7 @@ from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactory
 from itou.users.models import User
 
-from ..constants import OIDC_STATE_EXPIRATION
+from ..constants import OIDC_STATE_CLEANUP
 from ..models import TooManyKindsException
 from . import constants
 from .models import InclusionConnectPrescriberData, InclusionConnectSiaeStaffData, InclusionConnectState
@@ -83,7 +84,7 @@ def mock_oauth_dance(
         user_info["email"] = user_info_email
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
-    csrf_signed = InclusionConnectState.create_signed_csrf_token()
+    csrf_signed = test_class.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"]
     url = reverse("inclusion_connect:callback")
     response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
     if assert_redirects:
@@ -101,13 +102,23 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         state.refresh_from_db()
         self.assertIsNotNone(state)
 
-        state.created_at = timezone.now() - OIDC_STATE_EXPIRATION * 2
+        state.expired_at = timezone.now() - OIDC_STATE_CLEANUP * 2
         state.save()
 
         InclusionConnectState.objects.cleanup()
 
         with self.assertRaises(InclusionConnectState.DoesNotExist):
             state.refresh_from_db()
+
+    def test_state_is_valid(self):
+        with freeze_time("2022-09-13 12:00:01"):
+            csrf_signed = InclusionConnectState.create_signed_csrf_token()
+            self.assertTrue(isinstance(csrf_signed, str))
+            self.assertTrue(InclusionConnectState.get_from_csrf(csrf_signed).is_valid())
+
+            csrf_signed = InclusionConnectState.create_signed_csrf_token()
+        with freeze_time("2022-09-13 13:00:01"):
+            self.assertFalse(InclusionConnectState.get_from_csrf(csrf_signed).is_valid())
 
     def test_create_user_from_user_info(self):
         """
@@ -237,11 +248,6 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
             sorted(expected, key=itemgetter("field_name")),
         )
 
-    def test_state_is_valid(self):
-        csrf_signed = InclusionConnectState.create_signed_csrf_token()
-        self.assertTrue(isinstance(csrf_signed, str))
-        self.assertTrue(InclusionConnectState.is_valid(csrf_signed))
-
     def test_create_or_update_prescriber_raise_too_many_kind_exception(self):
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
 
@@ -307,7 +313,10 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
         self.assertIn(quote(email), response.url)
-        self.assertEqual(self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["user_email"], email)
+        state = InclusionConnectState.get_from_csrf(
+            self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"]
+        )
+        self.assertEqual(state.data["user_email"], email)
 
     def test_resume_endpoint_no_session(self):
         url = f"{reverse('inclusion_connect:resume_registration')}"
@@ -340,9 +349,65 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
         self.assertEqual(InclusionConnectState.objects.count(), 2)
 
+    def test_resume_endpoint_backward_compatibility(self):
+        # Fill up session with authorize view
+        session = self.client.session
+        session[constants.INCLUSION_CONNECT_SESSION_KEY] = {
+            "previous_url": None,
+            "next_url": None,
+            "user_email": None,
+            "user_kind": KIND_PRESCRIBER,
+            "channel": None,
+            "state": None,
+            "token": None,
+            "key": constants.INCLUSION_CONNECT_SESSION_KEY,
+        }
+        session.save()
+
+        url = f"{reverse('inclusion_connect:resume_registration')}"
+        response = self.client.get(url, follow=False)
+        self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
+        self.assertEqual(InclusionConnectState.objects.count(), 1)
+
     ####################################
     ######### Callback tests ###########
     ####################################
+    @respx.mock
+    def test_callback_backward_compatibility(self):
+        # Fill up session with authorize view
+        session = self.client.session
+        session[constants.INCLUSION_CONNECT_SESSION_KEY] = {
+            "previous_url": None,
+            "next_url": None,
+            "user_email": None,
+            "user_kind": KIND_PRESCRIBER,
+            "channel": None,
+            "state": None,
+            "token": None,
+            "key": constants.INCLUSION_CONNECT_SESSION_KEY,
+        }
+        session.save()
+
+        token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+        respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(
+            return_value=httpx.Response(200, json=OIDC_USERINFO)
+        )
+        csrf_signed = InclusionConnectState.create_signed_csrf_token()
+        url = reverse("inclusion_connect:callback")
+        self.client.get(url, data={"code": "123", "state": csrf_signed})
+
+        # User was created
+        self.assertEqual(User.objects.count(), 1)
+        user = User.objects.get(email=OIDC_USERINFO["email"])
+        self.assertEqual(user.first_name, OIDC_USERINFO["given_name"])
+        self.assertEqual(user.last_name, OIDC_USERINFO["family_name"])
+        self.assertEqual(user.username, OIDC_USERINFO["sub"])
+        self.assertTrue(user.has_sso_provider)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+        self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
+
     @respx.mock
     def test_callback_prescriber_created(self):
         ### User does not exist.
@@ -423,7 +488,7 @@ class InclusionConnectSessionTest(InclusionConnectBaseTestCase):
         ic_session = InclusionConnectSession()
         self.assertEqual(ic_session.key, constants.INCLUSION_CONNECT_SESSION_KEY)
 
-        expected_keys = ["token", "state", "previous_url", "next_url", "user_email", "user_kind", "request"]
+        expected_keys = ["token", "state"]
         ic_session_dict = ic_session.asdict()
         for key in expected_keys:
             with self.subTest(key):
@@ -434,7 +499,7 @@ class InclusionConnectSessionTest(InclusionConnectBaseTestCase):
         middleware = SessionMiddleware(lambda x: x)
         middleware.process_request(request)
         request.session.save()
-        request = ic_session.bind_to_request(request=request)
+        ic_session.bind_to_request(request=request)
         self.assertTrue(request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY))
 
 

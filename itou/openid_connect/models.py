@@ -8,7 +8,7 @@ from django.utils import crypto, timezone
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
 
-from .constants import OIDC_STATE_EXPIRATION
+from .constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
 
 
 class TooManyKindsException(Exception):
@@ -25,14 +25,20 @@ class MultipleUsersFoundException(Exception):
 
 class OIDConnectQuerySet(models.QuerySet):
     def cleanup(self, at=None):
-        at = at if at else timezone.now() - OIDC_STATE_EXPIRATION
-        return self.filter(created_at__lte=at).delete()
+        at = at if at else timezone.now() - OIDC_STATE_CLEANUP
+        return self.filter(expired_at__lte=at).delete()
+
+
+def default_expiration():
+    return timezone.now() + OIDC_STATE_EXPIRATION
 
 
 class OIDConnectState(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+    expired_at = models.DateTimeField(default=default_expiration)
     # Length used in call to get_random_string()
     csrf = models.CharField(max_length=12, unique=True)
+    data = models.JSONField(verbose_name=("Notifications"), default=dict, blank=True)
 
     objects = OIDConnectQuerySet.as_manager()
 
@@ -40,39 +46,38 @@ class OIDConnectState(models.Model):
         abstract = True
 
     @classmethod
-    def create_signed_csrf_token(cls):
+    def create_signed_csrf_token(cls, data=None):
         """
         Create and sign a new CSRF token to protect requests to identity providers.
         """
         token = crypto.get_random_string(length=12)
-        cls.objects.create(csrf=token)
+        cls.objects.create(csrf=token, data=data or {})
 
         signer = signing.Signer()
         signed_token = signer.sign(token)
         return signed_token
 
     @classmethod
-    def is_valid(cls, signed_csrf):
+    def get_from_csrf(cls, signed_csrf):
+        # Cleanup old states if any.
+        cls.objects.cleanup()
+
         if not signed_csrf:
-            return False
+            return None
 
         signer = signing.Signer()
         try:
             csrf = signer.unsign(unquote(signed_csrf))
         except signing.BadSignature:
-            return False
+            return None
 
-        # Cleanup old states if any.
-        cls.objects.cleanup()
+        return cls.objects.filter(csrf=csrf).first()
 
-        state = cls.objects.filter(csrf=csrf).first()
-        if not state:
-            return False
-
+    def is_valid(self):
         # One-time use
-        state.delete()
+        self.delete()
 
-        return True
+        return self.expired_at > timezone.now()
 
 
 @dataclasses.dataclass

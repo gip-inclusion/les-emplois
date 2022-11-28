@@ -6,7 +6,9 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 
+from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.users.enums import IdentityProvider
 from itou.users.factories import UserFactory
 from itou.users.models import User
@@ -72,7 +74,7 @@ class FranceConnectTest(TestCase):
         self.assertIsNotNone(state)
 
         # Set expired creation time for the state
-        state.created_at = timezone.now() - constants.FRANCE_CONNECT_STATE_EXPIRATION * 2
+        state.expired_at = timezone.now() - OIDC_STATE_CLEANUP * 2
         state.save()
 
         FranceConnectState.objects.cleanup()
@@ -82,7 +84,17 @@ class FranceConnectTest(TestCase):
 
     def test_state_verification(self):
         csrf_signed = FranceConnectState.create_signed_csrf_token()
-        self.assertTrue(FranceConnectState.is_valid(csrf_signed))
+        self.assertTrue(FranceConnectState.get_from_csrf(csrf_signed).is_valid())
+
+    def test_state_is_valid(self):
+        with freeze_time("2022-09-13 12:00:01"):
+            csrf_signed = FranceConnectState.create_signed_csrf_token()
+            self.assertTrue(isinstance(csrf_signed, str))
+            self.assertTrue(FranceConnectState.get_from_csrf(csrf_signed).is_valid())
+
+            csrf_signed = FranceConnectState.create_signed_csrf_token()
+        with freeze_time("2022-09-13 13:00:01"):
+            self.assertFalse(FranceConnectState.get_from_csrf(csrf_signed).is_valid())
 
     def test_authorize(self):
         url = reverse("france_connect:authorize")
