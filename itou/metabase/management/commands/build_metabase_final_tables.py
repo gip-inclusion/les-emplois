@@ -1,6 +1,4 @@
 """
-Command runned manually from time to time by C2 data analysts via a github action.
-
 This commands only runs the quick final SQL requests otherwise completed at the end of
 the daily `populate_metabase_itou` and the weekly `populate_metabase_fluxiae` commands.
 
