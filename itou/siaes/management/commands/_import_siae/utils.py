@@ -136,7 +136,7 @@ def geocode_siae(siae):
     return siae
 
 
-def sync_structures(df, source, kinds, build_structure, dry_run):
+def sync_structures(df, source, kinds, build_structure, wet_run=False):
     """
     Sync structures between db and export.
 
@@ -172,10 +172,10 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
 
         print(f"{source} siret={row.siret} will be created.")
         siae = build_structure(row)
-        if not dry_run:
+        if wet_run:
             siae.save()
             structures_created += 1
-            print(f"{source} siret={row.siret} has been created with siae.id={siae.id}.")
+        print(f"{source} siret={row.siret} has been created with siae.id={siae.id}.")
 
     structures_updated = 0
     # Update structures which already exist in database.
@@ -185,8 +185,8 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
             # If a user/staff created structure already exists in db and its siret is later found in an export,
             # it makes sense to convert it.
             print(f"siae.id={siae.id} siret={siae.siret} source={siae.source} will be converted to source={source}.")
-            if not dry_run:
-                siae.source = source
+            siae.source = source
+            if wet_run:
                 siae.save()
                 structures_updated += 1
 
@@ -205,9 +205,9 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
 
         if could_siae_be_deleted(siae):
             print(f"siae.id={siae.id} siret={siae.siret} will be deleted.")
-            deleted_count += 1
-            if not dry_run:
+            if wet_run:
                 siae.delete()
+                deleted_count += 1
             continue
 
         if siae.source == Siae.SOURCE_USER_CREATED:
@@ -297,7 +297,6 @@ def get_fluxiae_df(
     skip_first_row=True,
     anonymize_sensitive_data=True,
     infer_datetime_format=True,
-    dry_run=False,
 ):
     """
     Load fluxIAE CSV file as a dataframe.
@@ -332,8 +331,6 @@ def get_fluxiae_df(
         nrows = -3
         for _line in f:
             nrows += 1
-            if dry_run and nrows == 100:
-                break
 
     print(f"Loading {nrows} rows for {vue_name} ...")
 

@@ -172,17 +172,19 @@ class Command(BaseCommand):
     help = "Import the content of the EA+EATT csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
+        parser.add_argument(
+            "--wet-run", dest="wet_run", action="store_true", help="Do not make any modifications to the database"
+        )
 
     @timeit
-    def handle(self, dry_run=False, **options):
+    def handle(self, wet_run=False, **options):
         ea_eatt_df, info_stats = get_ea_eatt_df()
         info_stats |= sync_structures(
             df=ea_eatt_df,
             source=Siae.SOURCE_EA_EATT,
             kinds=[SiaeKind.EA, SiaeKind.EATT],
             build_structure=build_ea_eatt,
-            dry_run=dry_run,
+            wet_run=wet_run,
         )
 
         # Display some "stats" about the dataset

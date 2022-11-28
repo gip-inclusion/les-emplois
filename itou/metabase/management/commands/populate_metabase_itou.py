@@ -23,7 +23,6 @@ Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for 
 import gc
 from collections import OrderedDict
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -45,11 +44,7 @@ from itou.metabase.management.commands import (
     _rome_codes,
     _siaes,
 )
-from itou.metabase.management.commands._database_tables import (
-    get_dry_table_name,
-    get_new_table_name,
-    get_old_table_name,
-)
+from itou.metabase.management.commands._database_tables import get_new_table_name, get_old_table_name
 from itou.metabase.management.commands._dataframes import get_df_from_rows, store_df
 from itou.metabase.management.commands._utils import (
     build_final_tables,
@@ -66,8 +61,6 @@ from itou.utils.python import timeit
 from itou.utils.slack import send_slack_message
 
 
-METABASE_DRY_RUN_ROWS_PER_QUERYSET = 1000
-
 # Set how many rows are inserted at a time in metabase database.
 # A bigger number makes the script faster until a certain point,
 # but it also increases RAM usage.
@@ -83,19 +76,6 @@ METABASE_INSERT_BATCH_SIZE = 100
 
 
 class Command(BaseCommand):
-    """
-    Populate metabase database.
-
-    The `dry-run` mode is useful for quickly testing changes and iterating.
-    It builds tables with a dry prefix added to their name, to avoid
-    touching any real table, and injects only a sample of data.
-
-    To populate alternate tables with sample data:
-        django-admin populate_metabase_itou --dry-run
-
-    When ready:
-        django-admin populate_metabase_itou
-    """
 
     help = "Populate metabase database."
 
@@ -117,9 +97,6 @@ class Command(BaseCommand):
         }
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run", dest="dry_run", action="store_true", help="Populate alternate tables with sample data"
-        )
         parser.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
 
     def commit(self):
@@ -137,8 +114,6 @@ class Command(BaseCommand):
     def cleanup_tables(self, table_name):
         self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
         self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(table_name))))
-        # Dry run tables are periodically dropped by wet runs.
-        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_dry_table_name(table_name))))
         self.commit()
 
     def inject_chunk(self, table_columns, chunk, new_table_name):
@@ -164,8 +139,6 @@ class Command(BaseCommand):
             queryset = None
 
         table_name = table.name
-        if self.dry_run:
-            table_name = get_dry_table_name(table_name)
         new_table_name = get_new_table_name(table_name)
         old_table_name = get_old_table_name(table_name)
 
@@ -175,10 +148,7 @@ class Command(BaseCommand):
 
             self.cleanup_tables(table_name)
 
-            if self.dry_run:
-                total_rows = sum([min(queryset.count(), METABASE_DRY_RUN_ROWS_PER_QUERYSET) for queryset in querysets])
-            else:
-                total_rows = sum([queryset.count() for queryset in querysets])
+            total_rows = sum([queryset.count() for queryset in querysets])
 
             table.add_columns(
                 [
@@ -235,8 +205,6 @@ class Command(BaseCommand):
             for queryset in querysets:
                 injections = 0
                 total_injections = queryset.count()
-                if self.dry_run:
-                    total_injections = min(total_injections, METABASE_DRY_RUN_ROWS_PER_QUERYSET)
 
                 # Insert rows by batch of METABASE_INSERT_BATCH_SIZE.
                 for chunk_qs in chunked_queryset(queryset, chunk_size=METABASE_INSERT_BATCH_SIZE):
@@ -355,11 +323,9 @@ class Command(BaseCommand):
 
                     rows.append(row)
             self.stdout.write(f"selected_jobs: page_idx={page_idx} of total={paginator.num_pages} processed")
-            if self.dry_run and len(rows) >= 1000:
-                break
 
         df = get_df_from_rows(rows)
-        store_df(df=df, table_name=table_name, dry_run=self.dry_run)
+        store_df(df=df, table_name=table_name)
 
     def populate_approvals(self):
         """
@@ -429,7 +395,7 @@ class Command(BaseCommand):
             rows.append(row)
 
         df = get_df_from_rows(rows)
-        store_df(df=df, table_name=table_name, dry_run=self.dry_run)
+        store_df(df=df, table_name=table_name)
 
     @timeit
     def report_data_inconsistencies(self):
@@ -454,13 +420,10 @@ class Command(BaseCommand):
 
     @timeit
     def build_final_tables(self):
-        build_final_tables(dry_run=self.dry_run)
+        build_final_tables()
 
     @timeit
-    def handle(self, mode, dry_run=False, **options):
-        self.dry_run = dry_run
-        if not self.dry_run:
-            send_slack_message(f":rocket: Mise à jour Metabase mode={mode}")
+    def handle(self, mode, **options):
+        send_slack_message(f":rocket: Mise à jour Metabase mode={mode}")
         self.MODE_TO_OPERATION[mode]()
-        if not self.dry_run:
-            send_slack_message(f":white_check_mark: Fin de la mise à jour Metabase mode={mode}")
+        send_slack_message(f":white_check_mark: Fin de la mise à jour Metabase mode={mode}")

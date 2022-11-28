@@ -14,31 +14,11 @@ from itou.utils.slack import send_slack_message
 
 
 class Command(BaseCommand):
-    """
-    Run Metabase final SQL requests.
-
-    The `dry-run` mode is useful for quickly testing changes and iterating.
-    It builds tables with a dry prefix added to their name, to avoid
-    touching any real table, and injects only a sample of data.
-
-    To populate alternate tables with sample data:
-        django-admin build_metabase_final_tables --dry-run
-
-    When ready:
-        django-admin build_metabase_final_tables
-    """
 
     help = "Build Metabase final tables."
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run", dest="dry_run", action="store_true", help="Populate alternate tables with sample data"
-        )
-
     @timeit
-    def handle(self, dry_run=False, **options):
+    def handle(self, **options):
         send_slack_message(":rocket: Démarrage de la mise à jour des tables SQL secondaires")
-        build_final_tables(dry_run=dry_run)
-        self.stdout.write("-" * 80)
-        self.stdout.write("Done.")
+        build_final_tables()
         send_slack_message(":white_check_mark: Mise à jour des tables SQL secondaires terminée")

@@ -108,26 +108,28 @@ class Command(BaseCommand):
     GEIQ = "Groupement d'Employeurs pour l'Insertion et la Qualification".
 
     To debug:
-        django-admin import_geiq --dry-run
+        django-admin import_geiq
 
     To populate the database:
-        django-admin import_geiq
+        django-admin import_geiq --wet-run
     """
 
     help = "Import the content of the GEIQ csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
+        parser.add_argument(
+            "--wet-run", dest="wet_run", action="store_true", help="Do not make any modifications to the database"
+        )
 
     @timeit
-    def handle(self, dry_run=False, **options):
+    def handle(self, wet_run=False, **options):
         geiq_df, info_stats = get_geiq_df()
         info_stats |= sync_structures(
             df=geiq_df,
             source=Siae.SOURCE_GEIQ,
             kinds=[SiaeKind.GEIQ],
             build_structure=build_geiq,
-            dry_run=dry_run,
+            wet_run=wet_run,
         )
 
         # Display some "stats" about the dataset

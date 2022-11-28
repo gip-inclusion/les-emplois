@@ -6,14 +6,10 @@ import pandas as pd
 from tqdm import tqdm
 
 from itou.metabase.management.commands._database_sqlalchemy import get_pg_engine
-from itou.metabase.management.commands._database_tables import (
-    get_dry_table_name,
-    get_new_table_name,
-    switch_table_atomically,
-)
+from itou.metabase.management.commands._database_tables import get_new_table_name, switch_table_atomically
 
 
-def store_df(df, table_name, dry_run, max_attempts=5):
+def store_df(df, table_name, max_attempts=5):
     """
     Store dataframe in database.
 
@@ -22,10 +18,6 @@ def store_df(df, table_name, dry_run, max_attempts=5):
 
     Try up to `max_attempts` times.
     """
-    if dry_run:
-        table_name = get_dry_table_name(table_name)
-        df = df.head(1000)
-
     # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
     rows_per_chunk = 10 * 1000
     df_chunks = [df[i : i + rows_per_chunk] for i in range(0, df.shape[0], rows_per_chunk)]

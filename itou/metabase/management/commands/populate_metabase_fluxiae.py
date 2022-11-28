@@ -73,31 +73,13 @@ from itou.utils.slack import send_slack_message
 
 
 class Command(BaseCommand):
-    """
-    Populate metabase database with fluxIAE data.
-
-    The `dry-run` mode is useful for quickly testing changes and iterating.
-    It builds tables with a dry prefix added to their name, to avoid
-    touching any real table, and injects only a sample of data.
-
-    To populate alternate tables with sample data:
-        django-admin populate_metabase_fluxiae --dry-run
-
-    When ready:
-        django-admin populate_metabase_fluxiae
-    """
 
     help = "Populate metabase database with fluxIAE data."
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run", dest="dry_run", action="store_true", help="Populate alternate tables with sample data"
-        )
-
     @timeit
     def populate_fluxiae_view(self, vue_name, skip_first_row=True):
-        df = get_fluxiae_df(vue_name=vue_name, skip_first_row=skip_first_row, dry_run=self.dry_run)
-        store_df(df=df, table_name=vue_name, dry_run=self.dry_run)
+        df = get_fluxiae_df(vue_name=vue_name, skip_first_row=skip_first_row)
+        store_df(df=df, table_name=vue_name)
 
     def populate_fluxiae_referentials(self):
         for filename in get_fluxiae_referential_filenames():
@@ -105,10 +87,9 @@ class Command(BaseCommand):
 
     @timeit
     def populate_metabase_fluxiae(self):
-        if not self.dry_run:
-            send_slack_message(
-                ":rocket: Début de la mise à jour hebdomadaire de Metabase avec les dernières données FluxIAE :rocket:"
-            )
+        send_slack_message(
+            ":rocket: Début de la mise à jour hebdomadaire de Metabase avec les dernières données FluxIAE :rocket:"
+        )
 
         self.populate_fluxiae_referentials()
 
@@ -125,17 +106,12 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
         self.populate_fluxiae_view(vue_name="fluxIAE_Structure")
 
-        # Build custom tables by running raw SQL queries on existing tables.
-        build_final_tables(dry_run=self.dry_run)
+        build_final_tables()
 
-        if not self.dry_run:
-            send_slack_message(
-                ":white_check_mark: Fin de la mise à jour hebdomadaire de Metabase avec les"
-                " dernières données FluxIAE :white_check_mark:"
-            )
+        send_slack_message(
+            ":white_check_mark: Fin de la mise à jour hebdomadaire de Metabase avec les"
+            " dernières données FluxIAE :white_check_mark:"
+        )
 
-    def handle(self, dry_run=False, **options):
-        self.dry_run = dry_run
+    def handle(self, **options):
         self.populate_metabase_fluxiae()
-        self.stdout.write("-" * 80)
-        self.stdout.write("Done.")

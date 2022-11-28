@@ -11,11 +11,7 @@ from itou.approvals.models import Approval
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.db import MetabaseDatabaseCursor
-from itou.metabase.management.commands._database_tables import (
-    get_dry_table_name,
-    get_new_table_name,
-    switch_table_atomically,
-)
+from itou.metabase.management.commands._database_tables import get_new_table_name, switch_table_atomically
 from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.python import timeit
@@ -243,16 +239,11 @@ def chunked_queryset(queryset, chunk_size=10000):
 
 
 @timeit
-def build_custom_table(table_name, sql_request, dry_run):
+def build_custom_table(table_name, sql_request):
     """
     Build a new table with given sql_request.
     Minimize downtime by building a temporary table first then swap the two tables atomically.
     """
-    if dry_run:
-        # Note that during a dry run, the dry run version of the current table will be built
-        # from the wet run version of the underlying tables.
-        table_name = get_dry_table_name(table_name)
-
     with MetabaseDatabaseCursor() as (cur, conn):
         cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
         conn.commit()
@@ -266,7 +257,7 @@ def build_custom_table(table_name, sql_request, dry_run):
     switch_table_atomically(table_name=table_name)
 
 
-def build_final_tables(dry_run):
+def build_final_tables():
     """
     Build final custom tables one by one by playing SQL requests in `sql` folder.
 
@@ -286,7 +277,7 @@ def build_final_tables(dry_run):
         table_name = "_".join(filename.split(".")[0].split("_")[1:])
         with open(os.path.join(path, filename), "r") as file:
             sql_request = file.read()
-        build_custom_table(table_name=table_name, sql_request=sql_request, dry_run=dry_run)
+        build_custom_table(table_name=table_name, sql_request=sql_request)
         print("Done.")
 
 
