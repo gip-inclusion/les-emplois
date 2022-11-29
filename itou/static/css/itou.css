@@ -136,6 +136,10 @@ Credits go to https://stackoverflow.com/a/19229738
     overflow-y: auto;
 }
 
+.select2-selection__rendered {
+    white-space: break-spaces !important;
+}
+
 /* Missing Boostrap utilities.
 --------------------------------------------------------------------------- */
 
