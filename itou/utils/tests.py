@@ -495,13 +495,13 @@ class UtilsTemplateTagsTestCase(TestCase):
 
     def test_pluralizefr(self):
         """Test `pluralizefr` template tag."""
-        template = Template("{% load str_filters %}Résultat{{ counter|pluralizefr }}")
+        template = Template("{% load str_filters %}résultat{{ counter|pluralizefr }}")
         out = template.render(Context({"counter": 0}))
-        self.assertEqual(out, "Résultat")
+        self.assertEqual(out, "résultat")
         out = template.render(Context({"counter": 1}))
-        self.assertEqual(out, "Résultat")
+        self.assertEqual(out, "résultat")
         out = template.render(Context({"counter": 10}))
-        self.assertEqual(out, "Résultats")
+        self.assertEqual(out, "résultats")
 
     def test_mask_unless(self):
         template = Template("""{% load str_filters %}{{ value|mask_unless:predicate }}""")

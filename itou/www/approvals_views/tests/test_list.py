@@ -24,7 +24,7 @@ class TestApprovalsListView:
         url = reverse("approvals:list")
         response = client.get(url)
 
-        assertContains(response, "1 Résultat")
+        assertContains(response, "1 résultat")
         assertContains(response, approval.user.get_full_name())
         assertNotContains(response, approval_for_other_siae.user.get_full_name())
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
@@ -43,7 +43,7 @@ class TestApprovalsListView:
         url = reverse("approvals:list")
         response = client.get(url)
 
-        assertContains(response, "2 Résultats")
+        assertContains(response, "2 résultats")
         assertContains(response, approval.user.get_full_name(), count=2)
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertContains(response, reverse("approvals:detail", kwargs={"pk": another_approval.pk}))
@@ -61,7 +61,7 @@ class TestApprovalsListView:
         url = reverse("approvals:list")
         response = client.get(url)
 
-        assertContains(response, "1 Résultat")
+        assertContains(response, "1 résultat")
 
     def test_users_filters(self, client):
         approval = ApprovalFactory(
@@ -83,7 +83,7 @@ class TestApprovalsListView:
 
         url = reverse("approvals:list")
         response = client.get(url)
-        assertContains(response, "2 Résultats")
+        assertContains(response, "2 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_siae.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_siae.pk}))
@@ -96,14 +96,14 @@ class TestApprovalsListView:
 
         url = f"{reverse('approvals:list')}?users={approval.user_id}"
         response = client.get(url)
-        assertContains(response, "1 Résultat")
+        assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_siae.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_siae.pk}))
 
         url = f"{reverse('approvals:list')}?users={approval.user_id}&users={approval_same_siae.user_id}"
         response = client.get(url)
-        assertContains(response, "2 Résultats")
+        assertContains(response, "2 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_siae.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_siae.pk}))
@@ -144,27 +144,27 @@ class TestApprovalsListView:
 
         url = f"{reverse('approvals:list')}?status_valid=on"
         response = client.get(url)
-        assertContains(response, "1 Résultat")
+        assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": valid_approval.pk}))
 
         url = f"{reverse('approvals:list')}?status_suspended=on"
         response = client.get(url)
-        assertContains(response, "1 Résultat")
+        assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": suspended_approval.pk}))
 
         url = f"{reverse('approvals:list')}?status_future=on"
         response = client.get(url)
-        assertContains(response, "1 Résultat")
+        assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": future_approval.pk}))
 
         url = f"{reverse('approvals:list')}?status_expired=on"
         response = client.get(url)
-        assertContains(response, "1 Résultat")
+        assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": expired_approval.pk}))
 
         url = f"{reverse('approvals:list')}?status_expired=on&status_suspended=on&status_future=on&status_valid=on"
         response = client.get(url)
-        assertContains(response, "4 Résultats")
+        assertContains(response, "4 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": valid_approval.pk}))
         assertContains(response, reverse("approvals:detail", kwargs={"pk": suspended_approval.pk}))
         assertContains(response, reverse("approvals:detail", kwargs={"pk": future_approval.pk}))
