@@ -40,8 +40,9 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
     siae = job_description.siae
     can_update_job_description = request.session.get("current_siae") == siae.pk
 
+    # select_related on siae, location useful for _list_siae_actives_jobs_row.html template
     others_active_jobs = (
-        SiaeJobDescription.objects.select_related("appellation")
+        SiaeJobDescription.objects.select_related("appellation", "location", "siae")
         .filter(is_active=True, siae=siae)
         .exclude(id=job_description_id)
         .order_by("-updated_at", "-created_at")

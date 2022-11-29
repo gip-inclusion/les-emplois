@@ -39,6 +39,18 @@ class JobDescriptionAbstractTest(TestCase):
         )
         siae.jobs.add(*self.appellations)
 
+        # Make sure at least one SiaeJobDescription has a location
+        SiaeJobDescription.objects.filter(pk=siae.job_description_through.last().pk).update(
+            location=City.objects.create(
+                name="Rennes",
+                slug="rennes",
+                department="35",
+                post_codes=["35000"],
+                code_insee="35000",
+                coords=Point(-1.7, 45),
+            )
+        )
+
         self.siae = siae
         self.user = user
 
@@ -405,6 +417,17 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
 
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(self.url)
+        with self.assertNumQueries(
+            1  # fetch django session
+            + 1  # fetch user
+            + 1  # check user is active
+            + 1  # fetch siaes_siaejobdescription
+            + 1  # fetch siaes infos
+            + 1  # fetch prescribers_prescribermembership/organization
+            + 1  # fetch jobappelation
+            + 1  # weird fetch social account
+            + 1  # fetch other job infos
+        ):
+            response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler")
