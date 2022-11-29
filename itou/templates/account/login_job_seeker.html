@@ -1,68 +1,115 @@
 {# django-allauth template override. #}
-{% extends "layout/content_two_columns.html" %}
+{% extends "layout/content_full_viewport.html" %}
 {% load bootstrap4 %}
 {% load redirection_fields %}
 {% load static %}
 
-{% block title %}Connexion candidat{{ block.super }}{% endblock %}
+{% block title %}Connexion candidat {{ block.super }}{% endblock %}
 
-{% block content_container_css_classes %}s-section-lg-with-background{% endblock %}
-
-{% block right_content %}
-    <div class="py-5 py-lg-7">
-        <h1 class="h1-hero-c1 text-center">Se connecter</h1>
-        {% if show_france_connect %}
-            <div class="mt-4">{% include "signup/includes/france_connect_button.html" %}</div>
-            <div class="mt-4 mb-3">
-                <p class="text-center">
-                    <hr class="my-5" data-text="ou">
-                </p>
-            </div>
-        {% else %}
-            <p class="font-italic text-center mt-3">FranceConnect est désactivé.</p>
-        {% endif %}
-
-        {% if show_peamu %}
-            <div class="row mt-3">
-                <div class="col-sm">
-                    <div class="text-center">{% include "signup/includes/peamu_button.html" %}</div>
+{% block content %}
+    <section class="p-0">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <nav class="c-breadcrumb c-breadcrumb--marche" aria-label="Fil d'ariane">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'home:hp' %}">Accueil</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Se connecter / S'inscrire</li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
-        {% else %}
-            <p class="font-italic text-center">Pôle emploi Connect est désactivé.</p>
-        {% endif %}
-        <hr class="my-5" data-text="ou">
+        </div>
+    </section>
 
-        <form method="post" action="{% url 'login:job_seeker' %}" class="js-prevent-multiple-submit">
+    <section class="s-title-01 p-0">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        <strong>Se connecter / S'inscrire</strong>
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            {% csrf_token %}
+    <section class="s-section pt-0">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-lg-6">
+                    <div class="c-form mb-5">
+                        <h2>Se connecter</h2>
+                        <p class="h4">S’identifier avec FranceConnect</p>
+                        {% if show_france_connect %}
+                            <div class="mt-4">{% include "signup/includes/france_connect_button.html" %}</div>
+                        {% else %}
+                            <div class="alert alert-info" role="status">
+                                <p class="mb-0">FranceConnect est désactivé.</p>
+                            </div>
+                        {% endif %}
+                        <hr class="my-5" data-text="ou">
 
-            {% bootstrap_form_errors form type="all" %}
+                        <p class="h4">S’identifier avec Pôle emploi</p>
+                        {% if show_peamu %}
+                            <div class="row mt-3">
+                                <div class="col-sm">
+                                    <div class="text-center">{% include "signup/includes/peamu_button.html" %}</div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info" role="status">
+                                <p class="mb-0">Pôle emploi est désactivé.</p>
+                            </div>
+                        {% endif %}
+                        <hr class="my-5" data-text="ou">
 
-            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
-
-            {% bootstrap_field form.login form_group_class="form-group" %}
-
-            {% bootstrap_field form.password form_group_class="form-group mb-1" %}
-            <p>
-                <a href="{% url 'account_reset_password' %}" class="font-weight-bold">Mot de passe oublié ?</a>
-            </p>
-
-            <p class="text-center">{% bootstrap_button "Se connecter" button_type="submit" button_class="btn-primary btn" %}</p>
-
-        </form>
-
-    </div>
-{% endblock %}
-
-{% block left_content %}
-    <div class="py-5 py-lg-7 text-center">
-        <h1 class="h1-hero-c1">S'inscrire</h1>
-        <p class="mb-5">
-            <a class="btn btn-outline-primary" href="{% url 'signup:job_seeker_situation' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
-                Créer un compte candidat
-            </a>
-        </p>
-        <img class="img-fluid img-fitcover w-50 w-md-auto mt-5" src="{% static 'img/login.svg' %}" alt="">
-    </div>
+                        <form method="post" action="{% url 'login:job_seeker' %}" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+                            <fieldset>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="h4">S’identifier avec vos identifiants</p>
+                                        {% bootstrap_form_errors form type="all" %}
+                                        {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
+                                        {% bootstrap_field form.login form_group_class="form-group" %}
+                                        {% bootstrap_field form.password form_group_class="form-group mb-2" %}
+                                        <div class="form-group">
+                                            <a href="{% url 'account_reset_password' %}" class="btn-link fs-sm">Mot de passe oublié ?</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div class="form-row justify-content-end">
+                                <div class="form-group col-12 col-lg-auto">
+                                    {% bootstrap_button "Se connecter" button_type="submit" button_class="btn btn-primary btn-block" %}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="s-section__col col-12 col-lg-6">
+                    <div class="c-form">
+                        <div class="row">
+                            <div class="col-12">
+                                <h2>S'inscrire</h2>
+                                <div class="form-row justify-content-end">
+                                    <div class="form-group col-12 col-lg-auto">
+                                        <a class="btn btn-primary btn-block" href="{% url 'signup:job_seeker_situation' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                                            Créer un compte candidat
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <picture class="d-none d-lg-block text-center">
+                        <img class="img-fluid" src="{% static 'img/illustration-login.svg' %}" alt="" loading="lazy">
+                    </picture>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
