@@ -641,12 +641,11 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
 
     senders = forms.MultipleChoiceField(required=False, label="Nom de la personne", widget=Select2MultipleWidget)
-
     job_seekers = forms.MultipleChoiceField(required=False, label="Nom du candidat", widget=Select2MultipleWidget)
 
     pass_iae_suspended = forms.BooleanField(label="Suspendu", required=False)
     pass_iae_active = forms.BooleanField(label="Actif", required=False)
-    criteria = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple)
+    criteria = forms.MultipleChoiceField(required=False, label="", widget=Select2MultipleWidget)
     eligibility_validated = forms.BooleanField(label="Éligibilité validée", required=False)
     departments = forms.MultipleChoiceField(
         required=False, label="Département du candidat", widget=forms.CheckboxSelectMultiple
