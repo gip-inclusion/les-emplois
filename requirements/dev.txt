@@ -115,7 +115,6 @@ certifi==2022.9.24 \
     --hash=sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382
     # via
     #   -r requirements/base.txt
-    #   elastic-apm
     #   httpcore
     #   httpx
     #   requests
@@ -422,9 +421,6 @@ editorconfig==0.12.3 \
     # via
     #   cssbeautifier
     #   jsbeautifier
-elastic-apm==6.13.0 \
-    --hash=sha256:04aec2676bf996a359554bf0498c7c5d3415e2e75e138dc42f3abfb5a99b7902
-    # via -r requirements/base.txt
 et-xmlfile==1.1.0 \
     --hash=sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c \
     --hash=sha256:a2ba85d1d6a74ef63837eed693bcb89c3f752169b0e3e7ae5b16ca5e1b3deada
@@ -1320,7 +1316,6 @@ urllib3==1.26.12 \
     # via
     #   -r requirements/base.txt
     #   botocore
-    #   elastic-apm
     #   requests
     #   sentry-sdk
 uwsgi==2.0.21 \
@@ -1407,7 +1402,6 @@ wrapt==1.14.1 \
     #   -r requirements/base.txt
     #   astroid
     #   deprecated
-    #   elastic-apm
 xlrd==2.0.1 \
     --hash=sha256:6a33ee89877bd9abc1158129f6e94be74e2679636b8a205b43b85206c3f0bbdd \
     --hash=sha256:f72f148f54442c6b056bf931dbc34f986fd0c3b0b6b5a58d013c9aef274d0c88

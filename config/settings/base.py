@@ -56,7 +56,6 @@ THIRD_PARTY_APPS = [
     "import_export",
     "hijack",
     "hijack.contrib.admin",
-    "elasticapm.contrib.django",
 ]
 
 
@@ -508,17 +507,6 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "API - Les emplois de l'inclusion",
     "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
     "VERSION": "1.0.0",
-}
-
-ELASTIC_APM = {
-    "ENABLED": bool(os.getenv("APM_SERVER_URL")),
-    "SERVICE_NAME": "itou-django",
-    "SERVICE_VERSION": os.getenv("COMMIT_ID"),
-    "SERVER_URL": os.getenv("APM_SERVER_URL"),
-    "SECRET_TOKEN": os.getenv("APM_AUTH_TOKEN"),
-    "ENVIRONMENT": ITOU_ENVIRONMENT,
-    "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
-    "TRANSACTION_SAMPLE_RATE": 0.1,
 }
 
 # Requests default timeout is None... See https://blog.mathieu-leplatre.info/handling-requests-timeout-in-python.html
