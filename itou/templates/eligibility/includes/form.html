@@ -42,8 +42,10 @@
 
     <p>En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.</p>
     {% buttons %}
-        {% if cancel_url %}<a class="btn btn-outline-primary" href="{{ cancel_url }}">Annuler</a>{% endif %}
-        <button type="submit" class="btn btn-primary">Valider</button>
+        <p class="text-right">
+            {% if cancel_url %}<a class="btn btn-outline-primary" href="{{ cancel_url }}">Annuler</a>{% endif %}
+            <button type="submit" class="btn btn-primary">Valider</button>
+        </p>
     {% endbuttons %}
 
 </form>
