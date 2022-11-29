@@ -74,11 +74,6 @@ DATABASES["default"]["NAME"] = os.getenv("PGDATABASE", "itou")  # noqa: F405
 DATABASES["default"]["USER"] = os.getenv("PGUSER", "postgres")  # noqa: F405
 DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")  # noqa: F405
 
-ELASTIC_APM["ENABLED"] = False  # noqa: F405
-# FIXME(vperron): Remove this as soon as the checks are disabled
-# followup on https://github.com/elastic/apm-agent-python/pull/1632
-ELASTIC_APM["SERVER_URL"] = "http://127.0.0.1"  # noqa: F405
-
 if os.getenv("SQL_DEBUG", "False") == "True":
     LOGGING.setdefault("loggers", {})["django.db.backends"] = {  # noqa: F405
         "level": "DEBUG",

@@ -108,4 +108,3 @@ python-dotenv  # https://github.com/theskumar/python-dotenv
 # ------------------------------------------------------------------------------
 uwsgi==2.0.*  # https://github.com/unbit/uwsgi
 sentry-sdk  # https://github.com/getsentry/sentry-python
-elastic-apm==6.13.0  # https://www.elastic.co/guide/en/apm/agent/python/current/django-support.html
