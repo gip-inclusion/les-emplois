@@ -12,25 +12,25 @@
     <div class="col-md-4 text-right">
         <p class="small mb-0">
             {% if state == "SUBMITTED" and reviewed_at %}
-                <p class="badge badge-pilotage float-right">Nouveaux justificatifs à traiter</p>
+                <p class="badge badge-pill badge-pilotage float-right">Nouveaux justificatifs à traiter</p>
             {% elif state == "SUBMITTED" %}
-                <p class="badge badge-pilotage float-right">À traiter</p>
+                <p class="badge badge-pill badge-pilotage float-right">À traiter</p>
             {% elif state == "REFUSED_2" or evaluated_siae.evaluation_is_final and state == "REFUSED" %}
                 {# Final refusal #}
-                <p class="badge badge-danger float-right">Problème constaté</p>
+                <p class="badge badge-pill badge-danger float-right">Problème constaté</p>
             {% elif not evaluated_siae.reviewed_at and state == "REFUSED" %}
                 {% comment %}
                     Show “Problème constaté” until the review is submitted, which starts the “phase contradictoire”
                     (tracked by the reviewed_at field).
                      After review, refused job applications fall through to “Phase contradictoire - En attente”.
                 {% endcomment %}
-                <p class="badge badge-danger float-right">Problème constaté</p>
+                <p class="badge badge-pill badge-danger float-right">Problème constaté</p>
             {% elif state == "ACCEPTED" %}
-                <p class="badge badge-success float-right">Validé</p>
+                <p class="badge badge-pill badge-success float-right">Validé</p>
             {% elif state == "UPLOADED" %}
-                <p class="badge badge-pilotage float-right">Justificatifs téléversés</p>
+                <p class="badge badge-pill badge-pilotage float-right">Justificatifs téléversés</p>
             {% else %}
-                <p class="badge badge-emploi float-right">
+                <p class="badge badge-pill badge-emploi float-right">
                     {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
                     En attente
                 </p>

@@ -665,7 +665,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-success float-right">Validé</p>',
+            '<p class="badge badge-pill badge-success float-right">Validé</p>',
             count=1,
         )
         self.assertContains(
@@ -706,7 +706,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-danger float-right">Problème constaté</p>',
+            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
             html=True,
             count=1,
         )
@@ -747,7 +747,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-danger float-right">Problème constaté</p>',
+            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
             html=True,
             count=1,
         )
@@ -777,7 +777,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-emploi float-right">En attente</p>',
+            '<p class="badge badge-pill badge-emploi float-right">En attente</p>',
             html=True,
             count=1,
         )
@@ -1023,7 +1023,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertNotContains(response, self.submit_text)
         self.assertNotContains(response, message)
         self.assertNotContains(response, self.control_text)
-        self.assertContains(response, '<p class="badge badge-danger float-right">Problème constaté</p>', count=1)
+        self.assertContains(
+            response, '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>', count=1
+        )
 
     def test_notification_pending_show_view_evaluated_admin_criteria(self):
         self.client.force_login(self.user)
