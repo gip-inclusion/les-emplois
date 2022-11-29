@@ -8,7 +8,9 @@
     <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
         {% csrf_token %}
         {% buttons %}
-            <button type="submit" class="btn btn-warning">J'étudie cette candidature</button>
+            <p class="text-right">
+                <button type="submit" class="btn btn-primary">J'étudie cette candidature</button>
+            </p>
         {% endbuttons %}
     </form>
 
