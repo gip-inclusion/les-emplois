@@ -28,7 +28,7 @@
                     <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
                     {% if job_application.is_sent_by_authorized_prescriber %}
                         <br>
-                        <small><span class="badge badge-warning">Prescripteur habilité</span></small>
+                        <small><span class="badge badge-pill badge-warning">Prescripteur habilité</span></small>
                     {% endif %}
                 {% endif %}
             {% endif %}
@@ -38,7 +38,7 @@
                 <b>{{ job_application.sender_siae.display_name }}</b>
                 {% if request.user.is_siae_staff %}
                     <br>
-                    <small><span class="badge badge-info">Auto-prescription</span></small>
+                    <small><span class="badge badge-pill badge-info">Auto-prescription</span></small>
                 {% endif %}
             {% endif %}
 
@@ -51,7 +51,7 @@
             <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>
             {% if job_application.has_suspended_approval %}
                 <br>
-                <small><span class="badge badge-warning">PASS IAE suspendu</span></small>
+                <small><span class="badge badge-pill badge-warning">PASS IAE suspendu</span></small>
             {% endif %}
         </p>
     </div>

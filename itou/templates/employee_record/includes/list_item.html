@@ -24,23 +24,23 @@
             <div class="col-md-5 text-right">
                 <p class="small mb-0">
                     {% if form.status.value == "SENT" %}
-                        <p class="badge badge-warning">
+                        <p class="badge badge-pill badge-warning">
                             Transmise à l'ASP le&nbsp;<b>{{ employee_record.updated_at }}</b>
                         </p>
                     {% elif form.status.value == "REJECTED" %}
-                        <p class="badge badge-danger">
+                        <p class="badge badge-pill badge-danger">
                             Retour en erreur le&nbsp;<b>{{ employee_record.updated_at }}</b>
                         </p>
                     {% elif form.status.value == "PROCESSED" %}
-                        <p class="badge badge-success">
+                        <p class="badge badge-pill badge-success">
                             Intégrée ASP le&nbsp;<b>{{ employee_record.updated_at }}</b>
                         </p>
                     {% elif form.status.value == "READY" %}
-                        <p class="badge badge-secondary">
+                        <p class="badge badge-pill badge-secondary">
                             Complétée le&nbsp;<b>{{ employee_record.updated_at }}</b>
                         </p>
                     {% elif form.status.value == "DISABLED" %}
-                        <p class="badge badge-emploi-lightest">
+                        <p class="badge badge-pill badge-emploi-lightest">
                             Désactivée le&nbsp;<b>{{ employee_record.updated_at }}</b>
                         </p>
                     {% endif %}

@@ -14,7 +14,7 @@
                             {% if s.pk != current_siae.pk %}
                                 <li>
                                     <button class="dropdown-item text-primary font-weight-bold" type="submit" name="siae_id" value="{{ s.pk }}">
-                                        <span class="badge badge-sm badge-primary mr-1">{{ s.kind }}</span>
+                                        <span class="badge badge-pill badge-sm badge-primary mr-1">{{ s.kind }}</span>
                                         {{ s.display_name|truncatechars:50 }}
                                     </button>
                                 </li>
@@ -38,7 +38,7 @@
                             {% if po.pk != current_prescriber_organization.pk %}
                                 <li>
                                     <button class="dropdown-item text-primary" type="submit" name="prescriber_organization_id" value="{{ po.pk }}">
-                                        <span class="badge badge-sm badge-primary mr-1">{{ po.kind }}</span>
+                                        <span class="badge badge-pill badge-sm badge-primary mr-1">{{ po.kind }}</span>
                                         {{ po.display_name|truncatechars:50 }}
                                     </button>
                                 </li>
@@ -63,7 +63,7 @@
                             {% if i.pk != current_institution.pk %}
                                 <li>
                                     <button class="dropdown-item text-primary" type="submit" name="institution_id" value="{{ i.pk }}">
-                                        <span class="badge badge-sm badge-primary mr-1">{{ i.kind }}</span>
+                                        <span class="badge badge-sm badge-pill badge-primary mr-1">{{ i.kind }}</span>
                                         {{ i.display_name|truncatechars:50 }}
                                     </button>
                                 </li>
