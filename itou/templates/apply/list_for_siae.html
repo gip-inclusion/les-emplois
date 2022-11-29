@@ -39,13 +39,13 @@
                         <h3>Filtrer les candidatures</h3>
                     </div>
                     <div class="card-body">
+                        {% include "apply/includes/job_applications_filters/statut.html" %}
+                        {% include "apply/includes/job_applications_filters/job_seekers.html" %}
+                        {% include "apply/includes/job_applications_filters/eligibility_validated.html" %}
                         {% include "apply/includes/job_applications_filters/pass.html" %}
                         {% include "apply/includes/job_applications_filters/criteria.html" %}
-                        {% include "apply/includes/job_applications_filters/eligibility_validated.html" %}
                         {% include "apply/includes/job_applications_filters/departments.html" %}
-                        {% include "apply/includes/job_applications_filters/job_seekers.html" %}
                         {% include "apply/includes/job_applications_filters/dates.html" %}
-                        {% include "apply/includes/job_applications_filters/statut.html" %}
                         {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
                         {% include "apply/includes/job_applications_filters/sender.html" %}
                     </div>
