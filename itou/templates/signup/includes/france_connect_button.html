@@ -1,21 +1,20 @@
 {% load static %}
 
-
-<div class="text-center">
-    <b>Utilisez FranceConnect pour vous connecter ou créer un compte</b>
-    <br>
+<p class="mb-0">
+    <strong>Utilisez FranceConnect pour vous connecter ou créer un compte</strong>.
+</p>
+<p>
     FranceConnect est la solution proposée par l’État pour sécuriser et simplifier la connexion à vos services en ligne.
+</p>
+<div class="text-center">
+    <a href="{% url 'france_connect:authorize' %}"
+       title="S'identifier avec FranceConnect"
+       class="matomo-event"
+       data-matomo-category="inscription-candidat"
+       data-matomo-action="clic"
+       data-matomo-option="se-connecter-avec-france-connect">
+        <img class="img-fluid mb-1 itou-france-connect" alt="">
+    </a>
     <br>
-    <p class="mt-4">
-        <a href="{% url 'france_connect:authorize' %}"
-           title="S'identifier avec FranceConnect"
-           class="matomo-event"
-           data-matomo-category="inscription-candidat"
-           data-matomo-action="clic"
-           data-matomo-option="se-connecter-avec-france-connect">
-            <img class="img-fluid mb-1 itou-france-connect" alt="">
-        </a>
-        <br>
-        <a class="small font-italic d-inline-block" href="https://app.franceconnect.gouv.fr/en-savoir-plus">Qu’est-ce que FranceConnect ?</a>
-    </p>
+    <a class="btn btn-link" href="https://app.franceconnect.gouv.fr/en-savoir-plus">Qu’est-ce que FranceConnect ?</a>
 </div>

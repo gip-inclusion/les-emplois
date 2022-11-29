@@ -1,12 +1,12 @@
 {# This template needs a 'breadcrumbs' dict in context, format : {label: url,...} #}
-<nav class="c-breadcrumb c-breadcrumb--emploi" aria-label="breadcrumb">
+<nav class="c-breadcrumb c-breadcrumb--emploi" aria-label="Fil d'Ariane">
     <ol class="breadcrumb">
         {# Common parts #}
         <li class="breadcrumb-item">
-            <a href="{% url 'home:hp' %}" title="Accueil">Accueil</a>
+            <a href="{% url 'home:hp' %}">Accueil</a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{% url 'dashboard:index' %}" title="Tableau de bord">Tableau de bord</a>
+            <a href="{% url 'dashboard:index' %}">Tableau de bord</a>
         </li>
         {# Dynamic breadcrumbs #}
         {% for breadcrumb_label, breadcrumb_url in breadcrumbs.items %}
@@ -14,7 +14,7 @@
                 <li class="breadcrumb-item active" aria-current="page">{{ breadcrumb_label }}</li>
             {% else %}
                 <li class="breadcrumb-item">
-                    <a href="{{ breadcrumb_url }}" title="{{ breadcrumb_label }}">{{ breadcrumb_label }}</a>
+                    <a href="{{ breadcrumb_url }}">{{ breadcrumb_label }}</a>
                 </li>
             {% endif %}
         {% endfor %}
