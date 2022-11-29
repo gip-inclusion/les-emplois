@@ -117,6 +117,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_is_siae_admin": True,
                 "user_siaes": [siae],
                 "matomo_custom_variables": {
+                    "account_id": user.pk,
                     "is_authenticated": "yes",
                     "account_type": "employer",
                     "account_sub_type": "employer_admin",
@@ -148,6 +149,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_is_siae_admin": False,
                 "user_siaes": [siae1, siae2],
                 "matomo_custom_variables": {
+                    "account_id": user.pk,
                     "is_authenticated": "yes",
                     "account_type": "employer",
                     "account_sub_type": "employer_not_admin",
@@ -174,6 +176,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_prescriberorganizations": [organization],
                 "user_is_prescriber_org_admin": True,
                 "matomo_custom_variables": {
+                    "account_id": user.pk,
                     "is_authenticated": "yes",
                     "account_type": "prescriber",
                     "account_sub_type": "prescriber_with_unauthorized_org",
@@ -204,6 +207,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_prescriberorganizations": [organization1, organization2],
                 "user_is_prescriber_org_admin": True,
                 "matomo_custom_variables": {
+                    "account_id": user.pk,
                     "is_authenticated": "yes",
                     "account_type": "prescriber",
                     "account_sub_type": "prescriber_with_unauthorized_org",
@@ -230,6 +234,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_institutions": [institution],
                 "user_is_institution_admin": True,
                 "matomo_custom_variables": {
+                    "account_id": user.pk,
                     "is_authenticated": "yes",
                     "account_type": "labor_inspector",
                     "account_sub_type": "inspector_admin",
@@ -260,6 +265,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_institutions": [institution1, institution2],
                 "user_is_institution_admin": False,
                 "matomo_custom_variables": {
+                    "account_id": user.pk,
                     "is_authenticated": "yes",
                     "account_type": "labor_inspector",
                     "account_sub_type": "inspector_not_admin",

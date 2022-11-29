@@ -19,7 +19,9 @@ def get_current_organization_and_perms(request):
 
     if request.user.is_authenticated:
         context, extra_context, extra_matomo_context = {}, {}, {}
-        matomo_context = {"is_authenticated": "yes"} | user_to_account_type(request.user)
+        matomo_context = {"account_id": request.user.pk, "is_authenticated": "yes"} | user_to_account_type(
+            request.user
+        )
 
         if siae_pk:
             extra_context, extra_matomo_context = get_context_siae(request.user, siae_pk)
