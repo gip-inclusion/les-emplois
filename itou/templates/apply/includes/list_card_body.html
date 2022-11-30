@@ -38,7 +38,15 @@
                 <b>{{ job_application.sender_siae.display_name }}</b>
                 {% if request.user.is_siae_staff %}
                     <br>
-                    <small><span class="badge badge-pill badge-info">Auto-prescription</span></small>
+                    <small>
+                        <span class="badge badge-info">
+                            {% if job_application.created_from_pe_approval %}
+                                Import agrément Pôle emploi
+                            {% else %}
+                                Auto-prescription
+                            {% endif %}
+                        </span>
+                    </small>
                 {% endif %}
             {% endif %}
 
