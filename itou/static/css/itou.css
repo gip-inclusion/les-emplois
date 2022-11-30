@@ -1,3 +1,8 @@
+/* Scroll past the sticky header when navigating to a fragment. */
+[id] {
+    scroll-margin-top: 120px;
+}
+
 .container-search {
     background-position: top left, top right;
     background-repeat: no-repeat;
