@@ -1,0 +1,18 @@
+Bonjour, 
+
+Vous recevez cet e-mail parce que vous, ou quelqu’un d’autre, avez demandé à réinitialiser le mot de passe associé à votre compte sur les emplois de l’inclusion (https://emplois.inclusion.beta.gouv.fr/).
+
+Toutefois, nous n’avons trouvé aucun compte utilisateur associé à votre adresse e-mail.
+
+Si vous n’avez fait aucune demande de nouveau mot de passe, vous pouvez ignorer cet e-mail.
+
+Si vous avez fait cette demande de nouveau mot de passe :
+
+- Assurez-vous que vous n’aviez pas créé votre compte sur les emplois de l’inclusion depuis une autre adresse e-mail.
+- Vous pouvez créer un nouveau compte en utilisant le lien ci-dessous :
+
+https://emplois.inclusion.beta.gouv.fr/accounts/signup/ 
+
+Cordialement,
+
+L’équipe des emplois de l’inclusion
