@@ -1,5 +1,80 @@
 # Journal des modifications
 
+## [53] - 2022-12-16
+
+### Ajouté
+- Analytics : Ajout d'une application d'analytics et de premières métriques sur les fiches salariées
+- API : Ajout de l'API candidats à la liste des nouveautés de la doc
+- Parcours d'embauche : Ajout d'un message d'erreur quand le NIR renseigné existe déjà
+- Parcours d'embauche : Ajout des informations concernant le QPV et le ZRR dans les diagnostics d'éligibilité
+- Contrôle a posteriori : Ajout d'une formule de politesse au mail de notification avant la phase contradictoire
+- Contrôle a posteriori : Ajout d'accès en lecture dans l'admin
+- Contrôle a posteriori : Notifier les SIAE sans justificatifs vers la fin de la phase contradictoire
+- Contrôle a posteriori : Clarifier le début de la phase contradictoire dans un mail
+- Contrôle a posteriori : Communiquer aux DDETS les SIAEs n'ayant pas répondu en phase amiable
+- Contrôle a posteriori : Ajout de notifications lors du passage forcé en phase contradictoire
+- Contrôle a posteriori : Ajout d'un export depuis l'admin
+- Espace salarié : Ajout de l'espace "Mes salariés" dans le tableau de bord des SIAE
+- Facilitateurs : Utiliser inclusion Connect pour créer un compte et se connecter
+- Fiches salarié : Ajout de nouvelles villes pour aider la recherche quand plusieurs communes ont le même code INSEE
+- Fiches salarié : Ajouter la possibilité de trier les fiches salariées
+- Inclusion Connect : Ajout d'une vue pour reprendre la création de compte lorsque l'email de vérification n'arrive pas
+- Inclusion Connect : Ajout d'un lien direct pour créer un compte (et non arriver sur la page de connexion)
+- Métabase : Ajout des SIAE, Organisations prescriptrices et institutions dans le suivi
+- Métabase : Ajout de l'appartenance à une zone qpv pour les candidats
+- Métabase : Ajout de données anonymisées sur les utilisateurs
+- Métabase : Ajout de la région du prescripteur aux données
+- Métabase : Ajout du suivi de la consommation des ETPs
+- Métabase : Ajout d'un accès stats pour la DGPE
+- Métabase : Ajout de la table FluxIAE Convention
+- Métabase : Ajout d'un suivi mensuel de la consommation en ETP des SIAEs
+- Recherche de postes : Ajout d'un onglet dans les resultats de recherche employeur pour afficher les fiches de postes
+- Recherche de postes : Ajout de filtres par type de contrat
+- Recherche de postes : Ajout de filtres par domaine métier ROME
+- Sécurité : Mise en place des Content Security Policy
+- Sécurité : Mise en place d'un antivirus pour les fichiers déposés dans sur le stockage S3
+
+### Modifié
+- Admin : Amélioration des performances de la page de candidatures
+- API : Amélioration des performances de l'API des SIAEs
+- Candidature : Mise à jour des ROME et appelations
+- Candidature : Modification de la largeur de la page dans certaines étapes du canal de candidature
+- Candidature : Masquer la modale de confirmation si les formulaires contiennent des erreurs
+- Candidature : Amélioration des performances de la page de détail
+- Contrôle a posteriori : Recalcul de l’état d’une EvaluatedSiae avant notification de revue
+- Fiches salarié : Améliorations de l'interface de saisie de fiche salarié d'actualisation
+- Fiches salarié : Fiabiliser l'information affichée dans l'admin
+- Fiches salarié : Meilleur affichage des badges
+- Inclusion Connect : Correction de la taille des logos des services partenaires sur certains navigateurs
+- Liste de candidatures : modification du filtre par critères d'éligibilité
+- Métabase : re-essayer les tâches d'export en cas d'erreur
+- Métabase : Nombreuses améliorations de performances des différentes tâches d'export
+- Métabase : Désanonymisation de champs ID non sensibles.
+- Métabase : Refonte du code de l'application pour faciliter les évolutions futures
+- Parcours d'embauche : Amélioration de l'expérience utilisateur
+- PASS IAE : Affichage du reliquat du pass en nombre de jours
+- PASS IAE : Correction de la détection du dernier employeurs quand ne candidature a été créée directement au statut acceptée
+- PASS IAE : Correction de la détection du dernier employeurs avec les candidats du stock AI
+- PASS IAE : Permettre l'affichade d'un PASS IAE sans candidatures dans l'admin
+- PASS IAE : Modification des règles de prolongation
+- Recherche de postes : Correction de la recherche quand une SIAE sans département est trouvée
+- Recherche de postes : Améliorations des performances
+- Sécurité : Ventilation des tâches d'analyse antivirus
+- Thème : mise à jour vers la version 0.5.5
+- UI : Multiples petits changements d'ergonomie
+- UI : Mise à jour des couleurs de badges
+- UI : Mise à jour de l'icone de téléchargement
+- UI : Utilisation de notre thème pour les tooltips (bulles d'aides)
+- UX : Améliorer l'indicateur d'état de téléversement de fichiers
+- UX : Améliorer les performances de certains pages du site
+- Utilisateurs : Bloquer la modification des informations personnelles dans l'admin d'utilisateurs utilisant un SSO
+
+### Retiré
+- Candidature : Suppression du bandeau d'alerte sur l'évolution des critères d'éligibilité
+- Fiches de poste : Suppression de la contrainte d'unicité sur les appelation par SIAE
+- UI : Suppression du lien (cassé) d'inscription à la newsletter
+
+
 ## [52] - 2022-11-04
 
 ### Ajouté
@@ -66,25 +141,25 @@
 - Contrôle a posteriori : cache les candidatures des campagnes précédentes #1579
 
 ### Modifié
-- Technique : mise à jour vers Django 4.1 #1453 
+- Technique : mise à jour vers Django 4.1 #1453
 - Technique : amélioration de la résilience du parcours d'inscription prescripteur face aux API indisponibles #1532
-- Technique : correction de l'intégation continue (CI) #1534  
+- Technique : correction de l'intégation continue (CI) #1534
 - Technique : accélération des tests #1559
 - Technique : mise à jour vers Django 4.1.2 # 1588
-- Documentation : modification des notes d’installation (Docker, venv, config) #1515, #1517, #1519, #1551 
+- Documentation : modification des notes d’installation (Docker, venv, config) #1515, #1517, #1519, #1551
 - PASS IAE : affichage du PASS IAE pour les demandeurs d'emploi #1535
-- Pilotage : candidatures - ajout du nom du conseiller Pôle emploi #1543 
-- Pilotage : candidatures par fiche de poste - ajout colonne injection AI #1546 
+- Pilotage : candidatures - ajout du nom du conseiller Pôle emploi #1543
+- Pilotage : candidatures par fiche de poste - ajout colonne injection AI #1546
 - Pilotage : ajout de colonnes utiles extraites du NIR (sexe, année et mois de naissance) dans la table candidats sur Metabase #1565
 - Pilotage : ajout de deux blocs informatifs en bas des pages stats #1565
 - Thème : mise à jour vers la version 0.5.1 #1542
 - Candidatures : les candidatures ne sont plus toutes enregistrées comme "spontanées" #1548
-- Candidatures : nettoyage des vues de l'ancien parcours de dépôt de candidatures #1556 
+- Candidatures : nettoyage des vues de l'ancien parcours de dépôt de candidatures #1556
 - Prolongation / suspension : le dernier employeur qui a embauché un candidat a la main pour prolonger ou suspendre #1536
 - Prolongation / suspension : le motif de suspension “contrat de travail suspendu depuis plus de 15 jours” d'un pass IAE n’empêche plus de postuler à d'autres offres #1539
 - UI : notification des données factices sur l'environnement de démo #1530
 - UI : lors de la saisie des informations d'un utilisateur, le téléphone devient optionnel et les informations de l'adresse obligatoires #1530
-- UI : correction “S’inscrire” dans les options de navigation #1549 
+- UI : correction “S’inscrire” dans les options de navigation #1549
 - E-mails : vérification de la suppression de l'e-mail de notification d'une nouvelle embauche pour les SIAE #1530
 - E-mails : modification de l'e-mail envoyé aux prescripteurs lors d'un refus d'habilitation #1530
 - PHC : utiliser le SIRET plutôt que la clé primaire des SIAE pour choisir les contrats convergence #1596
@@ -97,7 +172,7 @@
 - Pilotage : désactivation temporaire de certains formulaires Tally #1565
 - Pilotage : désactivation temporaire du tableau de bord AF DGEFP #1565
 - Pilotage : retrait de plusieurs badges "Nouveaux" # 1565
-- Contrôle a posteriori : retrait des dates de la campagne de contrôle a posteriori 2021 #1587 
+- Contrôle a posteriori : retrait des dates de la campagne de contrôle a posteriori 2021 #1587
 
 ## [49] - 2022-09-12
 
