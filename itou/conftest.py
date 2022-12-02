@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.gis.db.models.fields import get_srid_info
+from django.core.cache import cache
 from django.db import connection
 
 from itou.utils.htmx.testing import HtmxClient
@@ -40,3 +41,8 @@ def preload_spatial_reference(django_db_setup, django_db_blocker):
     """
     with django_db_blocker.unblock():
         get_srid_info(4326, connection)
+
+
+@pytest.fixture(autouse=True)
+def reset_cache():
+    cache.clear()
