@@ -41,6 +41,7 @@ from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import get_user_info
+from itou.utils.sync import yield_sync_diff
 from itou.utils.tasks import sanitize_mailjet_recipients
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
@@ -1078,3 +1079,37 @@ class TestPaginator:
         pager = pagination.pager(object_list, 10, items_per_page=5)
         assert pager.display_pager
         assert pager.pages_to_display == range(5, 16)
+
+
+def test_yield_sync_diff():
+    # NOTE(vperron): not ideal, since I'm using models from a different Django app.
+    # But I'm not sure that for such a simple utility function, I should really create a model
+    # dedicated to it in the tests... at least lazy import it to avoid circular imports for the
+    # longest possible time. Also choose a very simple model.
+    from itou.jobs.models import Rome  # pylint: disable=import-outside-toplevel
+
+    Rome(code="FOO", name="Petit papa noel").save()
+    Rome(code="BAR", name="contenu inchangé").save()
+    Rome(code="BAZ", name="Vas-y francky").save()
+    lines = [
+        line
+        for line in yield_sync_diff(
+            [
+                {"key": "HELLO", "label": "nouvel objet stylé !"},
+                {"key": "BAR", "label": "contenu inchangé"},
+                {"key": "FOO", "label": "quand tu descendras du ciel..."},
+            ],
+            "key",
+            Rome.objects.all(),
+            "code",
+            [("label", "name")],
+        )
+    ]
+    assert lines == [
+        "count=2 label=Rome had the same key in collection and queryset",
+        "\tCHANGED name=Petit papa noel changes to label=quand tu descendras du ciel...",
+        "count=1 label=Rome added by collection",
+        '\tADDED {"key": "HELLO", "label": "nouvel objet stylé !"}',
+        "count=1 label=Rome removed by collection",
+        "\tREMOVED Vas-y francky (BAZ)",
+    ]
