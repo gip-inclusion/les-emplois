@@ -17,8 +17,8 @@ from unidecode import unidecode
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.job_applications import enums as job_application_enums
 from itou.siaes import enums as siae_enums
-from itou.utils.apis import enums as api_enums
-from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiApiClient, PoleEmploiAPIException
+from itou.utils.apis import enums as api_enums, pole_emploi_api_client
+from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiAPIException
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric, validate_siret
 
@@ -26,14 +26,6 @@ from . import enums
 
 
 logger = logging.getLogger(__name__)
-
-
-pole_emploi_api_client = PoleEmploiApiClient(
-    settings.API_ESD["BASE_URL"],
-    settings.API_ESD["AUTH_BASE_URL"],
-    settings.API_ESD["KEY"],
-    settings.API_ESD["SECRET"],
-)
 
 
 class CommonApprovalMixin(models.Model):
@@ -529,8 +521,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             )
             return
 
+        pe_client = pole_emploi_api_client()
+
         try:
-            encrypted_nir = pole_emploi_api_client.recherche_individu_certifie(
+            encrypted_nir = pe_client.recherche_individu_certifie(
                 self.user.first_name, self.user.last_name, self.user.birthdate, self.user.nir
             )
         except PoleEmploiAPIException:
@@ -543,7 +537,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             return
 
         try:
-            pole_emploi_api_client.mise_a_jour_pass_iae(
+            pe_client.mise_a_jour_pass_iae(
                 self,
                 encrypted_nir,
                 siae.siret,
@@ -1286,8 +1280,9 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
         """FIXME(vperron): All this code and tests can probably be removed whenever the notifications
         have ended and we sent everything to Pole Emploi (no more pending or should retry)
         """
+        pe_client = pole_emploi_api_client()
         try:
-            encrypted_nir = pole_emploi_api_client.recherche_individu_certifie(
+            encrypted_nir = pe_client.recherche_individu_certifie(
                 self.first_name, self.last_name, self.birthdate, self.nir
             )
         except PoleEmploiAPIException:
@@ -1319,7 +1314,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
             return
 
         try:
-            pole_emploi_api_client.mise_a_jour_pass_iae(
+            pe_client.mise_a_jour_pass_iae(
                 self,
                 encrypted_nir,
                 self.siae_siret,

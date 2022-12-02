@@ -1,8 +1,8 @@
 import logging
 import re
-from datetime import datetime, timedelta
 
 import httpx
+from django.core.cache import cache
 from unidecode import unidecode
 
 
@@ -38,6 +38,8 @@ API_CLIENT_EMPTY_NIR_BAD_RESPONSE = "empty_nir"
 
 
 API_TIMEOUT_SECONDS = 60  # this API is pretty slow, let's give it a chance
+
+CACHE_API_TOKEN_KEY = "pole_emploi_api_client_token"
 
 # Pole Emploi also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
 AUTHORIZED_SCOPES = [
@@ -78,30 +80,11 @@ class PoleEmploiApiClient:
         self.auth_base_url = auth_base_url
         self.key = key
         self.secret = secret
-        self.token = None
-        self.expires_at = None
 
-    @property
-    def token_url(self):
-        return f"{self.auth_base_url}/connexion/oauth2/access_token"
-
-    @property
-    def recherche_individu_url(self):
-        return f"{self.base_url}/rechercheindividucertifie/v1/rechercheIndividuCertifie"
-
-    @property
-    def mise_a_jour_url(self):
-        return f"{self.base_url}/maj-pass-iae/v1/passIAE/miseAjour"
-
-    def _refresh_token(self, at=None):
-        if not at:
-            at = datetime.now()
-        if self.expires_at and self.expires_at > at + timedelta(seconds=REFRESH_TOKEN_MARGIN_SECONDS):
-            return
-
+    def _refresh_token(self):
         scopes = " ".join(AUTHORIZED_SCOPES)
         response = httpx.post(
-            self.token_url,
+            f"{self.auth_base_url}/connexion/oauth2/access_token",
             params={"realm": "/partenaire"},
             data={
                 "client_id": self.key,
@@ -113,18 +96,28 @@ class PoleEmploiApiClient:
         )
         response.raise_for_status()
         auth_data = response.json()
-        self.token = f"{auth_data['token_type']} {auth_data['access_token']}"
-        self.expires_at = at + timedelta(seconds=auth_data["expires_in"])
-
-    @property
-    def _headers(self):
-        return {"Authorization": self.token, "Content-Type": "application/json"}
+        token = f"{auth_data['token_type']} {auth_data['access_token']}"
+        cache.set(
+            CACHE_API_TOKEN_KEY,
+            token,
+            auth_data["expires_in"]
+            - REFRESH_TOKEN_MARGIN_SECONDS,  # make the token expire a little sooner than expected
+        )
+        return token
 
     def _request(self, url, data=None, params=None, method="POST"):
         try:
-            self._refresh_token()
+            token = cache.get(CACHE_API_TOKEN_KEY)
+            if not token:
+                token = self._refresh_token()
+
             response = httpx.request(
-                method, url, params=params, json=data, headers=self._headers, timeout=API_TIMEOUT_SECONDS
+                method,
+                url,
+                params=params,
+                json=data,
+                headers={"Authorization": token, "Content-Type": "application/json"},
+                timeout=API_TIMEOUT_SECONDS,
             )
             if response.status_code not in (200, 206):
                 raise PoleEmploiAPIException(response.status_code)
@@ -150,7 +143,7 @@ class PoleEmploiApiClient:
         }
         """
         data = self._request(
-            self.recherche_individu_url,
+            f"{self.base_url}/rechercheindividucertifie/v1/rechercheIndividuCertifie",
             {
                 "dateNaissance": birthdate.strftime(DATE_FORMAT) if birthdate else "",
                 "nirCertifie": nir[:MAX_NIR_CHARACTERS] if nir else "",
@@ -186,23 +179,20 @@ class PoleEmploiApiClient:
             "typeSIAE": siae_type,
             "origineCandidature": origine_candidature,
         }
-        data = self._request(self.mise_a_jour_url, params)
+        data = self._request(f"{self.base_url}/maj-pass-iae/v1/passIAE/miseAjour", params)
         code_sortie = data.get("codeSortie")
         if code_sortie != API_MAJ_PASS_SUCCESS:
             raise PoleEmploiAPIBadResponse(code_sortie)
 
     def referentiel(self, code):
-        url = f"{self.base_url}/offresdemploi/v2/referentiel/{code}"
-        return self._request(url, method="GET")
+        return self._request(f"{self.base_url}/offresdemploi/v2/referentiel/{code}", method="GET")
 
     def offres(self, typeContrat="", natureContrat="", range=None):
-        url = f"{self.base_url}/offresdemploi/v2/offres/search"
         params = {"typeContrat": typeContrat, "natureContrat": natureContrat}
         if range:
             params["range"] = range
-        data = self._request(url, params=params, method="GET")
+        data = self._request(f"{self.base_url}/offresdemploi/v2/offres/search", params=params, method="GET")
         return data["resultats"]
 
     def appellations(self):
-        url = f"{self.base_url}/rome/v1/appellation?champs=code,libelle,metier(code)"
-        return self._request(url, method="GET")
+        return self._request(f"{self.base_url}/rome/v1/appellation?champs=code,libelle,metier(code)", method="GET")

@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 import httpx
 import respx
-from django.conf import settings
 from django.core import management
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -17,7 +16,6 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind, siae_kind_to_pe_type_siae
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
-from itou.utils.apis.pole_emploi import PoleEmploiApiClient
 from itou.utils.mocks.pole_emploi import (
     API_MAJPASS_RESULT_ERROR,
     API_MAJPASS_RESULT_OK,
@@ -28,26 +26,15 @@ from itou.utils.mocks.pole_emploi import (
 
 @override_settings(
     API_ESD={
-        "BASE_URL": "https://base.domain",
-        "AUTH_BASE_URL": "https://authentication-domain.fr",
+        "BASE_URL": "https://pe.fake",
+        "AUTH_BASE_URL": "https://auth.fr",
         "KEY": "foobar",
         "SECRET": "pe-secret",
     }
 )
 class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     def setUp(self):
-        self.api_client = PoleEmploiApiClient(
-            settings.API_ESD["BASE_URL"],
-            settings.API_ESD["AUTH_BASE_URL"],
-            settings.API_ESD["KEY"],
-            settings.API_ESD["SECRET"],
-        )
-        # added here in order to reset our API client between two tests; if not, it would save
-        # its token internally, which could lead to unexpected behaviour.
-        mocker = patch("itou.approvals.models.pole_emploi_api_client", self.api_client)
-        mocker.start()
-        self.addCleanup(mocker.stop)
-        respx.post(self.api_client.token_url).respond(
+        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
             200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
         )
 
@@ -82,8 +69,10 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     @respx.mock
     def test_notification_accepted_nominal(self):
         now = timezone.now()
-        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
-        respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_siae__kind=SiaeKind.ACI,
@@ -112,8 +101,10 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     @respx.mock
     def test_notification_stays_pending_if_approval_starts_after_today(self):
         now = timezone.now()
-        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
-        respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         tomorrow = (now + datetime.timedelta(days=1)).date()
         approval = ApprovalFactory(start_at=tomorrow)
         with self.assertLogs("itou.approvals.models") as logs:
@@ -133,7 +124,9 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     @respx.mock
     def test_notification_goes_to_retry_if_there_is_a_timeout(self):
         now = timezone.now()
-        respx.post(self.api_client.token_url).mock(side_effect=httpx.ConnectTimeout)
+        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").mock(
+            side_effect=httpx.ConnectTimeout
+        )
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         approval.notify_pole_emploi(at=now)
@@ -146,7 +139,9 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     @respx.mock
     def test_notification_goes_to_error_if_something_goes_wrong_with_rech_individu(self):
         now = timezone.now()
-        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_MANY_RESULTS)
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_MANY_RESULTS
+        )
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         approval.notify_pole_emploi(at=now)
@@ -159,8 +154,10 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     @respx.mock
     def test_notification_goes_to_error_if_something_goes_wrong_with_maj_pass(self):
         now = timezone.now()
-        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
-        respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_ERROR)
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         approval.notify_pole_emploi(at=now)
@@ -173,8 +170,10 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     @respx.mock
     def test_notification_goes_to_error_if_missing_siae_kind(self):
         now = timezone.now()
-        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
-        respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_ERROR)
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         job_seeker = JobSeekerFactory()
         siae = SiaeFactory(kind="FOOBAR")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
@@ -189,8 +188,10 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     @respx.mock
     def test_notification_goes_to_pending_if_job_application_is_not_accepted(self):
         now = timezone.now()
-        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
-        respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_ERROR)
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         job_seeker = JobSeekerFactory()
         siae = SiaeFactory(kind="FOOBAR")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
@@ -247,36 +248,23 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
 
 @override_settings(
     API_ESD={
-        "BASE_URL": "https://base.domain",
-        "AUTH_BASE_URL": "https://authentication-domain.fr",
+        "BASE_URL": "https://pe.fake",
+        "AUTH_BASE_URL": "https://auth.fr",
         "KEY": "foobar",
         "SECRET": "pe-secret",
     }
 )
 class PoleEmploiApprovalNotifyPoleEmploiIntegrationTest(TestCase):
-    """FIXME(vperron): Cleanup once all the PE Approvals have been sent to Pole Emploi."""
-
-    def setUp(self):
-        self.api_client = PoleEmploiApiClient(
-            settings.API_ESD["BASE_URL"],
-            settings.API_ESD["AUTH_BASE_URL"],
-            settings.API_ESD["KEY"],
-            settings.API_ESD["SECRET"],
-        )
-        # added here in order to reset our API client between two tests; if not, it would save
-        # its token internally, which could lead to unexpected behaviour.
-        mocker = patch("itou.approvals.models.pole_emploi_api_client", self.api_client)
-        mocker.start()
-        self.addCleanup(mocker.stop)
-        respx.post(self.api_client.token_url).respond(
-            200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
-        )
-
     @respx.mock
     def test_notification_accepted_nominal(self):
         now = timezone.now()
-        respx.post(self.api_client.recherche_individu_url).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
-        respx.post(self.api_client.mise_a_jour_url).respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
+            200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+        )
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         pe_approval = PoleEmploiApprovalFactory(
             nir="FOOBAR2000", siae_kind=SiaeKind.ACI.value
         )  # avoid the OPCS, not mapped yet
