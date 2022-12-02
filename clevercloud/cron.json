@@ -8,5 +8,6 @@
   "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
   "0 0 * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files c1-prod --daily",
   "0 0 1 * * $ROOT/clevercloud/run_management_command.sh scan_s3_files c1-prod",
+  "0 0 15 * * $ROOT/clevercloud/run_management_command.sh sync_romes_and_appellations",
   "0 2 * * MON $ROOT/clevercloud/crons/populate_metabase_matomo.sh"
 ]
