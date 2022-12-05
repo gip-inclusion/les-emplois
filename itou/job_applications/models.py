@@ -320,18 +320,14 @@ class JobApplicationQuerySet(models.QuerySet):
                     Suspension.objects.filter(
                         siae=OuterRef("to_siae"),
                         approval=OuterRef("approval"),
-                        # Limit to recent suspension as the older ones will already have been handled by the support.
-                        # The date was chosen arbitrarily, don't mind it too much :).
-                        created_at__gte=timezone.make_aware(datetime.datetime(2022, 1, 1)),
+                        created_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
                     )
                 ),
                 has_recent_prolongation=Exists(
                     Prolongation.objects.filter(
                         declared_by_siae=OuterRef("to_siae"),
                         approval=OuterRef("approval"),
-                        # Limit to recent prolongation as the older ones will already have been handled by the support.
-                        # The date was chosen arbitrarily, don't mind it too much :).
-                        created_at__gte=timezone.make_aware(datetime.datetime(2022, 1, 1)),
+                        created_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
                     )
                 ),
             )
