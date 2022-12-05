@@ -7,15 +7,15 @@ with constantes as (
 )
 
 select 
-    distinct emi.emi_pph_id as identifiant_salarie, /* ici on considère bien le salarié qu'une fois pour éviter des problèmes */
+    distinct emi.emi_pph_id as identifiant_salarie, /* ici on considère bien le salarié qu'une fois pour éviter des doublons et donc sur estimer les ETPs */
     make_date(cast(emi.emi_sme_annee as integer), cast(emi.emi_sme_mois as integer), 1) as date_saisie,
     to_date (emi.emi_date_validation ,'dd/mm/yyyy') as date_validation_declaration,
     emi.emi_part_etp as nombre_etp_consommes_asp,
     emi.emi_nb_heures_travail as nombre_heures_travaillees,
-    /*Nous calculons directement les ETPs réalisés pour éviter des problèmes sur metabase*/
+    /*Nous calculons directement les ETPs réalisés pour éviter des problèmes de filtres/colonnes/etc sur metabase*/
     /* ETPs réalisés = Nbr heures travaillées / montant d'heures necessaires pour avoir 1 ETP */
-    (emi.emi_nb_heures_travail / firmi.rmi_valeur) as nombre_etp_consommes_reels_annuels, 
-    (emi.emi_nb_heures_travail / firmi.rmi_valeur) * 12 as nombre_etp_consommes_reels_mensuels,
+    (emi.emi_nb_heures_travail / firmi.rmi_valeur) as nombre_etp_consommes_reels_mensuels, 
+    (emi.emi_nb_heures_travail / firmi.rmi_valeur) * 12 as nombre_etp_consommes_reels_annuels,
     emi.emi_afi_id as identifiant_annexe_fin,
     af.af_numero_convention,
     af.af_numero_annexe_financiere,
