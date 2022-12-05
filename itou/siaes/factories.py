@@ -182,7 +182,6 @@ class SiaeJobDescriptionFactory(factory.django.DjangoModelFactory):
     siae = factory.SubFactory(SiaeFactory)
     description = factory.Faker("sentence", locale="fr_FR")
     contract_type = factory.fuzzy.FuzzyChoice(ContractType.values)
-    other_contract_type = factory.Faker("word", locale="fr_FR")
     location = factory.LazyAttribute(lambda obj: City.objects.order_by("?").first())
     profile_description = factory.Faker("sentence", locale="fr_FR")
     market_context_description = factory.Faker("sentence", locale="fr_FR")
