@@ -2,7 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.db.models import OuterRef, Prefetch, Q, Subquery
+from django.db.models import Prefetch, Q
 from django.utils import timezone
 
 from itou.utils.emails import get_email_message
@@ -181,9 +181,9 @@ class MembershipQuerySet(models.QuerySet):
         """
         Return a User QuerySet. Useful to iterate over User objects instead of Membership ones.
         """
-        memberships = memberships.filter(user=OuterRef("pk"))
-        user_model = memberships.model._meta.get_field("user").related_model
-        return user_model.objects.filter(pk=Subquery(memberships.values("user")))
+        user_field = memberships.model._meta.get_field("user")
+        remote_field_lookup = user_field.remote_field.name  # for exemple "siaememberships"
+        return user_field.related_model.objects.filter(**{f"{remote_field_lookup}__in": memberships})
 
 
 class MembershipAbstract(models.Model):
