@@ -39,8 +39,8 @@ $(document).ready(() => {
       .get()  // Convert the jQuery object to an Array
       .flatMap(item => $(box).find($(item).data("swap-element-with")))  // Make a flat list of elements to swap with
       .reduce($.merge)  // Convert the Array to a jQuery object
-    swap_elements.hide()
-    swap_element_with.show()
+    swap_elements.addClass('d-none').removeClass('d-block')
+    swap_element_with.addClass('d-block').removeClass('d-none')
   }
   $(".js-swap-elements").each(function () {
     $(this).find("[data-swap-element]").each(function () {
