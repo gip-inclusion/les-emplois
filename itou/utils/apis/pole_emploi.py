@@ -119,6 +119,8 @@ class PoleEmploiApiClient:
                 headers={"Authorization": token, "Content-Type": "application/json"},
                 timeout=API_TIMEOUT_SECONDS,
             )
+            if response.status_code == 204:
+                return None
             if response.status_code not in (200, 206):
                 raise PoleEmploiAPIException(response.status_code)
             data = response.json()
@@ -192,6 +194,8 @@ class PoleEmploiApiClient:
         if range:
             params["range"] = range
         data = self._request(f"{self.base_url}/offresdemploi/v2/offres/search", params=params, method="GET")
+        if not data:
+            return []
         return data["resultats"]
 
     def appellations(self):
