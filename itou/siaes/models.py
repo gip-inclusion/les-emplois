@@ -570,7 +570,6 @@ class SiaeJobDescription(models.Model):
     class Meta:
         verbose_name = "Fiche de poste"
         verbose_name_plural = "Fiches de postes"
-        unique_together = ("appellation", "siae")
         ordering = ["appellation__name", "ui_rank"]
 
     def __str__(self):
