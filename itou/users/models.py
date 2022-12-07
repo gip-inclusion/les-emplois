@@ -223,7 +223,12 @@ class User(AbstractUser, AddressMixin):
 
     # Don’t need to specify db_index because unique implies the creation of an index.
     nir = models.CharField(
-        verbose_name="NIR", max_length=15, validators=[validate_nir], null=True, blank=True, unique=True
+        verbose_name="NIR",
+        max_length=15,
+        validators=[validate_nir],
+        null=True,
+        blank=True,
+        unique=True,
     )
 
     # The two following Pôle emploi fields are reserved for job seekers.
@@ -308,7 +313,12 @@ class User(AbstractUser, AddressMixin):
         self.validate_unique()
 
         # TODO(rsebille): Replace by a UniqueConstraint once the data have been cleaned
-        user_kinds = [self.is_job_seeker, self.is_prescriber, self.is_siae_staff, self.is_labor_inspector]
+        user_kinds = [
+            self.is_job_seeker,
+            self.is_prescriber,
+            self.is_siae_staff,
+            self.is_labor_inspector,
+        ]
         if user_kinds.count(True) > 1:
             raise ValidationError("A User can not have more than one kind")
 
@@ -370,7 +380,11 @@ class User(AbstractUser, AddressMixin):
         if approvals.valid().exists():
             return approvals.valid().first()
         approval = sorted(
-            approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
+            approvals,
+            key=lambda x: (
+                -time.mktime(x.end_at.timetuple()),
+                time.mktime(x.start_at.timetuple()),
+            ),
         )[0]
         if approval.waiting_period_has_elapsed:
             return None
@@ -385,7 +399,11 @@ class User(AbstractUser, AddressMixin):
         if not pe_approvals:
             return None
         pe_approval = sorted(
-            pe_approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
+            pe_approvals,
+            key=lambda x: (
+                -time.mktime(x.end_at.timetuple()),
+                time.mktime(x.start_at.timetuple()),
+            ),
         )[0]
         if pe_approval.waiting_period_has_elapsed:
             return None
@@ -728,7 +746,12 @@ class User(AbstractUser, AddressMixin):
             self.external_data_source_history = []
 
         try:
-            field_history = list(filter(lambda d: d["field_name"] == field, self.external_data_source_history))
+            field_history = list(
+                filter(
+                    lambda d: d["field_name"] == field,
+                    self.external_data_source_history,
+                )
+            )
             current_value = field_history[-1]["value"]
         except IndexError:
             current_value = None
