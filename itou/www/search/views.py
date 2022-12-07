@@ -37,14 +37,6 @@ class EmployerSearchBaseView(FormView):
         # in the case of SIAEs, keep the filter from the URL if present.
         # this enables not losing the count while changing tabs.
         contract_types = form.cleaned_data.get("contract_types", self.request.GET.getlist("contract_types", []))
-        context = {
-            "form": form,
-            "city": city,
-            "distance": distance,
-            "kinds_query": urlencode({"kinds": kinds}, doseq=True),
-            "contract_types_query": urlencode({"contract_types": contract_types}, doseq=True),
-            "ea_eatt_kinds": [SiaeKind.EA, SiaeKind.EATT],
-        }
 
         siaes = (
             Siae.objects.active()
@@ -89,13 +81,26 @@ class EmployerSearchBaseView(FormView):
         if districts:
             siaes = siaes.filter(post_code__in=districts)
 
-        context.update(
-            {
-                "results_page": self.get_results_page(siaes, job_descriptions),
-                "siaes_count": siaes.count(),
-                "job_descriptions_count": job_descriptions.count(),
-            }
-        )
+        context = {
+            "form": form,
+            "ea_eatt_kinds": [SiaeKind.EA, SiaeKind.EATT],
+            "city": city,
+            "distance": distance,
+            "filters_query_string": urlencode(
+                {
+                    "city": city.slug,
+                    "city_name": str(city),
+                    "distance": distance,
+                    "kinds": kinds,
+                    "contract_types": contract_types,
+                    "departments": departments,
+                },
+                doseq=True,
+            ),
+            "results_page": self.get_results_page(siaes, job_descriptions),
+            "siaes_count": siaes.count(),
+            "job_descriptions_count": job_descriptions.count(),
+        }
 
         return render(self.request, self.template_name, context)
 
