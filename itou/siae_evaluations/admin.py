@@ -1,5 +1,11 @@
+import csv
+import io
+import zipfile
+
 from django.contrib import admin, messages
+from django.http import HttpResponse
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from itou.siae_evaluations import models
@@ -80,6 +86,52 @@ class EvaluatedAdministrativeCriteriaInline(admin.TabularInline):
 
 @admin.register(models.EvaluationCampaign)
 class EvaluationCampaignAdmin(admin.ModelAdmin):
+    @admin.action(description="Exporter les SIAE des campagnes sélectionnées")
+    def export_siaes(self, request, queryset):
+        queryset = queryset.select_related("institution").prefetch_related(
+            "evaluated_siaes__evaluated_job_applications__evaluated_administrative_criteria",
+            "evaluated_siaes__siae__memberships__user",
+            "evaluated_siaes__siae__convention",
+        )
+        with io.BytesIO() as outfile:
+            with zipfile.ZipFile(outfile, "w") as zip:
+                for campaign in queryset:
+                    with io.StringIO() as csvfile:
+                        writer = csv.writer(csvfile)
+                        writer.writerow(
+                            [
+                                "SIRET signature",
+                                "Type",
+                                "Nom",
+                                "Département",
+                                "Emails administrateurs",
+                                "Numéro de téléphone",
+                                "État du contrôle",
+                            ]
+                        )
+                        for evaluated_siae in campaign.evaluated_siaes.all():
+                            siae = evaluated_siae.siae
+                            # Keep in sync with MembershipQuerySet.active_admin_members.
+                            to = [p.user.email for p in siae.memberships.all() if p.is_admin and p.user.is_active]
+                            writer.writerow(
+                                [
+                                    siae.convention.siret_signature,
+                                    siae.kind,
+                                    siae.name,
+                                    siae.department,
+                                    ", ".join(to),
+                                    siae.phone,
+                                    evaluated_siae.state,
+                                ]
+                            )
+                        filename = str(campaign).replace("/", "-").replace(":", "-")
+                        zip.writestr(f"{filename}.csv", csvfile.getvalue())
+            response = HttpResponse(outfile.getvalue())
+            response.headers["Content-Type"] = "application/zip, application/octet-stream"
+            now = timezone.now().isoformat(timespec="seconds").replace(":", "-")
+            response.headers["Content-Disposition"] = f'attachment; filename="export-siaes-campagnes-{now}.zip"'
+            return response
+
     @admin.action(description="Passer les campagnes en phase contradictoire")
     def transition_to_adversarial_phase(self, request, queryset):
         for campaign in queryset:
@@ -103,7 +155,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
             ("Les campagnes sélectionnées sont closes."),
         )
 
-    actions = [transition_to_adversarial_phase, close]
+    actions = [export_siaes, transition_to_adversarial_phase, close]
     list_display = (
         "name",
         "institution",
