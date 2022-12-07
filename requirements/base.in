@@ -67,7 +67,7 @@ sqlalchemy==1.4.*  # https://github.com/sqlalchemy/sqlalchemy
 # Huey for async processing
 # https://huey.readthedocs.io/en/latest/
 huey  # https://github.com/coleifer/huey
-redis  # https://github.com/andymccurdy/redis-py
+redis  # https://github.com/redis/redis-py
 
 # Embedding Metabase signed dashboards
 PyJWT  # https://github.com/jpadilla/pyjwt
