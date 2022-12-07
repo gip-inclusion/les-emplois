@@ -193,10 +193,6 @@ class SearchPrescriberTest(TestCase):
 
 class JobDescriptionSearchViewTest(TestCase):
     def setUp(self):
-        # FIXME(vperron): this should probably be done ONCE with the initialization of any test DB,
-        # which would also fix the constant calling of this with every test that uses SiaeFactory,
-        # which is a slow process since it's reading JSON, injecting in the database, etc etc.
-        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         self.url = reverse("search:job_descriptions_results")
 
     def test_not_existing(self):
@@ -204,6 +200,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
 
     def test_district(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city_slug = "paris-75"
         paris_city = City.objects.create(
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
@@ -232,6 +229,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, capfirst(job.display_name), html=True)
 
     def test_kind(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.AI)
 
@@ -242,6 +240,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, "Aucun résultat")
 
     def test_distance(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         # 3 SIAEs in two departments to test distance and department filtering
         vannes = create_city_vannes()
         SIAE_VANNES = "SIAE Vannes"
@@ -301,6 +300,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, SIAE_VANNES.capitalize())
 
     def test_order_by(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         guerande = create_city_guerande()
 
         siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350")
@@ -327,6 +327,7 @@ class JobDescriptionSearchViewTest(TestCase):
         assert list(siaes_results) == [job2, job1, job3]
 
     def test_is_popular(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
         job = SiaeJobDescriptionFactory(siae=siae)
@@ -348,6 +349,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
 
     def test_no_department(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         st_andre = create_city_saint_andre()
         siae_without_dpt = SiaeFactory(department="", coords=st_andre.coords, post_code="44117", kind=SiaeKind.AI)
         siae = SiaeFactory(department="44", coords=st_andre.coords, post_code="44117", kind=SiaeKind.AI)
