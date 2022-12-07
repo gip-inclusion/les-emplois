@@ -36,7 +36,8 @@ with candidats_p as ( /* Ici on sélectionne les colonnes pertinentes à partir 
 prescripteurs as (
     select 
         id,
-        nom_département as nom_département_prescripteur /* Ajout du département du prescripteur pour les TBs privés */
+        nom_département as nom_département_prescripteur, /* Ajout du département du prescripteur pour les TBs privés */
+        région as nom_région_prescripteur
     from organisations o 
 )
 select /* On selectionne les colonnes finales qui nous intéressent */
@@ -90,6 +91,7 @@ select /* On selectionne les colonnes finales qui nous intéressent */
     nom_auteur_diagnostic,
     id_org_prescripteur,
     nom_département_prescripteur,
+    nom_région_prescripteur,
     total_candidatures,
     total_diagnostics,
     total_embauches,
