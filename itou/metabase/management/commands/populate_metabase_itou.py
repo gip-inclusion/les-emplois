@@ -23,6 +23,7 @@ Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for 
 import gc
 from collections import OrderedDict
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -34,7 +35,6 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
-from itou.metabase import constants
 from itou.metabase.db import MetabaseDatabaseCursor
 from itou.metabase.management.commands import (
     _approvals,
@@ -57,7 +57,6 @@ from itou.metabase.management.commands._utils import (
     chunked_queryset,
     compose,
     convert_boolean_to_int,
-    enable_sql_logging,
     get_active_siae_pks,
     hash_content,
 )
@@ -68,8 +67,20 @@ from itou.utils.python import timeit
 from itou.utils.slack import send_slack_message
 
 
-if constants.METABASE_SHOW_SQL_REQUESTS:
-    enable_sql_logging()
+METABASE_DRY_RUN_ROWS_PER_QUERYSET = 1000
+
+# Set how many rows are inserted at a time in metabase database.
+# A bigger number makes the script faster until a certain point,
+# but it also increases RAM usage.
+# -- Bench results for self.populate_approvals()
+# by batch of 100 => 2m38s
+# by batch of 1000 => 2m23s
+# -- Bench results for self.populate_diagnostics()
+# by batch of 1 => 2m51s
+# by batch of 10 => 19s
+# by batch of 100 => 5s
+# by batch of 1000 => 5s
+METABASE_INSERT_BATCH_SIZE = 100
 
 
 class Command(BaseCommand):
@@ -166,9 +177,7 @@ class Command(BaseCommand):
             self.cleanup_tables(table_name)
 
             if self.dry_run:
-                total_rows = sum(
-                    [min(queryset.count(), constants.METABASE_DRY_RUN_ROWS_PER_QUERYSET) for queryset in querysets]
-                )
+                total_rows = sum([min(queryset.count(), METABASE_DRY_RUN_ROWS_PER_QUERYSET) for queryset in querysets])
             else:
                 total_rows = sum([queryset.count() for queryset in querysets])
 
@@ -230,10 +239,10 @@ class Command(BaseCommand):
                     injections = 0
                     total_injections = queryset.count()
                     if self.dry_run:
-                        total_injections = min(total_injections, constants.METABASE_DRY_RUN_ROWS_PER_QUERYSET)
+                        total_injections = min(total_injections, METABASE_DRY_RUN_ROWS_PER_QUERYSET)
 
-                    # Insert rows by batch of constants.METABASE_INSERT_BATCH_SIZE.
-                    for chunk_qs in chunked_queryset(queryset, chunk_size=constants.METABASE_INSERT_BATCH_SIZE):
+                    # Insert rows by batch of METABASE_INSERT_BATCH_SIZE.
+                    for chunk_qs in chunked_queryset(queryset, chunk_size=METABASE_INSERT_BATCH_SIZE):
                         injections_left = total_injections - injections
                         if injections_left == 0:
                             break  # During a dry run stop as soon as we have injected enough rows.

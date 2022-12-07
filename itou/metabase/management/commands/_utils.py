@@ -24,13 +24,6 @@ from itou.utils.python import timeit
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-def enable_sql_logging():
-    # Unfortunately each SQL query log appears twice ¬_¬
-    db_logger = logging.getLogger("django.db.backends")
-    db_logger.setLevel(logging.DEBUG)
-    db_logger.addHandler(logging.StreamHandler())
-
-
 def convert_boolean_to_int(b):
     # True => 1, False => 0, None => None.
     return None if b is None else int(b)

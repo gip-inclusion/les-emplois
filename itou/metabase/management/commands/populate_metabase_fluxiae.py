@@ -58,12 +58,10 @@ One mission has many EMI.
 An EMI does not necessarily have a mission.
 
 """
-from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from itou.metabase import constants
 from itou.metabase.management.commands._dataframes import store_df
-from itou.metabase.management.commands._utils import build_final_tables, enable_sql_logging
+from itou.metabase.management.commands._utils import build_final_tables
 
 # FIXME(vperron): Those helpers are shared between populate_metabase and import_siae.
 # It would make a lot more sense, to avoid eventual circular imports, to move everything
@@ -72,10 +70,6 @@ from itou.metabase.management.commands._utils import build_final_tables, enable_
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames
 from itou.utils.python import timeit
 from itou.utils.slack import send_slack_message
-
-
-if constants.METABASE_SHOW_SQL_REQUESTS:
-    enable_sql_logging()
 
 
 class Command(BaseCommand):
