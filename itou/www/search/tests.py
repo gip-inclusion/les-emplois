@@ -420,16 +420,24 @@ class JobDescriptionSearchViewTest(TestCase):
         siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
         romes = Rome.objects.all().order_by("code")
         job1 = SiaeJobDescriptionFactory(
-            siae=siae, appellation=romes[0].appellations.first(), contract_type=ContractType.APPRENTICESHIP
+            siae=siae,
+            appellation=romes[0].appellations.first(),
+            contract_type=ContractType.APPRENTICESHIP,
+            custom_name="Eviteur de Flakyness",
         )
         job2 = SiaeJobDescriptionFactory(
-            siae=siae, appellation=romes[1].appellations.first(), contract_type=ContractType.BUSINESS_CREATION
+            siae=siae,
+            appellation=romes[1].appellations.first(),
+            contract_type=ContractType.BUSINESS_CREATION,
+            custom_name="Forceur de Nom de Métier",
         )
 
         inactive_siae = SiaeFactory(
             department="45", coords=city.coords, post_code="44117", kind=SiaeKind.EI, convention=None
         )
-        job3 = SiaeJobDescriptionFactory(siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP)
+        job3 = SiaeJobDescriptionFactory(
+            siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP, custom_name="Métier Inutilisé"
+        )
 
         # no filter: returns everything.
         response = self.client.get(
