@@ -42,5 +42,10 @@
             {% bootstrap_field form.contract_types form_group_class="form-group mt-2" label_class="h3 font-weight-bold text-muted" %}
         {% endif %}
 
+        {% if form.domains %}
+            <hr>
+            {% bootstrap_field form.domains form_group_class="form-group mt-2" label_class="h3 font-weight-bold text-muted" %}
+        {% endif %}
+
     </div>
 </div>

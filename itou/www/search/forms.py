@@ -4,6 +4,7 @@ from django.utils.datastructures import MultiValueDict
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
+from itou.jobs.models import ROME_DOMAINS
 from itou.siaes.enums import ContractType, SiaeKind
 
 
@@ -106,6 +107,13 @@ class JobDescriptionSearchForm(SiaeSearchForm):
     contract_types = forms.MultipleChoiceField(
         label="Types de contrats",
         choices=CONTRACT_TYPE_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    domains = forms.MultipleChoiceField(
+        label="Domaines métier",
+        choices=list(ROME_DOMAINS.items()),
         required=False,
         widget=forms.CheckboxSelectMultiple,
     )

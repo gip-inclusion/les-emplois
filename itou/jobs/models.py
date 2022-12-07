@@ -6,6 +6,26 @@ from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 
 
+# This list has been retrieved by an API call to
+# <PE_API_URL>/partenaire/rome/v1/granddomaine
+ROME_DOMAINS = {
+    "A": "Agriculture et Pêche, Espaces naturels et Espaces verts, Soins aux animaux",
+    "B": "Arts et Façonnage d'ouvrages d'art",
+    "C": "Banque, Assurance, Immobilier",
+    "D": "Commerce, Vente et Grande distribution",
+    "E": "Communication, Média et Multimédia",
+    "F": "Construction, Bâtiment et Travaux publics",
+    "G": "Hôtellerie-Restauration, Tourisme, Loisirs et Animation",
+    "H": "Industrie",
+    "I": "Installation et Maintenance",
+    "J": "Santé",
+    "K": "Services à la personne et à la collectivité",
+    "L": "Spectacle",
+    "M": "Support à l'entreprise",
+    "N": "Transport et Logistique",
+}
+
+
 class Rome(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     code = models.CharField(verbose_name="Code ROME", max_length=5, primary_key=True)

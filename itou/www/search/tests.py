@@ -7,7 +7,7 @@ from itou.cities.factories import create_city_guerande, create_city_saint_andre,
 from itou.cities.models import City
 from itou.job_applications.factories import JobApplicationFactory
 from itou.jobs.factories import create_test_romes_and_appellations
-from itou.jobs.models import Appellation
+from itou.jobs.models import Appellation, Rome
 from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
@@ -413,3 +413,58 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertNotContains(response, capfirst(job1.display_name), html=True)
         self.assertNotContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
+
+    def test_domains(self):
+        create_test_romes_and_appellations(("N1101", "M1805"))
+        city = create_city_saint_andre()
+        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
+        romes = Rome.objects.all().order_by("code")
+        job1 = SiaeJobDescriptionFactory(
+            siae=siae, appellation=romes[0].appellations.first(), contract_type=ContractType.APPRENTICESHIP
+        )
+        job2 = SiaeJobDescriptionFactory(
+            siae=siae, appellation=romes[1].appellations.first(), contract_type=ContractType.BUSINESS_CREATION
+        )
+
+        inactive_siae = SiaeFactory(
+            department="45", coords=city.coords, post_code="44117", kind=SiaeKind.EI, convention=None
+        )
+        job3 = SiaeJobDescriptionFactory(siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP)
+
+        # no filter: returns everything.
+        response = self.client.get(
+            self.url,
+            {"city": city.slug},
+        )
+
+        displayed_job_name_1 = capfirst(job1.display_name)
+        displayed_job_name_2 = capfirst(job2.display_name)
+        displayed_job_name_3 = capfirst(job3.display_name)
+
+        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, displayed_job_name_1, html=True)
+        self.assertContains(response, displayed_job_name_2, html=True)
+        self.assertNotContains(response, displayed_job_name_3, html=True)
+
+        # pass both domains
+        response = self.client.get(self.url, {"city": city.slug, "domains": ["N", "M"]})
+        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, displayed_job_name_1, html=True)
+        self.assertContains(response, displayed_job_name_2, html=True)
+        self.assertNotContains(response, displayed_job_name_3, html=True)
+
+        # filter it down.
+        response = self.client.get(self.url, {"city": city.slug, "domains": ["M"]})
+        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, displayed_job_name_1, html=True)
+        self.assertNotContains(response, displayed_job_name_2, html=True)
+        self.assertNotContains(response, displayed_job_name_3, html=True)
+
+        response = self.client.get(
+            self.url,
+            {"city": city.slug, "domains": ["WAT"]},
+        )
+        self.assertContains(response, "Aucun résultat")
+        self.assertNotContains(response, displayed_job_name_1, html=True)
+        self.assertNotContains(response, displayed_job_name_2, html=True)
+        self.assertNotContains(response, displayed_job_name_3, html=True)

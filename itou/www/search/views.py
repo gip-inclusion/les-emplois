@@ -81,6 +81,13 @@ class EmployerSearchBaseView(FormView):
         if districts:
             siaes = siaes.filter(post_code__in=districts)
 
+        domains = self.request.GET.getlist("domains")
+        if domains:
+            query = Q()
+            for domain in domains:
+                query |= Q(appellation__rome__code__startswith=domain)
+            job_descriptions = job_descriptions.filter(query)
+
         context = {
             "form": form,
             "ea_eatt_kinds": [SiaeKind.EA, SiaeKind.EATT],
@@ -94,6 +101,7 @@ class EmployerSearchBaseView(FormView):
                     "kinds": kinds,
                     "contract_types": contract_types,
                     "departments": departments,
+                    "domains": domains,
                 },
                 doseq=True,
             ),
