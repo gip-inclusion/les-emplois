@@ -74,7 +74,7 @@ DATABASES["default"]["NAME"] = os.getenv("PGDATABASE", "itou")  # noqa: F405
 DATABASES["default"]["USER"] = os.getenv("PGUSER", "postgres")  # noqa: F405
 DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")  # noqa: F405
 
-if os.getenv("SQL_DEBUG", "False") == "True":
+if SQL_DEBUG:  # noqa: F405
     LOGGING.setdefault("loggers", {})["django.db.backends"] = {  # noqa: F405
         "level": "DEBUG",
         "handlers": ["console"],

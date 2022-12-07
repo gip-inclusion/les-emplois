@@ -181,6 +181,8 @@ DATABASES = {
     }
 }
 
+SQL_DEBUG = bool(os.getenv("SQL_DEBUG"))
+
 if os.getenv("DATABASE_PERSISTENT_CONNECTIONS") == "True":
     # Since we have the health checks enabled, no need to define a max age:
     # if the connection was closed on the database side, the check will detect it
