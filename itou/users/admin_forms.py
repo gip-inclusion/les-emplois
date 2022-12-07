@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
 
 from itou.users.models import User
+from itou.utils.apis.exceptions import AddressLookupError
 
 
 class UserAdminForm(UserChangeForm):
@@ -44,3 +45,11 @@ class UserAdminForm(UserChangeForm):
         nir = self.cleaned_data["nir"]
         if nir and self.instance.nir_already_exists(nir=nir, exclude_pk=self.instance.pk):
             raise ValidationError("Le NIR de ce candidat est déjà associé à un autre utilisateur.")
+
+        if self.instance.is_job_seeker:
+            # Update job seeker geolocation
+            try:
+                self.instance.set_coords(self.cleaned_data["address_line_1"], self.cleaned_data["post_code"])
+            except AddressLookupError:
+                # Nothing to do: re-raised and already logged as error
+                pass

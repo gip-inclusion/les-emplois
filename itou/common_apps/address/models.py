@@ -51,10 +51,19 @@ class AddressMixin(models.Model):
         blank=True,
         help_text="Appartement, suite, bloc, bâtiment, boite postale, etc.",
     )
-    post_code = models.CharField(verbose_name="Code Postal", validators=[validate_post_code], max_length=5, blank=True)
+    post_code = models.CharField(
+        verbose_name="Code Postal",
+        validators=[validate_post_code],
+        max_length=5,
+        blank=True,
+    )
     city = models.CharField(verbose_name="Ville", max_length=255, blank=True)
     department = models.CharField(
-        verbose_name="Département", choices=DEPARTMENT_CHOICES, max_length=3, blank=True, db_index=True
+        verbose_name="Département",
+        choices=DEPARTMENT_CHOICES,
+        max_length=3,
+        blank=True,
+        db_index=True,
     )
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
@@ -95,7 +104,11 @@ class AddressMixin(models.Model):
     def address_on_one_line(self):
         if not all([self.address_line_1, self.post_code, self.city]):
             return None
-        fields = [self.address_line_1, self.address_line_2, f"{self.post_code} {self.city}"]
+        fields = [
+            self.address_line_1,
+            self.address_line_2,
+            f"{self.post_code} {self.city}",
+        ]
         return ", ".join([field for field in fields if field])
 
     @property
@@ -145,8 +158,6 @@ class AddressMixin(models.Model):
     def set_coords(self, address, post_code=None):
         try:
             geocoding_data = get_geocoding_data(address, post_code=post_code)
-            self.coords = geocoding_data["coords"]
-            self.geocoding_score = geocoding_data["score"]
         except GeocodingDataError as exc:
             # The coordinates are not erased because they are used in the search engine,
             # even if they no longer correspond to the address.
@@ -154,6 +165,9 @@ class AddressMixin(models.Model):
             raise AddressLookupError(
                 f"L'adresse '{ address }' - { post_code } n'a pas été trouvée dans la Base Adresse Nationale."
             ) from exc
+        else:
+            self.coords = geocoding_data["coords"]
+            self.geocoding_score = geocoding_data["score"]
 
     def clean(self):
         if self.department != department_from_postcode(self.post_code):

@@ -112,7 +112,12 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["birthdate", "phone", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        fields = [
+            "birthdate",
+            "phone",
+            "pole_emploi_id",
+            "lack_of_pole_emploi_id_reason",
+        ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
             "phone": "Par exemple 0610203040.",
@@ -175,7 +180,14 @@ class CreateJobSeekerStep2ForSenderForm(MandatoryAddressFormMixin, forms.ModelFo
 
     class Meta:
         model = User
-        fields = ["address_line_1", "address_line_2", "post_code", "city_slug", "city", "phone"]
+        fields = [
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city_slug",
+            "city",
+            "phone",
+        ]
 
 
 class CreateJobSeekerStep3ForSenderForm(forms.ModelForm):
@@ -197,7 +209,9 @@ class CreateJobSeekerStep3ForSenderForm(forms.ModelForm):
 
     # This field is a subset of the possible choices of `has_rsa_allocation` model field
     has_rsa_allocation = forms.ChoiceField(
-        required=False, label="Majoration du RSA", choices=asp_models.RSAAllocation.choices[1:]
+        required=False,
+        label="Majoration du RSA",
+        choices=asp_models.RSAAllocation.choices[1:],
     )
 
     def __init__(self, *args, **kwargs):
@@ -237,7 +251,10 @@ class CreateJobSeekerStep3ForSenderForm(forms.ModelForm):
             elif not self.cleaned_data.get("pole_emploi_id") and not self.has_error("pole_emploi_id"):
                 # The 'pole_emploi_id' field is missing when its validation fails,
                 # also don't stack a 'missing field' error if an error already exists ('wrong format' in this case)
-                self.add_error("pole_emploi_id", forms.ValidationError("L'identifiant Pôle emploi est obligatoire"))
+                self.add_error(
+                    "pole_emploi_id",
+                    forms.ValidationError("L'identifiant Pôle emploi est obligatoire"),
+                )
         else:
             self.cleaned_data["pole_emploi_id_forgotten"] = ""
             self.cleaned_data["pole_emploi_id"] = ""
@@ -246,7 +263,10 @@ class CreateJobSeekerStep3ForSenderForm(forms.ModelForm):
         # Handle RSA extra fields
         if self.cleaned_data["rsa_allocation"]:
             if not self.cleaned_data["has_rsa_allocation"]:
-                self.add_error("has_rsa_allocation", forms.ValidationError("La majoration RSA est obligatoire"))
+                self.add_error(
+                    "has_rsa_allocation",
+                    forms.ValidationError("La majoration RSA est obligatoire"),
+                )
         else:
             self.cleaned_data["has_rsa_allocation"] = asp_models.RSAAllocation.NO
 
@@ -549,7 +569,9 @@ class FilterJobApplicationsForm(forms.Form):
     """
 
     states = forms.MultipleChoiceField(
-        required=False, choices=JobApplicationWorkflow.STATE_CHOICES, widget=forms.CheckboxSelectMultiple
+        required=False,
+        choices=JobApplicationWorkflow.STATE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
     )
     start_date = forms.DateField(
         label="À partir du",
@@ -648,7 +670,9 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     criteria = forms.MultipleChoiceField(required=False, label="", widget=Select2MultipleWidget)
     eligibility_validated = forms.BooleanField(label="Éligibilité validée", required=False)
     departments = forms.MultipleChoiceField(
-        required=False, label="Département du candidat", widget=forms.CheckboxSelectMultiple
+        required=False,
+        label="Département du candidat",
+        widget=forms.CheckboxSelectMultiple,
     )
     selected_jobs = forms.MultipleChoiceField(
         required=False, label="Fiches de poste", widget=forms.CheckboxSelectMultiple
@@ -711,7 +735,9 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
     """
 
     sender_organizations = forms.MultipleChoiceField(
-        required=False, label="Nom de l'organisme prescripteur", widget=Select2MultipleWidget
+        required=False,
+        label="Nom de l'organisme prescripteur",
+        widget=Select2MultipleWidget,
     )
 
     def __init__(self, job_applications_qs, siae, *args, **kwargs):

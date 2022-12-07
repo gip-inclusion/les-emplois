@@ -8,6 +8,7 @@ from itou.job_applications.notifications import (
 )
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
@@ -79,6 +80,13 @@ class EditUserInfoForm(MandatoryAddressFormMixin, forms.ModelForm):
         super().clean()
         if self.instance.is_job_seeker:
             self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
+
+            # Update job seeker geolocation
+            try:
+                self.instance.set_coords(self.cleaned_data["address_line_1"], self.cleaned_data["post_code"])
+            except AddressLookupError:
+                # Nothing to do: re-raised and already logged as error
+                pass
 
 
 class EditUserEmailForm(forms.Form):

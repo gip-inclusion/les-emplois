@@ -23,6 +23,7 @@ from itou.job_applications.notifications import (
 )
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import JobSeekerProfile, User
+from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.perms.user import get_user_info
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.storage.s3 import S3Upload
@@ -578,6 +579,14 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         else:
             profile = JobSeekerProfile(user=user, **self._get_profile_data_from_session())
             profile.save()
+
+            try:
+                user.set_coords(user.address_line_1, user.post_code)
+            except AddressLookupError:
+                # Nothing to do: re-raised and already logged as error
+                pass
+            else:
+                user.save()
 
             self.apply_session.set("job_seeker_pk", profile.user.pk)
             self.job_seeker_session.delete()  # Point of no return
