@@ -137,7 +137,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
 
 @admin.register(models.EvaluatedSiae)
 class EvaluatedSiaeAdmin(admin.ModelAdmin):
-    list_display = ("evaluation_campaign", "siae", "reviewed_at")
+    list_display = ["evaluation_campaign", "siae", "state", "reviewed_at"]
     list_display_links = ("siae",)
     readonly_fields = (
         "evaluation_campaign",
