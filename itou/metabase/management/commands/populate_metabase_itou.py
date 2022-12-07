@@ -58,7 +58,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.python import timeit
-from itou.utils.slack import send_slack_message
 
 
 # Set how many rows are inserted at a time in metabase database.
@@ -409,6 +408,4 @@ class Command(BaseCommand):
 
     @timeit
     def handle(self, mode, **options):
-        send_slack_message(f":rocket: Mise à jour Metabase mode={mode}")
         self.MODE_TO_OPERATION[mode]()
-        send_slack_message(f":white_check_mark: Fin de la mise à jour Metabase mode={mode}")

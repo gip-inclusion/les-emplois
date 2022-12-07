@@ -11,7 +11,6 @@ from psycopg2 import extras as psycopg2_extras, sql
 
 from itou.metabase.db import MetabaseDatabaseCursor
 from itou.utils import constants
-from itou.utils.slack import send_slack_message
 
 
 DASHBOARDS_TO_DOWNLOAD = {
@@ -53,7 +52,6 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
     def handle(self, wet_run=False, **options):
-        send_slack_message(":rocket: Démarrage de la mise à jour des données Matomo")
         today = datetime.date.today()
         max_date = datetime.date.today() - datetime.timedelta(days=today.weekday() + 1)
 
@@ -110,5 +108,3 @@ class Command(BaseCommand):
                 )
                 psycopg2_extras.execute_values(cursor, insert_query, all_rows)
                 conn.commit()
-
-            send_slack_message(":white_check_mark: Mise à jour des données Matomo terminée")
