@@ -12,6 +12,7 @@ from itou.users.factories import UserFactory
 from itou.users.models import User
 from itou.utils.testing import reload_module
 
+from ..constants import OIDC_STATE_EXPIRATION
 from ..models import TooManyKindsException
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
@@ -72,7 +73,7 @@ class FranceConnectTest(TestCase):
         self.assertIsNotNone(state)
 
         # Set expired creation time for the state
-        state.created_at = timezone.now() - constants.FRANCE_CONNECT_STATE_EXPIRATION * 2
+        state.created_at = timezone.now() - OIDC_STATE_EXPIRATION * 2
         state.save()
 
         FranceConnectState.objects.cleanup()
