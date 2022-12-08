@@ -2,15 +2,11 @@
 {% block body %}
 Bonjour,
 
-La {{evaluation_campaign.institution.name}} a vérifié tous les justificatifs que vous avez transmis dans le cadre du contrôle a posteriori sur vos embauches réalisées en auto-prescription entre le {{evaluation_campaign.evaluated_period_start_at|date:"d E Y"}} et le {{evaluation_campaign.evaluated_period_end_at|date:"d E Y"}}
+Vous trouverez ci-après le résultat du contrôle a posteriori sur vos auto-prescriptions réalisées entre le {{evaluation_campaign.evaluated_period_start_at|date:"d E Y"}} et le {{evaluation_campaign.evaluated_period_end_at|date:"d E Y"}}.
 
-Suite à cette vérification, un ou plusieurs justificatifs sont attendus par la {{evaluation_campaign.institution.name}}.
+La {{evaluation_campaign.institution.name}} a vérifié les nouveaux justificatifs transmis par votre structure {{ siae.kind }} {{ siae.name }} ID-{{siae.id}} dans le cadre de la phase contradictoire du contrôle a posteriori sur vos embauches réalisées en auto-prescription entre le {{evaluation_campaign.evaluated_period_start_at|date:"d E Y"}} et le {{evaluation_campaign.evaluated_period_end_at|date:"d E Y"}}.
 
-Rendez-vous sur le tableau de bord de {{ siae.kind }} {{ siae.name }} ID-{{siae.id}} à la rubrique “Justifier mes auto-prescriptions”.
-
-Les embauches avec le statut “nouveaux justificatifs à traiter”, nécessitent la transmission d’un nouveau justificatif pour chaque critère concerné.  Dans la page de chaque auto-prescription, un commentaire concernant le refus du premier justificatif peut être présent afin de vous fournir plus de précisions.
-
-En cas de besoin, vous pouvez consulter ce mode d’emploi : {{ itou_community_url }}/doc/non-knowledgebase/controle-a-posteriori-pour-les-siae/
+Un ou plusieurs de vos justificatifs n’ont pas été validés par conséquent votre résultat concernant cette procédure est négatif (vous serez alerté des sanctions éventuelles concernant votre SIAE prochainement) conformément à l’instruction N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative à la mise en œuvre opérationnelle du contrôle a posteriori des recrutements en auto-prescription prévu par les articles R. 5132-1-12 à R. 5132-1-17 du code du travail.
 
 Cordialement,
 {% endblock %}

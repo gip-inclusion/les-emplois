@@ -2067,7 +2067,8 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
 
         # refused
         self.evaluated_siae.reviewed_at = None
-        self.evaluated_siae.save(update_fields=["reviewed_at"])
+        self.evaluated_siae.final_reviewed_at = None
+        self.evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=self.evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
@@ -2114,7 +2115,39 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         )
         [email] = mail.outbox
         assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
-        assert "la conformité des justificatifs" in email.body
+        assert "a validé la conformité des justificatifs" in email.body
+
+    def test_accepted_after_adversarial(self):
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            evaluation_campaign__institution=self.institution,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
+            siae__name="Les petits jardins",
+            reviewed_at=timezone.now() - relativedelta(days=1),
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            uploaded_at=timezone.now() - relativedelta(hours=2),
+            submitted_at=timezone.now() - relativedelta(hours=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_validation",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+        )
+        [email] = mail.outbox
+        assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
+        assert "a validé la conformité des nouveaux justificatifs" in email.body
 
     def test_refused(self):
         evaluated_siae = EvaluatedSiaeFactory.create(
@@ -2146,3 +2179,35 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         [email] = mail.outbox
         assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
         assert "un ou plusieurs justificatifs sont attendus" in email.body
+
+    def test_refused_after_adversarial(self):
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            evaluation_campaign__institution=self.institution,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
+            siae__name="Les petits jardins",
+            reviewed_at=timezone.now() - relativedelta(days=1),
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            uploaded_at=timezone.now() - relativedelta(hours=2),
+            submitted_at=timezone.now() - relativedelta(hours=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_validation",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+        )
+        [email] = mail.outbox
+        assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
+        assert "plusieurs de vos justificatifs n’ont pas été validés" in email.body
