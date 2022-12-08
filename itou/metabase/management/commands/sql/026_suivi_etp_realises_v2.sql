@@ -8,6 +8,7 @@ with constantes as (
 
 select 
     distinct emi.emi_pph_id as identifiant_salarie, /* ici on considère bien le salarié qu'une fois pour éviter des doublons et donc sur estimer les ETPs */
+    emi.emi_afi_id as id_annexe_financiere,
     make_date(cast(emi.emi_sme_annee as integer), cast(emi.emi_sme_mois as integer), 1) as date_saisie,
     to_date (emi.emi_date_validation ,'dd/mm/yyyy') as date_validation_declaration,
     emi.emi_part_etp as nombre_etp_consommes_asp,

@@ -7,7 +7,8 @@ with constantes as
 )
 
 select
-    distinct af.af_numero_convention,
+    distinct af.af_id_annexe_financiere as id_annexe_financiere, 
+    af.af_numero_convention,
     af.af_numero_annexe_financiere,
     date_part('year', af.af_date_debut_effet_v2) as annee_af,
     af.af_etat_annexe_financiere_code,
