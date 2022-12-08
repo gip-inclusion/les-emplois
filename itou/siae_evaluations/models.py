@@ -399,27 +399,30 @@ class EvaluatedSiae(models.Model):
         ACCEPTED = evaluation_enums.EvaluatedSiaeState.ACCEPTED
         REFUSED = evaluation_enums.EvaluatedSiaeState.REFUSED
         ADVERSARIAL_STAGE = evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+        NOTIFICATION_PENDING = evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
         if self.state in {ACCEPTED, REFUSED, ADVERSARIAL_STAGE}:
-            adversarial_stage = bool(self.reviewed_at)
+            from_adversarial_stage = bool(self.reviewed_at)
+            previous_state = self.state
 
             now = timezone.now()
-            if self.state == ACCEPTED:
+            if previous_state == ACCEPTED:
                 self.reviewed_at = now
                 self.final_reviewed_at = now
-            elif self.state == REFUSED:
+            elif previous_state == REFUSED:
                 self.reviewed_at = now
-            elif self.state == ADVERSARIAL_STAGE:
+            elif previous_state == ADVERSARIAL_STAGE:
                 self.final_reviewed_at = now
             else:
                 raise TypeError(f"Cannot review an “{self.__class__.__name__}” with status “{self.state}”.")
             self.save()
-
+            # Invalidate the cache, a review changes the state of the evaluation.
+            del self.state
             email = {
                 (ACCEPTED, True): functools.partial(self.get_email_to_siae_reviewed, adversarial=True),
                 (ACCEPTED, False): functools.partial(self.get_email_to_siae_reviewed, adversarial=False),
-                (REFUSED, False): self.get_email_to_siae_refused,
-                (ADVERSARIAL_STAGE, True): self.get_email_to_siae_adversarial_stage,
-            }[(self.state, adversarial_stage)]()
+                (ADVERSARIAL_STAGE, False): self.get_email_to_siae_adversarial_stage,
+                (NOTIFICATION_PENDING, True): self.get_email_to_siae_refused,
+            }[(self.state, from_adversarial_stage)]()
             send_email_messages([email])
 
     @property
@@ -466,14 +469,14 @@ class EvaluatedSiae(models.Model):
         body = "siae_evaluations/email/to_siae_reviewed_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def get_email_to_siae_refused(self):
+    def get_email_to_siae_adversarial_stage(self):
         to = self.siae.active_admin_members.values_list("email", flat=True)
         context = {
             "evaluation_campaign": self.evaluation_campaign,
             "siae": self.siae,
         }
-        subject = "siae_evaluations/email/to_siae_refused_subject.txt"
-        body = "siae_evaluations/email/to_siae_refused_body.txt"
+        subject = "siae_evaluations/email/to_siae_adversarial_stage_subject.txt"
+        body = "siae_evaluations/email/to_siae_adversarial_stage_body.txt"
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_forced_to_adversarial_stage(self):
@@ -491,14 +494,14 @@ class EvaluatedSiae(models.Model):
         body = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def get_email_to_siae_adversarial_stage(self):
+    def get_email_to_siae_refused(self):
         to = self.siae.active_admin_members.values_list("email", flat=True)
         context = {
             "evaluation_campaign": self.evaluation_campaign,
             "siae": self.siae,
         }
-        subject = "siae_evaluations/email/to_siae_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_siae_adversarial_stage_body.txt"
+        subject = "siae_evaluations/email/to_siae_refused_subject.txt"
+        body = "siae_evaluations/email/to_siae_refused_body.txt"
         return get_email_message(to, context, subject, body)
 
     def get_email_to_siae_notify_before_campaign_close(self):
