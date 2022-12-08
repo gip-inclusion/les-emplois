@@ -119,3 +119,17 @@ class Command(BaseCommand):
 
         if wet_run:
             update_table_at_date(METABASE_DASHBOARDS_TABLE_NAME, column_names, at, all_rows)
+
+        all_rows = []
+        custom_var_options = base_options | {
+            "idSite": "117",
+            "flat": "1",
+            "method": "CustomVariables.getCustomVariables",
+        }
+        for row in matomo_api_call(custom_var_options):
+            row["Date"] = at
+            column_names = list(row.keys())
+            all_rows.append(list(row.values()))
+
+        if wet_run:
+            update_table_at_date(METABASE_CUSTOM_VARS_TABLE_NAME, column_names, at, all_rows)
