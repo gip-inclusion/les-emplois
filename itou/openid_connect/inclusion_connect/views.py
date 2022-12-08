@@ -132,7 +132,10 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     if code is None or not InclusionConnectState.is_valid(state):
         return _redirect_to_login_page_on_error(error_msg="Missing code or invalid state.", request=request)
 
-    ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
+    ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
+    if ic_session is None:
+        return _redirect_to_login_page_on_error(error_msg="Missing session.", request=request)
+
     token_redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
 
     data = {
