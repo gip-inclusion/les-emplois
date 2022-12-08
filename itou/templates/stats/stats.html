@@ -23,7 +23,7 @@
     {% endif %}
 
     <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
-    <iframe src="{{ iframeurl }}" width="100%" onload="iFrameResize({}, this)" frameborder="0">
+    <iframe id="stats-iframe" src="{{ iframeurl }}" width="100%" frameborder="0">
     </iframe>
 
     {% if back_url %}
@@ -143,5 +143,13 @@
             };
         </script>
     {% endif %}
+{% endblock %}
 
+{% block script %}
+    {{ block.super }}
+    <script nonce="{{ CSP_NONCE }}">
+        document.getElementById("stats-iframe").addEventListener("load", function(){
+            iFrameResize({}, this)
+        });
+    </script>
 {% endblock %}
