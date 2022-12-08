@@ -577,11 +577,13 @@ CSP_DEFAULT_SRC = ["'self'"]
 CSP_FRAME_SRC = [
     "https://app.livestorm.co",  # Upcoming events from the homepage
     "https://stats.inclusion.beta.gouv.fr",
+    "*.hotjar.com",
 ]
 CSP_IMG_SRC = [
     "'self'",
     "data:",  # Because of tarteaucitron.js
     "*.tile.openstreetmap.org",
+    "*.hotjar.com",
 ]
 CSP_STYLE_SRC = [
     "'self'",
@@ -593,18 +595,21 @@ CSP_STYLE_SRC = [
 CSP_FONT_SRC = [
     "'self'",
     "https://fonts.gstatic.com",
+    "*.hotjar.com",
 ]
 CSP_SCRIPT_SRC = [
     "'self'",
     "https://stats.data.gouv.fr",
     "https://stats.inclusion.beta.gouv.fr",
-    "https://static.hotjar.com",
+    "*.hotjar.com",
     "https://cdnjs.cloudflare.com/",  # Used by select 2, gis widgets and maybe more in the future
 ]
 CSP_CONNECT_SRC = [
     "'self'",
     "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
     "https://stats.data.gouv.fr",
+    "*.hotjar.com",
+    "*.hotjar.io",
 ]
 if S3_STORAGE_ENDPOINT_DOMAIN:
     CSP_CONNECT_SRC += [
