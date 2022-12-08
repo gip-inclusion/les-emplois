@@ -1989,11 +1989,13 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
 
 
 class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         membership = InstitutionMembershipFactory()
-        self.user = membership.user
-        self.evaluation_campaign = EvaluationCampaignFactory(institution=membership.institution)
-        self.evaluated_siae = create_evaluated_siae_consistent_datas(self.evaluation_campaign)
+        cls.institution = membership.institution
+        cls.user = membership.user
+        cls.evaluation_campaign = EvaluationCampaignFactory(institution=membership.institution)
+        cls.evaluated_siae = create_evaluated_siae_consistent_datas(cls.evaluation_campaign)
 
     def test_access(self):
         self.client.force_login(self.user)
@@ -2082,3 +2084,65 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.evaluated_siae.refresh_from_db()
         self.assertEqual(timestamp, self.evaluated_siae.reviewed_at)
+
+    def test_accepted(self):
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            evaluation_campaign__institution=self.institution,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
+            siae__name="Les petits jardins",
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            uploaded_at=timezone.now() - relativedelta(hours=2),
+            submitted_at=timezone.now() - relativedelta(hours=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_validation",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+        )
+        [email] = mail.outbox
+        assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
+        assert "la conformité des justificatifs" in email.body
+
+    def test_refused(self):
+        evaluated_siae = EvaluatedSiaeFactory.create(
+            evaluation_campaign__institution=self.institution,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=1),
+            siae__name="Les petits jardins",
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            uploaded_at=timezone.now() - relativedelta(hours=2),
+            submitted_at=timezone.now() - relativedelta(hours=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_validation",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+        )
+        [email] = mail.outbox
+        assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
+        assert "un ou plusieurs justificatifs sont attendus" in email.body
