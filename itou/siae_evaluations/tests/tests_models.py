@@ -1047,27 +1047,6 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.refresh_from_db()
         self.assertIsNotNone(evaluated_siae.reviewed_at)
 
-    def test_review_emails(self):
-        fake_now = timezone.now()
-        values = [
-            (evaluation_enums.EvaluatedSiaeState.ACCEPTED, None, "la conformité des justificatifs"),
-            (evaluation_enums.EvaluatedSiaeState.ACCEPTED, fake_now, "la conformité des nouveaux justificatifs"),
-            (evaluation_enums.EvaluatedSiaeState.REFUSED, None, "un ou plusieurs justificatifs sont attendus"),
-            (
-                evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE,
-                fake_now,
-                "plusieurs de vos justificatifs n’ont pas été validés",
-            ),
-        ]
-
-        for state, reviewed_at, txt in values:
-            with mock.patch.object(EvaluatedSiae, "state", state):
-                with self.subTest(state=state, reviewed_at=reviewed_at, txt=txt):
-                    evaluated_siae = EvaluatedSiaeFactory(reviewed_at=reviewed_at)
-                    evaluated_siae.review()
-                    email = mail.outbox[-1]
-                    self.assertIn(txt, email.body)
-
     def test_get_email_to_institution_submitted_by_siae(self):
         institution = InstitutionWith2MembershipFactory()
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__institution=institution)
