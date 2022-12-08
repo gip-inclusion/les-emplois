@@ -603,6 +603,7 @@ CSP_SCRIPT_SRC = [
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
     "https://cdnjs.cloudflare.com/",  # Used by select 2, gis widgets and maybe more in the future
+    "https://cdn.jsdelivr.net",  # Used by redoc and maybe more
 ]
 CSP_CONNECT_SRC = [
     "'self'",

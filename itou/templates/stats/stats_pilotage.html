@@ -35,8 +35,13 @@
             <script src="{% static "vendor/iframe-resizer-4.3.2/iframeResizer.contentWindow.min.js" %}"></script>
             {% comment %} we took the scripts from {{stats_base_url}} to always use the same version{% endcomment %}
             <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
-            <iframe src="{{ iframeurl }}" width="100%" onload="iFrameResize({}, this)" frameborder="0">
+            <iframe id="stats-iframe" src="{{ iframeurl }}" width="100%" frameborder="0">
             </iframe>
+            <script nonce="{{ CSP_NONCE }}">
+                document.getElementById("stats-iframe").addEventListener("load", function(){
+                    iFrameResize({}, this)
+                });
+            </script>
         {% endblock %}
     </body>
 </html>
