@@ -610,21 +610,14 @@ CSP_SCRIPT_SRC = [
     "https://stats.data.gouv.fr",
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
-    "https://cdnjs.cloudflare.com/",  # Used by select 2, gis widgets and maybe more in the future
+    "https://translate.googleapis.com",  # Allow google translate
+    "https://cdnjs.cloudflare.com",  # Used by select 2, gis widgets and maybe more in the future
     "https://cdn.jsdelivr.net",  # Used by redoc and maybe more
     "https://tally.so/",
 ]
 # Some browsers don't seem to fallback on script-src if script-src-elem is not there
-CSP_SCRIPT_SRC_ELEM = [
-    "'self'",
-    "https://stats.data.gouv.fr",
-    "https://stats.inclusion.beta.gouv.fr",
-    "*.hotjar.com",
-    "https://translate.googleapis.com",  # Allow google translate
-    "https://cdnjs.cloudflare.com",  # Used by select 2, gis widgets and maybe more in the future
-    "https://stats.inclusion.beta.gouv.fr",
-    "https://tally.so/",
-]
+# But some other don't support script-src-elem... just copy one into the other
+CSP_SCRIPT_SRC_ELEM = CSP_SCRIPT_SRC
 CSP_CONNECT_SRC = [
     "'self'",
     "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
