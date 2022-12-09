@@ -155,6 +155,7 @@ class JobApplicationQuerySet(models.QuerySet):
         has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
         return self.annotate(has_suspended_approval=Exists(has_suspended_approval))
 
+    # We should store this in dedicated field and update it at each model.save()
     def with_last_change(self):
         return self.annotate(last_change=Greatest("created_at", Max("logs__timestamp")))
 
