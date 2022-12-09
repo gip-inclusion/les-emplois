@@ -593,9 +593,9 @@ CSP_STYLE_SRC = [
     "https://cdnjs.cloudflare.com/",  # Used by select 2, gis widgets and maybe more in the future
 ]
 CSP_FONT_SRC = [
-    "'self'",
-    "https://fonts.gstatic.com",
-    "*.hotjar.com",
+    "*",
+    # There are many users that override the font with extensions or with services such as google translates.
+    # For accessibility reasons we need to allow the user to chose the used font.
 ]
 CSP_SCRIPT_SRC = [
     "'self'",
