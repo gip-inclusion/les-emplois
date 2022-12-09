@@ -24,7 +24,7 @@ Accès direct à votre liste d’auto-prescriptions : {{ url }}
 
 Pour chaque embauche, cliquez sur “Sélectionner les critères”, les critères que vous avez enregistrés sont affichés.
 Sélectionnez le ou les critères que vous souhaitez justifier (un nombre minimum de justificatifs est requis en fonction du type de critères et de SIAE).
-Ensuite cliquez sur  “Ajouter un justificatif”  pour déposer le justificatif demandé.
+Ensuite cliquez sur “Ajouter un justificatif” pour déposer le justificatif demandé.
 
 3- Validez votre dossier de contrôle :
 
