@@ -288,6 +288,8 @@ class User(AbstractUser, AddressMixin):
         encoder=DjangoJSONEncoder,
     )
 
+    last_checked_at = models.DateTimeField(verbose_name="Date de dernière vérification", default=timezone.now)
+
     objects = ItouUserManager()
 
     class Meta(AbstractUser.Meta):
