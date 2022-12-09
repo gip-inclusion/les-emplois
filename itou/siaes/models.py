@@ -66,13 +66,14 @@ class SiaeQuerySet(OrganizationQuerySet):
     def within(self, point, distance_km):
         return self.filter(coords__dwithin=(point, D(km=distance_km)))
 
-    def prefetch_job_description_through(self, **kwargs):
+    def prefetch_job_description_through(self, with_is_popular=True, **kwargs):
         qs = (
             SiaeJobDescription.objects.filter(is_active=True, **kwargs)
-            .with_annotation_is_popular()
             .select_related("appellation__rome")
             .order_by("-updated_at", "-created_at")
         )
+        if with_is_popular:
+            qs = qs.with_annotation_is_popular()
         return self.prefetch_related(Prefetch("job_description_through", queryset=qs))
 
     def with_count_recent_received_job_apps(self):

@@ -25,6 +25,15 @@ class SiaeAPIFetchListTest(APITestCase):
             with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), department="44", coords=self.saint_andre.coords
         )
 
+    def test_performances(self):
+        num_queries = 1  # Get city with insee_code
+        num_queries += 1  # Count siaes
+        num_queries += 1  # Select sias
+        num_queries += 1  # prefetch job_description_through
+        with self.assertNumQueries(num_queries):
+            query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
+            self.client.get(ENDPOINT_URL, query_params, format="json")
+
     def test_fetch_siae_list_without_params(self):
         """
         The query parameters for INSEE code and distance are mandatories

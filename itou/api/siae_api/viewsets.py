@@ -126,7 +126,7 @@ On peut spécifier la direction de tri :
 
     def get_queryset(self):
         # We only get to this point if permissions are OK
-        queryset = Siae.objects
+        queryset = Siae.objects.prefetch_job_description_through(with_is_popular=False)
 
         # Get (registered) query parameters filters
         queryset = self._filter_by_query_params(self.request, queryset)
