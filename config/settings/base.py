@@ -579,7 +579,7 @@ CSP_FRAME_SRC = [
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
     "https://pilotage.inclusion.beta.gouv.fr",
-    "https://tally.so/",
+    "https://tally.so",
 ]
 CSP_IMG_SRC = [
     "'self'",
@@ -596,7 +596,7 @@ CSP_STYLE_SRC = [
     # It would be better to whilelist styles hashes but it's to much work for now.
     "'unsafe-inline'",
     "https://fonts.googleapis.com",
-    "https://cdnjs.cloudflare.com/",  # Used by select 2, gis widgets and maybe more in the future
+    "https://cdnjs.cloudflare.com",  # Used by select 2, gis widgets and maybe more in the future
 ]
 CSP_FONT_SRC = [
     # There are many users that override the font with extensions or with services such as google translates.
@@ -613,7 +613,7 @@ CSP_SCRIPT_SRC = [
     "https://translate.googleapis.com",  # Allow google translate
     "https://cdnjs.cloudflare.com",  # Used by select 2, gis widgets and maybe more in the future
     "https://cdn.jsdelivr.net",  # Used by redoc and maybe more
-    "https://tally.so/",
+    "https://tally.so",
 ]
 # Some browsers don't seem to fallback on script-src if script-src-elem is not there
 # But some other don't support script-src-elem... just copy one into the other
