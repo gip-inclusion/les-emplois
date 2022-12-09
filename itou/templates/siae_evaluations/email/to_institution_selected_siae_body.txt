@@ -4,18 +4,18 @@
 Bonjour,
 
 
-La procédure de  transmission des justificatifs dans le cadre du contrôle a posteriori sur les embauches réalisées en auto-prescription embauches réalisées entre le {{evaluated_period_start_at|date:"d E Y"}} et le {{evaluated_period_end_at|date:"d E Y"}}, est ouverte pour les SIAE.
+La procédure de transmission des justificatifs dans le cadre du contrôle a posteriori sur les embauches réalisées en auto-prescription embauches réalisées entre le {{evaluated_period_start_at|date:"d E Y"}} et le {{evaluated_period_end_at|date:"d E Y"}}, est ouverte pour les SIAE.
 
 Vous pouvez consulter la liste des SIAE qui ont été aléatoirement sélectionnées pour cette campagne de contrôle. Cette liste a été établie sur la base du taux de SIAE à contrôler que vous aviez préalablement validé.
 
 Cette phase de transmission et vérification des justificatifs est ouverte jusqu’au {{ end_date|date:"d E Y" }}. Passé ce délai les justificatifs non fournis par les SIAE seront enregistrés comme manquants.
 
-Comment ça marche ? 
+Comment ça marche ?
 
 1- Consultez la liste des SIAE soumises au contrôle et suivez l’avancée du dossier
 Dans votre tableau de bord, à la rubrique “ Contrôler les pièces justificatives” vous trouverez la liste des SIAE qui doivent justifier certaines de leurs auto-prescriptions.
 
-2- Suivez et vérifiez les pièces justificatives transmises par les SIAE 
+2- Suivez et vérifiez les pièces justificatives transmises par les SIAE
 Vous recevez une notification e-mail chaque fois qu’une SIAE transmet l’intégralité des justificatifs demandés.
 Vous pouvez consulter les justificatifs pour chaque salarié, les valider ou les rejeter en expliquant la raison.
 
@@ -23,7 +23,7 @@ Vous pouvez consulter les justificatifs pour chaque salarié, les valider ou les
 Après avoir traité toutes les justificatifs d’une SIAE, vous pouvez finaliser le contrôle en cliquant sur le bouton “Valider”. La SIAE sera automatiquement notifiée.
 
 
-Vous trouverez plus d’informations dans ce mode d’emploi :  https://communaute.inclusion.beta.gouv.fr/doc/emplois/mode-demploi-sur-le-controle-a-posteriori-pour-les-ddets/
+Vous trouverez plus d’informations dans ce mode d’emploi : https://communaute.inclusion.beta.gouv.fr/doc/emplois/mode-demploi-sur-le-controle-a-posteriori-pour-les-ddets/
 
 Cordialement,
 

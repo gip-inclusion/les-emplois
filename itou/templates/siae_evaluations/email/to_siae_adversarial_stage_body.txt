@@ -8,7 +8,7 @@ Suite à cette vérification, un ou plusieurs justificatifs sont attendus par la
 
 Rendez-vous sur le tableau de bord de {{ siae.kind }} {{ siae.name }} ID-{{siae.id}} à la rubrique “Justifier mes auto-prescriptions”.
 
-Les embauches avec le statut “nouveaux justificatifs à traiter”, nécessitent la transmission d’un nouveau justificatif pour chaque critère concerné.  Dans la page de chaque auto-prescription, un commentaire concernant le refus du premier justificatif peut être présent afin de vous fournir plus de précisions.
+Les embauches avec le statut “nouveaux justificatifs à traiter”, nécessitent la transmission d’un nouveau justificatif pour chaque critère concerné. Dans la page de chaque auto-prescription, un commentaire concernant le refus du premier justificatif peut être présent afin de vous fournir plus de précisions.
 
 En cas de besoin, vous pouvez consulter ce mode d’emploi : {{ itou_community_url }}/doc/non-knowledgebase/controle-a-posteriori-pour-les-siae/
 
