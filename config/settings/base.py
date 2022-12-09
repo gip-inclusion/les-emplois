@@ -620,6 +620,7 @@ CSP_SCRIPT_SRC_ELEM = [
     "https://tally.so/",
     "https://translate.googleapis.com",  # Allow google translate
     "https://cdnjs.cloudflare.com",  # Used by select 2, gis widgets and maybe more in the future
+    "https://stats.inclusion.beta.gouv.fr",
 ]
 CSP_CONNECT_SRC = [
     "'self'",
