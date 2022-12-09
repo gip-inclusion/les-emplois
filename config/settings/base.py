@@ -611,7 +611,14 @@ CSP_SCRIPT_SRC = [
     "https://cdnjs.cloudflare.com/",  # Used by select 2, gis widgets and maybe more in the future
     "https://cdn.jsdelivr.net",  # Used by redoc and maybe more
     "https://tally.so/",
-    "cdn.jsdelivr.net",  # Used by redoc
+]
+# Some browsers don't seem to fallback on script-src if script-src-elem is not there
+CSP_SCRIPT_SRC_ELEM = [
+    "'self'",
+    "*.hotjar.com",
+    "https://stats.data.gouv.fr",
+    "https://tally.so/",
+    "https://translate.googleapis.com",  # Allow google translate
 ]
 CSP_CONNECT_SRC = [
     "'self'",
@@ -619,6 +626,7 @@ CSP_CONNECT_SRC = [
     "https://stats.data.gouv.fr",
     "*.hotjar.com",
     "*.hotjar.io",
+    "https://translate.googleapis.com",  # Allow google translate
 ]
 if S3_STORAGE_ENDPOINT_DOMAIN:
     CSP_CONNECT_SRC += [
