@@ -615,12 +615,13 @@ CSP_SCRIPT_SRC = [
 # Some browsers don't seem to fallback on script-src if script-src-elem is not there
 CSP_SCRIPT_SRC_ELEM = [
     "'self'",
-    "*.hotjar.com",
     "https://stats.data.gouv.fr",
-    "https://tally.so/",
+    "https://stats.inclusion.beta.gouv.fr",
+    "*.hotjar.com",
     "https://translate.googleapis.com",  # Allow google translate
     "https://cdnjs.cloudflare.com",  # Used by select 2, gis widgets and maybe more in the future
     "https://stats.inclusion.beta.gouv.fr",
+    "https://tally.so/",
 ]
 CSP_CONNECT_SRC = [
     "'self'",
