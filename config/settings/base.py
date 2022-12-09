@@ -578,12 +578,18 @@ CSP_FRAME_SRC = [
     "https://app.livestorm.co",  # Upcoming events from the homepage
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
+    "https://pilotage.inclusion.beta.gouv.fr",
+    "https://tally.so/",
 ]
 CSP_IMG_SRC = [
     "'self'",
     "data:",  # Because of tarteaucitron.js
     "*.tile.openstreetmap.org",
     "*.hotjar.com",
+    "https://stats.data.gouv.fr",
+    "https://www.gstatic.com",  # Used by google translate
+    "https://translate.google.com",  # Used by google translate
+    "https://cdn.redoc.ly",
 ]
 CSP_STYLE_SRC = [
     "'self'",
@@ -604,6 +610,8 @@ CSP_SCRIPT_SRC = [
     "*.hotjar.com",
     "https://cdnjs.cloudflare.com/",  # Used by select 2, gis widgets and maybe more in the future
     "https://cdn.jsdelivr.net",  # Used by redoc and maybe more
+    "https://tally.so/",
+    "cdn.jsdelivr.net",  # Used by redoc
 ]
 CSP_CONNECT_SRC = [
     "'self'",
