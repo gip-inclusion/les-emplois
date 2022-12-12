@@ -226,6 +226,9 @@ class ItouUserAdmin(UserAdmin):
             },
         ),
     )
+    # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
+    assert "last_login" in fieldsets[-2][1]["fields"]
+    fieldsets[-2][1]["fields"] += ("last_checked_at",)
 
     def has_verified_email(self, obj):
         """
