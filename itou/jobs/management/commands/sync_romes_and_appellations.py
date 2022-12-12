@@ -37,8 +37,8 @@ class Command(BaseCommand):
         pe_client = pole_emploi_api_client()
 
         romes_data = pe_client.referentiel(pe_api_enums.REFERENTIEL_ROME)
-        for line in yield_sync_diff(romes_data, "code", Rome.objects.all(), "code", [("libelle", "name")]):
-            self.stdout.write(line)
+        for item in yield_sync_diff(romes_data, "code", Rome.objects.all(), "code", [("libelle", "name")]):
+            self.stdout.write(item.label)
 
         if wet_run:
             romes = [pe_data_to_rome(item, now) for item in romes_data]
@@ -52,10 +52,10 @@ class Command(BaseCommand):
             self.stdout.write(f"len={len(romes)} ROME entries have been created or updated.")
 
         appellations_data = pe_client.appellations()
-        for line in yield_sync_diff(
+        for item in yield_sync_diff(
             appellations_data, "code", Appellation.objects.all(), "code", [("libelle", "name")]
         ):
-            self.stdout.write(line)
+            self.stdout.write(item.label)
 
         if wet_run:
             appellations = [pe_data_to_appellation(item, now) for item in appellations_data]

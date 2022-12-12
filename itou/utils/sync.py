@@ -1,6 +1,25 @@
 import json
+from dataclasses import dataclass
+from enum import Enum, auto
+from typing import Callable
 
 from django.db.models import QuerySet
+
+
+class DiffItemKind(Enum):
+    ADDITION = auto()
+    DELETION = auto()
+    EDITION = auto()
+    SUMMARY = auto()
+
+
+@dataclass
+class DiffItem:
+    key: str
+    kind: DiffItemKind
+    label: str
+    raw: dict = None
+    db_pk: str | int | None = None  # database pk in the case of an update
 
 
 def yield_sync_diff(
@@ -8,7 +27,7 @@ def yield_sync_diff(
     collection_key: str,
     queryset: QuerySet,
     queryset_key: str,
-    compared_keys: list[tuple[str, str]],
+    compared_keys: list[tuple[str | Callable, str]],
 ):
     """An utility function to yield human readable differences between:
 
@@ -28,21 +47,34 @@ def yield_sync_diff(
     already_there = coll_codes.intersection(db_codes)
     removed_in_coll = db_codes - coll_codes
 
-    yield f"count={len(already_there)} label={label} had the same key in collection and queryset"
+    yield DiffItem(
+        None,
+        DiffItemKind.SUMMARY,
+        f"count={len(already_there)} label={label} had the same key in collection and queryset",
+    )
     for key in sorted(already_there):
         obj_db = db_map[key]
         obj_coll = data_map[key]
+        if not compared_keys:
+            yield DiffItem(key, DiffItemKind.EDITION, f"\tCHANGED item key={key}", obj_coll, obj_db.pk)
         for coll_key, db_key in compared_keys:
             db_val = getattr(obj_db, db_key)
-            col_val = obj_coll[coll_key]
+            col_val = obj_coll[coll_key] if isinstance(coll_key, str) else coll_key(obj_coll)
             if db_val != col_val:
-                yield f"\tCHANGED {db_key}={db_val} changes to {coll_key}={col_val}"
+                yield DiffItem(
+                    key,
+                    DiffItemKind.EDITION,
+                    f"\tCHANGED {db_key}={db_val} changed to value={col_val}",
+                    obj_coll,
+                    obj_db.pk,
+                )
 
-    yield f"count={len(added_by_coll)} label={label} added by collection"
+    yield DiffItem(None, DiffItemKind.SUMMARY, f"count={len(added_by_coll)} label={label} added by collection")
     for key in sorted(added_by_coll):
         obj_coll = data_map[key]
-        yield f"\tADDED {json.dumps(obj_coll, ensure_ascii=False)}"
+        yield DiffItem(key, DiffItemKind.ADDITION, f"\tADDED {json.dumps(obj_coll, ensure_ascii=False)}", obj_coll)
 
-    yield f"count={len(removed_in_coll)} label={label} removed by collection"
+    yield DiffItem(None, DiffItemKind.SUMMARY, f"count={len(removed_in_coll)} label={label} removed by collection")
     for key in sorted(removed_in_coll):
-        yield f"\tREMOVED {db_map[key]}"
+        obj_db = db_map[key]
+        yield DiffItem(key, DiffItemKind.DELETION, f"\tREMOVED {db_map[key]}", obj_db)

@@ -41,7 +41,7 @@ from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import get_user_info
-from itou.utils.sync import yield_sync_diff
+from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.tasks import sanitize_mailjet_recipients
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.test import TestCase
@@ -1117,12 +1117,38 @@ def test_yield_sync_diff():
     # longest possible time. Also choose a very simple model.
     from itou.jobs.models import Rome  # pylint: disable=import-outside-toplevel
 
+    # test trivial case
+    items = list(
+        yield_sync_diff(
+            [],
+            "key",
+            Rome.objects.all(),
+            "code",
+            [("label", "name")],
+        )
+    )
+    assert items == [
+        DiffItem(
+            key=None,
+            kind=DiffItemKind.SUMMARY,
+            label="count=0 label=Rome had the same key in collection and " "queryset",
+            raw=None,
+            db_pk=None,
+        ),
+        DiffItem(
+            key=None, kind=DiffItemKind.SUMMARY, label="count=0 label=Rome added by collection", raw=None, db_pk=None
+        ),
+        DiffItem(
+            key=None, kind=DiffItemKind.SUMMARY, label="count=0 label=Rome removed by collection", raw=None, db_pk=None
+        ),
+    ]
+
     Rome(code="FOO", name="Petit papa noel").save()
     Rome(code="BAR", name="contenu inchangé").save()
-    Rome(code="BAZ", name="Vas-y francky").save()
-    lines = [
-        line
-        for line in yield_sync_diff(
+    item_to_remove = Rome(code="BAZ", name="Vas-y francky")
+    item_to_remove.save()
+    items = list(
+        yield_sync_diff(
             [
                 {"key": "HELLO", "label": "nouvel objet stylé !"},
                 {"key": "BAR", "label": "contenu inchangé"},
@@ -1133,10 +1159,55 @@ def test_yield_sync_diff():
             "code",
             [("label", "name")],
         )
+    )
+    assert [d.kind for d in items] == [
+        DiffItemKind.SUMMARY,
+        DiffItemKind.EDITION,
+        DiffItemKind.SUMMARY,
+        DiffItemKind.ADDITION,
+        DiffItemKind.SUMMARY,
+        DiffItemKind.DELETION,
+    ]
+    assert [d.label for d in items] == [
+        "count=2 label=Rome had the same key in collection and queryset",
+        # only one item actually changed
+        "\tCHANGED name=Petit papa noel changed to value=quand tu descendras du ciel...",
+        "count=1 label=Rome added by collection",
+        '\tADDED {"key": "HELLO", "label": "nouvel objet stylé !"}',
+        "count=1 label=Rome removed by collection",
+        "\tREMOVED Vas-y francky (BAZ)",
+    ]
+    assert [d.key for d in items] == [None, "FOO", None, "HELLO", None, "BAZ"]
+    assert [d.raw for d in items] == [
+        None,
+        {"key": "FOO", "label": "quand tu descendras du ciel..."},
+        None,
+        {"key": "HELLO", "label": "nouvel objet stylé !"},
+        None,
+        item_to_remove,
+    ]
+    assert [d.db_pk for d in items] == [None, "FOO", None, None, None, None]
+
+    # check lambda and detailed keys
+    lines = [
+        diff_item.label
+        for diff_item in yield_sync_diff(
+            [
+                {"key": "HELLO", "label": "nouvel objet stylé !"},
+                {"key": "BAR", "label": "contenu inchangé"},
+                {"key": "FOO", "label": "quand tu descendras du ciel..."},
+            ],
+            "key",
+            Rome.objects.all(),
+            "code",
+            [],  # no compared detailed keys
+        )
     ]
     assert lines == [
         "count=2 label=Rome had the same key in collection and queryset",
-        "\tCHANGED name=Petit papa noel changes to label=quand tu descendras du ciel...",
+        # in this mode we get a line for every item having the same ID, even if the content did not change
+        "\tCHANGED item key=BAR",
+        "\tCHANGED item key=FOO",
         "count=1 label=Rome added by collection",
         '\tADDED {"key": "HELLO", "label": "nouvel objet stylé !"}',
         "count=1 label=Rome removed by collection",

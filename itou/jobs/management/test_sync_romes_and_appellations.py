@@ -47,7 +47,7 @@ def test_sync_rome_appellation(capsys, respx_mock):
     assert stderr == ""
     assert stdout.splitlines() == [
         "count=1 label=Rome had the same key in collection and queryset",
-        "\tCHANGED name=Patisserie changes to libelle=Pâtisserie avec accent",
+        "\tCHANGED name=Patisserie changed to value=Pâtisserie avec accent",
         "count=1 label=Rome added by collection",
         '\tADDED {"code": "MET01", "libelle": "Edition"}',
         "count=2 label=Rome removed by collection",
@@ -55,8 +55,8 @@ def test_sync_rome_appellation(capsys, respx_mock):
         "\tREMOVED Arts de la table (F002)",  # not really removed though by our command, see docstring
         "len=2 ROME entries have been created or updated.",
         "count=2 label=Appellation had the same key in collection and queryset",
-        "\tCHANGED name=Entraîneur sportif changes to libelle=Entraîneur sportif " "avéré",
-        "\tCHANGED name=Chef cuistot d'élite changes to libelle=Chef cuistor d'élite",
+        "\tCHANGED name=Entraîneur sportif changed to value=Entraîneur sportif " "avéré",
+        "\tCHANGED name=Chef cuistot d'élite changed to value=Chef cuistor d'élite",
         "count=1 label=Appellation added by collection",
         '\tADDED {"code": "JOB32", "libelle": "Ecriveur de bouquins", "metier": ' '{"code": "MET01"}}',
         "count=0 label=Appellation removed by collection",
