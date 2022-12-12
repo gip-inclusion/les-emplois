@@ -258,6 +258,8 @@ class ProcessViewsTest(TestCase):
                     state=state, job_seeker=job_seeker, to_siae=siae
                 )
                 self.client.force_login(siae_user)
+                previous_last_checked_at = job_seeker.last_checked_at
+
                 # Good duration.
                 hiring_start_at = today
                 post_data = {
@@ -286,6 +288,8 @@ class ProcessViewsTest(TestCase):
                     self.assertContains(response, f"Fin : {hiring_end_at.strftime('%d')}")
                 else:
                     self.assertContains(response, "Fin : Non renseigné")
+                # last_checked_at has been updated
+                assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 
         ##############
         # Exceptions #
