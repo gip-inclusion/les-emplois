@@ -19,6 +19,8 @@ def test_no_email_sent(client):
         {
             "date_joined_0": naive_now.date(),
             "date_joined_1": naive_now.time(),
+            "last_checked_at_0": naive_now.date(),
+            "last_checked_at_1": naive_now.time(),
             # email was set by SSO.
             "is_job_seeker": True,
             "is_staff": True,
@@ -40,4 +42,5 @@ def test_no_email_sent(client):
     assert user_refreshed.first_name == user.first_name
     assert user_refreshed.last_name == user.last_name
     assert user_refreshed.date_joined == now
+    assert user_refreshed.last_checked_at == now
     assert user_refreshed.identity_provider == IdentityProvider.INCLUSION_CONNECT

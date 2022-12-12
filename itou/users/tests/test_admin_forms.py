@@ -45,6 +45,7 @@ class UserAdminFormTest(TestCase):
             "email": "john@wayne.com",
             "is_job_seeker": True,
             "date_joined": "2022-02-02",
+            "last_checked_at": "2022-02-02",
             "identity_provider": IdentityProvider.DJANGO,
         }
 
@@ -91,6 +92,7 @@ class UserAdminFormTest(TestCase):
             "email": "john@wayne.com",
             "is_job_seeker": True,
             "date_joined": "2022-02-02",
+            "last_checked_at": "2022-02-02",
             "identity_provider": IdentityProvider.DJANGO,
         }
 
