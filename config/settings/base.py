@@ -630,7 +630,7 @@ if S3_STORAGE_ENDPOINT_DOMAIN:
     CSP_CONNECT_SRC += [
         f"https://{S3_STORAGE_ENDPOINT_DOMAIN}",
     ]
-CSP_INCLUDE_NONCE_IN = ["script-src"]
+CSP_INCLUDE_NONCE_IN = ["script-src", "script-src-elem"]
 CSP_REPORT_URI = os.getenv("CSP_REPORT_URI", None)
 CSP_REPORT_ONLY = True
 CSP_REPORT_PERCENTAGE = float(os.getenv("CSP_REPORT_PERCENTAGE", 1))
