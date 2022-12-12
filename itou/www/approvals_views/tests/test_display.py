@@ -89,7 +89,31 @@ class TestDisplayApproval(TestCase):
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
-    def test_display_approval_missing_diagnosis_ai(self, *args, **kwargs):
+    def test_display_approval_missing_diagnosis_ai_approval(self, *args, **kwargs):
+        # On November 30th, 2021, AI were delivered approvals without a diagnosis.
+        # See itou.users.management.commands.import_ai_employees.
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            eligibility_diagnosis=None,
+            approval_manually_delivered_by=UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL),
+            created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+        )
+
+        siae_member = job_application.to_siae.members.first()
+        self.client.force_login(siae_member)
+
+        response = self.client.get(
+            reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
+        )
+
+        assert response.status_code == 200
+        assert response.context["approval"] == job_application.approval
+        assert response.context["siae"] == job_application.to_siae
+        self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
+        self.assertContains(response, "Imprimer ce PASS IAE")
+        self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
+
+    def test_display_approval_missing_diagnosis_ai_job_application(self, *args, **kwargs):
         # On November 30th, 2021, AI were delivered approvals without a diagnosis.
         # See itou.users.management.commands.import_ai_employees.
         approval_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
