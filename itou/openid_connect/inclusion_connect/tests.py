@@ -14,6 +14,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.users import enums as users_enums
@@ -21,7 +22,7 @@ from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactory
 from itou.users.models import User
 
-from ..constants import OIDC_STATE_EXPIRATION
+from ..constants import OIDC_STATE_CLEANUP
 from ..models import TooManyKindsException
 from . import constants
 from .models import InclusionConnectPrescriberData, InclusionConnectSiaeStaffData, InclusionConnectState
@@ -101,13 +102,24 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         state.refresh_from_db()
         self.assertIsNotNone(state)
 
-        state.created_at = timezone.now() - OIDC_STATE_EXPIRATION * 2
+        # Set creation time for the state so that the state is expired
+        state.created_at = timezone.now() - OIDC_STATE_CLEANUP * 2
         state.save()
 
         InclusionConnectState.objects.cleanup()
 
         with self.assertRaises(InclusionConnectState.DoesNotExist):
             state.refresh_from_db()
+
+    def test_state_is_valid(self):
+        with freeze_time("2022-09-13 12:00:01"):
+            csrf_signed = InclusionConnectState.create_signed_csrf_token()
+            self.assertTrue(isinstance(csrf_signed, str))
+            self.assertTrue(InclusionConnectState.get_from_csrf(csrf_signed).is_valid())
+
+            csrf_signed = InclusionConnectState.create_signed_csrf_token()
+        with freeze_time("2022-09-14 12:00:01"):
+            self.assertFalse(InclusionConnectState.get_from_csrf(csrf_signed).is_valid())
 
     def test_create_user_from_user_info(self):
         """
@@ -236,11 +248,6 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
             sorted(user.external_data_source_history, key=itemgetter("field_name")),
             sorted(expected, key=itemgetter("field_name")),
         )
-
-    def test_state_is_valid(self):
-        csrf_signed = InclusionConnectState.create_signed_csrf_token()
-        self.assertTrue(isinstance(csrf_signed, str))
-        self.assertTrue(InclusionConnectState.is_valid(csrf_signed))
 
     def test_create_or_update_prescriber_raise_too_many_kind_exception(self):
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)

@@ -8,7 +8,7 @@ from django.utils import crypto, timezone
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
 
-from .constants import OIDC_STATE_EXPIRATION
+from .constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
 
 
 class TooManyKindsException(Exception):
@@ -25,12 +25,13 @@ class MultipleUsersFoundException(Exception):
 
 class OIDConnectQuerySet(models.QuerySet):
     def cleanup(self, at=None):
-        at = at if at else timezone.now() - OIDC_STATE_EXPIRATION
+        at = at if at else timezone.now() - OIDC_STATE_CLEANUP
         return self.filter(created_at__lte=at).delete()
 
 
 class OIDConnectState(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    used_at = models.DateTimeField(verbose_name="Date d'utilisation", null=True)
     # Length used in call to get_random_string()
     csrf = models.CharField(max_length=12, unique=True)
 
@@ -38,6 +39,9 @@ class OIDConnectState(models.Model):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return f"{self.csrf} created_at={self.created_at} used_at={self.used_at}"
 
     @classmethod
     def create_signed_csrf_token(cls):
@@ -52,27 +56,33 @@ class OIDConnectState(models.Model):
         return signed_token
 
     @classmethod
-    def is_valid(cls, signed_csrf):
+    def get_from_csrf(cls, signed_csrf):
+        # Cleanup old states if any.
+        cls.objects.cleanup()
+
         if not signed_csrf:
-            return False
+            return None
 
         signer = signing.Signer()
         try:
             csrf = signer.unsign(unquote(signed_csrf))
         except signing.BadSignature:
-            return False
+            return None
 
-        # Cleanup old states if any.
-        cls.objects.cleanup()
+        return cls.objects.filter(csrf=csrf).first()
 
-        state = cls.objects.filter(csrf=csrf).first()
-        if not state:
-            return False
+    @property
+    def expired_at(self):
+        return self.created_at + OIDC_STATE_EXPIRATION
 
+    def is_valid(self):
         # One-time use
-        state.delete()
+        if self.used_at:
+            return False
+        self.used_at = timezone.now()
+        self.save()
 
-        return True
+        return self.expired_at > timezone.now()
 
 
 @dataclasses.dataclass

@@ -6,14 +6,15 @@ from django.core.exceptions import ValidationError
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 
+from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.users.enums import IdentityProvider
 from itou.users.factories import UserFactory
 from itou.users.models import User
 from itou.utils.test import TestCase
 from itou.utils.testing import reload_module
 
-from ..constants import OIDC_STATE_EXPIRATION
 from ..models import TooManyKindsException
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
@@ -73,8 +74,8 @@ class FranceConnectTest(TestCase):
         state.refresh_from_db()
         self.assertIsNotNone(state)
 
-        # Set expired creation time for the state
-        state.created_at = timezone.now() - OIDC_STATE_EXPIRATION * 2
+        # Set creation time for the state so that the state is expired
+        state.created_at = timezone.now() - OIDC_STATE_CLEANUP * 2
         state.save()
 
         FranceConnectState.objects.cleanup()
@@ -84,7 +85,17 @@ class FranceConnectTest(TestCase):
 
     def test_state_verification(self):
         csrf_signed = FranceConnectState.create_signed_csrf_token()
-        self.assertTrue(FranceConnectState.is_valid(csrf_signed))
+        self.assertTrue(FranceConnectState.get_from_csrf(csrf_signed).is_valid())
+
+    def test_state_is_valid(self):
+        with freeze_time("2022-09-13 12:00:01"):
+            csrf_signed = FranceConnectState.create_signed_csrf_token()
+            self.assertTrue(isinstance(csrf_signed, str))
+            self.assertTrue(FranceConnectState.get_from_csrf(csrf_signed).is_valid())
+
+            csrf_signed = FranceConnectState.create_signed_csrf_token()
+        with freeze_time("2022-09-14 12:00:01"):
+            self.assertFalse(FranceConnectState.get_from_csrf(csrf_signed).is_valid())
 
     def test_authorize(self):
         url = reverse("france_connect:authorize")
