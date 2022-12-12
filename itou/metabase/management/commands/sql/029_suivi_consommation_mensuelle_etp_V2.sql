@@ -6,8 +6,11 @@ select
     annee_af,
     sum(nombre_etp_consommes_reels_mensuels) as total_etp_annuels_realises,
     sum(nombre_etp_consommes_reels_annuels) as total_etp_mensuels_realises,
-    sum(nombre_etp_consommes_reels_annuels)/etp.nombre_etp_conventionnés*100 as taux_de_realisation,
-    (etp.nombre_etp_conventionnés) as etp_conventionnés, 
+    (etp.nombre_etp_conventionnés) as etp_conventionnés,
+    case 
+        when etp.nombre_etp_conventionnés <> 0 then sum(nombre_etp_consommes_reels_annuels)/etp.nombre_etp_conventionnés*100      
+        else 0
+    end taux_de_realisation,
     max(date_part('month',etp_c.date_saisie)) as mois_max,
     etp.type_structure,
     etp.structure_denomination,
