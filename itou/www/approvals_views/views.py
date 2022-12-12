@@ -142,14 +142,13 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
             # We want to raise an error if the approval of the pass originates from our side, but
             # is not from the AI stock, as it should not happen.
             # We may have to add conditions there in case of new mass imports.
-            if not approval.is_from_ai_stock:
+            if not approval.is_from_ai_stock and not job_application.is_from_ai_stock:
                 # Keep track of job applications without a proper eligibility diagnosis because
                 # it shouldn't happen.
                 # If this occurs too much we may have to change `can_display_approval()`
                 # and investigate a lot more about what's going on.
-                # See also migration `0035_link_diagnoses.py`.
                 raise Exception(
-                    f"Job application={job_application.pk} comes from itou, "
+                    f"Approval={approval.pk} comes from itou, "
                     "had no eligibility diagnosis and also was not mass-imported."
                 )
 
