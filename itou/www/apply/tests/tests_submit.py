@@ -1708,3 +1708,50 @@ class ApplicationViewTest(S3AccessingTestCase):
         )
         assert new_eligibility_diagnosis != eligibility_diagnosis
         assert new_eligibility_diagnosis.author == prescriber
+
+
+class LastCheckedAtViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        cls.job_seeker = JobSeekerFactory()
+
+    def _check_last_checked_at(self, user, sees_warning):
+        self.client.force_login(user)
+        apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
+        apply_session.init(
+            {
+                "job_seeker_pk": self.job_seeker.pk,
+                "selected_jobs": [],
+            }
+        )
+        apply_session.save()
+
+        url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk})
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+        # Check last_checked_at is shown
+        self.assertContains(response, "Dernière actualisation du profil : ")
+        self.assertNotContains(response, "Merci de vérifier la validité des informations")
+
+        self.job_seeker.last_checked_at -= datetime.timedelta(days=500)
+        self.job_seeker.save(update_fields=["last_checked_at"])
+        response = self.client.get(url)
+        assert response.status_code == 200
+        warning_check = self.assertContains if sees_warning else self.assertNotContains
+        warning_check(response, "Merci de vérifier la validité des informations")
+
+    def test_siae_employee(self):
+        self._check_last_checked_at(self.siae.members.first(), sees_warning=True)
+
+    def test_job_seeker(self):
+        self._check_last_checked_at(self.job_seeker, sees_warning=False)
+
+    def test_authorized_prescriber(self):
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        self._check_last_checked_at(authorized_prescriber, sees_warning=True)
+
+    def test_unauthorized_prescriber(self):
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        self._check_last_checked_at(prescriber, sees_warning=True)
