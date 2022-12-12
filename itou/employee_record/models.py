@@ -280,6 +280,9 @@ class EmployeeRecord(models.Model):
             # Format job seeker address
             profile.update_hexa_address()
 
+        self.job_seeker.last_checked_at = timezone.now()
+        self.job_seeker.save(update_fields=["last_checked_at"])
+
         self.clean()
 
         # If we reach this point, the employee record is ready to be serialized
