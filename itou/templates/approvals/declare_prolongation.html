@@ -106,7 +106,7 @@
     {{ block.super }}
 
     {# Clicking on a reason that does not require the opinion of a prescriber hide email field  #}
-    <script nonce="{{ CSP_NONCE }}" type="text/javascript">
+    <script nonce="{{ CSP_NONCE }}">
         $(document).ready(() => {
             var reasons_max_durations = {{ form.reasons_max_duration_labels|js }};
             var reasons_not_need_prescriber_opinion = {{ form.reasons_not_need_prescriber_opinion|js }};

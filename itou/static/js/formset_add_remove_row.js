@@ -8,7 +8,7 @@
     3- Add this snippet to the script block:
     ```
     <script src="{% static "js/formset_add_remove_row.js" %}"></script>
-    <script type='text/javascript'>
+    <script>
         $(document).on('click', '.add-form-row', function(e){
             e.preventDefault();
             // First argument is a selector targeting the row to clone..

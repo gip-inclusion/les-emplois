@@ -97,7 +97,7 @@
     <script src="{% static 'js/split_nir.js' %}"></script>
     {% if preview_mode %}
         {# Show the confirmation modal after submitting the form. #}
-        <script nonce="{{ CSP_NONCE }}" type="text/javascript">
+        <script nonce="{{ CSP_NONCE }}">
             // Adding the "show" CSS class is not enough and not documented.
             // A JS initialization is recommended.
             $("#email-confirmation-modal").modal("show");
