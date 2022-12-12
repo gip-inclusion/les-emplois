@@ -176,7 +176,7 @@ DATABASES = {
         "USER": os.getenv("POSTGRESQL_ADDON_CUSTOM_USER") or os.getenv("POSTGRESQL_ADDON_USER"),
         "PASSWORD": os.getenv("POSTGRESQL_ADDON_CUSTOM_PASSWORD") or os.getenv("POSTGRESQL_ADDON_PASSWORD"),
         "OPTIONS": {
-            "connect_timeout": 5,
+            "connect_timeout": 15,
         },
     }
 }
