@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.job_applications.notifications import (
@@ -87,6 +88,10 @@ class EditUserInfoForm(MandatoryAddressFormMixin, forms.ModelForm):
             except AddressLookupError:
                 # Nothing to do: re-raised and already logged as error
                 pass
+
+    def save(self, commit=True):
+        self.instance.last_checked_at = timezone.now()
+        return super().save(commit=commit)
 
 
 class EditUserEmailForm(forms.Form):
