@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 
 from itou.antivirus.models import Scan
@@ -25,13 +26,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         now = timezone.now()
-        files = (
-            File.objects.exclude(scan__clamav_completed_at__gt=now - relativedelta(month=1))
-            .order_by("scan__clamav_completed_at")
-            .asc(nulls_first=True)[: self.BATCH_SIZE]
-        )
+        files = File.objects.exclude(scan__clamav_completed_at__gt=now - relativedelta(month=1)).order_by(
+            F("scan__clamav_completed_at").asc(nulls_first=True)
+        )[: self.BATCH_SIZE]
         # Indicate these files are being processed to concurrent scans.
-        files = files.select_for_update(skip_locked=True, no_key=True)
+        files = files.select_for_update(of=["self"], skip_locked=True, no_key=True)
         with tempfile.TemporaryDirectory() as workdir:
             with transaction.atomic():
                 filepath_s3key = self.download_files(files, workdir)
