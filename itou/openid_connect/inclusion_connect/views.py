@@ -58,7 +58,7 @@ class InclusionConnectSession:
 def _redirect_to_login_page_on_error(error_msg, request=None):
     if request:
         messages.error(request, "Une erreur technique est survenue. Merci de recommencer.")
-    logger.error(error_msg)
+    logger.error(error_msg, exc_info=True)
     return HttpResponseRedirect(reverse("home:hp"))
 
 
