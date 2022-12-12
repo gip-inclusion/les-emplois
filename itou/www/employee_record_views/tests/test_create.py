@@ -630,11 +630,14 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
         assert employee_record.status == Status.NEW
 
+        previous_last_checked_at = employee_record.job_application.job_seeker.last_checked_at
         # Validation of create process
         self.client.post(self.url)
 
         employee_record.refresh_from_db()
         assert employee_record.status == Status.READY
+
+        assert employee_record.job_application.job_seeker.last_checked_at > previous_last_checked_at
 
 
 class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
