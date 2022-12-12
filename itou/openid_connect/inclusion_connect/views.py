@@ -129,8 +129,11 @@ def inclusion_connect_resume_registration(request):
 def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
     code = request.GET.get("code")
     state = request.GET.get("state")
-    if code is None or not InclusionConnectState.is_valid(state):
-        return _redirect_to_login_page_on_error(error_msg="Missing code or invalid state.", request=request)
+    ic_state = InclusionConnectState.get_from_csrf(state)
+    if code is None or ic_state is None:
+        return _redirect_to_login_page_on_error(error_msg="Missing code or state.", request=request)
+    if not ic_state.is_valid():
+        return _redirect_to_login_page_on_error(error_msg="Invalid state.", request=request)
 
     ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
     if ic_session is None:

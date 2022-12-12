@@ -61,7 +61,8 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     state = request.GET.get("state")
-    if not FranceConnectState.is_valid(state):
+    fc_state = FranceConnectState.get_from_csrf(state)
+    if not fc_state or not fc_state.is_valid():
         error_msg = (
             "Le paramètre « state » fourni par France Connect et nécessaire à votre authentification n’est pas valide."
         )
