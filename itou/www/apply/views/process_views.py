@@ -8,6 +8,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
@@ -264,6 +265,10 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 # so use `commit=False` to avoid a double save.
                 job_application = form_accept.save(commit=False)
                 job_application.accept(user=request.user)
+
+                # Mark job seeker's infos as up-to-date
+                job_application.job_seeker.last_checked_at = timezone.now()
+                job_application.job_seeker.save(update_fields=["last_checked_at"])
         except ApprovalAlreadyExistsError:
             link_to_form = get_external_link_markup(
                 url=f"{global_constants.ITOU_COMMUNITY_URL }/aide/emplois/#support",
