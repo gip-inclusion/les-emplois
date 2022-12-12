@@ -1,15 +1,18 @@
 /* Cette table nous permet de suivre la consommation d'etp par structures, par rapport à leur conventionnement */
 with calcul_etp as (
 select 
-    distinct(etp.id_annexe_financiere),
+    distinct(etp.id_annexe_financiere), /* Utilisation de l'ID de l'annexe financière -> ID unique contrairement à la convention et l'af */
     etp.af_numero_annexe_financiere,
     etp.af_numero_convention,
     annee_af,
     sum(nombre_etp_consommes_reels_mensuels) as total_etp_annuels_realises,
     sum(nombre_etp_consommes_reels_annuels) as total_etp_mensuels_realises,
+    /* les deux conditions si dessous sont identiques, sauf que pour l'une on considère les ETPs mensuels et l'autre les annuels */
     case 
-        when (max(annee_af) = date_part ('year', current_date )- 1) then (sum(nombre_etp_consommes_reels_mensuels) / max(date_part('month',etp_c.date_saisie)))
+        /* Sur les deux lignes du dessous on sélectionne le dernier mois saisi pour avoir une moyenne mensuelle des ETPs consommés sur les années précédentes */
+        when (max(annee_af) = date_part ('year', current_date )- 1) then (sum(nombre_etp_consommes_reels_mensuels) / max(date_part('month',etp_c.date_saisie)))  
         when (max(annee_af) = date_part('year', current_date )- 2) then (sum(nombre_etp_consommes_reels_mensuels) / max(date_part('month',etp_c.date_saisie)))
+        /* Ici on lui demande de seulement prendre en compte les mois écoulés pour l'année en cours (donc en mars il divisera le total par 3) */
         else sum(nombre_etp_consommes_reels_mensuels) filter (where annee_af = (date_part('year', current_date))) 
                 / (max(date_part('month',etp_c.date_saisie)) filter (where annee_af = (date_part('year', current_date))))
         end moyenne_nb_etp_annuels_depuis_debut_annee,
@@ -49,12 +52,11 @@ group by
     etp.nom_departement_af,
     etp.nom_region_af
 )
-
 select 
     *,
     case 
         /* On calcule la moyenne des etp consommés depuis le début de l'année et on la compare avec le nombre d'etp 
-        conventionné */
+        conventionnés */
         when moyenne_nb_etp_mensuels_depuis_debut_annee < etp_conventionnés then 'sous-consommation'
         when moyenne_nb_etp_mensuels_depuis_debut_annee > etp_conventionnés then 'sur-consommation'
         else 'conforme'
