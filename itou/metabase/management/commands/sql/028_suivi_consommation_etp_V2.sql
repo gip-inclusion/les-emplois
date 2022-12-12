@@ -1,4 +1,5 @@
 /* Cette table nous permet de suivre la consommation d'etp par structures, par rapport à leur conventionnement */
+with calcul_etp as (
 select 
     distinct(etp.id_annexe_financiere),
     etp.af_numero_annexe_financiere,
@@ -12,6 +13,12 @@ select
         else sum(nombre_etp_consommes_reels_mensuels) filter (where annee_af = (date_part('year', current_date))) 
                 / (max(date_part('month',etp_c.date_saisie)) filter (where annee_af = (date_part('year', current_date))))
         end moyenne_nb_etp_annuels_depuis_debut_annee,
+    case 
+        when (max(annee_af) = date_part ('year', current_date )- 1) then (sum(nombre_etp_consommes_reels_annuels) / max(date_part('month',etp_c.date_saisie)))
+        when (max(annee_af) = date_part('year', current_date )- 2) then (sum(nombre_etp_consommes_reels_annuels) / max(date_part('month',etp_c.date_saisie)))
+        else sum(nombre_etp_consommes_reels_annuels) filter (where annee_af = (date_part('year', current_date))) 
+                / (max(date_part('month',etp_c.date_saisie)) filter (where annee_af = (date_part('year', current_date))))
+        end moyenne_nb_etp_mensuels_depuis_debut_annee,
     (etp.nombre_etp_conventionnés) as etp_conventionnés, 
     max(date_part('month',etp_c.date_saisie)) as mois_max,
     etp.type_structure,
@@ -41,3 +48,16 @@ group by
     etp.code_departement_af,
     etp.nom_departement_af,
     etp.nom_region_af
+)
+
+select 
+    *,
+    case 
+        /* On calcule la moyenne des etp consommés depuis le début de l'année et on la compare avec le nombre d'etp 
+        conventionné */
+        when moyenne_nb_etp_mensuels_depuis_debut_annee < etp_conventionnés then 'sous-consommation'
+        when moyenne_nb_etp_mensuels_depuis_debut_annee > etp_conventionnés then 'sur-consommation'
+        else 'conforme'
+    end consommation_ETP
+from 
+    calcul_etp
