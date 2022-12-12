@@ -482,6 +482,7 @@ class EditJobSeekerInfo(TestCase):
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
         job_application.job_seeker.created_by = user
         job_application.job_seeker.save()
+        previous_last_checked_at = job_application.job_seeker.last_checked_at
 
         self.client.force_login(user)
 
@@ -525,6 +526,9 @@ class EditJobSeekerInfo(TestCase):
 
         assert job_seeker.phone == post_data["phone"]
         assert job_seeker.address_line_2 == post_data["address_line_2"]
+
+        # last_checked_at should have been updated
+        assert job_seeker.last_checked_at > previous_last_checked_at
 
     def test_edit_by_prescriber(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
