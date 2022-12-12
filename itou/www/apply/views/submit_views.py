@@ -44,6 +44,9 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 logger = logging.getLogger(__name__)
 
 
+JOB_SEEKER_INFOS_CHECK_PERIOD = relativedelta(months=6)
+
+
 def _check_job_seeker_approval(request, job_seeker, siae):
     user_info = get_user_info(request)
     if job_seeker.approval_can_be_renewed_by(
@@ -127,6 +130,11 @@ class ApplicationBaseView(ApplyStepBaseView):
             "is_subject_to_eligibility_rules": self.siae.is_subject_to_eligibility_rules,
             "can_edit_personal_information": self.request.user.can_edit_personal_information(self.job_seeker),
             "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
+            # Do not show the warning for job seekers
+            "new_check_needed": (
+                not self.request.user.is_job_seeker
+                and self.job_seeker.last_checked_at < timezone.now() - JOB_SEEKER_INFOS_CHECK_PERIOD
+            ),
         }
 
 

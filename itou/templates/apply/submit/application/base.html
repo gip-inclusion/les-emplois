@@ -28,6 +28,30 @@
                             {% endif %}
                         {% endif %}
                     </div>
+                    <div class="d-flex flex-column flex-md-row align-items-center mb-4">
+                        Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
+                        {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
+                    </div>
+                    {% if new_check_needed %}
+                        <div class="alert alert-warning alert-dismissible fade show mb-4">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                <i class="ri-close-line"></i>
+                            </button>
+                            <div class="row">
+                                <div class="col-auto pr-0">
+                                    <i class="ri-information-line ri-xl text-warning"></i>
+                                </div>
+                                <div class="col">
+                                    <p>
+                                        <strong>Veuillez vérifier les informations du candidat</strong>
+                                    </p>
+                                    <p>
+                                        La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                     <div class="c-stepper my-5">
                         <div class="progress progress--emploi mb-2">
                             <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
