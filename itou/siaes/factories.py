@@ -27,7 +27,7 @@ class SiaeFinancialAnnexFactory(factory.django.DjangoModelFactory):
         model = models.SiaeFinancialAnnex
 
     # e.g. EI59V182019A1M1
-    number = factory.fuzzy.FuzzyText(length=6, chars=string.digits, prefix="EI59V", suffix="A1M1")
+    number = factory.Sequence(lambda n: f"EI59V{n:06d}A1M1")
     state = models.SiaeFinancialAnnex.STATE_VALID
     start_at = factory.LazyFunction(lambda: timezone.now() - ONE_MONTH)
     end_at = factory.LazyFunction(lambda: timezone.now() + ONE_MONTH)
