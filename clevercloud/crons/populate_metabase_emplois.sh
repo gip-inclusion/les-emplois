@@ -21,7 +21,7 @@ if [[ "$1" == "--daily" ]]; then
     django-admin populate_metabase_emplois --mode=selected_jobs
     django-admin populate_metabase_emplois --mode=approvals
     django-admin populate_metabase_emplois --mode=final_tables
-    django-admin populate_metabase_emplois --mode=inconsistencies
+    django-admin populate_metabase_emplois --mode=data_inconsistencies
     django-admin send_slack_message ":white_check_mark: succès mise à jour de données C1 -> Metabase"
 elif [[ "$1" == "--monthly" ]]; then
     django-admin send_slack_message ":rocket: lancement mise à jour de données peu fréquentes C1 -> Metabase"
