@@ -1,6 +1,5 @@
 import csv
 import io
-import zipfile
 
 from django.contrib import admin, messages
 from django.http import HttpResponse
@@ -93,43 +92,41 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
             "evaluated_siaes__siae__memberships__user",
             "evaluated_siaes__siae__convention",
         )
-        with io.BytesIO() as outfile:
-            with zipfile.ZipFile(outfile, "w") as zip:
-                for campaign in queryset:
-                    with io.StringIO() as csvfile:
-                        writer = csv.writer(csvfile)
-                        writer.writerow(
-                            [
-                                "SIRET signature",
-                                "Type",
-                                "Nom",
-                                "Département",
-                                "Emails administrateurs",
-                                "Numéro de téléphone",
-                                "État du contrôle",
-                            ]
-                        )
-                        for evaluated_siae in campaign.evaluated_siaes.all():
-                            siae = evaluated_siae.siae
-                            # Keep in sync with MembershipQuerySet.active_admin_members.
-                            to = [p.user.email for p in siae.memberships.all() if p.is_admin and p.user.is_active]
-                            writer.writerow(
-                                [
-                                    siae.convention.siret_signature,
-                                    siae.kind,
-                                    siae.name,
-                                    siae.department,
-                                    ", ".join(to),
-                                    siae.phone,
-                                    evaluated_siae.state,
-                                ]
-                            )
-                        filename = str(campaign).replace("/", "-").replace(":", "-")
-                        zip.writestr(f"{filename}.csv", csvfile.getvalue())
-            response = HttpResponse(outfile.getvalue())
-            response.headers["Content-Type"] = "application/zip, application/octet-stream"
+        with io.StringIO() as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(
+                [
+                    "Campagne",
+                    "SIRET signature",
+                    "Type",
+                    "Nom",
+                    "Département",
+                    "Emails administrateurs",
+                    "Numéro de téléphone",
+                    "État du contrôle",
+                ]
+            )
+            for campaign in queryset:
+                for evaluated_siae in campaign.evaluated_siaes.all():
+                    siae = evaluated_siae.siae
+                    # Keep in sync with MembershipQuerySet.active_admin_members.
+                    to = [p.user.email for p in siae.memberships.all() if p.is_admin and p.user.is_active]
+                    writer.writerow(
+                        [
+                            campaign.name,
+                            siae.convention.siret_signature,
+                            siae.kind,
+                            siae.name,
+                            siae.department,
+                            ", ".join(to),
+                            siae.phone,
+                            evaluated_siae.state,
+                        ]
+                    )
+            response = HttpResponse(csvfile.getvalue())
+            response.headers["Content-Type"] = "text/csv"
             now = timezone.now().isoformat(timespec="seconds").replace(":", "-")
-            response.headers["Content-Disposition"] = f'attachment; filename="export-siaes-campagnes-{now}.zip"'
+            response.headers["Content-Disposition"] = f'attachment; filename="export-siaes-campagnes-{now}.csv"'
             return response
 
     @admin.action(description="Passer les campagnes en phase contradictoire")

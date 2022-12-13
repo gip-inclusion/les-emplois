@@ -1,6 +1,3 @@
-import io
-import zipfile
-
 from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
@@ -61,25 +58,17 @@ class TestEvaluationCampaignAdmin:
                 },
             )
         assert response.status_code == 200
-        assert response["Content-Type"] == "application/zip, application/octet-stream"
+        assert response["Content-Type"] == "text/csv"
         assert (
             response["Content-Disposition"]
-            == 'attachment; filename="export-siaes-campagnes-2022-12-07T11-11-00+00-00.zip"'
+            == 'attachment; filename="export-siaes-campagnes-2022-12-07T11-11-00+00-00.csv"'
         )
-        with io.BytesIO(response.content) as data:
-            with zipfile.ZipFile(data) as exported_zip:
-                file1, file2 = "DDETS 01 - Contrôle 01-01-2022.csv", "DDETS 01 - Contrôle 01-01-2021.csv"
-                assert exported_zip.namelist() == [file1, file2]
-                with exported_zip.open(file1) as campaign1_export:
-                    assert campaign1_export.read().decode() == (
-                        "SIRET signature,Type,Nom,Département,Emails administrateurs,Numéro de téléphone,"
-                        "État du contrôle\r\n"
-                        '00000000000032,EI,les jardins,14,"campaign1+1@beta.gouv.fr, campaign1+2@beta.gouv.fr",,'
-                        "PENDING\r\n"
-                    )
-                with exported_zip.open(file2) as campaign2_export:
-                    assert campaign2_export.read().decode() == (
-                        "SIRET signature,Type,Nom,Département,Emails administrateurs,Numéro de téléphone,"
-                        "État du contrôle\r\n"
-                        "12345678900032,EI,les trucs du bazar,14,campaign2@beta.gouv.fr,0612345678,PENDING\r\n"
-                    )
+        assert response.content.decode(response.charset) == (
+            "Campagne,SIRET signature,Type,Nom,Département,Emails administrateurs,Numéro de téléphone,"
+            "État du contrôle\r\n"
+            # campaign1
+            "Contrôle 01/01/2022,00000000000032,EI,les jardins,14,"
+            '"campaign1+1@beta.gouv.fr, campaign1+2@beta.gouv.fr",,PENDING\r\n'
+            # campaign2
+            "Contrôle 01/01/2021,12345678900032,EI,les trucs du bazar,14,campaign2@beta.gouv.fr,0612345678,PENDING\r\n"
+        )
