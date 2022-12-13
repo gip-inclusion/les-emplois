@@ -2,12 +2,61 @@
 Helper methods for manipulating dataframes used by both populate_metabase_emplois and
 populate_metabase_fluxiae scripts.
 """
+import csv
+from io import StringIO
 
+import numpy as np
 import pandas as pd
+from psycopg2 import sql
 from tqdm import tqdm
 
-from itou.metabase.management.commands._database_sqlalchemy import get_pg_engine
+from itou.metabase.db import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_tables import get_new_table_name, switch_table_atomically
+
+
+PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {
+    np.int64: "BIGINT",
+    np.object0: "TEXT",
+    np.float64: "DOUBLE PRECISION",
+    np.bool8: "BOOLEAN",
+}
+
+
+def infer_colomns_from_df(df):
+    # Generate a dataframe with the same headers a the first non null value for each colomn
+    df_columns = [df[column_name] for column_name in df.columns]
+    non_null_values = [df_column.get(df_column.first_valid_index()) for df_column in df_columns]
+    initial_line = pd.DataFrame([non_null_values], columns=df.columns)
+
+    # Generate table sql definition from np types
+    return [
+        (col_name, PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING[col_type.type])
+        for col_name, col_type in initial_line.dtypes.items()
+    ]
+
+
+def create_table(table_name: str, columns: list[str, str]):
+    """Create table from colomns names and types"""
+    with MetabaseDatabaseCursor() as (cursor, conn):
+        create_table_query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({fields_with_type})").format(
+            table_name=sql.Identifier(table_name),
+            fields_with_type=sql.SQL(",").join(
+                [sql.SQL(" ").join([sql.Identifier(col_name), sql.SQL(col_type)]) for col_name, col_type in columns]
+            ),
+        )
+        cursor.execute(create_table_query)
+        conn.commit()
+
+
+def init_table(df, table_name):
+    new_table_name = get_new_table_name(table_name)
+    with MetabaseDatabaseCursor() as (cursor, conn):
+        cursor.execute(
+            sql.SQL("DROP TABLE IF EXISTS {new_table_name}").format(new_table_name=sql.Identifier(new_table_name))
+        )
+        conn.commit()
+    # Generate table
+    create_table(new_table_name, infer_colomns_from_df(df))
 
 
 def store_df(df, table_name, max_attempts=5):
@@ -29,21 +78,14 @@ def store_df(df, table_name, max_attempts=5):
 
     while attempts < max_attempts:
         try:
-            if_exists = "replace"  # For the 1st chunk, drop old existing table if needed.
+            init_table(df, table_name)
             for df_chunk in tqdm(df_chunks):
-                pg_engine = get_pg_engine()
-                df_chunk.to_sql(
-                    name=get_new_table_name(table_name),
-                    # Use a new connection for each chunk to avoid random disconnections.
-                    con=pg_engine,
-                    if_exists=if_exists,
-                    index=False,
-                    chunksize=1000,
-                    # INSERT by batch and not one by one. Increases speed x100.
-                    method="multi",
-                )
-                pg_engine.dispose()
-                if_exists = "append"  # For all other chunks, append to table in progress.
+                buffer = StringIO()
+                df_chunk.to_csv(buffer, header=False, index=False, sep="\t", quoting=csv.QUOTE_NONE, escapechar="\\")
+                buffer.seek(0)
+                with MetabaseDatabaseCursor() as (cursor, conn):
+                    cursor.copy_from(buffer, get_new_table_name(table_name), sep="\t", null="")
+                    conn.commit()
             break
         except Exception as e:
             # Catching all exceptions is a generally a code smell but we eventually reraise it so it's ok.
