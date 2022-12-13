@@ -469,10 +469,9 @@ ANYMAIL = {
     "WEBHOOK_SECRET": os.getenv("MAILJET_WEBHOOK_SECRET"),
 }
 
-if ITOU_ENVIRONMENT in ["DEMO", "PROD", "STAGING"]:
-    EMAIL_BACKEND = "itou.utils.tasks.AsyncEmailBackend"
-elif ITOU_ENVIRONMENT in ["REVIEW-APP", "FAST-MACHINE"]:
-    EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+EMAIL_BACKEND = "itou.utils.tasks.AsyncEmailBackend"
+# This is the "real" email backend used by the async wrapper / email backend
+ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
 SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600
