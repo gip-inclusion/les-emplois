@@ -46,6 +46,7 @@ METABASE_CUSTOM_VARS_TABLE_NAME = "suivi_visites_custom_vars_v0"
 
 def matomo_api_call(options):
     response = httpx.get(f"{settings.MATOMO_BASE_URL}?{urllib.parse.urlencode(options)}", timeout=MATOMO_TIMEOUT)
+    print(response.content)
     csv_content = response.content.decode("utf-16")
     yield from csv.DictReader(io.StringIO(csv_content), dialect="excel")
 
@@ -105,28 +106,32 @@ class Command(BaseCommand):
             "token_auth": settings.MATOMO_AUTH_TOKEN,
         }
 
-        for dashboard, public_name in DASHBOARDS_TO_DOWNLOAD.items():
-            dashboard_options = base_options | {
-                "idSite": "146",  # pilotage
-                "segment": f"pageUrl=={constants.PILOTAGE_SITE_URL}/tableaux-de-bord/{dashboard}/",
-            }
-            for row in matomo_api_call(dashboard_options):
-                row["Date"] = at
-                row["tableau de bord"] = public_name
-                if not column_names:
-                    column_names = list(row.keys())
-                all_rows.append(list(row.values()))
+        # for dashboard, public_name in DASHBOARDS_TO_DOWNLOAD.items():
+        #     dashboard_options = base_options | {
+        #         "idSite": "146",  # pilotage
+        #         "segment": f"pageUrl=={constants.PILOTAGE_SITE_URL}/tableaux-de-bord/{dashboard}/",
+        #     }
+        #     for row in matomo_api_call(dashboard_options):
+        #         row["Date"] = at
+        #         row["tableau de bord"] = public_name
+        #         if not column_names:
+        #             column_names = list(row.keys())
+        #         all_rows.append(list(row.values()))
 
-        if wet_run:
-            update_table_at_date(METABASE_DASHBOARDS_TABLE_NAME, column_names, at, all_rows)
+        # if wet_run:
+        #     update_table_at_date(METABASE_DASHBOARDS_TABLE_NAME, column_names, at, all_rows)
 
         all_rows = []
         custom_var_options = base_options | {
             "idSite": "117",
             "flat": "1",
-            "method": "CustomVariables.getCustomVariables",
+            # "method": "CustomVariables.getCustomVariables",
+            "method": "Live.getLastVisitsDetails",
+            # "segment": f"pageUrl=={constants.PILOTAGE_SITE_URL}/tableaux-de-bord/{dashboard}/",
         }
         for row in matomo_api_call(custom_var_options):
+            print(row)
+            break
             row["Date"] = at
             column_names = list(row.keys())
             all_rows.append(list(row.values()))
