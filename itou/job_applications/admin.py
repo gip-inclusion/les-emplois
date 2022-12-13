@@ -41,7 +41,6 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
     form = JobApplicationAdminForm
-    date_hierarchy = "created_at"
     list_display = ("pk", "state", "sender_kind", "created_at")
     raw_id_fields = (
         "job_seeker",
