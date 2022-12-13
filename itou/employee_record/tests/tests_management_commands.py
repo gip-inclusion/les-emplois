@@ -5,7 +5,6 @@ from django.utils import timezone
 
 from itou.employee_record import constants
 from itou.employee_record.enums import NotificationType, Status
-from itou.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from itou.employee_record.mocks.transfer_employee_records import (
     SFTPAllDupsConnectionMock,
     SFTPBadConnectionMock,
@@ -253,79 +252,3 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         self.assertEqual(
             self.employee_record.update_notifications.first().notification_type, NotificationType.APPROVAL
         )
-
-
-class SanitizeManagementCommandTest(ManagementCommandTestCase):
-
-    MANAGEMENT_COMMAND_NAME = "sanitize_employee_records"
-
-    def test_dry_run(self):
-        # Check `dry-run` switch / option
-        dry_run_msg = " - DRY-RUN mode: not fixing, just reporting"
-
-        # On:
-        out, _ = self.call_command()
-        self.assertNotIn(out, dry_run_msg)
-
-        # Off:
-        out, _ = self.call_command(dry_run=True)
-        self.assertIn(dry_run_msg, out)
-        self.assertNotIn(" - done!", out)
-
-    def test_3436_errors_check(self):
-        # Check for 3436 errors fix (ASP duplicates)
-
-        # Note: must be created with a valid profile, or the profile check will disable it beforehand
-        EmployeeRecordWithProfileFactory(
-            status=Status.REJECTED,
-            asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE,
-        )
-        self.assertEqual(1, EmployeeRecord.objects.asp_duplicates().count())
-
-        out, _ = self.call_command()
-
-        # Exterminate 3436s
-        self.assertIn(" - fixing 3436 errors: forcing status to PROCESSED", out)
-        self.assertIn(" - done!", out)
-        self.assertEqual(0, EmployeeRecord.objects.asp_duplicates().count())
-
-    def test_orphans_check(self):
-        # Check if any orphan (mismatch in `asp_id`)
-
-        # TODO: Simple way to create an orphan but would a factory be better ?
-        # Note: must be created with a valid profile, or the profile check will disable it beforehand
-        orphan_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
-        orphan_employee_record.asp_id += 1
-        orphan_employee_record.save()
-
-        self.assertEqual(1, EmployeeRecord.objects.orphans().count())
-
-        out, _ = self.call_command()
-
-        self.assertIn(" - fixing orphans: switching status to DISABLED", out)
-        self.assertIn(" - done!", out)
-        self.assertEqual(0, EmployeeRecord.objects.orphans().count())
-
-    def test_profile_errors_check(self):
-        # Check for profile errors during sanitize_employee_records
-
-        # This factory does not define a profile
-        EmployeeRecordFactory()
-
-        out, _ = self.call_command()
-
-        self.assertIn(" - fixing missing jobseeker profiles: switching status to DISABLED", out)
-        self.assertIn(" - done!", out)
-
-    def test_missing_approvals(self):
-        # Check for employee record without approval (through job application)
-
-        employee_record = EmployeeRecordFactory()
-        employee_record.job_application.approval = None
-        employee_record.job_application.save()
-
-        out, _ = self.call_command()
-
-        self.assertEqual(0, EmployeeRecord.objects.filter(job_application__approval__isnull=True).count())
-        self.assertIn(" - fixing missing approvals: DELETING employee records", out)
-        self.assertIn(" - done!", out)
