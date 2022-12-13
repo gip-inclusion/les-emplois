@@ -16,7 +16,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.1", "0.0.0.0"]
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+ASYNC_EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 SHOW_TEST_ACCOUNTS_BANNER = True
 

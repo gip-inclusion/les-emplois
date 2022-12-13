@@ -1,4 +1,5 @@
 import pytest
+from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core.cache import cache
 from django.db import connection
@@ -52,3 +53,9 @@ def preload_spatial_reference(django_db_setup, django_db_blocker):
 @pytest.fixture(autouse=True)
 def reset_cache():
     cache.clear()
+
+
+@pytest.fixture(autouse=True, scope="session")
+def django_test_environment_email_fixup(django_test_environment) -> None:
+    settings.EMAIL_BACKEND = "itou.utils.tasks.AsyncEmailBackend"
+    settings.ASYNC_EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
