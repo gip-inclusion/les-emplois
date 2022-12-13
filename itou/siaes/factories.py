@@ -178,7 +178,6 @@ class SiaeJobDescriptionFactory(factory.django.DjangoModelFactory):
 
     appellation = factory.LazyAttribute(lambda obj: Appellation.objects.order_by("?").first())
     siae = factory.SubFactory(SiaeFactory)
-    custom_name = factory.Faker("job", locale="fr_FR")
     description = factory.Faker("sentence", locale="fr_FR")
     contract_type = factory.fuzzy.FuzzyChoice(ContractType.values)
     other_contract_type = factory.Faker("word", locale="fr_FR")
