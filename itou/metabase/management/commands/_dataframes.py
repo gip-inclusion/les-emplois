@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from itou.metabase.db import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_tables import get_new_table_name, switch_table_atomically
+from itou.metabase.management.commands._utils import create_table
 
 
 PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {
@@ -33,19 +34,6 @@ def infer_colomns_from_df(df):
         (col_name, PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING[col_type.type])
         for col_name, col_type in initial_line.dtypes.items()
     ]
-
-
-def create_table(table_name: str, columns: list[str, str]):
-    """Create table from colomns names and types"""
-    with MetabaseDatabaseCursor() as (cursor, conn):
-        create_table_query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({fields_with_type})").format(
-            table_name=sql.Identifier(table_name),
-            fields_with_type=sql.SQL(",").join(
-                [sql.SQL(" ").join([sql.Identifier(col_name), sql.SQL(col_type)]) for col_name, col_type in columns]
-            ),
-        )
-        cursor.execute(create_table_query)
-        conn.commit()
 
 
 def init_table(df, table_name):

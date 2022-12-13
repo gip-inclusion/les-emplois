@@ -257,6 +257,19 @@ def build_custom_table(table_name, sql_request):
     switch_table_atomically(table_name=table_name)
 
 
+def create_table(table_name: str, columns: list[str, str]):
+    """Create table from colomns names and types"""
+    with MetabaseDatabaseCursor() as (cursor, conn):
+        create_table_query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({fields_with_type})").format(
+            table_name=sql.Identifier(table_name),
+            fields_with_type=sql.SQL(",").join(
+                [sql.SQL(" ").join([sql.Identifier(col_name), sql.SQL(col_type)]) for col_name, col_type in columns]
+            ),
+        )
+        cursor.execute(create_table_query)
+        conn.commit()
+
+
 def build_final_tables():
     """
     Build final custom tables one by one by playing SQL requests in `sql` folder.
