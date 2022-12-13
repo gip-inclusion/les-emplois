@@ -115,12 +115,41 @@ class Command(BaseCommand):
         new_table_name = get_new_table_name(table_name)
         old_table_name = get_old_table_name(table_name)
 
-        with MetabaseDatabaseCursor() as (cur, conn):
-
-            def drop_old_and_new_tables(table_name):
+        def drop_old_and_new_tables(table_name):
+            with MetabaseDatabaseCursor() as (cur, conn):
                 cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(new_table_name)))
                 cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
                 conn.commit()
+
+        drop_old_and_new_tables(table_name)
+
+        total_rows = sum([queryset.count() for queryset in querysets])
+
+        table.add_columns(
+            [
+                {
+                    "name": "date_mise_à_jour_metabase",
+                    "type": "date",
+                    "comment": "Date de dernière mise à jour de Metabase",
+                    # As metabase daily updates run typically every night after midnight, the last day with
+                    # complete data is yesterday, not today.
+                    "fn": lambda o: timezone.now() + timezone.timedelta(days=-1),
+                },
+            ]
+        )
+
+        # Transform boolean fields into 0-1 integer fields as
+        # metabase cannot sum or average boolean columns ¯\_(ツ)_/¯
+        for c in table.columns:
+            if c["type"] == "boolean":
+                c["type"] = "integer"
+                c["fn"] = compose(convert_boolean_to_int, c["fn"])
+
+        self.stdout.write(f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:")
+
+        create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns])
+
+        with MetabaseDatabaseCursor() as (cur, conn):
 
             def inject_chunk(table_columns, chunk, new_table_name):
                 insert_query = sql.SQL("insert into {new_table_name} ({fields}) values %s").format(
@@ -132,36 +161,6 @@ class Command(BaseCommand):
                 dataset = [[c["fn"](o) for c in table_columns] for o in chunk]
                 psycopg2_extras.execute_values(cur, insert_query, dataset, template=None)
                 conn.commit()
-
-            drop_old_and_new_tables(table_name)
-
-            total_rows = sum([queryset.count() for queryset in querysets])
-
-            table.add_columns(
-                [
-                    {
-                        "name": "date_mise_à_jour_metabase",
-                        "type": "date",
-                        "comment": "Date de dernière mise à jour de Metabase",
-                        # As metabase daily updates run typically every night after midnight, the last day with
-                        # complete data is yesterday, not today.
-                        "fn": lambda o: timezone.now() + timezone.timedelta(days=-1),
-                    },
-                ]
-            )
-
-            # Transform boolean fields into 0-1 integer fields as
-            # metabase cannot sum or average boolean columns ¯\_(ツ)_/¯
-            for c in table.columns:
-                if c["type"] == "boolean":
-                    c["type"] = "integer"
-                    c["fn"] = compose(convert_boolean_to_int, c["fn"])
-
-            self.stdout.write(
-                f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:"
-            )
-
-            create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns])
 
             # Add comments on table columns.
             for c in table.columns:
@@ -210,7 +209,8 @@ class Command(BaseCommand):
                 )
             )
             conn.commit()
-            drop_old_and_new_tables(table_name)
+
+        drop_old_and_new_tables(table_name)
 
     def populate_siaes(self):
         queryset = (
