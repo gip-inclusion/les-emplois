@@ -10,10 +10,10 @@ from itou.employee_record.serializers import (
     EmployeeRecordUpdateNotificationSerializer,
     _AddressSerializer,
 )
-from itou.employee_record.tests.common import EmployeeRecordFixtureTest
+from itou.utils.test import TestCase
 
 
-class EmployeeRecordAddressSerializerTest(EmployeeRecordFixtureTest):
+class EmployeeRecordAddressSerializerTest(TestCase):
     def test_hexa_additional_address(self):
         # If additional address contains special characters
         # or is more than 32 charactrs long
@@ -69,7 +69,7 @@ class EmployeeRecordAddressSerializerTest(EmployeeRecordFixtureTest):
         self.assertEqual(good_lane_name, data["adrLibelleVoie"])
 
 
-class EmployeeRecordUpdateNotificationSerializerTest(EmployeeRecordFixtureTest):
+class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
     def test_notification_serializer(self):
         # High-level : just check basic information
         start_at = timezone.localdate()

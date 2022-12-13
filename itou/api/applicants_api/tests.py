@@ -10,13 +10,6 @@ from itou.users.factories import JobSeekerFactory
 
 
 class ApplicantsAPITest(APITestCase):
-
-    # For fake addresses
-    fixtures = [
-        "test_asp_INSEE_communes_factory.json",
-        "test_asp_INSEE_countries_factory.json",
-    ]
-
     def setUp(self):
         self.client = APIClient()
         self.url = reverse("v1:applicants-list")

@@ -353,10 +353,6 @@ class JobApplicationModelTest(TestCase):
 
 
 class JobApplicationQuerySetTest(TestCase):
-
-    # Needed for employee record eligibility
-    fixtures = ["test_asp_INSEE_communes_factory.json"]
-
     def test_created_in_past(self):
         now = timezone.now()
         hours_ago_10 = now - timezone.timedelta(hours=10)

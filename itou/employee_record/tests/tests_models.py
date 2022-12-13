@@ -10,7 +10,6 @@ from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import CloningError, InvalidStatusError
 from itou.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
-from itou.employee_record.tests.common import EmployeeRecordFixtureTest
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
@@ -20,9 +19,10 @@ from itou.job_applications.factories import (
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.mocks.address_format import mock_get_geocoding_data
+from itou.utils.test import TestCase
 
 
-class EmployeeRecordModelTest(EmployeeRecordFixtureTest):
+class EmployeeRecordModelTest(TestCase):
     def setUp(self):
         self.employee_record = EmployeeRecordFactory()
 
@@ -244,7 +244,7 @@ class EmployeeRecordModelTest(EmployeeRecordFixtureTest):
             bad_employee_record.clone_orphan(-1)
 
 
-class EmployeeRecordBatchTest(EmployeeRecordFixtureTest):
+class EmployeeRecordBatchTest(TestCase):
     """
     Misc tests on batch wrapper level
     """
@@ -268,7 +268,7 @@ class EmployeeRecordBatchTest(EmployeeRecordFixtureTest):
         )
 
 
-class EmployeeRecordLifeCycleTest(EmployeeRecordFixtureTest):
+class EmployeeRecordLifeCycleTest(TestCase):
     """
     Note: employee records status is never changed manually
     """
@@ -570,7 +570,7 @@ class EmployeeRecordLifeCycleTest(EmployeeRecordFixtureTest):
             employee_record_other_status.update_as_processed_as_duplicate()
 
 
-class EmployeeRecordJobApplicationConstraintsTest(EmployeeRecordFixtureTest):
+class EmployeeRecordJobApplicationConstraintsTest(TestCase):
     """
     Check constraints between job applications and employee records
     """
@@ -619,7 +619,7 @@ class EmployeeRecordJobApplicationConstraintsTest(EmployeeRecordFixtureTest):
         self.assertFalse(self.job_application.can_be_cancelled)
 
 
-class EmployeeRecordQuerysetTest(EmployeeRecordFixtureTest):
+class EmployeeRecordQuerysetTest(TestCase):
     def test_orphans(self):
         # Check orphans employee records
         # (asp_id in object different from actual SIAE convention asp_id field)

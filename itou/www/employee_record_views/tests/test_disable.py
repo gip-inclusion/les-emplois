@@ -4,12 +4,12 @@ from django.utils.html import escape
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecord
-from itou.employee_record.tests.common import EmployeeRecordFixtureTest
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from itou.utils.test import TestCase
 
 
-class DisableEmployeeRecordsTest(EmployeeRecordFixtureTest):
+class DisableEmployeeRecordsTest(TestCase):
     def setUp(self):
         # User must be super user for UI first part (tmp)
         self.siae = SiaeWithMembershipAndJobsFactory(

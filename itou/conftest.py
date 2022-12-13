@@ -1,6 +1,7 @@
 import pytest
 from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
+from django.core import management
 from django.core.cache import cache
 from django.db import connection
 
@@ -48,6 +49,18 @@ def preload_spatial_reference(django_db_setup, django_db_blocker):
     """
     with django_db_blocker.unblock():
         get_srid_info(4326, connection)
+
+
+@pytest.fixture(autouse=True, scope="session", name="django_loaddata")
+def django_loaddata_fixture(django_db_setup, django_db_blocker):
+    with django_db_blocker.unblock():
+        management.call_command(
+            "loaddata",
+            *{
+                "test_asp_INSEE_communes_factory.json",
+                "test_asp_INSEE_countries_factory.json",
+            },
+        )
 
 
 @pytest.fixture(autouse=True)

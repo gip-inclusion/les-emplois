@@ -5,11 +5,11 @@ from django.urls import reverse
 from itou.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
-from itou.employee_record.tests.common import EmployeeRecordFixtureTest
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMockedAddressFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
+from itou.utils.test import TestCase
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -28,7 +28,7 @@ def _get_user_form_data(user):
     return form_data
 
 
-class AbstractCreateEmployeeRecordTest(EmployeeRecordFixtureTest):
+class AbstractCreateEmployeeRecordTest(TestCase):
     def setUp(self):
         self.siae = SiaeWithMembershipAndJobsFactory(
             name="Evil Corp.", membership__user__first_name="Elliot", kind="EI"

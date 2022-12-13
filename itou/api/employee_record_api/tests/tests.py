@@ -3,7 +3,7 @@ from unittest import mock
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
@@ -13,13 +13,11 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
-from .common import EmployeeRecordApiTestCase
-
 
 ENDPOINT_URL = reverse("v1:employee-records-list")
 
 
-class DummyEmployeeRecordAPITest(EmployeeRecordApiTestCase):
+class DummyEmployeeRecordAPITest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
@@ -56,7 +54,7 @@ class DummyEmployeeRecordAPITest(EmployeeRecordApiTestCase):
         self.assertIn("situationSalarie", employee_record_json)
 
 
-class EmployeeRecordAPIPermissionsTest(EmployeeRecordApiTestCase):
+class EmployeeRecordAPIPermissionsTest(APITestCase):
 
     token_url = reverse("v1:token-auth")
 
@@ -120,7 +118,7 @@ class EmployeeRecordAPIPermissionsTest(EmployeeRecordApiTestCase):
         self.assertRedirects(response, reverse("account_logout"), status_code=302, target_status_code=200)
 
 
-class EmployeeRecordAPIFetchListTest(EmployeeRecordApiTestCase):
+class EmployeeRecordAPIFetchListTest(APITestCase):
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
@@ -245,7 +243,7 @@ class EmployeeRecordAPIFetchListTest(EmployeeRecordApiTestCase):
         self.assertEqual(results.get("adresse").get("adrMail"), self.user.email)
 
 
-class EmployeeRecordAPIParametersTest(EmployeeRecordApiTestCase):
+class EmployeeRecordAPIParametersTest(APITestCase):
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,

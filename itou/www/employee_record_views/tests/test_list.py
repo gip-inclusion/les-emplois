@@ -4,12 +4,12 @@ from django.utils import timezone
 
 from itou.employee_record import factories as employee_record_factories
 from itou.employee_record.enums import Status
-from itou.employee_record.tests.common import EmployeeRecordFixtureTest
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from itou.utils.test import TestCase
 
 
-class ListEmployeeRecordsTest(EmployeeRecordFixtureTest):
+class ListEmployeeRecordsTest(TestCase):
     def setUp(self):
         # User must be super user for UI first part (tmp)
         self.siae = SiaeWithMembershipAndJobsFactory(

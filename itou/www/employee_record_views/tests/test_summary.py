@@ -1,12 +1,12 @@
 from django.urls import reverse
 
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
-from itou.employee_record.tests.common import EmployeeRecordFixtureTest
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from itou.utils.test import TestCase
 
 
-class SummaryEmployeeRecordsTest(EmployeeRecordFixtureTest):
+class SummaryEmployeeRecordsTest(TestCase):
     def setUp(self):
         # User must be super user for UI first part (tmp)
         self.siae = SiaeWithMembershipAndJobsFactory(

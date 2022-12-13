@@ -89,13 +89,6 @@ class ManagerTest(TestCase):
 
 
 class ModelTest(TestCase):
-
-    # Needed for `asp.Country` and 'asp.Commune' factories
-    fixtures = [
-        "test_asp_INSEE_communes_factory.json",
-        "test_asp_INSEE_countries_factory",
-    ]
-
     def test_prescriber_of_authorized_organization(self):
         prescriber = PrescriberFactory()
 
@@ -847,8 +840,6 @@ class JobSeekerProfileModelTest(TestCase):
 
     Job seeker profile is extra-data from the ASP and EmployeeRecord domains
     """
-
-    fixtures = ["test_asp_INSEE_communes_factory.json"]
 
     def setUp(self):
         self.profile = JobSeekerProfileFactory()

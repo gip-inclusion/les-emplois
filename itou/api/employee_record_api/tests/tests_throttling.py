@@ -1,20 +1,18 @@
 from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import reverse
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from itou.api.employee_record_api.viewsets import EmployeeRecordRateThrottle
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD
-
-from .common import EmployeeRecordApiTestCase
 
 
 ENDPOINT_URL = reverse("v1:employee-records-list")
 
 
 @override_settings(CACHES={"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}})
-class EmployeeRecordThrottleTest(EmployeeRecordApiTestCase):
+class EmployeeRecordThrottleTest(APITestCase):
     # This a simple smoke test, goal is *not* testing DRF throttling
 
     def setUp(self):

@@ -5,15 +5,7 @@ from django.core import management
 from itou.utils.test import TestCase
 
 
-class EmployeeRecordFixtureTest(TestCase):
-    # "Use the fixture, Luke!"
-    fixtures = [
-        "test_asp_INSEE_communes_factory.json",
-        "test_asp_INSEE_countries_factory.json",
-    ]
-
-
-class ManagementCommandTestCase(EmployeeRecordFixtureTest):
+class ManagementCommandTestCase(TestCase):
 
     # Override as needed
     MANAGEMENT_COMMAND_NAME = None

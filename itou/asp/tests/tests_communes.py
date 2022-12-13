@@ -5,12 +5,7 @@ from itou.users.factories import UserFactory
 from itou.utils.test import TestCase
 
 
-class _CommuneTest(TestCase):
-    # Test fixture(s) to be checked
-    fixtures = ["test_asp_INSEE_communes_factory.json"]
-
-
-class CommunesFixtureTest(_CommuneTest):
+class CommunesFixtureTest(TestCase):
 
     # INSEE commune with a single entry (1 history entry)
     _CODES_WITHOUT_HISTORY = ["97108", "13200"]
@@ -62,7 +57,7 @@ class CommunesFixtureTest(_CommuneTest):
         self.assertEqual(0, communes.count())
 
 
-class CommuneModelTest(_CommuneTest):
+class CommuneModelTest(TestCase):
     def test_by_insee_code(self):
         old_commune = Commune(
             code=99999,
