@@ -1,11 +1,6 @@
-import datetime
-import random
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
-from itou.antivirus.models import Scan
 from itou.files.models import File
 from itou.utils.storage.s3 import s3_client
 
@@ -35,13 +30,3 @@ class Command(BaseCommand):
         # Users cannot change a file after uploading it. It’s OK to ignore
         # conflicts, as the last_modified field does not change.
         File.objects.bulk_create(files, ignore_conflicts=True)
-        now = timezone.now()
-        scans = []
-        seconds_in_day = 24 * 60 * 60
-        for file in files:
-            fake_completed_at = now.replace(hour=0, minute=0, second=0)
-            fake_completed_at -= datetime.timedelta(
-                days=random.randint(0, 30), seconds=random.randrange(seconds_in_day)
-            )
-            scans.append(Scan(file=file, clamav_completed_at=fake_completed_at))
-        Scan.objects.bulk_create(scans)
