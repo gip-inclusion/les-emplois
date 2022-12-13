@@ -1,7 +1,7 @@
 """
 Populate metabase with fluxIAE data and some custom tables for our needs.
 
-For itou data, see the other script `populate_metabase_itou.py`.
+For itou data, see the other script `populate_metabase_emplois.py`.
 
 This script is launched manually every week by Supportix on a fast machine, not production.
 

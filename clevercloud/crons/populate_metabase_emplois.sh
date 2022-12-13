@@ -13,15 +13,15 @@ set -o errexit
 # is intended to be automated by a proper tool like Airflow anyway.
 if [[ "$1" == "--daily" ]]; then
     django-admin send_slack_message ":rocket: lancement mise à jour de données C1 -> Metabase"
-    django-admin populate_metabase_itou --mode=siaes
-    django-admin populate_metabase_itou --mode=job_descriptions
-    django-admin populate_metabase_itou --mode=organizations
-    django-admin populate_metabase_itou --mode=job_seekers
-    django-admin populate_metabase_itou --mode=job_applications
-    django-admin populate_metabase_itou --mode=selected_jobs
-    django-admin populate_metabase_itou --mode=approvals
-    django-admin populate_metabase_itou --mode=final_tables
-    django-admin populate_metabase_itou --mode=inconsistencies
+    django-admin populate_metabase_emplois --mode=siaes
+    django-admin populate_metabase_emplois --mode=job_descriptions
+    django-admin populate_metabase_emplois --mode=organizations
+    django-admin populate_metabase_emplois --mode=job_seekers
+    django-admin populate_metabase_emplois --mode=job_applications
+    django-admin populate_metabase_emplois --mode=selected_jobs
+    django-admin populate_metabase_emplois --mode=approvals
+    django-admin populate_metabase_emplois --mode=final_tables
+    django-admin populate_metabase_emplois --mode=inconsistencies
     django-admin send_slack_message ":white_check_mark: succès mise à jour de données C1 -> Metabase"
 elif [[ "$1" == "--monthly" ]]; then
     django-admin send_slack_message ":rocket: lancement mise à jour de données peu fréquentes C1 -> Metabase"
