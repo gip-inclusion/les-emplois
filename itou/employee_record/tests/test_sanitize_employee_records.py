@@ -51,7 +51,7 @@ def test_3436_errors_check(command):
 
 def test_orphans_check(command):
     # Check if any orphan (mismatch in `asp_id`)
-    factories.BareEmployeeRecordFactory(status=models.Status.DISABLED)
+    factories.EmployeeRecordFactory(status=models.Status.DISABLED)
     employee_record = factories.BareEmployeeRecordFactory(status=models.Status.PROCESSED)
     employee_record.asp_id += 1
     employee_record.save()
@@ -61,7 +61,7 @@ def test_orphans_check(command):
     employee_record.refresh_from_db()
     assert employee_record.status == models.Status.DISABLED
     assert command.stdout.getvalue().split("\n") == [
-        "* Checking PROCESSED employee records with bad asp_id (orphans):",
+        "* Checking orphans employee records:",
         " - found 1 orphan(s)",
         " - fixing orphans: switching status to DISABLED",
         " - done!",

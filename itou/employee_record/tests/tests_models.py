@@ -621,7 +621,7 @@ class EmployeeRecordJobApplicationConstraintsTest(TestCase):
 
 
 class TestEmployeeRecordQueryset:
-    @pytest.mark.parametrize("status", [Status.PROCESSED, Status.DISABLED])
+    @pytest.mark.parametrize("status", list(Status))
     def test_orphans(self, status):
         # Check orphans employee records
         # (asp_id in object different from actual SIAE convention asp_id field)

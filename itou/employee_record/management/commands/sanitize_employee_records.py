@@ -46,15 +46,14 @@ class Command(BaseCommand):
     def _check_orphans(self, dry_run):
         # Report all orphans employee records (bad asp_id)
 
-        orphans = EmployeeRecord.objects.orphans().processed()
-        count_orphans = orphans.count()
+        orphans = EmployeeRecord.objects.orphans()
 
-        self.stdout.write("* Checking PROCESSED employee records with bad asp_id (orphans):")
+        self.stdout.write("* Checking orphans employee records:")
 
-        if count_orphans == 0:
+        if len(orphans) == 0:
             self.stdout.write(" - none found (great!)")
         else:
-            self.stdout.write(f" - found {count_orphans} orphan(s)")
+            self.stdout.write(f" - found {len(orphans)} orphan(s)")
 
             if dry_run:
                 return
@@ -63,7 +62,8 @@ class Command(BaseCommand):
 
             with transaction.atomic():
                 for orphan in orphans:
-                    orphan.update_as_disabled()
+                    if orphan.can_be_disabled:
+                        orphan.update_as_disabled()
 
             self.stdout.write(" - done!")
 
