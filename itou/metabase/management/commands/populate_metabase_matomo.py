@@ -10,6 +10,7 @@ from django.core.management.base import BaseCommand
 from psycopg2 import extras as psycopg2_extras, sql
 
 from itou.metabase.db import MetabaseDatabaseCursor
+from itou.metabase.management.commands._utils import create_table
 from itou.utils import constants
 
 
@@ -83,16 +84,12 @@ class Command(BaseCommand):
                 all_rows.append(list(row.values()))
 
         if wet_run:
+            create_table(
+                METABASE_TABLE_NAME,
+                [(col_name, "varchar") for col_name in MATOMO_COLUMNS],
+            )
+
             with MetabaseDatabaseCursor() as (cursor, conn):
-                cursor.execute(
-                    sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({fields_with_type})").format(
-                        table_name=sql.Identifier(METABASE_TABLE_NAME),
-                        fields_with_type=sql.SQL(",").join(
-                            [sql.SQL(" ").join([sql.Identifier(col), sql.SQL("varchar")]) for col in MATOMO_COLUMNS]
-                        ),
-                    )
-                )
-                conn.commit()
                 cursor.execute(
                     sql.SQL("""DELETE FROM {table_name} WHERE "Date" = {value}""").format(
                         table_name=sql.Identifier(METABASE_TABLE_NAME),

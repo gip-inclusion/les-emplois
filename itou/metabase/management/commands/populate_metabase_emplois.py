@@ -51,6 +51,7 @@ from itou.metabase.management.commands._utils import (
     chunked_queryset,
     compose,
     convert_boolean_to_int,
+    create_table,
     get_active_siae_pks,
     hash_content,
 )
@@ -117,8 +118,8 @@ class Command(BaseCommand):
         with MetabaseDatabaseCursor() as (cur, conn):
 
             def drop_old_and_new_tables(table_name):
-                cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
-                cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(table_name))))
+                cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(new_table_name)))
+                cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
                 conn.commit()
 
             def inject_chunk(table_columns, chunk, new_table_name):
@@ -160,15 +161,7 @@ class Command(BaseCommand):
                 f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:"
             )
 
-            # Create table.
-            create_table_query = sql.SQL("CREATE TABLE {new_table_name} ({fields_with_type})").format(
-                new_table_name=sql.Identifier(new_table_name),
-                fields_with_type=sql.SQL(",").join(
-                    [sql.SQL(" ").join([sql.Identifier(c["name"]), sql.SQL(c["type"])]) for c in table.columns]
-                ),
-            )
-            cur.execute(create_table_query)
-            conn.commit()
+            create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns])
 
             # Add comments on table columns.
             for c in table.columns:
