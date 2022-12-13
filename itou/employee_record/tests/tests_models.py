@@ -619,31 +619,31 @@ class EmployeeRecordJobApplicationConstraintsTest(TestCase):
         self.assertFalse(self.job_application.can_be_cancelled)
 
 
-class EmployeeRecordQuerysetTest(TestCase):
+class TestEmployeeRecordQueryset:
     def test_orphans(self):
         # Check orphans employee records
         # (asp_id in object different from actual SIAE convention asp_id field)
         orphan_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
 
         # Not an orphan, yet
-        self.assertFalse(orphan_employee_record.is_orphan)
-        self.assertEqual(0, EmployeeRecord.objects.orphans().count())
+        assert orphan_employee_record.is_orphan is False
+        assert EmployeeRecord.objects.orphans().count() == 0
 
         # Whatever int different from asp_id will do, but factory sets this field at 0
         orphan_employee_record.asp_id += 1
         orphan_employee_record.save()
 
-        self.assertTrue(orphan_employee_record.is_orphan)
-        self.assertEqual(1, EmployeeRecord.objects.orphans().count())
+        assert orphan_employee_record.is_orphan is True
+        assert EmployeeRecord.objects.orphans().count() == 1
 
     def test_asp_duplicates(self):
         # Filter REJECTED employee records with error code 3436
         EmployeeRecordWithProfileFactory(status=Status.REJECTED)
 
-        self.assertEqual(0, EmployeeRecord.objects.asp_duplicates().count())
+        assert EmployeeRecord.objects.asp_duplicates().count() == 0
 
         EmployeeRecordWithProfileFactory(
             status=Status.REJECTED, asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
         )
 
-        self.assertEqual(1, EmployeeRecord.objects.asp_duplicates().count())
+        assert EmployeeRecord.objects.asp_duplicates().count() == 1
