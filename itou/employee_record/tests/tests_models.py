@@ -2,6 +2,7 @@ import json
 from datetime import date, timedelta
 from unittest import mock
 
+import pytest
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
@@ -620,20 +621,21 @@ class EmployeeRecordJobApplicationConstraintsTest(TestCase):
 
 
 class TestEmployeeRecordQueryset:
-    def test_orphans(self):
+    @pytest.mark.parametrize("status", [Status.PROCESSED, Status.DISABLED])
+    def test_orphans(self, status):
         # Check orphans employee records
         # (asp_id in object different from actual SIAE convention asp_id field)
-        orphan_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
+        employee_record = EmployeeRecordFactory(status=status)
 
         # Not an orphan, yet
-        assert orphan_employee_record.is_orphan is False
+        assert employee_record.is_orphan is False
         assert EmployeeRecord.objects.orphans().count() == 0
 
         # Whatever int different from asp_id will do, but factory sets this field at 0
-        orphan_employee_record.asp_id += 1
-        orphan_employee_record.save()
+        employee_record.asp_id += 1
+        employee_record.save()
 
-        assert orphan_employee_record.is_orphan is True
+        assert employee_record.is_orphan is True
         assert EmployeeRecord.objects.orphans().count() == 1
 
     def test_asp_duplicates(self):

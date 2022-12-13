@@ -51,7 +51,7 @@ def test_3436_errors_check(command):
 
 def test_orphans_check(command):
     # Check if any orphan (mismatch in `asp_id`)
-
+    factories.BareEmployeeRecordFactory(status=models.Status.DISABLED)
     employee_record = factories.BareEmployeeRecordFactory(status=models.Status.PROCESSED)
     employee_record.asp_id += 1
     employee_record.save()

@@ -89,7 +89,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
 
     def orphans(self):
         """
-        PROCESSED employee records with an `asp_id` different from their hiring SIAE.
+        PROCESSED or DISABLED employee records with an `asp_id` different from their hiring SIAE.
         Could occur when using `siae.move_siae_data` management command.
         """
         return (
@@ -98,7 +98,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
                 "job_application__to_siae",
                 "job_application__to_siae__convention",
             )
-            .filter(status=Status.PROCESSED)
+            .filter(status__in=[Status.PROCESSED, Status.DISABLED])
             .exclude(job_application__to_siae__convention__asp_id=F("asp_id"))
         )
 
@@ -419,7 +419,7 @@ class EmployeeRecord(models.Model):
 
     def clone_orphan(self, asp_id):
         """
-        Create and return a copy of a PROCESSED employee record object with a bad `asp_id` (orphan):
+        Create and return a copy of a PROCESSED or DISABLED employee record object with a bad `asp_id` (orphan):
             -`asp_id` field must be different from the original one,
             - by default, `status` is also changed to `READY` to notify ASP.
 
@@ -427,7 +427,7 @@ class EmployeeRecord(models.Model):
             - deactivation of old employee record,
             - create a new one ready to be processed by SIAE before a new transfer to ASP.
 
-        If cloning is succesful, current employee record is DISABLED to avoid conflicts.
+        If cloning is successful, current employee record is DISABLED to avoid conflicts.
 
         Raises `CloningError` if cloning conditions are not met.
         """

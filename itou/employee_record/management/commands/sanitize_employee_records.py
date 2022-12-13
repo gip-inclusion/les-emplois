@@ -46,7 +46,7 @@ class Command(BaseCommand):
     def _check_orphans(self, dry_run):
         # Report all orphans employee records (bad asp_id)
 
-        orphans = EmployeeRecord.objects.orphans()
+        orphans = EmployeeRecord.objects.orphans().processed()
         count_orphans = orphans.count()
 
         self.stdout.write("* Checking PROCESSED employee records with bad asp_id (orphans):")
