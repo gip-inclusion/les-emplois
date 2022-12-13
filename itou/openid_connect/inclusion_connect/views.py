@@ -1,8 +1,8 @@
 import dataclasses
-import json
 import logging
 
 import httpx
+import jwt
 from allauth.account.adapter import get_adapter
 from django.contrib import messages
 from django.contrib.auth import login
@@ -126,21 +126,9 @@ def inclusion_connect_resume_registration(request):
     return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
 
 
-def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
-    code = request.GET.get("code")
-    state = request.GET.get("state")
-    ic_state = InclusionConnectState.get_from_csrf(state)
-    if code is None or ic_state is None:
-        return _redirect_to_login_page_on_error(error_msg="Missing code or state.", request=request)
-    if not ic_state.is_valid():
-        return _redirect_to_login_page_on_error(error_msg="Invalid state.", request=request)
-
-    ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
-    if ic_session is None:
-        return _redirect_to_login_page_on_error(error_msg="Missing session.", request=request)
-
+def get_token(request, code):
+    # Retrieve token from Inclusion Connect
     token_redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
-
     data = {
         "client_id": constants.INCLUSION_CONNECT_CLIENT_ID,
         "client_secret": constants.INCLUSION_CONNECT_CLIENT_SECRET,
@@ -148,30 +136,18 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         "grant_type": "authorization_code",
         "redirect_uri": token_redirect_uri,
     }
-
     response = httpx.post(
         constants.INCLUSION_CONNECT_ENDPOINT_TOKEN,
         data=data,
         timeout=constants.INCLUSION_CONNECT_TIMEOUT,
     )
-
-    if response.status_code != 200:
-        return _redirect_to_login_page_on_error(error_msg="Impossible to get IC token.", request=request)
-
     # Contains access_token, token_type, expires_in, id_token
-    token_data = response.json()
-    access_token = token_data.get("access_token")
-    if not access_token:
-        return _redirect_to_login_page_on_error(error_msg="Access token field missing.", request=request)
+    if response.status_code != 200:
+        return None, _redirect_to_login_page_on_error(error_msg="Impossible to get IC token.", request=request)
+    return response.json(), None
 
-    # Keep token_data["id_token"] to logout from IC.
-    # At this step, we can update the user's fields in DB and create a session if required.
-    ic_session["token"] = token_data["id_token"]
-    ic_session["state"] = state
-    request.session.modified = True
 
-    # A token has been provided so it's time to fetch associated user infos
-    # because the token is only valid for 5 seconds.
+def get_user_info(request, access_token):
     response = httpx.get(
         constants.INCLUSION_CONNECT_ENDPOINT_USERINFO,
         params={"schema": "openid"},
@@ -179,16 +155,50 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         timeout=constants.INCLUSION_CONNECT_TIMEOUT,
     )
     if response.status_code != 200:
-        return _redirect_to_login_page_on_error(error_msg="Impossible to get user infos.", request=request)
+        return None, _redirect_to_login_page_on_error(error_msg="Impossible to get user infos.", request=request)
+    return response.json(), None
 
-    try:
-        user_data = json.loads(response.content.decode("utf-8"))
-    except json.decoder.JSONDecodeError:
-        return _redirect_to_login_page_on_error(error_msg="Impossible to decode user infos.", request=request)
 
-    if "sub" not in user_data:
+def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
+    code = request.GET.get("code")
+    state = request.GET.get("state")
+    if code is None or state is None:
+        return _redirect_to_login_page_on_error(error_msg="Missing code or state.", request=request)
+
+    # Get access token now to have more data in sentry
+    token_data, error_rediction = get_token(request, code)
+    if error_rediction:
+        return error_rediction
+    access_token = token_data.get("access_token")
+    if not access_token:
+        return _redirect_to_login_page_on_error(error_msg="Access token field missing.", request=request)
+    decode_access_token = jwt.decode(access_token, algorithms=["RS256"], options={"verify_signature": False})
+
+    # Check if state is valid and session exists
+    ic_state = InclusionConnectState.get_from_csrf(state)
+    if ic_state is None or not ic_state.is_valid():
+        return _redirect_to_login_page_on_error(error_msg="Invalid state.", request=request)
+    ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
+    if ic_session is None:
+        return _redirect_to_login_page_on_error(error_msg="Missing session.", request=request)
+
+    # Keep token_data["id_token"] to logout from IC.
+    # At this step, we can update the user's fields in DB
+    ic_session["token"] = token_data["id_token"]
+    ic_session["state"] = state
+    request.session.modified = True
+
+    # A token has been provided so it's time to fetch associated user infos
+    # because the token is only valid for 5 seconds.
+    # We don't really need to access user_info since all we need is already in the access_token.
+    # Should we remove this ?
+    user_data, error_rediction = get_user_info(request, access_token)
+    if error_rediction:
+        return error_rediction
+
+    if "sub" not in user_data or user_data["sub"] != decode_access_token["sub"]:
         # 'sub' is the unique identifier from Inclusion Connect, we need that to match a user later on.
-        return _redirect_to_login_page_on_error(error_msg="Sub parameter missing.", request=request)
+        return _redirect_to_login_page_on_error(error_msg="Sub parameter error.", request=request)
 
     user_kind = ic_session["user_kind"]
     is_successful = True
