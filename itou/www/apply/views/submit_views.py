@@ -1,4 +1,3 @@
-import functools
 import logging
 
 from dateutil.relativedelta import relativedelta
@@ -43,24 +42,6 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
 logger = logging.getLogger(__name__)
-
-
-def valid_session_required(required_keys=None):
-    def wrapper(function):
-        @functools.wraps(function)
-        def decorated(request, *args, **kwargs):
-            session_ns = SessionNamespace(request.session, f"job_application-{kwargs['siae_pk']}")
-            if not session_ns.exists():
-                return HttpResponseRedirect(reverse("siaes_views:card", kwargs={"siae_id": kwargs["siae_pk"]}))
-            if required_keys:
-                for key in required_keys:
-                    if session_ns.get(key) != kwargs[key]:
-                        raise PermissionDenied("missing session data information", key)
-            return function(request, *args, **kwargs)
-
-        return decorated
-
-    return wrapper
 
 
 def _check_job_seeker_approval(request, job_seeker, siae):
