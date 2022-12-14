@@ -113,7 +113,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
             "job_seeker_pk": None,
             "nir": None,
             "siae_pk": None,
-            "sender_pk": None,
             "selected_jobs": [],
         }
 
@@ -135,7 +134,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": user.pk,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -161,7 +159,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": user.pk,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -212,7 +209,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
             | {
                 "job_seeker_pk": user.pk,
                 "siae_pk": siae.pk,
-                "sender_pk": user.pk,
                 "selected_jobs": [siae.job_description_through.first().pk],
             },
         )
@@ -368,7 +364,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "job_seeker_pk": None,
             "nir": None,
             "siae_pk": None,
-            "sender_pk": None,
             "selected_jobs": [],
         }
 
@@ -393,7 +388,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         session_data = session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -422,7 +416,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
 
@@ -546,7 +539,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "nir": dummy_job_seeker_profile.user.nir,
             "job_seeker_pk": new_job_seeker.pk,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
 
@@ -569,7 +561,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
                 "nir": dummy_job_seeker_profile.user.nir,
                 "job_seeker_pk": new_job_seeker.pk,
                 "siae_pk": siae.pk,
-                "sender_pk": user.pk,
                 "selected_jobs": [siae.job_description_through.first().pk],
             },
         )
@@ -656,7 +647,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -674,7 +664,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
 
@@ -798,7 +787,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "nir": dummy_job_seeker_profile.user.nir,
             "job_seeker_pk": new_job_seeker.pk,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
 
@@ -821,7 +809,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
                 "nir": dummy_job_seeker_profile.user.nir,
                 "job_seeker_pk": new_job_seeker.pk,
                 "siae_pk": siae.pk,
-                "sender_pk": user.pk,
                 "selected_jobs": [siae.job_description_through.first().pk],
             },
         )
@@ -939,7 +926,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
             "job_seeker_pk": None,
             "nir": None,
             "siae_pk": None,
-            "sender_pk": None,
             "selected_jobs": [],
         }
 
@@ -960,7 +946,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -979,7 +964,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
 
@@ -1117,7 +1101,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
             "nir": dummy_job_seeker_profile.user.nir,
             "job_seeker_pk": new_job_seeker.pk,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
 
@@ -1140,7 +1123,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
                 "nir": dummy_job_seeker_profile.user.nir,
                 "job_seeker_pk": new_job_seeker.pk,
                 "siae_pk": siae.pk,
-                "sender_pk": user.pk,
                 "selected_jobs": [siae.job_description_through.first().pk],
             },
         )
@@ -1349,7 +1331,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
             "job_seeker_pk": None,
             "nir": None,
             "siae_pk": None,
-            "sender_pk": None,
             "selected_jobs": [],
         }
 
@@ -1383,7 +1364,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -1402,7 +1382,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertDictEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
 
@@ -1526,7 +1505,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
             "nir": dummy_job_seeker_profile.user.nir,
             "job_seeker_pk": new_job_seeker.pk,
             "siae_pk": siae.pk,
-            "sender_pk": user.pk,
         }
         self.assertEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
 
@@ -1549,7 +1527,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
                 "nir": dummy_job_seeker_profile.user.nir,
                 "job_seeker_pk": new_job_seeker.pk,
                 "siae_pk": siae.pk,
-                "sender_pk": user.pk,
                 "selected_jobs": [siae.job_description_through.first().pk],
             },
         )
