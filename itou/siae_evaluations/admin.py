@@ -104,6 +104,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
                     "Emails administrateurs",
                     "Numéro de téléphone",
                     "État du contrôle",
+                    "Phase du contrôle",
                 ]
             )
             for campaign in queryset:
@@ -111,6 +112,14 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
                     siae = evaluated_siae.siae
                     # Keep in sync with MembershipQuerySet.active_admin_members.
                     to = [p.user.email for p in siae.memberships.all() if p.is_admin and p.user.is_active]
+                    if campaign.ended_at:
+                        stage = "Campagne terminée"
+                    elif evaluated_siae.reviewed_at is None:
+                        stage = "Phase amiable"
+                    elif evaluated_siae.final_reviewed_at is None:
+                        stage = "Phase contradictoire"
+                    else:
+                        stage = "Contrôle terminé"
                     writer.writerow(
                         [
                             campaign.name,
@@ -121,6 +130,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
                             ", ".join(to),
                             siae.phone,
                             evaluated_siae.state,
+                            stage,
                         ]
                     )
             response = HttpResponse(csvfile.getvalue())

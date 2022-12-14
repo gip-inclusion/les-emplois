@@ -1,8 +1,16 @@
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
-from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
+from itou.siae_evaluations import enums as evaluation_enums
+from itou.siae_evaluations.factories import (
+    EvaluatedAdministrativeCriteriaFactory,
+    EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory,
+    EvaluationCampaignFactory,
+)
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import JobSeekerFactory
 
@@ -27,8 +35,41 @@ class TestEvaluationCampaignAdmin:
             siae__siret="12345678900040",
             siae__convention__siret_signature="12345678900032",
             siae__phone="0612345678",
+            reviewed_at=timezone.now(),
         )
         SiaeMembershipFactory(siae=campaign2_siae.siae, user__email="campaign2@beta.gouv.fr")
+        campaign3 = EvaluationCampaignFactory(
+            name="Contrôle 01/01/2019", institution__name="DDETS 01", ended_at=timezone.now()
+        )
+        campaign3_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign3,
+            siae__name="les bidules",
+            siae__siret="11111111100040",
+            siae__convention__siret_signature="11111111100032",
+            siae__phone="0611111111",
+            notified_at=timezone.now(),
+            notification_text="Justificatifs mangés par le chat",
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.MISSING_PROOF,
+        )
+        SiaeMembershipFactory(siae=campaign3_siae.siae, user__email="campaign3@beta.gouv.fr")
+        campaign4 = EvaluationCampaignFactory(name="Contrôle 01/01/2018", institution__name="DDETS 01")
+        campaign4_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign4,
+            siae__name="les machins",
+            siae__convention__siret_signature="22222222200032",
+            siae__phone="0622222222",
+            reviewed_at=timezone.now() - relativedelta(days=2),
+            final_reviewed_at=timezone.now() - relativedelta(days=1),
+        )
+        campaign4_jobapp = EvaluatedJobApplicationFactory.create(evaluated_siae=campaign4_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=campaign4_jobapp,
+            uploaded_at=timezone.now() - relativedelta(days=1),
+            submitted_at=timezone.now() - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        SiaeMembershipFactory(siae=campaign4_siae.siae, user__email="campaign4@beta.gouv.fr")
+        # Not selected.
         EvaluatedSiaeFactory(evaluation_campaign__name="Contrôle 02/02/2020")
         admin_user = JobSeekerFactory(is_staff=True, is_superuser=True)
         client.force_login(admin_user)
@@ -40,6 +81,7 @@ class TestEvaluationCampaignAdmin:
             + 1  # Fetch evaluation campaigns
             + 1  # Prefetch evaluated siaes
             + 1  # Prefetch job applications
+            + 1  # Prefetch administrative criteria
             + 1  # Prefetch siaes
             + 1  # Prefetch siae memberships
             + 1  # Prefetch users of siae memberships
@@ -54,6 +96,8 @@ class TestEvaluationCampaignAdmin:
                     "_selected_action": [
                         campaign1.pk,
                         campaign2.pk,
+                        campaign3.pk,
+                        campaign4.pk,
                     ],
                 },
             )
@@ -65,10 +109,17 @@ class TestEvaluationCampaignAdmin:
         )
         assert response.content.decode(response.charset) == (
             "Campagne,SIRET signature,Type,Nom,Département,Emails administrateurs,Numéro de téléphone,"
-            "État du contrôle\r\n"
+            "État du contrôle,Phase du contrôle\r\n"
             # campaign1
             "Contrôle 01/01/2022,00000000000032,EI,les jardins,14,"
-            '"campaign1+1@beta.gouv.fr, campaign1+2@beta.gouv.fr",,PENDING\r\n'
+            '"campaign1+1@beta.gouv.fr, campaign1+2@beta.gouv.fr",,PENDING,Phase amiable\r\n'
             # campaign2
-            "Contrôle 01/01/2021,12345678900032,EI,les trucs du bazar,14,campaign2@beta.gouv.fr,0612345678,PENDING\r\n"
+            "Contrôle 01/01/2021,12345678900032,EI,les trucs du bazar,14,"
+            "campaign2@beta.gouv.fr,0612345678,PENDING,Phase contradictoire\r\n"
+            # campaign3
+            "Contrôle 01/01/2019,11111111100032,EI,les bidules,14,"
+            "campaign3@beta.gouv.fr,0611111111,REFUSED,Campagne terminée\r\n"
+            # campaign4
+            "Contrôle 01/01/2018,22222222200032,EI,les machins,14,"
+            "campaign4@beta.gouv.fr,0622222222,ACCEPTED,Contrôle terminé\r\n"
         )
