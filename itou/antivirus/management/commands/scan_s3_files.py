@@ -4,6 +4,7 @@ import shutil
 import stat
 import subprocess
 import tempfile
+import time
 
 from botocore.exceptions import ConnectionError as BotoConnectionError, HTTPClientError
 from dateutil.relativedelta import relativedelta
@@ -25,6 +26,7 @@ class Command(BaseCommand):
     BATCH_SIZE = 200
 
     def handle(self, *args, **options):
+        start = time.perf_counter()
         now = timezone.now()
         files = File.objects.exclude(scan__clamav_completed_at__gt=now - relativedelta(month=1)).order_by(
             F("scan__clamav_completed_at").asc(nulls_first=True)
@@ -58,6 +60,8 @@ class Command(BaseCommand):
                     update_fields=["clamav_completed_at"],
                     unique_fields=["file_id"],
                 )
+        elapsed = time.perf_counter() - start
+        self.stderr.write(f"Scanned {len(files)} files in {elapsed:.2f}s.")
 
     def download_files(self, files, workdir):
         client = s3_client()
