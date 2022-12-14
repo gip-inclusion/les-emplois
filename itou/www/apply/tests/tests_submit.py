@@ -111,7 +111,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         return {
             "back_url": "/",
             "job_seeker_pk": None,
-            "job_seeker_email": None,
             "nir": None,
             "siae_pk": None,
             "sender_pk": None,
@@ -367,7 +366,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         return {
             "back_url": "/",
             "job_seeker_pk": None,
-            "job_seeker_email": None,
             "nir": None,
             "siae_pk": None,
             "sender_pk": None,
@@ -939,7 +937,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         return {
             "back_url": "/",
             "job_seeker_pk": None,
-            "job_seeker_email": None,
             "nir": None,
             "siae_pk": None,
             "sender_pk": None,
@@ -1350,7 +1347,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         return {
             "back_url": "/",
             "job_seeker_pk": None,
-            "job_seeker_email": None,
             "nir": None,
             "siae_pk": None,
             "sender_pk": None,
