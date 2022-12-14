@@ -192,7 +192,6 @@ class StartView(ApplyStepBaseView):
             {
                 "back_url": self._coalesce_back_url(),
                 "job_seeker_pk": user_info.user.pk if user_info.user.is_job_seeker else None,
-                "job_seeker_email": None,
                 "nir": None,
                 "siae_pk": self.siae.pk,
                 "sender_pk": user_info.user.pk,
