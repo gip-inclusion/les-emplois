@@ -194,7 +194,6 @@ class StartView(ApplyStepBaseView):
                 "job_seeker_pk": user_info.user.pk if user_info.user.is_job_seeker else None,
                 "nir": None,
                 "siae_pk": self.siae.pk,
-                "sender_pk": user_info.user.pk,
                 "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
             }
         )
