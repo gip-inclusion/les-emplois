@@ -411,14 +411,7 @@ class EmployeeRecord(models.Model):
 
     def clone_orphan(self, asp_id):
         """
-        Create and return a copy of an employee record object with a bad `asp_id` (orphan):
-            -`asp_id` field must be different from the original one,
-            - by default, `status` is also changed to `READY` to notify ASP.
-
-        This is useful when orphans are detected (irrelevant `asp_id`):
-            - deactivation of old employee record,
-            - create a new one ready to be processed by SIAE before a new transfer to ASP.
-
+        Create and return a NEW copy of an orphan employee record, this is useful when orphans are detected.
         If cloning is successful, current employee record is DISABLED (if possible) to avoid conflicts.
 
         Raises `CloningError` if cloning conditions are not met.
@@ -438,24 +431,21 @@ class EmployeeRecord(models.Model):
             raise CloningError(f"Unable to find SIAE convention for asp_id: {asp_id}")
 
         # Cleanup clone fields
-        er_copy = EmployeeRecord.objects.get(pk=self.pk)
-        er_copy.pk = None
-        er_copy.created_at = timezone.now()
-        er_copy.asp_id = convention.asp_id
-        er_copy.siret = convention.siret_signature
-        er_copy.status = Status.READY
-        er_copy.asp_batch_file = None
-        er_copy.asp_batch_line_number = None
-        er_copy.asp_processing_label = f"{self.ASP_CLONE_MESSAGE} (pk origine: {self.pk})"
-        er_copy.asp_processing_code = None
-        er_copy.archived_json = None
+        er_copy = EmployeeRecord(
+            status=Status.NEW,
+            job_application=self.job_application,
+            approval_number=self.approval_number,
+            asp_id=convention.asp_id,
+            siret=EmployeeRecord.siret_from_asp_source(self.job_application.to_siae),
+            asp_processing_label=f"{self.ASP_CLONE_MESSAGE} (pk origine: {self.pk})",
+        )
 
         try:
             er_copy.save()
         except Exception as ex:
             raise CloningError(
                 f"Can't persist employee record clone. "
-                f"Duplicate asp_ip / approval number pair ? ({er_copy.asp_id=}, {er_copy.approval_number=})"
+                f"Duplicate asp_id / approval_number pair? ({er_copy.asp_id=}, {er_copy.approval_number=})"
             ) from ex
 
         # Disable current object to avoid conflicts
