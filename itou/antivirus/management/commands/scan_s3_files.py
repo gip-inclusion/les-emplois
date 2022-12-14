@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         now = timezone.now()
-        files = File.objects.exclude(scan__clamav_completed_at__gt=now - relativedelta(month=1)).order_by(
+        files = File.objects.exclude(scan__clamav_completed_at__gt=now - relativedelta(months=1)).order_by(
             F("scan__clamav_completed_at").asc(nulls_first=True)
         )[: self.BATCH_SIZE]
         # Indicate these files are being processed to concurrent scans.
