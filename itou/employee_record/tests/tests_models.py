@@ -657,3 +657,10 @@ class TestEmployeeRecordQueryset:
 
         assert EmployeeRecord.objects.for_siae(employee_record_1.job_application.to_siae).get() == employee_record_1
         assert EmployeeRecord.objects.for_siae(employee_record_2.job_application.to_siae).get() == employee_record_2
+
+    def test_for_siae_with_different_asp_id(self):
+        employee_record = EmployeeRecordFactory(
+            asp_id=0,
+        )
+
+        assert list(EmployeeRecord.objects.for_siae(employee_record.job_application.to_siae)) == []

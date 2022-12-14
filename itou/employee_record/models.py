@@ -66,7 +66,10 @@ class EmployeeRecordQuerySet(models.QuerySet):
 
     # Search queries
     def for_siae(self, siae):
-        return self.filter(job_application__to_siae=siae)
+        return self.filter(
+            job_application__to_siae=siae,
+            asp_id=F("job_application__to_siae__convention__asp_id"),
+        )
 
     def find_by_batch(self, filename, line_number):
         """
