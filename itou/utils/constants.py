@@ -4,6 +4,7 @@ ITOU_DOC_URL = "https://doc.inclusion.beta.gouv.fr"
 ITOU_EMAIL_PROLONGATION = "prolongation@inclusion.beta.gouv.fr"
 PILOTAGE_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/pilotage"
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
+EMPLOIS_SITE_URL = "https://emplois.inclusion.beta.gouv.fr"
 POLE_EMPLOI_EMAIL_SUFFIX = "@pole-emploi.fr"
 
 # These session keys should actually reside in the views that

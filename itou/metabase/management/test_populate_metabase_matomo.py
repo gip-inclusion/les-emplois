@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from django.core import management
 from django.db import connection
@@ -63,7 +65,7 @@ MATOMO_HEADERS = (
     "Avg. Visit Duration (in seconds)"
 )
 
-MATOMO_CONTENT = (
+MATOMO_ONLINE_CONTENT = (
     "25,26,0,242,43,1,17222,13,132,13,0,43,0%,10.2,12 min 36s,13,110,13,0,24,8%,8.5,9 min 29s,0,0,"
     "17,9,0,0,0,0,2,4,0,65%,0%,0%,0%,35%,27.411,225,111.02,225,7.119,224,149.254,167,178.406,123,"
     "1.025,123,474.235,225,0.12s,0.49s,0.03s,0.89s,1.45s,0.01s,2.11s,0,0,0,0%,0,0,0,0%,0,0,0,0%,"
@@ -76,15 +78,13 @@ MATOMO_CONTENT = (
 @pytest.mark.respx(base_url="https://mato.mo")
 @pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
-def test_matomo_populate(respx_mock):
+def test_matomo_populate_public(monkeypatch, respx_mock):
+    monkeypatch.setattr(time, "sleep", lambda x: None)
     respx_mock.get("/").respond(
         200,
-        content=f"{MATOMO_HEADERS}\n{MATOMO_CONTENT}".encode("utf-16"),
+        content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
-    management.call_command(
-        "populate_metabase_matomo",
-        wet_run=True,
-    )
+    management.call_command("populate_metabase_matomo", wet_run=True, mode="public")
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM suivi_visiteurs_tb_publics_v0")
         rows = cursor.fetchall()
@@ -174,5 +174,150 @@ def test_matomo_populate(respx_mock):
             "9.3",
             "11 min 2s",
             "2022-06-13",
-            "tb 129 - Analyse des publics",
+            "tb 116 - Recrutement",
         )
+
+
+@override_settings(MATOMO_BASE_URL="https://mato.mo")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.respx(base_url="https://mato.mo")
+@pytest.mark.usefixtures("metabase")
+@freeze_time("2022-06-21")
+def test_matomo_populate_private(monkeypatch, respx_mock):
+
+    # lazy import, if we import at the root the metabase fixture won't work.
+    from .commands import populate_metabase_matomo
+
+    # rewrite the REGIONS import or the test, even with mocked HTTP calls, is several minutes
+    monkeypatch.setattr(populate_metabase_matomo, "REGIONS", {"Bretagne": ["75", "31"]})
+    monkeypatch.setattr(time, "sleep", lambda x: None)
+    respx_mock.get("/").respond(
+        200,
+        content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
+    )
+    management.call_command("populate_metabase_matomo", wet_run=True, mode="private")
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM suivi_visiteurs_tb_prives_v0")
+        rows = cursor.fetchall()
+        assert len(rows) == 23
+        assert rows[0] == (
+            "25",
+            "26",
+            "0",
+            "242",
+            "43",
+            "1",
+            "17222",
+            "13",
+            "132",
+            "13",
+            "0",
+            "43",
+            "0%",
+            "10.2",
+            "12 min 36s",
+            "13",
+            "110",
+            "13",
+            "0",
+            "24",
+            "8%",
+            "8.5",
+            "9 min 29s",
+            "0",
+            "0",
+            "17",
+            "9",
+            "0",
+            "0",
+            "0",
+            "0",
+            "2",
+            "4",
+            "0",
+            "65%",
+            "0%",
+            "0%",
+            "0%",
+            "35%",
+            "27.411",
+            "225",
+            "111.02",
+            "225",
+            "7.119",
+            "224",
+            "149.254",
+            "167",
+            "178.406",
+            "123",
+            "1.025",
+            "123",
+            "474.235",
+            "225",
+            "0.12s",
+            "0.49s",
+            "0.03s",
+            "0.89s",
+            "1.45s",
+            "0.01s",
+            "2.11s",
+            "0",
+            "0",
+            "0",
+            "0%",
+            "0",
+            "0",
+            "0",
+            "0%",
+            "0",
+            "0",
+            "0",
+            "0%",
+            "225",
+            "95",
+            "0",
+            "0",
+            "17",
+            "12",
+            "0",
+            "0",
+            "4%",
+            "9.3",
+            "11 min 2s",
+            "2022-06-13",
+            "TB DGEFP",
+            None,
+            None,
+            None,
+        )
+        assert [line[-5:] for line in rows] == [
+            ("2022-06-13", "TB DGEFP", None, None, None),
+            ("2022-06-13", "tb 117 - Données IAE DREETS/DDETS", None, None, "Bretagne"),
+            ("2022-06-13", "tb 149 - Candidatures orientées PE", None, None, "Bretagne"),
+            ("2022-06-13", "tb 160 - Facilitation de l'embauche DREETS/DDETS", None, None, "Bretagne"),
+            ("2022-06-13", "tb 162 - Fiches de poste en tension PE", None, None, "Bretagne"),
+            ("2022-06-13", "tb 168 - Délai d'entrée en IAE", None, None, "Bretagne"),
+            ("2022-06-13", "tb 169 - Taux de transformation PE", None, None, "Bretagne"),
+            ("2022-06-13", "tb 117 - Données IAE DREETS/DDETS", "31 - Haute-Garonne", "31", "Occitanie"),
+            ("2022-06-13", "tb 118 - Données IAE CD", "31 - Haute-Garonne", "31", "Occitanie"),
+            ("2022-06-13", "tb 149 - Candidatures orientées PE", "31 - Haute-Garonne", "31", "Occitanie"),
+            (
+                "2022-06-13",
+                "tb 160 - Facilitation de l'embauche DREETS/DDETS",
+                "31 - Haute-Garonne",
+                "31",
+                "Occitanie",
+            ),
+            ("2022-06-13", "tb 162 - Fiches de poste en tension PE", "31 - Haute-Garonne", "31", "Occitanie"),
+            ("2022-06-13", "tb 165 - Recrutement SIAE", "31 - Haute-Garonne", "31", "Occitanie"),
+            ("2022-06-13", "tb 168 - Délai d'entrée en IAE", "31 - Haute-Garonne", "31", "Occitanie"),
+            ("2022-06-13", "tb 169 - Taux de transformation PE", "31 - Haute-Garonne", "31", "Occitanie"),
+            ("2022-06-13", "tb 117 - Données IAE DREETS/DDETS", "75 - Paris", "75", "Île-de-France"),
+            ("2022-06-13", "tb 118 - Données IAE CD", "75 - Paris", "75", "Île-de-France"),
+            ("2022-06-13", "tb 149 - Candidatures orientées PE", "75 - Paris", "75", "Île-de-France"),
+            ("2022-06-13", "tb 160 - Facilitation de l'embauche DREETS/DDETS", "75 - Paris", "75", "Île-de-France"),
+            ("2022-06-13", "tb 162 - Fiches de poste en tension PE", "75 - Paris", "75", "Île-de-France"),
+            ("2022-06-13", "tb 165 - Recrutement SIAE", "75 - Paris", "75", "Île-de-France"),
+            ("2022-06-13", "tb 168 - Délai d'entrée en IAE", "75 - Paris", "75", "Île-de-France"),
+            ("2022-06-13", "tb 169 - Taux de transformation PE", "75 - Paris", "75", "Île-de-France"),
+        ]
