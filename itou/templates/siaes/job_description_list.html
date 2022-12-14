@@ -180,24 +180,9 @@
         </div>
     </div>
 
-    {# Preview search results modal #}
-    <div class="modal modal-md fade" id="js-modal-preview" tabindex="-1" role="dialog" aria-labelledby="modalPrevisualisationTitle" aria-modal="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modalPrevisualisationTitle" class="modal-title">Vue de votre structure depuis la liste de résultats</h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                        <i class="ri-close-line"></i>
-                    </button>
-                </div>
-                <div id="js-modal-preview-body" class="modal-body">
-                </div>
-                <div class="modal-footer">
-                    <a class="btn btn-sm btn-primary" href="#" data-dismiss="modal" title="Fermer la fenêtre">Fermer la fenêtre</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% with submit_btn='<a class="btn btn-sm btn-primary" href="#" data-dismiss="modal" title="Fermer la fenêtre">Fermer la fenêtre</a>' %}
+        {% include "layout/_modal.html" with id="js-modal-preview" size="lg" title="Vue de votre structure depuis la liste de résultats" body_id="js-modal-preview-body" submit_btn_tag=submit_btn %}
+    {% endwith submit_btn %}
 
 {% endblock %}
 
