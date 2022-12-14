@@ -647,3 +647,9 @@ class TestEmployeeRecordQueryset:
         )
 
         assert EmployeeRecord.objects.asp_duplicates().count() == 1
+
+    def test_for_siae(self):
+        employee_record_1, employee_record_2 = EmployeeRecordFactory.create_batch(2)
+
+        assert EmployeeRecord.objects.for_siae(employee_record_1.job_application.to_siae).get() == employee_record_1
+        assert EmployeeRecord.objects.for_siae(employee_record_2.job_application.to_siae).get() == employee_record_2

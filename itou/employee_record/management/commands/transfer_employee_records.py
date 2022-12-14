@@ -259,7 +259,7 @@ class Command(EmployeeRecordTransferCommand):
         """
         Upload a file composed of all ready employee records
         """
-        ready_employee_records = EmployeeRecord.objects.ready()
+        ready_employee_records = EmployeeRecord.objects.filter(status=Status.READY)
 
         # FIXME: temp disabled, too much impact, must be discussed
         # As requested by ASP, we can now send employee records in bigger batches

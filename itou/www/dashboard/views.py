@@ -76,10 +76,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "url"
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
-        num_rejected_employee_records = EmployeeRecord.objects.filter(
-            status=Status.REJECTED,
-            job_application__to_siae=current_org,
-        ).count()
+        num_rejected_employee_records = (
+            EmployeeRecord.objects.for_siae(current_org).filter(status=Status.REJECTED).count()
+        )
 
     if request.user.is_prescriber:
         try:

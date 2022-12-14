@@ -10,7 +10,7 @@ from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record import constants
 from itou.employee_record.exceptions import SerializationError
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
 from itou.utils.iterators import chunks
 
@@ -104,7 +104,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         new_objects = (
             EmployeeRecordUpdateNotification.objects.new()
             if object_class == EmployeeRecordUpdateNotification
-            else EmployeeRecord.objects.ready()
+            else EmployeeRecord.objects.filter(status=Status.READY)
         )
 
         object_serializer = (

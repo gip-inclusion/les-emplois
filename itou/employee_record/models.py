@@ -64,45 +64,9 @@ class EmployeeRecordQuerySet(models.QuerySet):
             "job_application__job_seeker__jobseeker_profile__hexa_commune",
         )
 
-    # Status filters
-
-    def ready(self):
-        """
-        These FS are ready to to be sent to ASP
-        """
-        return self.filter(status=Status.READY)
-
-    def ready_for_siae(self, siae):
-        return self.ready().filter(job_application__to_siae=siae).select_related("job_application")
-
-    def sent(self):
-        return self.filter(status=Status.SENT)
-
-    def sent_for_siae(self, siae):
-        return self.sent().filter(job_application__to_siae=siae).select_related("job_application")
-
-    def rejected(self):
-        return self.filter(status=Status.REJECTED)
-
-    def rejected_for_siae(self, siae):
-        return self.rejected().filter(job_application__to_siae=siae).select_related("job_application")
-
-    def processed(self):
-        return self.filter(status=Status.PROCESSED)
-
-    def processed_for_siae(self, siae):
-        return self.processed().filter(job_application__to_siae=siae).select_related("job_application")
-
-    def disabled(self):
-        return self.filter(status=Status.DISABLED)
-
-    def disabled_for_siae(self, siae):
-        return self.disabled().filter(job_application__to_siae=siae).select_related("job_application")
-
-    def archived(self):
-        return self.filter(status=Status.ARCHIVED)
-
     # Search queries
+    def for_siae(self, siae):
+        return self.filter(job_application__to_siae=siae)
 
     def find_by_batch(self, filename, line_number):
         """
@@ -114,14 +78,14 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         Fetch employee records in PROCESSED state for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
         """
-        return self.processed().filter(processed_at__lte=timezone.now() - ARCHIVING_DELTA)
+        return self.filter(status=Status.PROCESSED, processed_at__lte=timezone.now() - ARCHIVING_DELTA)
 
     def asp_duplicates(self):
         """
         Return REJECTED employee records with error code '3436'.
         These employee records are considered as duplicates by ASP.
         """
-        return self.rejected().filter(asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE)
+        return self.filter(status=Status.REJECTED).filter(asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE)
 
     def orphans(self):
         """
@@ -134,7 +98,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
                 "job_application__to_siae",
                 "job_application__to_siae__convention",
             )
-            .processed()
+            .filter(status=Status.PROCESSED)
             .exclude(job_application__to_siae__convention__asp_id=F("asp_id"))
         )
 

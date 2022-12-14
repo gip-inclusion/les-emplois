@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.throttling import UserRateThrottle
 
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordUpdateNotificationSerializer
 from itou.job_applications.models import JobApplication
 
@@ -144,12 +144,10 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
 
         # Query params are chainable
 
-        if status := params.getlist("status"):
+        # if no status given, return employee records in PROCESSED state
+        if status := params.getlist("status", [Status.PROCESSED]):
             status_filter = [s.upper() for s in status]
             result = result.filter(status__in=status_filter)
-        else:
-            # if no status given, return employee records in PROCESSED state
-            result = result.processed()
 
         if created := params.get("created"):
             result = _annotate_convert_created_at(result).filter(creation_date=created)

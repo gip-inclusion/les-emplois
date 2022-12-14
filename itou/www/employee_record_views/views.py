@@ -79,10 +79,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
     # Badges for "real" employee records
     employee_record_statuses = (
-        EmployeeRecord.objects.filter(job_application__to_siae=siae)
-        .values("status")
-        .annotate(cnt=Count("status"))
-        .order_by("-status")
+        EmployeeRecord.objects.for_siae(siae).values("status").annotate(cnt=Count("status")).order_by("-status")
     )
     employee_record_badges = {row["status"]: row["cnt"] for row in employee_record_statuses}
 
@@ -136,16 +133,8 @@ def list_employee_records(request, template_name="employee_record/list.html"):
                     item.employee_record_new = e
                     break
         employee_records_list = False
-    elif status == Status.READY:
-        data = base_query.ready_for_siae(siae)
-    elif status == Status.SENT:
-        data = base_query.sent_for_siae(siae)
-    elif status == Status.REJECTED:
-        data = EmployeeRecord.objects.rejected_for_siae(siae).order_by(*employee_record_order_by)
-    elif status == Status.PROCESSED:
-        data = base_query.processed_for_siae(siae)
-    elif status == Status.DISABLED:
-        data = base_query.disabled_for_siae(siae)
+    else:
+        data = base_query.filter(status=status).for_siae(siae)
 
     if data:
         navigation_pages = pager(data, request.GET.get("page", 1), items_per_page=10)
