@@ -38,12 +38,14 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.SiaeConvention
+        django_get_or_create = ("asp_id", "kind")
 
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     # FIXME(vperron): this should be made random
     kind = SiaeKind.EI
-    asp_id = factory.Sequence(int)
+    # factory.Sequence() start with 0 and an ASP ID should be greater than 0
+    asp_id = factory.Sequence(lambda n: n + 1)
     is_active = True
     financial_annex = factory.RelatedFactory(SiaeFinancialAnnexFactory, "convention")
 

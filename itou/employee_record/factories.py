@@ -28,6 +28,9 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
     approval_number = factory.SelfAttribute(".job_application.approval.number")
     siret = factory.SelfAttribute(".job_application.to_siae.siret")
 
+    class Params:
+        orphan = factory.Trait(asp_id=0)
+
 
 class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
     """
