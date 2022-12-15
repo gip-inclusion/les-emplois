@@ -33,28 +33,26 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
-from itou.metabase.db import MetabaseDatabaseCursor
-from itou.metabase.management.commands import (
-    _approvals,
-    _insee_codes,
-    _job_applications,
-    _job_descriptions,
-    _job_seekers,
-    _organizations,
-    _rome_codes,
-    _siaes,
-)
-from itou.metabase.management.commands._database_tables import get_new_table_name, get_old_table_name
-from itou.metabase.management.commands._dataframes import get_df_from_rows, store_df
-from itou.metabase.management.commands._utils import (
+from itou.metabase.dataframes import get_df_from_rows, store_df
+from itou.metabase.db import (
+    MetabaseDatabaseCursor,
     build_final_tables,
-    chunked_queryset,
-    compose,
-    convert_boolean_to_int,
     create_table,
-    get_active_siae_pks,
-    hash_content,
+    get_new_table_name,
+    get_old_table_name,
 )
+from itou.metabase.tables import (
+    approvals,
+    insee_codes,
+    job_applications,
+    job_descriptions,
+    job_seekers,
+    organizations,
+    rome_codes,
+    siaes,
+)
+from itou.metabase.tables.utils import get_active_siae_pks, hash_content
+from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
@@ -227,7 +225,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table=_siaes.TABLE, querysets=[queryset])
+        self.populate_table(table=siaes.TABLE, querysets=[queryset])
 
     def populate_job_descriptions(self):
         queryset = (
@@ -240,7 +238,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table=_job_descriptions.TABLE, querysets=[queryset])
+        self.populate_table(table=job_descriptions.TABLE, querysets=[queryset])
 
     def populate_organizations(self):
         """
@@ -253,9 +251,9 @@ class Command(BaseCommand):
         ).all()
 
         self.populate_table(
-            table=_organizations.TABLE,
+            table=organizations.TABLE,
             querysets=[queryset],
-            extra_object=_organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
+            extra_object=organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
         )
 
     def populate_job_applications(self):
@@ -268,7 +266,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table=_job_applications.TABLE, querysets=[queryset])
+        self.populate_table(table=job_applications.TABLE, querysets=[queryset])
 
     def populate_selected_jobs(self):
         """
@@ -316,10 +314,10 @@ class Command(BaseCommand):
             "user", "user__job_applications", "user__job_applications__to_siae"
         ).all()
         queryset2 = PoleEmploiApproval.objects.filter(
-            start_at__gte=_approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
+            start_at__gte=approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
         ).all()
 
-        self.populate_table(table=_approvals.TABLE, querysets=[queryset1, queryset2])
+        self.populate_table(table=approvals.TABLE, querysets=[queryset1, queryset2])
 
     def populate_job_seekers(self):
         """
@@ -344,17 +342,17 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(table=_job_seekers.TABLE, querysets=[queryset])
+        self.populate_table(table=job_seekers.TABLE, querysets=[queryset])
 
     def populate_rome_codes(self):
         queryset = Rome.objects.all()
 
-        self.populate_table(table=_rome_codes.TABLE, querysets=[queryset])
+        self.populate_table(table=rome_codes.TABLE, querysets=[queryset])
 
     def populate_insee_codes(self):
         queryset = City.objects.all()
 
-        self.populate_table(table=_insee_codes.TABLE, querysets=[queryset])
+        self.populate_table(table=insee_codes.TABLE, querysets=[queryset])
 
     def populate_departments(self):
         table_name = "departements"

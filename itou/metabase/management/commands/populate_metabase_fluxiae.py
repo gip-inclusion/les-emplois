@@ -60,8 +60,8 @@ An EMI does not necessarily have a mission.
 """
 from django.core.management.base import BaseCommand
 
-from itou.metabase.management.commands._dataframes import store_df
-from itou.metabase.management.commands._utils import build_final_tables
+from itou.metabase.dataframes import store_df
+from itou.metabase.db import build_final_tables
 
 # FIXME(vperron): Those helpers are shared between populate_metabase and import_siae.
 # It would make a lot more sense, to avoid eventual circular imports, to move everything

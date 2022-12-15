@@ -1,37 +1,30 @@
 import functools
 import hashlib
-import os
 from operator import attrgetter
 
 from django.conf import settings
 from django.utils import timezone
-from psycopg2 import sql
 
 from itou.approvals.models import Approval
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.metabase.db import MetabaseDatabaseCursor
-from itou.metabase.management.commands._database_tables import get_new_table_name, switch_table_atomically
 from itou.siaes.models import Siae
 from itou.users.models import User
-from itou.utils.python import timeit
 
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+class MetabaseTable:
+    def __init__(self, name):
+        self.name = name
+        self.columns = []
 
+    def add_columns(self, columns):
+        self.columns += columns
 
-def convert_boolean_to_int(b):
-    # True => 1, False => 0, None => None.
-    return None if b is None else int(b)
-
-
-def compose(f, g):
-    # Compose two lambda methods.
-    # https://stackoverflow.com/questions/16739290/composing-functions-in-python
-    # I had to use this to solve a cryptic
-    # `RecursionError: maximum recursion depth exceeded` error
-    # when composing convert_boolean_to_int and c["fn"].
-    return lambda *a, **kw: f(g(*a, **kw))
+    def get(self, column_name, input):
+        matching_columns = [c for c in self.columns if c["name"] == column_name]
+        assert len(matching_columns) == 1
+        fn = matching_columns[0]["fn"]
+        return fn(input)
 
 
 def get_choice(choices, key):
@@ -44,14 +37,6 @@ def get_choice(choices, key):
         # return gettext(choices[key])
         return choices[key]
     return None
-
-
-def chunks(items, n):
-    """
-    Yield successive n-sized chunks from items.
-    """
-    for i in range(0, len(items), n):
-        yield items[i : i + n]
 
 
 def get_first_membership_join_date(memberships):
@@ -213,100 +198,6 @@ def get_qpv_job_seeker_pks():
     # Objects returned by `raw` are defered which means their fields are not preloaded unless they have been
     # explicitely specified in the SQL request. We did specify and thus preload `id` fields.
     return [job_seeker.pk for job_seeker in qpv_job_seekers]
-
-
-def chunked_queryset(queryset, chunk_size=10000):
-    """
-    Slice a queryset into chunks. This is useful to avoid memory issues when
-    iterating through large querysets.
-    Credits go to:
-    https://medium.com/@rui.jorge.rei/today-i-learned-django-memory-leak-and-the-sql-query-cache-1c152f62f64
-    Code initially adapted from https://djangosnippets.org/snippets/10599/
-    """
-    if not queryset.exists():
-        return
-    queryset = queryset.order_by("pk")
-    pks = queryset.values_list("pk", flat=True)
-    start_pk = pks[0]
-    while True:
-        try:
-            end_pk = pks.filter(pk__gte=start_pk)[chunk_size]
-        except IndexError:
-            break
-        yield queryset.filter(pk__gte=start_pk, pk__lt=end_pk)
-        start_pk = end_pk
-    yield queryset.filter(pk__gte=start_pk)
-
-
-@timeit
-def build_custom_table(table_name, sql_request):
-    """
-    Build a new table with given sql_request.
-    Minimize downtime by building a temporary table first then swap the two tables atomically.
-    """
-    with MetabaseDatabaseCursor() as (cur, conn):
-        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
-        conn.commit()
-        cur.execute(
-            sql.SQL("CREATE TABLE {} AS {}").format(
-                sql.Identifier(get_new_table_name(table_name)), sql.SQL(sql_request)
-            )
-        )
-        conn.commit()
-
-    switch_table_atomically(table_name=table_name)
-
-
-def create_table(table_name: str, columns: list[str, str]):
-    """Create table from colomns names and types"""
-    with MetabaseDatabaseCursor() as (cursor, conn):
-        create_table_query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({fields_with_type})").format(
-            table_name=sql.Identifier(table_name),
-            fields_with_type=sql.SQL(",").join(
-                [sql.SQL(" ").join([sql.Identifier(col_name), sql.SQL(col_type)]) for col_name, col_type in columns]
-            ),
-        )
-        cursor.execute(create_table_query)
-        conn.commit()
-
-
-def build_final_tables():
-    """
-    Build final custom tables one by one by playing SQL requests in `sql` folder.
-
-    Typically:
-    - 001_fluxIAE_DateDerniereMiseAJour.sql
-    - 002_missions_ai_ehpad.sql
-    - ...
-
-    The numerical prefixes ensure the order of execution is deterministic.
-
-    The name of the table being created with the query is derived from the filename,
-    # e.g. '002_missions_ai_ehpad.sql' => 'missions_ai_ehpad'
-    """
-    path = f"{CURRENT_DIR}/sql"
-    for filename in sorted([f for f in os.listdir(path) if f.endswith(".sql")]):
-        print(f"Running {filename} ...")
-        table_name = "_".join(filename.split(".")[0].split("_")[1:])
-        with open(os.path.join(path, filename), "r") as file:
-            sql_request = file.read()
-        build_custom_table(table_name=table_name, sql_request=sql_request)
-        print("Done.")
-
-
-class MetabaseTable:
-    def __init__(self, name):
-        self.name = name
-        self.columns = []
-
-    def add_columns(self, columns):
-        self.columns += columns
-
-    def get(self, column_name, input):
-        matching_columns = [c for c in self.columns if c["name"] == column_name]
-        assert len(matching_columns) == 1
-        fn = matching_columns[0]["fn"]
-        return fn(input)
 
 
 def hash_content(content):

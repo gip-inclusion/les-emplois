@@ -1,6 +1,6 @@
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.metabase.management.commands._utils import (
+from itou.metabase.tables.utils import (
     MetabaseTable,
     get_ai_stock_approval_pks,
     get_choice,

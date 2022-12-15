@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.metabase.management.commands._utils import (
+from itou.metabase.tables.utils import (
     MetabaseTable,
     get_ai_stock_job_seeker_pks,
     get_choice,

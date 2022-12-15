@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.metabase.management.commands._utils import hash_content
+from itou.metabase.tables.utils import hash_content
 from itou.siaes.models import Siae
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data

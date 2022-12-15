@@ -1,4 +1,4 @@
-from itou.metabase.management.commands._utils import MetabaseTable
+from itou.metabase.tables.utils import MetabaseTable
 
 
 TABLE = MetabaseTable(name="codes_rome")
