@@ -1,7 +1,7 @@
 from django.test import override_settings
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.metabase.management.commands._approvals import TABLE
+from itou.metabase.tables.approvals import TABLE
 
 
 @override_settings(METABASE_HASH_SALT="foobar2000")

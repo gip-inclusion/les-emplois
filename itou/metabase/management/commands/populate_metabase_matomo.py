@@ -9,8 +9,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from psycopg2 import extras as psycopg2_extras, sql
 
-from itou.metabase.db import MetabaseDatabaseCursor
-from itou.metabase.management.commands._utils import create_table
+from itou.metabase.db import MetabaseDatabaseCursor, create_table
 from itou.utils import constants
 
 

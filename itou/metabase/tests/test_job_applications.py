@@ -4,7 +4,7 @@ from itou.job_applications.factories import (
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationSentByPrescriberPoleEmploiFactory,
 )
-from itou.metabase.management.commands._job_applications import TABLE
+from itou.metabase.tables.job_applications import TABLE
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.test import TestCase
 

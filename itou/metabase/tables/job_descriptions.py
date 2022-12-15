@@ -1,4 +1,4 @@
-from itou.metabase.management.commands._utils import MetabaseTable, get_department_and_region_columns
+from itou.metabase.tables.utils import MetabaseTable, get_department_and_region_columns
 
 
 TABLE = MetabaseTable(name="fiches_de_poste")

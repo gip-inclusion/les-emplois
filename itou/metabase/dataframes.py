@@ -10,9 +10,7 @@ import pandas as pd
 from psycopg2 import sql
 from tqdm import tqdm
 
-from itou.metabase.db import MetabaseDatabaseCursor
-from itou.metabase.management.commands._database_tables import get_new_table_name, switch_table_atomically
-from itou.metabase.management.commands._utils import create_table
+from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table_name, switch_table_atomically
 
 
 PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {

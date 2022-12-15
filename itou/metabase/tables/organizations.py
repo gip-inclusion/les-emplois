@@ -1,6 +1,6 @@
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.metabase.management.commands._utils import (
+from itou.metabase.tables.utils import (
     MetabaseTable,
     get_active_siae_pks,
     get_address_columns,

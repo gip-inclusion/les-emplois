@@ -1,6 +1,6 @@
 import pytest
 
-from itou.metabase.management.commands._siaes import TABLE
+from itou.metabase.tables.siaes import TABLE
 from itou.siaes.factories import SiaeFactory
 
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from django.conf import settings
 
 from itou.approvals.models import Approval, PoleEmploiApproval
-from itou.metabase.management.commands._utils import (
+from itou.metabase.tables.utils import (
     MetabaseTable,
     get_ai_stock_approval_pks,
     get_department_and_region_columns,

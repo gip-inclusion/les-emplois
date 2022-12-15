@@ -1,6 +1,6 @@
 from itou.geo.factories import QPVFactory
 from itou.geo.utils import coords_to_geometry
-from itou.metabase.management.commands._utils import get_qpv_job_seeker_pks
+from itou.metabase.tables.utils import get_qpv_job_seeker_pks
 from itou.users.factories import JobSeekerFactory
 
 
