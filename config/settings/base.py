@@ -591,7 +591,7 @@ CSP_STYLE_SRC = [
     "'self'",
     # It would be better to whilelist styles hashes but it's to much work for now.
     "'unsafe-inline'",
-    "https://fonts.googleapis.com",
+    "*.googleapis.com",  # Google translate
     "https://cdnjs.cloudflare.com",  # Used by select 2, gis widgets and maybe more in the future
 ]
 CSP_FONT_SRC = [
