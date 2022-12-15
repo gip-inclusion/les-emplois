@@ -39,6 +39,6 @@ message_info "Creating a new database..."
 createdb
 
 message_info "Applying the backup to the new database..."
-pg_restore --dbname="${ITOU_POSTGRES_DATABASE_NAME}" --format=c --clean --no-owner --verbose "${backup_filename}"
+pg_restore --dbname="${ITOU_POSTGRES_DATABASE_NAME}" --format=c --clean --no-owner --jobs=4 --verbose "${backup_filename}"
 
 message_success "The '${ITOU_POSTGRES_DATABASE_NAME}' database has been restored from the '${backup_filename}' backup."
