@@ -620,6 +620,7 @@ CSP_CONNECT_SRC = [
     "https://stats.data.gouv.fr",
     "*.hotjar.com",
     "*.hotjar.io",
+    "wss://*.hotjar.com",
     "https://translate.googleapis.com",  # Allow google translate
 ]
 if S3_STORAGE_ENDPOINT_DOMAIN:
