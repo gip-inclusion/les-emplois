@@ -128,7 +128,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class CreateJobSeekerStep1ForSenderForm(forms.ModelForm):
+class CreateOrUpdateJobSeekerStep1Form(forms.ModelForm):
 
     REQUIRED_FIELDS = [
         "title",
@@ -161,7 +161,7 @@ class CreateJobSeekerStep1ForSenderForm(forms.ModelForm):
         ]
 
 
-class CreateJobSeekerStep2ForSenderForm(MandatoryAddressFormMixin, forms.ModelForm):
+class CreateOrUpdateJobSeekerStep2Form(MandatoryAddressFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -190,7 +190,7 @@ class CreateJobSeekerStep2ForSenderForm(MandatoryAddressFormMixin, forms.ModelFo
         ]
 
 
-class CreateJobSeekerStep3ForSenderForm(forms.ModelForm):
+class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
 
     # A set of transient checkboxes used to collapse optional blocks
     pole_emploi = forms.BooleanField(required=False, label="Inscrit à Pôle emploi")
