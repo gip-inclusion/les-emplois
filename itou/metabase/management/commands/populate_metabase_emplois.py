@@ -177,20 +177,13 @@ class Command(BaseCommand):
             if extra_object:
                 inject_chunk(table_columns=table.columns, chunk=[extra_object], new_table_name=new_table_name)
 
+            written_rows = 0
             for queryset in querysets:
-                injections = 0
-                total_injections = queryset.count()
-
                 # Insert rows by batch of METABASE_INSERT_BATCH_SIZE.
                 for chunk_qs in chunked_queryset(queryset, chunk_size=METABASE_INSERT_BATCH_SIZE):
-                    injections_left = total_injections - injections
-                    if injections_left == 0:
-                        break  # During a dry run stop as soon as we have injected enough rows.
-                    if chunk_qs.count() > injections_left:
-                        chunk_qs = chunk_qs[:injections_left]
                     inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
-                    injections += chunk_qs.count()
-                    self.stdout.write(f"count={injections} of total={total_rows} written")
+                    written_rows += chunk_qs.count()
+                    self.stdout.write(f"count={written_rows} of total={total_rows} written")
 
                 # Trigger garbage collection to optimize memory use.
                 gc.collect()
