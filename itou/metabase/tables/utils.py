@@ -138,6 +138,18 @@ def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o
             "comment": f"Ville{comment_suffix}",
             "fn": lambda o: custom_fn(o).city,
         },
+        {
+            "name": f"longitude{name_suffix}",
+            "type": "float",
+            "comment": f"Longitude{comment_suffix}",
+            "fn": lambda o: custom_fn(o).longitude,
+        },
+        {
+            "name": f"latitude{name_suffix}",
+            "type": "float",
+            "comment": f"Latitude{comment_suffix}",
+            "fn": lambda o: custom_fn(o).latitude,
+        },
     ] + get_department_and_region_columns(name_suffix, comment_suffix, custom_fn)
 
 

@@ -159,8 +159,6 @@ TABLE.add_columns(
             "comment": "Date de la dernière création de candidature",
             "fn": get_org_last_job_application_creation_date,
         },
-        {"name": "longitude", "type": "float", "comment": "Longitude", "fn": lambda o: o.longitude},
-        {"name": "latitude", "type": "float", "comment": "Latitude", "fn": lambda o: o.latitude},
     ]
 )
 

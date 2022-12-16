@@ -218,7 +218,5 @@ TABLE.add_columns(
             "comment": "Nombre de fiches de poste inactives de la structure",
             "fn": lambda o: len([jd for jd in o.job_description_through.all() if not jd.is_active]),
         },
-        {"name": "longitude", "type": "float", "comment": "Longitude", "fn": lambda o: o.longitude},
-        {"name": "latitude", "type": "float", "comment": "Latitude", "fn": lambda o: o.latitude},
     ]
 )
