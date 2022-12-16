@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("siaes", "0055_alter_siaejobdescription_location"),
         ("job_applications", "0041_jobapplicationpoleemploinotificationlog_env_and_more"),
-        ("institutions", "0003_alter_institution_kind"),
+        ("institutions", "0001_initial"),
         ("eligibility", "0001_initial"),
     ]
 
