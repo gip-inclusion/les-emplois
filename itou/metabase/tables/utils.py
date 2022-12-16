@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from itou.approvals.models import Approval
+from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.models import Siae
@@ -89,6 +90,22 @@ def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_
     ]
 
 
+@functools.cache
+def get_post_code_to_insee_code_map():
+    """
+    Load once and for all this ~35k items dataset in memory.
+    """
+    post_code_to_insee_code_map = {}
+    for city in City.objects.all():
+        for post_code in city.post_codes:
+            post_code_to_insee_code_map[post_code] = city.code_insee
+    return post_code_to_insee_code_map
+
+
+def convert_post_code_to_insee_code(post_code):
+    return get_post_code_to_insee_code_map().get(post_code)
+
+
 def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
     return [
         {
@@ -108,6 +125,12 @@ def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o
             "type": "varchar",
             "comment": f"Code postal{comment_suffix}",
             "fn": lambda o: custom_fn(o).post_code,
+        },
+        {
+            "name": f"code_commune{name_suffix}",
+            "type": "varchar",
+            "comment": f"Code commune{comment_suffix}",
+            "fn": lambda o: convert_post_code_to_insee_code(custom_fn(o).post_code),
         },
         {
             "name": f"ville{name_suffix}",
