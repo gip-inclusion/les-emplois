@@ -5,8 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
+    replaces = [("employee_record", "0013_add_notification_update_trigger")]
+
     dependencies = [
-        ("employee_record", "0012_employee_record_notification_model"),
+        ("employee_record", "0001_initial"),
     ]
 
     operations = [
