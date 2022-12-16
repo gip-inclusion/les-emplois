@@ -89,7 +89,7 @@ class Command(BaseCommand):
             "job_descriptions": 100,
             "organizations": 100,
             "job_seekers": 100,
-            "job_applications": 100,
+            "job_applications": 1000,
             "selected_jobs": 10000,
             "approvals": 1000,
             "rome_codes": 1000,
@@ -346,10 +346,29 @@ class Command(BaseCommand):
 
     def populate_job_applications(self, batch_size):
         queryset = (
-            JobApplication.objects.select_related(
-                "to_siae", "sender", "sender_siae", "sender_prescriber_organization", "approval"
-            )
+            JobApplication.objects.select_related("to_siae", "sender", "sender_siae", "sender_prescriber_organization")
             .prefetch_related("logs")
+            .only(
+                "pk",
+                "created_at",
+                "sender_kind",
+                "sender_siae__kind",
+                "sender_prescriber_organization__kind",
+                "sender_prescriber_organization__name",
+                "sender_prescriber_organization__code_safir_pole_emploi",
+                "sender_prescriber_organization__is_authorized",
+                "sender__last_name",
+                "sender__first_name",
+                "state",
+                "refusal_reason",
+                "job_seeker_id",
+                "to_siae__kind",
+                "to_siae__brand",
+                "to_siae__name",
+                "to_siae__department",
+                "approval_id",
+                "approval_delivery_mode",
+            )
             .filter(created_from_pe_approval=False, to_siae_id__in=get_active_siae_pks())
             .all()
         )

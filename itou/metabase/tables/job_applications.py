@@ -267,7 +267,7 @@ TABLE.add_columns(
             "name": "injection_ai",
             "type": "boolean",
             "comment": "Provient des injections AI",
-            "fn": lambda o: o.approval.pk in get_ai_stock_approval_pks() if o.approval else False,
+            "fn": lambda o: o.approval_id in get_ai_stock_approval_pks(),
         },
         {
             "name": "mode_attribution_pass_iae",
