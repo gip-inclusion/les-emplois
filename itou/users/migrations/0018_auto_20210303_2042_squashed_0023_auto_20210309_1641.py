@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("users", "0017_auto_20210224_1543"),
-        ("asp", "0002_auto_20210218_2051"),
+        ("asp", "__first__"),
     ]
 
     operations = [
