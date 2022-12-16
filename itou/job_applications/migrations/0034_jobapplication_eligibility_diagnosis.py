@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("eligibility", "0005_auto_20200913_0532"),
+        ("eligibility", "0001_initial"),
         ("job_applications", "0033_alter_jobapplication_created_from_pe_approval"),
     ]
 

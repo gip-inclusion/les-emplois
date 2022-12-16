@@ -123,7 +123,7 @@ def move_data_forward(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("eligibility", "0005_auto_20200913_0532"),
+        ("eligibility", "0001_initial"),
         ("job_applications", "0034_jobapplication_eligibility_diagnosis"),
         ("users", "0025_create_index_upper_email"),
     ]

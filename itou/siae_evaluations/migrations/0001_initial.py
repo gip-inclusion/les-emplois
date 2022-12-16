@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         ("siaes", "0055_alter_siaejobdescription_location"),
         ("job_applications", "0041_jobapplicationpoleemploinotificationlog_env_and_more"),
         ("institutions", "0003_alter_institution_kind"),
-        ("eligibility", "0008_rename_rsa_administrative_criteria"),
+        ("eligibility", "0001_initial"),
     ]
 
     operations = [
