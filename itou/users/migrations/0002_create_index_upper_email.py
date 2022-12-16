@@ -5,8 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
+    replaces = [("users", "0025_create_index_upper_email")]
+
     dependencies = [
-        ("users", "0024_backend_employee_record"),
+        ("users", "0001_initial"),
     ]
 
     operations = [
