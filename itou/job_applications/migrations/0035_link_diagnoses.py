@@ -43,6 +43,7 @@ JobApplication.objects.filter(
     hiring_without_approval=False,
 ).count()
 """
+from django.conf import settings
 from django.db import migrations
 
 
@@ -125,7 +126,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("eligibility", "0001_initial"),
         ("job_applications", "0034_jobapplication_eligibility_diagnosis"),
-        ("users", "0025_create_index_upper_email"),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [migrations.RunPython(move_data_forward, migrations.RunPython.noop)]
