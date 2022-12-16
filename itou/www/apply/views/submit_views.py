@@ -31,9 +31,9 @@ from itou.www.apply.forms import (
     ApplicationJobsForm,
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
-    CreateJobSeekerStep1ForSenderForm,
-    CreateJobSeekerStep2ForSenderForm,
-    CreateJobSeekerStep3ForSenderForm,
+    CreateOrUpdateJobSeekerStep1Form,
+    CreateOrUpdateJobSeekerStep2Form,
+    CreateOrUpdateJobSeekerStep3Form,
     SubmitJobApplicationForm,
     UserExistsForm,
 )
@@ -399,7 +399,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.form = CreateJobSeekerStep1ForSenderForm(
+        self.form = CreateOrUpdateJobSeekerStep1Form(
             data=request.POST or None, initial=self.job_seeker_session.get("user", {})
         )
 
@@ -431,7 +431,7 @@ class CreateJobSeekerStep2ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.form = CreateJobSeekerStep2ForSenderForm(
+        self.form = CreateOrUpdateJobSeekerStep2Form(
             data=request.POST or None, initial=self.job_seeker_session.get("user", {})
         )
 
@@ -468,7 +468,7 @@ class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.form = CreateJobSeekerStep3ForSenderForm(
+        self.form = CreateOrUpdateJobSeekerStep3Form(
             data=request.POST or None,
             initial=self.job_seeker_session.get("profile", {})
             | {
@@ -528,7 +528,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         return {k: v for k, v in self.job_seeker_session.get("user").items() if k not in ["city_slug"]}
 
     def _get_profile_data_from_session(self):
-        # Dummy fields used by CreateJobSeekerStep3ForSenderForm()
+        # Dummy fields used by CreateOrUpdateJobSeekerStep3Form()
         fields_to_exclude = [
             "pole_emploi",
             "pole_emploi_id_forgotten",
@@ -885,7 +885,7 @@ class ApplicationEndView(ApplyStepBaseView):
             JobApplication.objects.select_related("job_seeker", "to_siae"),
             pk=kwargs.get("application_pk"),
         )
-        self.form = CreateJobSeekerStep2ForSenderForm(
+        self.form = CreateOrUpdateJobSeekerStep2Form(
             instance=self.job_application.job_seeker, data=request.POST or None
         )
 
