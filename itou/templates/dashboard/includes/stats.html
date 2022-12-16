@@ -24,7 +24,7 @@
                 {% if can_view_stats_pe %}
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_pe_delay_main' %}">Voir les données du délai d'entrée en IAE</a>
+                        <a href="{% url 'stats:stats_pe_state_main' %}">Voir les données de l’état des candidatures orientées</a>
                     </li>
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
@@ -32,11 +32,11 @@
                     </li>
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_pe_state_main' %}">Voir les données de l’état des candidatures orientées</a>
+                        <a href="{% url 'stats:stats_pe_tension' %}">Voir les données des fiches de poste en tension</a>
                     </li>
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_pe_tension' %}">Voir les données des fiches de poste en tension</a>
+                        <a href="{% url 'stats:stats_pe_delay_main' %}">Voir les données du délai d'entrée en IAE</a>
                     </li>
                 {% endif %}
                 {% if can_view_stats_ddets %}
