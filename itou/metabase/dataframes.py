@@ -10,7 +10,7 @@ import pandas as pd
 from psycopg2 import sql
 from tqdm import tqdm
 
-from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table_name, switch_table_atomically
+from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table_name, rename_table_atomically
 
 
 PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {
@@ -35,14 +35,11 @@ def infer_colomns_from_df(df):
 
 
 def init_table(df, table_name):
-    new_table_name = get_new_table_name(table_name)
     with MetabaseDatabaseCursor() as (cursor, conn):
-        cursor.execute(
-            sql.SQL("DROP TABLE IF EXISTS {new_table_name}").format(new_table_name=sql.Identifier(new_table_name))
-        )
+        cursor.execute(sql.SQL("DROP TABLE IF EXISTS {new_table_name}").format(table_name=sql.Identifier(table_name)))
         conn.commit()
     # Generate table
-    create_table(new_table_name, infer_colomns_from_df(df))
+    create_table(table_name, infer_colomns_from_df(df))
 
 
 def store_df(df, table_name, max_attempts=5):
@@ -62,15 +59,16 @@ def store_df(df, table_name, max_attempts=5):
 
     attempts = 0
 
+    new_table_name = get_new_table_name(table_name)
     while attempts < max_attempts:
         try:
-            init_table(df, table_name)
+            init_table(df, new_table_name)
             for df_chunk in tqdm(df_chunks):
                 buffer = StringIO()
                 df_chunk.to_csv(buffer, header=False, index=False, sep="\t", quoting=csv.QUOTE_NONE, escapechar="\\")
                 buffer.seek(0)
                 with MetabaseDatabaseCursor() as (cursor, conn):
-                    cursor.copy_from(buffer, get_new_table_name(table_name), sep="\t", null="")
+                    cursor.copy_from(buffer, new_table_name, sep="\t", null="")
                     conn.commit()
             break
         except Exception as e:
@@ -82,7 +80,7 @@ def store_df(df, table_name, max_attempts=5):
                 raise
             print("New attempt started...")
 
-    switch_table_atomically(table_name=table_name)
+    rename_table_atomically(new_table_name, table_name)
     print(f"Stored {table_name} in database ({len(df)} rows).")
     print("")
 

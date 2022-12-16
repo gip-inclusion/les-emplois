@@ -56,27 +56,29 @@ def get_old_table_name(table_name):
     return f"z_old_{table_name}"
 
 
-def switch_table_atomically(table_name):
+def rename_table_atomically(from_table_name, to_table_name):
     """
-    Replace table_name with z_new_table_name.
-    This allows to take our time filling z_new_table_name without locking table_name.
+    Rename from_table_name into to_table_name.
+    Most of the time, we replace an existing table, so we will first rename
+    to_table_name into z_old_<to_table_name>.
+    This allows to take our time filling the new table without locking the current one.
     """
 
     with MetabaseDatabaseCursor() as (cur, conn):
         cur.execute(
             sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
-                sql.Identifier(table_name),
-                sql.Identifier(get_old_table_name(table_name)),
+                sql.Identifier(to_table_name),
+                sql.Identifier(get_old_table_name(to_table_name)),
             )
         )
         cur.execute(
             sql.SQL("ALTER TABLE {} RENAME TO {}").format(
-                sql.Identifier(get_new_table_name(table_name)),
-                sql.Identifier(table_name),
+                sql.Identifier(from_table_name),
+                sql.Identifier(to_table_name),
             )
         )
         conn.commit()
-        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(table_name))))
+        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(to_table_name))))
         conn.commit()
 
 
@@ -99,17 +101,14 @@ def build_custom_table(table_name, sql_request):
     Build a new table with given sql_request.
     Minimize downtime by building a temporary table first then swap the two tables atomically.
     """
+    new_table_name = get_new_table_name(table_name)
     with MetabaseDatabaseCursor() as (cur, conn):
-        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_new_table_name(table_name))))
+        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(new_table_name)))
         conn.commit()
-        cur.execute(
-            sql.SQL("CREATE TABLE {} AS {}").format(
-                sql.Identifier(get_new_table_name(table_name)), sql.SQL(sql_request)
-            )
-        )
+        cur.execute(sql.SQL("CREATE TABLE {} AS {}").format(sql.Identifier(new_table_name), sql.SQL(sql_request)))
         conn.commit()
 
-    switch_table_atomically(table_name=table_name)
+    rename_table_atomically(new_table_name, table_name)
 
 
 def build_final_tables():
