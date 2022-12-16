@@ -28,10 +28,9 @@ DASHBOARDS_TO_DOWNLOAD = {
 
 MATOMO_OPTIONS = {
     "expanded": 1,
-    "filter_limit": 400,
+    "filter_limit": -1,
     "format": "CSV",
     "format_metrics": 1,
-    "idSite": "146",  # pilotage
     "language": "en",
     "method": "API.get",
     "module": "API",
@@ -41,7 +40,37 @@ MATOMO_OPTIONS = {
 
 MATOMO_TIMEOUT = 60  # in seconds. Matomo can be slow.
 
-METABASE_TABLE_NAME = "suivi_visiteurs_tb_publics_v0"
+METABASE_DASHBOARDS_TABLE_NAME = "suivi_visiteurs_tb_publics_v0"
+METABASE_CUSTOM_VARS_TABLE_NAME = "suivi_visites_custom_vars_v0"
+
+
+def matomo_api_call(options):
+    response = httpx.get(f"{settings.MATOMO_BASE_URL}?{urllib.parse.urlencode(options)}", timeout=MATOMO_TIMEOUT)
+    csv_content = response.content.decode("utf-16")
+    yield from csv.DictReader(io.StringIO(csv_content), dialect="excel")
+
+
+def update_table_at_date(table_name, column_names, at, rows):
+    create_table(
+        table_name,
+        [(col_name, "varchar") for col_name in column_names],
+    )
+    with MetabaseDatabaseCursor() as (cursor, conn):
+        cursor.execute(
+            sql.SQL("""DELETE FROM {table_name} WHERE "Date" = {value}""").format(
+                table_name=sql.Identifier(table_name),
+                col_name=sql.Identifier("Date"),
+                value=sql.Literal(str(at)),
+            )
+        )
+        insert_query = sql.SQL("INSERT INTO {table_name} ({fields}) VALUES %s").format(
+            table_name=sql.Identifier(table_name),
+            fields=sql.SQL(",").join(
+                [sql.Identifier(col) for col in column_names],
+            ),
+        )
+        psycopg2_extras.execute_values(cursor, insert_query, rows)
+        conn.commit()
 
 
 class Command(BaseCommand):
@@ -58,49 +87,30 @@ class Command(BaseCommand):
         # NOTE(vperron): if you need to initiate this table, just run the following line with
         # dtstart=datetime.date(2022,1,1)
         for monday in rrule(WEEKLY, byweekday=MO, dtstart=max_date - datetime.timedelta(days=7), until=max_date):
-            self._fetch_matomo_row(monday.date(), wet_run=wet_run)
+            self._process_matomo_weekly_data(monday.date(), wet_run=wet_run)
 
-    def _fetch_matomo_row(self, at, wet_run=False):
-        MATOMO_COLUMNS = None
+    def _process_matomo_weekly_data(self, at, wet_run=False):
+        """A helper whose sole purpose is to ease the initialization of all the Matomo tables in metabase.
+        Call it with a given week and it's going to do all the initialization.
+        """
+        column_names = None  # unknown column names initially, they're all the same for every dashboard
         all_rows = []
+        base_options = MATOMO_OPTIONS | {
+            "date": f"{at}",
+            "token_auth": settings.MATOMO_AUTH_TOKEN,
+        }
 
         for dashboard, public_name in DASHBOARDS_TO_DOWNLOAD.items():
-            options_dict = MATOMO_OPTIONS | {
-                "date": f"{at}",
+            dashboard_options = base_options | {
+                "idSite": "146",  # pilotage
                 "segment": f"pageUrl=={constants.PILOTAGE_SITE_URL}/tableaux-de-bord/{dashboard}/",
-                "token_auth": settings.MATOMO_AUTH_TOKEN,
             }
-            response = httpx.get(
-                f"{settings.MATOMO_BASE_URL}?{urllib.parse.urlencode(options_dict)}", timeout=MATOMO_TIMEOUT
-            )
-            csv_content = response.content.decode("utf-16")
-            reader = csv.DictReader(io.StringIO(csv_content), dialect="excel")
-            for row in reader:
+            for row in matomo_api_call(dashboard_options):
                 row["Date"] = at
                 row["tableau de bord"] = public_name
-                if not MATOMO_COLUMNS:
-                    MATOMO_COLUMNS = list(row.keys())
+                if not column_names:
+                    column_names = list(row.keys())
                 all_rows.append(list(row.values()))
 
         if wet_run:
-            create_table(
-                METABASE_TABLE_NAME,
-                [(col_name, "varchar") for col_name in MATOMO_COLUMNS],
-            )
-
-            with MetabaseDatabaseCursor() as (cursor, conn):
-                cursor.execute(
-                    sql.SQL("""DELETE FROM {table_name} WHERE "Date" = {value}""").format(
-                        table_name=sql.Identifier(METABASE_TABLE_NAME),
-                        col_name=sql.Identifier("Date"),
-                        value=sql.Literal(str(at)),
-                    )
-                )
-                insert_query = sql.SQL("insert into {table_name} ({fields}) values %s").format(
-                    table_name=sql.Identifier(METABASE_TABLE_NAME),
-                    fields=sql.SQL(",").join(
-                        [sql.Identifier(col) for col in MATOMO_COLUMNS],
-                    ),
-                )
-                psycopg2_extras.execute_values(cursor, insert_query, all_rows)
-                conn.commit()
+            update_table_at_date(METABASE_DASHBOARDS_TABLE_NAME, column_names, at, all_rows)
