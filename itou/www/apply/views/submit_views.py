@@ -391,7 +391,7 @@ class CreateJobSeekerForSenderBaseView(ApplyStepForSenderBaseView):
 
 
 class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
-    template_name = "apply/submit/create_job_seeker_for_sender/step_1.html"
+    template_name = "apply/submit/create_or_update_job_seeker/step_1.html"
 
     def __init__(self):
         super().__init__()
@@ -423,7 +423,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
 
 class CreateJobSeekerStep2ForSenderView(CreateJobSeekerForSenderBaseView):
-    template_name = "apply/submit/create_job_seeker_for_sender/step_2.html"
+    template_name = "apply/submit/create_or_update_job_seeker/step_2.html"
 
     def __init__(self):
         super().__init__()
@@ -459,7 +459,7 @@ class CreateJobSeekerStep2ForSenderView(CreateJobSeekerForSenderBaseView):
 
 
 class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
-    template_name = "apply/submit/create_job_seeker_for_sender/step_3.html"
+    template_name = "apply/submit/create_or_update_job_seeker/step_3.html"
 
     def __init__(self):
         super().__init__()
@@ -518,7 +518,7 @@ class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
 
 
 class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
-    template_name = "apply/submit/create_job_seeker_for_sender/step_end.html"
+    template_name = "apply/submit/create_or_update_job_seeker/step_end.html"
 
     def __init__(self):
         super().__init__()
