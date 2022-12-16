@@ -36,7 +36,7 @@ def infer_colomns_from_df(df):
 
 def init_table(df, table_name):
     with MetabaseDatabaseCursor() as (cursor, conn):
-        cursor.execute(sql.SQL("DROP TABLE IF EXISTS {new_table_name}").format(table_name=sql.Identifier(table_name)))
+        cursor.execute(sql.SQL("DROP TABLE IF EXISTS {table_name}").format(table_name=sql.Identifier(table_name)))
         conn.commit()
     # Generate table
     create_table(table_name, infer_colomns_from_df(df))
