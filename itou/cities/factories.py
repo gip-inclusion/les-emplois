@@ -85,7 +85,7 @@ def create_city_vannes():
         coords=Point(-2.8186843, 47.657641),
         # Dummy
         post_codes=["56000"],
-        code_insee="56000",
+        code_insee="56260",
     )
 
 
