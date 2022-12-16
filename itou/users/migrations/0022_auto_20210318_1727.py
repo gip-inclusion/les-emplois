@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("asp", "0003_auto_20210311_1147"),
+        ("asp", "__first__"),
         ("users", "0021_auto_20210318_1608"),
     ]
 

@@ -8,17 +8,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
+    replaces = [("asp", "0007_commune_created_at_commune_created_by")]
+
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("asp", "0006_auto_20211006_1104"),
+        ("asp", "0001_initial"),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name="commune",
-            name="created_at",
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
-        ),
         migrations.AddField(
             model_name="commune",
             name="created_by",
