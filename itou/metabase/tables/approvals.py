@@ -77,6 +77,13 @@ TABLE.add_columns(
         {"name": "date_fin", "type": "date", "comment": "Date de fin", "fn": lambda o: o.end_at},
         {"name": "durée", "type": "interval", "comment": "Durée", "fn": lambda o: o.end_at - o.start_at},
         {
+            "name": "id",
+            "type": "integer",
+            "comment": "ID C1 du candidat",
+            "fn": lambda o: o.user.pk if isinstance(o, Approval) else None,
+        },
+        {
+            # TODO @dejafait : eventually drop this obsolete field
             "name": "id_candidat_anonymisé",
             "type": "varchar",
             "comment": "ID anonymisé du candidat",

@@ -121,6 +121,13 @@ TABLE = MetabaseTable(name="candidatures")
 TABLE.add_columns(
     [
         {
+            "name": "id",
+            "type": "integer",
+            "comment": "ID C1 de la candidature",
+            "fn": lambda o: o.pk,
+        },
+        {
+            # TODO @dejafait : eventually drop this obsolete field
             "name": "id_anonymisé",
             "type": "varchar",
             "comment": "ID anonymisé de la candidature",
@@ -177,6 +184,13 @@ TABLE.add_columns(
             "fn": lambda o: o.get_refusal_reason_display() if o.refusal_reason != "" else None,
         },
         {
+            "name": "id_candidat",
+            "type": "integer",
+            "comment": "ID C1 du candidat",
+            "fn": lambda o: o.job_seeker_id,
+        },
+        {
+            # TODO @dejafait : eventually drop this obsolete field
             "name": "id_candidat_anonymisé",
             "type": "varchar",
             "comment": "ID anonymisé du candidat",

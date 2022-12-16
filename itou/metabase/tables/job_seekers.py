@@ -188,10 +188,17 @@ TABLE = MetabaseTable(name="candidats")
 TABLE.add_columns(
     [
         {
+            "name": "id",
+            "type": "integer",
+            "comment": "ID C1 du candidat",
+            "fn": lambda o: o.pk,
+        },
+        {
+            # TODO @dejafait : eventually drop this obsolete field
             "name": "id_anonymisé",
             "type": "varchar",
             "comment": "ID anonymisé du candidat",
-            "fn": lambda o: hash_content(o.id),
+            "fn": lambda o: hash_content(o.pk),
         },
         {
             "name": "hash_nir",

@@ -294,6 +294,8 @@ class Command(BaseCommand):
                     row = OrderedDict()
 
                     row["id_fiche_de_poste"] = jd.pk
+                    row["id_candidature"] = ja.pk
+                    # TODO @dejafait : eventually drop this obsolete field
                     row["id_anonymisé_candidature"] = hash_content(ja.pk)
 
                     rows.append(row)
@@ -324,8 +326,6 @@ class Command(BaseCommand):
         Populate job seekers table and add detailed stats about
         diagnoses and administrative criteria, including one column
         for each of the 15 possible criteria.
-
-        Note that job seeker id is anonymized.
         """
         queryset = (
             User.objects.filter(is_job_seeker=True)
