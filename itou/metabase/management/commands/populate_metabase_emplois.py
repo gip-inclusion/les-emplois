@@ -290,17 +290,49 @@ class Command(BaseCommand):
         and add a special "ORG_OF_PRESCRIBERS_WITHOUT_ORG" to gather stats
         of prescriber users *without* any organization.
         """
+
+        setattr(organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG, "members_last_login", None)
+
+        active_user_created_job_applications_filter = Q(
+            jobapplication__created_from_pe_approval=False,
+            jobapplication__to_siae_id__in=get_active_siae_pks(),
+        )
+        job_applications_count = Count(
+            "jobapplication",
+            filter=active_user_created_job_applications_filter,
+            # This distinct isn't required since we don't filter on ManyToMany fields, or reverse ForeignKeys.
+            # However, it' better to keep it in case someone adds such a filter.
+            # We will be able to remove it when we have some tests on this function.
+            distnct=True,
+        )
+        accepted_job_applications_count = Count(
+            "jobapplication",
+            filter=(
+                active_user_created_job_applications_filter
+                & Q(jobapplication__state=JobApplicationWorkflow.STATE_ACCEPTED)
+            ),
+            # This distinct isn't required since we don't filter on ManyToMany fields, or reverse ForeignKeys.
+            # However, it' better to keep it in case someone adds such a filter.
+            # We will be able to remove it when we have some tests on this function.
+            distnct=True,
+        )
+        last_job_application_creation_date = Max(
+            "jobapplication__created_at",
+            filter=active_user_created_job_applications_filter,
+        )
         queryset = (
-            PrescriberOrganization.objects.prefetch_related("prescribermembership_set", "jobapplication_set")
+            PrescriberOrganization.objects.prefetch_related("prescribermembership_set")
             .annotate(
+                job_applications_count=job_applications_count,
+                accepted_job_applications_count=accepted_job_applications_count,
+                last_job_application_creation_date=last_job_application_creation_date,
                 members_last_login=Max(
                     "members__last_login",
                 ),
+                # Don't try counting members or getting first join date, It's way too long
             )
             .all()
         )
-
-        setattr(organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG, "members_last_login", None)
 
         self.populate_table(
             table=organizations.TABLE,

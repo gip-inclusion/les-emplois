@@ -46,41 +46,22 @@ def _get_ja_sent_by_prescribers_without_org():
     )
 
 
-def _get_org_job_applications(org):
-    job_applications = list(org.jobapplication_set.all())
-    # We have to do all this in python to benefit from prefetch_related.
-    job_applications = [
-        ja
-        for ja in job_applications
-        if ja.created_from_pe_approval is False and ja.to_siae_id in get_active_siae_pks()
-    ]
-    return job_applications
-
-
 def get_org_job_applications_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         # Number of job applications made by prescribers without org.
         return _get_ja_sent_by_prescribers_without_org().count()
-    return len(_get_org_job_applications(org))
+    return org.job_applications_count
 
 
 def get_org_accepted_job_applications_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         return _get_ja_sent_by_prescribers_without_org().filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count()
-    job_applications = [
-        ja for ja in _get_org_job_applications(org) if ja.state == JobApplicationWorkflow.STATE_ACCEPTED
-    ]
-    return len(job_applications)
+    return org.accepted_job_applications_count
 
 
 def get_org_last_job_application_creation_date(org):
     if org != ORG_OF_PRESCRIBERS_WITHOUT_ORG:
-        job_applications = _get_org_job_applications(org)
-        # We have to do all this in python to benefit from prefetch_related.
-        if len(job_applications) >= 1:
-            job_applications.sort(key=lambda o: o.created_at, reverse=True)
-            last_job_application = job_applications[0]
-            return last_job_application.created_at
+        return org.last_job_application_creation_date
     # This field makes no sense for prescribers without org.
     return None
 
