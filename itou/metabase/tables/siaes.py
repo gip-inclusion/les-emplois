@@ -89,7 +89,7 @@ def get_parent_siae(siae):
     return siae
 
 
-TABLE.add_columns(get_address_columns(comment_suffix=" de la structure", custom_fn=get_parent_siae))
+TABLE.add_columns(get_address_columns(comment_suffix=" de la structure mère", custom_fn=get_parent_siae))
 
 TABLE.add_columns(
     [
