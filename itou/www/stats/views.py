@@ -230,7 +230,9 @@ def render_stats_pe(request, page_title):
     params = {
         DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
-    if current_org.is_drpe:
+    if current_org.is_dgpe:
+        matomo_custom_url_suffix = "dgpe"
+    elif current_org.is_drpe:
         matomo_custom_url_suffix = f"{format_region_for_matomo(current_org.region)}/drpe"
     else:
         matomo_custom_url_suffix = format_region_and_department_for_matomo(current_org.department)

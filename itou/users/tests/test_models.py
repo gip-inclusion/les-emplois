@@ -13,6 +13,7 @@ import itou.asp.factories as asp
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, EmployerType
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionWithMembershipFactory
@@ -688,6 +689,38 @@ class ModelTest(TestCase):
         user = PrescriberFactory()
         self.assertFalse(user.can_view_stats_cd(current_org=org))
         self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+
+    def test_can_view_stats_pe_as_regular_pe_agency(self):
+        regular_pe_agency = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, kind=PrescriberOrganizationKind.PE, department="93"
+        )
+        user = regular_pe_agency.members.get()
+        self.assertFalse(regular_pe_agency.is_drpe)
+        self.assertFalse(regular_pe_agency.is_dgpe)
+        self.assertTrue(user.can_view_stats_pe(current_org=regular_pe_agency))
+        self.assertEqual(user.get_stats_pe_departments(current_org=regular_pe_agency), ["93"])
+
+    def test_can_view_stats_pe_as_drpe(self):
+        drpe = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, kind=PrescriberOrganizationKind.PE, department="93", code_safir_pole_emploi="75980"
+        )
+        user = drpe.members.get()
+        self.assertTrue(drpe.is_drpe)
+        self.assertFalse(drpe.is_dgpe)
+        self.assertTrue(user.can_view_stats_pe(current_org=drpe))
+        self.assertEqual(
+            user.get_stats_pe_departments(current_org=drpe), ["75", "77", "78", "91", "92", "93", "94", "95"]
+        )
+
+    def test_can_view_stats_pe_as_dgpe(self):
+        dgpe = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, kind=PrescriberOrganizationKind.PE, department="93", code_safir_pole_emploi="00162"
+        )
+        user = dgpe.members.get()
+        self.assertFalse(dgpe.is_drpe)
+        self.assertTrue(dgpe.is_dgpe)
+        self.assertTrue(user.can_view_stats_pe(current_org=dgpe))
+        self.assertEqual(user.get_stats_pe_departments(current_org=dgpe), DEPARTMENTS.keys())
 
     def test_can_view_stats_ddets(self):
         """

@@ -26,7 +26,7 @@ from itou.asp.models import (
     LaneType,
     RSAAllocation,
 )
-from itou.common_apps.address.departments import REGIONS, department_from_postcode
+from itou.common_apps.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
 from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
 from itou.institutions.enums import InstitutionKind
@@ -670,6 +670,8 @@ class User(AbstractUser, AddressMixin):
     def get_stats_pe_departments(self, current_org):
         if not self.can_view_stats_pe(current_org=current_org):
             raise PermissionDenied
+        if current_org.is_dgpe:
+            return DEPARTMENTS.keys()
         if current_org.is_drpe:
             return REGIONS[current_org.region]
         return [current_org.department]

@@ -88,6 +88,9 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     In case 3, we talk about "prescripteur habilité" in French.
     """
 
+    # DGPE, as in "Direction Générale Pôle emploi" is a special PE agency which oversees the whole country.
+    DGPE_SAFIR_CODE = "00162"
+
     # DRPE, as in "Direction Régionale Pôle emploi", are special PE agencies which oversee their whole region.
     # We keep it simple by hardcoding their (short) list here to avoid the complexity of adding a field or a kind.
     DRPE_SAFIR_CODES = [
@@ -291,6 +294,13 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         subject = "prescribers/email/must_validate_prescriber_organization_email_subject.txt"
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
+
+    @property
+    def is_dgpe(self):
+        """
+        DGPE, as in "Direction Générale Pôle emploi" is a special PE agency which oversees the whole country.
+        """
+        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi == self.DGPE_SAFIR_CODE
 
     @property
     def is_drpe(self):
