@@ -24,7 +24,6 @@ import gc
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand
-from django.core.paginator import Paginator
 from django.db.models import Count, Max, Min, Q
 from django.utils import timezone
 from psycopg2 import extras as psycopg2_extras, sql
@@ -51,9 +50,10 @@ from itou.metabase.tables import (
     job_seekers,
     organizations,
     rome_codes,
+    selected_jobs,
     siaes,
 )
-from itou.metabase.tables.utils import get_active_siae_pks, hash_content
+from itou.metabase.tables.utils import get_active_siae_pks
 from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
@@ -360,37 +360,13 @@ class Command(BaseCommand):
         """
         Populate associations between job applications and job descriptions.
         """
-        table_name = "fiches_de_poste_par_candidature"
-        chunk_size = 1000
-        self.stdout.write(f"Preparing content for {table_name} table by chunk of {chunk_size} items...")
-
-        # Iterating directly on this very large queryset results in psycopg2.errors.DiskFull error.
-        # We use pagination to mitigate this issue.
         queryset = (
-            JobApplication.objects.select_related("to_siae")
-            .prefetch_related("selected_jobs")
-            .filter(created_from_pe_approval=False, to_siae_id__in=get_active_siae_pks())
-            .all()
+            JobApplication.objects.filter(created_from_pe_approval=False, to_siae_id__in=get_active_siae_pks())
+            .exclude(selected_jobs=None)
+            .values("pk", "selected_jobs__id")
         )
-        paginator = Paginator(queryset, chunk_size)
 
-        rows = []
-        for page_idx in range(1, paginator.num_pages + 1):
-            for ja in paginator.page(page_idx).object_list:
-                for jd in ja.selected_jobs.all():
-                    # We want to preserve the order of columns.
-                    row = OrderedDict()
-
-                    row["id_fiche_de_poste"] = jd.pk
-                    row["id_candidature"] = ja.pk
-                    # TODO @dejafait : eventually drop this obsolete field
-                    row["id_anonymisé_candidature"] = hash_content(ja.pk)
-
-                    rows.append(row)
-            self.stdout.write(f"selected_jobs: page_idx={page_idx} of total={paginator.num_pages} processed")
-
-        df = get_df_from_rows(rows)
-        store_df(df=df, table_name=table_name)
+        self.populate_table(selected_jobs.TABLE, batch_size, querysets=[queryset])
 
     def populate_approvals(self, batch_size):
         """
