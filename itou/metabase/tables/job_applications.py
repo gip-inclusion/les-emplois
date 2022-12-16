@@ -122,7 +122,7 @@ TABLE.add_columns(
     [
         {
             "name": "id",
-            "type": "integer",
+            "type": "varchar",
             "comment": "ID C1 de la candidature",
             "fn": lambda o: o.pk,
         },
