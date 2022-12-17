@@ -86,7 +86,7 @@ class Command(BaseCommand):
         # but it also increases RAM usage.
         self.METABASE_INSERT_BATCH_SIZE = {
             "siaes": 100,
-            "job_descriptions": 100,
+            "job_descriptions": 10000,
             "organizations": 100,
             "job_seekers": 1000,
             "job_applications": 1000,
