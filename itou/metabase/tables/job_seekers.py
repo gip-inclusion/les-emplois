@@ -15,6 +15,7 @@ from itou.metabase.tables.utils import (
     get_qpv_job_seeker_pks,
     hash_content,
 )
+from itou.users.enums import IdentityProvider
 
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
@@ -241,7 +242,7 @@ TABLE.add_columns(
             "name": "pe_connect",
             "type": "boolean",
             "comment": "Le candidat utilise PE Connect",
-            "fn": lambda o: o.is_peamu,
+            "fn": lambda o: o.identity_provider == IdentityProvider.PE_CONNECT,
         },
         {
             "name": "pe_inscrit",

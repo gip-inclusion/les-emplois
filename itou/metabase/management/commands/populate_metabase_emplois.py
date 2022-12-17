@@ -88,7 +88,7 @@ class Command(BaseCommand):
             "siaes": 100,
             "job_descriptions": 100,
             "organizations": 100,
-            "job_seekers": 100,
+            "job_seekers": 1000,
             "job_applications": 1000,
             "selected_jobs": 10000,
             "approvals": 1000,
@@ -413,14 +413,13 @@ class Command(BaseCommand):
         queryset = (
             User.objects.filter(is_job_seeker=True)
             .prefetch_related(
-                "approvals",
                 "eligibility_diagnoses",
                 "eligibility_diagnoses__administrative_criteria",
                 "eligibility_diagnoses__author_prescriber_organization",
                 "eligibility_diagnoses__author_siae",
                 "job_applications",
                 "job_applications__to_siae",
-                "socialaccount_set",
+                "created_by",
             )
             .all()
         )
