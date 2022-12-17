@@ -46,7 +46,7 @@ select
     région_structure,
     candidatures_echelle_locale.ville,
     nom_epci,
-    code_commune,
+    candidatures_echelle_locale.code_commune,
     nom_arrondissement,
     bassin_d_emploi    
 from 
@@ -76,6 +76,6 @@ group by
     nombre_etp_conventionnes,
     candidatures_echelle_locale.ville,
     nom_epci,
-    code_commune,
+    candidatures_echelle_locale.code_commune,
     nom_arrondissement,
     bassin_d_emploi 
