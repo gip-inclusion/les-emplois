@@ -25,13 +25,14 @@ from collections import OrderedDict
 
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
+from django.db.models import Max, Q
 from django.utils import timezone
 from psycopg2 import extras as psycopg2_extras, sql
 
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
 from itou.metabase.db import (
@@ -212,8 +213,13 @@ class Command(BaseCommand):
                 "convention__siaes",
                 "siaemembership_set",
                 "job_applications_received",
-                "job_applications_received__logs",
                 "job_description_through",
+            )
+            .annotate(
+                last_job_application_transition_date=Max(
+                    "job_applications_received__logs__timestamp",
+                    filter=~Q(job_applications_received__logs__to_state=JobApplicationWorkflow.STATE_OBSOLETE),
+                )
             )
             .all()
         )

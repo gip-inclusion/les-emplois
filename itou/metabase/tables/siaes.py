@@ -20,17 +20,6 @@ def get_siae_first_join_date(siae):
     return get_first_membership_join_date(memberships=siae.siaemembership_set)
 
 
-def get_siae_last_ja_transition_date(siae):
-    timestamps = []
-    for ja in siae.job_applications_received.all():
-        ja_timestamps = [
-            log.timestamp for log in ja.logs.all() if log.to_state != JobApplicationWorkflow.STATE_OBSOLETE
-        ]
-        if len(ja_timestamps) >= 1:
-            timestamps.append(max(ja_timestamps))
-    return max(timestamps, default=None)
-
-
 def get_siae_last_month_job_applications(siae):
     return [ja for ja in siae.job_applications_received.all() if ja.created_at > ONE_MONTH_AGO]
 
@@ -204,7 +193,7 @@ TABLE.add_columns(
             "name": "date_dernière_évolution_candidature",
             "type": "date",
             "comment": "Date de dernière évolution candidature sauf passage obsolète",
-            "fn": get_siae_last_ja_transition_date,
+            "fn": lambda o: o.last_job_application_transition_date,
         },
         {
             "name": "total_fiches_de_poste_actives",
