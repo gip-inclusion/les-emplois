@@ -32,6 +32,7 @@ from psycopg2 import extras as psycopg2_extras, sql
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
@@ -205,12 +206,12 @@ class Command(BaseCommand):
         drop_old_and_new_tables(table_name)
 
     def populate_siaes(self):
+        ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
         queryset = (
             Siae.objects.active()
             .select_related("convention")
             .prefetch_related(
                 "convention__siaes",
-                "job_applications_received",
                 "job_description_through",
             )
             .annotate(
@@ -223,6 +224,43 @@ class Command(BaseCommand):
                 ),
                 members_count=Count(
                     "siaemembership",
+                ),
+                total_candidatures=Count(
+                    "job_applications_received",
+                ),
+                total_embauches=Count(
+                    "job_applications_received",
+                    filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_ACCEPTED),
+                ),
+                total_candidatures_30j=Count(
+                    "job_applications_received", filter=Q(job_applications_received__created_at__gte=ONE_MONTH_AGO)
+                ),
+                total_embauches_30j=Count(
+                    "job_applications_received",
+                    filter=Q(
+                        job_applications_received__state=JobApplicationWorkflow.STATE_ACCEPTED,
+                        job_applications_received__created_at__gte=ONE_MONTH_AGO,
+                    ),
+                ),
+                total_auto_prescriptions=Count(
+                    "job_applications_received",
+                    filter=Q(job_applications_received__sender_kind=SenderKind.SIAE_STAFF),
+                ),
+                total_candidatures_autonomes=Count(
+                    "job_applications_received",
+                    filter=Q(job_applications_received__sender_kind=SenderKind.JOB_SEEKER),
+                ),
+                total_candidatures_prescripteur=Count(
+                    "job_applications_received",
+                    filter=Q(job_applications_received__sender_kind=SenderKind.PRESCRIBER),
+                ),
+                total_candidatures_non_traitees=Count(
+                    "job_applications_received",
+                    filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_NEW),
+                ),
+                total_candidatures_en_cours=Count(
+                    "job_applications_received",
+                    filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_PROCESSING),
                 ),
             )
             .all()

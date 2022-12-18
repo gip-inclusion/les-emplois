@@ -1,7 +1,3 @@
-from django.utils import timezone
-
-from itou.job_applications.enums import SenderKind
-from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.tables.utils import (
     MetabaseTable,
     get_address_columns,
@@ -10,21 +6,6 @@ from itou.metabase.tables.utils import (
     get_establishment_last_login_date_column,
 )
 from itou.siaes.models import Siae
-
-
-ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
-
-
-def get_siae_last_month_job_applications(siae):
-    return [ja for ja in siae.job_applications_received.all() if ja.created_at > ONE_MONTH_AGO]
-
-
-def get_siae_last_month_hirings(siae):
-    return [
-        ja
-        for ja in siae.job_applications_received.all()
-        if ja.created_at > ONE_MONTH_AGO and ja.state == JobApplicationWorkflow.STATE_ACCEPTED
-    ]
 
 
 TABLE = MetabaseTable(name="structures")
@@ -93,22 +74,19 @@ TABLE.add_columns(
             "name": "total_candidatures",
             "type": "integer",
             "comment": "Nombre de candidatures dont la structure est destinataire",
-            "fn": lambda o: len(o.job_applications_received.all()),
+            "fn": lambda o: o.total_candidatures,
         },
         {
             "name": "total_candidatures_30j",
             "type": "integer",
             "comment": "Nombre de candidatures dans les 30 jours glissants dont la structure est destinataire",
-            "fn": lambda o: len(get_siae_last_month_job_applications(o)),
+            "fn": lambda o: o.total_candidatures_30j,
         },
         {
             "name": "total_embauches",
             "type": "integer",
             "comment": "Nombre de candidatures en état accepté dont la structure est destinataire",
-            # We have to do all this in python to benefit from prefetch_related.
-            "fn": lambda o: len(
-                [ja for ja in o.job_applications_received.all() if ja.state == JobApplicationWorkflow.STATE_ACCEPTED]
-            ),
+            "fn": lambda o: o.total_embauches,
         },
         {
             "name": "total_embauches_30j",
@@ -117,63 +95,48 @@ TABLE.add_columns(
                 "Nombre de candidatures en état accepté dans les 30 jours glissants "
                 "dont la structure est destinataire"
             ),
-            "fn": lambda o: len(get_siae_last_month_hirings(o)),
+            "fn": lambda o: o.total_embauches_30j,
         },
         {
             "name": "taux_conversion_30j",
             "type": "float",
             "comment": "Taux de conversion des candidatures en embauches dans les 30 jours glissants",
             "fn": lambda o: round(
-                1.0 * len(get_siae_last_month_hirings(o)) / len(get_siae_last_month_job_applications(o))
-                if get_siae_last_month_job_applications(o)
-                else 0.0,
+                1.0 * o.total_embauches_30j / o.total_candidatures_30j if o.total_candidatures_30j else 0.0,
                 2,
             ),
         },
+        # FIXME(vperron) Sur ce cas précis ça vaudrait le coup d'exporter chaque jour le contenu de la table
+        # plutot que de s'écrire des agrégations à l'infini
         {
             "name": "total_auto_prescriptions",
             "type": "integer",
             "comment": "Nombre de candidatures de source employeur dont la structure est destinataire",
-            # We have to do all this in python to benefit from prefetch_related.
-            "fn": lambda o: len(
-                [ja for ja in o.job_applications_received.all() if ja.sender_kind == SenderKind.SIAE_STAFF]
-            ),
+            "fn": lambda o: o.total_auto_prescriptions,
         },
         {
             "name": "total_candidatures_autonomes",
             "type": "integer",
             "comment": "Nombre de candidatures de source candidat dont la structure est destinataire",
-            # We have to do all this in python to benefit from prefetch_related.
-            "fn": lambda o: len(
-                [ja for ja in o.job_applications_received.all() if ja.sender_kind == SenderKind.JOB_SEEKER]
-            ),
+            "fn": lambda o: o.total_candidatures_autonomes,
         },
         {
             "name": "total_candidatures_via_prescripteur",
             "type": "integer",
             "comment": "Nombre de candidatures de source prescripteur dont la structure est destinataire",
-            # We have to do all this in python to benefit from prefetch_related.
-            "fn": lambda o: len(
-                [ja for ja in o.job_applications_received.all() if ja.sender_kind == SenderKind.PRESCRIBER]
-            ),
+            "fn": lambda o: o.total_candidatures_prescripteur,
         },
         {
             "name": "total_candidatures_non_traitées",
             "type": "integer",
             "comment": "Nombre de candidatures en état nouveau dont la structure est destinataire",
-            # We have to do all this in python to benefit from prefetch_related.
-            "fn": lambda o: len(
-                [ja for ja in o.job_applications_received.all() if ja.state == JobApplicationWorkflow.STATE_NEW]
-            ),
+            "fn": lambda o: o.total_candidatures_non_traitees,
         },
         {
             "name": "total_candidatures_en_étude",
             "type": "integer",
             "comment": "Nombre de candidatures en état étude dont la structure est destinataire",
-            # We have to do all this in python to benefit from prefetch_related.
-            "fn": lambda o: len(
-                [ja for ja in o.job_applications_received.all() if ja.state == JobApplicationWorkflow.STATE_PROCESSING]
-            ),
+            "fn": lambda o: o.total_candidatures_en_cours,
         },
     ]
 )
