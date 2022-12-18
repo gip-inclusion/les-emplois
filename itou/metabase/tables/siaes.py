@@ -8,16 +8,11 @@ from itou.metabase.tables.utils import (
     get_choice,
     get_establishment_is_active_column,
     get_establishment_last_login_date_column,
-    get_first_membership_join_date,
 )
 from itou.siaes.models import Siae
 
 
 ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
-
-
-def get_siae_first_join_date(siae):
-    return get_first_membership_join_date(memberships=siae.siaemembership_set)
 
 
 def get_siae_last_month_job_applications(siae):
@@ -86,13 +81,13 @@ TABLE.add_columns(
             "name": "date_inscription",
             "type": "date",
             "comment": "Date inscription du premier compte employeur",
-            "fn": get_siae_first_join_date,
+            "fn": lambda o: o.first_membership_join_date,
         },
         {
             "name": "total_membres",
             "type": "integer",
             "comment": "Nombre de comptes employeur rattachés à la structure",
-            "fn": lambda o: o.members.count(),
+            "fn": lambda o: o.members_count,
         },
         {
             "name": "total_candidatures",

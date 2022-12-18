@@ -25,7 +25,7 @@ from collections import OrderedDict
 
 from django.core.management.base import BaseCommand
 from django.core.paginator import Paginator
-from django.db.models import Max, Q
+from django.db.models import Count, Max, Min, Q
 from django.utils import timezone
 from psycopg2 import extras as psycopg2_extras, sql
 
@@ -209,9 +209,7 @@ class Command(BaseCommand):
             Siae.objects.active()
             .select_related("convention")
             .prefetch_related(
-                "members",
                 "convention__siaes",
-                "siaemembership_set",
                 "job_applications_received",
                 "job_description_through",
             )
@@ -219,7 +217,13 @@ class Command(BaseCommand):
                 last_job_application_transition_date=Max(
                     "job_applications_received__logs__timestamp",
                     filter=~Q(job_applications_received__logs__to_state=JobApplicationWorkflow.STATE_OBSOLETE),
-                )
+                ),
+                first_membership_join_date=Min(
+                    "siaemembership__joined_at",
+                ),
+                members_count=Count(
+                    "siaemembership",
+                ),
             )
             .all()
         )
