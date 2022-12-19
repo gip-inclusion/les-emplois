@@ -29,6 +29,10 @@ SIAE_WITH_CONVENTION_KINDS = [
 SIAE_WITH_CONVENTION_CHOICES = [(k, v) for k, v in SiaeKind.choices if k in SIAE_WITH_CONVENTION_KINDS]
 
 
+class ContractNature(models.TextChoices):
+    PEC_OFFER = "PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences"
+
+
 class ContractType(models.TextChoices):
     """
     A list of possible work contract types for SIAE.
@@ -114,5 +118,4 @@ def siae_kind_to_pe_type_siae(siae_kind):
 
 
 class JobSource(models.TextChoices):
-    LOCAL = "LOCAL", "Les Emplois de l'Inclusion"
     PE_API = "PE_API", "API Pôle Emploi"

@@ -244,12 +244,19 @@ class SiaeJobDescriptionAdmin(admin.ModelAdmin):
         "open_positions",
     )
     raw_id_fields = ("appellation", "siae", "location")
+    list_filter = ("source_kind",)
     search_fields = (
         "pk",
         "siae__siret",
         "siae__name",
         "custom_name",
         "appellation__name",
+    )
+    readonly_fields = (
+        "pk",
+        "source_id",
+        "source_kind",
+        "source_url",
     )
 
     def get_display_name(self, obj):

@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models import BooleanField, Case, Count, Exists, OuterRef, Prefetch, Q, Subquery, When
+from django.db.models.constraints import UniqueConstraint
 from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +14,7 @@ from itou.common_apps.organizations.models import MembershipAbstract, Organizati
 from itou.siaes.enums import (
     SIAE_WITH_CONVENTION_CHOICES,
     SIAE_WITH_CONVENTION_KINDS,
+    ContractNature,
     ContractType,
     JobSource,
     SiaeKind,
@@ -541,6 +543,9 @@ class SiaeJobDescription(models.Model):
         verbose_name="Type de contrat", choices=ContractType.choices, max_length=30, blank=True
     )
     other_contract_type = models.CharField(verbose_name="Autre type de contrat", max_length=255, blank=True, null=True)
+    contract_nature = models.CharField(
+        verbose_name="Nature du contrat", choices=ContractNature.choices, max_length=64, blank=True, null=True
+    )
     location = models.ForeignKey(
         "cities.City",
         on_delete=models.SET_NULL,
@@ -561,13 +566,14 @@ class SiaeJobDescription(models.Model):
     is_qpv_mandatory = models.BooleanField(verbose_name="Une clause QPV est nécessaire pour ce poste", default=False)
     market_context_description = models.TextField(verbose_name="Contexte du marché", blank=True)
 
-    source_id = models.CharField(verbose_name="ID dans le référentiel source", blank=True, max_length=255)
+    source_id = models.CharField(verbose_name="ID dans le référentiel source", null=True, blank=True, max_length=255)
     source_kind = models.CharField(
         verbose_name="Source de la donnée",
         choices=JobSource.choices,
         max_length=30,
-        default=JobSource.LOCAL,
+        null=True,
     )
+    source_url = models.URLField(verbose_name="URL source de l'offre", max_length=512, null=True, blank=True)
 
     objects = models.Manager.from_queryset(SiaeJobDescriptionQuerySet)()
 
@@ -575,6 +581,13 @@ class SiaeJobDescription(models.Model):
         verbose_name = "Fiche de poste"
         verbose_name_plural = "Fiches de postes"
         ordering = ["appellation__name", "ui_rank"]
+        constraints = [
+            UniqueConstraint(
+                fields=["source_kind", "source_id"],
+                condition=Q(source_kind__isnull=False) & Q(source_id__isnull=False) & ~Q(source_id=""),
+                name="source_id_kind_unique_without_null_values",
+            ),
+        ]
 
     def __str__(self):
         return self.display_name
