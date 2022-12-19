@@ -9,7 +9,7 @@ from import_export.admin import ExportActionMixin
 from import_export.fields import Field
 
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
-from itou.siaes import models
+from itou.siaes import enums, models
 from itou.siaes.admin_forms import SiaeAdminForm
 from itou.utils.admin import ItouGISMixin, PkSupportRemarkInline
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -230,6 +230,20 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
                     "d'authentification il est impossible de s'y inscrire."
                 ),
             )
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.siret == enums.POLE_EMPLOI_SIRET:
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        # we specifically target Pole Emploi and not a "RESERVED" kind nor the "ADMIN_CREATED" source.
+        # The reason behind this is that at the time of writing, what we want to avoid is to modify
+        # Pole Emploi in the admin; we can't make assumptions about the future ADMIN_CREATED or
+        # RESERVED Siaes that might be created someday.
+        if obj and obj.siret == enums.POLE_EMPLOI_SIRET:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 @admin.register(models.SiaeJobDescription)

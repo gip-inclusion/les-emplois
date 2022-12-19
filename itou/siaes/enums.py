@@ -119,3 +119,15 @@ def siae_kind_to_pe_type_siae(siae_kind):
 
 class JobSource(models.TextChoices):
     PE_API = "PE_API", "API Pôle Emploi"
+
+
+# SIRET of the POLE EMPLOI structure as of January 2023
+POLE_EMPLOI_SIRET = "13000548100010"
+
+# Not within the SiaeKind TextChoices, it is a special value reserved for special
+# siaes that are managed by the software.
+SIAE_KIND_RESERVED = "RESERVED"
+
+# not in Siae.SOURCE_XXX choices deliberately: this value can't be selected in
+# the admin and must be set by software.
+SIAE_SOURCE_ADMIN_CREATED = "ADMIN_CREATED"

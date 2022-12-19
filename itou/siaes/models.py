@@ -12,6 +12,7 @@ from django.utils import timezone
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.siaes.enums import (
+    POLE_EMPLOI_SIRET,
     SIAE_WITH_CONVENTION_CHOICES,
     SIAE_WITH_CONVENTION_KINDS,
     ContractNature,
@@ -43,6 +44,9 @@ class SiaeQuerySet(OrganizationQuerySet):
             # ASP source siaes and user created siaes are active if and only
             # if they have an active convention.
             | has_active_convention
+            # Exclude POLE EMPLOI specifically since it is there to be linked with
+            # external PEC offers (time of writing) but should not be selected or
+            # specifically searchable.
         )
 
     def with_has_convention_in_grace_period(self):
@@ -175,6 +179,11 @@ class SiaeQuerySet(OrganizationQuerySet):
         )
 
 
+class SiaeManager(models.Manager.from_queryset(SiaeQuerySet)):
+    def get_queryset(self):
+        return super().get_queryset().exclude(siret=POLE_EMPLOI_SIRET)
+
+
 class Siae(AddressMixin, OrganizationAbstract):
     """
     Structures d'insertion par l'activité économique.
@@ -209,7 +218,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     # Both SIRET numbers are kept up to date by the weekly `import_siae.py` script.
     siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name="Naf", max_length=5, validators=[validate_naf], blank=True)
-    kind = models.CharField(verbose_name="Type", max_length=6, choices=SiaeKind.choices, default=SiaeKind.EI)
+    kind = models.CharField(verbose_name="Type", max_length=8, choices=SiaeKind.choices, default=SiaeKind.EI)
     # `brand` (or `enseigne` in French) is used to override `name` if needed.
     brand = models.CharField(verbose_name="Enseigne", max_length=255, blank=True)
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
@@ -263,7 +272,8 @@ class Siae(AddressMixin, OrganizationAbstract):
         verbose_name="Score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)", null=True
     )
 
-    objects = models.Manager.from_queryset(SiaeQuerySet)()
+    objects = SiaeManager()
+    unfiltered_objects = models.Manager.from_queryset(SiaeQuerySet)()
 
     class Meta:
         verbose_name = "Entreprise"

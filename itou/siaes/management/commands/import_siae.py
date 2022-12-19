@@ -179,7 +179,7 @@ class Command(BaseCommand):
         blocked_deletions = 0
         deletions = 0
 
-        for siae in Siae.objects.select_related("convention").all():
+        for siae in Siae.objects.select_related("convention"):
             if not siae.grace_period_has_expired:
                 continue
             if could_siae_be_deleted(siae):
