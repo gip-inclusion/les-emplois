@@ -50,7 +50,10 @@ TABLE.add_columns(
 
 def get_parent_siae(siae):
     if siae.convention_id and siae.source == Siae.SOURCE_USER_CREATED:
-        return siae.convention.siaes.all()[0]
+        # NOTE: siae.convention.siaes should absolutely be prefetched !
+        for convention_siae in siae.convention.siaes.all():
+            if convention_siae.source == Siae.SOURCE_ASP:
+                return convention_siae
     return siae
 
 
