@@ -222,6 +222,9 @@ class Command(BaseCommand):
                 first_membership_join_date=Min(
                     "siaemembership__joined_at",
                 ),
+                members_last_login=Max(
+                    "members__last_login",
+                ),
                 members_count=Count(
                     "siaemembership",
                 ),
@@ -287,9 +290,17 @@ class Command(BaseCommand):
         and add a special "ORG_OF_PRESCRIBERS_WITHOUT_ORG" to gather stats
         of prescriber users *without* any organization.
         """
-        queryset = PrescriberOrganization.objects.prefetch_related(
-            "prescribermembership_set", "members", "jobapplication_set"
-        ).all()
+        queryset = (
+            PrescriberOrganization.objects.prefetch_related("prescribermembership_set", "jobapplication_set")
+            .annotate(
+                members_last_login=Max(
+                    "members__last_login",
+                ),
+            )
+            .all()
+        )
+
+        setattr(organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG, "members_last_login", None)
 
         self.populate_table(
             table=organizations.TABLE,
