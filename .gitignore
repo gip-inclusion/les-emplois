@@ -2,14 +2,11 @@
 envs/dev.env
 envs/prod.env
 envs/secrets.env
-envs/staging.env
 .envrc
 
 # Config
 docker-compose-prod.yml
-docker-compose-staging.yml
 docker/prod/
-docker/staging/
 
 # Project specific
 itou/static_collected/

@@ -338,7 +338,7 @@ MIGRATION_MODULES = {
 # -------------
 
 
-# Environment, sets the type of env of the app (PROD, FAST-MACHINE, STAGING, DEMO, DEV…)
+# Environment, sets the type of env of the app (PROD, FAST-MACHINE, DEMO, DEV…)
 ITOU_ENVIRONMENT = os.getenv("ITOU_ENVIRONMENT", "PROD")
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = os.getenv("ITOU_FQDN", "emplois.inclusion.beta.gouv.fr")
@@ -446,7 +446,8 @@ STATS_SIAE_USER_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_USER_PK_WHITELIS
 # Slack notifications sent by Metabase cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
-REDIS_URL = os.getenv("REDIS_URL")  # pay attention, prod & staging share the same redis but != DB
+# Production instances (`PROD`, `DEMO`, `FAST-MACHINE`, ...) share the same redis but different DB
+REDIS_URL = os.getenv("REDIS_URL")
 REDIS_DB = os.getenv("REDIS_DB")
 
 HUEY = {
@@ -458,7 +459,7 @@ HUEY = {
         "workers": 2,
         "worker_type": "thread",
     },
-    "immediate": ITOU_ENVIRONMENT not in ("DEMO", "PROD", "STAGING"),
+    "immediate": ITOU_ENVIRONMENT not in ("DEMO", "PROD"),
 }
 
 # Email https://anymail.readthedocs.io/en/stable/esps/mailjet/

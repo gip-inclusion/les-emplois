@@ -29,16 +29,6 @@ class NewDnsRedirectMiddlewareTest(SimpleTestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response["Location"], f"https://emplois.inclusion.beta.gouv.fr{path}")
 
-    @override_settings(ALLOWED_HOSTS=["staging.inclusion.beta.gouv.fr", "staging.emplois.inclusion.beta.gouv.fr"])
-    def test_staging_redirect(self):
-        path = "/accounts/login/?account_type=job_seeker"
-        request = self.request_factory.get(path, HTTP_HOST="staging.inclusion.beta.gouv.fr")
-
-        response = self.middleware(request)
-
-        self.assertEqual(response.status_code, 301)
-        self.assertEqual(response["Location"], f"https://staging.emplois.inclusion.beta.gouv.fr{path}")
-
     @override_settings(ALLOWED_HOSTS=["demo.inclusion.beta.gouv.fr", "demo.emplois.inclusion.beta.gouv.fr"])
     def test_demo_redirect(self):
         path = "/accounts/login/?account_type=job_seeker"
