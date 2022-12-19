@@ -115,13 +115,13 @@ class Command(BaseCommand):
         new_table_name = get_new_table_name(table_name)
         old_table_name = get_old_table_name(table_name)
 
-        def drop_old_and_new_tables(table_name):
+        def drop_old_and_new_tables():
             with MetabaseDatabaseCursor() as (cur, conn):
                 cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(new_table_name)))
                 cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
                 conn.commit()
 
-        drop_old_and_new_tables(table_name)
+        drop_old_and_new_tables()
 
         total_rows = sum([queryset.count() for queryset in querysets])
 
@@ -203,7 +203,7 @@ class Command(BaseCommand):
             )
             conn.commit()
 
-        drop_old_and_new_tables(table_name)
+        drop_old_and_new_tables()
 
     def populate_siaes(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
