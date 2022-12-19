@@ -49,8 +49,8 @@ TABLE.add_columns(
 
 
 def get_parent_siae(siae):
-    if siae.convention and siae.source == Siae.SOURCE_USER_CREATED:
-        return siae.convention.siaes.get(source=Siae.SOURCE_ASP)
+    if siae.convention_id and siae.source == Siae.SOURCE_USER_CREATED:
+        return siae.convention.siaes.all()[0]
     return siae
 
 
