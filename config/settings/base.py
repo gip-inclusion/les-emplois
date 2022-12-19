@@ -433,7 +433,7 @@ METABASE_HASH_SALT = os.getenv("METABASE_HASH_SALT")
 ASP_ITOU_PREFIX = "99999"
 
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(
-    os.getenv("PILOTAGE_DASHBOARDS_WHITELIST", "[63, 90, 32, 52, 54, 116, 43, 136, 140, 129, 150]")
+    os.getenv("PILOTAGE_DASHBOARDS_WHITELIST", "[63, 90, 32, 52, 54, 116, 43, 136, 140, 129, 150, 217]")
 )
 
 # Only ACIs given by Convergence France may access some contracts
