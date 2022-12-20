@@ -8,6 +8,9 @@ cd "$APP_HOME" || exit 1
 
 set -o errexit
 
+OUTPUT_PATH=shared_bucket/populate_metabase_emplois
+mkdir -p $OUTPUT_PATH
+
 # NOTE(vperron): this is not a proper getopt parsing but getopt is SO verbose for
 # just that simple use that I have rather use a very simple version. This script
 # is intended to be automated by a proper tool like Airflow anyway.
@@ -34,4 +37,4 @@ set -o errexit
     else
         echo "populate_metabase_emplois shell script: unknown mode='$1' selected"
     fi
-) |& tee -a "shared_bucket/populate_metabase_emplois/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+) |& tee -a "$OUTPUT_PATH/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
