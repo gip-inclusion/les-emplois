@@ -229,17 +229,22 @@ class Command(BaseCommand):
                     "members__last_login",
                 ),
                 members_count=Count(
-                    "siaemembership",
+                    "members",
+                    distinct=True,
                 ),
                 total_candidatures=Count(
                     "job_applications_received",
+                    distinct=True,
                 ),
                 total_embauches=Count(
                     "job_applications_received",
                     filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_ACCEPTED),
+                    distinct=True,
                 ),
                 total_candidatures_30j=Count(
-                    "job_applications_received", filter=Q(job_applications_received__created_at__gte=ONE_MONTH_AGO)
+                    "job_applications_received",
+                    filter=Q(job_applications_received__created_at__gte=ONE_MONTH_AGO),
+                    distinct=True,
                 ),
                 total_embauches_30j=Count(
                     "job_applications_received",
@@ -247,26 +252,32 @@ class Command(BaseCommand):
                         job_applications_received__state=JobApplicationWorkflow.STATE_ACCEPTED,
                         job_applications_received__created_at__gte=ONE_MONTH_AGO,
                     ),
+                    distinct=True,
                 ),
                 total_auto_prescriptions=Count(
                     "job_applications_received",
                     filter=Q(job_applications_received__sender_kind=SenderKind.SIAE_STAFF),
+                    distinct=True,
                 ),
                 total_candidatures_autonomes=Count(
                     "job_applications_received",
                     filter=Q(job_applications_received__sender_kind=SenderKind.JOB_SEEKER),
+                    distinct=True,
                 ),
                 total_candidatures_prescripteur=Count(
                     "job_applications_received",
                     filter=Q(job_applications_received__sender_kind=SenderKind.PRESCRIBER),
+                    distinct=True,
                 ),
                 total_candidatures_non_traitees=Count(
                     "job_applications_received",
                     filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_NEW),
+                    distinct=True,
                 ),
                 total_candidatures_en_cours=Count(
                     "job_applications_received",
                     filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_PROCESSING),
+                    distinct=True,
                 ),
             )
             .all()
