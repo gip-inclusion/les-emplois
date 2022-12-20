@@ -128,6 +128,9 @@ def get_matomo_dashboard(at: datetime.datetime, options: MatomoFetchOptions):
     column_names = None
     results = []
     for row in matomo_api_call(base_options | options.api_options):
+        if all(x in ["0", "0s", "0%"] for x in row.values()):
+            print(f"\t! empty matomo values for date={at} dashboard={options.dashboard_name}")
+            return None, None
         row["Date"] = at
         row["Tableau de bord"] = options.dashboard_name
         for extra_col, extra_value in options.extra_columns.items():
@@ -156,7 +159,11 @@ def multiget_matomo_dashboards(at: datetime.datetime, dashboard_options: List[Ma
             for options in dashboard_options
         ]
         for future in concurrent.futures.as_completed(futures, timeout=600):  # 10 minutes max for a dashboard
-            column_names, rows = future.result()  # redefine column_names every time, always the same
+            cols, rows = future.result()
+            if rows is None:
+                continue
+            # redefine column_names every time, they should always be the same
+            column_names = cols
             all_rows += rows
     return column_names, all_rows
 
