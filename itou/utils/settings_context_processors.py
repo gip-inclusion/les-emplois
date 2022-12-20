@@ -33,5 +33,6 @@ def expose_settings(request):
         "ITOU_FQDN": settings.ITOU_FQDN,
         "ITOU_PILOTAGE_URL": global_constants.PILOTAGE_SITE_URL,
         "ITOU_PROTOCOL": settings.ITOU_PROTOCOL,
+        "MATOMO_SITE_ID": global_constants.MATOMO_SITE_EMPLOIS_ID,
         "SHOW_TEST_ACCOUNTS_BANNER": settings.SHOW_TEST_ACCOUNTS_BANNER,
     }

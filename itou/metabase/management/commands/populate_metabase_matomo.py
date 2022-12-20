@@ -38,23 +38,23 @@ PUBLIC_DASHBOARDS = {
 }
 
 PRIVATE_DEPARTMENT_DASHBOARDS = {
-    "stats/cd/{}": "tb 118 - Données IAE CD",
-    "stats/ddets/hiring/{}": "tb 160 - Facilitation de l'embauche DREETS/DDETS",
-    "stats/ddets/iae/{}": "tb 117 - Données IAE DREETS/DDETS",
-    "stats/pe/conversion/main/{}": "tb 169 - Taux de transformation PE",
-    "stats/pe/delay/main/{}": "tb 168 - Délai d'entrée en IAE",
-    "stats/pe/state/main/{}": "tb 149 - Candidatures orientées PE",
-    "stats/pe/tension/{}": "tb 162 - Fiches de poste en tension PE",
-    "stats/siae/hiring/{}": "tb 165 - Recrutement SIAE",
+    "stats_cd": "tb 118 - Données IAE CD",
+    "stats_ddets_hiring": "tb 160 - Facilitation de l'embauche DREETS/DDETS",
+    "stats_ddets_iae": "tb 117 - Données IAE DREETS/DDETS",
+    "stats_pe_conversion_main": "tb 169 - Taux de transformation PE",
+    "stats_pe_delay_main": "tb 168 - Délai d'entrée en IAE",
+    "stats_pe_state_main": "tb 149 - Candidatures orientées PE",
+    "stats_pe_tension": "tb 162 - Fiches de poste en tension PE",
+    "stats_siae_hiring": "tb 165 - Recrutement SIAE",
 }
 
 PRIVATE_REGION_DASHBOARDS = {
-    "stats/dreets/hiring/{}": "tb 160 - Facilitation de l'embauche DREETS/DDETS",
-    "stats/dreets/iae/{}": "tb 117 - Données IAE DREETS/DDETS",
-    "stats/pe/conversion/main/{}": "tb 169 - Taux de transformation PE",
-    "stats/pe/delay/main/{}": "tb 168 - Délai d'entrée en IAE",
-    "stats/pe/state/main/{}": "tb 149 - Candidatures orientées PE",
-    "stats/pe/tension/{}": "tb 162 - Fiches de poste en tension PE",
+    "stats_dreets_hiring": "tb 160 - Facilitation de l'embauche DREETS/DDETS",
+    "stats_dreets_iae": "tb 117 - Données IAE DREETS/DDETS",
+    "stats_pe_conversion_main": "tb 169 - Taux de transformation PE",
+    "stats_pe_delay_main": "tb 168 - Délai d'entrée en IAE",
+    "stats_pe_state_main": "tb 149 - Candidatures orientées PE",
+    "stats_pe_tension": "tb 162 - Fiches de poste en tension PE",
 }
 
 
@@ -187,7 +187,7 @@ class Command(BaseCommand):
                 MatomoFetchOptions(
                     dashboard_name,
                     {
-                        "idSite": "146",  # pilotage
+                        "idSite": constants.MATOMO_SITE_PILOTAGE_ID,
                         "segment": f"pageUrl=={constants.PILOTAGE_SITE_URL}/tableaux-de-bord/{url_path}/",
                     },
                     {},
@@ -205,7 +205,7 @@ class Command(BaseCommand):
             )
 
     def _fetch_matomo_private_dashboards(self, at, wet_run=False):
-        base_options = {"idSite": "117"}  # emplois
+        base_options = {"idSite": constants.MATOMO_SITE_EMPLOIS_ID}
         base_extra_columns = {
             "Nom Département": None,
             "Département": None,
@@ -224,13 +224,13 @@ class Command(BaseCommand):
 
         def _options_from_url_path(url_path):
             return base_options | {
-                "segment": f"pageUrl=={constants.EMPLOIS_SITE_URL}/{url_path}",
+                "segment": f"pageUrl=={constants.EMPLOIS_SITE_URL}{url_path}",
             }
 
         for region, departments in REGIONS.items():
             region_url_path = format_region_for_matomo(region)
-            for url_path_fmt, dashboard_name in PRIVATE_REGION_DASHBOARDS.items():
-                url_path = url_path_fmt.format(region_url_path)
+            for url_name, dashboard_name in PRIVATE_REGION_DASHBOARDS.items():
+                url_path = f"stats:{url_name}/{region_url_path}"
                 extra_columns = base_extra_columns | {
                     "Région": region,
                 }
@@ -244,8 +244,8 @@ class Command(BaseCommand):
 
             for department in departments:
                 dpt_url_path = format_region_and_department_for_matomo(department)
-                for url_path_fmt, dashboard_name in PRIVATE_DEPARTMENT_DASHBOARDS.items():
-                    url_path = url_path_fmt.format(dpt_url_path)
+                for url_name, dashboard_name in PRIVATE_DEPARTMENT_DASHBOARDS.items():
+                    url_path = f"stats:{url_name}/{dpt_url_path}"
                     extra_columns = {
                         "Nom Département": DEPARTMENTS[department],
                         "Département": department,
