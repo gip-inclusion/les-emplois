@@ -492,4 +492,9 @@ class Command(BaseCommand):
 
     @timeit
     def handle(self, mode, **options):
-        self.MODE_TO_OPERATION[mode](self.METABASE_INSERT_BATCH_SIZE[mode])
+        operation = self.MODE_TO_OPERATION[mode]
+        batch_size = self.METABASE_INSERT_BATCH_SIZE[mode]
+        if batch_size:
+            operation(batch_size=batch_size)
+        else:
+            operation()
