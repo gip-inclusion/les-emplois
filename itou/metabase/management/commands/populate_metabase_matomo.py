@@ -24,6 +24,10 @@ from itou.metabase.db import MetabaseDatabaseCursor, create_table
 from itou.utils import constants
 
 
+# Matomo might be a little tingly sometimes, let's give it retries.
+httpx_transport = httpx.HTTPTransport(retries=3)
+client = httpx.Client(transport=httpx_transport)
+
 PUBLIC_DASHBOARDS = {
     "analyse-des-publics": "tb 129 - Analyse des publics",
     "auto-prescription": "tb 32 - Acceptés en auto-prescription",
@@ -77,7 +81,7 @@ METABASE_PRIVATE_DASHBOARDS_TABLE_NAME = "suivi_visiteurs_tb_prives_v0"
 
 
 def matomo_api_call(options):
-    response = httpx.get(f"{settings.MATOMO_BASE_URL}?{urllib.parse.urlencode(options)}", timeout=MATOMO_TIMEOUT)
+    response = client.get(f"{settings.MATOMO_BASE_URL}?{urllib.parse.urlencode(options)}", timeout=MATOMO_TIMEOUT)
     csv_content = response.content.decode("utf-16")
     yield from csv.DictReader(io.StringIO(csv_content), dialect="excel")
 
