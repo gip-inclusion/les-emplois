@@ -37,13 +37,15 @@ class ProcessViewsTest(TestCase):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
         - GET
-        - POST: show the confirmation modal)
+        - POST: show the confirmation modal
         - POST: hide the modal and redirect to the next url.
         """
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "Confirmation de l’embauche")
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Make sure modal is hidden.
+        self.assertNotContains(response, "data-htmx-open-modal")
 
         if not post_data:
             hiring_start_at = timezone.localdate()
@@ -59,15 +61,11 @@ class ProcessViewsTest(TestCase):
                 "city_slug": city.slug,
             }
 
-        # Confirmation modal.
-        # Users clicks on the confirmation button.
-        # As buttons uses HTMX, test AJAX requests from now on.
-        # TODO: use django-htmx.tests.test_middleware.RequestFactory instead.
-        # See https://github.com/adamchainz/django-htmx/blob/main/tests/test_middleware.py
         response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
         if assert_successful:
-            self.assertTemplateUsed(response, "apply/partials/_accept_confirmation_modal.html")
-            self.assertContains(response, "Confirmation de l’embauche")
+            self.assertContains(response, "data-htmx-open-modal")
+        else:
+            self.assertNotContains(response, "data-htmx-open-modal")
 
         post_data = post_data | {"confirmed": "True"}
         response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
@@ -565,7 +563,7 @@ class ProcessViewsTest(TestCase):
 
         # Accept the job application for the first job seeker.
         self.client.force_login(siae.members.first())
-        _, next_url = self.accept_job_application(job_application=job_application, city=city, assert_successful=False)
+        _, next_url = self.accept_job_application(job_application=job_application, city=city)
         response = self.client.get(next_url)
         self.assertNotIn(
             "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. ",
@@ -585,9 +583,7 @@ class ProcessViewsTest(TestCase):
         )
 
         # Gracefully display a message instead of just plain crashing
-        _, next_url = self.accept_job_application(
-            job_application=another_job_application, city=city, assert_successful=False
-        )
+        _, next_url = self.accept_job_application(job_application=another_job_application, city=city)
         response = self.client.get(next_url)
         self.assertIn(
             "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. ",

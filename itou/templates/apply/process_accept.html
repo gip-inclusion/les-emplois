@@ -9,67 +9,81 @@
         <p class="mb-0">Confirmez votre choix en renseignant quelques informations supplémentaires.</p>
     </div>
 
-    <form method="post" action="" class="mt-5" id="acceptForm">
+    {% block htmx %}
+        <form method="post"
+              action=""
+              hx-post="{{ request.path }}"
+              hx-swap="outerHTML"
+              class="mt-5"
+              id="acceptForm"
+              tabindex="0"
+              aria-labelledby="dialogLabel"
+              aria-hidden="true"
+              {% if modal_shown %}data-htmx-open-modal="#js-confirmation-modal"{% endif %}>
 
-        {% csrf_token %}
+            {% csrf_token %}
 
-        {% if form_address or form_pe_status %}<h3 class="h2">Candidat</h3>{% endif %}
+            {% if form_address or form_pe_status %}<h3 class="h2">Candidat</h3>{% endif %}
 
-        {% if form_pe_status %}
-            {% if not job_application.approval_not_needed %}
-                <div class="alert alert-warning" role="status">
-                    <p class="mb-0">
-                        Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat.
-                    </p>
-                </div>
-            {% endif %}
-            {% bootstrap_form form_pe_status alert_error_type="all" %}
-        {% endif %}
-
-
-        {% if form_user_address %}
-            {% bootstrap_form form_user_address alert_error_type="all" %}
-        {% endif %}
-
-        <div class="mt-5">
-
-            <h3 class="h2">Embauche</h3>
-            {% bootstrap_form form_accept alert_error_type="all" %}
-
-        </div>
-
-        <hr class="my-5">
-        {% buttons %}
-            <div class="text-right mb-4">
-                <a class="btn btn-outline-primary bg-white" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
-                <button type="button" class="btn btn-primary btn-ico" data-toggle="modal" data-target="#confirmModal">
-                    <i class="ri-check-line ri-xl"></i><span class=".btn .btn-ico"></span>Valider l’embauche
-                </button>
-            </div>
-        {% endbuttons %}
-        <div class="modal" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title" id="confirmModalLabel">Confirmation de l’embauche</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                            <i class="ri-close-line"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>
-                            Êtes-vous sûre de vouloir confirmer l’embauche de <strong>{{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }}</strong> dans la structure suivante ?
+            {% if form_pe_status %}
+                {% if not job_application.approval_not_needed %}
+                    <div class="alert alert-warning" role="status">
+                        <p class="mb-0">
+                            Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat.
                         </p>
-                        <p>{% include "siaes/includes/_siae_info.html" with siae=job_application.to_siae %}</p>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Retour</button>
-                        <button type="submit" class="btn btn-primary">Confirmer</button>
-                    </div>
+                {% endif %}
+                {% bootstrap_form form_pe_status alert_error_type="all" %}
+            {% endif %}
+
+
+            {% if form_user_address %}
+                {% bootstrap_form form_user_address alert_error_type="all" %}
+            {% endif %}
+
+            <div class="mt-5">
+
+                <h3 class="h2">Embauche</h3>
+                {% bootstrap_form form_accept alert_error_type="all" %}
+
+            </div>
+
+            <hr class="my-5">
+            {% buttons %}
+                <div class="text-right mb-4">
+                    <a class="btn btn-outline-primary bg-white" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
+                    <button type="submit" class="btn btn-primary btn-ico">
+                        <i class="ri-check-line ri-xl"></i><span class=".btn .btn-ico"></span>Valider l’embauche
+                    </button>
+                </div>
+            {% endbuttons %}
+
+        </form>
+    {% endblock %}
+
+    <div class="modal" id="js-confirmation-modal" tabindex="-1" aria-labelledby="confirmation-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content modal-centered">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="confirmation-modal-label">Confirmation de l’embauche</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Êtes-vous sûr(e) de vouloir confirmer l’embauche de <strong>{{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }}</strong> dans la structure suivante ?
+                    </p>
+                    <p>{% include "siaes/includes/_siae_info.html" with siae=job_application.to_siae %}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Retour</button>
+                    <button type="submit" class="btn btn-primary" hx-post={{ request.path }} hx-vals='{"confirmed": "True"}' hx-include="#acceptForm">Confirmer
+                    </button>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
 
 {% endblock %}
 
@@ -78,17 +92,4 @@
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form_accept.media }}
     {% if form_pe_status %}{{ form_pe_status.media }}{% endif %}
-    <script nonce="{{ CSP_NONCE }}">
-        $(function () {
-            $("#acceptForm").on("submit", function (e) {
-                let modal = $("#confirmModal");
-                if (modal.is(":visible")) {
-                    return true;
-                }
-                modal.modal("show");
-                e.preventDefault();
-                return false;
-            });
-        })
-    </script>
 {% endblock %}
