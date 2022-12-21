@@ -915,3 +915,282 @@ class ApplicationEndView(ApplyStepBaseView):
                 self.job_application.job_seeker
             ),
         }
+
+
+class UpdateJobSeekerBaseView(ApplyStepBaseView):
+    def __init__(self):
+        super().__init__()
+        self.job_seeker_session = None
+
+    def setup(self, request, *args, **kwargs):
+        self.job_seeker = get_object_or_404(User, pk=kwargs["job_seeker_pk"])
+        self.job_seeker_session = SessionNamespace(request.session, f"job_seeker-{self.job_seeker.pk}")
+        if request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker):
+            # Since the link leading to this process isn't visible to those users, this should never happen
+            raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
+        super().setup(request, *args, **kwargs)
+        if (session_job_seeker_pk := self.apply_session.get("job_seeker_pk")) != self.job_seeker.pk:
+            # This shouldn't happen. But if it does, make sure it doesn't go too far.
+            logger.error(
+                "Trying to update job_seeker=%s from url while job_seeker=%s is present in the session",
+                self.job_seeker.pk,
+                session_job_seeker_pk,
+            )
+            raise PermissionDenied("Mismatching job seekers between URL & session")
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "update_job_seeker": True,
+            "job_seeker": self.job_seeker,
+        }
+
+    def _disable_form(self):
+        for field in self.form:
+            field.field.disabled = True
+
+
+class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
+    template_name = "apply/submit/create_or_update_job_seeker/step_1.html"
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        if not self.job_seeker_session.exists():
+            self.job_seeker_session.init({"user": {}})
+
+        self.form = CreateOrUpdateJobSeekerStep1Form(
+            instance=self.job_seeker,
+            initial=self.job_seeker_session.get("user", {}),
+            data=request.POST or None,
+        )
+        if not self.request.user.can_edit_personal_information(self.job_seeker):
+            self._disable_form()
+
+    def post(self, request, *args, **kwargs):
+        if not self.request.user.can_edit_personal_information(self.job_seeker):
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:update_job_seeker_step_2",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
+            )
+        if self.form.is_valid():
+            self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:update_job_seeker_step_2",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
+            )
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "readonly_form": not self.request.user.can_edit_personal_information(self.job_seeker),
+            "progress": "20",
+        }
+
+
+class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
+    template_name = "apply/submit/create_or_update_job_seeker/step_2.html"
+    required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.form = CreateOrUpdateJobSeekerStep2Form(
+            instance=self.job_seeker,
+            initial=self.job_seeker_session.get("user", {}),
+            data=request.POST or None,
+        )
+        if not self.request.user.can_edit_personal_information(self.job_seeker):
+            self._disable_form()
+
+    def post(self, request, *args, **kwargs):
+        if not self.request.user.can_edit_personal_information(self.job_seeker):
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:update_job_seeker_step_3",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
+            )
+        if self.form.is_valid():
+            self.job_seeker_session.set("user", self.job_seeker_session.get("user") | self.form.cleaned_data)
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:update_job_seeker_step_3",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
+            )
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "readonly_form": not self.request.user.can_edit_personal_information(self.job_seeker),
+            "progress": "40",
+            "back_url": reverse(
+                "apply:update_job_seeker_step_1",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            ),
+        }
+
+
+class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
+    template_name = "apply/submit/create_or_update_job_seeker/step_3.html"
+    required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
+
+    def __init__(self):
+        super().__init__()
+        self.form = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        session_pole_emploi_id = self.job_seeker_session.get("user").get("pole_emploi_id")
+        session_lack_of_pole_emploi_id_reason = self.job_seeker_session.get("user").get(
+            "lack_of_pole_emploi_id_reason"
+        )
+        initial_form_data = self.job_seeker_session.get("profile", {}) | {
+            "pole_emploi_id": session_pole_emploi_id
+            if session_pole_emploi_id is not None
+            else self.job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": session_lack_of_pole_emploi_id_reason
+            if session_lack_of_pole_emploi_id_reason is not None
+            else self.job_seeker.lack_of_pole_emploi_id_reason,
+        }
+        self.form = CreateOrUpdateJobSeekerStep3Form(
+            instance=self.job_seeker.jobseeker_profile if self.job_seeker.has_jobseeker_profile else None,
+            initial=initial_form_data,
+            data=request.POST or None,
+        )
+
+    def post(self, request, *args, **kwargs):
+        if self.form.is_valid():
+            self.job_seeker_session.set(
+                "profile",
+                {
+                    k: v
+                    for k, v in self.form.cleaned_data.items()
+                    if k not in ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+                },
+            )
+            self.job_seeker_session.set(
+                "user",
+                self.job_seeker_session.get("user")
+                | {
+                    "pole_emploi_id": self.form.cleaned_data.get("pole_emploi_id"),
+                    "lack_of_pole_emploi_id_reason": self.form.cleaned_data.get("lack_of_pole_emploi_id_reason"),
+                },
+            )
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:update_job_seeker_step_end",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
+            )
+
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form": self.form,
+            "progress": "60",
+            "back_url": reverse(
+                "apply:update_job_seeker_step_2",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            ),
+        }
+
+
+class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
+    template_name = "apply/submit/create_or_update_job_seeker/step_end.html"
+    required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
+
+    def __init__(self):
+        super().__init__()
+        self.profile = None
+        self.updated_user_fields = []
+
+    def _get_profile_data_from_session(self):
+        # Dummy fields used by CreateOrUpdateJobSeekerStep3Form()
+        fields_to_exclude = [
+            "pole_emploi",
+            "pole_emploi_id_forgotten",
+            "rsa_allocation",
+            "unemployed",
+            "ass_allocation",
+            "aah_allocation",
+        ]
+        return {k: v for k, v in self.job_seeker_session.get("profile").items() if k not in fields_to_exclude}
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        allowed_user_fields_to_update = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        if self.request.user.can_edit_personal_information(self.job_seeker):
+            allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep1Form.Meta.fields)
+            allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep2Form.Meta.fields)
+            allowed_user_fields_to_update.remove("city_slug")
+
+        for field in allowed_user_fields_to_update:
+            if field in self.job_seeker_session.get("user", {}):
+                session_value = self.job_seeker_session.get("user")[field]
+                if session_value != getattr(self.job_seeker, field):
+                    setattr(self.job_seeker, field, session_value)
+                    self.updated_user_fields.append(field)
+
+        if not self.job_seeker.has_jobseeker_profile:
+            self.profile = JobSeekerProfile(
+                user=self.job_seeker,
+                **self._get_profile_data_from_session(),
+            )
+        else:
+            self.profile = self.job_seeker.jobseeker_profile
+            for k, v in self._get_profile_data_from_session().items():
+                setattr(self.profile, k, v)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        self.updated_user_fields.append("last_checked_at")
+        try:
+            if "address_line_1" in self.updated_user_fields or "post_code" in self.updated_user_fields:
+                try:
+                    self.job_seeker.set_coords(self.job_seeker.address_line_1, self.job_seeker.post_code)
+                except AddressLookupError:
+                    # Nothing to do: re-raised and already logged as error
+                    pass
+                else:
+                    self.updated_user_fields.extend(["coords", "geocoding_score"])
+            self.job_seeker.last_checked_at = timezone.now()
+            self.job_seeker.save(update_fields=self.updated_user_fields)
+        except ValidationError as e:
+            messages.error(request, " ".join(e.messages))
+            url = reverse(
+                "apply:update_job_seeker_step_1",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            )
+        else:
+            self.profile.save()
+            self.job_seeker_session.delete()  # Point of no return
+            url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk})
+        return HttpResponseRedirect(url)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "profile": self.profile,
+            "progress": "80",
+            "back_url": reverse(
+                "apply:update_job_seeker_step_3",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            ),
+        }
