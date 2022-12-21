@@ -279,14 +279,14 @@ class SiaeQuerySetTest(TestCase):
 
         self.assertEqual(expected, result.count_recent_received_job_apps)
 
-    def test_with_job_app_score(self):
+    def test_with_computed_job_app_score(self):
         siae = SiaeFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"))
         siae.job_description_through.first()
         JobApplicationFactory(to_siae=siae)
         JobApplicationFactory(to_siae=siae)
 
         expected_score = siae.job_applications_received.count() / siae.job_description_through.count()
-        result = Siae.objects.with_job_app_score().get(pk=siae.pk)
+        result = Siae.objects.with_computed_job_app_score().get(pk=siae.pk)
 
         active_job_descriptions = (
             Siae.objects.with_count_active_job_descriptions().get(pk=siae.pk).count_active_job_descriptions
@@ -296,17 +296,17 @@ class SiaeQuerySetTest(TestCase):
             Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk).count_recent_received_job_apps
         )
         self.assertEqual(recent_job_apps, 2)
-        self.assertEqual(expected_score, result.job_app_score)
+        self.assertEqual(expected_score, result.computed_job_app_score)
 
-    def test_with_job_app_score_no_job_description(self):
+    def test_with_computed_job_app_score_no_job_description(self):
         siae = SiaeFactory()
         JobApplicationFactory(to_siae=siae)
         JobApplicationFactory(to_siae=siae)
 
         expected_score = None
-        result = Siae.objects.with_job_app_score().get(pk=siae.pk)
+        result = Siae.objects.with_computed_job_app_score().get(pk=siae.pk)
 
-        self.assertEqual(expected_score, result.job_app_score)
+        self.assertEqual(expected_score, result.computed_job_app_score)
 
     def test_with_count_active_job_descriptions(self):
         siae = SiaeFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"))
