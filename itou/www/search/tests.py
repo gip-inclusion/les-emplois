@@ -131,7 +131,16 @@ class SearchSiaeTest(TestCase):
         siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350", block_job_applications=True)
         created_siaes.append(siae)
 
-        response = self.client.get(self.url, {"city": guerande.slug})
+        with self.assertNumQueries(
+            1  # find city
+            + 1  # find siaes
+            + 1  # count siaes
+            + 1  # count job descriptions
+            + 1  # get siaes infos
+            + 1  # get job descriptions infos
+            + 4  # check & update session (select, savepoint, update, release)
+        ):
+            response = self.client.get(self.url, {"city": guerande.slug})
         siaes_results = response.context["results_page"]
 
         self.assertEqual(

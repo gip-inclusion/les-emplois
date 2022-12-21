@@ -148,9 +148,9 @@ class EmployerSearchView(EmployerSearchBaseView):
             siaes.prefetch_related(
                 Prefetch(
                     lookup="job_description_through",
-                    queryset=SiaeJobDescription.objects.with_annotation_is_popular().filter(
-                        siae__in=siaes, is_active=True
-                    ),
+                    queryset=SiaeJobDescription.objects.with_annotation_is_popular()
+                    .filter(siae__in=siaes, is_active=True)
+                    .select_related("appellation", "location", "siae"),
                     to_attr="active_job_descriptions",
                 )
             )
