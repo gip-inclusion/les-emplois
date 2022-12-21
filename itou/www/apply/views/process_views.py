@@ -6,10 +6,12 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
+from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
 from itou.eligibility.models import EligibilityDiagnosis
@@ -236,7 +238,22 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     form_accept = AcceptForm(instance=job_application, data=request.POST or None)
     forms.append(form_accept)
 
+    context = {
+        "form_accept": form_accept,
+        "form_user_address": form_user_address,
+        "form_pe_status": form_pe_status,
+        "job_application": job_application,
+    }
+
     if request.method == "POST" and all([form.is_valid() for form in forms]):
+        if request.htmx and not request.POST.get("confirmed"):
+            context["modal_shown"] = True
+            return TemplateResponse(
+                request=request,
+                template=template_name,
+                context=context,
+            )
+
         try:
             with transaction.atomic():
                 if form_pe_status:
@@ -271,10 +288,10 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     "<ul>"
                 ),
             )
-            return HttpResponseRedirect(next_url)
+            return HttpResponseClientRedirect(next_url)
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.")
-            return HttpResponseRedirect(next_url)
+            return HttpResponseClientRedirect(next_url)
 
         if job_application.to_siae.is_subject_to_eligibility_rules:
             # Automatic approval delivery mode.
@@ -331,14 +348,8 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             mark_safe(f"Êtes-vous satisfait des emplois de l'inclusion ? {external_link}"),
         )
 
-        return HttpResponseRedirect(next_url)
+        return HttpResponseClientRedirect(next_url)
 
-    context = {
-        "form_accept": form_accept,
-        "form_user_address": form_user_address,
-        "form_pe_status": form_pe_status,
-        "job_application": job_application,
-    }
     return render(request, template_name, context)
 
 
