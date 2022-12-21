@@ -4,6 +4,7 @@ import json
 import uuid
 from unittest import mock
 
+import freezegun
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -999,6 +1000,7 @@ def user_with_approval_in_waiting_period():
 
 
 class LatestApprovalTestCase(TestCase):
+    @freezegun.freeze_time("2022-08-10")
     def test_merge_approvals_timeline_case1(self):
 
         user = JobSeekerFactory()
@@ -1028,6 +1030,7 @@ class LatestApprovalTestCase(TestCase):
         self.assertEqual(user.latest_approval, None)
         self.assertEqual(user.latest_pe_approval, pe_approval_1)
 
+    @freezegun.freeze_time("2022-08-10")
     def test_merge_approvals_timeline_case2(self):
 
         user = JobSeekerFactory()
