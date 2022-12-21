@@ -23,24 +23,24 @@
             <div class="col-md-5 text-right">
                 <p class="small mb-0">
                     {% if form.status.value == "SENT" %}
-                        <p class="badge badge-pill badge-warning">
-                            Transmise à l'ASP le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        <p class="badge badge-pill badge-sm badge-warning">
+                            Transmise à l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                         </p>
                     {% elif form.status.value == "REJECTED" %}
-                        <p class="badge badge-pill badge-danger">
-                            Retour en erreur le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        <p class="badge badge-pill badge-sm badge-danger">
+                            Retour en erreur le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                         </p>
                     {% elif form.status.value == "PROCESSED" %}
-                        <p class="badge badge-pill badge-success">
-                            Intégrée ASP le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        <p class="badge badge-pill badge-sm badge-success">
+                            Intégrée ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                         </p>
                     {% elif form.status.value == "READY" %}
-                        <p class="badge badge-pill badge-secondary">
-                            Complétée le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        <p class="badge badge-pill badge-sm badge-secondary">
+                            Complétée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                         </p>
                     {% elif form.status.value == "DISABLED" %}
-                        <p class="badge badge-pill badge-emploi-lightest">
-                            Désactivée le&nbsp;<b>{{ employee_record.updated_at }}</b>
+                        <p class="badge badge-pill badge-sm badge-emploi-lightest">
+                            Désactivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                         </p>
                     {% endif %}
                 </p>
