@@ -131,7 +131,7 @@ class SiaeQuerySet(OrganizationQuerySet):
         )
         return self.annotate(count_active_job_descriptions=Coalesce(sub_query, 0))
 
-    def with_job_app_score(self):
+    def with_computed_job_app_score(self):
         """
         Employers search results boost SIAE which did not receive enough job applications
         compared to their total job descriptions.
@@ -158,7 +158,7 @@ class SiaeQuerySet(OrganizationQuerySet):
             self.with_count_recent_received_job_apps()
             .with_count_active_job_descriptions()
             .annotate(
-                job_app_score=Case(
+                computed_job_app_score=Case(
                     When(has_active_job_desc, then=get_score),
                     default=None,
                 )
@@ -255,6 +255,10 @@ class Siae(AddressMixin, OrganizationAbstract):
         blank=True,
         null=True,
         related_name="siaes",
+    )
+
+    job_app_score = models.FloatField(
+        verbose_name="Score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)", null=True
     )
 
     objects = models.Manager.from_queryset(SiaeQuerySet)()

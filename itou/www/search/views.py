@@ -160,7 +160,7 @@ class EmployerSearchView(EmployerSearchBaseView):
             # with 9 members, then siaes with 8 members etc...
             # This is clearly not what we want. We want to show siaes with members
             # (whatever the number of members is) then siaes without members.
-            .with_has_active_members().with_job_app_score()
+            .with_has_active_members()
             # Sort in 4 subgroups in the following order, each subgroup being sorted by job_app_score.
             # 1) has_active_members and not block_job_applications
             # These are the siaes which can currently hire, and should be on top.

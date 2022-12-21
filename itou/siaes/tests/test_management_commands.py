@@ -2,6 +2,7 @@ import io
 
 from django.core import management
 
+from itou.job_applications.factories import JobApplicationFactory
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory
 from itou.siaes import factories as siaes_factories
 from itou.siaes.enums import SiaeKind
@@ -43,3 +44,22 @@ class MoveSiaeDataTest(TestCase):
         )
         self.assertEqual(siae1.evaluated_siaes.count(), 0)
         self.assertEqual(siae2.evaluated_siaes.count(), 1)
+
+
+def test_update_siaes_job_app_score():
+    siae1 = siaes_factories.SiaeFactory()
+    siae2 = JobApplicationFactory(to_siae__with_jobs=True).to_siae
+
+    assert siae1.job_app_score is None
+    assert siae2.job_app_score is None
+
+    stdout = io.StringIO()
+    management.call_command("update_siaes_job_app_score", stdout=stdout)
+    # siae1 did not change (from None to None)
+    assert "Updated 1 Siaes" in stdout.getvalue()
+
+    siae1.refresh_from_db()
+    siae2.refresh_from_db()
+
+    assert siae1.job_app_score is None
+    assert siae2.job_app_score is not None

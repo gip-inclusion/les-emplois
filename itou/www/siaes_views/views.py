@@ -80,7 +80,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 @login_required
 @require_safe
 def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
-    siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
+    siae = get_current_siae_or_404(request, with_job_descriptions=True)
     job_descriptions = (
         SiaeJobDescription.objects.filter(siae__pk=siae.pk, is_active=True)
         .prefetch_related("appellation", "appellation__rome", "siae")
@@ -96,7 +96,7 @@ def card_search_preview(request, template_name="siaes/includes/_card_siae.html")
 @login_required
 @transaction.atomic
 def job_description_list(request, template_name="siaes/job_description_list.html"):
-    siae = get_current_siae_or_404(request, with_job_app_score=True, with_job_descriptions=True)
+    siae = get_current_siae_or_404(request, with_job_descriptions=True)
     job_descriptions = (
         SiaeJobDescription.objects.filter(siae__pk=siae.pk)
         .prefetch_related("appellation", "appellation__rome", "siae")
@@ -397,7 +397,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
-    queryset = Siae.objects.prefetch_job_description_through().with_job_app_score()
+    queryset = Siae.objects.prefetch_job_description_through()
 
     siae = get_object_or_404(queryset, pk=siae_id)
     jobs_descriptions = siae.job_description_through.all()
