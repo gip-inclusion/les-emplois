@@ -8,8 +8,9 @@ from itou.job_applications.factories import JobApplicationFactory
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation, Rome
 from itou.prescribers.factories import PrescriberOrganizationFactory
-from itou.siaes.enums import ContractType, SiaeKind
+from itou.siaes.enums import POLE_EMPLOI_SIRET, ContractType, JobSource, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
+from itou.siaes.models import Siae
 from itou.utils.test import TestCase
 from itou.www.testing import NUM_CSRF_SESSION_REQUESTS
 
@@ -381,6 +382,17 @@ class JobDescriptionSearchViewTest(TestCase):
         )
         job3 = SiaeJobDescriptionFactory(siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP)
 
+        # FIXME(vperron): do not display this PEC offer for now
+        pe_siae = Siae.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
+        job_pec = SiaeJobDescriptionFactory(
+            siae=pe_siae,
+            appellation=appellations[2],
+            contract_type=ContractType.APPRENTICESHIP,
+            location=city,
+            source_id="GNEH",
+            source_kind=JobSource.PE_API,
+        )
+
         # no filter: returns everything.
         response = self.client.get(
             self.url,
@@ -390,6 +402,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, capfirst(job1.display_name), html=True)
         self.assertContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
+        self.assertNotContains(response, capfirst(job_pec.display_name), html=True)
 
         # pass both contract types, should have the same result.
         response = self.client.get(
