@@ -1,14 +1,28 @@
 {% extends "layout/base.html" %}
 {% load bootstrap4 %}
 
-{% block title %}Création du compte candidat{{ block.super }}{% endblock %}
+{% block title %}
+    {% if update_job_seeker %}
+        Modification
+    {% else %}
+        Création
+    {% endif %}
+    du compte candidat{{ block.super }}
+{% endblock %}
 {% block content_full_viewport %}
     <section class="s-section-twocolumns">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-5 order-md-2 pl-lg-5 d-none d-lg-block mb-6"></div>
                 <div class="col-12 col-lg-7 order-md-1 pr-lg-5">
-                    <h1 class="my-5">Création du compte candidat</h1>
+                    <h1 class="my-5">
+                        {% if update_job_seeker %}
+                            Modification
+                        {% else %}
+                            Création
+                        {% endif %}
+                        du compte candidat
+                    </h1>
                     <div class="c-stepper my-5">
                         <div class="progress progress--emploi mb-2">
                             <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
@@ -22,6 +36,25 @@
                         <h2>
                             {% block step_title %}{% endblock %}
                         </h2>
+                        {% if readonly_form %}
+                            <div class="alert alert-warning alert-dismissible fade show mb-4">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                    <i class="ri-close-line"></i>
+                                </button>
+                                <div class="row">
+                                    <div class="col-auto pr-0">
+                                        <i class="ri-information-line ri-xl text-warning"></i>
+                                    </div>
+                                    <div class="col">
+                                        <p>
+                                            <strong>Informations modifiables par le candidat uniquement</strong>
+                                        </p>
+                                        <p>Le candidat s’étant connecté à son compte utilisateur, vous ne pouvez modifier que sa situation administrative.</p>
+                                        <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_3" siae_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Voir la situation administrative</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         <hr class="mt-5">
                         {% bootstrap_form_errors form type="all" %}
                         <form method="post" class="js-enable-submit-when-valid js-collapsable-subfields">

@@ -70,6 +70,27 @@ urlpatterns = [
         submit_views.ApplicationEndView.as_view(),
         name="application_end",
     ),
+    # Job seeker check/updates
+    path(
+        "<int:siae_pk>/update_job_seeker/<int:job_seeker_pk>/1",
+        submit_views.UpdateJobSeekerStep1View.as_view(),
+        name="update_job_seeker_step_1",
+    ),
+    path(
+        "<int:siae_pk>/update_job_seeker/<int:job_seeker_pk>/2",
+        submit_views.UpdateJobSeekerStep2View.as_view(),
+        name="update_job_seeker_step_2",
+    ),
+    path(
+        "<int:siae_pk>/update_job_seeker/<int:job_seeker_pk>/3",
+        submit_views.UpdateJobSeekerStep3View.as_view(),
+        name="update_job_seeker_step_3",
+    ),
+    path(
+        "<int:siae_pk>/update_job_seeker/<int:job_seeker_pk>/end",
+        submit_views.UpdateJobSeekerStepEndView.as_view(),
+        name="update_job_seeker_step_end",
+    ),
     # List.
     path("job_seeker/list", list_views.list_for_job_seeker, name="list_for_job_seeker"),
     path("prescriber/list", list_views.list_for_prescriber, name="list_for_prescriber"),

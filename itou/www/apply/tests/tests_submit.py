@@ -7,9 +7,10 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.messages import get_messages
 from django.urls import resolve, reverse
 from django.utils import timezone
+from pytest_django.asserts import assertRedirects
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.asp.models import RSAAllocation
+from itou.asp.models import EducationLevel, RSAAllocation
 from itou.cities.factories import create_city_in_zrr, create_test_cities
 from itou.cities.models import City
 from itou.eligibility.factories import EligibilityDiagnosisFactory
@@ -1716,7 +1717,7 @@ class LastCheckedAtViewTest(TestCase):
         cls.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
         cls.job_seeker = JobSeekerFactory()
 
-    def _check_last_checked_at(self, user, sees_warning):
+    def _check_last_checked_at(self, user, sees_warning, sees_verify_link):
         self.client.force_login(user)
         apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
         apply_session.init(
@@ -1731,6 +1732,12 @@ class LastCheckedAtViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
+        # Check the presence of the verify link
+        update_url = reverse(
+            "apply:update_job_seeker_step_1", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+        )
+        link_check = self.assertContains if sees_verify_link else self.assertNotContains
+        link_check(response, f'<a class="btn btn-link" href="{update_url}">Vérifier le profil</a>', html=True)
         # Check last_checked_at is shown
         self.assertContains(response, "Dernière actualisation du profil : ")
         self.assertNotContains(response, "Merci de vérifier la validité des informations")
@@ -1741,17 +1748,354 @@ class LastCheckedAtViewTest(TestCase):
         assert response.status_code == 200
         warning_check = self.assertContains if sees_warning else self.assertNotContains
         warning_check(response, "Merci de vérifier la validité des informations")
+        link_check(response, f'<a class="btn btn-link" href="{update_url}">Vérifier le profil</a>', html=True)
 
     def test_siae_employee(self):
-        self._check_last_checked_at(self.siae.members.first(), sees_warning=True)
+        self._check_last_checked_at(self.siae.members.first(), sees_warning=True, sees_verify_link=True)
 
     def test_job_seeker(self):
-        self._check_last_checked_at(self.job_seeker, sees_warning=False)
+        self._check_last_checked_at(self.job_seeker, sees_warning=False, sees_verify_link=False)
 
     def test_authorized_prescriber(self):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
-        self._check_last_checked_at(authorized_prescriber, sees_warning=True)
+        self._check_last_checked_at(authorized_prescriber, sees_warning=True, sees_verify_link=True)
 
     def test_unauthorized_prescriber(self):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
-        self._check_last_checked_at(prescriber, sees_warning=True)
+        self._check_last_checked_at(prescriber, sees_warning=True, sees_verify_link=False)
+
+    def test_unauthorized_prescriber_that_created_the_job_seeker(self):
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        self.job_seeker.created_by = prescriber
+        self.job_seeker.save(update_fields=["created_by"])
+        self._check_last_checked_at(prescriber, sees_warning=True, sees_verify_link=True)
+
+
+class UpdateJobSeekerViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        cls.job_seeker = JobSeekerFactory()
+        cls.step_1_url = reverse(
+            "apply:update_job_seeker_step_1", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+        )
+        cls.step_2_url = reverse(
+            "apply:update_job_seeker_step_2", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+        )
+        cls.step_3_url = reverse(
+            "apply:update_job_seeker_step_3", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+        )
+        cls.step_end_url = reverse(
+            "apply:update_job_seeker_step_end", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+        )
+        create_test_cities(["67"], num_per_department=1)
+        cls.city = City.objects.first()
+
+        cls.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT = "Informations modifiables par le candidat uniquement"
+        cls.job_seeker_session_key = f"job_seeker-{cls.job_seeker.pk}"
+
+    def _check_nothing_permitted(self, user):
+        self.client.force_login(user)
+        apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
+        apply_session.init(
+            {
+                "job_seeker_pk": self.job_seeker.pk,
+                "selected_jobs": [],
+            }
+        )
+        apply_session.save()
+        for url in [
+            self.step_1_url,
+            self.step_2_url,
+            self.step_3_url,
+            self.step_end_url,
+        ]:
+            response = self.client.get(url)
+            assert response.status_code == 403
+
+    def _check_everything_allowed(self, user):
+        self.client.force_login(user)
+        apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
+        apply_session.init(
+            {
+                "job_seeker_pk": self.job_seeker.pk,
+                "selected_jobs": [],
+            }
+        )
+        apply_session.save()
+
+        # STEP 1
+        response = self.client.get(self.step_1_url)
+        assert response.status_code == 200
+        self.assertContains(response, self.job_seeker.first_name)
+        self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
+
+        NEW_FIRST_NAME = "New first name"
+
+        post_data = {
+            "title": "M",
+            "first_name": NEW_FIRST_NAME,
+            "last_name": "New last name",
+            "birthdate": self.job_seeker.birthdate,
+        }
+        response = self.client.post(self.step_1_url, data=post_data)
+        assertRedirects(response, self.step_2_url, fetch_redirect_response=False)
+
+        # Data is stored in the session but user is untouched
+        expected_job_seeker_session = {"user": post_data}
+        assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        self.job_seeker.refresh_from_db()
+        assert self.job_seeker.first_name != NEW_FIRST_NAME
+
+        # If you go back to step 1, new data is shown
+        response = self.client.get(self.step_1_url)
+        assert response.status_code == 200
+        self.assertContains(response, NEW_FIRST_NAME)
+
+        # STEP 2
+        response = self.client.get(self.step_2_url)
+        assert response.status_code == 200
+        self.assertContains(response, self.job_seeker.phone)
+        self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
+
+        NEW_ADDRESS_LINE = "123 de la jolie rue"
+
+        post_data = {
+            "address_line_1": NEW_ADDRESS_LINE,
+            "post_code": self.city.post_codes[0],
+            "city_slug": self.city.slug,
+            "city": self.city.name,
+            "phone": self.job_seeker.phone,
+        }
+        response = self.client.post(self.step_2_url, data=post_data)
+        assertRedirects(response, self.step_3_url, fetch_redirect_response=False)
+
+        # Data is stored in the session but user is untouched
+        expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
+        assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        self.job_seeker.refresh_from_db()
+        assert self.job_seeker.address_line_1 != NEW_ADDRESS_LINE
+
+        # If you go back to step 2, new data is shown
+        response = self.client.get(self.step_2_url)
+        assert response.status_code == 200
+        self.assertContains(response, NEW_ADDRESS_LINE)
+
+        # STEP 3
+        response = self.client.get(self.step_3_url)
+        assert response.status_code == 200
+
+        self.assertContains(response, "Niveau de formation")
+
+        post_data = {
+            "education_level": EducationLevel.BAC_LEVEL.value,
+        }
+        response = self.client.post(self.step_3_url, data=post_data)
+        assertRedirects(response, self.step_end_url, fetch_redirect_response=False)
+
+        # Data is stored in the session but user & profiles are untouched
+        expected_job_seeker_session["profile"] = post_data | {
+            "resourceless": False,
+            "rqth_employee": False,
+            "oeth_employee": False,
+            "pole_emploi": False,
+            "pole_emploi_id_forgotten": "",
+            "pole_emploi_since": "",
+            "unemployed": False,
+            "unemployed_since": "",
+            "rsa_allocation": False,
+            "has_rsa_allocation": RSAAllocation.NO.value,
+            "rsa_allocation_since": "",
+            "ass_allocation": False,
+            "ass_allocation_since": "",
+            "aah_allocation": False,
+            "aah_allocation_since": "",
+        }
+        expected_job_seeker_session["user"] |= {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+        }
+        assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        self.job_seeker.refresh_from_db()
+        assert not self.job_seeker.has_jobseeker_profile
+
+        # If you go back to step 3, new data is shown
+        response = self.client.get(self.step_3_url)
+        assert response.status_code == 200
+        self.assertContains(response, '<option value="40" selected="">Formation de niveau BAC</option>', html=True)
+
+        # Step END
+        response = self.client.get(self.step_end_url)
+        assert response.status_code == 200
+
+        self.assertContains(response, NEW_FIRST_NAME)
+        self.assertContains(response, NEW_ADDRESS_LINE)
+        self.assertContains(response, "Formation de niveau BAC")
+
+        previous_last_checked_at = self.job_seeker.last_checked_at
+
+        response = self.client.post(self.step_end_url)
+        assertRedirects(
+            response,
+            reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
+            fetch_redirect_response=False,
+        )
+        assert self.client.session.get(self.job_seeker_session_key) is None
+
+        self.job_seeker.refresh_from_db()
+        assert self.job_seeker.has_jobseeker_profile is True
+        assert self.job_seeker.first_name == NEW_FIRST_NAME
+        assert self.job_seeker.address_line_1 == NEW_ADDRESS_LINE
+        assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
+
+        assert self.job_seeker.last_checked_at != previous_last_checked_at
+
+    def _check_only_administrative_allowed(self, user):
+        self.client.force_login(user)
+        apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
+        apply_session.init(
+            {
+                "job_seeker_pk": self.job_seeker.pk,
+                "selected_jobs": [],
+            }
+        )
+        apply_session.save()
+
+        # STEP 1
+        response = self.client.get(self.step_1_url)
+        assert response.status_code == 200
+        self.assertContains(response, self.job_seeker.first_name)
+        self.assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
+
+        response = self.client.post(self.step_1_url)
+        assertRedirects(response, self.step_2_url, fetch_redirect_response=False)
+
+        # Session is created
+        expected_job_seeker_session = {"user": {}}
+        assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
+
+        # STEP 2
+        response = self.client.get(self.step_2_url)
+        assert response.status_code == 200
+        self.assertContains(response, self.job_seeker.phone)
+        self.assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
+
+        response = self.client.post(self.step_2_url)
+        assertRedirects(response, self.step_3_url, fetch_redirect_response=False)
+
+        # Data is stored in the session but user is untouched
+        assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
+
+        # STEP 3
+        response = self.client.get(self.step_3_url)
+        assert response.status_code == 200
+
+        self.assertContains(response, "Niveau de formation")
+
+        post_data = {
+            "education_level": EducationLevel.BAC_LEVEL.value,
+        }
+        response = self.client.post(self.step_3_url, data=post_data)
+        assertRedirects(response, self.step_end_url, fetch_redirect_response=False)
+
+        # Data is stored in the session but user & profiles are untouched
+        expected_job_seeker_session["profile"] = post_data | {
+            "resourceless": False,
+            "rqth_employee": False,
+            "oeth_employee": False,
+            "pole_emploi": False,
+            "pole_emploi_id_forgotten": "",
+            "pole_emploi_since": "",
+            "unemployed": False,
+            "unemployed_since": "",
+            "rsa_allocation": False,
+            "has_rsa_allocation": RSAAllocation.NO.value,
+            "rsa_allocation_since": "",
+            "ass_allocation": False,
+            "ass_allocation_since": "",
+            "aah_allocation": False,
+            "aah_allocation_since": "",
+        }
+        expected_job_seeker_session["user"] |= {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+        }
+        assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
+        self.job_seeker.refresh_from_db()
+        assert not self.job_seeker.has_jobseeker_profile
+
+        # If you go back to step 3, new data is shown
+        response = self.client.get(self.step_3_url)
+        assert response.status_code == 200
+        self.assertContains(response, '<option value="40" selected="">Formation de niveau BAC</option>', html=True)
+
+        # Step END
+        response = self.client.get(self.step_end_url)
+        assert response.status_code == 200
+
+        self.assertContains(response, "Formation de niveau BAC")
+
+        previous_last_checked_at = self.job_seeker.last_checked_at
+
+        response = self.client.post(self.step_end_url)
+        assertRedirects(
+            response,
+            reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
+            fetch_redirect_response=False,
+        )
+        assert self.client.session.get(self.job_seeker_session_key) is None
+
+        self.job_seeker.refresh_from_db()
+        assert self.job_seeker.has_jobseeker_profile is True
+        assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
+        assert self.job_seeker.last_checked_at != previous_last_checked_at
+
+    def test_as_job_seeker(self):
+        self._check_nothing_permitted(self.job_seeker)
+
+    def test_as_unauthorized_prescriber(self):
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        self._check_nothing_permitted(prescriber)
+
+    def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self):
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        self.job_seeker.created_by = prescriber
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        self._check_everything_allowed(prescriber)
+
+    def test_as_unauthorized_prescriber_that_created_the_non_proxied_job_seeker(self):
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        self.job_seeker.created_by = prescriber
+        # Make sure the job seeker does manage its own account
+        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        self._check_nothing_permitted(prescriber)
+
+    def test_as_authorized_prescriber_with_proxied_job_seeker(self):
+        # Make sure the job seeker does not manage its own account
+        self.job_seeker.created_by = UserFactory()
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        self._check_everything_allowed(authorized_prescriber)
+
+    def test_as_authorized_prescriber_with_non_proxied_job_seeker(self):
+        # Make sure the job seeker does manage its own account
+        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
+        self.job_seeker.save(update_fields=["last_login"])
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        self._check_only_administrative_allowed(authorized_prescriber)
+
+    def test_as_siae_with_proxied_job_seeker(self):
+        # Make sure the job seeker does not manage its own account
+        self.job_seeker.created_by = UserFactory()
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        self._check_everything_allowed(self.siae.members.first())
+
+    def test_as_siae_with_non_proxied_job_seeker(self):
+        # Make sure the job seeker does manage its own account
+        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
+        self.job_seeker.save(update_fields=["last_login"])
+        self._check_only_administrative_allowed(self.siae.members.first())
