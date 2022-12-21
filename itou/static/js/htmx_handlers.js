@@ -4,6 +4,7 @@
   htmx.on("htmx:afterOnLoad", (e) => {
     const responseStatus = e.detail.xhr.status;
     if (200 <= responseStatus && responseStatus < 300) {
+      initDuetDatePicker();
       // - We're looking for the modal that is supposedly referred by the `htmx-open-modal` data element on the form.
       // - This form is either using `hx-swap=innerHtml` in which case it is `e.detail.elt`
       // - or it uses `outerHtml`, in which case we have to traverse `e.detail.elt` to find our form back.
