@@ -10,7 +10,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertRedirects
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.asp.models import EducationLevel, RSAAllocation
+from itou.asp.models import AllocationDuration, EducationLevel, RSAAllocation
 from itou.cities.factories import create_city_in_zrr, create_test_cities
 from itou.cities.models import City
 from itou.eligibility.factories import EligibilityDiagnosisFactory
@@ -2099,3 +2099,38 @@ class UpdateJobSeekerViewTestCase(TestCase):
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["last_login"])
         self._check_only_administrative_allowed(self.siae.members.first())
+
+
+class UpdateJobSeekerStep3ViewTestCase(TestCase):
+    def test_job_seeker_with_profile_has_check_boxes_ticked_in_step3(self):
+        siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        JobSeekerProfileFactory(user=job_seeker, ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS)
+
+        self.client.force_login(siae.members.first())
+        apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
+        apply_session.init(
+            {
+                "job_seeker_pk": job_seeker.pk,
+                "selected_jobs": [],
+            }
+        )
+        apply_session.save()
+
+        # STEP 1 to setup jobseeker session
+        response = self.client.get(
+            reverse("apply:update_job_seeker_step_1", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+        )
+        assert response.status_code == 200
+
+        # Go straight to STEP 3
+        response = self.client.get(
+            reverse("apply:update_job_seeker_step_3", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+        )
+        assert response.status_code == 200
+
+        self.assertContains(
+            response,
+            '<input type="checkbox" name="ass_allocation" class="form-check-input" id="id_ass_allocation" checked="">',
+            html=True,
+        )

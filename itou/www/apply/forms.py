@@ -220,6 +220,18 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
         self.fields["education_level"].required = True
         self.fields["education_level"].label = "Niveau de formation"
 
+        if self.instance:
+            # if an instance is provided, make sure the initial values for non-model fields are consistent
+            for field in [
+                "pole_emploi",
+                "unemployed",
+                "rsa_allocation",
+                "ass_allocation",
+                "aah_allocation",
+            ]:
+                if field not in self.initial:
+                    self.initial[field] = bool(getattr(self.instance, f"{field}_since"))
+
     def clean(self):
         super().clean()
 
