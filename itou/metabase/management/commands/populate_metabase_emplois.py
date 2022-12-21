@@ -81,23 +81,6 @@ class Command(BaseCommand):
             "final_tables": self.build_final_tables,
             "data_inconsistencies": self.report_data_inconsistencies,
         }
-        # Set how many rows are inserted at a time in metabase database.
-        # A bigger number makes the script faster until a certain point,
-        # but it also increases RAM usage.
-        self.METABASE_INSERT_BATCH_SIZE = {
-            "siaes": 100,
-            "job_descriptions": 10000,
-            "organizations": 100,
-            "job_seekers": 1000,
-            "job_applications": 1000,
-            "selected_jobs": 10000,
-            "approvals": 1000,
-            "rome_codes": 1000,
-            "insee_codes": 1000,
-            "departments": None,
-            "final_tables": None,
-            "data_inconsistencies": None,
-        }
 
     def add_arguments(self, parser):
         parser.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
@@ -184,7 +167,9 @@ class Command(BaseCommand):
 
             written_rows = 0
             for queryset in querysets:
-                # Insert rows by batch of METABASE_INSERT_BATCH_SIZE.
+                # Insert rows by batch of batch_size.
+                # A bigger number makes the script faster until a certain point,
+                # but it also increases RAM usage.
                 for chunk_qs in chunked_queryset(queryset, chunk_size=batch_size):
                     inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
                     written_rows += chunk_qs.count()
@@ -208,7 +193,7 @@ class Command(BaseCommand):
 
         drop_old_and_new_tables()
 
-    def populate_siaes(self, batch_size):
+    def populate_siaes(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
         queryset = (
             Siae.objects.active()
@@ -283,9 +268,9 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(siaes.TABLE, batch_size, querysets=[queryset])
+        self.populate_table(siaes.TABLE, batch_size=100, querysets=[queryset])
 
-    def populate_job_descriptions(self, batch_size):
+    def populate_job_descriptions(self):
         queryset = (
             SiaeJobDescription.objects.select_related(
                 "siae",
@@ -296,15 +281,14 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(job_descriptions.TABLE, batch_size, querysets=[queryset])
+        self.populate_table(job_descriptions.TABLE, batch_size=10_000, querysets=[queryset])
 
-    def populate_organizations(self, batch_size):
+    def populate_organizations(self):
         """
         Populate prescriber organizations,
         and add a special "ORG_OF_PRESCRIBERS_WITHOUT_ORG" to gather stats
         of prescriber users *without* any organization.
         """
-
         setattr(organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG, "members_last_login", None)
 
         active_user_created_job_applications_filter = Q(
@@ -350,12 +334,12 @@ class Command(BaseCommand):
 
         self.populate_table(
             organizations.TABLE,
-            batch_size,
+            batch_size=100,
             querysets=[queryset],
             extra_object=organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
         )
 
-    def populate_job_applications(self, batch_size):
+    def populate_job_applications(self):
         queryset = (
             JobApplication.objects.select_related("to_siae", "sender", "sender_siae", "sender_prescriber_organization")
             .prefetch_related("logs")
@@ -384,9 +368,9 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(job_applications.TABLE, batch_size, querysets=[queryset])
+        self.populate_table(job_applications.TABLE, batch_size=1000, querysets=[queryset])
 
-    def populate_selected_jobs(self, batch_size):
+    def populate_selected_jobs(self):
         """
         Populate associations between job applications and job descriptions.
         """
@@ -396,9 +380,9 @@ class Command(BaseCommand):
             .values("pk", "selected_jobs__id")
         )
 
-        self.populate_table(selected_jobs.TABLE, batch_size, querysets=[queryset])
+        self.populate_table(selected_jobs.TABLE, batch_size=10_000, querysets=[queryset])
 
-    def populate_approvals(self, batch_size):
+    def populate_approvals(self):
         """
         Populate approvals table by merging Approvals and PoleEmploiApprovals.
         Some stats are available on both kinds of objects and some only
@@ -413,9 +397,9 @@ class Command(BaseCommand):
             start_at__gte=approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
         ).all()
 
-        self.populate_table(approvals.TABLE, batch_size, querysets=[queryset1, queryset2])
+        self.populate_table(approvals.TABLE, batch_size=1000, querysets=[queryset1, queryset2])
 
-    def populate_job_seekers(self, batch_size):
+    def populate_job_seekers(self):
         """
         Populate job seekers table and add detailed stats about
         diagnoses and administrative criteria, including one column
@@ -435,19 +419,19 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(job_seekers.TABLE, batch_size, querysets=[queryset])
+        self.populate_table(job_seekers.TABLE, batch_size=1000, querysets=[queryset])
 
-    def populate_rome_codes(self, batch_size):
+    def populate_rome_codes(self):
         queryset = Rome.objects.all()
 
-        self.populate_table(rome_codes.TABLE, batch_size, querysets=[queryset])
+        self.populate_table(rome_codes.TABLE, batch_size=1000, querysets=[queryset])
 
-    def populate_insee_codes(self, batch_size):
+    def populate_insee_codes(self):
         queryset = City.objects.all()
 
-        self.populate_table(insee_codes.TABLE, batch_size, querysets=[queryset])
+        self.populate_table(insee_codes.TABLE, batch_size=1000, querysets=[queryset])
 
-    def populate_departments(self, batch_size):
+    def populate_departments(self):
         table_name = "departements"
         self.stdout.write(f"Preparing content for {table_name} table...")
 
@@ -466,7 +450,7 @@ class Command(BaseCommand):
         store_df(df=df, table_name=table_name)
 
     @timeit
-    def report_data_inconsistencies(self, batch_size):
+    def report_data_inconsistencies(self):
         """
         Report data inconsistencies that were previously ignored during `populate_approvals` method in order to avoid
         having the script break in the middle. This way, the scripts breaks only at the end with informative
@@ -492,9 +476,4 @@ class Command(BaseCommand):
 
     @timeit
     def handle(self, mode, **options):
-        operation = self.MODE_TO_OPERATION[mode]
-        batch_size = self.METABASE_INSERT_BATCH_SIZE[mode]
-        if batch_size:
-            operation(batch_size=batch_size)
-        else:
-            operation()
+        self.MODE_TO_OPERATION[mode]()
