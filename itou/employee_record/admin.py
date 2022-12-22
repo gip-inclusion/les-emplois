@@ -35,15 +35,23 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
     @admin.action(description="Planifier une notification de changement 'PASS IAE' pour ces fiches salarié")
     def schedule_approval_update_notification(self, request, queryset):
+        total_created, total_updated = 0, 0
         for employee_record in queryset:
-            models.EmployeeRecordUpdateNotification.objects.update_or_create(
+            _, created = models.EmployeeRecordUpdateNotification.objects.update_or_create(
                 employee_record=employee_record,
                 notification_type=models.NotificationType.APPROVAL,
+                status=Status.NEW,
                 defaults={"updated_at": timezone.now},
             )
+            total_created += int(created)
+            total_updated += int(not created)
 
-        s = pluralizefr(queryset)
-        messages.add_message(request, messages.SUCCESS, f"{len(queryset)} notification{s} planifiée{s}")
+        if total_created:
+            s = pluralizefr(total_created)
+            messages.add_message(request, messages.SUCCESS, f"{total_created} notification{s} planifiée{s}")
+        if total_updated:
+            s = pluralizefr(total_updated)
+            messages.add_message(request, messages.SUCCESS, f"{total_updated} notification{s} mise{s} à jour")
 
     actions = [
         update_employee_record_as_ready,
