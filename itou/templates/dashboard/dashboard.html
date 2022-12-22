@@ -107,28 +107,61 @@
 {% endblock %}
 
 {% block pre_content %}
-    {# Mise en avant temporaire de Dora. #}
-    {% if user.is_prescriber or user.is_siae_staff %}
+    {# Mise en avant de Dora. #}
+    {% if show_dora_banner %}
         <section class="s-banner-01 pt-3 pb-0">
             <div class="s-banner-01__container container">
                 <div class="s-banner-01__row row">
                     <div class="s-banner-01__col col-12">
                         <div class="d-flex flex-column flex-md-row">
-                            <div class="text-center text-md-left mt-3">
-                                <a href="https://dora.fabrique.social.gouv.fr/contribuer?utm_source=lesemplois&utm_medium=banniere&utm_campaign=dashboard" target="_blank">
-                                    <img src="{% static 'img/logo_dora.svg' %}" alt="DORA : recensement et mise à jour de l’offre d’insertion" width="140">
-                                </a>
-                            </div>
                             <div class="w-100 mt-3 pl-0 pl-md-3">
-                                <p class="h3 mb-2">
-                                    Participez au référencement de l’offre d’insertion de votre territoire en renseignant les services que vous utilisez au quotidien.
-                                </p>
-                                <p class="mb-0 text-right">
-                                    <a href="https://dora.fabrique.social.gouv.fr/contribuer?utm_source=lesemplois&utm_medium=banniere&utm_campaign=dashboard" rel="noopener" target="_blank" class="btn btn-sm btn-outline-primary btn-ico">
-                                        <span>Je contribue</span>
-                                        <i class="ri-external-link-line ri-lg"></i>
-                                    </a>
-                                </p>
+                                {% if user.is_prescriber %}
+                                    <p class="h3 mb-2">Consultez l’offre de service de vos partenaires</p>
+                                    <p>
+                                        DORA vous aide dans la levée des freins périphériques bloquant le retour à l'emploi des bénéficiaires en facilitant l’identification des services d’insertion adaptés.
+                                    </p>
+                                    <p class="mb-0">
+                                        <a class="btn btn-primary btn-ico"
+                                           href="https://dora.fabrique.social.gouv.fr/?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
+                                           title="Consulter les services (ouverture dans un nouvel onglet)"
+                                           rel="noopener"
+                                           target="_blank">
+                                            <span>Consulter les services</span>
+                                            <i class="ri-external-link-line ri-lg"></i>
+                                        </a>
+                                        <a class="btn btn-link btn-ico"
+                                           href="https://dora.fabrique.social.gouv.fr/contribuer?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
+                                           title="Suggérer les services de vos partenaires (ouverture dans un nouvel onglet)"
+                                           rel="noopener"
+                                           target="_blank">
+                                            <span>Suggérer les services de vos partenaires</span>
+                                            <i class="ri-external-link-line ri-lg"></i>
+                                        </a>
+                                    </p>
+                                {% elif user.is_siae_staff %}
+                                    <p class="h3 mb-2">Donnez de la visibilité à votre offre d’insertion</p>
+                                    <p>
+                                        DORA est une cartographie numérique de l'offre d'insertion nationale. Rendez vos services visibles sur votre territoire et sur tous les sites partenaires, grâce à notre démarche collective d'ouverture des données.
+                                    </p>
+                                    <p class="mb-0">
+                                        <a class="btn btn-primary btn-ico"
+                                           href="https://dora.fabrique.social.gouv.fr/auth/rattachement?siret={{ current_org.siret }}&utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
+                                           title="Référencer un service (ouverture dans un nouvel onglet)"
+                                           rel="noopener"
+                                           target="_blank">
+                                            <span>Référencer un service</span>
+                                            <i class="ri-external-link-line ri-lg"></i>
+                                        </a>
+                                        <a class="btn btn-link btn-ico"
+                                           href="https://dora.fabrique.social.gouv.fr/?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
+                                           title="Découvrir DORA (ouverture dans un nouvel onglet)"
+                                           rel="noopener"
+                                           target="_blank">
+                                            <span>Découvrir DORA</span>
+                                            <i class="ri-external-link-line ri-lg"></i>
+                                        </a>
+                                    </p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -211,6 +244,10 @@
 
         {% if can_view_stats_ddets and active_campaigns %}
             {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
+        {% endif %}
+
+        {% if user.is_siae_staff or user.is_prescriber %}
+            {% include "dashboard/includes/dora_card.html" with siret=current_org.siret tracker="utm_source=LesEmplois&utm_medium=blocLesEmplois&utm_campaign=dashboard" %}
         {% endif %}
     </div>
 

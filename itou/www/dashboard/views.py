@@ -97,6 +97,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         campaign_in_progress = any(campaign.ended_at is None for campaign in active_campaigns)
 
     context = {
+        "current_org": current_org,
         "job_applications_categories": job_applications_categories,
         # FIXME(vperron): I think there's a rising need for a revamped permission system.
         "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
@@ -117,6 +118,11 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "evaluated_siae_notifications": evaluated_siae_notifications,
         "precriber_kind_pe": PrescriberOrganizationKind.PE,
         "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
+        "show_dora_banner": (
+            any([request.user.is_siae_staff, request.user.is_prescriber])
+            and current_org
+            and current_org.department in ["08", "60", "91", "974"]
+        ),
     }
 
     return render(request, template_name, context)

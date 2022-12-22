@@ -340,6 +340,76 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
 
+    def test_dora_card_is_not_shown_for_job_seeker(self):
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "DORA")
+
+    def test_dora_card_is_shown_for_siae(self):
+        siae = SiaeFactory(with_membership=True)
+        self.client.force_login(siae.members.first())
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "DORA")
+        self.assertContains(response, "Consulter les services d'insertion de votre territoire")
+        self.assertContains(response, "Référencer vos services")
+        self.assertContains(response, "Suggérer un service partenaire")
+
+    def test_dora_card_is_shown_for_prescriber(self):
+        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        self.client.force_login(prescriber_organization.members.first())
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "DORA")
+        self.assertContains(response, "Consulter les services d'insertion de votre territoire")
+        self.assertContains(response, "Référencer vos services")
+        self.assertContains(response, "Suggérer un service partenaire")
+
+    def test_dora_banner_is_not_shown_for_job_seeker(self):
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Consultez l’offre de service de vos partenaires")
+        self.assertNotContains(response, "Donnez de la visibilité à votre offre d’insertion")
+
+    def test_dora_banner_is_shown_for_siae(self):
+        for department in ["08", "60", "91", "974"]:
+            with self.subTest(department=department):
+                siae = SiaeFactory(with_membership=True, department=department)
+                self.client.force_login(siae.members.first())
+
+                response = self.client.get(reverse("dashboard:index"))
+                self.assertContains(response, "Donnez de la visibilité à votre offre d’insertion")
+
+    def test_dora_banner_is_shown_for_prescriber(self):
+        for department in ["08", "60", "91", "974"]:
+            with self.subTest(department=department):
+                prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
+                    department=department,
+                )
+                self.client.force_login(prescriber_organization.members.first())
+
+                response = self.client.get(reverse("dashboard:index"))
+                self.assertContains(response, "Consultez l’offre de service de vos partenaires")
+
+    def test_dora_banner_is_not_shown_for_other_department(self):
+        siae = SiaeFactory(with_membership=True, department="01")
+        self.client.force_login(siae.members.first())
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Donnez de la visibilité à votre offre d’insertion")
+
+        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
+            department="01",
+        )
+        self.client.force_login(prescriber_organization.members.first())
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Consultez l’offre de service de vos partenaires")
+
     def test_dashboard_prescriber_suspend_link(self):
 
         user = JobSeekerFactory()
