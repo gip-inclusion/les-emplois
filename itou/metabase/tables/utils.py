@@ -159,7 +159,9 @@ def get_establishment_last_login_date_column():
             "name": "date_dernière_connexion",
             "type": "date",
             "comment": "Date de dernière connexion utilisateur",
-            "fn": lambda o: o.members_last_login,
+            "fn": lambda o: max([u.last_login for u in o.members.all() if u.last_login], default=None)
+            if o.members.exists()
+            else None,
         },
     ]
 
@@ -170,8 +172,10 @@ def get_establishment_is_active_column():
             "name": "active",
             "type": "boolean",
             "comment": "Dernière connexion dans les 7 jours",
-            "fn": lambda o: o.members_last_login > timezone.now() - timezone.timedelta(days=7)
-            if o.members_last_login
+            "fn": lambda o: any(
+                [u.last_login > timezone.now() - timezone.timedelta(days=7) for u in o.members.all() if u.last_login]
+            )
+            if o.members.exists()
             else False,
         },
     ]

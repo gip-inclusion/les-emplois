@@ -71,7 +71,7 @@ TABLE.add_columns(
             "name": "total_membres",
             "type": "integer",
             "comment": "Nombre de comptes employeur rattachés à la structure",
-            "fn": lambda o: o.members_count,
+            "fn": lambda o: o.members.count(),
         },
         {
             "name": "total_candidatures",

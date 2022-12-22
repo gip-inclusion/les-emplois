@@ -198,10 +198,7 @@ class Command(BaseCommand):
         queryset = (
             Siae.objects.active()
             .select_related("convention")
-            .prefetch_related(
-                "convention__siaes",
-                "job_description_through",
-            )
+            .prefetch_related("convention__siaes", "job_description_through", "members")
             .annotate(
                 last_job_application_transition_date=Max(
                     "job_applications_received__logs__timestamp",
@@ -209,13 +206,6 @@ class Command(BaseCommand):
                 ),
                 first_membership_join_date=Min(
                     "siaemembership__joined_at",
-                ),
-                members_last_login=Max(
-                    "members__last_login",
-                ),
-                members_count=Count(
-                    "members",
-                    distinct=True,
                 ),
                 total_candidatures=Count(
                     "job_applications_received",
@@ -264,6 +254,7 @@ class Command(BaseCommand):
                     filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_PROCESSING),
                     distinct=True,
                 ),
+                # Don't try counting members or getting first join date, It's way too long
             )
             .all()
         )
@@ -289,8 +280,6 @@ class Command(BaseCommand):
         and add a special "ORG_OF_PRESCRIBERS_WITHOUT_ORG" to gather stats
         of prescriber users *without* any organization.
         """
-        setattr(organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG, "members_last_login", None)
-
         active_user_created_job_applications_filter = Q(
             jobapplication__created_from_pe_approval=False,
             jobapplication__to_siae_id__in=get_active_siae_pks(),
@@ -319,14 +308,11 @@ class Command(BaseCommand):
             filter=active_user_created_job_applications_filter,
         )
         queryset = (
-            PrescriberOrganization.objects.prefetch_related("prescribermembership_set")
+            PrescriberOrganization.objects.prefetch_related("prescribermembership_set", "members")
             .annotate(
                 job_applications_count=job_applications_count,
                 accepted_job_applications_count=accepted_job_applications_count,
                 last_job_application_creation_date=last_job_application_creation_date,
-                members_last_login=Max(
-                    "members__last_login",
-                ),
                 # Don't try counting members or getting first join date, It's way too long
             )
             .all()
