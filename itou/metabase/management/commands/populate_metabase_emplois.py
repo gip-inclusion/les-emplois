@@ -290,7 +290,7 @@ class Command(BaseCommand):
             # This distinct isn't required since we don't filter on ManyToMany fields, or reverse ForeignKeys.
             # However, it' better to keep it in case someone adds such a filter.
             # We will be able to remove it when we have some tests on this function.
-            distnct=True,
+            distinct=True,
         )
         accepted_job_applications_count = Count(
             "jobapplication",
@@ -301,7 +301,7 @@ class Command(BaseCommand):
             # This distinct isn't required since we don't filter on ManyToMany fields, or reverse ForeignKeys.
             # However, it' better to keep it in case someone adds such a filter.
             # We will be able to remove it when we have some tests on this function.
-            distnct=True,
+            distinct=True,
         )
         last_job_application_creation_date = Max(
             "jobapplication__created_at",
