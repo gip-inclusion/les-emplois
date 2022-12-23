@@ -8,6 +8,8 @@ lxml  # https://lxml.de/
 
 Unidecode  # https://github.com/avian2/unidecode
 
+tenacity  # https://github.com/jd/tenacity
+
 # Django
 # ------------------------------------------------------------------------------
 

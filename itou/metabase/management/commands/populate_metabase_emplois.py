@@ -23,6 +23,7 @@ Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for 
 import gc
 from collections import OrderedDict
 
+import tenacity
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Max, Min, Q
 from django.utils import timezone
@@ -59,6 +60,10 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.python import timeit
+
+
+def log_retry_attempt(retry_state):
+    print(f"attempt failed with outcome={retry_state.outcome}")
 
 
 class Command(BaseCommand):
@@ -461,5 +466,6 @@ class Command(BaseCommand):
         build_final_tables()
 
     @timeit
+    @tenacity.retry(stop=tenacity.stop_after_attempt(3), wait=tenacity.wait_fixed(5), after=log_retry_attempt)
     def handle(self, mode, **options):
         self.MODE_TO_OPERATION[mode]()
