@@ -395,9 +395,9 @@ django-htmx==1.13.0 \
     --hash=sha256:781a59376d769aa28302619e73d37d481a125ab155d9fdd7fb17f10e7d25f352 \
     --hash=sha256:848c3e195b8757656626c8a099f9be59c6d30f468f1d54e69f0f2a48f0a14928
     # via -r requirements/base.txt
-django-import-export==2.8.0 \
-    --hash=sha256:31d7dcfba22251e3ef93accb7da844f58c4d78585db9dd7dae37bb76f939da2c \
-    --hash=sha256:33c37b2921ef84e2cd9aa0eb76d04a7c2b538c9d04cb1ed97ac32600876cab30
+django-import-export==3.0.2 \
+    --hash=sha256:ae77a44c08d94b98e50dec11ea53fd5f65702b7d8c3c929c88c310a4e4444507 \
+    --hash=sha256:f0f08f119b1f3a39e67dab8f945609ee13e264a798be532bdd7210e1c851efe2
     # via -r requirements/base.txt
 django-select2==8.0.0 \
     --hash=sha256:0145c9cb34a8c0813f68d7165ed6b034ac03fbdbf145aea203d15ae1653cf7d9 \
@@ -1177,6 +1177,10 @@ tablib[html,ods,xls,xlsx,yaml]==3.2.1 \
     # via
     #   -r requirements/base.txt
     #   django-import-export
+tenacity==8.1.0 \
+    --hash=sha256:35525cd47f82830069f0d6b73f7eb83bc5b73ee2fff0437952cedf98b27653ac \
+    --hash=sha256:e48c437fdf9340f5666b92cd7990e96bc5fc955e1298baf4a907e3972067a445
+    # via -r requirements/base.txt
 toml==0.10.2 \
     --hash=sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b \
     --hash=sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f
