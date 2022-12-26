@@ -129,7 +129,7 @@ def build_final_tables():
     for filename in sorted([f for f in os.listdir(path) if f.endswith(".sql")]):
         print(f"Running {filename} ...")
         table_name = "_".join(filename.split(".")[0].split("_")[1:])
-        with open(os.path.join(path, filename), "r") as file:
+        with open(os.path.join(path, filename)) as file:
             sql_request = file.read()
         build_custom_table(table_name=table_name, sql_request=sql_request)
         print("Done.")

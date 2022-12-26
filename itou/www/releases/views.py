@@ -11,7 +11,7 @@ def releases(request, template_name="releases/list.html"):
     Render our CHANGELOG.md file in HTML
     """
     changelog_filename = os.path.join(settings.ROOT_DIR, "CHANGELOG.md")
-    with open(changelog_filename, "r", encoding="utf-8") as f:
+    with open(changelog_filename, encoding="utf-8") as f:
         changelog_html = markdown.markdown(f.read())
 
     context = {"changelog_html": mark_safe(changelog_html)}

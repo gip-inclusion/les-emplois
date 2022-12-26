@@ -157,11 +157,9 @@ class DeclareProlongationForm(forms.ModelForm):
         }
         help_texts = {
             "end_at": mark_safe(
-                (
-                    'Date jusqu\'à laquelle le PASS IAE doit être prolongé<strong id="js-duration-label"></strong>.'
-                    "<br>"
-                    "Au format JJ/MM/AAAA, par exemple 20/12/1978."
-                )
+                'Date jusqu\'à laquelle le PASS IAE doit être prolongé<strong id="js-duration-label"></strong>.'
+                "<br>"
+                "Au format JJ/MM/AAAA, par exemple 20/12/1978."
             ),
         }
 
@@ -225,19 +223,15 @@ class SuspensionForm(forms.ModelForm):
         }
         help_texts = {
             "start_at": mark_safe(
-                (
-                    "Au format JJ/MM/AAAA, par exemple 20/12/1978."
-                    "<br>"
-                    "La suspension ne doit pas chevaucher une suspension déjà existante."
-                    " Elle ne peut pas commencer dans le futur."
-                )
+                "Au format JJ/MM/AAAA, par exemple 20/12/1978."
+                "<br>"
+                "La suspension ne doit pas chevaucher une suspension déjà existante."
+                " Elle ne peut pas commencer dans le futur."
             ),
             "end_at": mark_safe(
-                (
-                    "Au format JJ/MM/AAAA, par exemple 20/12/1978."
-                    "<br>"
-                    "Renseignez une date de fin à 12 mois si le contrat de travail est terminé ou rompu."
-                )
+                "Au format JJ/MM/AAAA, par exemple 20/12/1978."
+                "<br>"
+                "Renseignez une date de fin à 12 mois si le contrat de travail est terminé ou rompu."
             ),
             "reason_explanation": "Obligatoire seulement en cas de force majeure.",
         }

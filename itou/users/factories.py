@@ -52,10 +52,10 @@ class UserFactory(factory.django.DjangoModelFactory):
             emails=factory.PostGeneration(_verify_emails_for_user),
         )
 
-    username = factory.Sequence("user_name{0}".format)
+    username = factory.Sequence("user_name{}".format)
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
-    email = factory.Sequence("email{0}@domain.com".format)
+    email = factory.Sequence("email{}@domain.com".format)
     password = factory.LazyFunction(default_password)
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     phone = factory.Faker("phone_number", locale="fr_FR")

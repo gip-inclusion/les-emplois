@@ -236,4 +236,4 @@ def get_qpv_job_seeker_pks():
 
 
 def hash_content(content):
-    return hashlib.sha256(f"{content}{settings.METABASE_HASH_SALT}".encode("utf-8")).hexdigest()
+    return hashlib.sha256(f"{content}{settings.METABASE_HASH_SALT}".encode()).hexdigest()

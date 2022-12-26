@@ -1,6 +1,5 @@
 from io import BytesIO
 from os import path
-from typing import Optional
 
 import pysftp
 from django.conf import settings
@@ -45,7 +44,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
             cnopts=connection_options,
         )
 
-    def upload_json_file(self, json_data, conn: pysftp.Connection, dry_run=False) -> Optional[str]:
+    def upload_json_file(self, json_data, conn: pysftp.Connection, dry_run=False) -> str | None:
         """
         Upload `json_data` (as byte array) to given SFTP connection `conn`.
         Returns uploaded filename if ok, `None` otherwise.

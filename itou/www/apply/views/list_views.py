@@ -99,7 +99,7 @@ def list_for_prescriber_exports_download(request, month_identifier):
     filename = f"candidatures-{month_identifier}.csv"
 
     response = HttpResponse(content_type="text/csv", charset="utf-8")
-    response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     generate_csv_export(job_applications, response)
 
@@ -166,7 +166,7 @@ def list_for_siae_exports_download(request, month_identifier):
     filename = f"candidatures-{slugify(siae.display_name)}-{month_identifier}.csv"
 
     response = HttpResponse(content_type="text/csv", charset="utf-8")
-    response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     generate_csv_export(job_applications, response)
 

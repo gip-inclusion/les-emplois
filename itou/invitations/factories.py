@@ -13,9 +13,9 @@ class SiaeStaffInvitationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.SiaeStaffInvitation
 
-    email = factory.Sequence("email{0}@siaestaff.com".format)
-    first_name = factory.Sequence("first_name{0}".format)
-    last_name = factory.Sequence("last_name{0}".format)
+    email = factory.Sequence("email{}@siaestaff.com".format)
+    first_name = factory.Sequence("first_name{}".format)
+    last_name = factory.Sequence("last_name{}".format)
     sender = factory.SubFactory(UserFactory)
     siae = factory.SubFactory(SiaeFactory, with_membership=True)
 

@@ -270,10 +270,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         already_exists = bool(self.pk)
         if not already_exists and hasattr(self, "user") and self.user.approvals.valid().exists():
             raise ValidationError(
-                (
-                    f"Un agrément dans le futur ou en cours de validité existe déjà "
-                    f"pour {self.user.get_full_name()} ({self.user.email})."
-                )
+                f"Un agrément dans le futur ou en cours de validité existe déjà "
+                f"pour {self.user.get_full_name()} ({self.user.email})."
             )
         super().clean()
 
@@ -1075,19 +1073,15 @@ class Prolongation(models.Model):
         if self.get_overlapping_prolongations().exists():
             overlap = self.get_overlapping_prolongations().first()
             raise ValidationError(
-                (
-                    f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
-                    f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
-                )
+                f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
+                f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
             )
 
         if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
             raise ValidationError(
-                (
-                    f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
-                    f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
-                    f'pour le motif "{self.get_reason_display()}".'
-                )
+                f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
+                f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
+                f'pour le motif "{self.get_reason_display()}".'
             )
 
     @property

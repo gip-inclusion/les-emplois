@@ -62,7 +62,7 @@ class SiaeSignupTokenGenerator:
         ).hexdigest()[
             ::2
         ]  # Limit to 20 characters to shorten the URL.
-        return "%s-%s" % (timestamp_b36, hash_string)
+        return f"{timestamp_b36}-{hash_string}"
 
     def _make_hash_value(self, siae, timestamp):
         """

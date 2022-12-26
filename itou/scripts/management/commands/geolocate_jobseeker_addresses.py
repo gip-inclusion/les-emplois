@@ -2,7 +2,6 @@ import csv
 import logging
 import os.path
 from io import StringIO
-from typing import Dict, List
 
 import httpx
 import pandas as pd
@@ -81,14 +80,14 @@ class Command(BaseCommand):
             writer.writerows(rows)
             return file.getvalue()
 
-    def _from_csv(self, content) -> List[Dict]:
+    def _from_csv(self, content) -> list[dict]:
         assert content
 
         with StringIO(content.decode("utf-8")) as file:
             reader = csv.DictReader(file, delimiter=CSV_SEPARATOR)
             return list(reader)
 
-    def _api_lookup(self, addresses) -> List[Dict]:
+    def _api_lookup(self, addresses) -> list[dict]:
         # Batch lookup is only possible via CSV file / body
         if not addresses:
             return []

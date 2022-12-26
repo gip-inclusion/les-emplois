@@ -195,14 +195,14 @@ class Command(BaseCommand):
                     )
                     count_update += 1
             else:
-                self.stdout.write("- will add number=%s last_name=%s" % (NUM_AGR_DEC, NOM_USAGE_BENE))
+                self.stdout.write(f"- will add number={NUM_AGR_DEC} last_name={NOM_USAGE_BENE}")
                 count_add += 1
 
             if wet_run:
                 try:
                     pe_approval.save()
                 except Exception as exc:
-                    self.stdout.write(">>> FATAL ERROR when saving number=%s exception=%s" % (NUM_AGR_DEC, exc))
+                    self.stdout.write(f">>> FATAL ERROR when saving number={NUM_AGR_DEC} exception={exc}")
 
         count_after = PoleEmploiApproval.objects.count()
 

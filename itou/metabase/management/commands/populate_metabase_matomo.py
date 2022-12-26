@@ -5,7 +5,6 @@ import io
 import urllib
 from dataclasses import dataclass
 from time import sleep
-from typing import List
 
 import httpx
 from dateutil.rrule import MO, WEEKLY, rrule
@@ -146,7 +145,7 @@ def get_matomo_dashboard(at: datetime.datetime, options: MatomoFetchOptions):
     return column_names, results
 
 
-def multiget_matomo_dashboards(at: datetime.datetime, dashboard_options: List[MatomoFetchOptions]):
+def multiget_matomo_dashboards(at: datetime.datetime, dashboard_options: list[MatomoFetchOptions]):
     all_rows = []
     column_names = None
     with concurrent.futures.ThreadPoolExecutor() as executor:

@@ -24,7 +24,7 @@ def create_test_cities(selected_departments, num_per_department=None):
     """
     departments_counter = {department: 0 for department in selected_departments}
 
-    with open(CITIES_JSON_FILE, "r") as raw_json_data:
+    with open(CITIES_JSON_FILE) as raw_json_data:
 
         json_data = json.load(raw_json_data)
 

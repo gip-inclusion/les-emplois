@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from django.contrib.gis.geos import GEOSGeometry
 
@@ -7,7 +6,7 @@ from django.contrib.gis.geos import GEOSGeometry
 logger = logging.getLogger(__name__)
 
 
-def coords_to_geometry(lat, lon) -> Optional[GEOSGeometry]:
+def coords_to_geometry(lat, lon) -> GEOSGeometry | None:
     if lat is not None and lon is not None:
         return GEOSGeometry(f"POINT({lon} {lat})")
     return None

@@ -20,5 +20,5 @@ def send_slack_message(text="Hello world :wave:"):
     )
     if response.status_code != 200:
         raise ValueError(
-            "Request to slack returned an error %s, the response is:\n%s" % (response.status_code, response.text)
+            f"Request to slack returned an error {response.status_code}, the response is:\n{response.text}"
         )

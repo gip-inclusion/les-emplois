@@ -1,6 +1,5 @@
 import dataclasses
 import datetime
-from typing import Optional
 
 from itou.users.enums import IdentityProvider
 
@@ -15,11 +14,11 @@ class FranceConnectState(OIDConnectState):
 class FranceConnectUserData(OIDConnectUserData):  # pylint: disable=too-many-instance-attributes
     # Attributes are User model ones.
     # Mapping is made in self.user_info_mapping_dict.
-    phone: Optional[str] = None
-    birthdate: Optional[datetime.date] = None
-    address_line_1: Optional[str] = None
-    post_code: Optional[str] = None
-    city: Optional[str] = None
+    phone: str | None = None
+    birthdate: datetime.date | None = None
+    address_line_1: str | None = None
+    post_code: str | None = None
+    city: str | None = None
     is_job_seeker: bool = True
     identity_provider: IdentityProvider = IdentityProvider.FRANCE_CONNECT
 

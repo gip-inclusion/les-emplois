@@ -151,7 +151,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     """
     print(f"Loaded {len(df)} {source} from export.")
 
-    db_sirets = set([siae.siret for siae in Siae.objects.filter(kind__in=kinds)])
+    db_sirets = {siae.siret for siae in Siae.objects.filter(kind__in=kinds)}
     df_sirets = set(df.siret.tolist())
 
     creatable_sirets = df_sirets - db_sirets

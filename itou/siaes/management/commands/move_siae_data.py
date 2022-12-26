@@ -147,9 +147,7 @@ class Command(BaseCommand):
             evaluated_siaes = EvaluatedSiae.objects.filter(siae_id=from_id)
             self.stdout.write("| Evaluated siaes: %s\n" % evaluated_siaes.count())
 
-        self.stdout.write(
-            "INTO siae.id=%s - %s %s - %s\n" % (to_siae.pk, to_siae.kind, to_siae.siret, to_siae.display_name)
-        )
+        self.stdout.write(f"INTO siae.id={to_siae.pk} - {to_siae.kind} {to_siae.siret} - {to_siae.display_name}\n")
 
         dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
         self.stdout.write("| Job applications sent: %s\n" % dest_siae_job_applications_sent.count())
@@ -232,7 +230,7 @@ class Command(BaseCommand):
                 )
 
         self.stdout.write(
-            "MOVE %s OF siae.id=%s FINISHED\n" % ("DATA" if move_all_data else "JOB APPLICATIONS", from_siae.pk)
+            "MOVE {} OF siae.id={} FINISHED\n".format("DATA" if move_all_data else "JOB APPLICATIONS", from_siae.pk)
         )
         orig_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=from_id)
         self.stdout.write("| Job applications sent: %s\n" % orig_job_applications_sent.count())

@@ -35,7 +35,7 @@ def lazy_import_siae_command():
 class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
     path_source = "./siaes/fixtures"
-    app_dir_path = Path((settings.APPS_DIR))
+    app_dir_path = Path(settings.APPS_DIR)
     mod = None
 
     @classmethod

@@ -11,7 +11,7 @@ APPELLATIONS_CSV_FILE = f"{CURRENT_DIR}/data/appellations_test_fixture.csv"
 
 
 def create_test_romes_and_appellations(rome_codes, appellations_per_rome=30):
-    with open(APPELLATIONS_CSV_FILE, "r", encoding="utf-8") as f:
+    with open(APPELLATIONS_CSV_FILE, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         romes = set()
         appellations = []

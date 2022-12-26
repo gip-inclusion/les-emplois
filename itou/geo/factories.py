@@ -1,5 +1,4 @@
 from random import sample
-from typing import Dict
 
 import factory
 
@@ -22,7 +21,7 @@ ZRRS = [
 ]
 
 
-def _params_for_zrr_status(status: ZRRStatus) -> Dict:
+def _params_for_zrr_status(status: ZRRStatus) -> dict:
     [(insee_code, status)] = sample([elt for elt in ZRRS if elt[1] == status.value], 1)
     return {"insee_code": insee_code, "status": status}
 
@@ -80,7 +79,7 @@ def _format_qpv_tuple(qpv):
     }
 
 
-def _params_for_random_qpv() -> Dict:
+def _params_for_random_qpv() -> dict:
     return _format_qpv_tuple(sample(QPVS, 1))
 
 

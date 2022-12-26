@@ -249,13 +249,11 @@ class User(AbstractUser, AddressMixin):
     lack_of_pole_emploi_id_reason = models.CharField(
         verbose_name="Pas d'identifiant Pôle emploi ?",
         help_text=mark_safe(
-            (
-                "Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>"
-                "Renseigner l'identifiant Pôle emploi des candidats inscrits "
-                "permet d'instruire instantanément votre demande.<br>"
-                "Dans le cas contraire un délai de deux jours est nécessaire "
-                "pour effectuer manuellement les vérifications d’usage."
-            )
+            "Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>"
+            "Renseigner l'identifiant Pôle emploi des candidats inscrits "
+            "permet d'instruire instantanément votre demande.<br>"
+            "Dans le cas contraire un délai de deux jours est nécessaire "
+            "pour effectuer manuellement les vérifications d’usage."
         ),
         max_length=30,
         choices=REASON_CHOICES,

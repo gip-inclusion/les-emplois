@@ -155,7 +155,7 @@ class Command(BaseCommand):
 
             # Add comments on table columns.
             for c in table.columns:
-                assert set(c.keys()) == set(["name", "type", "comment", "fn"])
+                assert set(c.keys()) == {"name", "type", "comment", "fn"}
                 column_name = c["name"]
                 column_comment = c["comment"]
                 comment_query = sql.SQL("comment on column {new_table_name}.{column_name} is {column_comment}").format(

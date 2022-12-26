@@ -353,7 +353,7 @@ class CommuneQuerySet(PeriodQuerySet):
         return (
             self.asp_imported()
             .filter(code=insee_code, start_date__lte=period)
-            .filter((Q(end_date=None) | Q(end_date__gt=period)))
+            .filter(Q(end_date=None) | Q(end_date__gt=period))
             .get()
         )
 

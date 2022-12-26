@@ -49,14 +49,14 @@ class Command(BaseCommand):
         def append_new_dates_to_file(file_path, end_dates):
             filename, ext = splitext(file_path)
             new_filename = f"{filename}{FILENAME_SUFFIX}{ext}"
-            with open(file_path, "r") as input_file:
+            with open(file_path) as input_file:
                 with open(new_filename, "w") if wet_run else StringIO() as output_file:
                     for line, end_date in zip(input_file, end_dates):
                         new_line = line.rstrip() + f"{end_date}\n" if end_date else line
                         output_file.write(new_line)
             return new_filename
 
-        with open(file_path, "r") as input_file:
+        with open(file_path) as input_file:
             reader = csv.reader(input_file, delimiter=CSV_SEPARATOR)
             for line_number, (id_itou, _, _, approval_number, _, end_date, _) in enumerate(reader, 1):
                 try:

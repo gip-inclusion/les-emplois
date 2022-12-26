@@ -34,7 +34,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         input_file = options.get("input_file")
         renderer = JSONRenderer()
 
-        with open(input_file.name, "r") as f:
+        with open(input_file.name) as f:
             data = json.load(f)
             filename = os_path.basename(f.name)
             batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(filename)

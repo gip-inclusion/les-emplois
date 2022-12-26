@@ -1,5 +1,4 @@
 import random
-from typing import Dict, List
 
 import factory
 
@@ -33,7 +32,7 @@ class AbstractCountryFactory(factory.django.DjangoModelFactory):
     code = name = pk = None
 
     @staticmethod
-    def _codes_for_zone(zone: str) -> List[Dict]:
+    def _codes_for_zone(zone: str) -> list[dict]:
         match zone:
             case "france":
                 codes = _FRANCE_CODES

@@ -27,7 +27,7 @@ class Command(BaseCommand):
             if debug:
                 self.stdout.write(f"[DEBUG_LOG] {s}")
 
-        with open(file_path, "r", encoding="utf-8") as input_file:
+        with open(file_path, encoding="utf-8") as input_file:
             input_file.readline()
             for line in input_file:
                 [id_itou, number, _, _, _, name, first_name, birthday] = line.split(CSV_SEPARATOR)[:8]

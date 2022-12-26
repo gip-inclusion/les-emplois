@@ -44,7 +44,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
         self.set_logger(options.get("verbosity"))
 
-        with open(CITIES_JSON_FILE, "r") as raw_json_data:
+        with open(CITIES_JSON_FILE) as raw_json_data:
 
             json_data = json.load(raw_json_data)
             total_len = len(json_data)

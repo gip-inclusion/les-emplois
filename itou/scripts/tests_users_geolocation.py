@@ -88,7 +88,7 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
         # Could not find an elegant way to mock file creation
         # `mock_open()` does not seem to be the right thing to use for write ops
         # Works well for reading ops though
-        with open(path, "r") as f:
+        with open(path) as f:
             [_, row] = csv.reader(f, delimiter=";")
             self.assertIn(coords, row)
             self.assertIn(str(score), row)

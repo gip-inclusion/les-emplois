@@ -1,6 +1,5 @@
 import contextlib
 import json
-from typing import Optional, Union
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -202,7 +201,7 @@ class EmployeeRecord(models.Model):
     processed_as_duplicate = models.BooleanField(verbose_name="Déjà intégrée par l'ASP", default=False)
 
     # Added typing helper: improved type checking for `objects` methods
-    objects: Union[EmployeeRecordQuerySet, Manager] = EmployeeRecordQuerySet.as_manager()
+    objects: EmployeeRecordQuerySet | Manager = EmployeeRecordQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Fiche salarié"
@@ -469,7 +468,7 @@ class EmployeeRecord(models.Model):
         return self.job_application.job_seeker if self.job_application else None
 
     @property
-    def job_seeker_profile(self) -> Optional[JobSeekerProfile]:
+    def job_seeker_profile(self) -> JobSeekerProfile | None:
         """
         Shortcut to job seeker profile
         """
@@ -479,7 +478,7 @@ class EmployeeRecord(models.Model):
         return None
 
     @property
-    def approval(self) -> Optional[Approval]:
+    def approval(self) -> Approval | None:
         """
         Shortcut to job application approval
         """
