@@ -27,7 +27,7 @@ class JobsAutocompleteTest(TestCase):
                 "siae_id": self.siae.id,
             },
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = [
             {
                 "value": "Agent / Agente cariste de livraison ferroviaire (N1101)",
@@ -36,7 +36,7 @@ class JobsAutocompleteTest(TestCase):
                 "name": "Agent / Agente cariste de livraison ferroviaire",
             }
         ]
-        self.assertEqual(json.loads(response.content), expected)
+        assert json.loads(response.content) == expected
 
     def test_search_case_insensitive_and_explicit_rome_code(self):
         response = self.client.get(
@@ -46,7 +46,7 @@ class JobsAutocompleteTest(TestCase):
                 "siae_id": self.siae.id,
             },
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = [
             {
                 "value": "Chauffeur-livreur / Chauffeuse-livreuse (N4105)",
@@ -55,7 +55,7 @@ class JobsAutocompleteTest(TestCase):
                 "name": "Chauffeur-livreur / Chauffeuse-livreuse",
             }
         ]
-        self.assertEqual(json.loads(response.content), expected)
+        assert json.loads(response.content) == expected
 
     def test_search_empty_chars(self):
         response = self.client.get(
@@ -65,9 +65,9 @@ class JobsAutocompleteTest(TestCase):
                 "siae_id": self.siae.id,
             },
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = b"[]"
-        self.assertEqual(response.content, expected)
+        assert response.content == expected
 
     def test_search_full_label(self):
         response = self.client.get(
@@ -77,7 +77,7 @@ class JobsAutocompleteTest(TestCase):
                 "siae_id": self.siae.id,
             },
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = [
             {
                 "value": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
@@ -86,7 +86,7 @@ class JobsAutocompleteTest(TestCase):
                 "name": "Conducteur / Conductrice de chariot élévateur de l'armée",
             }
         ]
-        self.assertEqual(json.loads(response.content), expected)
+        assert json.loads(response.content) == expected
 
     def test_search_special_chars(self):
         response = self.client.get(
@@ -96,7 +96,7 @@ class JobsAutocompleteTest(TestCase):
                 "siae_id": self.siae.id,
             },
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = [
             {
                 "value": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
@@ -105,7 +105,7 @@ class JobsAutocompleteTest(TestCase):
                 "name": "Conducteur / Conductrice de chariot élévateur de l'armée",
             }
         ]
-        self.assertEqual(json.loads(response.content), expected)
+        assert json.loads(response.content) == expected
 
 
 class CitiesAutocompleteTest(TestCase):
@@ -116,7 +116,7 @@ class CitiesAutocompleteTest(TestCase):
         url = reverse("autocomplete:cities")
 
         response = self.client.get(url, {"term": "alte"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = [
             {"value": "Altenheim (67)", "slug": "altenheim-67"},
             {"value": "Altorf (67)", "slug": "altorf-67"},
@@ -124,14 +124,14 @@ class CitiesAutocompleteTest(TestCase):
             {"value": "Albé (67)", "slug": "albe-67"},
             {"value": "Altwiller (67)", "slug": "altwiller-67"},
         ]
-        self.assertEqual(json.loads(response.content), expected)
+        assert json.loads(response.content) == expected
 
         response = self.client.get(url, {"term": "    "})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = b"[]"
-        self.assertEqual(response.content, expected)
+        assert response.content == expected
 
         response = self.client.get(url, {"term": "paris"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         expected = b"[]"
-        self.assertEqual(response.content, expected)
+        assert response.content == expected

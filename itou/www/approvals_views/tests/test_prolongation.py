@@ -33,7 +33,7 @@ class ApprovalProlongationTest(TestCase):
         self.siae = self.job_application.to_siae
         self.siae_user = self.job_application.to_siae.members.first()
         self.approval = self.job_application.approval
-        self.assertEqual(0, self.approval.prolongation_set.count())
+        assert 0 == self.approval.prolongation_set.count()
 
     def test_form_without_pre_existing_instance(self):
         """
@@ -41,13 +41,13 @@ class ApprovalProlongationTest(TestCase):
         """
         form = DeclareProlongationForm(approval=self.approval, siae=self.siae, data={})
 
-        self.assertIsNone(form.fields["reason"].initial)
+        assert form.fields["reason"].initial is None
 
         # Ensure that `form.instance` is populated so that `Prolongation.clean()`
         # is triggered from within the form validation step with the right data.
-        self.assertEqual(form.instance.declared_by_siae, self.siae)
-        self.assertEqual(form.instance.approval, self.approval)
-        self.assertEqual(form.instance.start_at, Prolongation.get_start_at(self.approval))
+        assert form.instance.declared_by_siae == self.siae
+        assert form.instance.approval == self.approval
+        assert form.instance.start_at == Prolongation.get_start_at(self.approval)
 
     def test_prolong_approval_view(self):
         """
@@ -62,8 +62,8 @@ class ApprovalProlongationTest(TestCase):
         url = f"{url}?{params}"
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["preview"], False)
+        assert response.status_code == 200
+        assert response.context["preview"] is False
 
         # Since December 1, 2021, health context reason can no longer be used
         reason = Prolongation.Reason.HEALTH_CONTEXT
@@ -77,7 +77,7 @@ class ApprovalProlongationTest(TestCase):
             "preview": "1",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, escape("Sélectionnez un choix valide."))
 
         # With valid reason
@@ -95,31 +95,31 @@ class ApprovalProlongationTest(TestCase):
 
         # Go to preview.
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["preview"], True)
+        assert response.status_code == 200
+        assert response.context["preview"] is True
 
         # Save to DB.
         del post_data["preview"]
         post_data["save"] = 1
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, back_url)
 
-        self.assertEqual(1, self.approval.prolongation_set.count())
+        assert 1 == self.approval.prolongation_set.count()
 
         prolongation = self.approval.prolongation_set.first()
-        self.assertEqual(prolongation.created_by, self.siae_user)
-        self.assertEqual(prolongation.declared_by, self.siae_user)
-        self.assertEqual(prolongation.declared_by_siae, self.job_application.to_siae)
-        self.assertEqual(prolongation.validated_by, self.prescriber)
-        self.assertEqual(prolongation.reason, post_data["reason"])
+        assert prolongation.created_by == self.siae_user
+        assert prolongation.declared_by == self.siae_user
+        assert prolongation.declared_by_siae == self.job_application.to_siae
+        assert prolongation.validated_by == self.prescriber
+        assert prolongation.reason == post_data["reason"]
 
         # An email should have been sent to the chosen authorized prescriber.
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], post_data["email"])
+        assert len(email.to) == 1
+        assert email.to[0] == post_data["email"]
 
     def test_prolong_approval_view_without_prescriber(self):
         """
@@ -134,8 +134,8 @@ class ApprovalProlongationTest(TestCase):
         url = f"{url}?{params}"
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["preview"], False)
+        assert response.status_code == 200
+        assert response.context["preview"] is False
 
         reason = Prolongation.Reason.COMPLETE_TRAINING
         end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
@@ -150,25 +150,25 @@ class ApprovalProlongationTest(TestCase):
 
         # Go to preview.
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["preview"], True)
+        assert response.status_code == 200
+        assert response.context["preview"] is True
 
         # Save to DB.
         del post_data["preview"]
         post_data["save"] = 1
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, back_url)
 
-        self.assertEqual(1, self.approval.prolongation_set.count())
+        assert 1 == self.approval.prolongation_set.count()
 
         prolongation = self.approval.prolongation_set.first()
-        self.assertEqual(prolongation.created_by, self.siae_user)
-        self.assertEqual(prolongation.declared_by, self.siae_user)
-        self.assertEqual(prolongation.declared_by_siae, self.job_application.to_siae)
-        self.assertIsNone(prolongation.validated_by)
-        self.assertEqual(prolongation.reason, post_data["reason"])
+        assert prolongation.created_by == self.siae_user
+        assert prolongation.declared_by == self.siae_user
+        assert prolongation.declared_by_siae == self.job_application.to_siae
+        assert prolongation.validated_by is None
+        assert prolongation.reason == post_data["reason"]
 
         # No email should have been sent.
-        self.assertEqual(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0

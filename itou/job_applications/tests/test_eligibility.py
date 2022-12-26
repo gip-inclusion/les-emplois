@@ -25,8 +25,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_good)
         non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_bad)
 
-        self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae_good))
-        self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae_good))
+        assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(siae_good)
+        assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(siae_good)
 
     def test_existing_employee_record(self):
         # A job application must not have any employee record linked if newly created
@@ -35,8 +35,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
         EmployeeRecordWithProfileFactory(job_application=non_eligible_job_application, status=er_enums.Status.READY)
 
-        self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
-        self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
+        assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(siae)
+        assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(siae)
 
     def test_siae_kind(self):
         # Hiring SIAE must be of a specific kind to use employee record feature
@@ -47,8 +47,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_bad)
         eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_good)
 
-        self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae_bad))
-        self.assertNotIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae_bad))
+        assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(siae_bad)
+        assert eligible_job_application not in JobApplication.objects.eligible_as_employee_record(siae_bad)
 
     def test_admin_validation(self):
         # Employee record creation can be blocked via admin for a given job application
@@ -58,8 +58,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         )
         eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae, create_employee_record=True)
 
-        self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
-        self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
+        assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(siae)
+        assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(siae)
 
     def test_hiring_start_date(self):
         # Hiring date must be after the employee record feature availability date
@@ -69,8 +69,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae, hiring_start_at=bad_ts)
         eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae, hiring_start_at=good_ts)
 
-        self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
-        self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
+        assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(siae)
+        assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(siae)
 
     def test_existing_approval(self):
         # Job application must be linked to an existing approval to be eligible
@@ -79,8 +79,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         non_eligible_job_application = JobApplicationWithoutApprovalFactory(to_siae=siae)
         eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
 
-        self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
-        self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
+        assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(siae)
+        assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(siae)
 
     def test_existing_new_employee_records(self):
         # An employee record:
@@ -95,5 +95,5 @@ class EmployeeRecordEligibilityTest(TestCase):
         EmployeeRecordWithProfileFactory(job_application=non_eligible_job_application, status=er_enums.Status.READY)
         EmployeeRecordWithProfileFactory(job_application=eligible_job_application, status=er_enums.Status.NEW)
 
-        self.assertNotIn(non_eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
-        self.assertIn(eligible_job_application, JobApplication.objects.eligible_as_employee_record(siae))
+        assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(siae)
+        assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(siae)

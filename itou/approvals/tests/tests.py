@@ -3,6 +3,7 @@ import threading
 import time
 from unittest import mock
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -42,8 +43,8 @@ class CommonApprovalQuerySetTest(TestCase):
         end_at = start_at + relativedelta(years=2)
         PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
 
-        self.assertEqual(2, PoleEmploiApproval.objects.count())
-        self.assertEqual(1, PoleEmploiApproval.objects.valid().count())
+        assert 2 == PoleEmploiApproval.objects.count()
+        assert 1 == PoleEmploiApproval.objects.valid().count()
 
     def test_valid_for_approval_model(self):
         start_at = timezone.localdate() - relativedelta(years=1)
@@ -54,8 +55,8 @@ class CommonApprovalQuerySetTest(TestCase):
         end_at = start_at + relativedelta(years=2)
         ApprovalFactory(start_at=start_at, end_at=end_at)
 
-        self.assertEqual(2, Approval.objects.count())
-        self.assertEqual(1, Approval.objects.valid().count())
+        assert 2 == Approval.objects.count()
+        assert 1 == Approval.objects.valid().count()
 
     def test_valid(self):
 
@@ -63,47 +64,47 @@ class CommonApprovalQuerySetTest(TestCase):
         start_at = timezone.localdate()
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
+        assert Approval.objects.filter(id=approval.id).valid().exists()
 
         # End today.
         end_at = timezone.localdate()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
+        assert Approval.objects.filter(id=approval.id).valid().exists()
 
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(Approval.objects.filter(id=approval.id).valid().exists())
+        assert not Approval.objects.filter(id=approval.id).valid().exists()
 
         # Ended yesterday.
         end_at = timezone.localdate() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(Approval.objects.filter(id=approval.id).valid().exists())
+        assert not Approval.objects.filter(id=approval.id).valid().exists()
 
         # In the future.
         start_at = timezone.localdate() + relativedelta(years=2)
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
+        assert Approval.objects.filter(id=approval.id).valid().exists()
 
     def test_can_be_deleted(self):
         job_app = JobApplicationFactory(with_approval=True)
         approval = job_app.approval
-        self.assertTrue(approval.can_be_deleted)
+        assert approval.can_be_deleted
 
         # An approval exists without a Job Application
         approval = ApprovalFactory()
-        self.assertFalse(approval.can_be_deleted)
+        assert not approval.can_be_deleted
 
         job_app.state = JobApplicationWorkflow.STATE_REFUSED
         job_app.save()
-        self.assertFalse(approval.can_be_deleted)
+        assert not approval.can_be_deleted
 
         JobApplicationFactory(with_approval=True, job_seeker=job_app.job_seeker, approval=job_app.approval)
-        self.assertFalse(approval.can_be_deleted)
+        assert not approval.can_be_deleted
 
     def test_starts_date_filters_for_approval_model(self):
         start_at = timezone.localdate() - relativedelta(years=1)
@@ -118,10 +119,10 @@ class CommonApprovalQuerySetTest(TestCase):
         end_at = start_at + relativedelta(years=2)
         approval_future = ApprovalFactory(start_at=start_at, end_at=end_at)
 
-        self.assertEqual(3, Approval.objects.count())
-        self.assertEqual([approval_past], list(Approval.objects.starts_in_the_past()))
-        self.assertEqual([approval_today], list(Approval.objects.starts_today()))
-        self.assertEqual([approval_future], list(Approval.objects.starts_in_the_future()))
+        assert 3 == Approval.objects.count()
+        assert [approval_past] == list(Approval.objects.starts_in_the_past())
+        assert [approval_today] == list(Approval.objects.starts_today())
+        assert [approval_future] == list(Approval.objects.starts_in_the_future())
 
 
 class CommonApprovalMixinTest(TestCase):
@@ -130,12 +131,12 @@ class CommonApprovalMixinTest(TestCase):
         start_at = datetime.date(1998, 1, 1)
         approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
         expected = datetime.date(2002, 1, 1)
-        self.assertEqual(approval.waiting_period_end, expected)
+        assert approval.waiting_period_end == expected
 
     def test_is_in_progress(self):
         start_at = timezone.localdate() - relativedelta(days=10)
         approval = ApprovalFactory(start_at=start_at)
-        self.assertTrue(approval.is_in_progress)
+        assert approval.is_in_progress
 
     def test_waiting_period(self):
 
@@ -143,44 +144,44 @@ class CommonApprovalMixinTest(TestCase):
         end_at = timezone.localdate() + relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid())
-        self.assertFalse(approval.is_in_waiting_period)
+        assert approval.is_valid()
+        assert not approval.is_in_waiting_period
 
         # End is today.
         end_at = timezone.localdate()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid())
-        self.assertFalse(approval.is_in_waiting_period)
+        assert approval.is_valid()
+        assert not approval.is_in_waiting_period
 
         # End is yesterday.
         end_at = timezone.localdate() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid())
-        self.assertTrue(approval.is_in_waiting_period)
+        assert not approval.is_valid()
+        assert approval.is_in_waiting_period
 
         # Ended since more than WAITING_PERIOD_YEARS.
         end_at = timezone.localdate() - relativedelta(years=Approval.WAITING_PERIOD_YEARS, days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid())
-        self.assertFalse(approval.is_in_waiting_period)
+        assert not approval.is_valid()
+        assert not approval.is_in_waiting_period
 
     def test_originates_from_itou(self):
         approval = ApprovalFactory(number="XXXXX0000001")
-        self.assertTrue(approval.originates_from_itou)
+        assert approval.originates_from_itou
         approval = PoleEmploiApprovalFactory(number="625741810182")
-        self.assertFalse(approval.originates_from_itou)
+        assert not approval.originates_from_itou
 
     def test_is_pass_iae(self):
         # PoleEmploiApproval.
         user = JobSeekerFactory()
         approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
-        self.assertFalse(approval.is_pass_iae)
+        assert not approval.is_pass_iae
         # Approval.
         approval = ApprovalFactory(user=user)
-        self.assertTrue(approval.is_pass_iae)
+        assert approval.is_pass_iae
 
 
 class ApprovalModelTest(TestCase):
@@ -188,7 +189,7 @@ class ApprovalModelTest(TestCase):
         approval = ApprovalFactory()
         approval.start_at = timezone.localdate()
         approval.end_at = timezone.localdate() - datetime.timedelta(days=365 * 2)
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             approval.save()
 
     def test_get_next_number(self):
@@ -196,20 +197,20 @@ class ApprovalModelTest(TestCase):
         # No pre-existing objects.
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
         next_number = Approval.get_next_number()
-        self.assertEqual(next_number, expected_number)
+        assert next_number == expected_number
 
         # With pre-existing objects.
         ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}0000040")
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000041"
         next_number = Approval.get_next_number()
-        self.assertEqual(next_number, expected_number)
+        assert next_number == expected_number
         Approval.objects.all().delete()
 
         # With pre-existing Pôle emploi approval.
         ApprovalFactory(number="625741810182")
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
         next_number = Approval.get_next_number()
-        self.assertEqual(next_number, expected_number)
+        assert next_number == expected_number
         Approval.objects.all().delete()
 
         # With various pre-existing objects.
@@ -217,7 +218,7 @@ class ApprovalModelTest(TestCase):
         ApprovalFactory(number="625741810182")
         expected_number = f"{Approval.ASP_ITOU_PREFIX}8888883"
         next_number = Approval.get_next_number()
-        self.assertEqual(next_number, expected_number)
+        assert next_number == expected_number
         Approval.objects.all().delete()
 
         demo_prefix = "XXXXX"
@@ -225,11 +226,11 @@ class ApprovalModelTest(TestCase):
             ApprovalFactory(number=f"{demo_prefix}0044440")
             expected_number = f"{demo_prefix}0044441"
             next_number = Approval.get_next_number()
-            self.assertEqual(next_number, expected_number)
+            assert next_number == expected_number
             Approval.objects.all().delete()
 
         ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}9999999")
-        with self.assertRaises(RuntimeError):
+        with pytest.raises(RuntimeError):
             next_number = Approval.get_next_number()
         Approval.objects.all().delete()
 
@@ -239,31 +240,31 @@ class ApprovalModelTest(TestCase):
         start_at = timezone.localdate()
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid())
+        assert approval.is_valid()
 
         # End today.
         end_at = timezone.localdate()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid())
+        assert approval.is_valid()
 
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid())
+        assert not approval.is_valid()
 
         # Ended yesterday.
         end_at = timezone.localdate() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid())
+        assert not approval.is_valid()
 
     def test_number_with_spaces(self):
 
         approval = ApprovalFactory(number="999990000001")
         expected = "99999 00 00001"
-        self.assertEqual(approval.number_with_spaces, expected)
+        assert approval.number_with_spaces == expected
 
     def test_is_last_for_user(self):
 
@@ -279,8 +280,8 @@ class ApprovalModelTest(TestCase):
         end_at = start_at + relativedelta(years=2)
         approval2 = ApprovalFactory(start_at=start_at, end_at=end_at, user=user)
 
-        self.assertFalse(approval1.is_last_for_user)
-        self.assertTrue(approval2.is_last_for_user)
+        assert not approval1.is_last_for_user
+        assert approval2.is_last_for_user
 
     @freeze_time("2022-11-17")
     def test_is_open_to_prolongation(self):
@@ -289,28 +290,28 @@ class ApprovalModelTest(TestCase):
             start_at=datetime.date(2021, 11, 18),
             end_at=datetime.date(2023, 11, 17),
         )
-        self.assertFalse(approval.is_open_to_prolongation)
+        assert not approval.is_open_to_prolongation
 
         # Ensure "now" is in the period open to prolongations.
         approval = ApprovalFactory(
             start_at=datetime.date(2021, 11, 17),
             end_at=datetime.date(2023, 11, 16),
         )
-        self.assertTrue(approval.is_open_to_prolongation)
+        assert approval.is_open_to_prolongation
 
         # until 3 month after the end date, users are allowed to prolong it up to 3 months after the end.
         approval = ApprovalFactory(
             start_at=datetime.date(2020, 8, 18),
             end_at=datetime.date(2022, 8, 17),
         )
-        self.assertTrue(approval.is_open_to_prolongation)
+        assert approval.is_open_to_prolongation
 
         # Ensure "now" is "after" the period open to prolongations.
         approval = ApprovalFactory(
             start_at=datetime.date(2020, 8, 17),
             end_at=datetime.date(2022, 8, 16),
         )
-        self.assertFalse(approval.is_open_to_prolongation)
+        assert not approval.is_open_to_prolongation
 
     def test_get_or_create_from_valid(self):
         # FIXME(vperron): This test should be moved to users.tests or jobseekerprofile.tests.
@@ -323,33 +324,33 @@ class ApprovalModelTest(TestCase):
         )
         approval = user.get_or_create_approval()
 
-        self.assertTrue(isinstance(approval, Approval))
-        self.assertEqual(approval.start_at, valid_pe_approval.start_at)
-        self.assertEqual(approval.end_at, valid_pe_approval.end_at)
-        self.assertEqual(approval.number, valid_pe_approval.number[:12])
-        self.assertEqual(approval.user, user)
-        self.assertEqual(approval.created_by, None)
+        assert isinstance(approval, Approval)
+        assert approval.start_at == valid_pe_approval.start_at
+        assert approval.end_at == valid_pe_approval.end_at
+        assert approval.number == valid_pe_approval.number[:12]
+        assert approval.user == user
+        assert approval.created_by is None
 
         # With an existing valid `Approval`.
 
         user = JobSeekerFactory()
         valid_approval = ApprovalFactory(user=user, start_at=timezone.localdate() - relativedelta(days=1))
         approval = user.get_or_create_approval()
-        self.assertTrue(isinstance(approval, Approval))
-        self.assertEqual(approval, valid_approval)
+        assert isinstance(approval, Approval)
+        assert approval == valid_approval
 
     def test_is_from_ai_stock(self):
         approval_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
 
         approval = ApprovalFactory()
-        self.assertFalse(approval.is_from_ai_stock)
+        assert not approval.is_from_ai_stock
 
         approval = ApprovalFactory(created_at=approval_created_at)
-        self.assertFalse(approval.is_from_ai_stock)
+        assert not approval.is_from_ai_stock
 
         approval = ApprovalFactory(created_at=approval_created_at, created_by=developer)
-        self.assertTrue(approval.is_from_ai_stock)
+        assert approval.is_from_ai_stock
 
     def test_is_open_to_application_process_with_suspension(self):
         today = timezone.localdate()
@@ -366,7 +367,7 @@ class ApprovalModelTest(TestCase):
                 end_at=today + relativedelta(months=1),
                 reason=reason_to_refuse,
             )
-            self.assertFalse(approval.can_be_unsuspended)
+            assert not approval.can_be_unsuspended
             suspension.delete()
             approval.delete()
 
@@ -379,7 +380,7 @@ class ApprovalModelTest(TestCase):
                 reason=reason,
             )
 
-            self.assertTrue(approval.can_be_unsuspended)
+            assert approval.can_be_unsuspended
             suspension.delete()
             approval.delete()
 
@@ -387,7 +388,7 @@ class ApprovalModelTest(TestCase):
         today = timezone.localdate()
         approval_start_at = today - relativedelta(months=3)
         approval = ApprovalFactory(start_at=approval_start_at)
-        self.assertFalse(approval.can_be_unsuspended)
+        assert not approval.can_be_unsuspended
 
     def test_last_in_progress_suspension(self):
         today = timezone.localdate()
@@ -404,7 +405,7 @@ class ApprovalModelTest(TestCase):
             end_at=today + relativedelta(months=2),
             reason=Suspension.Reason.BROKEN_CONTRACT.value,
         )
-        self.assertEqual(suspension.pk, approval.last_in_progress_suspension.pk)
+        assert suspension.pk == approval.last_in_progress_suspension.pk
 
     def test_last_in_progress_without_suspension_in_progress(self):
         today = timezone.localdate()
@@ -415,7 +416,7 @@ class ApprovalModelTest(TestCase):
             start_at=approval_start_at + relativedelta(months=1),
             end_at=approval_start_at + relativedelta(months=2),
         )
-        self.assertIsNone(approval.last_in_progress_suspension)
+        assert approval.last_in_progress_suspension is None
 
     @freeze_time("2022-09-17")
     def test_unsuspend_valid(self):
@@ -441,7 +442,7 @@ class ApprovalModelTest(TestCase):
                 )
                 approval.unsuspend(hiring_start_at=today)
                 suspension.refresh_from_db()
-                self.assertEqual(suspension.end_at, suspension_expected_end_date)
+                assert suspension.end_at == suspension_expected_end_date
 
     @freeze_time("2022-09-17")
     def test_unsuspend_invalid(self):
@@ -467,7 +468,7 @@ class ApprovalModelTest(TestCase):
                 )
                 approval.unsuspend(hiring_start_at=today)
                 suspension.refresh_from_db()
-                self.assertEqual(suspension.end_at, suspension_end_date)
+                assert suspension.end_at == suspension_end_date
 
     def test_unsuspend_the_day_suspension_starts(self):
         today = timezone.localdate()
@@ -479,7 +480,7 @@ class ApprovalModelTest(TestCase):
             reason=Suspension.Reason.BROKEN_CONTRACT.value,
         )
         approval.unsuspend(hiring_start_at=today)
-        with self.assertRaises(ObjectDoesNotExist):
+        with pytest.raises(ObjectDoesNotExist):
             suspension.refresh_from_db()
 
     def test_state(self):
@@ -505,23 +506,23 @@ class ApprovalModelTest(TestCase):
         )
 
         self.assertQuerysetEqual(Approval.objects.invalid(), [expired_approval])
-        self.assertEqual(expired_approval.state, ApprovalStatus.EXPIRED)
-        self.assertEqual(expired_approval.get_state_display(), "Expiré")
+        assert expired_approval.state == ApprovalStatus.EXPIRED
+        assert expired_approval.get_state_display() == "Expiré"
 
         self.assertQuerysetEqual(Approval.objects.starts_in_the_future(), [future_approval])
-        self.assertEqual(future_approval.state, ApprovalStatus.FUTURE)
-        self.assertEqual(future_approval.get_state_display(), "Valide (non démarré)")
+        assert future_approval.state == ApprovalStatus.FUTURE
+        assert future_approval.get_state_display() == "Valide (non démarré)"
 
         self.assertQuerysetEqual(
             Approval.objects.valid().starts_in_the_past(), [valid_approval, suspended_approval], ordered=False
         )
-        self.assertEqual(valid_approval.state, ApprovalStatus.VALID)
-        self.assertEqual(valid_approval.get_state_display(), "Valide")
+        assert valid_approval.state == ApprovalStatus.VALID
+        assert valid_approval.get_state_display() == "Valide"
 
         suspended_approval.refresh_from_db()
-        self.assertEqual(suspended_approval.is_suspended, True)
-        self.assertEqual(suspended_approval.state, ApprovalStatus.SUSPENDED)
-        self.assertEqual(suspended_approval.get_state_display(), "Valide (suspendu)")
+        assert suspended_approval.is_suspended is True
+        assert suspended_approval.state == ApprovalStatus.SUSPENDED
+        assert suspended_approval.get_state_display() == "Valide (suspendu)"
 
     @freeze_time("2022-11-22")
     def test_remainder(self):
@@ -529,7 +530,7 @@ class ApprovalModelTest(TestCase):
             start_at=datetime.date(2021, 3, 25),
             end_at=datetime.date(2023, 3, 24),
         )
-        self.assertEqual(approval.remainder, datetime.timedelta(days=122))
+        assert approval.remainder == datetime.timedelta(days=122)
 
         # Futur prolongation
         ProlongationFactory(
@@ -550,7 +551,7 @@ class ApprovalModelTest(TestCase):
             end_at=datetime.date(2021, 12, 1),
         )
         # Prolongations change the approval end_date, so it doesn't change the remainder
-        self.assertEqual(approval.remainder, datetime.timedelta(days=122))
+        assert approval.remainder == datetime.timedelta(days=122)
 
         # Futur suspension
         SuspensionFactory(
@@ -571,25 +572,25 @@ class ApprovalModelTest(TestCase):
             end_at=datetime.date(2022, 12, 1),
         )
         # Substract to remainder the relaining suspension time
-        self.assertEqual(approval.remainder, datetime.timedelta(days=109))
+        assert approval.remainder == datetime.timedelta(days=109)
 
 
 class PoleEmploiApprovalModelTest(TestCase):
     def test_format_name_as_pole_emploi(self):
-        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi(" François"), "FRANCOIS")
-        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("M'Hammed "), "M'HAMMED")
-        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("     jean kevin  "), "JEAN KEVIN")
-        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("     Jean-Kevin  "), "JEAN-KEVIN")
-        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("Kertész István"), "KERTESZ ISTVAN")
-        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("Backer-Grøndahl"), "BACKER-GRONDAHL")
-        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("désirée artôt"), "DESIREE ARTOT")
-        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("N'Guessan"), "N'GUESSAN")
-        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("N Guessan"), "N GUESSAN")
+        assert PoleEmploiApproval.format_name_as_pole_emploi(" François") == "FRANCOIS"
+        assert PoleEmploiApproval.format_name_as_pole_emploi("M'Hammed ") == "M'HAMMED"
+        assert PoleEmploiApproval.format_name_as_pole_emploi("     jean kevin  ") == "JEAN KEVIN"
+        assert PoleEmploiApproval.format_name_as_pole_emploi("     Jean-Kevin  ") == "JEAN-KEVIN"
+        assert PoleEmploiApproval.format_name_as_pole_emploi("Kertész István") == "KERTESZ ISTVAN"
+        assert PoleEmploiApproval.format_name_as_pole_emploi("Backer-Grøndahl") == "BACKER-GRONDAHL"
+        assert PoleEmploiApproval.format_name_as_pole_emploi("désirée artôt") == "DESIREE ARTOT"
+        assert PoleEmploiApproval.format_name_as_pole_emploi("N'Guessan") == "N'GUESSAN"
+        assert PoleEmploiApproval.format_name_as_pole_emploi("N Guessan") == "N GUESSAN"
 
     def test_number_with_spaces(self):
         pole_emploi_approval = PoleEmploiApprovalFactory(number="400121910144")
         expected = "40012 19 10144"
-        self.assertEqual(pole_emploi_approval.number_with_spaces, expected)
+        assert pole_emploi_approval.number_with_spaces == expected
 
     def test_is_valid(self):
         now_date = timezone.localdate() - relativedelta(months=1)
@@ -600,19 +601,19 @@ class PoleEmploiApprovalModelTest(TestCase):
             end_at = now_date
             start_at = end_at - relativedelta(years=2)
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-            self.assertTrue(approval.is_valid())
+            assert approval.is_valid()
 
             # Ended yesterday.
             end_at = now_date - relativedelta(days=1)
             start_at = end_at - relativedelta(years=2)
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-            self.assertFalse(approval.is_valid())
+            assert not approval.is_valid()
 
             # Starts tomorrow.
             start_at = now_date + relativedelta(days=1)
             end_at = start_at + relativedelta(years=2)
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-            self.assertTrue(approval.is_valid())
+            assert approval.is_valid()
 
     @freeze_time("2022-11-22")
     def test_remainder(self):
@@ -620,7 +621,7 @@ class PoleEmploiApprovalModelTest(TestCase):
             start_at=datetime.date(2021, 3, 25),
             end_at=datetime.date(2023, 3, 24),
         )
-        self.assertEqual(pole_emploi_approval.remainder, datetime.timedelta(days=122))
+        assert pole_emploi_approval.remainder == datetime.timedelta(days=122)
 
 
 class PoleEmploiApprovalManagerTest(TestCase):
@@ -628,12 +629,12 @@ class PoleEmploiApprovalManagerTest(TestCase):
         user = JobSeekerFactory(pole_emploi_id="")
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
-        self.assertEqual(search_results.count(), 0)
+        assert search_results.count() == 0
 
         user = JobSeekerFactory(birthdate=None)
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
-        self.assertEqual(search_results.count(), 0)
+        assert search_results.count() == 0
 
     def test_find_for_user(self):
 
@@ -644,35 +645,35 @@ class PoleEmploiApprovalManagerTest(TestCase):
         PoleEmploiApprovalFactory()
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
-        self.assertEqual(search_results.count(), 1)
-        self.assertEqual(search_results.first(), pe_approval)
+        assert search_results.count() == 1
+        assert search_results.first() == pe_approval
 
         # ensure we can find **all** PE approvals using their pole_emploi_id and not the others.
         other_valid_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
-        self.assertEqual(search_results.count(), 2)
-        self.assertEqual(search_results[0], pe_approval)
-        self.assertEqual(search_results[1], other_valid_approval)
+        assert search_results.count() == 2
+        assert search_results[0] == pe_approval
+        assert search_results[1] == other_valid_approval
 
         # ensure we **also** find PE approvals using the user's NIR.
         nir_approval = PoleEmploiApprovalFactory(nir=user.nir)
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
-        self.assertEqual(search_results.count(), 3)
-        self.assertEqual(search_results[0], pe_approval)
-        self.assertEqual(search_results[1], other_valid_approval)
-        self.assertEqual(search_results[2], nir_approval)
+        assert search_results.count() == 3
+        assert search_results[0] == pe_approval
+        assert search_results[1] == other_valid_approval
+        assert search_results[2] == nir_approval
 
         # since we can have multiple PE approvals with the same nir, let's fetch them all
         other_nir_approval = PoleEmploiApprovalFactory(nir=user.nir)
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
-        self.assertEqual(search_results.count(), 4)
-        self.assertEqual(search_results[0], pe_approval)
-        self.assertEqual(search_results[1], other_valid_approval)
-        self.assertEqual(search_results[2], nir_approval)
-        self.assertEqual(search_results[3], other_nir_approval)
+        assert search_results.count() == 4
+        assert search_results[0] == pe_approval
+        assert search_results[1] == other_valid_approval
+        assert search_results[2] == nir_approval
+        assert search_results[3] == other_nir_approval
 
         # ensure it's not an issue if the PE approval matches both NIR, pole_emploi_id and birthdate.
         nir_approval.birthdate = user.birthdate
@@ -681,9 +682,9 @@ class PoleEmploiApprovalManagerTest(TestCase):
 
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
-        self.assertEqual(search_results.count(), 4)
-        self.assertEqual(search_results[0], pe_approval)
-        self.assertEqual(search_results[1], other_valid_approval)
+        assert search_results.count() == 4
+        assert search_results[0] == pe_approval
+        assert search_results[1] == other_valid_approval
 
         # the order changes because now, the first WHERE clause gets `nir_approval` alone "first",
         # and the ordering on `start_at DESC` doesn't change this as both columns are set to "today".
@@ -691,15 +692,15 @@ class PoleEmploiApprovalManagerTest(TestCase):
         # - also order by pk or creation date
         # - use a fixture that has a clearly different start_at
         # in order to ensure this test does not become flaky.
-        self.assertEqual(search_results[2], other_nir_approval)
-        self.assertEqual(search_results[3], nir_approval)
+        assert search_results[2] == other_nir_approval
+        assert search_results[3] == nir_approval
 
     def test_find_for_no_nir(self):
         user = JobSeekerFactory(nir=None)
         PoleEmploiApprovalFactory(nir=None)  # entirely unrelated
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
-        self.assertEqual(search_results.count(), 0)
+        assert search_results.count() == 0
 
 
 class AutomaticApprovalAdminViewsTest(TestCase):
@@ -723,7 +724,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         url = reverse("admin:approvals_approval_change", args=[approval.pk])
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "start_at": approval.start_at.strftime("%d/%m/%Y"),
@@ -732,7 +733,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             "number": "XXXXX1234567",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertFormError(
             response.context["adminform"],
             "number",
@@ -765,7 +766,7 @@ class CustomApprovalAdminViewsTest(TestCase):
 
         # Not enough perms.
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         user.is_staff = True
         user.save()
@@ -775,7 +776,7 @@ class CustomApprovalAdminViewsTest(TestCase):
 
         # With good perms.
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Les numéros avec le préfixe `ASP_ITOU_PREFIX` ne doivent pas pouvoir
         # être délivrés à la main dans l'admin.
@@ -787,8 +788,8 @@ class CustomApprovalAdminViewsTest(TestCase):
             "number": f"{Approval.ASP_ITOU_PREFIX}1234567",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("number", response.context["form"].errors, ApprovalAdminForm.ERROR_NUMBER)
+        assert response.status_code == 200
+        assert "number" in response.context["form"].errors, ApprovalAdminForm.ERROR_NUMBER
 
         # Create an approval.
         post_data = {
@@ -798,23 +799,23 @@ class CustomApprovalAdminViewsTest(TestCase):
             "created_by": user.pk,
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # An approval should have been created, attached to the job
         # application, and sent by email.
         job_application = JobApplication.objects.get(pk=job_application.pk)
-        self.assertTrue(job_application.approval_number_sent_by_email)
-        self.assertIsNotNone(job_application.approval_number_sent_at)
-        self.assertEqual(job_application.approval_manually_delivered_by, user)
-        self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
+        assert job_application.approval_number_sent_by_email
+        assert job_application.approval_number_sent_at is not None
+        assert job_application.approval_manually_delivered_by == user
+        assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
         approval = job_application.approval
-        self.assertEqual(approval.created_by, user)
-        self.assertEqual(approval.user, job_application.job_seeker)
+        assert approval.created_by == user
+        assert approval.user == job_application.job_seeker
 
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertIn(approval.number_with_spaces, email.body)
+        assert approval.number_with_spaces in email.body
 
     def test_employee_record_status(self):
         # When an employee record exists
@@ -858,26 +859,26 @@ class SuspensionQuerySetTest(TestCase):
         start_at = timezone.localdate()  # Starts today so it's in progress.
         expected_num = 5
         SuspensionFactory.create_batch(expected_num, start_at=start_at)
-        self.assertEqual(expected_num, Suspension.objects.in_progress().count())
+        assert expected_num == Suspension.objects.in_progress().count()
 
     def test_not_in_progress(self):
         start_at = timezone.localdate() - relativedelta(years=1)
         end_at = start_at + relativedelta(months=6)
         expected_num = 3
         SuspensionFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
-        self.assertEqual(expected_num, Suspension.objects.not_in_progress().count())
+        assert expected_num == Suspension.objects.not_in_progress().count()
 
     def test_old(self):
         # Starting today.
         start_at = timezone.localdate()
         SuspensionFactory.create_batch(2, start_at=start_at)
-        self.assertEqual(0, Suspension.objects.old().count())
+        assert 0 == Suspension.objects.old().count()
         # Old.
         start_at = timezone.localdate() - relativedelta(years=1)
         end_at = Suspension.get_max_end_at(start_at)
         expected_num = 3
         SuspensionFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
-        self.assertEqual(expected_num, Suspension.objects.old().count())
+        assert expected_num == Suspension.objects.old().count()
 
 
 class SuspensionModelTest(TestCase):
@@ -890,21 +891,21 @@ class SuspensionModelTest(TestCase):
         # Suspension.start_date is too old.
         suspension = SuspensionFactory.build(approval=approval)
         suspension.start_at = start_at - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS + 1)
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             suspension.clean()
 
         # suspension.end_at < suspension.start_at
         suspension = SuspensionFactory.build(approval=approval)
         suspension.start_at = start_at
         suspension.end_at = start_at - relativedelta(months=1)
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             suspension.clean()
 
         # Suspension.start_at is in the future.
         suspension = SuspensionFactory.build(approval=approval)
         suspension.start_at = today + relativedelta(days=2)
         suspension.end_at = end_at
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             suspension.clean()
 
     def test_duration(self):
@@ -912,13 +913,13 @@ class SuspensionModelTest(TestCase):
         start_at = timezone.localdate()
         end_at = start_at + expected_duration
         suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
-        self.assertEqual(suspension.duration, expected_duration)
+        assert suspension.duration == expected_duration
 
     def test_start_in_future(self):
         start_at = timezone.localdate() + relativedelta(days=10)
         # Build provides a local object without saving it to the database.
         suspension = SuspensionFactory.build(start_at=start_at)
-        self.assertTrue(suspension.start_in_future)
+        assert suspension.start_in_future
 
     def test_start_in_approval_boundaries(self):
         start_at = timezone.localdate()
@@ -928,29 +929,29 @@ class SuspensionModelTest(TestCase):
         suspension = SuspensionFactory.build(approval=approval, start_at=start_at)
 
         # Equal to lower boundary.
-        self.assertTrue(suspension.start_in_approval_boundaries)
+        assert suspension.start_in_approval_boundaries
 
         # In boundaries.
         suspension.start_at = approval.start_at + relativedelta(days=5)
-        self.assertTrue(suspension.start_in_approval_boundaries)
+        assert suspension.start_in_approval_boundaries
 
         # Equal to upper boundary.
         suspension.start_at = approval.end_at
-        self.assertTrue(suspension.start_in_approval_boundaries)
+        assert suspension.start_in_approval_boundaries
 
         # Before lower boundary.
         suspension.start_at = approval.start_at - relativedelta(days=1)
-        self.assertFalse(suspension.start_in_approval_boundaries)
+        assert not suspension.start_in_approval_boundaries
 
         # After upper boundary.
         suspension.start_at = approval.end_at + relativedelta(days=1)
-        self.assertFalse(suspension.start_in_approval_boundaries)
+        assert not suspension.start_in_approval_boundaries
 
     def test_is_in_progress(self):
         start_at = timezone.localdate() - relativedelta(days=10)
         # Build provides a local object without saving it to the database.
         suspension = SuspensionFactory.build(start_at=start_at)
-        self.assertTrue(suspension.is_in_progress)
+        assert suspension.is_in_progress
 
     def test_get_overlapping_suspensions(self):
         start_at = timezone.localdate() - relativedelta(days=10)
@@ -960,36 +961,36 @@ class SuspensionModelTest(TestCase):
         # Start same day as suspension1.
         # Build provides a local object without saving it to the database.
         suspension2 = SuspensionFactory.build(approval=approval, siae=suspension1.siae, start_at=start_at)
-        self.assertTrue(suspension2.get_overlapping_suspensions().exists())
+        assert suspension2.get_overlapping_suspensions().exists()
 
         # Start at suspension1.end_at.
         suspension2.start_at = suspension1.end_at
         suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
-        self.assertTrue(suspension2.get_overlapping_suspensions().exists())
+        assert suspension2.get_overlapping_suspensions().exists()
 
         # Cover suspension1.
         suspension2.start_at = suspension1.start_at - relativedelta(days=1)
         suspension2.end_at = suspension1.end_at + relativedelta(days=1)
-        self.assertTrue(suspension2.get_overlapping_suspensions().exists())
+        assert suspension2.get_overlapping_suspensions().exists()
 
         # End before suspension1.
         suspension2.start_at = suspension1.start_at - relativedelta(years=2)
         suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
-        self.assertFalse(suspension2.get_overlapping_suspensions().exists())
+        assert not suspension2.get_overlapping_suspensions().exists()
 
     def test_displayed_choices_for_siae(self):
         # EI and ACI kind have one more choice
         for kind in [SiaeKind.EI, SiaeKind.ACI]:
             siae = SiaeFactory(kind=kind)
             result = Suspension.Reason.displayed_choices_for_siae(siae)
-            self.assertEqual(len(result), 5)
-            self.assertEqual(result[-1][0], Suspension.Reason.CONTRAT_PASSERELLE.value)
+            assert len(result) == 5
+            assert result[-1][0] == Suspension.Reason.CONTRAT_PASSERELLE.value
 
         # Some other cases
         for kind in [SiaeKind.ETTI, SiaeKind.AI]:
             siae = SiaeFactory(kind=kind)
             result = Suspension.Reason.displayed_choices_for_siae(siae)
-            self.assertEqual(len(result), 4)
+            assert len(result) == 4
 
     def test_next_min_start_date(self):
         today = timezone.localdate()
@@ -1010,17 +1011,17 @@ class SuspensionModelTest(TestCase):
         # What should be the expected suspension mimimum start date ?
 
         min_start_at = Suspension.next_min_start_at(job_application_1.approval)
-        self.assertEqual(min_start_at, today)
+        assert min_start_at == today
 
         # Same rules apply for PE approval and PASS IAE
         min_start_at = Suspension.next_min_start_at(job_application_2.approval)
-        self.assertEqual(min_start_at, start_at)
+        assert min_start_at == start_at
         min_start_at = Suspension.next_min_start_at(job_application_3.approval)
-        self.assertEqual(min_start_at, start_at)
+        assert min_start_at == start_at
 
         # Fix a type error when creating a suspension:
         min_start_at = Suspension.next_min_start_at(job_application_4.approval)
-        self.assertEqual(min_start_at, today - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS))
+        assert min_start_at == today - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
 
     def test_next_min_start_date_without_job_application(self):
         today = timezone.localdate()
@@ -1044,7 +1045,7 @@ class SuspensionModelTestTrigger(TestCase):
         suspension = SuspensionFactory(approval=approval, start_at=start_at)
 
         approval.refresh_from_db()
-        self.assertEqual(approval.duration, initial_duration + suspension.duration)
+        assert approval.duration == initial_duration + suspension.duration
 
     def test_delete(self):
         """
@@ -1058,12 +1059,12 @@ class SuspensionModelTestTrigger(TestCase):
 
         suspension = SuspensionFactory(approval=approval, start_at=start_at)
         approval.refresh_from_db()
-        self.assertEqual(approval.duration, initial_duration + suspension.duration)
+        assert approval.duration == initial_duration + suspension.duration
 
         suspension.delete()
 
         approval.refresh_from_db()
-        self.assertEqual(approval.duration, initial_duration)
+        assert approval.duration == initial_duration
 
     def test_save_and_edit(self):
         """
@@ -1090,11 +1091,11 @@ class SuspensionModelTestTrigger(TestCase):
         approval_duration_3 = approval.duration
 
         # Check suspension duration.
-        self.assertNotEqual(suspension_duration_1, suspension_duration_2)
+        assert suspension_duration_1 != suspension_duration_2
         # Check approval duration.
-        self.assertNotEqual(initial_duration, approval_duration_2)
-        self.assertNotEqual(approval_duration_2, approval_duration_3)
-        self.assertEqual(approval_duration_3, initial_duration + suspension_duration_2)
+        assert initial_duration != approval_duration_2
+        assert approval_duration_2 != approval_duration_3
+        assert approval_duration_3 == initial_duration + suspension_duration_2
 
 
 class ProlongationQuerySetTest(TestCase):
@@ -1102,14 +1103,14 @@ class ProlongationQuerySetTest(TestCase):
         start_at = timezone.localdate()  # Starts today so it's in progress.
         expected_num = 5
         ProlongationFactory.create_batch(expected_num, start_at=start_at)
-        self.assertEqual(expected_num, Prolongation.objects.in_progress().count())
+        assert expected_num == Prolongation.objects.in_progress().count()
 
     def test_not_in_progress(self):
         start_at = timezone.localdate() - relativedelta(years=1)
         end_at = start_at + relativedelta(months=6)
         expected_num = 3
         ProlongationFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
-        self.assertEqual(expected_num, Prolongation.objects.not_in_progress().count())
+        assert expected_num == Prolongation.objects.not_in_progress().count()
 
 
 class ProlongationManagerTest(TestCase):
@@ -1139,7 +1140,7 @@ class ProlongationManagerTest(TestCase):
         )
 
         expected_duration = datetime.timedelta(days=prolongation1_days + prolongation2_days)
-        self.assertEqual(expected_duration, Prolongation.objects.get_cumulative_duration_for(approval))
+        assert expected_duration == Prolongation.objects.get_cumulative_duration_for(approval)
 
     def test_get_cumulative_duration_for_rqth(self):
         """
@@ -1177,9 +1178,8 @@ class ProlongationManagerTest(TestCase):
         )
 
         expected_duration = datetime.timedelta(days=prolongation2_days + prolongation3_days)
-        self.assertEqual(
-            expected_duration,
-            Prolongation.objects.get_cumulative_duration_for(approval, reason=Prolongation.Reason.RQTH.value),
+        assert expected_duration == Prolongation.objects.get_cumulative_duration_for(
+            approval, reason=Prolongation.Reason.RQTH.value
         )
 
 
@@ -1201,7 +1201,7 @@ class ProlongationModelTestTrigger(TestCase):
         prolongation = ProlongationFactory(approval=approval, start_at=start_at)
 
         approval.refresh_from_db()
-        self.assertEqual(approval.duration, initial_duration + prolongation.duration)
+        assert approval.duration == initial_duration + prolongation.duration
 
     def test_delete(self):
         """
@@ -1216,12 +1216,12 @@ class ProlongationModelTestTrigger(TestCase):
 
         prolongation = ProlongationFactory(approval=approval, start_at=start_at)
         approval.refresh_from_db()
-        self.assertEqual(approval.duration, initial_duration + prolongation.duration)
+        assert approval.duration == initial_duration + prolongation.duration
 
         prolongation.delete()
 
         approval.refresh_from_db()
-        self.assertEqual(approval.duration, initial_duration)
+        assert approval.duration == initial_duration
 
     def test_save_and_edit(self):
         """
@@ -1248,13 +1248,13 @@ class ProlongationModelTestTrigger(TestCase):
         approval_duration_3 = approval.duration
 
         # Prolongation durations must be different.
-        self.assertNotEqual(prolongation_duration_1, prolongation_duration_2)
+        assert prolongation_duration_1 != prolongation_duration_2
 
         # Approval durations must be different.
-        self.assertNotEqual(initial_approval_duration, approval_duration_2)
-        self.assertNotEqual(approval_duration_2, approval_duration_3)
+        assert initial_approval_duration != approval_duration_2
+        assert approval_duration_2 != approval_duration_3
 
-        self.assertEqual(approval_duration_3, initial_approval_duration + prolongation_duration_2)
+        assert approval_duration_3 == initial_approval_duration + prolongation_duration_2
 
 
 class ProlongationModelTestConstraint(TestCase):
@@ -1267,7 +1267,7 @@ class ProlongationModelTestConstraint(TestCase):
             start_at=approval.end_at,
         )
 
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             # A prolongation that starts the same day as initial_prolongation.
             ProlongationFactory(
                 approval=approval,
@@ -1295,9 +1295,9 @@ class ProlongationModelTest(TestCase):
             start_at=start_at, end_at=end_at, approval=approval, declared_by_siae=siae
         )
 
-        with self.assertRaises(ValidationError) as error:
+        with pytest.raises(ValidationError) as error:
             prolongation.clean()
-        self.assertIn("La date de début doit être la même que la date de fin du PASS IAE", error.exception.message)
+        assert "La date de début doit être la même que la date de fin du PASS IAE" in error.value.message
 
     def test_get_start_at(self):
 
@@ -1306,7 +1306,7 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
 
         prolongation_start_at = Prolongation.get_start_at(approval)
-        self.assertEqual(prolongation_start_at, end_at)
+        assert prolongation_start_at == end_at
 
     def test_get_max_end_at(self):
 
@@ -1315,32 +1315,32 @@ class ProlongationModelTest(TestCase):
         reason = Prolongation.Reason.SENIOR_CDI.value
         expected_max_end_at = datetime.date(2031, 1, 31)  # 10 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
+        assert max_end_at == expected_max_end_at
 
         reason = Prolongation.Reason.COMPLETE_TRAINING.value
         expected_max_end_at = datetime.date(2023, 1, 31)  # 2 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
+        assert max_end_at == expected_max_end_at
 
         reason = Prolongation.Reason.RQTH.value
         expected_max_end_at = datetime.date(2024, 1, 31)  # 3 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
+        assert max_end_at == expected_max_end_at
 
         reason = Prolongation.Reason.SENIOR.value
         expected_max_end_at = datetime.date(2026, 1, 31)  # 5 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
+        assert max_end_at == expected_max_end_at
 
         reason = Prolongation.Reason.PARTICULAR_DIFFICULTIES.value
         expected_max_end_at = datetime.date(2022, 1, 31)  # 3 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
+        assert max_end_at == expected_max_end_at
 
         reason = Prolongation.Reason.HEALTH_CONTEXT.value
         expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
+        assert max_end_at == expected_max_end_at
 
     def test_time_boundaries(self):
         """
@@ -1370,8 +1370,8 @@ class ProlongationModelTest(TestCase):
         )
 
         approval.refresh_from_db()
-        self.assertEqual(prolongation1.end_at, expected_end_at)
-        self.assertEqual(approval.end_at, expected_end_at)
+        assert prolongation1.end_at == expected_end_at
+        assert approval.end_at == expected_end_at
 
         # Prolongation 2.
 
@@ -1385,14 +1385,12 @@ class ProlongationModelTest(TestCase):
         )
 
         approval.refresh_from_db()
-        self.assertEqual(prolongation2.end_at, expected_end_at)
-        self.assertEqual(approval.end_at, expected_end_at)
+        assert prolongation2.end_at == expected_end_at
+        assert approval.end_at == expected_end_at
 
         # Check duration.
 
-        self.assertEqual(
-            approval.duration, initial_approval_duration + prolongation1.duration + prolongation2.duration
-        )
+        assert approval.duration == initial_approval_duration + prolongation1.duration + prolongation2.duration
 
     def test_get_overlapping_prolongations(self):
 
@@ -1410,8 +1408,8 @@ class ProlongationModelTest(TestCase):
             declared_by_siae=initial_prolongation.declared_by_siae,
             start_at=approval.end_at,
         )
-        self.assertTrue(valid_prolongation.get_overlapping_prolongations().exists())
-        self.assertTrue(initial_prolongation, valid_prolongation.get_overlapping_prolongations().exists())
+        assert valid_prolongation.get_overlapping_prolongations().exists()
+        assert initial_prolongation, valid_prolongation.get_overlapping_prolongations().exists()
 
     def test_has_reached_max_cumulative_duration_for_complete_training(self):
 
@@ -1426,10 +1424,8 @@ class ProlongationModelTest(TestCase):
             reason=Prolongation.Reason.COMPLETE_TRAINING.value,
         )
 
-        self.assertFalse(prolongation.has_reached_max_cumulative_duration())
-        self.assertTrue(
-            prolongation.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
-        )
+        assert not prolongation.has_reached_max_cumulative_duration()
+        assert prolongation.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
 
     def test_has_reached_max_cumulative_duration_for_particular_difficulties(self):
 
@@ -1442,7 +1438,7 @@ class ProlongationModelTest(TestCase):
             reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
         )
 
-        self.assertFalse(prolongation1.has_reached_max_cumulative_duration())
+        assert not prolongation1.has_reached_max_cumulative_duration()
 
         prolongation2 = ProlongationFactory(
             approval=approval,
@@ -1451,10 +1447,8 @@ class ProlongationModelTest(TestCase):
             reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
         )
 
-        self.assertFalse(prolongation2.has_reached_max_cumulative_duration())
-        self.assertTrue(
-            prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
-        )
+        assert not prolongation2.has_reached_max_cumulative_duration()
+        assert prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
 
 
 class ProlongationNotificationsTest(TestCase):
@@ -1465,21 +1459,21 @@ class ProlongationNotificationsTest(TestCase):
         email = NewProlongationToAuthorizedPrescriberNotification(prolongation).email
 
         # To.
-        self.assertIn(prolongation.validated_by.email, email.to)
-        self.assertEqual(len(email.to), 1)
+        assert prolongation.validated_by.email in email.to
+        assert len(email.to) == 1
 
         # Body.
 
-        self.assertIn(prolongation.start_at.strftime("%d/%m/%Y"), email.body)
-        self.assertIn(prolongation.end_at.strftime("%d/%m/%Y"), email.body)
-        self.assertIn(prolongation.get_reason_display(), email.body)
-        self.assertIn(title(prolongation.declared_by.get_full_name()), email.body)
+        assert prolongation.start_at.strftime("%d/%m/%Y") in email.body
+        assert prolongation.end_at.strftime("%d/%m/%Y") in email.body
+        assert prolongation.get_reason_display() in email.body
+        assert title(prolongation.declared_by.get_full_name()) in email.body
 
-        self.assertIn(prolongation.declared_by_siae.display_name, email.body)
-        self.assertIn(prolongation.approval.number_with_spaces, email.body)
-        self.assertIn(title(prolongation.approval.user.first_name), email.body)
-        self.assertIn(title(prolongation.approval.user.last_name), email.body)
-        self.assertIn(global_constants.ITOU_EMAIL_PROLONGATION, email.body)
+        assert prolongation.declared_by_siae.display_name in email.body
+        assert prolongation.approval.number_with_spaces in email.body
+        assert title(prolongation.approval.user.first_name) in email.body
+        assert title(prolongation.approval.user.last_name) in email.body
+        assert global_constants.ITOU_EMAIL_PROLONGATION in email.body
 
 
 class ApprovalConcurrentModelTest(TransactionTestCase):
@@ -1493,15 +1487,15 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
         with transaction.atomic():
             # create a first approval out of the blue, ensure the number is correct.
             approval_1 = ApprovalFactory.build(user=UserFactory(), number=None)
-            self.assertEqual(Approval.objects.count(), 0)
+            assert Approval.objects.count() == 0
             approval_1.save()
-            self.assertEqual(approval_1.number, "XXXXX0000001")
-            self.assertEqual(Approval.objects.count(), 1)
+            assert approval_1.number == "XXXXX0000001"
+            assert Approval.objects.count() == 1
 
             # if a second one is created after the save, no worries man.
             approval_2 = ApprovalFactory.build(user=UserFactory(), number=None)
             approval_2.save()
-            self.assertEqual(approval_2.number, "XXXXX0000002")
+            assert approval_2.number == "XXXXX0000002"
 
     def test_race_condition(self):
         """Demonstrate the issue where two concurrent requests are locking the last row of
@@ -1547,44 +1541,44 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
         t1.join()
         t2.join()  # without the singleton we would suffer from IntegrityError here
 
-        self.assertEqual(approval.number, "XXXXX0000002")
-        self.assertEqual(approval2.number, "XXXXX0000003")
+        assert approval.number == "XXXXX0000002"
+        assert approval2.number == "XXXXX0000003"
 
 
 class PENotificationMixinTestCase(TestCase):
     def test_base_values(self):
         approval = ApprovalFactory()
-        self.assertEqual(approval.pe_notification_status, "notification_pending")
-        self.assertEqual(approval.pe_notification_time, None)
-        self.assertEqual(approval.pe_notification_endpoint, None)
-        self.assertEqual(approval.pe_notification_exit_code, None)
+        assert approval.pe_notification_status == "notification_pending"
+        assert approval.pe_notification_time is None
+        assert approval.pe_notification_endpoint is None
+        assert approval.pe_notification_exit_code is None
 
     def test_save_error(self):
         now = timezone.now()
         approval = ApprovalFactory()
         approval.pe_save_error("foo", "bar", at=now)
         approval.refresh_from_db()
-        self.assertEqual(approval.pe_notification_status, "notification_error")
-        self.assertEqual(approval.pe_notification_time, now)
-        self.assertEqual(approval.pe_notification_endpoint, "foo")
-        self.assertEqual(approval.pe_notification_exit_code, "bar")
+        assert approval.pe_notification_status == "notification_error"
+        assert approval.pe_notification_time == now
+        assert approval.pe_notification_endpoint == "foo"
+        assert approval.pe_notification_exit_code == "bar"
 
     def test_save_success(self):
         now = timezone.now()
         approval = ApprovalFactory()
         approval.pe_save_success(at=now)
         approval.refresh_from_db()
-        self.assertEqual(approval.pe_notification_status, "notification_success")
-        self.assertEqual(approval.pe_notification_time, now)
-        self.assertEqual(approval.pe_notification_endpoint, None)
-        self.assertEqual(approval.pe_notification_exit_code, None)
+        assert approval.pe_notification_status == "notification_success"
+        assert approval.pe_notification_time == now
+        assert approval.pe_notification_endpoint is None
+        assert approval.pe_notification_exit_code is None
 
     def test_save_should_retry(self):
         now = timezone.now()
         approval = ApprovalFactory()
         approval.pe_save_should_retry(at=now)
         approval.refresh_from_db()
-        self.assertEqual(approval.pe_notification_status, "notification_should_retry")
-        self.assertEqual(approval.pe_notification_time, now)
-        self.assertEqual(approval.pe_notification_endpoint, None)
-        self.assertEqual(approval.pe_notification_exit_code, None)
+        assert approval.pe_notification_status == "notification_should_retry"
+        assert approval.pe_notification_time == now
+        assert approval.pe_notification_endpoint is None
+        assert approval.pe_notification_exit_code is None

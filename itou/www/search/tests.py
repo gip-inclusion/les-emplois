@@ -143,10 +143,7 @@ class SearchSiaeTest(TestCase):
             response = self.client.get(self.url, {"city": guerande.slug})
         siaes_results = response.context["results_page"]
 
-        self.assertEqual(
-            [siae.pk for siae in siaes_results],
-            [siae.pk for siae in created_siaes],
-        )
+        assert [siae.pk for siae in siaes_results] == [siae.pk for siae in created_siaes]
 
     def test_opcs_displays_card_differently(self):
         city = create_city_saint_andre()

@@ -14,8 +14,8 @@ class CardViewTest(TestCase):
         prescriber_org = PrescriberOrganizationFactory(is_authorized=True)
         url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["prescriber_org"], prescriber_org)
+        assert response.status_code == 200
+        assert response.context["prescriber_org"] == prescriber_org
 
 
 class EditOrganizationTest(TestCase):
@@ -32,7 +32,7 @@ class EditOrganizationTest(TestCase):
 
         url = reverse("prescribers_views:edit_organization")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "name": "foo",
@@ -48,28 +48,28 @@ class EditOrganizationTest(TestCase):
             "website": "https://famous-siae.com",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         mock_call_ban_geocoding_api.assert_called_once()
 
         organization = PrescriberOrganization.objects.get(siret=organization.siret)
 
-        self.assertEqual(organization.name, post_data["name"])
-        self.assertEqual(organization.description, post_data["description"])
-        self.assertEqual(organization.address_line_1, post_data["address_line_1"])
-        self.assertEqual(organization.address_line_2, post_data["address_line_2"])
-        self.assertEqual(organization.city, post_data["city"])
-        self.assertEqual(organization.post_code, post_data["post_code"])
-        self.assertEqual(organization.department, post_data["department"])
-        self.assertEqual(organization.email, post_data["email"])
-        self.assertEqual(organization.phone, post_data["phone"])
-        self.assertEqual(organization.website, post_data["website"])
+        assert organization.name == post_data["name"]
+        assert organization.description == post_data["description"]
+        assert organization.address_line_1 == post_data["address_line_1"]
+        assert organization.address_line_2 == post_data["address_line_2"]
+        assert organization.city == post_data["city"]
+        assert organization.post_code == post_data["post_code"]
+        assert organization.department == post_data["department"]
+        assert organization.email == post_data["email"]
+        assert organization.phone == post_data["phone"]
+        assert organization.website == post_data["website"]
 
         # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
-        self.assertEqual(organization.coords, "SRID=4326;POINT (2.316754 48.838411)")
-        self.assertEqual(organization.latitude, 48.838411)
-        self.assertEqual(organization.longitude, 2.316754)
-        self.assertEqual(organization.geocoding_score, 0.587663373207207)
+        assert organization.coords == "SRID=4326;POINT (2.316754 48.838411)"
+        assert organization.latitude == 48.838411
+        assert organization.longitude == 2.316754
+        assert organization.geocoding_score == 0.587663373207207
 
         # Only admins should be able to edit organization details
         membership = organization.prescribermembership_set.first()
@@ -77,7 +77,7 @@ class EditOrganizationTest(TestCase):
         membership.save()
         url = reverse("prescribers_views:edit_organization")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_edit_with_multiple_memberships_and_same_siret(self, mock_call_ban_geocoding_api):
@@ -98,7 +98,7 @@ class EditOrganizationTest(TestCase):
 
         url = reverse("prescribers_views:edit_organization")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "siret": siret,
@@ -114,7 +114,7 @@ class EditOrganizationTest(TestCase):
             "website": "https://famous-siae.com",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         url = reverse("dashboard:index")
-        self.assertEqual(url, response.url)
+        assert url == response.url

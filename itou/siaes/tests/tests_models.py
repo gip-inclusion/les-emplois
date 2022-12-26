@@ -1,6 +1,7 @@
 from datetime import timedelta
 from unittest import mock
 
+import pytest
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
@@ -29,33 +30,33 @@ from itou.utils.test import TestCase
 class SiaeFactoriesTest(TestCase):
     def test_siae_with_membership_factory(self):
         siae = SiaeFactory(with_membership=True)
-        self.assertEqual(siae.members.count(), 1)
+        assert siae.members.count() == 1
         user = siae.members.get()
-        self.assertTrue(siae.has_admin(user))
+        assert siae.has_admin(user)
 
     def test_siae_with_membership_and_jobs_factory(self):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-        self.assertEqual(siae.jobs.count(), 2)
+        assert siae.jobs.count() == 2
 
     def test_siae_with_2_memberships_factory(self):
         siae = SiaeWith2MembershipsFactory()
-        self.assertEqual(siae.members.count(), 2)
-        self.assertEqual(siae.active_members.count(), 2)
-        self.assertEqual(siae.active_admin_members.count(), 1)
+        assert siae.members.count() == 2
+        assert siae.active_members.count() == 2
+        assert siae.active_admin_members.count() == 1
         admin_user = siae.active_admin_members.get()
-        self.assertTrue(siae.has_admin(admin_user))
+        assert siae.has_admin(admin_user)
         all_users = list(siae.members.all())
-        self.assertEqual(len(all_users), 2)
+        assert len(all_users) == 2
         all_users.remove(admin_user)
-        self.assertEqual(len(all_users), 1)
+        assert len(all_users) == 1
         regular_user = all_users[0]
-        self.assertFalse(siae.has_admin(regular_user))
+        assert not siae.has_admin(regular_user)
 
     def test_siae_with_4_memberships_factory(self):
         siae = SiaeWith4MembershipsFactory()
-        self.assertEqual(siae.members.count(), 4)
-        self.assertEqual(siae.active_members.count(), 2)
-        self.assertEqual(siae.active_admin_members.count(), 1)
+        assert siae.members.count() == 4
+        assert siae.active_members.count() == 2
+        assert siae.active_admin_members.count() == 1
 
 
 class SiaeModelTest(TestCase):
@@ -63,46 +64,46 @@ class SiaeModelTest(TestCase):
 
         siae = SiaeFactory(kind=SiaeKind.EI, department="57")
         url = siae.accept_survey_url
-        self.assertTrue(url.startswith(f"{settings.TALLY_URL}/r/"))
-        self.assertIn(f"id_siae={siae.pk}", url)
-        self.assertIn("type_siae=Entreprise+d%27insertion", url)
-        self.assertIn("region=Grand+Est", url)
-        self.assertIn("departement=57", url)
+        assert url.startswith(f"{settings.TALLY_URL}/r/")
+        assert f"id_siae={siae.pk}" in url
+        assert "type_siae=Entreprise+d%27insertion" in url
+        assert "region=Grand+Est" in url
+        assert "departement=57" in url
 
         # Ensure that the URL does not break when there is no department.
         siae = SiaeFactory(kind=SiaeKind.AI, department="")
-        self.assertTrue(url.startswith(f"{settings.TALLY_URL}/r/"))
+        assert url.startswith(f"{settings.TALLY_URL}/r/")
         url = siae.accept_survey_url
-        self.assertIn(f"id_siae={siae.pk}", url)
-        self.assertIn("type_siae=Association+interm%C3%A9diaire", url)
-        self.assertIn("region=", url)
-        self.assertIn("departement=", url)
+        assert f"id_siae={siae.pk}" in url
+        assert "type_siae=Association+interm%C3%A9diaire" in url
+        assert "region=" in url
+        assert "departement=" in url
 
     def test_siren_and_nic(self):
         siae = SiaeFactory(siret="12345678900001")
-        self.assertEqual(siae.siren, "123456789")
-        self.assertEqual(siae.siret_nic, "00001")
+        assert siae.siren == "123456789"
+        assert siae.siret_nic == "00001"
 
     def test_is_subject_to_eligibility_rules(self):
         siae = SiaeFactory(kind=SiaeKind.GEIQ)
-        self.assertFalse(siae.is_subject_to_eligibility_rules)
+        assert not siae.is_subject_to_eligibility_rules
 
         siae = SiaeFactory(kind=SiaeKind.EI)
-        self.assertTrue(siae.is_subject_to_eligibility_rules)
+        assert siae.is_subject_to_eligibility_rules
 
     def test_should_have_convention(self):
         siae = SiaeFactory(kind=SiaeKind.GEIQ)
-        self.assertFalse(siae.should_have_convention)
+        assert not siae.should_have_convention
 
         siae = SiaeFactory(kind=SiaeKind.EI)
-        self.assertTrue(siae.should_have_convention)
+        assert siae.should_have_convention
 
     def test_has_members(self):
         siae1 = SiaeFactory()
         siae2 = SiaeFactory(with_membership=True)
 
-        self.assertFalse(siae1.has_members)
-        self.assertTrue(siae2.has_members)
+        assert not siae1.has_members
+        assert siae2.has_members
 
     def test_has_member(self):
         siae1 = SiaeFactory(with_membership=True)
@@ -111,25 +112,25 @@ class SiaeModelTest(TestCase):
         user1 = siae1.members.get()
         user2 = siae2.members.get()
 
-        self.assertTrue(siae1.has_member(user1))
-        self.assertFalse(siae1.has_member(user2))
+        assert siae1.has_member(user1)
+        assert not siae1.has_member(user2)
 
-        self.assertTrue(siae2.has_member(user2))
-        self.assertFalse(siae2.has_member(user1))
+        assert siae2.has_member(user2)
+        assert not siae2.has_member(user1)
 
     def test_active_members(self):
         siae = SiaeWith2MembershipsFactory(membership2__is_active=False)
         user_with_active_membership = siae.members.first()
         user_with_inactive_membership = siae.members.last()
 
-        self.assertNotIn(user_with_inactive_membership, siae.active_members)
-        self.assertIn(user_with_active_membership, siae.active_members)
+        assert user_with_inactive_membership not in siae.active_members
+        assert user_with_active_membership in siae.active_members
 
         # Deactivate a user
         user_with_active_membership.is_active = False
         user_with_active_membership.save()
 
-        self.assertNotIn(user_with_active_membership, siae.active_members)
+        assert user_with_active_membership not in siae.active_members
 
     def test_active_admin_members(self):
         """
@@ -141,8 +142,8 @@ class SiaeModelTest(TestCase):
         siae_2 = SiaeFactory(with_membership=True)
         siae_2.members.add(siae_1_admin_user)
 
-        self.assertIn(siae_1_admin_user, siae_1.active_admin_members)
-        self.assertNotIn(siae_1_admin_user, siae_2.active_admin_members)
+        assert siae_1_admin_user in siae_1.active_admin_members
+        assert siae_1_admin_user not in siae_2.active_admin_members
 
     def test_has_admin(self):
         siae_1 = SiaeWith2MembershipsFactory()
@@ -150,14 +151,14 @@ class SiaeModelTest(TestCase):
         siae1_regular_user = siae_1.active_members.exclude(pk=siae_1_admin_user.pk).get()
         siae_2 = SiaeWith2MembershipsFactory(membership2__user=siae_1_admin_user)
 
-        self.assertTrue(siae_1.has_member(siae_1_admin_user))
-        self.assertTrue(siae_1.has_admin(siae_1_admin_user))
+        assert siae_1.has_member(siae_1_admin_user)
+        assert siae_1.has_admin(siae_1_admin_user)
 
-        self.assertTrue(siae_1.has_member(siae1_regular_user))
-        self.assertFalse(siae_1.has_admin(siae1_regular_user))
+        assert siae_1.has_member(siae1_regular_user)
+        assert not siae_1.has_admin(siae1_regular_user)
 
-        self.assertTrue(siae_2.has_member(siae_1_admin_user))
-        self.assertFalse(siae_2.has_admin(siae_1_admin_user))
+        assert siae_2.has_member(siae_1_admin_user)
+        assert not siae_2.has_admin(siae_1_admin_user)
 
     def test_new_signup_activation_email_to_official_contact(self):
 
@@ -171,59 +172,59 @@ class SiaeModelTest(TestCase):
             message = siae.new_signup_activation_email_to_official_contact(request)
             message.send()
 
-            self.assertEqual(len(mail.outbox), 1)
+            assert len(mail.outbox) == 1
             email = mail.outbox[0]
-            self.assertIn("Un nouvel utilisateur souhaite rejoindre votre structure", email.subject)
-            self.assertIn("Ouvrez le lien suivant pour procéder à l'inscription", email.body)
-            self.assertIn(siae.signup_magic_link, email.body)
-            self.assertIn(siae.display_name, email.body)
-            self.assertIn(siae.siret, email.body)
-            self.assertIn(siae.kind, email.body)
-            self.assertIn(siae.auth_email, email.body)
-            self.assertNotIn(siae.email, email.body)
-            self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-            self.assertEqual(len(email.to), 1)
-            self.assertEqual(email.to[0], siae.auth_email)
+            assert "Un nouvel utilisateur souhaite rejoindre votre structure" in email.subject
+            assert "Ouvrez le lien suivant pour procéder à l'inscription" in email.body
+            assert siae.signup_magic_link in email.body
+            assert siae.display_name in email.body
+            assert siae.siret in email.body
+            assert siae.kind in email.body
+            assert siae.auth_email in email.body
+            assert siae.email not in email.body
+            assert email.from_email == settings.DEFAULT_FROM_EMAIL
+            assert len(email.to) == 1
+            assert email.to[0] == siae.auth_email
 
     def test_activate_your_account_email(self):
         siae = SiaeFactory(with_membership=True)
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             siae.activate_your_account_email()
 
         siae = SiaeFactory(auth_email="")
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             siae.activate_your_account_email()
 
         siae = SiaeFactory()
         email = siae.activate_your_account_email()
-        self.assertEqual(email.to, [siae.auth_email])
-        self.assertIn(siae.kind, email.subject)
-        self.assertIn(siae.name, email.subject)
-        self.assertIn(siae.kind, email.body)
-        self.assertIn(siae.siret, email.body)
-        self.assertIn(reverse("signup:siae_select"), email.body)
+        assert email.to == [siae.auth_email]
+        assert siae.kind in email.subject
+        assert siae.name in email.subject
+        assert siae.kind in email.body
+        assert siae.siret in email.body
+        assert reverse("signup:siae_select") in email.body
 
     def test_deactivation_queryset_methods(self):
         siae = SiaeFactory()
-        self.assertEqual(Siae.objects.count(), 1)
-        self.assertEqual(Siae.objects.active().count(), 1)
-        self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 1)
+        assert Siae.objects.count() == 1
+        assert Siae.objects.active().count() == 1
+        assert Siae.objects.active_or_in_grace_period().count() == 1
         siae.delete()
-        self.assertEqual(Siae.objects.count(), 0)
+        assert Siae.objects.count() == 0
 
         siae = SiaePendingGracePeriodFactory()
-        self.assertEqual(Siae.objects.count(), 1)
-        self.assertEqual(Siae.objects.active().count(), 0)
-        self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 1)
+        assert Siae.objects.count() == 1
+        assert Siae.objects.active().count() == 0
+        assert Siae.objects.active_or_in_grace_period().count() == 1
         siae.delete()
-        self.assertEqual(Siae.objects.count(), 0)
+        assert Siae.objects.count() == 0
 
         siae = SiaeAfterGracePeriodFactory()
-        self.assertEqual(Siae.objects.count(), 1)
-        self.assertEqual(Siae.objects.active().count(), 0)
-        self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 0)
+        assert Siae.objects.count() == 1
+        assert Siae.objects.active().count() == 0
+        assert Siae.objects.active_or_in_grace_period().count() == 0
         siae.delete()
-        self.assertEqual(Siae.objects.count(), 0)
+        assert Siae.objects.count() == 0
 
     def test_active_member_with_many_memberships(self):
         siae1 = SiaeWith2MembershipsFactory(membership2__is_active=False)
@@ -231,19 +232,19 @@ class SiaeModelTest(TestCase):
         siae2 = SiaeWith2MembershipsFactory()
         siae2.members.add(user)
 
-        self.assertFalse(user in siae1.active_members)
-        self.assertEqual(siae1.members.count(), 2)
-        self.assertEqual(siae1.active_members.count(), 1)
-        self.assertTrue(user in siae1.deactivated_members)
-        self.assertFalse(user in siae1.active_members)
-        self.assertEqual(siae2.members.count(), 3)
-        self.assertEqual(siae2.active_members.count(), 3)
+        assert not (user in siae1.active_members)
+        assert siae1.members.count() == 2
+        assert siae1.active_members.count() == 1
+        assert user in siae1.deactivated_members
+        assert not (user in siae1.active_members)
+        assert siae2.members.count() == 3
+        assert siae2.active_members.count() == 3
 
     def test_is_opcs(self):
         siae = SiaeFactory(kind=SiaeKind.ACI)
-        self.assertFalse(siae.is_opcs)
+        assert not siae.is_opcs
         siae.kind = SiaeKind.OPCS
-        self.assertTrue(siae.is_opcs)
+        assert siae.is_opcs
 
 
 class SiaeQuerySetTest(TestCase):
@@ -251,19 +252,19 @@ class SiaeQuerySetTest(TestCase):
         siae = SiaeFactory(with_jobs=True)
 
         siae_result = Siae.objects.prefetch_job_description_through().get(pk=siae.pk)
-        self.assertTrue(hasattr(siae_result, "job_description_through"))
+        assert hasattr(siae_result, "job_description_through")
 
         # by default every job description is active
-        self.assertEqual(siae_result.job_description_through.count(), 4)
+        assert siae_result.job_description_through.count() == 4
 
         first_job_description = siae_result.job_description_through.first()
-        self.assertTrue(hasattr(first_job_description, "is_popular"))
+        assert hasattr(first_job_description, "is_popular")
 
         # now deactivate them
         jd = SiaeJobDescription.objects.filter(siae=siae).all()
         jd.update(is_active=False)
         siae_result = Siae.objects.prefetch_job_description_through().get(pk=siae.pk)
-        self.assertEqual(siae_result.job_description_through.count(), 0)
+        assert siae_result.job_description_through.count() == 0
 
     def test_with_count_recent_received_job_applications(self):
         siae = SiaeFactory()
@@ -277,7 +278,7 @@ class SiaeQuerySetTest(TestCase):
 
         result = Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk)
 
-        self.assertEqual(expected, result.count_recent_received_job_apps)
+        assert expected == result.count_recent_received_job_apps
 
     def test_with_computed_job_app_score(self):
         siae = SiaeFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"))
@@ -291,12 +292,12 @@ class SiaeQuerySetTest(TestCase):
         active_job_descriptions = (
             Siae.objects.with_count_active_job_descriptions().get(pk=siae.pk).count_active_job_descriptions
         )
-        self.assertEqual(active_job_descriptions, 4)
+        assert active_job_descriptions == 4
         recent_job_apps = (
             Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk).count_recent_received_job_apps
         )
-        self.assertEqual(recent_job_apps, 2)
-        self.assertEqual(expected_score, result.computed_job_app_score)
+        assert recent_job_apps == 2
+        assert expected_score == result.computed_job_app_score
 
     def test_with_computed_job_app_score_no_job_description(self):
         siae = SiaeFactory()
@@ -306,7 +307,7 @@ class SiaeQuerySetTest(TestCase):
         expected_score = None
         result = Siae.objects.with_computed_job_app_score().get(pk=siae.pk)
 
-        self.assertEqual(expected_score, result.computed_job_app_score)
+        assert expected_score == result.computed_job_app_score
 
     def test_with_count_active_job_descriptions(self):
         siae = SiaeFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"))
@@ -316,22 +317,22 @@ class SiaeQuerySetTest(TestCase):
         SiaeJobDescription.objects.bulk_update(job_descriptions, ["is_active"])
         result = Siae.objects.with_count_active_job_descriptions().get(pk=siae.pk)
 
-        self.assertEqual(1, result.count_active_job_descriptions)
+        assert 1 == result.count_active_job_descriptions
 
     def test_with_has_active_members(self):
         siae = SiaeFactory(with_membership=True)
         result = Siae.objects.with_has_active_members().get(pk=siae.pk)
-        self.assertTrue(result.has_active_members)
+        assert result.has_active_members
 
         # Deactivate members
         siae = Siae.objects.last()
-        self.assertEqual(siae.members.count(), 1)
+        assert siae.members.count() == 1
         membership = siae.siaemembership_set.first()
         membership.is_active = False
         membership.save()
 
         result = Siae.objects.with_has_active_members().get(pk=siae.pk)
-        self.assertFalse(result.has_active_members)
+        assert not result.has_active_members
 
 
 class SiaeJobDescriptionQuerySetTest(TestCase):
@@ -346,23 +347,21 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
 
         # Test attribute presence
         siae_job_description = SiaeJobDescription.objects.with_annotation_is_popular().first()
-        self.assertTrue(hasattr(siae_job_description, "is_popular"))
+        assert hasattr(siae_job_description, "is_popular")
 
         # Test popular threshold: popular job description
         popular_job_description = siae_job_descriptions[0]
         for _ in range(SiaeJobDescription.POPULAR_THRESHOLD + 1):
             JobApplicationFactory(to_siae=siae, selected_jobs=[popular_job_description], job_seeker=job_seeker)
 
-        self.assertTrue(
-            SiaeJobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
-        )
+        assert SiaeJobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
 
         # Test popular threshold: unpopular job description
         unpopular_job_description = siae_job_descriptions[1]
         JobApplicationFactory(to_siae=siae, selected_jobs=[unpopular_job_description])
 
-        self.assertFalse(
-            SiaeJobDescription.objects.with_annotation_is_popular().get(pk=unpopular_job_description.pk).is_popular
+        assert (
+            not SiaeJobDescription.objects.with_annotation_is_popular().get(pk=unpopular_job_description.pk).is_popular
         )
 
         # Popular job descriptions count related **pending** job applications.
@@ -378,15 +377,15 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
         )
 
-        self.assertFalse(SiaeJobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular)
+        assert not SiaeJobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular
 
     def test_with_job_applications_count(self):
         siae = SiaeFactory(with_jobs=True)
         job_description = siae.job_description_through.first()
         JobApplicationFactory(to_siae=siae, selected_jobs=[job_description])
         siae_job_description = SiaeJobDescription.objects.with_job_applications_count().get(pk=job_description.pk)
-        self.assertTrue(hasattr(siae_job_description, "job_applications_count"))
-        self.assertEqual(siae_job_description.job_applications_count, 1)
+        assert hasattr(siae_job_description, "job_applications_count")
+        assert siae_job_description.job_applications_count == 1
 
     def test_is_active(self):
         siae = SiaeFactory(kind=SiaeKind.EI, convention=None)
@@ -409,7 +408,7 @@ class SiaeContractTypeTest(TestCase):
             ("OTHER", "Autre type de contrat"),
         ]
         result = ContractType.choices_for_siae(siae=SiaeFactory(kind=SiaeKind.GEIQ))
-        self.assertEqual(result, expected)
+        assert result == expected
 
         # For any ACI
         expected = [
@@ -420,7 +419,7 @@ class SiaeContractTypeTest(TestCase):
             ("OTHER", "Autre type de contrat"),
         ]
         result = ContractType.choices_for_siae(siae=SiaeFactory(kind=SiaeKind.ACI))
-        self.assertEqual(result, expected)
+        assert result == expected
 
         # For an ACI from Convergence France
         expected = [
@@ -435,7 +434,7 @@ class SiaeContractTypeTest(TestCase):
         siae = SiaeFactory(kind=SiaeKind.ACI)
         with override_settings(ACI_CONVERGENCE_SIRET_WHITELIST=[siae.siret]):
             result = ContractType.choices_for_siae(siae=siae)
-        self.assertEqual(result, expected)
+        assert result == expected
 
     def test_choices_for_siae_new_siae_kind(self):
         """
@@ -447,4 +446,4 @@ class SiaeContractTypeTest(TestCase):
         expected.remove(("FED_TERM_I_PHC", "CDD-I Premières heures en Chantier"))
         expected.remove(("FIXED_TERM_I_CVG", "CDD-I Convergence"))
         result = ContractType.choices_for_siae(siae=SiaeFactory(kind="NEW"))
-        self.assertEqual(result, expected)
+        assert result == expected

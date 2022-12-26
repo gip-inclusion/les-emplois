@@ -115,15 +115,15 @@ class ExternalDataImportTest(TestCase):
         _mock_status_ok()
 
         result = import_user_pe_data(user, FOO_TOKEN)
-        self.assertEqual(result.status, ExternalDataImport.STATUS_OK)
+        assert result.status == ExternalDataImport.STATUS_OK
 
         report = result.report
 
         # Birthdate is already filled by factory:
-        self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
+        assert f"User/{user.pk}/birthdate" not in report.get("fields_updated")
 
-        self.assertEqual(6 + 1, len(report.get("fields_updated")))  # all the fields + history
-        self.assertEqual(12, len(report.get("fields_fetched")))
+        assert 6 + 1 == len(report.get("fields_updated"))  # all the fields + history
+        assert 12 == len(report.get("fields_fetched"))
 
     @respx.mock
     def test_status_partial(self):
@@ -131,17 +131,15 @@ class ExternalDataImportTest(TestCase):
         _mock_status_partial()
 
         result = import_user_pe_data(user, FOO_TOKEN)
-        self.assertEqual(result.status, ExternalDataImport.STATUS_PARTIAL)
+        assert result.status == ExternalDataImport.STATUS_PARTIAL
 
         report = result.report
-        self.assertTrue(user.has_external_data)
-        self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
-        self.assertIn(
-            f"JobSeekerExternalData/{user.jobseekerexternaldata.pk}/is_pe_jobseeker", report.get("fields_updated")
-        )
-        self.assertEqual(5 + 1, len(report.get("fields_updated")))  # fields + history
-        self.assertEqual(9, len(report.get("fields_fetched")))
-        self.assertEqual(2, len(report.get("fields_failed")))
+        assert user.has_external_data
+        assert f"User/{user.pk}/birthdate" not in report.get("fields_updated")
+        assert f"JobSeekerExternalData/{user.jobseekerexternaldata.pk}/is_pe_jobseeker" in report.get("fields_updated")
+        assert 5 + 1 == len(report.get("fields_updated"))  # fields + history
+        assert 9 == len(report.get("fields_fetched"))
+        assert 2 == len(report.get("fields_failed"))
 
     @respx.mock
     def test_status_failed(self):
@@ -149,12 +147,12 @@ class ExternalDataImportTest(TestCase):
         _mock_status_failed()
 
         result = import_user_pe_data(user, FOO_TOKEN)
-        self.assertEqual(result.status, ExternalDataImport.STATUS_FAILED)
+        assert result.status == ExternalDataImport.STATUS_FAILED
 
         report = result.report
-        self.assertEqual(0, len(report.get("fields_updated")))
-        self.assertEqual(0, len(report.get("fields_fetched")))
-        self.assertEqual(0, len(report.get("fields_failed")))
+        assert 0 == len(report.get("fields_updated"))
+        assert 0 == len(report.get("fields_fetched"))
+        assert 0 == len(report.get("fields_failed"))
 
 
 @override_settings(
@@ -173,21 +171,21 @@ class JobSeekerExternalDataTest(TestCase):
 
         result = import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
-        self.assertTrue(user.has_external_data)
+        assert user.has_external_data
 
         data = user.jobseekerexternaldata
 
-        self.assertFalse(data.has_minimal_social_allowance)
-        self.assertTrue(data.is_pe_jobseeker)
+        assert not data.has_minimal_social_allowance
+        assert data.is_pe_jobseeker
 
-        self.assertEqual(user.address_line_1, "4, Privet Drive")
-        self.assertEqual(user.address_line_2, "The cupboard under the stairs")
-        self.assertEqual(str(user.birthdate), "1970-01-01")
+        assert user.address_line_1 == "4, Privet Drive"
+        assert user.address_line_2 == "The cupboard under the stairs"
+        assert str(user.birthdate) == "1970-01-01"
 
         report = result.report
-        self.assertIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
-        self.assertEqual(7 + 1, len(report.get("fields_updated")))  # fields + history
-        self.assertEqual(12, len(report.get("fields_fetched")))
+        assert f"User/{user.pk}/birthdate" in report.get("fields_updated")
+        assert 7 + 1 == len(report.get("fields_updated"))  # fields + history
+        assert 12 == len(report.get("fields_fetched"))
 
         # Just checking birthdate is not overriden
         user = JobSeekerFactory()
@@ -197,9 +195,9 @@ class JobSeekerExternalDataTest(TestCase):
 
         user.refresh_from_db()
 
-        self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
-        self.assertEqual(birthdate, user.birthdate)
-        self.assertEqual(user.external_data_source_history[0]["source"], IdentityProvider.PE_CONNECT.value)
+        assert f"User/{user.pk}/birthdate" not in report.get("fields_updated")
+        assert birthdate == user.birthdate
+        assert user.external_data_source_history[0]["source"] == IdentityProvider.PE_CONNECT.value
 
     @respx.mock
     def test_import_partial(self):
@@ -208,17 +206,17 @@ class JobSeekerExternalDataTest(TestCase):
         user = JobSeekerFactory()
         import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
-        self.assertTrue(user.has_external_data)
+        assert user.has_external_data
 
         data = user.jobseekerexternaldata
 
-        self.assertIsNone(data.has_minimal_social_allowance)
-        self.assertTrue(data.is_pe_jobseeker)
+        assert data.has_minimal_social_allowance is None
+        assert data.is_pe_jobseeker
 
-        self.assertEqual(user.address_line_1, "4, Privet Drive")
-        self.assertEqual(user.address_line_2, "The cupboard under the stairs")
-        self.assertNotEqual(str(user.birthdate), "1970-01-01")
-        self.assertEqual(user.external_data_source_history[0]["source"], IdentityProvider.PE_CONNECT.value)
+        assert user.address_line_1 == "4, Privet Drive"
+        assert user.address_line_2 == "The cupboard under the stairs"
+        assert str(user.birthdate) != "1970-01-01"
+        assert user.external_data_source_history[0]["source"] == IdentityProvider.PE_CONNECT.value
 
     @respx.mock
     def test_import_failed(self):
@@ -227,11 +225,11 @@ class JobSeekerExternalDataTest(TestCase):
         user = JobSeekerFactory()
         import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
-        self.assertTrue(user.has_external_data)
+        assert user.has_external_data
 
         data = user.jobseekerexternaldata
-        self.assertIsNone(data.is_pe_jobseeker)
-        self.assertIsNone(data.has_minimal_social_allowance)
+        assert data.is_pe_jobseeker is None
+        assert data.has_minimal_social_allowance is None
 
     @respx.mock
     def test_has_external_data(self):
@@ -243,8 +241,8 @@ class JobSeekerExternalDataTest(TestCase):
         import_user_pe_data(user1, FOO_TOKEN)
         user1.refresh_from_db()
 
-        self.assertTrue(user1.has_external_data)
-        self.assertFalse(user2.has_external_data)
+        assert user1.has_external_data
+        assert not user2.has_external_data
 
 
 class MockEmailWebhookEvent:
@@ -262,11 +260,11 @@ class AnymailHookTests(TestCase):
         recipient = "idont@exi.st"
         initial_count = RejectedEmailEventData.objects.count()
         store_rejected_email_event(MockEmailWebhookEvent("rejected", recipient, "invalid"))
-        self.assertEqual(RejectedEmailEventData.objects.count(), initial_count + 1)
+        assert RejectedEmailEventData.objects.count() == initial_count + 1
 
     def test_accepted_event(self):
         """we do not store information about accepted emails"""
         recipient = "ido@exi.st"
         initial_count = RejectedEmailEventData.objects.count()
         store_rejected_email_event(MockEmailWebhookEvent("accepted", recipient, ""))
-        self.assertEqual(RejectedEmailEventData.objects.count(), initial_count)
+        assert RejectedEmailEventData.objects.count() == initial_count

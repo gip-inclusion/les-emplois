@@ -21,10 +21,10 @@ class INSEEApiTest(SimpleTestCase):
 
         access_token = api_entreprise.get_access_token()
 
-        self.assertTrue(endpoint.called)
-        self.assertIn(b"grant_type=client_credentials", endpoint.calls.last.request.content)
-        self.assertTrue(endpoint.calls.last.request.headers["Authorization"].startswith("Basic "))
-        self.assertEqual(access_token, INSEE_API_RESULT_MOCK["access_token"])
+        assert endpoint.called
+        assert b"grant_type=client_credentials" in endpoint.calls.last.request.content
+        assert endpoint.calls.last.request.headers["Authorization"].startswith("Basic ")
+        assert access_token == INSEE_API_RESULT_MOCK["access_token"]
 
     @respx.mock
     def test_access_token_with_http_error(self):
@@ -33,9 +33,9 @@ class INSEEApiTest(SimpleTestCase):
         with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
             access_token = api_entreprise.get_access_token()
 
-        self.assertIsNone(access_token)
-        self.assertIn("Failed to retrieve an access token", cm.records[0].message)
-        self.assertIs(cm.records[0].exc_info[0], httpx.HTTPStatusError)
+        assert access_token is None
+        assert "Failed to retrieve an access token" in cm.records[0].message
+        assert cm.records[0].exc_info[0] is httpx.HTTPStatusError
 
     @respx.mock
     def test_access_token_with_json_error(self):
@@ -44,9 +44,9 @@ class INSEEApiTest(SimpleTestCase):
         with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
             access_token = api_entreprise.get_access_token()
 
-        self.assertIsNone(access_token)
-        self.assertIn("Failed to retrieve an access token", cm.records[0].message)
-        self.assertIs(cm.records[0].exc_info[0], json.JSONDecodeError)
+        assert access_token is None
+        assert "Failed to retrieve an access token" in cm.records[0].message
+        assert cm.records[0].exc_info[0] is json.JSONDecodeError
 
 
 @override_settings(
@@ -72,15 +72,15 @@ class ApiEntrepriseTest(SimpleTestCase):
 
         etablissement, error = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertIsNone(error)
-        self.assertEqual(etablissement.name, "CENTRE COMMUNAL D'ACTION SOCIALE")
-        self.assertEqual(etablissement.address_line_1, "22 RUE DU WAD BILLY")
-        self.assertEqual(etablissement.address_line_2, "22-24")
-        self.assertEqual(etablissement.post_code, "57000")
-        self.assertEqual(etablissement.city, "METZ")
-        self.assertEqual(etablissement.department, "57")
-        self.assertFalse(etablissement.is_closed)
-        self.assertTrue(etablissement.is_head_office)
+        assert error is None
+        assert etablissement.name == "CENTRE COMMUNAL D'ACTION SOCIALE"
+        assert etablissement.address_line_1 == "22 RUE DU WAD BILLY"
+        assert etablissement.address_line_2 == "22-24"
+        assert etablissement.post_code == "57000"
+        assert etablissement.city == "METZ"
+        assert etablissement.department == "57"
+        assert not etablissement.is_closed
+        assert etablissement.is_head_office
 
     @respx.mock
     def test_etablissement_get_or_error_with_closed_status(self):
@@ -90,8 +90,8 @@ class ApiEntrepriseTest(SimpleTestCase):
 
         etablissement, error = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertIsNone(error)
-        self.assertTrue(etablissement.is_closed)
+        assert error is None
+        assert etablissement.is_closed
 
     @respx.mock
     def test_etablissement_get_or_error_without_token(self):
@@ -99,7 +99,7 @@ class ApiEntrepriseTest(SimpleTestCase):
 
         result = api_entreprise.etablissement_get_or_error("whatever")
 
-        self.assertEqual(result, (None, "Problème de connexion à la base Sirene. Essayez ultérieurement."))
+        assert result == (None, "Problème de connexion à la base Sirene. Essayez ultérieurement.")
 
     @respx.mock
     def test_etablissement_get_or_error_with_request_error(self):
@@ -108,8 +108,8 @@ class ApiEntrepriseTest(SimpleTestCase):
         with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
             result = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertEqual(result, (None, "Problème de connexion à la base Sirene. Essayez ultérieurement."))
-        self.assertTrue(cm.records[0].message.startswith("A request to the INSEE API failed"))
+        assert result == (None, "Problème de connexion à la base Sirene. Essayez ultérieurement.")
+        assert cm.records[0].message.startswith("A request to the INSEE API failed")
 
     @respx.mock
     def test_etablissement_get_or_error_with_other_http_bad_request_error(self):
@@ -117,7 +117,7 @@ class ApiEntrepriseTest(SimpleTestCase):
 
         result = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertEqual(result, (None, "Erreur dans le format du SIRET : « 26570134200148 »."))
+        assert result == (None, "Erreur dans le format du SIRET : « 26570134200148 ».")
 
     @respx.mock
     def test_etablissement_get_or_error_with_other_http_forbidden_error(self):
@@ -125,7 +125,7 @@ class ApiEntrepriseTest(SimpleTestCase):
 
         result = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertEqual(result, (None, "Cette entreprise a exercé son droit d'opposition auprès de l'INSEE."))
+        assert result == (None, "Cette entreprise a exercé son droit d'opposition auprès de l'INSEE.")
 
     @respx.mock
     def test_etablissement_get_or_error_with_other_http_not_found_error(self):
@@ -133,7 +133,7 @@ class ApiEntrepriseTest(SimpleTestCase):
 
         result = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertEqual(result, (None, "SIRET « 26570134200148 » non reconnu."))
+        assert result == (None, "SIRET « 26570134200148 » non reconnu.")
 
     @respx.mock
     def test_etablissement_get_or_error_with_http_error(self):
@@ -142,8 +142,8 @@ class ApiEntrepriseTest(SimpleTestCase):
         with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
             result = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertEqual(result, (None, "Problème de connexion à la base Sirene. Essayez ultérieurement."))
-        self.assertTrue(cm.records[0].message.startswith("Error while fetching"))
+        assert result == (None, "Problème de connexion à la base Sirene. Essayez ultérieurement.")
+        assert cm.records[0].message.startswith("Error while fetching")
 
     @respx.mock
     def test_etablissement_get_or_error_when_content_is_not_json(self):
@@ -152,9 +152,9 @@ class ApiEntrepriseTest(SimpleTestCase):
         with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
             result = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertEqual(result, (None, "Le format de la réponse API Entreprise est non valide."))
-        self.assertTrue(cm.records[0].message.startswith("Invalid format of response from API Entreprise"))
-        self.assertIs(cm.records[0].exc_info[0], json.JSONDecodeError)
+        assert result == (None, "Le format de la réponse API Entreprise est non valide.")
+        assert cm.records[0].message.startswith("Invalid format of response from API Entreprise")
+        assert cm.records[0].exc_info[0] is json.JSONDecodeError
 
     @respx.mock
     def test_etablissement_get_or_error_when_content_is_missing_data(self):
@@ -163,9 +163,9 @@ class ApiEntrepriseTest(SimpleTestCase):
         with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
             result = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertEqual(result, (None, "Le format de la réponse API Entreprise est non valide."))
-        self.assertTrue(cm.records[0].message.startswith("Invalid format of response from API Entreprise"))
-        self.assertIs(cm.records[0].exc_info[0], KeyError)
+        assert result == (None, "Le format de la réponse API Entreprise est non valide.")
+        assert cm.records[0].message.startswith("Invalid format of response from API Entreprise")
+        assert cm.records[0].exc_info[0] is KeyError
 
     @respx.mock
     def test_etablissement_get_or_error_when_content_is_missing_historical_data(self):
@@ -176,9 +176,9 @@ class ApiEntrepriseTest(SimpleTestCase):
         with self.assertLogs(api_entreprise.logger, logging.ERROR) as cm:
             result = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertEqual(result, (None, "Le format de la réponse API Entreprise est non valide."))
-        self.assertTrue(cm.records[0].message.startswith("Invalid format of response from API Entreprise"))
-        self.assertIs(cm.records[0].exc_info[0], IndexError)
+        assert result == (None, "Le format de la réponse API Entreprise est non valide.")
+        assert cm.records[0].message.startswith("Invalid format of response from API Entreprise")
+        assert cm.records[0].exc_info[0] is IndexError
 
     @respx.mock
     def test_etablissement_get_or_error_with_missing_address_number(self):
@@ -188,8 +188,8 @@ class ApiEntrepriseTest(SimpleTestCase):
 
         etablissement, error = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertIsNone(error)
-        self.assertEqual(etablissement.address_line_1, "RUE DU WAD BILLY")
+        assert error is None
+        assert etablissement.address_line_1 == "RUE DU WAD BILLY"
 
     @respx.mock
     def test_etablissement_get_or_error_with_empty_address(self):
@@ -207,9 +207,9 @@ class ApiEntrepriseTest(SimpleTestCase):
 
         etablissement, error = api_entreprise.etablissement_get_or_error("26570134200148")
 
-        self.assertIsNone(error)
-        self.assertEqual(etablissement.address_line_1, None)
-        self.assertEqual(etablissement.address_line_2, None)
-        self.assertEqual(etablissement.post_code, None)
-        self.assertEqual(etablissement.city, None)
-        self.assertEqual(etablissement.department, None)
+        assert error is None
+        assert etablissement.address_line_1 is None
+        assert etablissement.address_line_2 is None
+        assert etablissement.post_code is None
+        assert etablissement.city is None
+        assert etablissement.department is None

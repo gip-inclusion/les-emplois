@@ -73,12 +73,12 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
         self.client.get(url)
 
-        self.assertTrue(self.job_seeker.jobseeker_profile.hexa_address_filled)
+        assert self.job_seeker.jobseeker_profile.hexa_address_filled
 
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def pass_step_3(self):
         self.pass_step_2()
@@ -95,7 +95,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         }
         response = self.client.post(url, data)
 
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     def pass_step_4(self):
         self.pass_step_3()
@@ -106,7 +106,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         data = {"financial_annex": self.siae.convention.financial_annexes.first().id}
         response = self.client.post(url, data)
 
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     # Perform check permissions for each step
 
@@ -116,7 +116,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
 
         response = self.client.get(self.url)
         # Changed to 404
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_access_denied_bad_siae_kind(self):
         # SIAE can't use employee record (not the correct kind)
@@ -124,7 +124,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
 
 class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
@@ -144,7 +144,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_hiring_end_at_date_in_header(self):
 
@@ -153,7 +153,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, f"Fin du contrat : <b>{hiring_end_at.strftime('%e').lstrip()}")
 
     def test_no_hiring_end_at_in_header(self):
@@ -163,7 +163,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Fin du contrat : <b>Non renseigné")
 
     def test_title(self):
@@ -176,7 +176,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         data.pop("title")
 
         response = self.client.post(self.url, data=data)
-        self.assertEqual(200, response.status_code)
+        assert 200 == response.status_code
 
         data["title"] = "MME"
         response = self.client.post(self.url, data=data)
@@ -196,14 +196,14 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
         # Missing birth country
         response = self.client.post(self.url, data=data)
-        self.assertEqual(200, response.status_code)
+        assert 200 == response.status_code
 
         # France as birth country without commune
         data["birth_country"] = CountryFranceFactory().pk
         data.pop("insee_commune_code")
         response = self.client.post(self.url, data=data)
 
-        self.assertEqual(200, response.status_code)
+        assert 200 == response.status_code
 
     def test_birthplace_in_france(self):
         self.client.force_login(self.user)
@@ -262,7 +262,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         self.pass_step_1()
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_job_seeker_without_address(self):
         # Job seeker has no address filled (which should not happen without admin operation)
@@ -272,7 +272,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         self.assertContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
         self.assertContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
@@ -287,7 +287,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertNotContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
         self.assertNotContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
 
@@ -299,13 +299,13 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         )
         self.job_seeker = self.job_application.job_seeker
 
-        self.assertFalse(self.job_seeker.has_jobseeker_profile)
+        assert not self.job_seeker.has_jobseeker_profile
 
         # Changed job application: new URL
         self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Check that when lookup fails, user is properly notified
         # to input employee address manually
@@ -316,13 +316,13 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_update_form_with_bad_job_seeker_address(self):
         # If HEXA address is valid, user can still change it
         # but it must be a valid one, otherwise the previous address is discarded
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Set an invalid address
         data = {
@@ -334,8 +334,8 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
         response = self.client.post(self.url, data=data)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(self.job_seeker.jobseeker_profile.hexa_address_filled)
+        assert response.status_code == 200
+        assert not self.job_seeker.jobseeker_profile.hexa_address_filled
 
     def test_address_updated_by_user(self):
         # User can now update the geolocated address if invalid
@@ -354,7 +354,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         data = test_data
         response = self.client.post(self.url, data=data)
         # This data set should pass
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # Check form validators
 
@@ -364,16 +364,16 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         # Can't use extension without number
         data["hexa_lane_number"] = ""
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Can't use anything else than up to 5 digits
         data["hexa_lane_number"] = "a"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         data["hexa_lane_number"] = "123456"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Post code :
         data = test_data
@@ -381,20 +381,20 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         # 5 digits exactly
         data["hexa_post_code"] = "123456"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         data["hexa_post_code"] = "1234"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         data["hexa_lane_number"] = "1234a"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Coherence with INSEE code
         data["hexa_lane_number"] = "12345"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Lane name and additional address
         data = test_data
@@ -402,22 +402,22 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         # No special characters
         data["hexa_lane_name"] = "des colons !"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # 32 chars max
         data["hexa_lane_name"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         data = test_data
         data["hexa_additional_address"] = "Bat a !"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # 32 chars max
         data["hexa_additional_address"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
 
 class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
@@ -453,7 +453,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         form = response.context["form"]
 
         # Checkbox must be pre-checked if job seeker has a Pôle emploi ID
-        self.assertTrue(form.initial["pole_emploi"])
+        assert form.initial["pole_emploi"]
 
         # Fill other mandatory field from fold
         # POST will fail because if education_level is not filled
@@ -469,14 +469,14 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
 
         self.profile.refresh_from_db()
 
-        self.assertEqual("01", self.profile.pole_emploi_since)
+        assert "01" == self.profile.pole_emploi_since
 
     def test_fold_unemployed(self):
         response = self.client.get(self.url)
         form = response.context["form"]
 
         # Checkbox must not pre-checked: this value is unknown at this stage
-        self.assertFalse(form.initial["unemployed"])
+        assert not form.initial["unemployed"]
 
         # Fill other mandatory field from fold
         data = {
@@ -493,14 +493,14 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
 
         self.profile.refresh_from_db()
 
-        self.assertEqual("02", self.profile.unemployed_since)
+        assert "02" == self.profile.unemployed_since
 
     def test_fold_rsa(self):
         response = self.client.get(self.url)
         form = response.context["form"]
 
         # Checkbox must not pre-checked: this value is unknown at this stage
-        self.assertFalse(form.initial["rsa_allocation"])
+        assert not form.initial["rsa_allocation"]
 
         # Fill other mandatory field from fold
         data = {
@@ -518,14 +518,14 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
 
         self.profile.refresh_from_db()
 
-        self.assertEqual("OUI-M", self.profile.has_rsa_allocation)
+        assert "OUI-M" == self.profile.has_rsa_allocation
 
     def test_fold_ass(self):
         response = self.client.get(self.url)
         form = response.context["form"]
 
         # Checkbox must not pre-checked: this value is unknown at this stage
-        self.assertFalse(form.initial["ass_allocation"])
+        assert not form.initial["ass_allocation"]
 
         # Fill other mandatory field from fold
         data = {
@@ -542,7 +542,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
 
         self.profile.refresh_from_db()
 
-        self.assertEqual("03", self.profile.ass_allocation_since)
+        assert "03" == self.profile.ass_allocation_since
 
     def test_fail_step_3(self):
         # If anything goes wrong during employee record creation,
@@ -582,7 +582,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         employee_record.save()
 
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(
             response,
             "Il est impossible de créer cette fiche salarié pour la raison suivante",
@@ -628,13 +628,13 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         # Employee record should now be ready to send (READY)
 
         employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
-        self.assertEqual(employee_record.status, Status.NEW)
+        assert employee_record.status == Status.NEW
 
         # Validation of create process
         self.client.post(self.url)
 
         employee_record.refresh_from_db()
-        self.assertEqual(employee_record.status, Status.READY)
+        assert employee_record.status == Status.READY
 
 
 class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
@@ -660,11 +660,11 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
 
         # Must change status twice (contrained lifecycle)
         employee_record.update_as_sent("fooFileName.json", 1)
-        self.assertEqual(employee_record.status, Status.SENT)
+        assert employee_record.status == Status.SENT
 
         employee_record.update_as_rejected("0001", "Error message")
 
-        self.assertEqual(employee_record.status, Status.REJECTED)
+        assert employee_record.status == Status.REJECTED
 
         self.employee_record = employee_record
 
@@ -675,7 +675,7 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
         self.client.post(self.url)
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.READY)
+        assert self.employee_record.status == Status.READY
 
     # Simpler to test summary access from here
 
@@ -688,7 +688,7 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
         self.url = reverse("employee_record_views:summary", args=(employee_record.id,))
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
 
 # Tip: do no launch this test as standalone (unittest.skip does not work as expected)

@@ -1,5 +1,6 @@
 from unittest import mock
 
+import pytest
 from django.test.utils import override_settings
 from django.utils import timezone
 
@@ -72,7 +73,7 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         # employee record untouched
         self.call_command(upload=False, download=True)
 
-        self.assertEqual(employee_record.status, Status.READY)
+        assert employee_record.status == Status.READY
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
@@ -89,23 +90,23 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         # employee record untouched
         self.call_command(upload=False, download=True, dry_run=True)
 
-        self.assertEqual(employee_record.status, Status.READY)
+        assert employee_record.status == Status.READY
 
     @mock.patch("pysftp.Connection", SFTPBadConnectionMock)
     def test_upload_failure(self):
         employee_record = self.employee_record
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             self.call_command(upload=True)
 
-        self.assertEqual(employee_record.status, Status.READY)
+        assert employee_record.status == Status.READY
 
     @mock.patch("pysftp.Connection", SFTPBadConnectionMock)
     def test_download_failure(self):
         employee_record = self.employee_record
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             self.call_command(download=True)
 
-        self.assertEqual(employee_record.status, Status.READY)
+        assert employee_record.status == Status.READY
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
@@ -124,15 +125,15 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         self.call_command(upload=True, download=False)
         employee_record.refresh_from_db()
 
-        self.assertEqual(employee_record.status, Status.SENT)
-        self.assertEqual(employee_record.batch_line_number, 1)
-        self.assertIsNotNone(employee_record.asp_batch_file)
+        assert employee_record.status == Status.SENT
+        assert employee_record.batch_line_number == 1
+        assert employee_record.asp_batch_file is not None
 
         self.call_command(upload=False, download=True)
         employee_record.refresh_from_db()
 
-        self.assertEqual(employee_record.status, Status.PROCESSED)
-        self.assertEqual(employee_record.asp_processing_code, EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE)
+        assert employee_record.status == Status.PROCESSED
+        assert employee_record.asp_processing_code == EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
@@ -148,13 +149,11 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         self.call_command(upload=True, download=True)
         employee_record.refresh_from_db()
 
-        self.assertEqual(Status.PROCESSED, employee_record.status)
-        self.assertIsNotNone(employee_record.archived_json)
+        assert Status.PROCESSED == employee_record.status
+        assert employee_record.archived_json is not None
 
-        self.assertEqual(
-            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE, employee_record.archived_json.get("codeTraitement")
-        )
-        self.assertIsNotNone(employee_record.archived_json.get("libelleTraitement"))
+        assert EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE == employee_record.archived_json.get("codeTraitement")
+        assert employee_record.archived_json.get("libelleTraitement") is not None
 
     @mock.patch("pysftp.Connection", SFTPEvilConnectionMock)
     @mock.patch(
@@ -166,19 +165,19 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
 
         # Random upload failure
         for _ in range(10):
-            with self.assertRaises(Exception):
+            with pytest.raises(Exception):
                 self.call_command(upload=True, download=False)
 
         # Employee record must be in the same status
         employee_record.refresh_from_db()
-        self.assertEqual(employee_record.status, Status.READY)
+        assert employee_record.status == Status.READY
 
         for _ in range(10):
-            with self.assertRaises(Exception):
+            with pytest.raises(Exception):
                 self.call_command(upload=False, download=True)
 
         employee_record.refresh_from_db()
-        self.assertEqual(employee_record.status, Status.READY)
+        assert employee_record.status == Status.READY
 
     def test_archive_employee_records(self):
         """
@@ -196,8 +195,8 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         self.employee_record.refresh_from_db()
 
         # Check correct status and empty archived JSON
-        self.assertEqual(self.employee_record.status, Status.ARCHIVED)
-        self.assertIsNone(self.employee_record.archived_json)
+        assert self.employee_record.status == Status.ARCHIVED
+        assert self.employee_record.archived_json is None
 
     @mock.patch("pysftp.Connection", SFTPAllDupsConnectionMock)
     @mock.patch(
@@ -213,9 +212,9 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
 
         self.employee_record.refresh_from_db()
 
-        self.assertEqual(0, EmployeeRecord.objects.asp_duplicates().count())
-        self.assertEqual(Status.PROCESSED, self.employee_record.status)
-        self.assertTrue(self.employee_record.processed_as_duplicate)
+        assert 0 == EmployeeRecord.objects.asp_duplicates().count()
+        assert Status.PROCESSED == self.employee_record.status
+        assert self.employee_record.processed_as_duplicate
 
     @mock.patch("pysftp.Connection", SFTPAllDupsConnectionMock)
     @mock.patch(
@@ -230,10 +229,8 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
 
         self.employee_record.refresh_from_db()
 
-        self.assertEqual(self.employee_record.update_notifications.count(), 1)
-        self.assertEqual(
-            self.employee_record.update_notifications.first().notification_type, NotificationType.APPROVAL
-        )
+        assert self.employee_record.update_notifications.count() == 1
+        assert self.employee_record.update_notifications.first().notification_type == NotificationType.APPROVAL
 
     @mock.patch("pysftp.Connection", SFTPAllDupsConnectionMock)
     @mock.patch(
@@ -248,7 +245,5 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
 
         self.employee_record.refresh_from_db()
 
-        self.assertEqual(self.employee_record.update_notifications.count(), 1)
-        self.assertEqual(
-            self.employee_record.update_notifications.first().notification_type, NotificationType.APPROVAL
-        )
+        assert self.employee_record.update_notifications.count() == 1
+        assert self.employee_record.update_notifications.first().notification_type == NotificationType.APPROVAL

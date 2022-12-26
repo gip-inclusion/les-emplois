@@ -48,7 +48,7 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_user_with_inactive_siae_can_still_login_during_grace_period(self):
         siae = SiaePendingGracePeriodFactory()
@@ -58,7 +58,7 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_user_with_inactive_siae_cannot_login_after_grace_period(self):
         siae = SiaeAfterGracePeriodFactory()
@@ -68,9 +68,9 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("account_logout"))
+        assert last_url == reverse("account_logout")
 
         expected_message = "votre compte n'est malheureusement plus actif"
         self.assertContains(response, expected_message)
@@ -82,7 +82,7 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_dashboard_displays_asp_badge(self):
         siae = SiaeFactory(kind=SiaeKind.EI, with_membership=True)
@@ -97,10 +97,10 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Gérer mes fiches salarié")
         self.assertNotContains(response, "badge-danger")
-        self.assertEqual(response.context["num_rejected_employee_records"], 0)
+        assert response.context["num_rejected_employee_records"] == 0
 
         # create rejected job applications
         job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
@@ -119,24 +119,24 @@ class DashboardViewTest(TestCase):
         session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
         session.save()
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "badge-danger")
-        self.assertEqual(response.context["num_rejected_employee_records"], 2)
+        assert response.context["num_rejected_employee_records"] == 2
 
         # select the second SIAE's in the session
         session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = other_siae.pk
         session.save()
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "badge-danger")
-        self.assertEqual(response.context["num_rejected_employee_records"], 1)
+        assert response.context["num_rejected_employee_records"] == 1
 
         # select the third SIAE's in the session
         session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = last_siae.pk
         session.save()
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["num_rejected_employee_records"], 0)
+        assert response.status_code == 200
+        assert response.context["num_rejected_employee_records"] == 0
 
     def test_dashboard_agreements_and_job_postings(self):
         for kind in [
@@ -405,7 +405,7 @@ class EditUserInfoViewTest(TestCase):
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # There's a specific view to edit the email so we don't show it here
         self.assertNotContains(response, "Adresse électronique")
 
@@ -422,27 +422,27 @@ class EditUserInfoViewTest(TestCase):
             "city": "Saint-Malo",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         user = User.objects.get(id=user.id)
-        self.assertEqual(user.first_name, post_data["first_name"])
-        self.assertEqual(user.last_name, post_data["last_name"])
-        self.assertEqual(user.phone, post_data["phone"])
-        self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
-        self.assertEqual(user.address_line_1, post_data["address_line_1"])
-        self.assertEqual(user.address_line_2, post_data["address_line_2"])
-        self.assertEqual(user.post_code, post_data["post_code"])
-        self.assertEqual(user.city, post_data["city"])
+        assert user.first_name == post_data["first_name"]
+        assert user.last_name == post_data["last_name"]
+        assert user.phone == post_data["phone"]
+        assert user.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert user.address_line_1 == post_data["address_line_1"]
+        assert user.address_line_2 == post_data["address_line_2"]
+        assert user.post_code == post_data["post_code"]
+        assert user.city == post_data["city"]
 
         # Ensure that the job seeker cannot edit email here.
-        self.assertNotEqual(user.email, post_data["email"])
+        assert user.email != post_data["email"]
 
     def test_edit_sso(self):
         user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Adresse électronique")
 
         post_data = {
@@ -458,20 +458,20 @@ class EditUserInfoViewTest(TestCase):
             "city": "Saint-Malo",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         user = User.objects.get(id=user.id)
-        self.assertEqual(user.phone, post_data["phone"])
-        self.assertEqual(user.address_line_1, post_data["address_line_1"])
-        self.assertEqual(user.address_line_2, post_data["address_line_2"])
-        self.assertEqual(user.post_code, post_data["post_code"])
-        self.assertEqual(user.city, post_data["city"])
+        assert user.phone == post_data["phone"]
+        assert user.address_line_1 == post_data["address_line_1"]
+        assert user.address_line_2 == post_data["address_line_2"]
+        assert user.post_code == post_data["post_code"]
+        assert user.city == post_data["city"]
 
         # Ensure that the job seeker cannot update data retreived from the SSO here.
-        self.assertNotEqual(user.first_name, post_data["first_name"])
-        self.assertNotEqual(user.last_name, post_data["last_name"])
-        self.assertNotEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
-        self.assertNotEqual(user.email, post_data["email"])
+        assert user.first_name != post_data["first_name"]
+        assert user.last_name != post_data["last_name"]
+        assert user.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
+        assert user.email != post_data["email"]
 
 
 class EditJobSeekerInfo(TestCase):
@@ -490,7 +490,7 @@ class EditJobSeekerInfo(TestCase):
         url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "email": "bob@saintclar.net",
@@ -504,16 +504,16 @@ class EditJobSeekerInfo(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, back_url)
+        assert response.status_code == 302
+        assert response.url == back_url
 
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
-        self.assertEqual(job_seeker.first_name, post_data["first_name"])
-        self.assertEqual(job_seeker.last_name, post_data["last_name"])
-        self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
-        self.assertEqual(job_seeker.address_line_1, post_data["address_line_1"])
-        self.assertEqual(job_seeker.post_code, post_data["post_code"])
-        self.assertEqual(job_seeker.city, post_data["city"])
+        assert job_seeker.first_name == post_data["first_name"]
+        assert job_seeker.last_name == post_data["last_name"]
+        assert job_seeker.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert job_seeker.address_line_1 == post_data["address_line_1"]
+        assert job_seeker.post_code == post_data["post_code"]
+        assert job_seeker.city == post_data["city"]
 
         # Optional fields
         post_data |= {
@@ -523,8 +523,8 @@ class EditJobSeekerInfo(TestCase):
         response = self.client.post(url, data=post_data)
         job_seeker.refresh_from_db()
 
-        self.assertEqual(job_seeker.phone, post_data["phone"])
-        self.assertEqual(job_seeker.address_line_2, post_data["address_line_2"])
+        assert job_seeker.phone == post_data["phone"]
+        assert job_seeker.address_line_2 == post_data["address_line_2"]
 
     def test_edit_by_prescriber(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
@@ -537,7 +537,7 @@ class EditJobSeekerInfo(TestCase):
         self.client.force_login(user)
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_edit_by_prescriber_of_organization(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
@@ -555,7 +555,7 @@ class EditJobSeekerInfo(TestCase):
         self.client.force_login(other_prescriber)
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_edit_autonomous_not_allowed(self):
         job_application = JobApplicationSentByPrescriberFactory()
@@ -566,7 +566,7 @@ class EditJobSeekerInfo(TestCase):
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_edit_not_allowed(self):
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
@@ -578,7 +578,7 @@ class EditJobSeekerInfo(TestCase):
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_edit_email_when_unconfirmed(self):
         """
@@ -608,11 +608,11 @@ class EditJobSeekerInfo(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, back_url)
+        assert response.status_code == 302
+        assert response.url == back_url
 
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
-        self.assertEqual(job_seeker.email, new_email)
+        assert job_seeker.email == new_email
 
         # Optional fields
         post_data |= {
@@ -622,8 +622,8 @@ class EditJobSeekerInfo(TestCase):
         response = self.client.post(url, data=post_data)
         job_seeker.refresh_from_db()
 
-        self.assertEqual(job_seeker.phone, post_data["phone"])
-        self.assertEqual(job_seeker.address_line_2, post_data["address_line_2"])
+        assert job_seeker.phone == post_data["phone"]
+        assert job_seeker.address_line_2 == post_data["address_line_2"]
 
     def test_edit_email_when_confirmed(self):
         new_email = "bidou@yopmail.com"
@@ -658,16 +658,16 @@ class EditJobSeekerInfo(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, back_url)
+        assert response.status_code == 302
+        assert response.url == back_url
 
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         # The email is not changed, but other fields are taken into account
-        self.assertNotEqual(job_seeker.email, new_email)
-        self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
-        self.assertEqual(job_seeker.address_line_1, post_data["address_line_1"])
-        self.assertEqual(job_seeker.post_code, post_data["post_code"])
-        self.assertEqual(job_seeker.city, post_data["city"])
+        assert job_seeker.email != new_email
+        assert job_seeker.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert job_seeker.address_line_1 == post_data["address_line_1"]
+        assert job_seeker.post_code == post_data["post_code"]
+        assert job_seeker.city == post_data["city"]
 
         # Optional fields
         post_data |= {
@@ -677,8 +677,8 @@ class EditJobSeekerInfo(TestCase):
         response = self.client.post(url, data=post_data)
         job_seeker.refresh_from_db()
 
-        self.assertEqual(job_seeker.phone, post_data["phone"])
-        self.assertEqual(job_seeker.address_line_2, post_data["address_line_2"])
+        assert job_seeker.phone == post_data["phone"]
+        assert job_seeker.address_line_2 == post_data["address_line_2"]
 
 
 class ChangeEmailViewTest(TestCase):
@@ -697,52 +697,52 @@ class ChangeEmailViewTest(TestCase):
 
         post_data = {"email": new_email, "email_confirmation": new_email}
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # User is logged out
         user.refresh_from_db()
-        self.assertEqual(response.request.get("user"), None)
-        self.assertEqual(user.email, new_email)
-        self.assertEqual(user.emailaddress_set.count(), 0)
+        assert response.request.get("user") is None
+        assert user.email == new_email
+        assert user.emailaddress_set.count() == 0
 
         # User cannot log in with his old address
         post_data = {"login": old_email, "password": DEFAULT_PASSWORD}
         url = reverse("login:job_seeker")
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.context_data["form"].is_valid())
+        assert response.status_code == 200
+        assert not response.context_data["form"].is_valid()
 
         # User cannot log in until confirmation
         post_data = {"login": new_email, "password": DEFAULT_PASSWORD}
         url = reverse("login:job_seeker")
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("account_email_verification_sent"))
+        assert response.status_code == 302
+        assert response.url == reverse("account_email_verification_sent")
 
         # User receives an email to confirm his new address.
         email = mail.outbox[0]
-        self.assertIn("Confirmez votre adresse e-mail", email.subject)
-        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
-        self.assertEqual(email.to[0], new_email)
+        assert "Confirmez votre adresse e-mail" in email.subject
+        assert "Afin de finaliser votre inscription, cliquez sur le lien suivant" in email.body
+        assert email.to[0] == new_email
 
         # Confirm email + auto login.
         confirmation_token = EmailConfirmationHMAC(user.emailaddress_set.first()).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         response = self.client.post(confirm_email_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("account_login"))
+        assert response.status_code == 302
+        assert response.url == reverse("account_login")
 
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         url = reverse("account_login")
         response = self.client.post(url, data=post_data)
-        self.assertTrue(response.context.get("user").is_authenticated)
+        assert response.context.get("user").is_authenticated
 
         user.refresh_from_db()
-        self.assertEqual(user.email, new_email)
-        self.assertEqual(user.emailaddress_set.count(), 1)
+        assert user.email == new_email
+        assert user.emailaddress_set.count() == 1
         new_address = user.emailaddress_set.first()
-        self.assertEqual(new_address.email, new_email)
-        self.assertTrue(new_address.verified)
+        assert new_address.email == new_email
+        assert new_address.verified
 
     def test_update_email_forbidden(self):
         url = reverse("dashboard:edit_user_email")
@@ -750,12 +750,12 @@ class ChangeEmailViewTest(TestCase):
         job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
         self.client.force_login(job_seeker)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         prescriber = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
         self.client.force_login(prescriber)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
 
 class EditUserEmailFormTest(TestCase):
@@ -767,25 +767,25 @@ class EditUserEmailFormTest(TestCase):
         email_confirmation = "oscar@gabin.fr"
         data = {"email": email, "email_confirmation": email_confirmation}
         form = EditUserEmailForm(data=data, user_email=old_email)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
         # Email already taken by another user. Bad luck!
         user = JobSeekerFactory()
         data = {"email": user.email, "email_confirmation": user.email}
         form = EditUserEmailForm(data=data, user_email=old_email)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
         # New address is the same as the old one.
         data = {"email": old_email, "email_confirmation": old_email}
         form = EditUserEmailForm(data=data, user_email=old_email)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
     def test_valid_form(self):
         old_email = "bernard@blier.fr"
         new_email = "jean@gabin.fr"
         data = {"email": new_email, "email_confirmation": new_email}
         form = EditUserEmailForm(data=data, user_email=old_email)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
 
 class SwitchSiaeTest(TestCase):
@@ -799,39 +799,39 @@ class SwitchSiaeTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == siae
 
         url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], siae)
-        self.assertEqual(response.context["siae"], siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == siae
+        assert response.context["siae"] == siae
 
         url = reverse("dashboard:switch_siae")
         response = self.client.post(url, data={"siae_id": related_siae.pk})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], related_siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == related_siae
 
         url = reverse("siaes_views:card", kwargs={"siae_id": related_siae.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], related_siae)
-        self.assertEqual(response.context["siae"], related_siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == related_siae
+        assert response.context["siae"] == related_siae
 
         url = reverse("siaes_views:job_description_list")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], related_siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == related_siae
 
         url = reverse("apply:list_for_siae")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], related_siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == related_siae
 
     def test_can_still_switch_to_inactive_siae_during_grace_period(self):
         siae = SiaeFactory(with_membership=True)
@@ -843,18 +843,18 @@ class SwitchSiaeTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == siae
 
         url = reverse("dashboard:switch_siae")
         response = self.client.post(url, data={"siae_id": related_siae.pk})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # User has indeed switched.
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], related_siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == related_siae
 
     def test_cannot_switch_to_inactive_siae_after_grace_period(self):
         siae = SiaeFactory(with_membership=True)
@@ -866,20 +866,20 @@ class SwitchSiaeTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == siae
 
         # Switching to that siae is not even possible in practice because
         # it does not even show up in the menu.
         url = reverse("dashboard:switch_siae")
         response = self.client.post(url, data={"siae_id": related_siae.pk})
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
         # User is still working on the main active siae.
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], siae)
+        assert response.status_code == 200
+        assert response.context["current_siae"] == siae
 
 
 class EditUserPreferencesTest(TestCase):
@@ -892,24 +892,24 @@ class EditUserPreferencesTest(TestCase):
         self.client.force_login(user)
 
         # Recipient's notifications are empty for the moment.
-        self.assertFalse(recipient.notifications)
+        assert not recipient.notifications
 
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Recipients are subscribed to spontaneous notifications by default,
         # the form should reflect that.
-        self.assertTrue(response.context[form_name].fields["spontaneous"].initial)
+        assert response.context[form_name].fields["spontaneous"].initial
 
         data = {"spontaneous": True}
         response = self.client.post(url, data=data)
 
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         recipient.refresh_from_db()
-        self.assertTrue(recipient.notifications)
-        self.assertTrue(NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient))
+        assert recipient.notifications
+        assert NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient)
 
     def test_employer_opt_in_siae_with_job_descriptions(self):
         siae = SiaeWithMembershipAndJobsFactory()
@@ -920,27 +920,25 @@ class EditUserPreferencesTest(TestCase):
         self.client.force_login(user)
 
         # Recipient's notifications are empty for the moment.
-        self.assertFalse(recipient.notifications)
+        assert not recipient.notifications
 
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Recipients are subscribed to spontaneous notifications by default,
         # the form should reflect that.
-        self.assertEqual(response.context[form_name].fields["qualified"].initial, job_descriptions_pks)
+        assert response.context[form_name].fields["qualified"].initial == job_descriptions_pks
 
         data = {"qualified": job_descriptions_pks}
         response = self.client.post(url, data=data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         recipient.refresh_from_db()
-        self.assertTrue(recipient.notifications)
+        assert recipient.notifications
 
         for pk in job_descriptions_pks:
-            self.assertTrue(
-                NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
-            )
+            assert NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
 
     def test_employer_opt_out_siae_no_job_descriptions(self):
         siae = SiaeFactory(with_membership=True)
@@ -950,24 +948,24 @@ class EditUserPreferencesTest(TestCase):
         self.client.force_login(user)
 
         # Recipient's notifications are empty for the moment.
-        self.assertFalse(recipient.notifications)
+        assert not recipient.notifications
 
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Recipients are subscribed to spontaneous notifications by default,
         # the form should reflect that.
-        self.assertTrue(response.context[form_name].fields["spontaneous"].initial)
+        assert response.context[form_name].fields["spontaneous"].initial
 
         data = {"spontaneous": False}
         response = self.client.post(url, data=data)
 
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         recipient.refresh_from_db()
-        self.assertTrue(recipient.notifications)
-        self.assertFalse(NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient))
+        assert recipient.notifications
+        assert not NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient)
 
     def test_employer_opt_out_siae_with_job_descriptions(self):
         siae = SiaeWithMembershipAndJobsFactory()
@@ -978,28 +976,26 @@ class EditUserPreferencesTest(TestCase):
         self.client.force_login(user)
 
         # Recipient's notifications are empty for the moment.
-        self.assertFalse(recipient.notifications)
+        assert not recipient.notifications
 
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Recipients are subscribed to qualified notifications by default,
         # the form should reflect that.
-        self.assertEqual(response.context[form_name].fields["qualified"].initial, job_descriptions_pks)
+        assert response.context[form_name].fields["qualified"].initial == job_descriptions_pks
 
         # The recipient opted out from every notification.
         data = {"spontaneous": False}
         response = self.client.post(url, data=data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         recipient.refresh_from_db()
-        self.assertTrue(recipient.notifications)
+        assert recipient.notifications
 
         for _i, pk in enumerate(job_descriptions_pks):
-            self.assertFalse(
-                NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
-            )
+            assert not NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
 
 
 class EditUserPreferencesExceptionsTest(TestCase):
@@ -1010,10 +1006,10 @@ class EditUserPreferencesExceptionsTest(TestCase):
         self.client.force_login(prescriber)
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         job_seeker = JobSeekerFactory()
         self.client.force_login(job_seeker)
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403

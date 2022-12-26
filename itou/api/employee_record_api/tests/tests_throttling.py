@@ -25,13 +25,13 @@ class EmployeeRecordThrottleTest(APITestCase):
         client.login(username=user.username, password=DEFAULT_PASSWORD)
 
         response = client.get(ENDPOINT_URL, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Too fast, Jacky, one too many
         for _ in range(EmployeeRecordRateThrottle.EMPLOYEE_RECORD_API_REQUESTS_NUMBER):
             response = client.get(ENDPOINT_URL, format="json")
 
-        self.assertEqual(response.status_code, 429)
+        assert response.status_code == 429
 
     def test_basic_ok_throttling(self):
         client = APIClient()
@@ -40,10 +40,10 @@ class EmployeeRecordThrottleTest(APITestCase):
         client.login(username=user.username, password=DEFAULT_PASSWORD)
 
         response = client.get(ENDPOINT_URL, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Should hold it : a total of EMPLOYEE_RECORD_API_REQUESTS_NUMBER is sent
         for _ in range(EmployeeRecordRateThrottle.EMPLOYEE_RECORD_API_REQUESTS_NUMBER - 1):
             response = client.get(ENDPOINT_URL, format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200

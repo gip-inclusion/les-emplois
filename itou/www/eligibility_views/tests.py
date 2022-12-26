@@ -25,7 +25,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion1]
-        self.assertEqual(form.cleaned_data, expected_cleaned_data)
+        assert form.cleaned_data == expected_cleaned_data
 
     def test_valid_for_siae(self):
         siae = SiaeFactory(kind=SiaeKind.ACI, with_membership=True)
@@ -41,7 +41,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion1]
-        self.assertEqual(form.cleaned_data, expected_cleaned_data)
+        assert form.cleaned_data == expected_cleaned_data
 
         # Or at least 3 criterion level 2.
         form_data = {
@@ -52,14 +52,14 @@ class AdministrativeCriteriaFormTest(TestCase):
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion2, criterion3, criterion4]
-        self.assertEqual(form.cleaned_data, expected_cleaned_data)
+        assert form.cleaned_data == expected_cleaned_data
 
     def test_criteria_fields(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
         form = AdministrativeCriteriaForm(user, siae)
-        self.assertEqual(AdministrativeCriteria.objects.all().count(), len(form.fields))
+        assert AdministrativeCriteria.objects.all().count() == len(form.fields)
 
     def test_error_criteria_number_for_siae(self):
         """
@@ -75,7 +75,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         form_data = {f"{criterion1.key}": "false"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
-        self.assertIn(form.ERROR_CRITERIA_NUMBER, form.errors["__all__"])
+        assert form.ERROR_CRITERIA_NUMBER in form.errors["__all__"]
 
         form_data = {
             f"{criterion2.key}": "true",
@@ -83,7 +83,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         }
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
-        self.assertIn(form.ERROR_CRITERIA_NUMBER, form.errors["__all__"])
+        assert form.ERROR_CRITERIA_NUMBER in form.errors["__all__"]
 
     def test_valid_for_siae_of_kind_etti(self):
         siae = SiaeFactory(kind=SiaeKind.ETTI, with_membership=True)
@@ -98,7 +98,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion1]
-        self.assertEqual(form.cleaned_data, expected_cleaned_data)
+        assert form.cleaned_data == expected_cleaned_data
 
         # Or at least 2 criterion level 1.
         form_data = {
@@ -108,7 +108,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion2, criterion3]
-        self.assertEqual(form.cleaned_data, expected_cleaned_data)
+        assert form.cleaned_data == expected_cleaned_data
 
     def test_error_criteria_number_for_siae_of_kind_etti(self):
         """
@@ -124,13 +124,13 @@ class AdministrativeCriteriaFormTest(TestCase):
         form_data = {f"{criterion1.key}": "false"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
-        self.assertIn(form.ERROR_CRITERIA_NUMBER_ETTI_AI, form.errors["__all__"])
+        assert form.ERROR_CRITERIA_NUMBER_ETTI_AI in form.errors["__all__"]
 
         # Only one level 2 criterion.
         form_data = {f"{criterion2.key}": "true"}
         form = AdministrativeCriteriaForm(user, siae=siae, data=form_data)
         form.is_valid()
-        self.assertIn(form.ERROR_CRITERIA_NUMBER_ETTI_AI, form.errors["__all__"])
+        assert form.ERROR_CRITERIA_NUMBER_ETTI_AI in form.errors["__all__"]
 
     def test_error_senior_junior(self):
         """
@@ -147,7 +147,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         }
         form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
         form.is_valid()
-        self.assertIn(form.ERROR_SENIOR_JUNIOR, form.errors["__all__"])
+        assert form.ERROR_SENIOR_JUNIOR in form.errors["__all__"]
 
     def test_error_error_long_term_job_seeker(self):
         """
@@ -166,22 +166,22 @@ class AdministrativeCriteriaFormTest(TestCase):
         }
         form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
         form.is_valid()
-        self.assertIn(form.ERROR_LONG_TERM_JOB_SEEKER, form.errors["__all__"])
+        assert form.ERROR_LONG_TERM_JOB_SEEKER in form.errors["__all__"]
 
     def test_no_required_criteria_for_prescriber_with_authorized_organization(self):
         prescriber = PrescriberFactory()
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         siae = SiaeFactory()
 
-        self.assertFalse(AdministrativeCriteriaForm(prescriber, siae, data={}).is_valid())
-        self.assertTrue(AdministrativeCriteriaForm(authorized_prescriber, siae, data={}).is_valid())
+        assert not AdministrativeCriteriaForm(prescriber, siae, data={}).is_valid()
+        assert AdministrativeCriteriaForm(authorized_prescriber, siae, data={}).is_valid()
 
     def test_no_required_criteria_when_no_siae(self):
         prescriber = PrescriberFactory()
         siae = SiaeFactory()
 
-        self.assertFalse(AdministrativeCriteriaForm(prescriber, siae, data={}).is_valid())
-        self.assertTrue(AdministrativeCriteriaForm(prescriber, None, data={}).is_valid())
+        assert not AdministrativeCriteriaForm(prescriber, siae, data={}).is_valid()
+        assert AdministrativeCriteriaForm(prescriber, None, data={}).is_valid()
 
 
 class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
@@ -213,14 +213,14 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
         )
 
         form = AdministrativeCriteriaOfJobApplicationForm(user, siae, job_application=job_application)
-        self.assertEqual(2, len(form.fields))
-        self.assertIn(
-            AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first().key,
-            form.fields.keys(),
+        assert 2 == len(form.fields)
+        assert (
+            AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first().key
+            in form.fields.keys()
         )
-        self.assertIn(
-            AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first().key,
-            form.fields.keys(),
+        assert (
+            AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first().key
+            in form.fields.keys()
         )
 
     def test_num_level2_admin_criteria(self):
@@ -238,6 +238,6 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
                 form = AdministrativeCriteriaOfJobApplicationForm(user, siae, job_application=job_application)
 
                 if kind in [SiaeKind.ETTI, SiaeKind.AI]:
-                    self.assertEqual(2, form.num_level2_admin_criteria)
+                    assert 2 == form.num_level2_admin_criteria
                 else:
-                    self.assertEqual(3, form.num_level2_admin_criteria)
+                    assert 3 == form.num_level2_admin_criteria

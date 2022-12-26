@@ -11,9 +11,7 @@ class SubmitEvaluatedAdministrativeCriteriaProofFormFormTests(TestCase):
     def test_url_wo_correct_endpoint(self):
         form = SubmitEvaluatedAdministrativeCriteriaProofForm(data={"proof_url": "https://bad.com/rocky-balboa.pdf"})
 
-        self.assertEqual(
-            form.errors["proof_url"], ["Le document sélectionné ne provient pas d'une source de confiance."]
-        )
+        assert form.errors["proof_url"] == ["Le document sélectionné ne provient pas d'une source de confiance."]
 
 
 class LaborExplanationFormTests(TestCase):
@@ -23,4 +21,4 @@ class LaborExplanationFormTests(TestCase):
         )
         form = LaborExplanationForm(instance=evaluated_job_application)
 
-        self.assertTrue(form.fields["labor_inspector_explanation"].disabled)
+        assert form.fields["labor_inspector_explanation"].disabled

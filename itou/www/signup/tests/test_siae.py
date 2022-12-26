@@ -35,34 +35,34 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         A user joins an SIAE without members.
         """
         siae = SiaeFactory(kind=SiaeKind.ETTI)
-        self.assertEqual(0, siae.members.count())
+        assert 0 == siae.members.count()
 
         url = reverse("signup:siae_select")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Find an SIAE by SIREN.
         response = self.client.get(url, {"siren": siae.siret[:9]})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Choose an SIAE between results.
         post_data = {"siaes": siae.pk}
         # Pass `siren` in request.GET
         response = self.client.post(f"{url}?siren={siae.siret[:9]}", data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, "/")
 
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertIn("Un nouvel utilisateur souhaite rejoindre votre structure", email.subject)
+        assert "Un nouvel utilisateur souhaite rejoindre votre structure" in email.subject
 
         magic_link = siae.signup_magic_link
         response = self.client.get(magic_link)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # No error when opening magic link a second time.
         response = self.client.get(magic_link)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "inclusion_connect_button.svg")
 
         # Check IC will redirect to the correct url
@@ -94,15 +94,15 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=OIDC_USERINFO["email"])
 
         # Check `User` state.
-        self.assertFalse(user.is_job_seeker)
-        self.assertFalse(user.is_prescriber)
-        self.assertTrue(user.is_siae_staff)
-        self.assertTrue(user.is_active)
-        self.assertTrue(siae.has_admin(user))
-        self.assertEqual(1, siae.members.count())
+        assert not user.is_job_seeker
+        assert not user.is_prescriber
+        assert user.is_siae_staff
+        assert user.is_active
+        assert siae.has_admin(user)
+        assert 1 == siae.members.count()
 
         # No new sent email.
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
 
         # Magic link is no longer valid because siae.members.count() has changed.
         response = self.client.get(magic_link, follow=True)
@@ -119,11 +119,11 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         A user joins an SIAE without members.
         """
         siae = SiaeFactory(kind=SiaeKind.ETTI)
-        self.assertEqual(0, siae.members.count())
+        assert 0 == siae.members.count()
 
         user = SiaeStaffFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
         SiaeMembershipFactory(user=user)
-        self.assertEqual(1, user.siae_set.count())
+        assert 1 == user.siae_set.count()
 
         magic_link = siae.signup_magic_link
         response = self.client.get(magic_link)
@@ -153,9 +153,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # Check `User` state.
-        self.assertTrue(siae.has_admin(user))
-        self.assertEqual(1, siae.members.count())
-        self.assertEqual(2, user.siae_set.count())
+        assert siae.has_admin(user)
+        assert 1 == siae.members.count()
+        assert 2 == user.siae_set.count()
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -183,7 +183,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         )
         response = self.client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_not_called()
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, f"SIRET « {FAKE_SIRET} » non reconnu.")
 
         # Mock a valid answer from the server
@@ -231,16 +231,16 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=OIDC_USERINFO["email"])
 
         # Check `User` state.
-        self.assertFalse(user.is_job_seeker)
-        self.assertFalse(user.is_prescriber)
-        self.assertTrue(user.is_siae_staff)
-        self.assertTrue(user.is_active)
+        assert not user.is_job_seeker
+        assert not user.is_prescriber
+        assert user.is_siae_staff
+        assert user.is_active
         siae = Siae.objects.get(siret=FAKE_SIRET)
-        self.assertTrue(siae.has_admin(user))
-        self.assertEqual(1, siae.members.count())
+        assert siae.has_admin(user)
+        assert 1 == siae.members.count()
 
         # No sent email.
-        self.assertEqual(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0
 
     def test_facilitator_base_signup_process(self):
         url = reverse("signup:siae_select")
@@ -267,13 +267,13 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             + NUM_CSRF_SESSION_REQUESTS
         ):
             response = self.client.get(url, {"siren": "402191662"})
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
 
 class SiaeSignupViewsExceptionsTest(TestCase):
     def test_non_staff_cant_join_a_siae(self):
         siae = SiaeFactory(kind=SiaeKind.ETTI)
-        self.assertEqual(0, siae.members.count())
+        assert 0 == siae.members.count()
 
         user = PrescriberFactory(email=OIDC_USERINFO["email"])
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
@@ -284,10 +284,10 @@ class SiaeSignupViewsExceptionsTest(TestCase):
 
         response = self.client.get(url)
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual("Vous ne pouvez pas rejoindre une SIAE avec ce compte.", messages[0].message)
+        assert len(messages) == 1
+        assert "Vous ne pouvez pas rejoindre une SIAE avec ce compte." == messages[0].message
         self.assertRedirects(response, reverse("home:hp"))
 
         # Check `User` state.
-        self.assertFalse(siae.has_admin(user))
-        self.assertEqual(0, siae.members.count())
+        assert not siae.has_admin(user)
+        assert 0 == siae.members.count()

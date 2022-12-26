@@ -1,6 +1,7 @@
 # pylint: disable=too-many-lines
 from unittest import mock
 
+import pytest
 from django.core import mail
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
@@ -24,8 +25,8 @@ class CardViewTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["siae"], siae)
+        assert response.status_code == 200
+        assert response.context["siae"] == siae
         self.assertContains(response, escape(siae.display_name))
         self.assertContains(response, siae.email)
         self.assertContains(response, siae.phone)
@@ -39,9 +40,9 @@ class JobDescriptionCardViewTest(TestCase):
         job_description.save()
         url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["job"], job_description)
-        self.assertEqual(response.context["siae"], siae)
+        assert response.status_code == 200
+        assert response.context["job"] == job_description
+        assert response.context["siae"] == siae
         self.assertContains(response, job_description.description)
         self.assertContains(response, escape(job_description.display_name))
         self.assertContains(response, escape(siae.display_name))
@@ -51,20 +52,20 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
     def test_asp_source_siae_admin_can_see_but_cannot_select_af(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        self.assertTrue(siae.has_admin(user))
-        self.assertTrue(siae.should_have_convention)
-        self.assertTrue(siae.source == Siae.SOURCE_ASP)
+        assert siae.has_admin(user)
+        assert siae.should_have_convention
+        assert siae.source == Siae.SOURCE_ASP
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         url = reverse("siaes_views:show_financial_annexes")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         url = reverse("siaes_views:select_financial_annex")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_user_created_siae_admin_can_see_and_select_af(self):
         siae = SiaeFactory(
@@ -76,105 +77,105 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         # Only conventions of the same SIREN can be selected.
         new_convention = SiaeConventionFactory(siret_signature=f"{siae.siren}12345")
 
-        self.assertTrue(siae.has_admin(user))
-        self.assertTrue(siae.should_have_convention)
-        self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
+        assert siae.has_admin(user)
+        assert siae.should_have_convention
+        assert siae.source == Siae.SOURCE_USER_CREATED
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         url = reverse("siaes_views:show_financial_annexes")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         url = reverse("siaes_views:select_financial_annex")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
-        self.assertEqual(siae.convention, old_convention)
-        self.assertNotEqual(siae.convention, new_convention)
+        assert siae.convention == old_convention
+        assert siae.convention != new_convention
 
         post_data = {
             "financial_annexes": new_convention.financial_annexes.get().id,
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         siae.refresh_from_db()
-        self.assertNotEqual(siae.convention, old_convention)
-        self.assertEqual(siae.convention, new_convention)
+        assert siae.convention != old_convention
+        assert siae.convention == new_convention
 
     def test_staff_created_siae_admin_cannot_see_nor_select_af(self):
         siae = SiaeFactory(source=Siae.SOURCE_STAFF_CREATED, with_membership=True)
         user = siae.members.first()
-        self.assertTrue(siae.has_admin(user))
-        self.assertTrue(siae.should_have_convention)
-        self.assertTrue(siae.source == Siae.SOURCE_STAFF_CREATED)
+        assert siae.has_admin(user)
+        assert siae.should_have_convention
+        assert siae.source == Siae.SOURCE_STAFF_CREATED
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         url = reverse("siaes_views:show_financial_annexes")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         url = reverse("siaes_views:select_financial_annex")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_asp_source_siae_non_admin_cannot_see_nor_select_af(self):
         siae = SiaeFactory(membership__is_admin=False, with_membership=True)
         user = siae.members.first()
-        self.assertFalse(siae.has_admin(user))
-        self.assertTrue(siae.should_have_convention)
-        self.assertTrue(siae.source == Siae.SOURCE_ASP)
+        assert not siae.has_admin(user)
+        assert siae.should_have_convention
+        assert siae.source == Siae.SOURCE_ASP
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         url = reverse("siaes_views:show_financial_annexes")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         url = reverse("siaes_views:select_financial_annex")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_import_created_geiq_admin_cannot_see_nor_select_af(self):
         siae = SiaeFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_GEIQ, with_membership=True)
         user = siae.members.first()
-        self.assertTrue(siae.has_admin(user))
-        self.assertFalse(siae.should_have_convention)
-        self.assertTrue(siae.source == Siae.SOURCE_GEIQ)
+        assert siae.has_admin(user)
+        assert not siae.should_have_convention
+        assert siae.source == Siae.SOURCE_GEIQ
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         url = reverse("siaes_views:show_financial_annexes")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         url = reverse("siaes_views:select_financial_annex")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_user_created_geiq_admin_cannot_see_nor_select_af(self):
         siae = SiaeFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_USER_CREATED, with_membership=True)
         user = siae.members.first()
-        self.assertTrue(siae.has_admin(user))
-        self.assertFalse(siae.should_have_convention)
-        self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
+        assert siae.has_admin(user)
+        assert not siae.should_have_convention
+        assert siae.source == Siae.SOURCE_USER_CREATED
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         url = reverse("siaes_views:show_financial_annexes")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         url = reverse("siaes_views:select_financial_annex")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
 
 class CreateSiaeViewTest(TestCase):
@@ -187,12 +188,12 @@ class CreateSiaeViewTest(TestCase):
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         new_siren = "9876543210"
         new_siret = f"{new_siren}1234"
-        self.assertNotEqual(siae.siren, new_siren)
-        self.assertFalse(Siae.objects.filter(siret=new_siret).exists())
+        assert siae.siren != new_siren
+        assert not Siae.objects.filter(siret=new_siret).exists()
 
         post_data = {
             "siret": new_siret,
@@ -209,14 +210,14 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         expected_message = f"Le SIRET doit commencer par le SIREN {siae.siren}"
         self.assertContains(response, escape(expected_message))
         expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
         self.assertNotContains(response, escape(expected_message))
 
-        self.assertFalse(Siae.objects.filter(siret=post_data["siret"]).exists())
+        assert not Siae.objects.filter(siret=post_data["siret"]).exists()
 
     def test_create_preexisting_siae_outside_of_siren_fails(self):
 
@@ -227,12 +228,12 @@ class CreateSiaeViewTest(TestCase):
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         preexisting_siae = SiaeFactory()
         new_siret = preexisting_siae.siret
-        self.assertNotEqual(siae.siren, preexisting_siae.siren)
-        self.assertTrue(Siae.objects.filter(siret=new_siret).exists())
+        assert siae.siren != preexisting_siae.siren
+        assert Siae.objects.filter(siret=new_siret).exists()
 
         post_data = {
             "siret": new_siret,
@@ -249,14 +250,14 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         expected_message = "Le SIRET doit commencer par le SIREN"
         self.assertNotContains(response, escape(expected_message))
         expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
         self.assertContains(response, escape(expected_message))
 
-        self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
+        assert Siae.objects.filter(siret=post_data["siret"]).count() == 1
 
     def test_cannot_create_siae_with_same_siret_and_same_kind(self):
 
@@ -267,7 +268,7 @@ class CreateSiaeViewTest(TestCase):
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "siret": siae.siret,
@@ -284,7 +285,7 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         expected_message = "Le SIRET doit commencer par le SIREN"
         self.assertNotContains(response, escape(expected_message))
@@ -292,7 +293,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertContains(response, escape(expected_message))
         self.assertContains(response, escape(global_constants.ITOU_ASSISTANCE_URL))
 
-        self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
+        assert Siae.objects.filter(siret=post_data["siret"]).count() == 1
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siret_and_different_kind(self, _mock_call_ban_geocoding_api):
@@ -305,7 +306,7 @@ class CreateSiaeViewTest(TestCase):
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "siret": siae.siret,
@@ -322,9 +323,9 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
-        self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
+        assert Siae.objects.filter(siret=post_data["siret"]).count() == 1
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siren_and_different_kind(self, _mock_call_ban_geocoding_api):
@@ -334,13 +335,13 @@ class CreateSiaeViewTest(TestCase):
         user = siae.members.first()
 
         new_siret = siae.siren + "12345"
-        self.assertNotEqual(siae.siret, new_siret)
+        assert siae.siret != new_siret
 
         self.client.force_login(user)
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "siret": new_siret,
@@ -357,10 +358,10 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
-        self.assertEqual(Siae.objects.filter(siret=siae.siret).count(), 1)
-        self.assertEqual(Siae.objects.filter(siret=new_siret).count(), 0)
+        assert Siae.objects.filter(siret=siae.siret).count() == 1
+        assert Siae.objects.filter(siret=new_siret).count() == 0
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_create_siae_with_same_siren_and_same_kind(self, mock_call_ban_geocoding_api):
@@ -371,10 +372,10 @@ class CreateSiaeViewTest(TestCase):
 
         url = reverse("siaes_views:create_siae")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         new_siret = siae.siren + "12345"
-        self.assertNotEqual(siae.siret, new_siret)
+        assert siae.siret != new_siret
 
         post_data = {
             "siret": new_siret,
@@ -391,36 +392,36 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         mock_call_ban_geocoding_api.assert_called_once()
 
         new_siae = Siae.objects.get(siret=new_siret)
-        self.assertTrue(new_siae.has_admin(user))
-        self.assertEqual(siae.source, Siae.SOURCE_ASP)
-        self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
-        self.assertEqual(new_siae.siret, post_data["siret"])
-        self.assertEqual(new_siae.kind, post_data["kind"])
-        self.assertEqual(new_siae.name, post_data["name"])
-        self.assertEqual(new_siae.address_line_1, post_data["address_line_1"])
-        self.assertEqual(new_siae.city, post_data["city"])
-        self.assertEqual(new_siae.post_code, post_data["post_code"])
-        self.assertEqual(new_siae.department, post_data["department"])
-        self.assertEqual(new_siae.email, post_data["email"])
-        self.assertEqual(new_siae.phone, post_data["phone"])
-        self.assertEqual(new_siae.website, post_data["website"])
-        self.assertEqual(new_siae.description, post_data["description"])
-        self.assertEqual(new_siae.created_by, user)
-        self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
-        self.assertTrue(new_siae.is_active)
-        self.assertTrue(new_siae.convention is not None)
-        self.assertEqual(siae.convention, new_siae.convention)
+        assert new_siae.has_admin(user)
+        assert siae.source == Siae.SOURCE_ASP
+        assert new_siae.source == Siae.SOURCE_USER_CREATED
+        assert new_siae.siret == post_data["siret"]
+        assert new_siae.kind == post_data["kind"]
+        assert new_siae.name == post_data["name"]
+        assert new_siae.address_line_1 == post_data["address_line_1"]
+        assert new_siae.city == post_data["city"]
+        assert new_siae.post_code == post_data["post_code"]
+        assert new_siae.department == post_data["department"]
+        assert new_siae.email == post_data["email"]
+        assert new_siae.phone == post_data["phone"]
+        assert new_siae.website == post_data["website"]
+        assert new_siae.description == post_data["description"]
+        assert new_siae.created_by == user
+        assert new_siae.source == Siae.SOURCE_USER_CREATED
+        assert new_siae.is_active
+        assert new_siae.convention is not None
+        assert siae.convention == new_siae.convention
 
         # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
-        self.assertEqual(new_siae.coords, "SRID=4326;POINT (2.316754 48.838411)")
-        self.assertEqual(new_siae.latitude, 48.838411)
-        self.assertEqual(new_siae.longitude, 2.316754)
-        self.assertEqual(new_siae.geocoding_score, 0.587663373207207)
+        assert new_siae.coords == "SRID=4326;POINT (2.316754 48.838411)"
+        assert new_siae.latitude == 48.838411
+        assert new_siae.longitude == 2.316754
+        assert new_siae.geocoding_score == 0.587663373207207
 
 
 class EditSiaeViewTest(TestCase):
@@ -434,7 +435,7 @@ class EditSiaeViewTest(TestCase):
 
         url = reverse("siaes_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Informations générales")
 
         post_data = {
@@ -450,7 +451,7 @@ class EditSiaeViewTest(TestCase):
         response = self.client.post(url, data=post_data)
 
         # Ensure form validation is done
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Ce champ est obligatoire")
 
         # Go to next step: description
@@ -459,7 +460,7 @@ class EditSiaeViewTest(TestCase):
         self.assertRedirects(response, reverse("siaes_views:edit_siae_step_description"))
 
         response = self.client.post(url, data=post_data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Présentation de l'activité")
 
         # Go to next step: summary
@@ -472,34 +473,31 @@ class EditSiaeViewTest(TestCase):
         self.assertRedirects(response, reverse("siaes_views:edit_siae_step_preview"))
 
         response = self.client.post(url, data=post_data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Aperçu de la fiche")
 
         # Go back, should not be an issue
         step_2_url = reverse("siaes_views:edit_siae_step_description")
         response = self.client.get(step_2_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Présentation de l'activité")
-        self.assertEqual(
-            self.client.session["edit_siae_session_key"],
-            {
-                "address_line_1": "1 Rue Jeanne d'Arc",
-                "address_line_2": "",
-                "brand": "NEW FAMOUS SIAE BRAND NAME",
-                "city": "Arras",
-                "department": "62",
-                "description": "Le meilleur des SIAEs !",
-                "email": "toto@titi.fr",
-                "phone": "0610203050",
-                "post_code": "62000",
-                "provided_support": "On est très très forts pour tout",
-                "website": "https://famous-siae.com",
-            },
-        )
+        assert self.client.session["edit_siae_session_key"] == {
+            "address_line_1": "1 Rue Jeanne d'Arc",
+            "address_line_2": "",
+            "brand": "NEW FAMOUS SIAE BRAND NAME",
+            "city": "Arras",
+            "department": "62",
+            "description": "Le meilleur des SIAEs !",
+            "email": "toto@titi.fr",
+            "phone": "0610203050",
+            "post_code": "62000",
+            "provided_support": "On est très très forts pour tout",
+            "website": "https://famous-siae.com",
+        }
 
         # Go forward again
         response = self.client.post(step_2_url, data=post_data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Aperçu de la fiche")
         self.assertContains(response, "On est très très forts pour tout")
 
@@ -510,23 +508,23 @@ class EditSiaeViewTest(TestCase):
         # refresh Siae, but using the siret to be sure we didn't mess with the PK
         siae = Siae.objects.get(siret=siae.siret)
 
-        self.assertEqual(siae.brand, "NEW FAMOUS SIAE BRAND NAME")
-        self.assertEqual(siae.description, "Le meilleur des SIAEs !")
-        self.assertEqual(siae.email, "toto@titi.fr")
-        self.assertEqual(siae.phone, "0610203050")
-        self.assertEqual(siae.website, "https://famous-siae.com")
+        assert siae.brand == "NEW FAMOUS SIAE BRAND NAME"
+        assert siae.description == "Le meilleur des SIAEs !"
+        assert siae.email == "toto@titi.fr"
+        assert siae.phone == "0610203050"
+        assert siae.website == "https://famous-siae.com"
 
-        self.assertEqual(siae.address_line_1, "1 Rue Jeanne d'Arc")
-        self.assertEqual(siae.address_line_2, "")
-        self.assertEqual(siae.post_code, "62000")
-        self.assertEqual(siae.city, "Arras")
-        self.assertEqual(siae.department, "62")
+        assert siae.address_line_1 == "1 Rue Jeanne d'Arc"
+        assert siae.address_line_2 == ""
+        assert siae.post_code == "62000"
+        assert siae.city == "Arras"
+        assert siae.department == "62"
 
         # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
-        self.assertEqual(siae.coords, "SRID=4326;POINT (2.316754 48.838411)")
-        self.assertEqual(siae.latitude, 48.838411)
-        self.assertEqual(siae.longitude, 2.316754)
-        self.assertEqual(siae.geocoding_score, 0.587663373207207)
+        assert siae.coords == "SRID=4326;POINT (2.316754 48.838411)"
+        assert siae.latitude == 48.838411
+        assert siae.longitude == 2.316754
+        assert siae.geocoding_score == 0.587663373207207
 
     def test_permission(self):
         siae = SiaeFactory(with_membership=True)
@@ -540,7 +538,7 @@ class EditSiaeViewTest(TestCase):
         membership.save()
         url = reverse("siaes_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
 
 class EditSiaeViewWithWrongAddressTest(TestCase):
@@ -554,7 +552,7 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
 
         url = reverse("siaes_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Informations générales")
 
         post_data = {
@@ -582,7 +580,7 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
 
         # Save the object for real
         response = self.client.post(response.redirect_chain[-1][0])
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "L'adresse semble erronée")
 
 
@@ -593,7 +591,7 @@ class MembersTest(TestCase):
         self.client.force_login(user)
         url = reverse("siaes_views:members")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
 
 class UserMembershipDeactivationTest(TestCase):
@@ -610,12 +608,12 @@ class UserMembershipDeactivationTest(TestCase):
         self.client.force_login(admin)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": admin.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Trying to change self membership is not allowed
         # but does not raise an error (does nothing)
         membership.refresh_from_db()
-        self.assertTrue(membership.is_active)
+        assert membership.is_active
 
     def test_deactivate_user(self):
         """
@@ -627,27 +625,27 @@ class UserMembershipDeactivationTest(TestCase):
         guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         membership = guest.siaemembership_set.first()
-        self.assertFalse(guest in siae.active_admin_members)
-        self.assertTrue(admin in siae.active_admin_members)
+        assert not (guest in siae.active_admin_members)
+        assert admin in siae.active_admin_members
 
         self.client.force_login(admin)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # User should be deactivated now
         membership.refresh_from_db()
-        self.assertFalse(membership.is_active)
-        self.assertEqual(admin, membership.updated_by)
-        self.assertIsNotNone(membership.updated_at)
+        assert not membership.is_active
+        assert admin == membership.updated_by
+        assert membership.updated_at is not None
 
         # Check mailbox
         # User must have been notified of deactivation (we're human after all)
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(f"[Désactivation] Vous n'êtes plus membre de {siae.display_name}", email.subject)
-        self.assertIn("Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion", email.body)
-        self.assertEqual(email.to[0], guest.email)
+        assert f"[Désactivation] Vous n'êtes plus membre de {siae.display_name}" == email.subject
+        assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
+        assert email.to[0] == guest.email
 
     def test_deactivate_with_no_perms(self):
         """
@@ -658,7 +656,7 @@ class UserMembershipDeactivationTest(TestCase):
         self.client.force_login(guest)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_user_with_no_siae_left(self):
         """
@@ -674,7 +672,7 @@ class UserMembershipDeactivationTest(TestCase):
         self.client.force_login(admin)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.client.logout()
 
         self.client.force_login(guest)
@@ -682,8 +680,8 @@ class UserMembershipDeactivationTest(TestCase):
         response = self.client.get(url)
 
         # should be redirected to logout
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("account_logout"))
+        assert response.status_code == 302
+        assert response.url == reverse("account_logout")
 
     def test_structure_selector(self):
         """
@@ -698,13 +696,13 @@ class UserMembershipDeactivationTest(TestCase):
         siae.members.add(guest)
 
         memberships = guest.siaemembership_set.all()
-        self.assertEqual(len(memberships), 2)
+        assert len(memberships) == 2
 
         # Admin remove guest from structure
         self.client.force_login(admin)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.client.logout()
 
         # guest must be able to login
@@ -713,10 +711,10 @@ class UserMembershipDeactivationTest(TestCase):
         response = self.client.get(url)
 
         # Wherever guest lands should give a 200 OK
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Check response context, only one SIAE should remain
-        self.assertEqual(len(response.context["user_siaes"]), 1)
+        assert len(response.context["user_siaes"]) == 1
 
 
 class SIAEAdminMembersManagementTest(TestCase):
@@ -733,21 +731,21 @@ class SIAEAdminMembersManagementTest(TestCase):
 
         # Redirection to confirm page
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Confirm action
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         siae.refresh_from_db()
-        self.assertTrue(guest in siae.active_admin_members)
+        assert guest in siae.active_admin_members
 
         # The admin should receive a valid email
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(f"[Activation] Vous êtes désormais administrateur de {siae.display_name}", email.subject)
-        self.assertIn("Vous êtes administrateur d'une structure sur les emplois de l'inclusion", email.body)
-        self.assertEqual(email.to[0], guest.email)
+        assert f"[Activation] Vous êtes désormais administrateur de {siae.display_name}" == email.subject
+        assert "Vous êtes administrateur d'une structure sur les emplois de l'inclusion" in email.body
+        assert email.to[0] == guest.email
 
     def test_remove_admin(self):
         """
@@ -760,31 +758,28 @@ class SIAEAdminMembersManagementTest(TestCase):
         membership = guest.siaemembership_set.first()
         membership.is_admin = True
         membership.save()
-        self.assertTrue(guest in siae.active_admin_members)
+        assert guest in siae.active_admin_members
 
         self.client.force_login(admin)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
 
         # Redirection to confirm page
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Confirm action
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         siae.refresh_from_db()
-        self.assertFalse(guest in siae.active_admin_members)
+        assert not (guest in siae.active_admin_members)
 
         # The admin should receive a valid email
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(f"[Désactivation] Vous n'êtes plus administrateur de {siae.display_name}", email.subject)
-        self.assertIn(
-            "Un administrateur vous a retiré les droits d'administrateur d'une structure",
-            email.body,
-        )
-        self.assertEqual(email.to[0], guest.email)
+        assert f"[Désactivation] Vous n'êtes plus administrateur de {siae.display_name}" == email.subject
+        assert "Un administrateur vous a retiré les droits d'administrateur d'une structure" in email.body
+        assert email.to[0] == guest.email
 
     def test_admin_management_permissions(self):
         """
@@ -799,20 +794,20 @@ class SIAEAdminMembersManagementTest(TestCase):
 
         # Redirection to confirm page
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Confirm action
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Add self as admin with no privilege
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_suspicious_action(self):
         """
@@ -825,5 +820,5 @@ class SIAEAdminMembersManagementTest(TestCase):
 
         self.client.force_login(guest)
         # update: less test with RE_PATH
-        with self.assertRaises(NoReverseMatch):
+        with pytest.raises(NoReverseMatch):
             reverse("siaes_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})

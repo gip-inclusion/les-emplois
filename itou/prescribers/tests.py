@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import httpx
+import pytest
 import respx
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -55,11 +56,11 @@ class PrescriberOrganizationManagerTest(TestCase):
 
         # `expected_num` orgs should be accredited by the departmental council.
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(departmental_council_org)
-        self.assertEqual(accredited_org, accredited_orgs.first())
+        assert accredited_org == accredited_orgs.first()
 
         # No orgs should be accredited by the other org.
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(other_org)
-        self.assertEqual(accredited_orgs.count(), 0)
+        assert accredited_orgs.count() == 0
 
     def test_create_organization(self):
         """
@@ -72,8 +73,8 @@ class PrescriberOrganizationManagerTest(TestCase):
                 "authorization_status": PrescriberAuthorizationStatus.NOT_REQUIRED,
             },
         )
-        self.assertEqual(1, PrescriberOrganization.objects.count())
-        self.assertEqual(len(mail.outbox), 0)
+        assert 1 == PrescriberOrganization.objects.count()
+        assert len(mail.outbox) == 0
 
         org = PrescriberOrganization.objects.create_organization(
             {
@@ -82,9 +83,9 @@ class PrescriberOrganizationManagerTest(TestCase):
                 "authorization_status": PrescriberAuthorizationStatus.NOT_SET,
             },
         )
-        self.assertEqual(2, PrescriberOrganization.objects.count())
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn(str(org.pk), mail.outbox[0].body)
+        assert 2 == PrescriberOrganization.objects.count()
+        assert len(mail.outbox) == 1
+        assert str(org.pk) in mail.outbox[0].body
 
 
 class PrescriberOrganizationModelTest(TestCase):
@@ -92,18 +93,18 @@ class PrescriberOrganizationModelTest(TestCase):
 
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.PE, department="57")
         url = org.accept_survey_url
-        self.assertTrue(url.startswith(f"{settings.TALLY_URL}/r/"))
-        self.assertIn(f"idorganisation={org.pk}", url)
-        self.assertIn("region=Grand+Est", url)
-        self.assertIn("departement=57", url)
+        assert url.startswith(f"{settings.TALLY_URL}/r/")
+        assert f"idorganisation={org.pk}" in url
+        assert "region=Grand+Est" in url
+        assert "departement=57" in url
 
         # Ensure that the URL does not break when there is no department.
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI, department="")
         url = org.accept_survey_url
-        self.assertTrue(url.startswith(f"{settings.TALLY_URL}/r/"))
-        self.assertIn(f"idorganisation={org.pk}", url)
-        self.assertIn("region=", url)
-        self.assertIn("departement=", url)
+        assert url.startswith(f"{settings.TALLY_URL}/r/")
+        assert f"idorganisation={org.pk}" in url
+        assert "region=" in url
+        assert "departement=" in url
 
     def test_clean_siret(self):
         """
@@ -111,7 +112,7 @@ class PrescriberOrganizationModelTest(TestCase):
         """
         org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganizationKind.PE)
         org.clean_siret()
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganizationKind.CAP_EMPLOI)
             org.clean_siret()
 
@@ -121,7 +122,7 @@ class PrescriberOrganizationModelTest(TestCase):
         """
         org = PrescriberOrganizationFactory.build(code_safir_pole_emploi="12345", kind=PrescriberOrganizationKind.PE)
         org.clean_code_safir_pole_emploi()
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             org = PrescriberOrganizationFactory.build(
                 code_safir_pole_emploi="12345", kind=PrescriberOrganizationKind.CAP_EMPLOI
             )
@@ -133,15 +134,15 @@ class PrescriberOrganizationModelTest(TestCase):
             kind=PrescriberOrganizationKind.OTHER,
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
-        self.assertTrue(org.has_pending_authorization())
-        self.assertTrue(org.has_pending_authorization_proof())
+        assert org.has_pending_authorization()
+        assert org.has_pending_authorization_proof()
 
         org = PrescriberOrganizationFactory(
             kind=PrescriberOrganizationKind.CAP_EMPLOI,
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
-        self.assertTrue(org.has_pending_authorization())
-        self.assertFalse(org.has_pending_authorization_proof())
+        assert org.has_pending_authorization()
+        assert not org.has_pending_authorization_proof()
 
     def test_active_admin_members(self):
         """
@@ -153,35 +154,35 @@ class PrescriberOrganizationModelTest(TestCase):
         org_2 = PrescriberOrganizationWithMembershipFactory()
         org_2.members.add(org_1_admin_user)
 
-        self.assertIn(org_1_admin_user, org_1.active_admin_members)
-        self.assertNotIn(org_1_admin_user, org_2.active_admin_members)
+        assert org_1_admin_user in org_1.active_admin_members
+        assert org_1_admin_user not in org_2.active_admin_members
 
     def test_active_members(self):
         org = PrescriberOrganizationWith2MembershipFactory(membership2__is_active=False)
         user_with_active_membership = org.members.first()
         user_with_inactive_membership = org.members.last()
 
-        self.assertNotIn(user_with_inactive_membership, org.active_members)
-        self.assertIn(user_with_active_membership, org.active_members)
+        assert user_with_inactive_membership not in org.active_members
+        assert user_with_active_membership in org.active_members
 
         # Deactivate a user
         user_with_active_membership.is_active = False
         user_with_active_membership.save()
 
-        self.assertNotIn(user_with_active_membership, org.active_members)
+        assert user_with_active_membership not in org.active_members
 
     def test_add_member(self):
         org = PrescriberOrganizationFactory()
-        self.assertEqual(0, org.members.count())
+        assert 0 == org.members.count()
         admin_user = UserFactory()
         org.add_member(admin_user)
-        self.assertEqual(1, org.memberships.count())
-        self.assertTrue(org.memberships.get(user=admin_user).is_admin)
+        assert 1 == org.memberships.count()
+        assert org.memberships.get(user=admin_user).is_admin
 
         other_user = UserFactory()
         org.add_member(other_user)
-        self.assertEqual(2, org.memberships.count())
-        self.assertFalse(org.memberships.get(user=other_user).is_admin)
+        assert 2 == org.memberships.count()
+        assert not org.memberships.get(user=other_user).is_admin
 
     def test_merge_two_organizations(self):
         job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
@@ -191,11 +192,11 @@ class PrescriberOrganizationModelTest(TestCase):
         organization_2 = job_application_2.sender_prescriber_organization
 
         count_job_applications = job_applications_models.JobApplication.objects.count()
-        self.assertEqual(PrescriberOrganization.objects.count(), 2)
-        self.assertEqual(count_job_applications, 2)
+        assert PrescriberOrganization.objects.count() == 2
+        assert count_job_applications == 2
         organization_merge_into(organization_1.id, organization_2.id)
-        self.assertEqual(count_job_applications, job_applications_models.JobApplication.objects.count())
-        self.assertEqual(PrescriberOrganization.objects.count(), 1)
+        assert count_job_applications == job_applications_models.JobApplication.objects.count()
+        assert PrescriberOrganization.objects.count() == 1
 
     @respx.mock
     @override_settings(
@@ -217,25 +218,25 @@ class PrescriberOrganizationModelTest(TestCase):
         )
 
         # updated_at is empty, an update is required
-        self.assertIsNone(organization.updated_at)
+        assert organization.updated_at is None
         call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=7)
         organization.refresh_from_db()
-        self.assertIsNotNone(organization.updated_at)
-        self.assertTrue(organization.is_head_office)
+        assert organization.updated_at is not None
+        assert organization.is_head_office
 
         old_updated_at = organization.updated_at
 
         # No update required
         call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=7)
         organization.refresh_from_db()
-        self.assertEqual(old_updated_at, organization.updated_at)
-        self.assertTrue(organization.is_head_office)
+        assert old_updated_at == organization.updated_at
+        assert organization.is_head_office
 
         # Force updated of latest records
         call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=0)
         organization.refresh_from_db()
-        self.assertNotEqual(old_updated_at, organization.updated_at)
-        self.assertTrue(organization.is_head_office)
+        assert old_updated_at != organization.updated_at
+        assert organization.is_head_office
 
 
 class PrescriberOrganizationAdminTest(TestCase):
@@ -273,7 +274,7 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         for authorization_status, is_authorized in self.rights_list:
             with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
@@ -294,16 +295,13 @@ class PrescriberOrganizationAdminTest(TestCase):
                 }
 
                 response = self.client.post(url, data=post_data)
-                self.assertEqual(response.status_code, 302)
+                assert response.status_code == 302
 
                 updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-                self.assertFalse(updated_prescriberorganization.is_authorized)
-                self.assertEqual(updated_prescriberorganization.kind, PrescriberOrganizationKind.OTHER)
-                self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.superuser)
-                self.assertEqual(
-                    updated_prescriberorganization.authorization_status,
-                    PrescriberAuthorizationStatus.REFUSED,
-                )
+                assert not updated_prescriberorganization.is_authorized
+                assert updated_prescriberorganization.kind == PrescriberOrganizationKind.OTHER
+                assert updated_prescriberorganization.authorization_updated_by == self.superuser
+                assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.REFUSED
 
     def test_refuse_prescriber_habilitation_pending_status(self):
         self.client.force_login(self.user)
@@ -320,7 +318,7 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "id": prescriberorganization.pk,
@@ -338,13 +336,13 @@ class PrescriberOrganizationAdminTest(TestCase):
         }
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-        self.assertFalse(updated_prescriberorganization.is_authorized)
-        self.assertEqual(updated_prescriberorganization.kind, PrescriberOrganizationKind.OTHER)
-        self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.user)
-        self.assertEqual(updated_prescriberorganization.authorization_status, PrescriberAuthorizationStatus.REFUSED)
+        assert not updated_prescriberorganization.is_authorized
+        assert updated_prescriberorganization.kind == PrescriberOrganizationKind.OTHER
+        assert updated_prescriberorganization.authorization_updated_by == self.user
+        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.REFUSED
 
     def test_refuse_prescriber_habilitation_not_pending_status(self):
         self.client.force_login(self.user)
@@ -359,7 +357,7 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         for authorization_status, is_authorized in self.rights_list:
             with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
@@ -380,14 +378,14 @@ class PrescriberOrganizationAdminTest(TestCase):
                 }
 
                 response = self.client.post(url, data=post_data)
-                self.assertEqual(response.status_code, 403)
+                assert response.status_code == 403
 
                 updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-                self.assertEqual(updated_prescriberorganization.is_authorized, prescriberorganization.is_authorized)
-                self.assertEqual(updated_prescriberorganization.kind, prescriberorganization.kind)
-                self.assertIsNone(updated_prescriberorganization.authorization_updated_by)
-                self.assertEqual(
-                    updated_prescriberorganization.authorization_status, prescriberorganization.authorization_status
+                assert updated_prescriberorganization.is_authorized == prescriberorganization.is_authorized
+                assert updated_prescriberorganization.kind == prescriberorganization.kind
+                assert updated_prescriberorganization.authorization_updated_by is None
+                assert (
+                    updated_prescriberorganization.authorization_status == prescriberorganization.authorization_status
                 )
 
     def test_accept_prescriber_habilitation_by_superuser(self):
@@ -403,7 +401,7 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         for authorization_status, is_authorized in self.rights_list:
             with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
@@ -424,16 +422,13 @@ class PrescriberOrganizationAdminTest(TestCase):
                 }
 
                 response = self.client.post(url, data=post_data)
-                self.assertEqual(response.status_code, 302)
+                assert response.status_code == 302
 
                 updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-                self.assertTrue(updated_prescriberorganization.is_authorized)
-                self.assertEqual(updated_prescriberorganization.kind, prescriberorganization.kind)
-                self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.superuser)
-                self.assertEqual(
-                    updated_prescriberorganization.authorization_status,
-                    PrescriberAuthorizationStatus.VALIDATED,
-                )
+                assert updated_prescriberorganization.is_authorized
+                assert updated_prescriberorganization.kind == prescriberorganization.kind
+                assert updated_prescriberorganization.authorization_updated_by == self.superuser
+                assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     def test_accept_prescriber_habilitation_pending_status(self):
         self.client.force_login(self.user)
@@ -450,7 +445,7 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "id": prescriberorganization.pk,
@@ -468,13 +463,13 @@ class PrescriberOrganizationAdminTest(TestCase):
         }
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-        self.assertTrue(updated_prescriberorganization.is_authorized)
-        self.assertEqual(updated_prescriberorganization.kind, prescriberorganization.kind)
-        self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.user)
-        self.assertEqual(updated_prescriberorganization.authorization_status, PrescriberAuthorizationStatus.VALIDATED)
+        assert updated_prescriberorganization.is_authorized
+        assert updated_prescriberorganization.kind == prescriberorganization.kind
+        assert updated_prescriberorganization.authorization_updated_by == self.user
+        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     def test_accept_prescriber_habilitation_refused_status(self):
         self.client.force_login(self.user)
@@ -491,7 +486,7 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "id": prescriberorganization.pk,
@@ -509,13 +504,13 @@ class PrescriberOrganizationAdminTest(TestCase):
         }
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-        self.assertTrue(updated_prescriberorganization.is_authorized)
-        self.assertEqual(updated_prescriberorganization.kind, prescriberorganization.kind)
-        self.assertEqual(updated_prescriberorganization.authorization_updated_by, self.user)
-        self.assertEqual(updated_prescriberorganization.authorization_status, PrescriberAuthorizationStatus.VALIDATED)
+        assert updated_prescriberorganization.is_authorized
+        assert updated_prescriberorganization.kind == prescriberorganization.kind
+        assert updated_prescriberorganization.authorization_updated_by == self.user
+        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     def test_accept_prescriber_habilitation_other_status(self):
         self.client.force_login(self.user)
@@ -530,7 +525,7 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         rights_list = [
             (authorization_status, is_authorized)
@@ -561,14 +556,14 @@ class PrescriberOrganizationAdminTest(TestCase):
                 }
 
                 response = self.client.post(url, data=post_data)
-                self.assertEqual(response.status_code, 403)
+                assert response.status_code == 403
 
                 updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-                self.assertEqual(updated_prescriberorganization.is_authorized, prescriberorganization.is_authorized)
-                self.assertEqual(updated_prescriberorganization.kind, prescriberorganization.kind)
-                self.assertIsNone(updated_prescriberorganization.authorization_updated_by)
-                self.assertEqual(
-                    updated_prescriberorganization.authorization_status, prescriberorganization.authorization_status
+                assert updated_prescriberorganization.is_authorized == prescriberorganization.is_authorized
+                assert updated_prescriberorganization.kind == prescriberorganization.kind
+                assert updated_prescriberorganization.authorization_updated_by is None
+                assert (
+                    updated_prescriberorganization.authorization_status == prescriberorganization.authorization_status
                 )
 
 
@@ -595,20 +590,24 @@ class UpdateRefusedPrescriberOrganizationKindManagementCommandsTest(TestCase):
         )
 
         # Controls before execution
-        self.assertEqual(len(PrescriberAuthorizationStatus) + 2, PrescriberOrganization.objects.all().count())
-        self.assertEqual(
-            3,
-            PrescriberOrganization.objects.filter(authorization_status=PrescriberAuthorizationStatus.REFUSED).count(),
+        assert len(PrescriberAuthorizationStatus) + 2 == PrescriberOrganization.objects.all().count()
+        assert (
+            3
+            == PrescriberOrganization.objects.filter(
+                authorization_status=PrescriberAuthorizationStatus.REFUSED
+            ).count()
         )
-        self.assertEqual(0, PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count())
+        assert 0 == PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count()
 
         # Update refused prescriber organizations without duplicated siret
         call_command("update_refused_prescriber_organizations_kind")
 
         # Controls after execution
-        self.assertEqual(len(PrescriberAuthorizationStatus) + 2, PrescriberOrganization.objects.all().count())
-        self.assertEqual(
-            3,
-            PrescriberOrganization.objects.filter(authorization_status=PrescriberAuthorizationStatus.REFUSED).count(),
+        assert len(PrescriberAuthorizationStatus) + 2 == PrescriberOrganization.objects.all().count()
+        assert (
+            3
+            == PrescriberOrganization.objects.filter(
+                authorization_status=PrescriberAuthorizationStatus.REFUSED
+            ).count()
         )
-        self.assertEqual(1, PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count())
+        assert 1 == PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count()

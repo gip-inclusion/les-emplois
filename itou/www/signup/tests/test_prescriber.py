@@ -73,15 +73,15 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertRedirects(response, url)
         post_data = {"email": "athos@lestroismousquetaires.com"}
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context["form"].errors.get("email"))
+        assert response.status_code == 200
+        assert response.context["form"].errors.get("email")
 
         email = f"athos{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}"
         post_data = {"email": email}
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("signup:prescriber_pole_emploi_user"))
         session_data = self.client.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        self.assertEqual(email, session_data.get("email"))
+        assert email == session_data.get("email")
 
         response = self.client.get(response.url)
         self.assertContains(response, "inclusion_connect_button.svg")
@@ -114,31 +114,29 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Organization
-        self.assertEqual(
-            self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY), organization.pk
-        )
+        assert self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY) == organization.pk
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, f"Code SAFIR {organization.code_safir_pole_emploi}")
 
         user = User.objects.get(email=email)
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        assert not user.is_job_seeker
+        assert user.is_prescriber
+        assert not user.is_siae_staff
 
         user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
         # Make sure no confirmation email is sent.
-        self.assertEqual(len(user_emails), 0)
+        assert len(user_emails) == 0
 
         # Check organization.
-        self.assertTrue(organization.is_authorized)
-        self.assertEqual(organization.authorization_status, PrescriberAuthorizationStatus.VALIDATED)
+        assert organization.is_authorized
+        assert organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
         # Check membership.
-        self.assertEqual(1, user.prescriberorganization_set.count())
-        self.assertEqual(user.prescribermembership_set.count(), 1)
-        self.assertEqual(user.prescribermembership_set.get().organization_id, organization.pk)
-        self.assertEqual(user.siae_set.count(), 0)
+        assert 1 == user.prescriberorganization_set.count()
+        assert user.prescribermembership_set.count() == 1
+        assert user.prescribermembership_set.get().organization_id == organization.pk
+        assert user.siae_set.count() == 0
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -195,26 +193,26 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        assert not user.is_job_seeker
+        assert user.is_prescriber
+        assert not user.is_siae_staff
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
         # Make sure no confirmation email is sent.
-        self.assertEqual(len(user_emails), 0)
+        assert len(user_emails) == 0
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
-        self.assertFalse(org.is_authorized)
-        self.assertEqual(org.authorization_status, PrescriberAuthorizationStatus.NOT_SET)
+        assert not org.is_authorized
+        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_SET
 
         # Check membership.
-        self.assertEqual(1, user.prescriberorganization_set.count())
-        self.assertEqual(user.prescribermembership_set.count(), 1)
+        assert 1 == user.prescriberorganization_set.count()
+        assert user.prescribermembership_set.count() == 1
         membership = user.prescribermembership_set.get(organization=org)
-        self.assertTrue(membership.is_admin)
+        assert membership.is_admin
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -288,31 +286,31 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        assert not user.is_job_seeker
+        assert user.is_prescriber
+        assert not user.is_siae_staff
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
         # Make sure no confirmation email is sent.
-        self.assertEqual(len(user_emails), 0)
+        assert len(user_emails) == 0
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
-        self.assertFalse(org.is_authorized)
-        self.assertEqual(org.authorization_status, PrescriberAuthorizationStatus.NOT_SET)
+        assert not org.is_authorized
+        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_SET
 
         # Check membership.
-        self.assertEqual(1, user.prescriberorganization_set.count())
-        self.assertEqual(user.prescribermembership_set.count(), 1)
+        assert 1 == user.prescriberorganization_set.count()
+        assert user.prescribermembership_set.count() == 1
         membership = user.prescribermembership_set.get(organization=org)
-        self.assertTrue(membership.is_admin)
+        assert membership.is_admin
 
         # Check email has been sent to support (validation/refusal of authorisation needed).
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         subject = mail.outbox[0].subject
-        self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
+        assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -377,29 +375,29 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        assert not user.is_job_seeker
+        assert user.is_prescriber
+        assert not user.is_siae_staff
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
         # Make sure no confirmation email is sent.
-        self.assertEqual(len(user_emails), 0)
+        assert len(user_emails) == 0
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
-        self.assertFalse(org.is_authorized)
-        self.assertEqual(org.authorization_status, PrescriberAuthorizationStatus.NOT_REQUIRED)
+        assert not org.is_authorized
+        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_REQUIRED
 
         # Check membership.
-        self.assertEqual(1, user.prescriberorganization_set.count())
-        self.assertEqual(user.prescribermembership_set.count(), 1)
+        assert 1 == user.prescriberorganization_set.count()
+        assert user.prescribermembership_set.count() == 1
         membership = user.prescribermembership_set.get(organization=org)
-        self.assertTrue(membership.is_admin)
+        assert membership.is_admin
 
         # No email has been sent to support (validation/refusal of authorisation not needed).
-        self.assertEqual(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0
 
     def test_create_user_prescriber_with_existing_siren_other_department(self):
         """
@@ -520,21 +518,21 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        assert not user.is_job_seeker
+        assert user.is_prescriber
+        assert not user.is_siae_staff
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
         # Make sure no confirmation email is sent.
-        self.assertEqual(len(user_emails), 0)
+        assert len(user_emails) == 0
 
         # Check membership.
-        self.assertEqual(0, user.prescriberorganization_set.count())
+        assert 0 == user.prescriberorganization_set.count()
 
         # No email has been sent to support (validation/refusal of authorisation not needed).
-        self.assertEqual(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -601,10 +599,10 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check new org is OK.
         same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).order_by("kind").all()
-        self.assertEqual(2, len(same_siret_orgs))
+        assert 2 == len(same_siret_orgs)
         org1, org2 = same_siret_orgs
-        self.assertEqual(PrescriberOrganizationKind.ML.value, org1.kind)
-        self.assertEqual(PrescriberOrganizationKind.PLIE.value, org2.kind)
+        assert PrescriberOrganizationKind.ML.value == org1.kind
+        assert PrescriberOrganizationKind.PLIE.value == org2.kind
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -661,16 +659,16 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         requestor = {"first_name": "Bertrand", "last_name": "Martin", "email": "bertand@wahoo.fr"}
         response = self.client.post(url, data=requestor)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         mail_subject = mail.outbox[0].subject
-        self.assertIn(f"Demande pour rejoindre {prescriber_org.display_name}", mail_subject)
+        assert f"Demande pour rejoindre {prescriber_org.display_name}" in mail_subject
         mail_body = mail.outbox[0].body
-        self.assertIn(prescriber_membership.user.get_full_name().title(), mail_body)
-        self.assertIn(prescriber_membership.organization.display_name, mail_body)
+        assert prescriber_membership.user.get_full_name().title() in mail_body
+        assert prescriber_membership.organization.display_name in mail_body
         invitation_url = f'{reverse("invitations_views:invite_prescriber_with_org")}?{urlencode(requestor)}'
-        self.assertIn(invitation_url, mail_body)
+        assert invitation_url in mail_body
 
     @respx.mock
     def test_prescriber_already_exists__simple_signup(self):
@@ -707,7 +705,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        self.assertTrue(user.has_sso_provider)
+        assert user.has_sso_provider
 
     @respx.mock
     def test_prescriber_already_exists__create_organization(self):
@@ -778,13 +776,13 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check organization
         org = PrescriberOrganization.objects.get(siret=org.siret)
-        self.assertFalse(org.is_authorized)
-        self.assertEqual(org.authorization_status, PrescriberAuthorizationStatus.NOT_SET)
+        assert not org.is_authorized
+        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_SET
 
         # Check membership.
-        self.assertEqual(user.prescribermembership_set.count(), 1)
+        assert user.prescribermembership_set.count() == 1
         membership = user.prescribermembership_set.get(organization=org)
-        self.assertTrue(membership.is_admin)
+        assert membership.is_admin
 
 
 class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCase):
@@ -854,13 +852,13 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
 
         # The user should be logged out and redirected to the home page.
-        self.assertFalse(self.client.session.get(INCLUSION_CONNECT_SESSION_KEY))
-        self.assertFalse(auth.get_user(self.client).is_authenticated)
+        assert not self.client.session.get(INCLUSION_CONNECT_SESSION_KEY)
+        assert not auth.get_user(self.client).is_authenticated
         self.assertRedirects(response, reverse("home:hp"))
 
         # Check user was created but did not join an organisation
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        self.assertFalse(user.prescriberorganization_set.exists())
+        assert not user.prescriberorganization_set.exists()
 
     @respx.mock
     def test_employer_already_exists(self):
@@ -920,19 +918,19 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         response = self.client.get(response.url, follow=True)
 
         # Show an error and don't create an organization.
-        self.assertEqual(response.wsgi_request.path, signup_url)
+        assert response.wsgi_request.path == signup_url
         self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
         self.assertContains(response, "inclusion_connect_button.svg")
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
+        assert len(messages) == 1
         error_message = "Un compte employeur existe déjà avec cette adresse e-mail"
-        self.assertIn(error_message, messages[0].message)
+        assert error_message in messages[0].message
 
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        self.assertNotEqual(user.first_name, OIDC_USERINFO["given_name"])
+        assert user.first_name != OIDC_USERINFO["given_name"]
         organization_exists = PrescriberOrganization.objects.filter(siret=org.siret).exists()
-        self.assertFalse(organization_exists)
-        self.assertFalse(user.prescriberorganization_set.exists())
+        assert not organization_exists
+        assert not user.prescriberorganization_set.exists()
 
     @respx.mock
     def test_prescriber_signup__pe_organization_wrong_email(self):
@@ -981,15 +979,12 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
         self.assertContains(response, "inclusion_connect_button.svg")
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertIn(
-            "est différente de celle que vous avez indiquée précédemment",
-            messages[0].message,
-        )
+        assert len(messages) == 1
+        assert "est différente de celle que vous avez indiquée précédemment" in messages[0].message
 
         # Organization
-        self.assertFalse(self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY))
-        self.assertFalse(User.objects.filter(email=pe_email).exists())
+        assert not self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+        assert not User.objects.filter(email=pe_email).exists()
 
     def test_permission_denied_when_skiping_first_step(self):
         urls = [
@@ -1006,4 +1001,4 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         for url in urls:
             with self.subTest(url=url):
                 response = self.client.get(url)
-                self.assertEqual(response.status_code, 403)
+                assert response.status_code == 403

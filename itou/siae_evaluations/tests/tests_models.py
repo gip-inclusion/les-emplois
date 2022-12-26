@@ -1,6 +1,7 @@
 import datetime
 from unittest import mock
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
@@ -58,36 +59,30 @@ class EvaluationCampaignMiscMethodsTest(TestCase):
 
         # zero job application
         qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
-        self.assertIsInstance(qs, JobApplicationQuerySet)
-        self.assertEqual(0, qs.count())
+        assert isinstance(qs, JobApplicationQuerySet)
+        assert 0 == qs.count()
 
         # one job applications made by SIAE
         job_application = JobApplicationFactory(to_siae=siae, job_seeker=job_seeker)
-        self.assertEqual(
-            job_application,
-            select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).first(),
-        )
-        self.assertEqual(1, select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count())
+        assert job_application == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).first()
+        assert 1 == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count()
 
         # under 10 job applications, 20% is below the minimum value of 2 -> select 2
         JobApplicationFactory.create_batch(5, to_siae=siae, job_seeker=job_seeker)
-        self.assertEqual(
-            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-            select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
+        assert (
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN
+            == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count()
         )
 
         # from 20 job applications to 100 we have the correct percentage
         JobApplicationFactory.create_batch(55, to_siae=siae, job_seeker=job_seeker)
-        self.assertEqual(
-            12,
-            select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
-        )
+        assert 12 == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count()
 
         # Over 100, stop at the max number -> 20
         JobApplicationFactory.create_batch(50, to_siae=siae, job_seeker=job_seeker)
-        self.assertEqual(
-            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX,
-            select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count(),
+        assert (
+            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX
+            == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count()
         )
 
 
@@ -110,14 +105,14 @@ class EvaluationCampaignQuerySetTest(TestCase):
         )
         created_at_idx0 = EvaluationCampaign.objects.for_institution(institution2)[0].evaluated_period_end_at
         created_at_idx1 = EvaluationCampaign.objects.for_institution(institution2)[1].evaluated_period_end_at
-        self.assertEqual(3, EvaluationCampaign.objects.all().count())
-        self.assertEqual(2, EvaluationCampaign.objects.for_institution(institution2).count())
-        self.assertTrue(created_at_idx0 > created_at_idx1)
+        assert 3 == EvaluationCampaign.objects.all().count()
+        assert 2 == EvaluationCampaign.objects.for_institution(institution2).count()
+        assert created_at_idx0 > created_at_idx1
 
     def test_in_progress(self):
         institution = InstitutionFactory()
-        self.assertEqual(0, EvaluationCampaign.objects.all().count())
-        self.assertEqual(0, EvaluationCampaign.objects.in_progress().count())
+        assert 0 == EvaluationCampaign.objects.all().count()
+        assert 0 == EvaluationCampaign.objects.in_progress().count()
 
         now = timezone.now()
         sometimeago = now - relativedelta(months=2)
@@ -128,8 +123,8 @@ class EvaluationCampaignQuerySetTest(TestCase):
         EvaluationCampaignFactory(
             institution=institution,
         )
-        self.assertEqual(2, EvaluationCampaign.objects.all().count())
-        self.assertEqual(1, EvaluationCampaign.objects.in_progress().count())
+        assert 2 == EvaluationCampaign.objects.all().count()
+        assert 1 == EvaluationCampaign.objects.in_progress().count()
 
 
 class EvaluationCampaignManagerTest(TestCase):
@@ -147,20 +142,20 @@ class EvaluationCampaignManagerTest(TestCase):
             evaluated_period_start_at=now.date() - relativedelta(months=6),
             evaluated_period_end_at=now.date() - relativedelta(months=5),
         )
-        self.assertEqual(
-            now.date() - relativedelta(months=5),
-            EvaluationCampaign.objects.first_active_campaign(institution).evaluated_period_end_at,
+        assert (
+            now.date() - relativedelta(months=5)
+            == EvaluationCampaign.objects.first_active_campaign(institution).evaluated_period_end_at
         )
 
     def test_validate_institution(self):
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             validate_institution(0)
 
         for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS]:
             with self.subTest(kind=kind):
                 institution = InstitutionFactory(kind=kind)
-                with self.assertRaises(ValidationError):
+                with pytest.raises(ValidationError):
                     validate_institution(institution.id)
 
     def test_clean(self):
@@ -170,12 +165,12 @@ class EvaluationCampaignManagerTest(TestCase):
 
         evaluation_campaign.evaluated_period_start_at = now.date()
         evaluation_campaign.evaluated_period_end_at = now.date()
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             evaluation_campaign.clean()
 
         evaluation_campaign.evaluated_period_start_at = now.date()
         evaluation_campaign.evaluated_period_end_at = now.date() - relativedelta(months=6)
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             evaluation_campaign.clean()
 
     def test_create_campaigns(self):
@@ -187,26 +182,23 @@ class EvaluationCampaignManagerTest(TestCase):
         for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS]:
             with self.subTest(kind=kind):
                 InstitutionFactory(kind=kind)
-                self.assertEqual(
-                    0, create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at)
+                assert 0 == create_campaigns(
+                    evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at
                 )
-                self.assertEqual(0, EvaluationCampaign.objects.all().count())
-                self.assertEqual(len(mail.outbox), 0)
+                assert 0 == EvaluationCampaign.objects.all().count()
+                assert len(mail.outbox) == 0
 
         # institution DDETS
         InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS)
-        self.assertEqual(
-            2,
-            create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at),
-        )
-        self.assertEqual(2, EvaluationCampaign.objects.all().count())
+        assert 2 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at)
+        assert 2 == EvaluationCampaign.objects.all().count()
 
         # An email should have been sent to the institution members.
-        self.assertEqual(len(mail.outbox), 2)
+        assert len(mail.outbox) == 2
         email = mail.outbox[0]
-        self.assertEqual(len(email.to), 2)
+        assert len(email.to) == 2
         email = mail.outbox[1]
-        self.assertEqual(len(email.to), 2)
+        assert len(email.to) == 2
 
     def test_eligible_job_applications(self):
         evaluation_campaign = EvaluationCampaignFactory()
@@ -220,7 +212,7 @@ class EvaluationCampaignManagerTest(TestCase):
             sender_siae=siae,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
-        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+        assert 0 == len(evaluation_campaign.eligible_job_applications())
 
         # Job Application outside institution department
         siae12 = SiaeFactory(department="12")
@@ -233,7 +225,7 @@ class EvaluationCampaignManagerTest(TestCase):
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
 
-        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+        assert 0 == len(evaluation_campaign.eligible_job_applications())
 
         # Job Application not eligible kind
         for kind in [k for k in SiaeKind if k not in evaluation_enums.EvaluationSiaesKind.Evaluable]:
@@ -247,7 +239,7 @@ class EvaluationCampaignManagerTest(TestCase):
                     eligibility_diagnosis__author_siae=siae_wrong_kind,
                     hiring_start_at=timezone.now() - relativedelta(months=2),
                 )
-                self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+                assert 0 == len(evaluation_campaign.eligible_job_applications())
 
         # Job Application not accepted
         JobApplicationFactory(
@@ -259,7 +251,7 @@ class EvaluationCampaignManagerTest(TestCase):
             hiring_start_at=timezone.now() - relativedelta(months=2),
             state=JobApplicationWorkflow.STATE_REFUSED,
         )
-        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+        assert 0 == len(evaluation_campaign.eligible_job_applications())
 
         # Job Application not in period
         JobApplicationFactory(
@@ -270,7 +262,7 @@ class EvaluationCampaignManagerTest(TestCase):
             eligibility_diagnosis__author_siae=siae,
             hiring_start_at=timezone.now() - relativedelta(months=10),
         )
-        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+        assert 0 == len(evaluation_campaign.eligible_job_applications())
 
         # Eligibility Diagnosis not made by Siae_staff
         JobApplicationFactory(
@@ -281,7 +273,7 @@ class EvaluationCampaignManagerTest(TestCase):
             eligibility_diagnosis__author_siae=siae,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
-        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+        assert 0 == len(evaluation_campaign.eligible_job_applications())
 
         # Eligibility Diagnosis made by an other siae (not the on of the job application)
         JobApplicationFactory(
@@ -292,7 +284,7 @@ class EvaluationCampaignManagerTest(TestCase):
             eligibility_diagnosis__author_siae=siae2,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
-        self.assertEqual(0, len(evaluation_campaign.eligible_job_applications()))
+        assert 0 == len(evaluation_campaign.eligible_job_applications())
 
         # the eligible job application
         JobApplicationFactory(
@@ -303,17 +295,17 @@ class EvaluationCampaignManagerTest(TestCase):
             eligibility_diagnosis__author_siae=siae,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
-        self.assertEqual(
+        assert (
             JobApplication.objects.filter(
                 to_siae=siae,
                 sender_siae=siae,
                 eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
                 eligibility_diagnosis__author_siae=siae,
                 hiring_start_at=timezone.now() - relativedelta(months=2),
-            )[0],
-            evaluation_campaign.eligible_job_applications()[0],
+            )[0]
+            == evaluation_campaign.eligible_job_applications()[0]
         )
-        self.assertEqual(1, len(evaluation_campaign.eligible_job_applications()))
+        assert 1 == len(evaluation_campaign.eligible_job_applications())
 
     def test_eligible_siaes(self):
 
@@ -336,68 +328,68 @@ class EvaluationCampaignManagerTest(TestCase):
 
         # test eligible_siaes without upperbound
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
-        self.assertEqual(1, eligible_siaes_res.count())
-        self.assertIn(
-            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN},
-            eligible_siaes_res,
-        )
+        assert 1 == eligible_siaes_res.count()
+        assert {
+            "to_siae": siae2.id,
+            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+        } in eligible_siaes_res
 
         eligible_siaes_res = evaluation_campaign.eligible_siaes(upperbound=0)
-        self.assertEqual(1, eligible_siaes_res.count())
-        self.assertIn(
-            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN},
-            eligible_siaes_res,
-        )
+        assert 1 == eligible_siaes_res.count()
+        assert {
+            "to_siae": siae2.id,
+            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+        } in eligible_siaes_res
 
         # test eligible_siaes with upperbound = 3
         eligible_siaes_res = evaluation_campaign.eligible_siaes(
             upperbound=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN + 1
         )
-        self.assertEqual(1, eligible_siaes_res.count())
-        self.assertIn(
-            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN},
-            eligible_siaes_res,
-        )
+        assert 1 == eligible_siaes_res.count()
+        assert {
+            "to_siae": siae2.id,
+            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+        } in eligible_siaes_res
 
         # adding 2 more job applications to siae2
         create_batch_of_job_applications(siae2)
 
         # test eligible_siaes without upperbound
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
-        self.assertEqual(1, eligible_siaes_res.count())
-        self.assertIn(
-            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2},
-            eligible_siaes_res,
-        )
+        assert 1 == eligible_siaes_res.count()
+        assert {
+            "to_siae": siae2.id,
+            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2,
+        } in eligible_siaes_res
 
         eligible_siaes_res = evaluation_campaign.eligible_siaes(upperbound=0)
-        self.assertEqual(1, eligible_siaes_res.count())
-        self.assertIn(
-            {"to_siae": siae2.id, "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2},
-            eligible_siaes_res,
-        )
+        assert 1 == eligible_siaes_res.count()
+        assert {
+            "to_siae": siae2.id,
+            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2,
+        } in eligible_siaes_res
 
         # test eligible_siaes with upperbound = 3
         eligible_siaes_res = evaluation_campaign.eligible_siaes(
             upperbound=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN + 1
         )
-        self.assertEqual(0, eligible_siaes_res.count())
+        assert 0 == eligible_siaes_res.count()
 
     def test_number_of_siaes_to_select(self):
         evaluation_campaign = EvaluationCampaignFactory()
-        self.assertEqual(0, evaluation_campaign.number_of_siaes_to_select())
+        assert 0 == evaluation_campaign.number_of_siaes_to_select()
 
         for _ in range(3):
             siae = SiaeFactory(department="14")
             create_batch_of_job_applications(siae)
 
-        self.assertEqual(1, evaluation_campaign.number_of_siaes_to_select())
+        assert 1 == evaluation_campaign.number_of_siaes_to_select()
 
         for _ in range(3):
             siae = SiaeFactory(department="14")
             create_batch_of_job_applications(siae)
 
-        self.assertEqual(2, evaluation_campaign.number_of_siaes_to_select())
+        assert 2 == evaluation_campaign.number_of_siaes_to_select()
 
     def test_eligible_siaes_under_ratio(self):
         evaluation_campaign = EvaluationCampaignFactory()
@@ -406,7 +398,7 @@ class EvaluationCampaignManagerTest(TestCase):
             siae = SiaeFactory(department="14")
             create_batch_of_job_applications(siae)
 
-        self.assertEqual(2, evaluation_campaign.eligible_siaes_under_ratio().count())
+        assert 2 == evaluation_campaign.eligible_siaes_under_ratio().count()
 
     def test_populate(self):
         # integration tests
@@ -433,26 +425,26 @@ class EvaluationCampaignManagerTest(TestCase):
         )
         fake_now = timezone.now() - relativedelta(weeks=1)
 
-        self.assertEqual(0, EvaluatedSiae.objects.all().count())
-        self.assertEqual(0, EvaluatedJobApplication.objects.all().count())
+        assert 0 == EvaluatedSiae.objects.all().count()
+        assert 0 == EvaluatedJobApplication.objects.all().count()
 
         # first regular method exec
         evaluation_campaign.populate(fake_now)
         evaluation_campaign.refresh_from_db()
 
-        self.assertEqual(fake_now, evaluation_campaign.percent_set_at)
-        self.assertEqual(fake_now, evaluation_campaign.evaluations_asked_at)
-        self.assertEqual(1, EvaluatedSiae.objects.all().count())
-        self.assertEqual(2, EvaluatedJobApplication.objects.all().count())
+        assert fake_now == evaluation_campaign.percent_set_at
+        assert fake_now == evaluation_campaign.evaluations_asked_at
+        assert 1 == EvaluatedSiae.objects.all().count()
+        assert 2 == EvaluatedJobApplication.objects.all().count()
 
         # check links between EvaluatedSiae and EvaluatedJobApplication
         evaluated_siae = EvaluatedSiae.objects.first()
         for evaluated_job_application in EvaluatedJobApplication.objects.all():
             with self.subTest(evaluated_job_application_pk=evaluated_job_application.pk):
-                self.assertEqual(evaluated_siae, evaluated_job_application.evaluated_siae)
+                assert evaluated_siae == evaluated_job_application.evaluated_siae
 
         # retry on populated campaign
-        with self.assertRaises(CampaignAlreadyPopulatedException):
+        with pytest.raises(CampaignAlreadyPopulatedException):
             evaluation_campaign.populate(fake_now)
 
     def test_transition_to_adversarial_phase(self):
@@ -466,23 +458,23 @@ class EvaluationCampaignManagerTest(TestCase):
             evaluated_job_application=evaluated_job_application
             # default review_state is PENDING
         )
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
 
         # since we have a SIAE in SUBMITTED state, does not change anything
         campaign.transition_to_adversarial_phase()
-        self.assertEqual(2, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
+        assert 2 == EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count()
 
         # make the SIAE in another state
         evaluated_administrative_criterion.review_state = "FOOBAR"
         evaluated_administrative_criterion.save(update_fields=["review_state"])
         del evaluated_siae.state
-        self.assertNotEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED != evaluated_siae.state
 
         # now the transition works
         campaign.transition_to_adversarial_phase()
-        self.assertEqual(1, EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count())
+        assert 1 == EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count()
         evaluated_siae.refresh_from_db()
-        self.assertIsNotNone(evaluated_siae.reviewed_at)
+        assert evaluated_siae.reviewed_at is not None
 
         [siae_email, institution_email] = mail.outbox
         assert siae_email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
@@ -539,10 +531,10 @@ class EvaluationCampaignManagerTest(TestCase):
             siae__name="Les petits jardins",
             evaluation_campaign=evaluation_campaign,
         )
-        self.assertIsNone(evaluation_campaign.ended_at)
+        assert evaluation_campaign.ended_at is None
 
         evaluation_campaign.close()
-        self.assertIsNotNone(evaluation_campaign.ended_at)
+        assert evaluation_campaign.ended_at is not None
         ended_at = evaluation_campaign.ended_at
 
         [email] = mail.outbox
@@ -571,7 +563,7 @@ class EvaluationCampaignManagerTest(TestCase):
         )
 
         evaluation_campaign.close()
-        self.assertEqual(ended_at, evaluation_campaign.ended_at)
+        assert ended_at == evaluation_campaign.ended_at
         # No new mail.
         assert len(mail.outbox) == 1
 
@@ -584,32 +576,29 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         date = timezone.localdate()
         email = evaluation_campaign.get_email_to_institution_ratio_to_select(date)
 
-        self.assertEqual(email.to, list(u.email for u in institution.active_members))
-        self.assertIn(reverse("dashboard:index"), email.body)
-        self.assertIn(
-            f"Le choix du taux de SIAE à contrôler est possible jusqu’au {dateformat.format(date, 'd E Y')}",
-            email.body,
+        assert email.to == list(u.email for u in institution.active_members)
+        assert reverse("dashboard:index") in email.body
+        assert (
+            f"Le choix du taux de SIAE à contrôler est possible jusqu’au {dateformat.format(date, 'd E Y')}"
+            in email.body
         )
-        self.assertIn(f"avant le {dateformat.format(date, 'd E Y')}", email.subject)
+        assert f"avant le {dateformat.format(date, 'd E Y')}" in email.subject
 
     def test_get_email_to_siae_selected(self):
         siae = SiaeWith2MembershipsFactory()
         evaluated_siae = EvaluatedSiaeFactory(siae=siae, evaluation_campaign__evaluations_asked_at=timezone.now())
         email = evaluated_siae.get_email_to_siae_selected()
 
-        self.assertEqual(email.to, list(u.email for u in evaluated_siae.siae.active_admin_members))
-        self.assertEqual(
-            email.subject,
-            (
-                "Contrôle a posteriori sur vos embauches réalisées "
-                + f"du {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, 'd E Y')} "
-                + f"au {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, 'd E Y')}"
-            ),
+        assert email.to == list(u.email for u in evaluated_siae.siae.active_admin_members)
+        assert email.subject == (
+            "Contrôle a posteriori sur vos embauches réalisées "
+            + f"du {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, 'd E Y')} "
+            + f"au {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, 'd E Y')}"
         )
-        self.assertIn(siae.name, email.body)
-        self.assertIn(siae.kind, email.body)
-        self.assertIn(siae.convention.siret_signature, email.body)
-        self.assertIn(dateformat.format(timezone.now() + relativedelta(weeks=6), "d E Y"), email.body)
+        assert siae.name in email.body
+        assert siae.kind in email.body
+        assert siae.convention.siret_signature in email.body
+        assert dateformat.format(timezone.now() + relativedelta(weeks=6), "d E Y") in email.body
 
     def test_get_email_to_institution_selected_siae(self):
         fake_now = timezone.now()
@@ -617,10 +606,10 @@ class EvaluationCampaignEmailMethodsTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(institution=institution, evaluations_asked_at=fake_now)
 
         email = evaluation_campaign.get_email_to_institution_selected_siae()
-        self.assertEqual(email.to, list(u.email for u in institution.active_members))
-        self.assertIn(dateformat.format(fake_now + relativedelta(weeks=6), "d E Y"), email.body)
-        self.assertIn(dateformat.format(evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body)
-        self.assertIn(dateformat.format(evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body)
+        assert email.to == list(u.email for u in institution.active_members)
+        assert dateformat.format(fake_now + relativedelta(weeks=6), "d E Y") in email.body
+        assert dateformat.format(evaluation_campaign.evaluated_period_start_at, "d E Y") in email.body
+        assert dateformat.format(evaluation_campaign.evaluated_period_end_at, "d E Y") in email.body
 
 
 class EvaluatedSiaeQuerySetTest(TestCase):
@@ -629,23 +618,23 @@ class EvaluatedSiaeQuerySetTest(TestCase):
         siae2 = SiaeFactory()
         EvaluatedSiaeFactory(siae=siae2)
 
-        self.assertEqual(0, EvaluatedSiae.objects.for_siae(siae1).count())
-        self.assertEqual(1, EvaluatedSiae.objects.for_siae(siae2).count())
+        assert 0 == EvaluatedSiae.objects.for_siae(siae1).count()
+        assert 1 == EvaluatedSiae.objects.for_siae(siae2).count()
 
     def test_in_progress(self):
         fake_now = timezone.now()
 
         # evaluations_asked_at is None
         EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=None)
-        self.assertEqual(0, EvaluatedSiae.objects.in_progress().count())
+        assert 0 == EvaluatedSiae.objects.in_progress().count()
 
         # ended_at is not None
         EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
-        self.assertEqual(0, EvaluatedSiae.objects.in_progress().count())
+        assert 0 == EvaluatedSiae.objects.in_progress().count()
 
         # evaluations_asked_at is not None, ended_at is None
         EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=fake_now, evaluation_campaign__ended_at=None)
-        self.assertEqual(1, EvaluatedSiae.objects.in_progress().count())
+        assert 1 == EvaluatedSiae.objects.in_progress().count()
 
 
 class EvaluatedSiaeModelTest(TestCase):
@@ -655,12 +644,12 @@ class EvaluatedSiaeModelTest(TestCase):
 
         ## unit tests
         # no evaluated_job_application
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
         del evaluated_siae.state
 
         # no evaluated_administrative_criterion
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
         del evaluated_siae.state
 
         # one evaluated_administrative_criterion
@@ -668,31 +657,31 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application, proof_url=""
         )
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.PENDING, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
         del evaluated_siae.state
 
         # with proof_url
         evaluated_administrative_criteria0.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria0.save(update_fields=["proof_url"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTABLE, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.SUBMITTABLE == evaluated_siae.state
         del evaluated_siae.state
 
         # PENDING + submitted_at without review
         evaluated_administrative_criteria0.submitted_at = fake_now
         evaluated_administrative_criteria0.save(update_fields=["submitted_at"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state
 
         # PENDING + submitted_at before review: we still consider that the DDETS can validate the documents
         evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state
 
         # PENDING + submitted_at after review
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state
 
         # with review_state REFUSED, not reviewed : removed, should not exist in real life
@@ -702,15 +691,15 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_administrative_criteria0.save(update_fields=["review_state"])
         evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
-        self.assertLessEqual(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        assert evaluated_administrative_criteria0.submitted_at <= evaluated_siae.reviewed_at
+        assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
         del evaluated_siae.state
 
         # with review_state REFUSED, reviewed, submitted_at after reviewed_at
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
-        self.assertGreater(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        assert evaluated_administrative_criteria0.submitted_at > evaluated_siae.reviewed_at
+        assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
         del evaluated_siae.state
 
         # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at
@@ -720,13 +709,13 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_administrative_criteria0.save(update_fields=["review_state"])
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
         del evaluated_siae.state
 
         # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at, with final_reviewed_at
         evaluated_siae.final_reviewed_at = fake_now
         evaluated_siae.save(update_fields=["final_reviewed_at"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING == evaluated_siae.state
         del evaluated_siae.state
 
         # with review_state REFUSED_2, reviewed, submitted_at after
@@ -735,7 +724,7 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.notification_reason = evaluation_enums.EvaluatedSiaeNotificationReason.MISSING_PROOF
         evaluated_siae.notification_text = "Le document n’a pas été transmis."
         evaluated_siae.save(update_fields=["notified_at", "notification_reason", "notification_text"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.REFUSED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.REFUSED == evaluated_siae.state
         del evaluated_siae.state
 
         # with review_state REFUSED_2, reviewed, submitted_at before reviewed_at :
@@ -766,8 +755,8 @@ class EvaluatedSiaeModelTest(TestCase):
                 "notification_text",
             ]
         )
-        self.assertGreater(evaluated_administrative_criteria0.submitted_at, evaluated_siae.reviewed_at)
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
+        assert evaluated_administrative_criteria0.submitted_at > evaluated_siae.reviewed_at
+        assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
         del evaluated_siae.state
 
     def test_state_integration(self):
@@ -790,7 +779,7 @@ class EvaluatedSiaeModelTest(TestCase):
             2
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state
 
         # one Refused, two Accepted
@@ -800,7 +789,7 @@ class EvaluatedSiaeModelTest(TestCase):
             0
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
         del evaluated_siae.state
 
         # three Accepted
@@ -810,7 +799,7 @@ class EvaluatedSiaeModelTest(TestCase):
             1
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
         del evaluated_siae.state
         evaluated_siae.final_reviewed_at = None
         evaluated_siae.save(update_fields=["final_reviewed_at"])
@@ -832,7 +821,7 @@ class EvaluatedSiaeModelTest(TestCase):
             2
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state
 
         # one Refused, two Accepted
@@ -840,7 +829,7 @@ class EvaluatedSiaeModelTest(TestCase):
             0
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
         del evaluated_siae.state
 
         # three Accepted
@@ -850,7 +839,7 @@ class EvaluatedSiaeModelTest(TestCase):
             1
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
         del evaluated_siae.state
         evaluated_siae.final_reviewed_at = None
         evaluated_siae.save(update_fields=["final_reviewed_at"])
@@ -872,7 +861,7 @@ class EvaluatedSiaeModelTest(TestCase):
             2
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.SUBMITTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state
 
         # one Refused, two Accepted
@@ -880,7 +869,7 @@ class EvaluatedSiaeModelTest(TestCase):
             0
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
         del evaluated_siae.state
 
         # three Accepted
@@ -890,7 +879,7 @@ class EvaluatedSiaeModelTest(TestCase):
             1
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedSiaeState.ACCEPTED, evaluated_siae.state)
+        assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
         del evaluated_siae.state
 
     def test_state_on_closed_campaign_no_criteria(self):
@@ -1038,96 +1027,84 @@ class EvaluatedSiaeModelTest(TestCase):
 
         evaluated_siae.review()
         evaluated_siae.refresh_from_db()
-        self.assertIsNotNone(evaluated_siae.reviewed_at)
+        assert evaluated_siae.reviewed_at is not None
 
         evaluated_siae.reviewed_at = None
         evaluated_siae.save(update_fields=["reviewed_at"])
 
         evaluated_siae.review()
         evaluated_siae.refresh_from_db()
-        self.assertIsNotNone(evaluated_siae.reviewed_at)
+        assert evaluated_siae.reviewed_at is not None
 
     def test_get_email_to_institution_submitted_by_siae(self):
         institution = InstitutionWith2MembershipFactory()
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__institution=institution)
         email = evaluated_siae.get_email_to_institution_submitted_by_siae()
 
-        self.assertIn(evaluated_siae.siae.kind, email.subject)
-        self.assertIn(evaluated_siae.siae.name, email.subject)
-        self.assertIn(evaluated_siae.siae.kind, email.body)
-        self.assertIn(evaluated_siae.siae.name, email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), len(institution.active_members))
+        assert evaluated_siae.siae.kind in email.subject
+        assert evaluated_siae.siae.name in email.subject
+        assert evaluated_siae.siae.kind in email.body
+        assert evaluated_siae.siae.name in email.body
+        assert email.from_email == settings.DEFAULT_FROM_EMAIL
+        assert len(email.to) == len(institution.active_members)
 
     def test_get_email_to_siae_reviewed(self):
         siae = SiaeFactory(with_membership=True)
         evaluated_siae = EvaluatedSiaeFactory(siae=siae)
         email = evaluated_siae.get_email_to_siae_reviewed()
 
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), len(evaluated_siae.siae.active_admin_members))
-        self.assertEqual(email.to[0], evaluated_siae.siae.active_admin_members.first().email)
-        self.assertIn(evaluated_siae.siae.kind, email.subject)
-        self.assertIn(evaluated_siae.siae.name, email.subject)
-        self.assertIn(str(evaluated_siae.siae.id), email.subject)
-        self.assertIn(evaluated_siae.siae.kind, email.body)
-        self.assertIn(evaluated_siae.siae.name, email.body)
-        self.assertIn(str(evaluated_siae.siae.id), email.body)
-        self.assertIn(evaluated_siae.evaluation_campaign.institution.name, email.body)
-        self.assertIn(
-            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body
-        )
-        self.assertIn(
-            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body
-        )
-        self.assertIn("la conformité des justificatifs que vous avez", email.body)
+        assert email.from_email == settings.DEFAULT_FROM_EMAIL
+        assert len(email.to) == len(evaluated_siae.siae.active_admin_members)
+        assert email.to[0] == evaluated_siae.siae.active_admin_members.first().email
+        assert evaluated_siae.siae.kind in email.subject
+        assert evaluated_siae.siae.name in email.subject
+        assert str(evaluated_siae.siae.id) in email.subject
+        assert evaluated_siae.siae.kind in email.body
+        assert evaluated_siae.siae.name in email.body
+        assert str(evaluated_siae.siae.id) in email.body
+        assert evaluated_siae.evaluation_campaign.institution.name in email.body
+        assert dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, "d E Y") in email.body
+        assert dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y") in email.body
+        assert "la conformité des justificatifs que vous avez" in email.body
 
         email = evaluated_siae.get_email_to_siae_reviewed(adversarial=True)
-        self.assertIn("la conformité des nouveaux justificatifs que vous avez", email.body)
+        assert "la conformité des nouveaux justificatifs que vous avez" in email.body
 
     def test_get_email_to_siae_refused(self):
         siae = SiaeFactory(with_membership=True)
         evaluated_siae = EvaluatedSiaeFactory(siae=siae)
         email = evaluated_siae.get_email_to_siae_refused()
 
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), len(evaluated_siae.siae.active_admin_members))
-        self.assertEqual(email.to[0], evaluated_siae.siae.active_admin_members.first().email)
-        self.assertIn(evaluated_siae.siae.kind, email.subject)
-        self.assertIn(evaluated_siae.siae.name, email.subject)
-        self.assertIn(str(evaluated_siae.siae.id), email.subject)
-        self.assertIn(evaluated_siae.siae.kind, email.body)
-        self.assertIn(evaluated_siae.siae.name, email.body)
-        self.assertIn(str(evaluated_siae.siae.id), email.body)
-        self.assertIn(evaluated_siae.evaluation_campaign.institution.name, email.body)
-        self.assertIn(
-            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body
-        )
-        self.assertIn(
-            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body
-        )
+        assert email.from_email == settings.DEFAULT_FROM_EMAIL
+        assert len(email.to) == len(evaluated_siae.siae.active_admin_members)
+        assert email.to[0] == evaluated_siae.siae.active_admin_members.first().email
+        assert evaluated_siae.siae.kind in email.subject
+        assert evaluated_siae.siae.name in email.subject
+        assert str(evaluated_siae.siae.id) in email.subject
+        assert evaluated_siae.siae.kind in email.body
+        assert evaluated_siae.siae.name in email.body
+        assert str(evaluated_siae.siae.id) in email.body
+        assert evaluated_siae.evaluation_campaign.institution.name in email.body
+        assert dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, "d E Y") in email.body
+        assert dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y") in email.body
 
     def test_get_email_to_siae_adversarial_stage(self):
         siae = SiaeFactory(with_membership=True)
         evaluated_siae = EvaluatedSiaeFactory(siae=siae)
         email = evaluated_siae.get_email_to_siae_adversarial_stage()
 
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), len(evaluated_siae.siae.active_admin_members))
-        self.assertEqual(email.to[0], evaluated_siae.siae.active_admin_members.first().email)
-        self.assertIn(evaluated_siae.siae.kind, email.subject)
-        self.assertIn(evaluated_siae.siae.name, email.subject)
-        self.assertIn(str(evaluated_siae.siae.id), email.subject)
-        self.assertIn(evaluated_siae.siae.kind, email.body)
-        self.assertIn(evaluated_siae.siae.name, email.body)
-        self.assertIn(str(evaluated_siae.siae.id), email.body)
-        self.assertIn(evaluated_siae.evaluation_campaign.institution.name, email.body)
-        self.assertIn(
-            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, "d E Y"), email.body
-        )
-        self.assertIn(
-            dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y"), email.body
-        )
+        assert email.from_email == settings.DEFAULT_FROM_EMAIL
+        assert len(email.to) == len(evaluated_siae.siae.active_admin_members)
+        assert email.to[0] == evaluated_siae.siae.active_admin_members.first().email
+        assert evaluated_siae.siae.kind in email.subject
+        assert evaluated_siae.siae.name in email.subject
+        assert str(evaluated_siae.siae.id) in email.subject
+        assert evaluated_siae.siae.kind in email.body
+        assert evaluated_siae.siae.name in email.body
+        assert str(evaluated_siae.siae.id) in email.body
+        assert evaluated_siae.evaluation_campaign.institution.name in email.body
+        assert dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, "d E Y") in email.body
+        assert dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y") in email.body
 
 
 class EvaluatedJobApplicationModelTest(TestCase):
@@ -1135,63 +1112,61 @@ class EvaluatedJobApplicationModelTest(TestCase):
         evaluated_job_application = EvaluatedJobApplicationFactory()
         criterion = AdministrativeCriteria.objects.first()
 
-        self.assertTrue(
-            EvaluatedAdministrativeCriteria.objects.create(
-                evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
-            )
+        assert EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
         )
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             EvaluatedAdministrativeCriteria.objects.create(
                 evaluated_job_application=evaluated_job_application, administrative_criteria=criterion
             )
 
     def test_state(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
-        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PENDING, evaluated_job_application.state)
+        assert evaluation_enums.EvaluatedJobApplicationsState.PENDING == evaluated_job_application.state
         del evaluated_job_application.state  # clear cached_property stored value
 
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application, proof_url=""
         )
-        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.PROCESSING, evaluated_job_application.state)
+        assert evaluation_enums.EvaluatedJobApplicationsState.PROCESSING == evaluated_job_application.state
         del evaluated_job_application.state
 
         evaluated_administrative_criteria.proof_url = "https://www.test.com"
         evaluated_administrative_criteria.save(update_fields=["proof_url"])
-        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.UPLOADED, evaluated_job_application.state)
+        assert evaluation_enums.EvaluatedJobApplicationsState.UPLOADED == evaluated_job_application.state
         del evaluated_job_application.state
 
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
-        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED, evaluated_job_application.state)
+        assert evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED == evaluated_job_application.state
         del evaluated_job_application.state
 
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED, evaluated_job_application.state)
+        assert evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED == evaluated_job_application.state
         del evaluated_job_application.state
 
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.REFUSED, evaluated_job_application.state)
+        assert evaluation_enums.EvaluatedJobApplicationsState.REFUSED == evaluated_job_application.state
         del evaluated_job_application.state
 
         evaluated_administrative_criteria.review_state = (
             evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
         )
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2, evaluated_job_application.state)
+        assert evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2 == evaluated_job_application.state
         del evaluated_job_application.state
 
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        self.assertEqual(evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED, evaluated_job_application.state)
+        assert evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED == evaluated_job_application.state
 
     def test_should_select_criteria_with_mock(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
-        self.assertEqual(
-            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING,
-            evaluated_job_application.should_select_criteria,
+        assert (
+            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
+            == evaluated_job_application.should_select_criteria
         )
         del evaluated_job_application.state
 
@@ -1203,9 +1178,9 @@ class EvaluatedJobApplicationModelTest(TestCase):
         for state in editable_status:
             with self.subTest(state=state):
                 with mock.patch.object(EvaluatedJobApplication, "state", state):
-                    self.assertEqual(
-                        evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE,
-                        evaluated_job_application.should_select_criteria,
+                    assert (
+                        evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE
+                        == evaluated_job_application.should_select_criteria
                     )
 
         not_editable_status = [
@@ -1217,9 +1192,9 @@ class EvaluatedJobApplicationModelTest(TestCase):
         for state in not_editable_status:
             with self.subTest(state=state):
                 with mock.patch.object(EvaluatedJobApplication, "state", state):
-                    self.assertEqual(
-                        evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
-                        evaluated_job_application.should_select_criteria,
+                    assert (
+                        evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
+                        == evaluated_job_application.should_select_criteria
                     )
 
         # REVIEWED
@@ -1227,9 +1202,9 @@ class EvaluatedJobApplicationModelTest(TestCase):
         evaluated_siae.reviewed_at = timezone.now()
         evaluated_siae.save(update_fields=["reviewed_at"])
 
-        self.assertEqual(
-            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING,
-            evaluated_job_application.should_select_criteria,
+        assert (
+            evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
+            == evaluated_job_application.should_select_criteria
         )
         del evaluated_job_application.state
 
@@ -1240,9 +1215,9 @@ class EvaluatedJobApplicationModelTest(TestCase):
         ]:
             with self.subTest(state=state):
                 with mock.patch.object(EvaluatedJobApplication, "state", state):
-                    self.assertEqual(
-                        evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE,
-                        evaluated_job_application.should_select_criteria,
+                    assert (
+                        evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
+                        == evaluated_job_application.should_select_criteria
                     )
 
     def test_save_selected_criteria(self):
@@ -1252,43 +1227,43 @@ class EvaluatedJobApplicationModelTest(TestCase):
 
         # nothing to do
         evaluated_job_application.save_selected_criteria(changed_keys=[], cleaned_keys=[])
-        self.assertEqual(0, EvaluatedAdministrativeCriteria.objects.count())
+        assert 0 == EvaluatedAdministrativeCriteria.objects.count()
 
         # only create criterion1
         evaluated_job_application.save_selected_criteria(changed_keys=[criterion1.key], cleaned_keys=[criterion1.key])
-        self.assertEqual(1, EvaluatedAdministrativeCriteria.objects.count())
-        self.assertEqual(
-            EvaluatedAdministrativeCriteria.objects.first().administrative_criteria,
-            AdministrativeCriteria.objects.filter(level=1).first(),
+        assert 1 == EvaluatedAdministrativeCriteria.objects.count()
+        assert (
+            EvaluatedAdministrativeCriteria.objects.first().administrative_criteria
+            == AdministrativeCriteria.objects.filter(level=1).first()
         )
 
         # create criterion2 and delete criterion1
         evaluated_job_application.save_selected_criteria(
             changed_keys=[criterion1.key, criterion2.key], cleaned_keys=[criterion2.key]
         )
-        self.assertEqual(1, EvaluatedAdministrativeCriteria.objects.count())
-        self.assertEqual(
-            EvaluatedAdministrativeCriteria.objects.first().administrative_criteria,
-            AdministrativeCriteria.objects.filter(level=2).first(),
+        assert 1 == EvaluatedAdministrativeCriteria.objects.count()
+        assert (
+            EvaluatedAdministrativeCriteria.objects.first().administrative_criteria
+            == AdministrativeCriteria.objects.filter(level=2).first()
         )
 
         # only delete
         evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key], cleaned_keys=[])
-        self.assertEqual(0, EvaluatedAdministrativeCriteria.objects.count())
+        assert 0 == EvaluatedAdministrativeCriteria.objects.count()
 
         # delete non-existant criterion does not raise error ^^
         evaluated_job_application.save_selected_criteria(changed_keys=[criterion2.key], cleaned_keys=[])
-        self.assertEqual(0, EvaluatedAdministrativeCriteria.objects.count())
+        assert 0 == EvaluatedAdministrativeCriteria.objects.count()
 
         # atomic : deletion rolled back when trying to create existing criterion
         evaluated_job_application.save_selected_criteria(
             changed_keys=[criterion1.key, criterion2.key], cleaned_keys=[criterion1.key, criterion2.key]
         )
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             evaluated_job_application.save_selected_criteria(
                 changed_keys=[criterion1.key, criterion2.key], cleaned_keys=[criterion2.key]
             )
-        self.assertEqual(2, EvaluatedAdministrativeCriteria.objects.count())
+        assert 2 == EvaluatedAdministrativeCriteria.objects.count()
 
 
 class EvaluatedAdministrativeCriteriaModelTest(TestCase):
@@ -1299,7 +1274,7 @@ class EvaluatedAdministrativeCriteriaModelTest(TestCase):
             evaluated_job_application=EvaluatedJobApplicationFactory(),
             proof_url="",
         )
-        self.assertTrue(evaluated_administrative_criteria.can_upload())
+        assert evaluated_administrative_criteria.can_upload()
 
         evaluated_siae = evaluated_administrative_criteria.evaluated_job_application.evaluated_siae
         evaluated_siae.reviewed_at = fake_now
@@ -1308,7 +1283,7 @@ class EvaluatedAdministrativeCriteriaModelTest(TestCase):
         evaluated_administrative_criteria.submitted_at = fake_now
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria.save(update_fields=["submitted_at", "review_state"])
-        self.assertTrue(evaluated_administrative_criteria.can_upload())
+        assert evaluated_administrative_criteria.can_upload()
 
         for state in [
             state
@@ -1318,4 +1293,4 @@ class EvaluatedAdministrativeCriteriaModelTest(TestCase):
             with self.subTest(state=state):
                 evaluated_administrative_criteria.review_state = state
                 evaluated_administrative_criteria.save(update_fields=["review_state"])
-                self.assertFalse(evaluated_administrative_criteria.can_upload())
+                assert not evaluated_administrative_criteria.can_upload()

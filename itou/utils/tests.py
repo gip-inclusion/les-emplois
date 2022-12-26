@@ -86,7 +86,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
     def test_siae_one_membership(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        self.assertTrue(siae.has_admin(user))
+        assert siae.has_admin(user)
 
         request = self.go_to_dashboard(
             user=user,
@@ -114,11 +114,11 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         # Specify name to ensure alphabetical sorting order.
         siae1 = SiaeFactory(name="1", with_membership=True)
         user = siae1.members.first()
-        self.assertTrue(siae1.has_admin(user))
+        assert siae1.has_admin(user)
 
         siae2 = SiaeFactory(name="2")
         siae2.members.add(user)
-        self.assertFalse(siae2.has_admin(user))
+        assert not siae2.has_admin(user)
 
         request = self.go_to_dashboard(
             user=user,
@@ -145,7 +145,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
     def test_prescriber_organization_one_membership(self):
         organization = PrescriberOrganizationWithMembershipFactory()
         user = organization.members.first()
-        self.assertTrue(user.prescribermembership_set.get(organization=organization).is_admin)
+        assert user.prescribermembership_set.get(organization=organization).is_admin
 
         request = self.go_to_dashboard(
             user=user,
@@ -173,7 +173,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         # Specify name to ensure alphabetical sorting order.
         organization1 = PrescriberOrganizationWithMembershipFactory(name="1")
         user = organization1.members.first()
-        self.assertTrue(user.prescribermembership_set.get(organization=organization1).is_admin)
+        assert user.prescribermembership_set.get(organization=organization1).is_admin
 
         organization2 = PrescriberOrganizationWithMembershipFactory(name="2")
         organization2.members.add(user)
@@ -203,7 +203,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
     def test_labor_inspector_one_institution(self):
         institution = InstitutionWithMembershipFactory()
         user = institution.members.first()
-        self.assertTrue(user.institutionmembership_set.get(institution=institution).is_admin)
+        assert user.institutionmembership_set.get(institution=institution).is_admin
 
         request = self.go_to_dashboard(
             user=user,
@@ -231,10 +231,10 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         # Specify name to ensure alphabetical sorting order.
         institution1 = InstitutionWithMembershipFactory(name="1")
         user = institution1.members.first()
-        self.assertTrue(user.institutionmembership_set.get(institution=institution1).is_admin)
+        assert user.institutionmembership_set.get(institution=institution1).is_admin
         institution2 = InstitutionFactory(name="2")
         institution2.members.add(user)
-        self.assertFalse(institution2.has_admin(user))
+        assert not institution2.has_admin(user)
 
         request = self.go_to_dashboard(
             user=user,
@@ -261,59 +261,86 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
 class UtilsValidatorsTest(TestCase):
     def test_validate_alphanumeric(self):
-        self.assertRaises(ValidationError, alphanumeric, "1245a_89871")
+        with pytest.raises(ValidationError):
+            alphanumeric("1245a_89871")
         alphanumeric("6201Z")
 
     def test_validate_code_safir(self):
-        self.assertRaises(ValidationError, validate_code_safir, "1a3v5")
-        self.assertRaises(ValidationError, validate_code_safir, "123456")
+        with pytest.raises(ValidationError):
+            validate_code_safir("1a3v5")
+        with pytest.raises(ValidationError):
+            validate_code_safir("123456")
         alphanumeric("12345")
 
     def test_validate_naf(self):
-        self.assertRaises(ValidationError, validate_naf, "1")
-        self.assertRaises(ValidationError, validate_naf, "12254")
-        self.assertRaises(ValidationError, validate_naf, "abcde")
-        self.assertRaises(ValidationError, validate_naf, "1245789871")
+        with pytest.raises(ValidationError):
+            validate_naf("1")
+        with pytest.raises(ValidationError):
+            validate_naf("12254")
+        with pytest.raises(ValidationError):
+            validate_naf("abcde")
+        with pytest.raises(ValidationError):
+            validate_naf("1245789871")
         validate_naf("6201Z")
 
     def test_validate_siren(self):
-        self.assertRaises(ValidationError, validate_siren, "12000015")
-        self.assertRaises(ValidationError, validate_siren, "1200001531")
-        self.assertRaises(ValidationError, validate_siren, "12000015a")
-        self.assertRaises(ValidationError, validate_siren, "azertyqwe")
+        with pytest.raises(ValidationError):
+            validate_siren("12000015")
+        with pytest.raises(ValidationError):
+            validate_siren("1200001531")
+        with pytest.raises(ValidationError):
+            validate_siren("12000015a")
+        with pytest.raises(ValidationError):
+            validate_siren("azertyqwe")
         validate_siren("120000153")
 
     def test_validate_siret(self):
-        self.assertRaises(ValidationError, validate_siret, "1200001530001")
-        self.assertRaises(ValidationError, validate_siret, "120000153000111")
-        self.assertRaises(ValidationError, validate_siret, "1200001530001a")
-        self.assertRaises(ValidationError, validate_siret, "azertyqwerty")
+        with pytest.raises(ValidationError):
+            validate_siret("1200001530001")
+        with pytest.raises(ValidationError):
+            validate_siret("120000153000111")
+        with pytest.raises(ValidationError):
+            validate_siret("1200001530001a")
+        with pytest.raises(ValidationError):
+            validate_siret("azertyqwerty")
         validate_siret("12000015300011")
 
     def test_validate_post_code(self):
-        self.assertRaises(ValidationError, validate_post_code, "")
-        self.assertRaises(ValidationError, validate_post_code, "1234")
-        self.assertRaises(ValidationError, validate_post_code, "123456")
-        self.assertRaises(ValidationError, validate_post_code, "1234X")
+        with pytest.raises(ValidationError):
+            validate_post_code("")
+        with pytest.raises(ValidationError):
+            validate_post_code("1234")
+        with pytest.raises(ValidationError):
+            validate_post_code("123456")
+        with pytest.raises(ValidationError):
+            validate_post_code("1234X")
         validate_post_code("12345")
 
     def test_validate_pole_emploi_id(self):
-        self.assertRaises(ValidationError, validate_pole_emploi_id, "A2345678")
-        self.assertRaises(ValidationError, validate_pole_emploi_id, "1234")
-        self.assertRaises(ValidationError, validate_pole_emploi_id, "123412345654")
-        self.assertRaises(ValidationError, validate_pole_emploi_id, "A234567É")
+        with pytest.raises(ValidationError):
+            validate_pole_emploi_id("A2345678")
+        with pytest.raises(ValidationError):
+            validate_pole_emploi_id("1234")
+        with pytest.raises(ValidationError):
+            validate_pole_emploi_id("123412345654")
+        with pytest.raises(ValidationError):
+            validate_pole_emploi_id("A234567É")
         validate_pole_emploi_id("12345678")
         validate_pole_emploi_id("1234567E")
 
     def test_validate_birthdate(self):
         # Min.
-        self.assertRaises(ValidationError, validate_birthdate, datetime.date(1899, 12, 31))
+        with pytest.raises(ValidationError):
+            validate_birthdate(datetime.date(1899, 12, 31))
         validate_birthdate(datetime.date(1900, 1, 1))
         # Max.
         max_date = timezone.localdate() - relativedelta(years=16)
-        self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=1))
-        self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=365))
-        self.assertRaises(ValidationError, validate_birthdate, max_date)
+        with pytest.raises(ValidationError):
+            validate_birthdate(max_date + datetime.timedelta(days=1))
+        with pytest.raises(ValidationError):
+            validate_birthdate(max_date + datetime.timedelta(days=365))
+        with pytest.raises(ValidationError):
+            validate_birthdate(max_date)
         validate_birthdate(max_date - datetime.timedelta(days=3600))
 
     def test_validate_nir(self):
@@ -325,27 +352,38 @@ class UtilsValidatorsTest(TestCase):
         validate_nir("141062B78200582")
         # Valid number with fictitious month
         validate_nir("141208078200587")
-        self.assertRaises(ValidationError, validate_nir, "123456789")
-        self.assertRaises(ValidationError, validate_nir, "141068078200557123")
+        with pytest.raises(ValidationError):
+            validate_nir("123456789")
+        with pytest.raises(ValidationError):
+            validate_nir("141068078200557123")
         # Should start with 1 or 2.
-        self.assertRaises(ValidationError, validate_nir, "341208078200557")
+        with pytest.raises(ValidationError):
+            validate_nir("341208078200557")
         # Third group should be between 0 and 12.
-        self.assertRaises(ValidationError, validate_nir, "141208078200557")
+        with pytest.raises(ValidationError):
+            validate_nir("141208078200557")
         # Last group should validate the first 13 characters.
-        self.assertRaises(ValidationError, validate_nir, "141068078200520")
+        with pytest.raises(ValidationError):
+            validate_nir("141068078200520")
 
     def test_validate_af_number(self):
         # Dubious values.
-        self.assertRaises(ValidationError, validate_af_number, "")
-        self.assertRaises(ValidationError, validate_af_number, None)
+        with pytest.raises(ValidationError):
+            validate_af_number("")
+        with pytest.raises(ValidationError):
+            validate_af_number(None)
 
         # Missing or incorrect suffix (should be A0M0 or alike).
-        self.assertRaises(ValidationError, validate_af_number, "ACI063170007")
-        self.assertRaises(ValidationError, validate_af_number, "ACI063170007Z1Z1")
+        with pytest.raises(ValidationError):
+            validate_af_number("ACI063170007")
+        with pytest.raises(ValidationError):
+            validate_af_number("ACI063170007Z1Z1")
 
         # Missing digit.
-        self.assertRaises(ValidationError, validate_af_number, "EI08018002A1M1")
-        self.assertRaises(ValidationError, validate_af_number, "AI08816001A1M1")
+        with pytest.raises(ValidationError):
+            validate_af_number("EI08018002A1M1")
+        with pytest.raises(ValidationError):
+            validate_af_number("AI08816001A1M1")
 
         # Correct values.
         validate_af_number("ACI063170007A0M0")
@@ -368,21 +406,21 @@ class UtilsTemplateTagsTestCase(TestCase):
         template = Template("{% load url_add_query %}{% url_add_query url page=2 %}")
         out = template.render(Context(context))
         expected = f"{base_url}/siae/search?distance=100&amp;city=aubervilliers-93&amp;page=2"
-        self.assertEqual(out, expected)
+        assert out == expected
 
         # Relative URL.
         context = {"url": "/siae/search?distance=50&city=metz-57"}
         template = Template("{% load url_add_query %}{% url_add_query url page=22 %}")
         out = template.render(Context(context))
         expected = "/siae/search?distance=50&amp;city=metz-57&amp;page=22"
-        self.assertEqual(out, expected)
+        assert out == expected
 
         # Empty URL.
         context = {"url": ""}
         template = Template("{% load url_add_query %}{% url_add_query url page=1 %}")
         out = template.render(Context(context))
         expected = "?page=1"
-        self.assertEqual(out, expected)
+        assert out == expected
 
     def test_redirection_url(self):
         base_url = reverse("dashboard:index")
@@ -398,7 +436,7 @@ class UtilsTemplateTagsTestCase(TestCase):
         )
         out = template.render(Context(context)).strip()
         expected = base_url + f"?next={redirect_field_value}"
-        self.assertEqual(out, expected)
+        assert out == expected
 
         # No redirection value.
         template = Template(
@@ -409,7 +447,7 @@ class UtilsTemplateTagsTestCase(TestCase):
         )
         out = template.render(Context()).strip()
         expected = base_url
-        self.assertEqual(out, expected)
+        assert out == expected
 
     def test_redirection_input_field(self):
         name = "next"
@@ -425,7 +463,7 @@ class UtilsTemplateTagsTestCase(TestCase):
         )
         out = template.render(Context(context)).strip()
         expected = f'<input type="hidden" name="{name}" value="{value}">'
-        self.assertEqual(out, expected)
+        assert out == expected
 
         # No redirection expected.
         template = Template(
@@ -436,7 +474,7 @@ class UtilsTemplateTagsTestCase(TestCase):
         )
         out = template.render(Context()).strip()
         expected = ""
-        self.assertEqual(out, expected)
+        assert out == expected
 
     def test_call_method(self):
         """Test `call_method` template tag."""
@@ -446,44 +484,34 @@ class UtilsTemplateTagsTestCase(TestCase):
         template = Template("{% load call_method %}{% call_method siae 'has_member' user %}")
         out = template.render(Context(context))
         expected = "True"
-        self.assertEqual(out, expected)
+        assert out == expected
 
     def test_pluralizefr(self):
         """Test `pluralizefr` template tag."""
         template = Template("{% load str_filters %}résultat{{ counter|pluralizefr }}")
         out = template.render(Context({"counter": 0}))
-        self.assertEqual(out, "résultat")
+        assert out == "résultat"
         out = template.render(Context({"counter": 1}))
-        self.assertEqual(out, "résultat")
+        assert out == "résultat"
         out = template.render(Context({"counter": 10}))
-        self.assertEqual(out, "résultats")
+        assert out == "résultats"
 
     def test_mask_unless(self):
         template = Template("""{% load str_filters %}{{ value|mask_unless:predicate }}""")
 
-        self.assertEqual(
-            template.render(Context({"value": "Firstname Lastname", "predicate": True})),
-            "Firstname Lastname",
+        assert template.render(Context({"value": "Firstname Lastname", "predicate": True})) == "Firstname Lastname"
+        assert template.render(Context({"value": "Firstname Lastname", "predicate": False})) == "F… L…"
+        assert template.render(Context({"value": "Firstname Middlename Lastname", "predicate": False})) == "F… M… L…"
+        assert (
+            template.render(Context({"value": "Firstname Middlename Lastname1-Lastname2", "predicate": False}))
+            == "F… M… L…"
         )
-        self.assertEqual(
-            template.render(Context({"value": "Firstname Lastname", "predicate": False})),
-            "F… L…",
+        assert (
+            template.render(Context({"value": " Firstname  Middlename   Lastname ", "predicate": False})) == "F… M… L…"
         )
-        self.assertEqual(
-            template.render(Context({"value": "Firstname Middlename Lastname", "predicate": False})),
-            "F… M… L…",
-        )
-        self.assertEqual(
-            template.render(Context({"value": "Firstname Middlename Lastname1-Lastname2", "predicate": False})),
-            "F… M… L…",
-        )
-        self.assertEqual(
-            template.render(Context({"value": " Firstname  Middlename   Lastname ", "predicate": False})),
-            "F… M… L…",
-        )
-        self.assertEqual(
-            template.render(Context({"value": "\tFirstname\t\tMiddlename\tLastname\t\t", "predicate": False})),
-            "F… M… L…",
+        assert (
+            template.render(Context({"value": "\tFirstname\t\tMiddlename\tLastname\t\t", "predicate": False}))
+            == "F… M… L…"
         )
 
     @override_settings(TALLY_URL="https://foobar")
@@ -495,29 +523,29 @@ class UtilsTemplateTagsTestCase(TestCase):
         template = Template("{% load tally %}url:{% tally_form_url 'abcde' pk=test_id hard='coded'%}")
         out = template.render(Context(context))
 
-        self.assertEqual(f"url:{get_tally_form_url('abcde', pk=test_id, hard='coded')}", out)
+        assert f"url:{get_tally_form_url('abcde', pk=test_id, hard='coded')}" == out
 
 
 class UtilsTemplateFiltersTestCase(TestCase):
     def test_format_phone(self):
         """Test `format_phone` template filter."""
-        self.assertEqual(format_filters.format_phone(""), "")
-        self.assertEqual(format_filters.format_phone("0102030405"), "01 02 03 04 05")
+        assert format_filters.format_phone("") == ""
+        assert format_filters.format_phone("0102030405") == "01 02 03 04 05"
 
     def test_get_dict_item(self):
         """Test `get_dict_item` template filter."""
         my_dict = {"key1": "value1", "key2": "value2"}
-        self.assertEqual(dict_filters.get_dict_item(my_dict, "key1"), "value1")
-        self.assertEqual(dict_filters.get_dict_item(my_dict, "key2"), "value2")
+        assert dict_filters.get_dict_item(my_dict, "key1") == "value1"
+        assert dict_filters.get_dict_item(my_dict, "key2") == "value2"
 
     def test_format_siret(self):
         # Don't format invalid SIRET
-        self.assertEqual(format_filters.format_siret("1234"), "1234")
-        self.assertEqual(format_filters.format_siret(None), "None")
+        assert format_filters.format_siret("1234") == "1234"
+        assert format_filters.format_siret(None) == "None"
         # SIREN
-        self.assertEqual(format_filters.format_siret("123456789"), "123 456 789")
+        assert format_filters.format_siret("123456789") == "123 456 789"
         # SIRET
-        self.assertEqual(format_filters.format_siret("12345678912345"), "123 456 789 12345")
+        assert format_filters.format_siret("12345678912345") == "123 456 789 12345"
 
     def test_format_nir(self):
         test_cases = [
@@ -538,7 +566,7 @@ class UtilsTemplateFiltersTestCase(TestCase):
         ]
         for nir, expected in test_cases:
             with self.subTest(nir):
-                self.assertEqual(format_filters.format_nir(nir), expected)
+                assert format_filters.format_nir(nir) == expected
 
     def test_format_approval_number(self):
         test_cases = [
@@ -549,7 +577,7 @@ class UtilsTemplateFiltersTestCase(TestCase):
         ]
         for number, expected in test_cases:
             with self.subTest(number):
-                self.assertEqual(format_filters.format_approval_number(number), expected)
+                assert format_filters.format_approval_number(number) == expected
 
 
 class UtilsEmailsTestCase(TestCase):
@@ -559,36 +587,36 @@ class UtilsEmailsTestCase(TestCase):
         request = RequestFactory().get("/?next=/siae/search%3Fdistance%3D100%26city%3Dstrasbourg-67")
         url = get_safe_url(request, "next")
         expected = "/siae/search?distance=100&city=strasbourg-67"
-        self.assertEqual(url, expected)
+        assert url == expected
 
         request = RequestFactory().post("/", data={"next": "/siae/search?distance=100&city=strasbourg-67"})
         url = get_safe_url(request, "next")
         expected = "/siae/search?distance=100&city=strasbourg-67"
-        self.assertEqual(url, expected)
+        assert url == expected
 
         request = RequestFactory().get("/?next=https://evil.com/siae/search")
         url = get_safe_url(request, "next")
         expected = None
-        self.assertEqual(url, expected)
+        assert url == expected
 
         request = RequestFactory().post("/", data={"next": "https://evil.com"})
         url = get_safe_url(request, "next", fallback_url="/fallback")
         expected = "/fallback"
-        self.assertEqual(url, expected)
+        assert url == expected
 
     def test_get_absolute_url(self):
         url = get_absolute_url()
-        self.assertEqual(f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/", url)
+        assert f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/" == url
 
         # With path
         path = "awesome/team/"
         url = get_absolute_url(path)
-        self.assertEqual(f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/{path}", url)
+        assert f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/{path}" == url
 
         # Escape first slash
         path = "/awesome/team/"
         url = get_absolute_url(path)
-        self.assertEqual(f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/awesome/team/", url)
+        assert f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/awesome/team/" == url
 
     def test_get_external_link_markup(self):
         url = "https://emplois.inclusion.beta.gouv.fr"
@@ -596,7 +624,7 @@ class UtilsEmailsTestCase(TestCase):
         expected = (
             f'<a href="{url}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">{text}</a>'
         )
-        self.assertEqual(get_external_link_markup(url=url, text=text), expected)
+        assert get_external_link_markup(url=url, text=text) == expected
 
 
 class PermsUserTest(TestCase):
@@ -614,11 +642,11 @@ class PermsUserTest(TestCase):
         request.session.save()
 
         user_info = get_user_info(request)
-        self.assertEqual(user_info.user, user)
-        self.assertEqual(user_info.kind, KIND_SIAE_STAFF)
-        self.assertEqual(user_info.prescriber_organization, None)
-        self.assertEqual(user_info.is_authorized_prescriber, False)
-        self.assertEqual(user_info.siae, siae)
+        assert user_info.user == user
+        assert user_info.kind == KIND_SIAE_STAFF
+        assert user_info.prescriber_organization is None
+        assert user_info.is_authorized_prescriber is False
+        assert user_info.siae == siae
 
     def test_get_user_info_for_prescriber(self):
         prescriber_organization = PrescriberOrganizationWithMembershipFactory()
@@ -634,11 +662,11 @@ class PermsUserTest(TestCase):
         request.session.save()
 
         user_info = get_user_info(request)
-        self.assertEqual(user_info.user, user)
-        self.assertEqual(user_info.kind, KIND_PRESCRIBER)
-        self.assertEqual(user_info.prescriber_organization, prescriber_organization)
-        self.assertEqual(user_info.is_authorized_prescriber, False)
-        self.assertEqual(user_info.siae, None)
+        assert user_info.user == user
+        assert user_info.kind == KIND_PRESCRIBER
+        assert user_info.prescriber_organization == prescriber_organization
+        assert user_info.is_authorized_prescriber is False
+        assert user_info.siae is None
 
     def test_get_user_info_for_authorized_prescriber(self):
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
@@ -654,11 +682,11 @@ class PermsUserTest(TestCase):
         request.session.save()
 
         user_info = get_user_info(request)
-        self.assertEqual(user_info.user, user)
-        self.assertEqual(user_info.kind, KIND_PRESCRIBER)
-        self.assertEqual(user_info.prescriber_organization, prescriber_organization)
-        self.assertEqual(user_info.is_authorized_prescriber, True)
-        self.assertEqual(user_info.siae, None)
+        assert user_info.user == user
+        assert user_info.kind == KIND_PRESCRIBER
+        assert user_info.prescriber_organization == prescriber_organization
+        assert user_info.is_authorized_prescriber is True
+        assert user_info.siae is None
 
     def test_get_user_info_for_prescriber_without_organisation(self):
         user = PrescriberFactory()
@@ -671,11 +699,11 @@ class PermsUserTest(TestCase):
         request.session.save()
 
         user_info = get_user_info(request)
-        self.assertEqual(user_info.user, user)
-        self.assertEqual(user_info.kind, KIND_PRESCRIBER)
-        self.assertEqual(user_info.prescriber_organization, None)
-        self.assertEqual(user_info.is_authorized_prescriber, False)
-        self.assertEqual(user_info.siae, None)
+        assert user_info.user == user
+        assert user_info.kind == KIND_PRESCRIBER
+        assert user_info.prescriber_organization is None
+        assert user_info.is_authorized_prescriber is False
+        assert user_info.siae is None
 
     def test_get_user_info_for_job_seeker(self):
         user = JobSeekerFactory()
@@ -688,11 +716,11 @@ class PermsUserTest(TestCase):
         request.session.save()
 
         user_info = get_user_info(request)
-        self.assertEqual(user_info.user, user)
-        self.assertEqual(user_info.kind, KIND_JOB_SEEKER)
-        self.assertEqual(user_info.prescriber_organization, None)
-        self.assertEqual(user_info.is_authorized_prescriber, False)
-        self.assertEqual(user_info.siae, None)
+        assert user_info.user == user
+        assert user_info.kind == KIND_JOB_SEEKER
+        assert user_info.prescriber_organization is None
+        assert user_info.is_authorized_prescriber is False
+        assert user_info.siae is None
 
 
 class MockedSiaeSignupTokenGenerator(SiaeSignupTokenGenerator):
@@ -708,7 +736,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         siae = Siae.objects.create()
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
-        self.assertIs(p0.check_token(siae, tk1), True)
+        assert p0.check_token(siae, tk1) is True
 
     def test_10265(self):
         """
@@ -720,7 +748,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         p0 = MockedSiaeSignupTokenGenerator(datetime.datetime.now())
         tk1 = p0.make_token(siae)
         tk2 = p0.make_token(siae_reload)
-        self.assertEqual(tk1, tk2)
+        assert tk1 == tk2
 
     def test_timeout(self):
         """The token is valid after n seconds, but no greater."""
@@ -732,19 +760,19 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         p1 = MockedSiaeSignupTokenGenerator(
             datetime.datetime.now() + datetime.timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT - 1))
         )
-        self.assertIs(p1.check_token(siae, tk1), True)
+        assert p1.check_token(siae, tk1) is True
         p2 = MockedSiaeSignupTokenGenerator(
             datetime.datetime.now() + datetime.timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT + 1))
         )
-        self.assertIs(p2.check_token(siae, tk1), False)
+        assert p2.check_token(siae, tk1) is False
 
     def test_check_token_with_nonexistent_token_and_user(self):
         siae = Siae.objects.create()
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
-        self.assertIs(p0.check_token(None, tk1), False)
-        self.assertIs(p0.check_token(siae, None), False)
-        self.assertIs(p0.check_token(siae, tk1), True)
+        assert p0.check_token(None, tk1) is False
+        assert p0.check_token(siae, None) is False
+        assert p0.check_token(siae, tk1) is True
 
     def test_any_new_signup_invalidates_past_token(self):
         """
@@ -754,14 +782,14 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         siae = Siae.objects.create()
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
-        self.assertIs(p0.check_token(siae, tk1), True)
+        assert p0.check_token(siae, tk1) is True
         user = User()
         user.save()
         membership = SiaeMembership()
         membership.user = user
         membership.siae = siae
         membership.save()
-        self.assertIs(p0.check_token(siae, tk1), False)
+        assert p0.check_token(siae, tk1) is False
 
 
 class CnilCompositionPasswordValidatorTest(SimpleTestCase):
@@ -770,30 +798,30 @@ class CnilCompositionPasswordValidatorTest(SimpleTestCase):
         # Good passwords.
 
         # lower + upper + special char
-        self.assertIsNone(CnilCompositionPasswordValidator().validate("!*pAssWOrD"))
+        assert CnilCompositionPasswordValidator().validate("!*pAssWOrD") is None
         # lower + upper + digit
-        self.assertIsNone(CnilCompositionPasswordValidator().validate("MYp4ssW0rD"))
+        assert CnilCompositionPasswordValidator().validate("MYp4ssW0rD") is None
         # lower + upper + digit + special char
-        self.assertIsNone(CnilCompositionPasswordValidator().validate("M+p4ssW0rD"))
+        assert CnilCompositionPasswordValidator().validate("M+p4ssW0rD") is None
 
         # Wrong passwords.
 
         expected_error = CnilCompositionPasswordValidator.HELP_MSG
 
-        with self.assertRaises(ValidationError) as error:
+        with pytest.raises(ValidationError) as error:
             # Only lower + upper
             CnilCompositionPasswordValidator().validate("MYpAssWOrD")
-        self.assertEqual(error.exception.messages, [expected_error])
-        self.assertEqual(error.exception.error_list[0].code, "cnil_composition")
+        assert error.value.messages == [expected_error]
+        assert error.value.error_list[0].code == "cnil_composition"
 
-        with self.assertRaises(ValidationError) as error:
+        with pytest.raises(ValidationError) as error:
             # Only lower + digit
             CnilCompositionPasswordValidator().validate("myp4ssw0rd")
-        self.assertEqual(error.exception.messages, [expected_error])
-        self.assertEqual(error.exception.error_list[0].code, "cnil_composition")
+        assert error.value.messages == [expected_error]
+        assert error.value.error_list[0].code == "cnil_composition"
 
     def test_help_text(self):
-        self.assertEqual(CnilCompositionPasswordValidator().get_help_text(), CnilCompositionPasswordValidator.HELP_MSG)
+        assert CnilCompositionPasswordValidator().get_help_text() == CnilCompositionPasswordValidator.HELP_MSG
 
 
 class UtilsEmailsSplitRecipientTest(TestCase):
@@ -807,12 +835,12 @@ class UtilsEmailsSplitRecipientTest(TestCase):
         message = EmailMessage(from_email="unit-test@tests.com", body="xxx", to=[fake_email], subject="test")
         result = sanitize_mailjet_recipients(message)
 
-        self.assertEqual(1, len(result))
+        assert 1 == len(result)
 
-        self.assertEqual("xxx", result[0].body)
-        self.assertEqual("unit-test@tests.com", result[0].from_email)
-        self.assertEqual(fake_email, result[0].to[0])
-        self.assertEqual("test", result[0].subject)
+        assert "xxx" == result[0].body
+        assert "unit-test@tests.com" == result[0].from_email
+        assert fake_email == result[0].to[0]
+        assert "test" == result[0].subject
 
     def test_dont_split_emails(self):
         recipients = []
@@ -823,8 +851,8 @@ class UtilsEmailsSplitRecipientTest(TestCase):
         message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
         result = sanitize_mailjet_recipients(message)
 
-        self.assertEqual(1, len(result))
-        self.assertEqual(49, len(result[0].to))
+        assert 1 == len(result)
+        assert 49 == len(result[0].to)
 
     def test_must_split_emails(self):
         # 2 emails are needed; one with 50 the other with 25
@@ -835,30 +863,30 @@ class UtilsEmailsSplitRecipientTest(TestCase):
         message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
         result = sanitize_mailjet_recipients(message)
 
-        self.assertEqual(2, len(result))
-        self.assertEqual(50, len(result[0].to))
-        self.assertEqual(25, len(result[1].to))
+        assert 2 == len(result)
+        assert 50 == len(result[0].to)
+        assert 25 == len(result[1].to)
 
 
 class ResumeFormMixinTest(TestCase):
     @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
     def test_ensure_link_safe_hosting(self):
         form = ResumeFormMixin(data={"resume_link": "https://www.evil.com/virus.pdf"})
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors["resume_link"][0], "Le CV proposé ne provient pas d'une source de confiance.")
+        assert not form.is_valid()
+        assert form.errors["resume_link"][0] == "Le CV proposé ne provient pas d'une source de confiance."
 
         form = ResumeFormMixin(data={"resume_link": "https://foobar.com/safe.pdf"})
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
     def test_resume_is_optional(self):
         form = ResumeFormMixin(data={})
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         form = ResumeFormMixin(data={"resume_link": None})
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         form = ResumeFormMixin(data={"resume_link": ""})
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
 
 class SupportRemarkAdminViewsTest(TestCase):
@@ -881,7 +909,7 @@ class SupportRemarkAdminViewsTest(TestCase):
 
         # Not enough perms.
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         user.is_staff = True
         user.save()
@@ -898,7 +926,7 @@ class SupportRemarkAdminViewsTest(TestCase):
 
         # With good perms.
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         fake = fk(locale="fr_FR")
         fake_remark = fake.sentence()
@@ -924,7 +952,7 @@ class SupportRemarkAdminViewsTest(TestCase):
 
         # Is the remark created ?
         remark = PkSupportRemark.objects.filter(content_type=suspension_content_type, object_id=suspension.pk).first()
-        self.assertEqual(remark.remark, fake_remark)
+        assert remark.remark == fake_remark
 
         # Is the remark displayed in admin change form ?
         response = self.client.get(url)
@@ -944,63 +972,63 @@ class SessionNamespaceTest(TestCase):
         # __contains__ + __repr__
         for value_to_test in [{}, [], (), set()]:
             session[ns_name] = value_to_test
-            self.assertFalse("unknown" in ns)
-            self.assertEqual(repr(ns), f"<SessionNamespace({value_to_test!r})>")
+            assert not ("unknown" in ns)
+            assert repr(ns) == f"<SessionNamespace({value_to_test!r})>"
 
         for value_to_test in [{"value": "42"}, ["value"], ("value",), {"value"}]:
             session[ns_name] = value_to_test
-            self.assertTrue("value" in ns)
-            self.assertEqual(repr(ns), f"<SessionNamespace({value_to_test!r})>")
+            assert "value" in ns
+            assert repr(ns) == f"<SessionNamespace({value_to_test!r})>"
 
     def test_api_method(self):
         session = self._get_session_store()
         ns_name = faker.Faker().word()
 
         ns = itou.utils.session.SessionNamespace(session, ns_name)
-        self.assertNotIn(ns_name, session)  # The namespace doesn't yet exist in the session
+        assert ns_name not in session  # The namespace doesn't yet exist in the session
 
         # .init()
         ns.init({"key": "value"})
-        self.assertIn(ns_name, session)
-        self.assertEqual(session[ns_name], {"key": "value"})
+        assert ns_name in session
+        assert session[ns_name] == {"key": "value"}
 
         # .get()
-        self.assertEqual(ns.get("key"), "value")
-        self.assertIs(ns.get("not_existing_key", None), None)
-        self.assertIs(ns.get("not_existing_key"), ns.NOT_SET)
-        self.assertFalse(ns.get("not_existing_key"))
+        assert ns.get("key") == "value"
+        assert ns.get("not_existing_key", None) is None
+        assert ns.get("not_existing_key") is ns.NOT_SET
+        assert not ns.get("not_existing_key")
 
         # .set()
         ns.set("key2", "value2")
-        self.assertEqual(ns.get("key2"), "value2")
-        self.assertEqual(session[ns_name], {"key": "value", "key2": "value2"})
+        assert ns.get("key2") == "value2"
+        assert session[ns_name] == {"key": "value", "key2": "value2"}
 
         # .update()
         ns.update({"key3": "value3"})
-        self.assertEqual(ns.get("key3"), "value3")
-        self.assertEqual(session[ns_name], {"key": "value", "key2": "value2", "key3": "value3"})
+        assert ns.get("key3") == "value3"
+        assert session[ns_name] == {"key": "value", "key2": "value2", "key3": "value3"}
 
         ns.update({"key": "other_value"})
-        self.assertEqual(ns.get("key"), "other_value")
-        self.assertEqual(session[ns_name], {"key": "other_value", "key2": "value2", "key3": "value3"})
+        assert ns.get("key") == "other_value"
+        assert session[ns_name] == {"key": "other_value", "key2": "value2", "key3": "value3"}
 
         # .as_dict()
-        self.assertEqual(ns.as_dict(), {"key": "other_value", "key2": "value2", "key3": "value3"})
+        assert ns.as_dict() == {"key": "other_value", "key2": "value2", "key3": "value3"}
 
         # .exists() + .delete()
-        self.assertTrue(ns.exists())
+        assert ns.exists()
         ns.delete()
-        self.assertNotIn(ns_name, session)
-        self.assertFalse(ns.exists())
+        assert ns_name not in session
+        assert not ns.exists()
 
     def test_class_method(self):
         session = self._get_session_store()
 
         # .create_temporary()
         ns = itou.utils.session.SessionNamespace.create_temporary(session)
-        self.assertIsInstance(ns, itou.utils.session.SessionNamespace)
-        self.assertEqual(str(uuid.UUID(ns.name)), ns.name)
-        self.assertNotIn(ns.name, session)  # .init() wasn't called
+        assert isinstance(ns, itou.utils.session.SessionNamespace)
+        assert str(uuid.UUID(ns.name)) == ns.name
+        assert ns.name not in session  # .init() wasn't called
 
 
 class JSONTest(TestCase):
@@ -1037,22 +1065,22 @@ class JSONTest(TestCase):
         dumps = functools.partial(json.dumps, cls=itou.utils.json.JSONEncoder)
 
         for obj, expected in self.SYMMETRIC_CONVERSION:
-            self.assertEqual(dumps(obj), expected)
+            assert dumps(obj) == expected
 
         for obj, expected, *_ in self.ASYMMETRIC_CONVERSION:
-            self.assertEqual(dumps(obj), expected)
+            assert dumps(obj) == expected
 
         model_object = UserFactory()
-        self.assertEqual(dumps(model_object), str(model_object.pk))
+        assert dumps(model_object) == str(model_object.pk)
 
     def test_decode(self):
         loads = functools.partial(json.loads, cls=itou.utils.json.JSONDecoder)
 
         for expected, s in self.SYMMETRIC_CONVERSION:
-            self.assertEqual(loads(s), expected)
+            assert loads(s) == expected
 
         for *_, s, expected in self.ASYMMETRIC_CONVERSION:
-            self.assertEqual(loads(s), expected)
+            assert loads(s) == expected
 
 
 @pytest.mark.no_django_db

@@ -29,7 +29,7 @@ class ItouLoginTest(TestCase):
         user = JobSeekerFactory()
         url = reverse("account_login")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         form_data = {
             "login": user.email,
@@ -55,15 +55,15 @@ class ItouLoginFormTest(TestCase):
             "password": DEFAULT_PASSWORD,
         }
         form = ItouLoginForm(data=form_data, request=RequestFactory().get("/"))
-        self.assertFalse(form.is_valid())
-        self.assertIn("FranceConnect", form.errors["__all__"][0])
+        assert not form.is_valid()
+        assert "FranceConnect" in form.errors["__all__"][0]
 
 
 class PrescriberLoginTest(InclusionConnectBaseTestCase):
     def test_login_options(self):
         url = reverse("login:prescriber")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "S'identifier avec Inclusion Connect")
         self.assertContains(response, reverse("inclusion_connect:authorize"))
         self.assertContains(response, "Adresse e-mail")
@@ -73,7 +73,7 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
         user = PrescriberFactory()
         url = reverse("login:prescriber")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         form_data = {
             "login": user.email,
@@ -86,14 +86,14 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
         user = PrescriberFactory(identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
         url = reverse("login:prescriber")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         form_data = {
             "login": user.email,
             "password": "a",
         }
         response = self.client.post(url, data=form_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(
             response, "Votre compte est relié à Inclusion Connect. Merci de vous connecter avec ce service."
         )
@@ -103,7 +103,7 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
     def test_login_options(self):
         url = reverse("login:siae_staff")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "S'identifier avec Inclusion Connect")
         self.assertContains(response, reverse("inclusion_connect:authorize"))
         self.assertContains(response, "Adresse e-mail")
@@ -113,7 +113,7 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
         user = SiaeStaffFactory()
         url = reverse("login:siae_staff")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         form_data = {
             "login": user.email,
@@ -126,14 +126,14 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
         user = SiaeStaffFactory(identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
         url = reverse("login:siae_staff")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         form_data = {
             "login": user.email,
             "password": "a",
         }
         response = self.client.post(url, data=form_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(
             response, "Votre compte est relié à Inclusion Connect. Merci de vous connecter avec ce service."
         )
@@ -143,7 +143,7 @@ class LaborInspectorLoginTest(TestCase):
     def test_login_options(self):
         url = reverse("login:labor_inspector")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertNotContains(response, "S'identifier avec Inclusion Connect")
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")
@@ -152,7 +152,7 @@ class LaborInspectorLoginTest(TestCase):
         user = LaborInspectorFactory()
         url = reverse("login:labor_inspector")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         form_data = {
             "login": user.email,
@@ -167,7 +167,7 @@ class JopbSeekerLoginTest(TestCase):
         user = JobSeekerFactory()
         url = reverse("login:job_seeker")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         form_data = {
             "login": user.email,
@@ -198,10 +198,10 @@ class JopbSeekerLoginTest(TestCase):
         # Temporary NIR is not stored with user information.
         response = mock_oauth_dance(self, expected_route="login:job_seeker")
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(
-            messages[0].message,
-            "Vous avez deux comptes sur la plateforme et nous detectons un conflit d'email : seconde@email.com "
+        assert len(messages) == 1
+        assert (
+            messages[0].message
+            == "Vous avez deux comptes sur la plateforme et nous detectons un conflit d'email : seconde@email.com "
             "et wossewodda-3728@yopmail.com.Veuillez vous rapprocher du support pour débloquer la situation "
-            "en suivant <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>.",
+            "en suivant <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>."
         )

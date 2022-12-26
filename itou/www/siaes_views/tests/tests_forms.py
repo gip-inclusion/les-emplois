@@ -26,12 +26,12 @@ class EditSiaeJobDescriptionFormTest(TestCase):
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
 
-        self.assertIsNotNone(form.errors.get("other_contract_type"))
+        assert form.errors.get("other_contract_type") is not None
 
         post_data["other_contract_type"] = "CDD new generation"
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
     def test_clean_open_positions(self):
         siae = SiaeFactory()
@@ -44,24 +44,24 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         }
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
-        self.assertIsNotNone(form.errors.get("open_positions"))
+        assert form.errors.get("open_positions") is not None
 
         post_data["open_positions"] = "0"
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
-        self.assertIsNotNone(form.errors.get("open_positions"))
+        assert form.errors.get("open_positions") is not None
 
         post_data["open_positions"] = "1"
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
     def test_siae_errors(self):
         siae = SiaeFactory()
         post_data = {}
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
-        self.assertIsNotNone(form.errors)
-        self.assertIn("job_appellation_code", form.errors.keys())
-        self.assertIn("job_appellation", form.errors.keys())
+        assert form.errors is not None
+        assert "job_appellation_code" in form.errors.keys()
+        assert "job_appellation" in form.errors.keys()
 
         post_data.update(
             {
@@ -71,8 +71,8 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         )
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
-        self.assertIsNotNone(form.errors)
-        self.assertIn("contract_type", form.errors.keys())
+        assert form.errors is not None
+        assert "contract_type" in form.errors.keys()
 
         post_data.update(
             {
@@ -85,8 +85,8 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         )
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
-        self.assertIsNotNone(form.errors)
-        self.assertIn("open_positions", form.errors.keys())
+        assert form.errors is not None
+        assert "open_positions" in form.errors.keys()
 
         post_data.update(
             {
@@ -95,7 +95,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         )
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
     def test_siae_fields(self):
         siae = SiaeFactory()
@@ -115,35 +115,35 @@ class EditSiaeJobDescriptionFormTest(TestCase):
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
 
-        self.assertEqual("custom_name", cleaned_data.get("custom_name"))
-        self.assertEqual("guerande-44", cleaned_data.get("location_code"))
-        self.assertEqual(35, cleaned_data.get("hours_per_week"))
-        self.assertEqual(5, cleaned_data.get("open_positions"))
+        assert "custom_name" == cleaned_data.get("custom_name")
+        assert "guerande-44" == cleaned_data.get("location_code")
+        assert 35 == cleaned_data.get("hours_per_week")
+        assert 5 == cleaned_data.get("open_positions")
 
         form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
 
-        self.assertEqual("description", cleaned_data.get("description"))
-        self.assertEqual("profile_description", cleaned_data.get("profile_description"))
+        assert "description" == cleaned_data.get("description")
+        assert "profile_description" == cleaned_data.get("profile_description")
 
         # Checkboxes status
-        self.assertTrue(cleaned_data.get("is_resume_mandatory"))
+        assert cleaned_data.get("is_resume_mandatory")
 
         del post_data["is_resume_mandatory"]
 
         form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
-        self.assertFalse(cleaned_data.get("is_resume_mandatory"))
+        assert not cleaned_data.get("is_resume_mandatory")
 
     def test_opcs_errors(self):
         opcs = SiaeFactory(kind=SiaeKind.OPCS)
@@ -163,8 +163,8 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         }
 
         form = EditJobDescriptionForm(current_siae=opcs, data=post_data)
-        self.assertIsNotNone(form.errors)
-        self.assertIn("market_context_description", form.errors.keys())
+        assert form.errors is not None
+        assert "market_context_description" in form.errors.keys()
 
         post_data.update(
             {
@@ -173,7 +173,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         )
 
         form = EditJobDescriptionForm(current_siae=opcs, data=post_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
     def test_opcs_fields(self):
         siae = SiaeFactory(kind=SiaeKind.OPCS)
@@ -195,39 +195,39 @@ class EditSiaeJobDescriptionFormTest(TestCase):
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
 
-        self.assertEqual("custom_name", cleaned_data.get("custom_name"))
-        self.assertEqual("guerande-44", cleaned_data.get("location_code"))
-        self.assertEqual(35, cleaned_data.get("hours_per_week"))
-        self.assertEqual(5, cleaned_data.get("open_positions"))
-        self.assertEqual("market_context_description", cleaned_data.get("market_context_description"))
+        assert "custom_name" == cleaned_data.get("custom_name")
+        assert "guerande-44" == cleaned_data.get("location_code")
+        assert 35 == cleaned_data.get("hours_per_week")
+        assert 5 == cleaned_data.get("open_positions")
+        assert "market_context_description" == cleaned_data.get("market_context_description")
 
         form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
 
-        self.assertEqual("description", cleaned_data.get("description"))
-        self.assertEqual("profile_description", cleaned_data.get("profile_description"))
+        assert "description" == cleaned_data.get("description")
+        assert "profile_description" == cleaned_data.get("profile_description")
 
         # Checkboxes status
-        self.assertTrue(cleaned_data.get("is_resume_mandatory"))
-        self.assertTrue(cleaned_data.get("is_qpv_mandatory"))
+        assert cleaned_data.get("is_resume_mandatory")
+        assert cleaned_data.get("is_qpv_mandatory")
 
         del post_data["is_resume_mandatory"]
         del post_data["is_qpv_mandatory"]
 
         form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
-        self.assertFalse(cleaned_data.get("is_resume_mandatory"))
-        self.assertFalse(cleaned_data.get("is_qpv_mandatory"))
+        assert not cleaned_data.get("is_resume_mandatory")
+        assert not cleaned_data.get("is_qpv_mandatory")
 
 
 class EditJobDescriptionDetailsFormTest(TestCase):
@@ -242,24 +242,24 @@ class EditJobDescriptionDetailsFormTest(TestCase):
 
         form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
 
-        self.assertEqual("description", cleaned_data.get("description"))
-        self.assertEqual("profile_description", cleaned_data.get("profile_description"))
+        assert "description" == cleaned_data.get("description")
+        assert "profile_description" == cleaned_data.get("profile_description")
 
         # Checkboxes status
-        self.assertTrue(cleaned_data.get("is_resume_mandatory"))
+        assert cleaned_data.get("is_resume_mandatory")
 
         del post_data["is_resume_mandatory"]
 
         form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
-        self.assertFalse(cleaned_data.get("is_resume_mandatory"))
+        assert not cleaned_data.get("is_resume_mandatory")
 
     def test_opcs_fields(self):
         siae = SiaeFactory(kind=SiaeKind.OPCS)
@@ -273,24 +273,24 @@ class EditJobDescriptionDetailsFormTest(TestCase):
 
         form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
 
-        self.assertEqual("description", cleaned_data.get("description"))
-        self.assertEqual("profile_description", cleaned_data.get("profile_description"))
+        assert "description" == cleaned_data.get("description")
+        assert "profile_description" == cleaned_data.get("profile_description")
 
         # Checkboxes status
-        self.assertTrue(cleaned_data.get("is_resume_mandatory"))
-        self.assertTrue(cleaned_data.get("is_qpv_mandatory"))
+        assert cleaned_data.get("is_resume_mandatory")
+        assert cleaned_data.get("is_qpv_mandatory")
 
         del post_data["is_resume_mandatory"]
         del post_data["is_qpv_mandatory"]
 
         form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         cleaned_data = form.cleaned_data
-        self.assertFalse(cleaned_data.get("is_resume_mandatory"))
-        self.assertFalse(cleaned_data.get("is_qpv_mandatory"))
+        assert not cleaned_data.get("is_resume_mandatory")
+        assert not cleaned_data.get("is_qpv_mandatory")

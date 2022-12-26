@@ -1,3 +1,4 @@
+import pytest
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -31,12 +32,12 @@ class JobApplicationTransferModelTest(TestCase):
         for evil_state in evil_states:
             with self.subTest(evil_state):
                 job_application = JobApplicationFactory(state=evil_state)
-                self.assertFalse(job_application.is_in_transferable_state)
+                assert not job_application.is_in_transferable_state
 
         for good_state in good_states:
             with self.subTest(good_state):
                 job_application = JobApplicationFactory(state=good_state)
-                self.assertTrue(job_application.is_in_transferable_state)
+                assert job_application.is_in_transferable_state
 
     def test_can_be_transferred(self):
         # Only users in both origin and target SIAE
@@ -52,16 +53,16 @@ class JobApplicationTransferModelTest(TestCase):
 
         job_application = JobApplicationFactory(to_siae=origin_siae)
 
-        self.assertTrue(origin_user.is_siae_staff)
-        self.assertTrue(target_user.is_siae_staff)
-        self.assertFalse(job_application.can_be_transferred(target_user, job_application.to_siae))
-        self.assertFalse(job_application.can_be_transferred(lambda_user, target_siae))
-        self.assertFalse(job_application.can_be_transferred(target_user, target_siae))
-        self.assertFalse(job_application.can_be_transferred(origin_user, target_siae))
+        assert origin_user.is_siae_staff
+        assert target_user.is_siae_staff
+        assert not job_application.can_be_transferred(target_user, job_application.to_siae)
+        assert not job_application.can_be_transferred(lambda_user, target_siae)
+        assert not job_application.can_be_transferred(target_user, target_siae)
+        assert not job_application.can_be_transferred(origin_user, target_siae)
 
         job_application.state = JobApplicationWorkflow.STATE_PROCESSING
 
-        self.assertTrue(job_application.can_be_transferred(origin_user, target_siae))
+        assert job_application.can_be_transferred(origin_user, target_siae)
 
     def test_transfer_to(self):
         # If all conditions are valid, a user can transfer job applications between SIAE they are member of,
@@ -80,13 +81,13 @@ class JobApplicationTransferModelTest(TestCase):
         job_application = JobApplicationFactory(with_eligibility_diagnosis=True, to_siae=origin_siae)
 
         # Conditions hould be covered by previous test, but does not hurt (and tests raise)
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             job_application.transfer_to(lambda_user, target_siae)
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             job_application.transfer_to(origin_user, origin_siae)
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             job_application.transfer_to(target_user, target_siae)
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             job_application.transfer_to(origin_user, target_siae)
 
         job_application.state = JobApplicationWorkflow.STATE_PROCESSING
@@ -94,9 +95,9 @@ class JobApplicationTransferModelTest(TestCase):
         job_application.refresh_from_db()
 
         # "Normal" transfer
-        self.assertEqual(job_application.to_siae, target_siae)
-        self.assertEqual(job_application.state, JobApplicationWorkflow.STATE_NEW)
-        self.assertIsNotNone(job_application.eligibility_diagnosis)
+        assert job_application.to_siae == target_siae
+        assert job_application.state == JobApplicationWorkflow.STATE_NEW
+        assert job_application.eligibility_diagnosis is not None
 
         # Eligibilty diagnosis not sent by authorized prescriber must be deleted
         job_application = JobApplicationSentBySiaeFactory(
@@ -108,10 +109,10 @@ class JobApplicationTransferModelTest(TestCase):
         job_application.transfer_to(origin_user, target_siae)
         job_application.refresh_from_db()
 
-        self.assertEqual(job_application.to_siae, target_siae)
-        self.assertEqual(job_application.state, JobApplicationWorkflow.STATE_NEW)
-        self.assertIsNone(job_application.eligibility_diagnosis)
-        self.assertFalse(EligibilityDiagnosis.objects.filter(pk=eligibility_diagnosis_pk))
+        assert job_application.to_siae == target_siae
+        assert job_application.state == JobApplicationWorkflow.STATE_NEW
+        assert job_application.eligibility_diagnosis is None
+        assert not EligibilityDiagnosis.objects.filter(pk=eligibility_diagnosis_pk)
 
     def test_model_fields(self):
         # Check new fields in model
@@ -131,25 +132,25 @@ class JobApplicationTransferModelTest(TestCase):
         )
 
         # Failing to transfer must not update new fields
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             job_application.transfer_to(target_user, target_siae)
-        self.assertIsNone(job_application.transferred_by)
-        self.assertIsNone(job_application.transferred_from)
-        self.assertIsNone(job_application.transferred_at)
+        assert job_application.transferred_by is None
+        assert job_application.transferred_from is None
+        assert job_application.transferred_at is None
 
         with self.assertNumQueries(7):
             job_application.transfer_to(origin_user, target_siae)
 
         job_application.refresh_from_db()
 
-        self.assertEqual(job_application.transferred_by, origin_user)
-        self.assertEqual(job_application.transferred_from, origin_siae)
-        self.assertEqual(timezone.localdate(), job_application.transferred_at.date())
-        self.assertEqual(job_application.to_siae, target_siae)
-        self.assertEqual(job_application.state, JobApplicationWorkflow.STATE_NEW)
-        self.assertIsNone(job_application.eligibility_diagnosis)
-        self.assertEqual(job_application.answer, "")
-        self.assertEqual(job_application.answer_to_prescriber, "")
+        assert job_application.transferred_by == origin_user
+        assert job_application.transferred_from == origin_siae
+        assert timezone.localdate() == job_application.transferred_at.date()
+        assert job_application.to_siae == target_siae
+        assert job_application.state == JobApplicationWorkflow.STATE_NEW
+        assert job_application.eligibility_diagnosis is None
+        assert job_application.answer == ""
+        assert job_application.answer_to_prescriber == ""
 
     def test_workflow_transitions(self):
         # `source` contains possible entry points of transition
@@ -180,20 +181,20 @@ class JobApplicationTransferModelTest(TestCase):
         job_application.transfer_to(origin_user, target_siae)
 
         # Eligigibility diagnosis is done by SIAE : must not send an email
-        self.assertEqual(len(mail.outbox), 2)
+        assert len(mail.outbox) == 2
 
-        self.assertEqual(len(mail.outbox[0].to), 1)
-        self.assertIn(origin_user.email, mail.outbox[0].to)
-        self.assertIn(
-            f"La candidature de {job_seeker.first_name} {job_seeker.last_name} a été transférée",
-            mail.outbox[0].subject,
+        assert len(mail.outbox[0].to) == 1
+        assert origin_user.email in mail.outbox[0].to
+        assert (
+            f"La candidature de {job_seeker.first_name} {job_seeker.last_name} a été transférée"
+            in mail.outbox[0].subject
         )
-        self.assertIn("a transféré la candidature de :", mail.outbox[0].body)
+        assert "a transféré la candidature de :" in mail.outbox[0].body
 
-        self.assertEqual(len(mail.outbox[1].to), 1)
-        self.assertIn(job_application.job_seeker.email, mail.outbox[1].to)
-        self.assertIn("Votre candidature a été transférée à une autre structure", mail.outbox[1].subject)
-        self.assertIn("a transféré votre candidature à la structure", mail.outbox[1].body)
+        assert len(mail.outbox[1].to) == 1
+        assert job_application.job_seeker.email in mail.outbox[1].to
+        assert "Votre candidature a été transférée à une autre structure" in mail.outbox[1].subject
+        assert "a transféré votre candidature à la structure" in mail.outbox[1].body
 
     def test_transfer_must_notify_prescriber(self):
         # Same test and conditions as above, but this time prescriber
@@ -214,17 +215,17 @@ class JobApplicationTransferModelTest(TestCase):
 
         job_application.transfer_to(origin_user, target_siae)
 
-        self.assertEqual(len(mail.outbox), 3)
+        assert len(mail.outbox) == 3
 
         # Other email content have been checked in previous test
         # Focusing on prescriber email content
-        self.assertEqual(len(mail.outbox[2].to), 1)
-        self.assertIn(job_application.sender.email, mail.outbox[2].to)
-        self.assertIn(
-            f"La candidature de {job_seeker.first_name} {job_seeker.last_name} a été transférée",
-            mail.outbox[2].subject,
+        assert len(mail.outbox[2].to) == 1
+        assert job_application.sender.email in mail.outbox[2].to
+        assert (
+            f"La candidature de {job_seeker.first_name} {job_seeker.last_name} a été transférée"
+            in mail.outbox[2].subject
         )
-        self.assertIn("a transféré la candidature de :", mail.outbox[2].body)
+        assert "a transféré la candidature de :" in mail.outbox[2].body
 
     def test_transfer_notifications_to_many_siae_members(self):
         # Same as test_transfer_must_notify_siae_and_job_seeker
@@ -246,12 +247,12 @@ class JobApplicationTransferModelTest(TestCase):
         job_application.transfer_to(origin_user_1, target_siae)
 
         # Only checking SIAE email
-        self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(len(mail.outbox[0].to), 2)
-        self.assertIn(origin_user_1.email, mail.outbox[0].to)
-        self.assertIn(origin_user_2.email, mail.outbox[0].to)
-        self.assertIn(
-            f"La candidature de {job_seeker.first_name} {job_seeker.last_name} a été transférée",
-            mail.outbox[0].subject,
+        assert len(mail.outbox) == 2
+        assert len(mail.outbox[0].to) == 2
+        assert origin_user_1.email in mail.outbox[0].to
+        assert origin_user_2.email in mail.outbox[0].to
+        assert (
+            f"La candidature de {job_seeker.first_name} {job_seeker.last_name} a été transférée"
+            in mail.outbox[0].subject
         )
-        self.assertIn("a transféré la candidature de :", mail.outbox[0].body)
+        assert "a transféré la candidature de :" in mail.outbox[0].body

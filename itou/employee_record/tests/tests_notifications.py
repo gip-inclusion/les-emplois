@@ -21,9 +21,9 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.start_at = today + timedelta(days=1)
         approval.save()
 
-        self.assertEqual(1, EmployeeRecord.objects.count())
-        self.assertEqual(today + timedelta(days=1), approval.start_at)
-        self.assertEqual(1, EmployeeRecordUpdateNotification.objects.new().count())
+        assert 1 == EmployeeRecord.objects.count()
+        assert today + timedelta(days=1) == approval.start_at
+        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
 
     def test_update_approval_end_date(self):
         # If a modification occurs on the `end_date` field of an approval linked to a processed employee record
@@ -36,9 +36,9 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.end_at = today + timedelta(days=2)
         approval.save()
 
-        self.assertEqual(1, EmployeeRecord.objects.count())
-        self.assertEqual(today + timedelta(days=2), approval.end_at)
-        self.assertEqual(1, EmployeeRecordUpdateNotification.objects.new().count())
+        assert 1 == EmployeeRecord.objects.count()
+        assert today + timedelta(days=2) == approval.end_at
+        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
 
     def test_update_approval_twice(self):
         # If SEVERAL modifications occurs on a monitored field of an approval linked to a processed employee record
@@ -51,15 +51,15 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.start_at = today + timedelta(days=1)
         approval.save()
 
-        self.assertEqual(1, EmployeeRecord.objects.count())
-        self.assertEqual(today + timedelta(days=1), approval.start_at)
-        self.assertEqual(1, EmployeeRecordUpdateNotification.objects.new().count())
+        assert 1 == EmployeeRecord.objects.count()
+        assert today + timedelta(days=1) == approval.start_at
+        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
 
         approval.start_at = today
         approval.save()
 
-        self.assertEqual(today, approval.start_at)
-        self.assertEqual(1, EmployeeRecordUpdateNotification.objects.new().count())
+        assert today == approval.start_at
+        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
 
     def test_update_non_monitored_fields(self):
         # If a modification occurs on an approval linked to any or no employee record,
@@ -71,8 +71,8 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.created_at = timezone.localtime()
         approval.save()
 
-        self.assertEqual(1, EmployeeRecord.objects.count())
-        self.assertEqual(0, EmployeeRecordUpdateNotification.objects.new().count())
+        assert 1 == EmployeeRecord.objects.count()
+        assert 0 == EmployeeRecordUpdateNotification.objects.new().count()
 
     def test_update_on_approval_without_linked_employee_record(self):
         # If a date modification occurs on an approval NOT linked to any employee record,
@@ -83,7 +83,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.end_at = today + timedelta(days=2)
         approval.save()
 
-        self.assertEqual(0, EmployeeRecordUpdateNotification.objects.new().count())
+        assert 0 == EmployeeRecordUpdateNotification.objects.new().count()
 
     def test_update_on_non_processed_employee_record(self):
         # If a date modification occurs on an approval linked to an employee record NOT in processed state,
@@ -97,7 +97,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
                 approval.created_at = today + timedelta(days=2)
                 approval.save()
 
-                self.assertEqual(0, EmployeeRecordUpdateNotification.objects.new().count())
+                assert 0 == EmployeeRecordUpdateNotification.objects.new().count()
 
     def test_update_on_multiple_employee_records(self):
         # If a date modification occurs on an approval linked to *N* processed employee record,
@@ -134,8 +134,8 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
             start_at=start_at,
         )
 
-        self.assertEqual(1, EmployeeRecordUpdateNotification.objects.new().count())
-        self.assertEqual(employee_record.pk, EmployeeRecordUpdateNotification.objects.first().employee_record.pk)
+        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert employee_record.pk == EmployeeRecordUpdateNotification.objects.first().employee_record.pk
 
     def test_update_with_prolongation(self):
         # Creation of a prolongation on an approval linked to an employee record
@@ -148,5 +148,5 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
             start_at=approval.end_at,
         )
 
-        self.assertEqual(1, EmployeeRecordUpdateNotification.objects.new().count())
-        self.assertEqual(employee_record.pk, EmployeeRecordUpdateNotification.objects.first().employee_record.pk)
+        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert employee_record.pk == EmployeeRecordUpdateNotification.objects.first().employee_record.pk

@@ -42,7 +42,7 @@ class ProcessViewsTest(TestCase):
         """
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Confirmation de l’embauche")
         # Make sure modal is hidden.
         self.assertNotContains(response, "data-htmx-open-modal")
@@ -88,7 +88,7 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertFalse(job_application.has_editable_job_seeker)
+        assert not job_application.has_editable_job_seeker
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
 
@@ -97,7 +97,7 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertTrue(job_application.has_editable_job_seeker)
+        assert job_application.has_editable_job_seeker
         self.assertContains(response, "Modifier les informations")
 
         # Test resume presence:
@@ -128,7 +128,7 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(404, response.status_code)
+        assert 404 == response.status_code
 
     def test_details_for_siae_as_prescriber(self, *args, **kwargs):
         """As a prescriber, I cannot access the job_applications details for SIAEs."""
@@ -140,7 +140,7 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_details_for_prescriber(self, *args, **kwargs):
         """As a prescriber, I can access the job_applications details for prescribers."""
@@ -152,7 +152,7 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # Job seeker nir is displayed
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         # Approval is displayed
@@ -167,7 +167,7 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     def test_process(self, *args, **kwargs):
         """Ensure that the `process` transition is triggered."""
@@ -182,7 +182,7 @@ class ProcessViewsTest(TestCase):
         self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
-        self.assertTrue(job_application.state.is_processing)
+        assert job_application.state.is_processing
 
     def test_refuse(self, *args, **kwargs):
         """Ensure that the `refuse` transition is triggered."""
@@ -190,13 +190,13 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
         )
-        self.assertTrue(job_application.state.is_processing)
+        assert job_application.state.is_processing
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
 
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "refusal_reason": job_applications_enums.RefusalReason.OTHER,
@@ -207,7 +207,7 @@ class ProcessViewsTest(TestCase):
         self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
-        self.assertTrue(job_application.state.is_refused)
+        assert job_application.state.is_refused
 
     def test_postpone(self, *args, **kwargs):
         """Ensure that the `postpone` transition is triggered."""
@@ -215,13 +215,13 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
         )
-        self.assertTrue(job_application.state.is_processing)
+        assert job_application.state.is_processing
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
 
         url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {"answer": ""}
         response = self.client.post(url, data=post_data)
@@ -229,7 +229,7 @@ class ProcessViewsTest(TestCase):
         self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
-        self.assertTrue(job_application.state.is_postponed)
+        assert job_application.state.is_postponed
 
     def test_accept(self, *args, **kwargs):
         create_test_cities(["54", "57"], num_per_department=2)
@@ -274,13 +274,13 @@ class ProcessViewsTest(TestCase):
                 _, next_url = self.accept_job_application(job_application=job_application, post_data=post_data)
 
                 job_application = JobApplication.objects.get(pk=job_application.pk)
-                self.assertEqual(job_application.hiring_start_at, hiring_start_at)
-                self.assertEqual(job_application.hiring_end_at, hiring_end_at)
-                self.assertTrue(job_application.state.is_accepted)
+                assert job_application.hiring_start_at == hiring_start_at
+                assert job_application.hiring_end_at == hiring_end_at
+                assert job_application.state.is_accepted
 
                 # test how hiring_end_date is displayed
                 response = self.client.get(next_url)
-                self.assertEqual(response.status_code, 200)
+                assert response.status_code == 200
                 # test case hiring_end_at
                 if hiring_end_at:
                     self.assertContains(response, f"Fin : {hiring_end_at.strftime('%d')}")
@@ -403,11 +403,10 @@ class ProcessViewsTest(TestCase):
         g_suspension = get_job_application.approval.suspension_set.in_progress().last()
 
         # The end date of suspension is set to d-1 of hiring start day
-        self.assertEqual(g_suspension.end_at, get_job_application.hiring_start_at - relativedelta(days=1))
+        assert g_suspension.end_at == get_job_application.hiring_start_at - relativedelta(days=1)
         # Check if the duration of approval was updated correctly
-        self.assertEqual(
-            get_job_application.approval.end_at,
-            approval_job_seeker.end_at + relativedelta(days=(g_suspension.end_at - g_suspension.start_at).days),
+        assert get_job_application.approval.end_at == approval_job_seeker.end_at + relativedelta(
+            days=(g_suspension.end_at - g_suspension.start_at).days
         )
 
     def test_accept_with_manual_approval_delivery(self, *args, **kwargs):
@@ -447,7 +446,7 @@ class ProcessViewsTest(TestCase):
 
         self.accept_job_application(job_application=job_application, post_data=post_data)
         job_application.refresh_from_db()
-        self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
+        assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
     def test_accept_and_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
         create_test_cities(["54", "57"], num_per_department=2)
@@ -491,9 +490,9 @@ class ProcessViewsTest(TestCase):
         # First job application has been accepted.
         # All other job applications are obsolete.
         job_application.refresh_from_db()
-        self.assertTrue(job_application.state.is_accepted)
-        self.assertEqual(job_application.approval.start_at, job_application.hiring_start_at)
-        self.assertEqual(job_application.approval.end_at, approval_default_ending)
+        assert job_application.state.is_accepted
+        assert job_application.approval.start_at == job_application.hiring_start_at
+        assert job_application.approval.end_at == approval_default_ending
         self.client.logout()
 
         # SIAE 2 accepts the second job application
@@ -504,7 +503,7 @@ class ProcessViewsTest(TestCase):
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
         job_app_starting_earlier.refresh_from_db()
-        self.assertTrue(job_app_starting_earlier.state.is_obsolete)
+        assert job_app_starting_earlier.state.is_obsolete
 
         self.client.force_login(user)
         post_data = {
@@ -517,9 +516,9 @@ class ProcessViewsTest(TestCase):
 
         # Second job application has been accepted.
         # The job seeker has now two part-time jobs at the same time.
-        self.assertTrue(job_app_starting_earlier.state.is_accepted)
-        self.assertEqual(job_app_starting_earlier.approval.start_at, job_app_starting_earlier.hiring_start_at)
-        self.assertEqual(job_app_starting_earlier.approval.end_at, approval_default_ending)
+        assert job_app_starting_earlier.state.is_accepted
+        assert job_app_starting_earlier.approval.start_at == job_app_starting_earlier.hiring_start_at
+        assert job_app_starting_earlier.approval.end_at == approval_default_ending
         self.client.logout()
 
         # SIAE 3 accepts the third job application.
@@ -529,7 +528,7 @@ class ProcessViewsTest(TestCase):
         hiring_start_at = hiring_start_at + relativedelta(months=6)
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         job_app_starting_later.refresh_from_db()
-        self.assertTrue(job_app_starting_later.state.is_obsolete)
+        assert job_app_starting_later.state.is_obsolete
 
         self.client.force_login(user)
         post_data = {
@@ -542,8 +541,8 @@ class ProcessViewsTest(TestCase):
 
         # Third job application has been accepted.
         # The job seeker has now three part-time jobs at the same time.
-        self.assertTrue(job_app_starting_later.state.is_accepted)
-        self.assertEqual(job_app_starting_later.approval.start_at, job_app_starting_earlier.hiring_start_at)
+        assert job_app_starting_later.state.is_accepted
+        assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
     def test_accept_with_double_user(self, *args, **kwargs):
 
@@ -565,14 +564,13 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(siae.members.first())
         _, next_url = self.accept_job_application(job_application=job_application, city=city)
         response = self.client.get(next_url)
-        self.assertNotIn(
-            "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. ",
-            str(list(response.context["messages"])[0]),
+        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " not in str(
+            list(response.context["messages"])[0]
         )
 
         # This approval is found thanks to the PE Approval number
         approval = Approval.objects.get(number=pole_emploi_approval.number)
-        self.assertEqual(approval.user, job_seeker)
+        assert approval.user == job_seeker
 
         # Now generate a job seeker that is "almost the same"
         almost_same_job_seeker = JobSeekerWithAddressFactory(
@@ -585,9 +583,8 @@ class ProcessViewsTest(TestCase):
         # Gracefully display a message instead of just plain crashing
         _, next_url = self.accept_job_application(job_application=another_job_application, city=city)
         response = self.client.get(next_url)
-        self.assertIn(
-            "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. ",
-            str(list(response.context["messages"])[0]),
+        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " in str(
+            list(response.context["messages"])[0]
         )
 
     def test_eligibility(self, *args, **kwargs):
@@ -597,14 +594,14 @@ class ProcessViewsTest(TestCase):
             job_seeker=JobSeekerWithAddressFactory(with_address_in_qpv=True),
         )
 
-        self.assertTrue(job_application.state.is_processing)
+        assert job_application.state.is_processing
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
         )
-        self.assertFalse(has_considered_valid_diagnoses)
+        assert not has_considered_valid_diagnoses
 
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
@@ -612,13 +609,13 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
         # Ensure that a manual confirmation is mandatory.
         post_data = {"confirm": "false"}
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             # Administrative criteria level 1.
@@ -636,19 +633,19 @@ class ProcessViewsTest(TestCase):
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
         )
-        self.assertTrue(has_considered_valid_diagnoses)
+        assert has_considered_valid_diagnoses
 
         # Check diagnosis.
         eligibility_diagnosis = job_application.get_eligibility_diagnosis()
-        self.assertEqual(eligibility_diagnosis.author, siae_user)
-        self.assertEqual(eligibility_diagnosis.author_kind, EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF)
-        self.assertEqual(eligibility_diagnosis.author_siae, job_application.to_siae)
+        assert eligibility_diagnosis.author == siae_user
+        assert eligibility_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
+        assert eligibility_diagnosis.author_siae == job_application.to_siae
         # Check administrative criteria.
         administrative_criteria = eligibility_diagnosis.administrative_criteria.all()
-        self.assertEqual(3, administrative_criteria.count())
-        self.assertIn(criterion1, administrative_criteria)
-        self.assertIn(criterion2, administrative_criteria)
-        self.assertIn(criterion3, administrative_criteria)
+        assert 3 == administrative_criteria.count()
+        assert criterion1 in administrative_criteria
+        assert criterion2 in administrative_criteria
+        assert criterion3 in administrative_criteria
 
     def test_eligibility_for_siae_not_subject_to_eligibility_rules(self, *args, **kwargs):
         """Test eligibility for an Siae not subject to eligibility rules."""
@@ -663,7 +660,7 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_eligibility_state_for_job_application(self, *args, **kwargs):
         """The eligibility diagnosis page must only be accessible
@@ -679,7 +676,7 @@ class ProcessViewsTest(TestCase):
             self.client.force_login(siae_user)
             url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
             self.client.logout()
 
         # Wrong state
@@ -688,7 +685,7 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(siae_user)
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
         self.client.logout()
 
     def test_cancel(self, *args, **kwargs):
@@ -698,7 +695,7 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(siae_user)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Confirmer l'annulation de l'embauche")
         self.assertContains(
             response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
@@ -712,7 +709,7 @@ class ProcessViewsTest(TestCase):
         self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
-        self.assertTrue(job_application.state.is_cancelled)
+        assert job_application.state.is_cancelled
 
     def test_cannot_cancel(self, *args, **kwargs):
         job_application = JobApplicationFactory(
@@ -730,7 +727,7 @@ class ProcessViewsTest(TestCase):
         self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
-        self.assertFalse(job_application.state.is_cancelled)
+        assert not job_application.state.is_cancelled
 
     def test_accept_after_cancel(self, *args, **kwargs):
         # A canceled job application is not linked to an approval
@@ -747,10 +744,10 @@ class ProcessViewsTest(TestCase):
         self.accept_job_application(job_application=job_application, city=city)
 
         job_application.refresh_from_db()
-        self.assertEqual(job_seeker.approvals.count(), 1)
+        assert job_seeker.approvals.count() == 1
         approval = job_seeker.approvals.first()
-        self.assertEqual(approval.start_at, job_application.hiring_start_at)
-        self.assertTrue(job_application.state.is_accepted)
+        assert approval.start_at == job_application.hiring_start_at
+        assert job_application.state.is_accepted
 
     def test_archive(self, *args, **kwargs):
         """Ensure that when an SIAE archives a job_application, the hidden_for_siae flag is updated."""
@@ -758,7 +755,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_CANCELLED
         )
-        self.assertTrue(job_application.state.is_cancelled)
+        assert job_application.state.is_cancelled
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
 
@@ -779,7 +776,7 @@ class ProcessViewsTest(TestCase):
         self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
-        self.assertTrue(job_application.hidden_for_siae)
+        assert job_application.hidden_for_siae
 
 
 class ProcessTemplatesTest(TestCase):
@@ -1008,7 +1005,7 @@ class ProcessTransferJobApplicationTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
 
-        self.assertEqual(2, user.siaemembership_set.count())
+        assert 2 == user.siaemembership_set.count()
 
         self.client.force_login(user)
         response = self.client.get(
@@ -1047,6 +1044,6 @@ class ProcessTransferJobApplicationTest(TestCase):
         messages = list(response.context.get("messages"))
 
         self.assertRedirects(response, reverse("apply:list_for_siae"))
-        self.assertTrue(messages)
-        self.assertEqual(len(messages), 1)
-        self.assertIn(f"transférée à la SIAE <b>{other_siae.display_name}</b>", str(messages[0]))
+        assert messages
+        assert len(messages) == 1
+        assert f"transférée à la SIAE <b>{other_siae.display_name}</b>" in str(messages[0])

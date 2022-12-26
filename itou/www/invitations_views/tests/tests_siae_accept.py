@@ -22,14 +22,14 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
     def assert_accepted_invitation(self, response, invitation, user):
         user.refresh_from_db()
         invitation.refresh_from_db()
-        self.assertTrue(user.is_siae_staff)
-        self.assertTrue(invitation.accepted)
-        self.assertTrue(invitation.accepted_at)
+        assert user.is_siae_staff
+        assert invitation.accepted
+        assert invitation.accepted_at
 
         # A confirmation e-mail is sent to the invitation sender.
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(len(mail.outbox[0].to), 1)
-        self.assertEqual(invitation.sender.email, mail.outbox[0].to[0])
+        assert len(mail.outbox) == 1
+        assert len(mail.outbox[0].to) == 1
+        assert invitation.sender.email == mail.outbox[0].to[0]
 
         # Make sure there's a welcome message.
         self.assertContains(
@@ -39,7 +39,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         # Assert the user sees his new siae dashboard
         current_siae = get_current_siae_or_404(response.wsgi_request)
         # A user can be member of one or more siae
-        self.assertTrue(current_siae in user.siae_set.all())
+        assert current_siae in user.siae_set.all()
 
     @respx.mock
     def test_accept_invitation_signup_(self):
@@ -74,10 +74,10 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = self.client.get(response.url, follow=True)
         # Check user is redirected to the welcoming tour
         last_url, _status_code = response.redirect_chain[-1]
-        self.assertEqual(last_url, reverse("welcoming_tour:index"))
+        assert last_url == reverse("welcoming_tour:index")
 
         total_users_after = User.objects.count()
-        self.assertEqual((total_users_before + 1), total_users_after)
+        assert (total_users_before + 1) == total_users_after
 
         user = User.objects.get(email=invitation.email)
         self.assert_accepted_invitation(response, invitation, user)
@@ -125,18 +125,18 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = self.client.get(response.url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertIn("ne correspond pas à l’adresse e-mail de l’invitation", messages[0].message)
-        self.assertEqual(response.wsgi_request.get_full_path(), previous_url)
-        self.assertFalse(User.objects.filter(email=invitation.email).exists())
+        assert len(messages) == 1
+        assert "ne correspond pas à l’adresse e-mail de l’invitation" in messages[0].message
+        assert response.wsgi_request.get_full_path() == previous_url
+        assert not User.objects.filter(email=invitation.email).exists()
 
     def test_expired_invitation(self):
         invitation = ExpiredSiaeStaffInvitationFactory()
-        self.assertTrue(invitation.has_expired)
+        assert invitation.has_expired
 
         # User wants to join our website but it's too late!
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "expirée")
 
         user = SiaeStaffFactory(email=invitation.email)
@@ -159,7 +159,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
             first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com"
         )
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_accepted_invitation(self):
         invitation = SentSiaeStaffInvitationFactory(accepted=True)
@@ -187,7 +187,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         self.assertRedirects(response, reverse("welcoming_tour:index"))
 
         current_siae = get_current_siae_or_404(response.wsgi_request)
-        self.assertEqual(siae.pk, current_siae.pk)
+        assert siae.pk == current_siae.pk
         self.assert_accepted_invitation(response, invitation, user)
 
     @respx.mock
@@ -219,7 +219,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = self.client.get(response.url, follow=True)
         self.assertContains(response, escape("Cette structure n'est plus active."))
         user = User.objects.get(email=invitation.email)
-        self.assertEqual(user.siae_set.count(), 0)
+        assert user.siae_set.count() == 0
 
     def test_accept_existing_user_is_not_employer(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
@@ -232,14 +232,14 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
 
-        self.assertEqual(response.status_code, 403)
-        self.assertFalse(invitation.accepted)
+        assert response.status_code == 403
+        assert not invitation.accepted
 
     def test_accept_connected_user_is_not_the_invited_user(self):
         invitation = SentSiaeStaffInvitationFactory()
         self.client.force_login(invitation.sender)
         response = self.client.get(invitation.acceptance_link, follow=True)
 
-        self.assertEqual(reverse("account_logout"), response.wsgi_request.path)
-        self.assertFalse(invitation.accepted)
+        assert reverse("account_logout") == response.wsgi_request.path
+        assert not invitation.accepted
         self.assertContains(response, "Un utilisateur est déjà connecté.")

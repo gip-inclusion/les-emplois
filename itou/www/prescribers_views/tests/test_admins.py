@@ -1,3 +1,4 @@
+import pytest
 from django.core import mail
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
@@ -20,23 +21,21 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
 
         # Redirection to confirm page
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Confirm action
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         organization.refresh_from_db()
-        self.assertTrue(guest in organization.active_admin_members)
+        assert guest in organization.active_admin_members
 
         # The admin should receive a valid email
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(
-            f"[Activation] Vous êtes désormais administrateur de {organization.display_name}", email.subject
-        )
-        self.assertIn("Vous êtes administrateur d'une structure sur les emplois de l'inclusion", email.body)
-        self.assertEqual(email.to[0], guest.email)
+        assert f"[Activation] Vous êtes désormais administrateur de {organization.display_name}" == email.subject
+        assert "Vous êtes administrateur d'une structure sur les emplois de l'inclusion" in email.body
+        assert email.to[0] == guest.email
 
     def test_remove_admin(self):
         """
@@ -49,33 +48,28 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         membership = guest.prescribermembership_set.first()
         membership.is_admin = True
         membership.save()
-        self.assertTrue(guest in organization.active_admin_members)
+        assert guest in organization.active_admin_members
 
         self.client.force_login(admin)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
 
         # Redirection to confirm page
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Confirm action
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         organization.refresh_from_db()
-        self.assertFalse(guest in organization.active_admin_members)
+        assert not (guest in organization.active_admin_members)
 
         # The admin should receive a valid email
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(
-            f"[Désactivation] Vous n'êtes plus administrateur de {organization.display_name}", email.subject
-        )
-        self.assertIn(
-            "Un administrateur vous a retiré les droits d'administrateur d'une structure",
-            email.body,
-        )
-        self.assertEqual(email.to[0], guest.email)
+        assert f"[Désactivation] Vous n'êtes plus administrateur de {organization.display_name}" == email.subject
+        assert "Un administrateur vous a retiré les droits d'administrateur d'une structure" in email.body
+        assert email.to[0] == guest.email
 
     def test_admin_management_permissions(self):
         """
@@ -90,20 +84,20 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
 
         # Redirection to confirm page
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Confirm action
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Add self as admin with no privilege
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_suspicious_action(self):
         """
@@ -117,5 +111,5 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         self.client.force_login(guest)
 
         # update: possible actions are now filtered via RE_PATH in urls.py
-        with self.assertRaises(NoReverseMatch):
+        with pytest.raises(NoReverseMatch):
             reverse("prescribers_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})

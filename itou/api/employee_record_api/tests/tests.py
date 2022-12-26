@@ -31,27 +31,27 @@ class DummyEmployeeRecordAPITest(APITestCase):
         url = reverse("v1:token-auth")
         data = {"username": user.email, "password": DEFAULT_PASSWORD}
         response = self.client.post(url, data, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         token = response.json()["token"]
 
         url = reverse("v1:dummy-employee-records-list")
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         response = self.client.get(url, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # The dummy endpoint always returns 25 records, first page is 20 of them.
-        self.assertEqual(response.json()["count"], 25)
-        self.assertEqual(len(response.json()["results"]), 20)
+        assert response.json()["count"] == 25
+        assert len(response.json()["results"]) == 20
 
         employee_record_json = response.json()["results"][0]
-        self.assertIn("mesure", employee_record_json)
-        self.assertIn("siret", employee_record_json)
-        self.assertIn("numeroAnnexe", employee_record_json)
-        self.assertIn("personnePhysique", employee_record_json)
-        self.assertIn("passIae", employee_record_json["personnePhysique"])
-        self.assertIn("adresse", employee_record_json)
-        self.assertIn("situationSalarie", employee_record_json)
+        assert "mesure" in employee_record_json
+        assert "siret" in employee_record_json
+        assert "numeroAnnexe" in employee_record_json
+        assert "personnePhysique" in employee_record_json
+        assert "passIae" in employee_record_json["personnePhysique"]
+        assert "adresse" in employee_record_json
+        assert "situationSalarie" in employee_record_json
 
 
 class EmployeeRecordAPIPermissionsTest(APITestCase):
@@ -76,30 +76,30 @@ class EmployeeRecordAPIPermissionsTest(APITestCase):
         """
         data = {"username": self.user.email, "password": DEFAULT_PASSWORD}
         response = self.client.post(self.token_url, data, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         token = response.json().get("token")
-        self.assertIsNotNone(token)
+        assert token is not None
 
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         response = self.client.get(ENDPOINT_URL, format="json")
 
         # Result list found but empty
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_permissions_ko_with_token(self):
         data = {"username": self.unauthorized_user.email, "password": DEFAULT_PASSWORD}
         response = self.client.post(self.token_url, data, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         token = response.json().get("token")
-        self.assertIsNotNone(token)
+        assert token is not None
 
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
         response = self.client.get(ENDPOINT_URL, format="json")
 
         # Result list exists, but user is not member of any SIAE
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_permission_ok_with_session(self):
         """
@@ -109,7 +109,7 @@ class EmployeeRecordAPIPermissionsTest(APITestCase):
         self.client.force_login(self.user)
 
         response = self.client.get(ENDPOINT_URL, format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_permission_ko_with_session(self):
         self.client.force_login(self.unauthorized_user)
@@ -153,20 +153,20 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         # There should be no result at this point
         response = self.client.get(ENDPOINT_URL, format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         result = response.json()
 
-        self.assertEqual(len(result.get("results")), 0)
+        assert len(result.get("results")) == 0
 
         self.employee_record.update_as_processed(process_code, process_message, "{}")
         response = self.client.get(ENDPOINT_URL, format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         result = response.json()
 
-        self.assertEqual(len(result.get("results")), 1)
+        assert len(result.get("results")) == 1
         self.assertContains(response, self.siae.siret)
 
         # status = SENT
@@ -177,20 +177,20 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         # There should be no result at this point
         response = self.client.get(ENDPOINT_URL + "?status=SENT", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         result = response.json()
 
-        self.assertEqual(len(result.get("results")), 0)
+        assert len(result.get("results")) == 0
 
         employee_record_sent.update_as_sent("RIAE_FS_20210410130001.json", 1)
         response = self.client.get(ENDPOINT_URL + "?status=SENT", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         result = response.json()
 
-        self.assertEqual(len(result.get("results")), 1)
+        assert len(result.get("results")) == 1
         self.assertContains(response, self.siae.siret)
 
         # status = REJECTED
@@ -201,22 +201,22 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
 
         # There should be no result at this point
         response = self.client.get(ENDPOINT_URL + "?status=REJECTED", format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         result = response.json()
 
-        self.assertEqual(len(result.get("results")), 0)
+        assert len(result.get("results")) == 0
 
         err_code, err_message = "12", "JSON Invalide"
         employee_record_rejected.update_as_rejected(err_code, err_message)
 
         # Status case is not important
         response = self.client.get(ENDPOINT_URL + "?status=rEjEcTeD", format="json")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         result = response.json()
 
-        self.assertEqual(len(result.get("results")), 1)
+        assert len(result.get("results")) == 1
         self.assertContains(response, self.siae.siret)
 
     @mock.patch(
@@ -231,16 +231,16 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
 
         response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         json = response.json()
 
-        self.assertEqual(len(json.get("results")), 1)
+        assert len(json.get("results")) == 1
 
         results = json["results"][0]
 
-        self.assertEqual(results.get("adresse").get("adrTelephone"), self.user.phone)
-        self.assertEqual(results.get("adresse").get("adrMail"), self.user.email)
+        assert results.get("adresse").get("adrTelephone") == self.user.phone
+        assert results.get("adresse").get("adrMail") == self.user.email
 
 
 class EmployeeRecordAPIParametersTest(APITestCase):
@@ -259,16 +259,16 @@ class EmployeeRecordAPIParametersTest(APITestCase):
 
         response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json()
 
-        self.assertEqual(len(results.get("results")), 1)
+        assert len(results.get("results")) == 1
         # there is no "direct" way to match an API result to given employee record
         # (f.i. no pk exported)
         result = results.get("results")[0]
 
-        self.assertEqual(result.get("personnePhysique", {}).get("passIae"), job_application.approval.number)
+        assert result.get("personnePhysique", {}).get("passIae") == job_application.approval.number
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -291,26 +291,26 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json()
 
-        self.assertEqual(len(results.get("results")), 1)
+        assert len(results.get("results")) == 1
 
         response = self.client.get(ENDPOINT_URL + "?status=SENT&status=READY", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json()
 
-        self.assertEqual(len(results.get("results")), 2)
+        assert len(results.get("results")) == 2
 
         # results are ordered by created_at DESC
         result_1 = results.get("results")[0]
         result_2 = results.get("results")[1]
 
-        self.assertEqual(result_1.get("personnePhysique", {}).get("passIae"), job_application_2.approval.number)
-        self.assertEqual(result_2.get("personnePhysique", {}).get("passIae"), job_application_1.approval.number)
+        assert result_1.get("personnePhysique", {}).get("passIae") == job_application_2.approval.number
+        assert result_2.get("personnePhysique", {}).get("passIae") == job_application_1.approval.number
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -330,20 +330,20 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + f"?created={today_param}", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json()
 
-        self.assertEqual(len(results.get("results")), 1)
+        assert len(results.get("results")) == 1
         result = results.get("results")[0]
 
-        self.assertEqual(result.get("siret"), job_application.to_siae.siret)
+        assert result.get("siret") == job_application.to_siae.siret
 
         response = self.client.get(ENDPOINT_URL + f"?created={yesterday_param}", format="json")
         results = response.json()
 
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(results.get("results"))
+        assert response.status_code == 200
+        assert not results.get("results")
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -373,28 +373,28 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + f"?since={today}", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json()
 
-        self.assertFalse(results.get("results"))
+        assert not results.get("results")
 
         response = self.client.get(ENDPOINT_URL + f"?since={sooner}", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json().get("results")
 
-        self.assertTrue(results)
-        self.assertEqual(results[0].get("siret"), job_application_1.to_siae.siret)
+        assert results
+        assert results[0].get("siret") == job_application_1.to_siae.siret
 
         response = self.client.get(ENDPOINT_URL + f"?since={ancient}", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json().get("results")
 
-        self.assertEqual(len(results), 2)
+        assert len(results) == 2
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -421,32 +421,32 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + "?status=NEW", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json().get("results")
 
-        self.assertEqual(len(results), 1)
+        assert len(results) == 1
 
         response = self.client.get(ENDPOINT_URL + f"?status=NEW&created={sooner}", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json().get("results")
 
-        self.assertEqual(len(results), 1)
+        assert len(results) == 1
 
         response = self.client.get(ENDPOINT_URL + f"?status=READY&since={ancient}", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json().get("results")
 
-        self.assertEqual(len(results), 1)
+        assert len(results) == 1
 
         response = self.client.get(ENDPOINT_URL + f"?status=READY&since={sooner}", format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         results = response.json().get("results")
 
-        self.assertEqual(len(results), 0)
+        assert len(results) == 0

@@ -13,19 +13,19 @@ class InstitutionModelTest(TestCase):
         institution2 = InstitutionWithMembershipFactory()
         institution2.members.add(institution1_admin_user)
 
-        self.assertIn(institution1_admin_user, institution1.active_admin_members)
-        self.assertNotIn(institution1_admin_user, institution2.active_admin_members)
+        assert institution1_admin_user in institution1.active_admin_members
+        assert institution1_admin_user not in institution2.active_admin_members
 
     def test_active_members(self):
         institution = InstitutionWith2MembershipFactory(membership2__is_active=False)
         user_with_active_membership = institution.members.first()
         user_with_inactive_membership = institution.members.last()
 
-        self.assertNotIn(user_with_inactive_membership, institution.active_members)
-        self.assertIn(user_with_active_membership, institution.active_members)
+        assert user_with_inactive_membership not in institution.active_members
+        assert user_with_active_membership in institution.active_members
 
         # Deactivate a user
         user_with_active_membership.is_active = False
         user_with_active_membership.save()
 
-        self.assertNotIn(user_with_active_membership, institution.active_members)
+        assert user_with_active_membership not in institution.active_members

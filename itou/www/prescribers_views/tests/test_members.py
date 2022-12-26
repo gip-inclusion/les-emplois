@@ -16,7 +16,7 @@ class MembersTest(TestCase):
         self.client.force_login(user)
         url = reverse("prescribers_views:members")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
 
 class UserMembershipDeactivationTest(TestCase):
@@ -33,12 +33,12 @@ class UserMembershipDeactivationTest(TestCase):
         self.client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": admin.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # Trying to change self membership is not allowed
         # but does not raise an error (does nothing)
         membership.refresh_from_db()
-        self.assertTrue(membership.is_active)
+        assert membership.is_active
 
     def test_deactivate_user(self):
         """
@@ -55,21 +55,21 @@ class UserMembershipDeactivationTest(TestCase):
         self.client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # User should be deactivated now
         membership.refresh_from_db()
-        self.assertFalse(membership.is_active)
-        self.assertEqual(admin, membership.updated_by)
-        self.assertIsNotNone(membership.updated_at)
+        assert not membership.is_active
+        assert admin == membership.updated_by
+        assert membership.updated_at is not None
 
         # Check mailbox
         # User must have been notified of deactivation (we're human after all)
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(f"[Désactivation] Vous n'êtes plus membre de {organization.display_name}", email.subject)
-        self.assertIn("Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion", email.body)
-        self.assertEqual(email.to[0], guest.email)
+        assert f"[Désactivation] Vous n'êtes plus membre de {organization.display_name}" == email.subject
+        assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
+        assert email.to[0] == guest.email
 
     def test_deactivate_with_no_perms(self):
         """
@@ -82,7 +82,7 @@ class UserMembershipDeactivationTest(TestCase):
         self.client.force_login(guest)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_deactivated_prescriber_is_orienter(self):
         """
@@ -97,13 +97,13 @@ class UserMembershipDeactivationTest(TestCase):
         self.client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # guest is now an orienter
         self.client.force_login(guest)
         url = reverse("dashboard:index")
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_structure_selector(self):
         """
@@ -118,13 +118,13 @@ class UserMembershipDeactivationTest(TestCase):
         organization1.members.add(guest)
 
         memberships = guest.prescribermembership_set.all()
-        self.assertEqual(len(memberships), 2)
+        assert len(memberships) == 2
 
         # Admin remove guest from structure
         self.client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.client.logout()
 
         # guest must be able to login
@@ -133,7 +133,7 @@ class UserMembershipDeactivationTest(TestCase):
         response = self.client.get(url)
 
         # Wherever guest lands should give a 200 OK
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Check response context, only one prescriber organization should remain
-        self.assertEqual(len(response.context["user_prescriberorganizations"]), 1)
+        assert len(response.context["user_prescriberorganizations"]) == 1

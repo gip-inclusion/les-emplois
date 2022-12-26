@@ -1,6 +1,7 @@
 import datetime
 
 import httpx
+import pytest
 import respx
 from django.core.exceptions import ValidationError
 from django.test import override_settings
@@ -72,7 +73,7 @@ class FranceConnectTest(TestCase):
         FranceConnectState.objects.cleanup()
 
         state.refresh_from_db()
-        self.assertIsNotNone(state)
+        assert state is not None
 
         # Set creation time for the state so that the state is expired
         state.created_at = timezone.now() - OIDC_STATE_CLEANUP * 2
@@ -80,28 +81,28 @@ class FranceConnectTest(TestCase):
 
         FranceConnectState.objects.cleanup()
 
-        with self.assertRaises(FranceConnectState.DoesNotExist):
+        with pytest.raises(FranceConnectState.DoesNotExist):
             state.refresh_from_db()
 
     def test_state_verification(self):
         csrf_signed = FranceConnectState.create_signed_csrf_token()
-        self.assertTrue(FranceConnectState.get_from_csrf(csrf_signed).is_valid())
+        assert FranceConnectState.get_from_csrf(csrf_signed).is_valid()
 
     def test_state_is_valid(self):
         with freeze_time("2022-09-13 12:00:01"):
             csrf_signed = FranceConnectState.create_signed_csrf_token()
-            self.assertTrue(isinstance(csrf_signed, str))
-            self.assertTrue(FranceConnectState.get_from_csrf(csrf_signed).is_valid())
+            assert isinstance(csrf_signed, str)
+            assert FranceConnectState.get_from_csrf(csrf_signed).is_valid()
 
             csrf_signed = FranceConnectState.create_signed_csrf_token()
         with freeze_time("2022-09-14 12:00:01"):
-            self.assertFalse(FranceConnectState.get_from_csrf(csrf_signed).is_valid())
+            assert not FranceConnectState.get_from_csrf(csrf_signed).is_valid()
 
     def test_authorize(self):
         url = reverse("france_connect:authorize")
         response = self.client.get(url, follow=False)
         # Don't use assertRedirects to avoid fetch
-        self.assertTrue(response.url.startswith(constants.FRANCE_CONNECT_ENDPOINT_AUTHORIZE))
+        assert response.url.startswith(constants.FRANCE_CONNECT_ENDPOINT_AUTHORIZE)
 
     def test_create_django_user(self):
         """
@@ -109,28 +110,28 @@ class FranceConnectTest(TestCase):
         that is sent, so we create one
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        self.assertFalse(User.objects.filter(username=fc_user_data.username).exists())
-        self.assertFalse(User.objects.filter(email=fc_user_data.email).exists())
+        assert not User.objects.filter(username=fc_user_data.username).exists()
+        assert not User.objects.filter(email=fc_user_data.email).exists()
         user, created = fc_user_data.create_or_update_user()
-        self.assertTrue(created)
-        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
-        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
-        self.assertEqual(user.phone, FC_USERINFO["phone_number"])
-        self.assertEqual(user.birthdate, datetime.date.fromisoformat(FC_USERINFO["birthdate"]))
-        self.assertEqual(user.address_line_1, FC_USERINFO["address"]["street_address"])
-        self.assertEqual(user.post_code, FC_USERINFO["address"]["postal_code"])
-        self.assertEqual(user.city, FC_USERINFO["address"]["locality"])
+        assert created
+        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.first_name == FC_USERINFO["given_name"]
+        assert user.phone == FC_USERINFO["phone_number"]
+        assert user.birthdate == datetime.date.fromisoformat(FC_USERINFO["birthdate"])
+        assert user.address_line_1 == FC_USERINFO["address"]["street_address"]
+        assert user.post_code == FC_USERINFO["address"]["postal_code"]
+        assert user.city == FC_USERINFO["address"]["locality"]
 
-        self.assertEqual(user.external_data_source_history[0]["source"], "FC")
-        self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
-        self.assertTrue(user.is_job_seeker)
+        assert user.external_data_source_history[0]["source"] == "FC"
+        assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
+        assert user.is_job_seeker
 
         # Update user
         fc_user_data.last_name = "DUPUIS"
         user, created = fc_user_data.create_or_update_user()
-        self.assertFalse(created)
-        self.assertEqual(user.last_name, "DUPUIS")
-        self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+        assert not created
+        assert user.last_name == "DUPUIS"
+        assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
     def test_create_django_user_optional_fields(self):
         fc_info = FC_USERINFO | {
@@ -146,13 +147,13 @@ class FranceConnectTest(TestCase):
         }
         fc_user_data = FranceConnectUserData.from_user_info(fc_info)
         user, created = fc_user_data.create_or_update_user()
-        self.assertTrue(created)
-        self.assertFalse(user.first_name)
-        self.assertFalse(user.post_code)
-        self.assertFalse(user.birthdate)
-        self.assertFalse(user.phone)
-        self.assertFalse(user.address_line_1)
-        self.assertFalse(user.post_code)
+        assert created
+        assert not user.first_name
+        assert not user.post_code
+        assert not user.birthdate
+        assert not user.phone
+        assert not user.address_line_1
+        assert not user.post_code
 
     def test_create_django_user_country_other_than_france(self):
         """
@@ -168,17 +169,17 @@ class FranceConnectTest(TestCase):
             },
         }
         fc_user_data = FranceConnectUserData.from_user_info(user_info)
-        self.assertFalse(User.objects.filter(username=fc_user_data.username).exists())
-        self.assertFalse(User.objects.filter(email=fc_user_data.email).exists())
+        assert not User.objects.filter(username=fc_user_data.username).exists()
+        assert not User.objects.filter(email=fc_user_data.email).exists()
         user, created = fc_user_data.create_or_update_user()
-        self.assertTrue(created)
-        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
-        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
-        self.assertEqual(user.external_data_source_history[0]["source"], "FC")
-        self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
-        self.assertEqual(user.address_line_1, "")
-        self.assertEqual(user.post_code, "")
-        self.assertEqual(user.city, "")
+        assert created
+        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.first_name == FC_USERINFO["given_name"]
+        assert user.external_data_source_history[0]["source"] == "FC"
+        assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
+        assert user.address_line_1 == ""
+        assert user.post_code == ""
+        assert user.city == ""
 
     def test_create_django_user_with_already_existing_fc_id(self):
         """
@@ -192,11 +193,11 @@ class FranceConnectTest(TestCase):
             identity_provider=IdentityProvider.FRANCE_CONNECT,
         )
         user, created = fc_user_data.create_or_update_user()
-        self.assertFalse(created)
-        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
-        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
-        self.assertEqual(user.external_data_source_history[0]["source"], "FC")
-        self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+        assert not created
+        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.first_name == FC_USERINFO["given_name"]
+        assert user.external_data_source_history[0]["source"] == "FC"
+        assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
     def test_create_django_user_with_already_existing_fc_id_but_from_other_sso(self):
         """
@@ -210,7 +211,7 @@ class FranceConnectTest(TestCase):
             identity_provider=IdentityProvider.DJANGO,
             email="random@email.com",
         )
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             fc_user_data.create_or_update_user()
 
     def test_create_django_user_with_already_existing_fc_email_django(self):
@@ -221,12 +222,12 @@ class FranceConnectTest(TestCase):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         UserFactory(email=fc_user_data.email, identity_provider=IdentityProvider.DJANGO)
         user, created = fc_user_data.create_or_update_user()
-        self.assertFalse(created)
-        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
-        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
-        self.assertEqual(user.username, FC_USERINFO["sub"])
-        self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
-        self.assertNotEqual(user.external_data_source_history, {})
+        assert not created
+        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.first_name == FC_USERINFO["given_name"]
+        assert user.username == FC_USERINFO["sub"]
+        assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
+        assert user.external_data_source_history != {}
 
     def test_create_django_user_with_already_existing_fc_email_other_sso(self):
         """
@@ -236,13 +237,13 @@ class FranceConnectTest(TestCase):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         UserFactory(email=fc_user_data.email, identity_provider=IdentityProvider.INCLUSION_CONNECT)
         user, created = fc_user_data.create_or_update_user()
-        self.assertFalse(created)
-        self.assertNotEqual(user.last_name, FC_USERINFO["family_name"])
-        self.assertNotEqual(user.first_name, FC_USERINFO["given_name"])
-        self.assertNotEqual(user.username, FC_USERINFO["sub"])
+        assert not created
+        assert user.last_name != FC_USERINFO["family_name"]
+        assert user.first_name != FC_USERINFO["given_name"]
+        assert user.username != FC_USERINFO["sub"]
         # We did not fill this data using external data, so it is not set
-        self.assertFalse(user.external_data_source_history)
-        self.assertNotEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+        assert not user.external_data_source_history
+        assert user.identity_provider != IdentityProvider.FRANCE_CONNECT
 
     def test_create_or_update_user_raise_too_many_kind_exception(self):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
@@ -250,7 +251,7 @@ class FranceConnectTest(TestCase):
         for field in ["is_prescriber", "is_siae_staff", "is_labor_inspector"]:
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, **{field: True})
 
-            with self.assertRaises(TooManyKindsException):
+            with pytest.raises(TooManyKindsException):
                 fc_user_data.create_or_update_user()
 
             user.delete()
@@ -258,28 +259,28 @@ class FranceConnectTest(TestCase):
     def test_callback_no_code(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     def test_callback_no_state(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url, data={"code": "123"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     def test_callback_invalid_state(self):
         url = reverse("france_connect:callback")
         response = self.client.get(url, data={"code": "123", "state": "000"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     @respx.mock
     def test_callback(self):
         mock_oauth_dance(self)
-        self.assertEqual(User.objects.count(), 1)
+        assert User.objects.count() == 1
         user = User.objects.get(email=FC_USERINFO["email"])
-        self.assertEqual(user.first_name, FC_USERINFO["given_name"])
-        self.assertEqual(user.last_name, FC_USERINFO["family_name"])
-        self.assertEqual(user.username, FC_USERINFO["sub"])
-        self.assertTrue(user.has_sso_provider)
-        self.assertEqual(user.identity_provider, IdentityProvider.FRANCE_CONNECT)
+        assert user.first_name == FC_USERINFO["given_name"]
+        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.username == FC_USERINFO["sub"]
+        assert user.has_sso_provider
+        assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
     @respx.mock
     def test_callback_redirect_on_too_many_kind_exception(self):
@@ -293,8 +294,8 @@ class FranceConnectTest(TestCase):
     def test_logout_no_id_token(self):
         url = reverse("france_connect:logout")
         response = self.client.get(url + "?")
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Le paramètre « id_token » est manquant.")
+        assert response.status_code == 400
+        assert response.json()["message"] == "Le paramètre « id_token » est manquant."
 
     def test_logout(self):
         url = reverse("france_connect:logout")

@@ -28,40 +28,37 @@ class ExportPEApiRejectionsTestCase(TestCase):
         )
         stdout = io.StringIO()
         management.call_command("export_pe_api_rejections", stdout=stdout, stderr=io.StringIO())
-        self.assertEqual(
-            open("exports/2022-09-13-00-00-00-export_pe_api_rejections.csv").read(),
-            "\n".join(
-                [
-                    ",".join(
+        assert open("exports/2022-09-13-00-00-00-export_pe_api_rejections.csv").read() == "\n".join(
+            [
+                ",".join(
+                    [
+                        "numero",
+                        "date_notification",
+                        "code_echec",
+                        "nir",
+                        "pole_emploi_id",
+                        "nom_naissance",
+                        "prenom",
+                        "date_naissance",
+                        "siae_departement",
+                    ]
+                ),
+                ",".join(
+                    map(
+                        str,
                         [
-                            "numero",
-                            "date_notification",
-                            "code_echec",
-                            "nir",
-                            "pole_emploi_id",
-                            "nom_naissance",
-                            "prenom",
-                            "date_naissance",
-                            "siae_departement",
-                        ]
-                    ),
-                    ",".join(
-                        map(
-                            str,
-                            [
-                                approval.number,
-                                "2022-08-31 00:00:00+00:00",
-                                "FOOBAR",
-                                approval.user.nir,
-                                approval.user.pole_emploi_id,
-                                '"Pers,e"',
-                                '"Jul""ie"',
-                                approval.user.birthdate,
-                                42,
-                            ],
-                        )
-                    ),
-                    "",  # Trailing newline
-                ]
-            ),
+                            approval.number,
+                            "2022-08-31 00:00:00+00:00",
+                            "FOOBAR",
+                            approval.user.nir,
+                            approval.user.pole_emploi_id,
+                            '"Pers,e"',
+                            '"Jul""ie"',
+                            approval.user.birthdate,
+                            42,
+                        ],
+                    )
+                ),
+                "",  # Trailing newline
+            ]
         )

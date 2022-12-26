@@ -19,21 +19,21 @@ class ApplicantsAPITest(APITestCase):
         self.client.force_authenticate(user)
 
         response = self.client.get(self.url, format="json")
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_login_as_prescriber_organisation(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
         self.client.force_authenticate(user)
 
         response = self.client.get(self.url, format="json")
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_login_as_institution(self):
         user = InstitutionWithMembershipFactory().members.first()
         self.client.force_authenticate(user)
 
         response = self.client.get(self.url, format="json")
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_api_user_has_unique_siae_membership(self):
         # Connected user must only be member of target SIAE
@@ -43,7 +43,7 @@ class ApplicantsAPITest(APITestCase):
         self.client.force_authenticate(user)
         response = self.client.get(self.url, format="json")
 
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_api_user_is_admin(self):
         # Connected user must only be admin of target SIAE
@@ -55,7 +55,7 @@ class ApplicantsAPITest(APITestCase):
         self.client.force_authenticate(user)
         response = self.client.get(self.url, format="json")
 
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_login_as_siae(self):
         # Connect with an admin user with member of a sigle SIAE
@@ -63,8 +63,8 @@ class ApplicantsAPITest(APITestCase):
         self.client.force_authenticate(user)
 
         response = self.client.get(self.url, format="json")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json().get("results"), [])
+        assert response.status_code == 200
+        assert response.json().get("results") == []
 
     def test_applicant_data(self):
         siae = SiaeFactory(with_membership=True)
@@ -87,25 +87,22 @@ class ApplicantsAPITest(APITestCase):
         self.client.force_authenticate(user)
         response = self.client.get(self.url, format="json")
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         [result] = response.json().get("results")
 
-        self.assertEqual(
-            {
-                "civilite": job_seeker.title,
-                "nom": job_seeker.first_name,
-                "prenom": job_seeker.last_name,
-                "courriel": job_seeker.email,
-                "telephone": job_seeker.phone,
-                "adresse": job_seeker.address_line_1,
-                "complement_adresse": job_seeker.address_line_2,
-                "code_postal": job_seeker.post_code,
-                "ville": job_seeker.city,
-                "date_naissance": str(job_seeker.birthdate),
-                "lieu_naissance": job_seeker.birth_place.name,
-                "pays_naissance": job_seeker.birth_country.name,
-                "lien_cv": job_seeker.resume_link,
-            },
-            result,
-        )
+        assert {
+            "civilite": job_seeker.title,
+            "nom": job_seeker.first_name,
+            "prenom": job_seeker.last_name,
+            "courriel": job_seeker.email,
+            "telephone": job_seeker.phone,
+            "adresse": job_seeker.address_line_1,
+            "complement_adresse": job_seeker.address_line_2,
+            "code_postal": job_seeker.post_code,
+            "ville": job_seeker.city,
+            "date_naissance": str(job_seeker.birthdate),
+            "lieu_naissance": job_seeker.birth_place.name,
+            "pays_naissance": job_seeker.birth_country.name,
+            "lien_cv": job_seeker.resume_link,
+        } == result

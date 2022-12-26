@@ -24,10 +24,10 @@ class DisableEmployeeRecordsTest(TestCase):
     def test_access_granted(self):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_disable_employee_record_new(self):
-        self.assertEqual(self.employee_record.status, Status.NEW)
+        assert self.employee_record.status == Status.NEW
 
         self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=NEW")
@@ -36,13 +36,13 @@ class DisableEmployeeRecordsTest(TestCase):
         response = self.client.post(f"{self.url}?status=NEW", data={"confirm": "true"}, follow=True)
         self.assertRedirects(response, f"{self.next_url}?status=NEW")
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.DISABLED)
+        assert self.employee_record.status == Status.DISABLED
 
     def test_disable_employee_record_ready(self):
         self.employee_record.update_as_ready()
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.READY)
+        assert self.employee_record.status == Status.READY
 
         self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=READY", follow=True)
@@ -50,7 +50,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.assertContains(response, escape(EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE))
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.READY)
+        assert self.employee_record.status == Status.READY
 
     def test_disable_employee_record_sent(self):
         self.employee_record.update_as_ready()
@@ -58,7 +58,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.employee_record.update_as_sent(filename, 1)
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.SENT)
+        assert self.employee_record.status == Status.SENT
 
         self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=SENT", follow=True)
@@ -66,7 +66,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.assertContains(response, escape(EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE))
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.SENT)
+        assert self.employee_record.status == Status.SENT
 
     def test_disable_employee_record_rejected(self):
         self.employee_record.update_as_ready()
@@ -76,7 +76,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.employee_record.update_as_rejected(err_code, err_message)
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.REJECTED)
+        assert self.employee_record.status == Status.REJECTED
 
         self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=REJECTED")
@@ -86,7 +86,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.assertRedirects(response, f"{self.next_url}?status=REJECTED")
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.DISABLED)
+        assert self.employee_record.status == Status.DISABLED
 
     def test_disable_employee_record_completed(self):
         self.employee_record.update_as_ready()
@@ -96,7 +96,7 @@ class DisableEmployeeRecordsTest(TestCase):
         self.employee_record.update_as_processed(process_code, process_message, "{}")
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.PROCESSED)
+        assert self.employee_record.status == Status.PROCESSED
 
         self.client.force_login(self.user)
         response = self.client.get(f"{self.url}?status=PROCESSED")
@@ -106,4 +106,4 @@ class DisableEmployeeRecordsTest(TestCase):
         self.assertRedirects(response, f"{self.next_url}?status=PROCESSED")
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.DISABLED)
+        assert self.employee_record.status == Status.DISABLED

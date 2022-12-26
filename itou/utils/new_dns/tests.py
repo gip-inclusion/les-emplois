@@ -16,8 +16,8 @@ class NewDnsRedirectMiddlewareTest(SimpleTestCase):
 
         response = self.middleware(request)
 
-        self.assertEqual(response.status_code, 301)
-        self.assertEqual(response["Location"], f"https://emplois.inclusion.beta.gouv.fr{path}")
+        assert response.status_code == 301
+        assert response["Location"] == f"https://emplois.inclusion.beta.gouv.fr{path}"
 
     @override_settings(ALLOWED_HOSTS=["emploi.inclusion.beta.gouv.fr", "emplois.inclusion.beta.gouv.fr"])
     def test_emploi_redirect(self):
@@ -26,8 +26,8 @@ class NewDnsRedirectMiddlewareTest(SimpleTestCase):
 
         response = self.middleware(request)
 
-        self.assertEqual(response.status_code, 301)
-        self.assertEqual(response["Location"], f"https://emplois.inclusion.beta.gouv.fr{path}")
+        assert response.status_code == 301
+        assert response["Location"] == f"https://emplois.inclusion.beta.gouv.fr{path}"
 
     @override_settings(ALLOWED_HOSTS=["demo.inclusion.beta.gouv.fr", "demo.emplois.inclusion.beta.gouv.fr"])
     def test_demo_redirect(self):
@@ -36,8 +36,8 @@ class NewDnsRedirectMiddlewareTest(SimpleTestCase):
 
         response = self.middleware(request)
 
-        self.assertEqual(response.status_code, 301)
-        self.assertEqual(response["Location"], f"https://demo.emplois.inclusion.beta.gouv.fr{path}")
+        assert response.status_code == 301
+        assert response["Location"] == f"https://demo.emplois.inclusion.beta.gouv.fr{path}"
 
     @override_settings(ALLOWED_HOSTS=["localhost"])
     def test_non_redirect(self):
@@ -45,4 +45,4 @@ class NewDnsRedirectMiddlewareTest(SimpleTestCase):
 
         response = self.middleware(request)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
