@@ -783,9 +783,9 @@ pickleshare==0.7.5 \
     --hash=sha256:87683d47965c1da65cdacaf31c8441d12b8044cdec9aca500cd78fc2c683afca \
     --hash=sha256:9649af414d74d4df115d5d718f82acb59c9d418196b7b4290ed47a12ce62df56
     # via ipython
-pip-tools==6.10.0 \
-    --hash=sha256:57ac98392548f5ca96c2831927deec3035efe81ff476e3c744bd474ca9c6a1f2 \
-    --hash=sha256:7f9f7356052db6942b5aaabc8eba29983591ca0ad75affbf2f0a25d9361be624
+pip-tools==6.12.1 \
+    --hash=sha256:88efb7b29a923ffeac0713e6f23ef8529cc6175527d42b93f73756cc94387293 \
+    --hash=sha256:f0c0c0ec57b58250afce458e2e6058b1f30a4263db895b7d72fd6311bf1dc6f7
     # via -r requirements/dev.in
 platformdirs==2.5.4 \
     --hash=sha256:1006647646d80f16130f052404c6b901e80ee4ed6bef6792e1f238a8969106f7 \
@@ -1177,6 +1177,10 @@ tablib[html,ods,xls,xlsx,yaml]==3.2.1 \
     # via
     #   -r requirements/base.txt
     #   django-import-export
+tenacity==8.1.0 \
+    --hash=sha256:35525cd47f82830069f0d6b73f7eb83bc5b73ee2fff0437952cedf98b27653ac \
+    --hash=sha256:e48c437fdf9340f5666b92cd7990e96bc5fc955e1298baf4a907e3972067a445
+    # via -r requirements/base.txt
 toml==0.10.2 \
     --hash=sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b \
     --hash=sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f
