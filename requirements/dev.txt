@@ -527,9 +527,9 @@ ipython==8.6.0 \
     --hash=sha256:7c959e3dedbf7ed81f9b9d8833df252c430610e2a4a6464ec13cd20975ce20a5 \
     --hash=sha256:91ef03016bcf72dd17190f863476e7c799c6126ec7e8be97719d1bc9a78a59a4
     # via ipdb
-isort==5.10.1 \
-    --hash=sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7 \
-    --hash=sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951
+isort==5.11.4 \
+    --hash=sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6 \
+    --hash=sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b
     # via
     #   -r requirements/dev.in
     #   pylint
@@ -1177,6 +1177,10 @@ tablib[html,ods,xls,xlsx,yaml]==3.2.1 \
     # via
     #   -r requirements/base.txt
     #   django-import-export
+tenacity==8.1.0 \
+    --hash=sha256:35525cd47f82830069f0d6b73f7eb83bc5b73ee2fff0437952cedf98b27653ac \
+    --hash=sha256:e48c437fdf9340f5666b92cd7990e96bc5fc955e1298baf4a907e3972067a445
+    # via -r requirements/base.txt
 toml==0.10.2 \
     --hash=sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b \
     --hash=sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f
