@@ -172,7 +172,7 @@ class EmployerSearchView(EmployerSearchBaseView):
             # 4) not has_active_members and block_job_applications
             # This group is supposed to be empty. But itou staff may have
             # detached members from their siae so it could still happen.
-            .order_by("-has_active_members", "block_job_applications", "job_app_score")
+            .order_by("-has_active_members", "block_job_applications", "job_app_score", "pk")
         )
 
         return pager(siaes, self.request.GET.get("page"), items_per_page=10)
