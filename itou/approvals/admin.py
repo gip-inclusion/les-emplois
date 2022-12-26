@@ -53,17 +53,26 @@ class JobApplicationInline(admin.StackedInline):
     # Custom read-only fields as workaround :
     # there is no direct relation between approvals and employee records
     # (YET...)
+    @staticmethod
     @admin.display(description="Statut de la fiche salarié")
-    def employee_record_status(self, obj):
+    def employee_record_status(obj):
         if employee_record := obj.employee_record.first():
             url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
-            display = employee_record.get_status_display()
-            return format_html(f"<a href='{url}'><b>{display} (ID : {employee_record.id})</b></a>")
+            debug = f"ID: {employee_record.id}"
+            if employee_record.is_orphan:
+                debug += ", ORPHAN"
+            return format_html(f"<a href='{url}'><b>{employee_record.get_status_display()} ({debug})</b></a>")
 
-        elif obj.is_waiting_for_employee_record_creation and obj.to_siae.can_use_employee_record:
-            return "Fiche salarié en attente de creation"
+        if obj.candidate_has_employee_record:
+            return "Une fiche salarié existe déjà pour ce candidat"
 
-        return "Pas de fiche salarié crée pour cette candidature"
+        if not obj.to_siae.can_use_employee_record:
+            return "La SIAE n'utilise pas les fiches salariés"
+
+        if not obj.create_employee_record:
+            return "Création désactivée"
+
+        return "-"
 
 
 class SuspensionInline(admin.TabularInline):

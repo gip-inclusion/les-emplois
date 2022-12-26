@@ -18,7 +18,6 @@ from django_xworkflows import models as xwf_models
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications.admin_forms import JobApplicationAdminForm
@@ -40,7 +39,6 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
-from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -263,82 +261,6 @@ class JobApplicationModelTest(TestCase):
         job_application2 = JobApplicationFactory(with_approval=True, approval=job_application1.approval)
         self.assertTrue(job_application1.candidate_has_employee_record)
         self.assertFalse(job_application2.candidate_has_employee_record)
-
-    def test_is_waiting_for_employee_record_creation(self):
-
-        today = datetime.date.today()
-        job_application = JobApplicationFactory(with_approval=True)
-        to_siae = job_application.to_siae
-
-        # test application with missing hiring_start_at (it’s an optional)
-        job_application.hiring_start_at = None
-        self.assertFalse(job_application.is_waiting_for_employee_record_creation)
-
-        # test application before EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
-        day_in_the_past = EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date() - relativedelta(months=2)
-        job_application.hiring_start_at = day_in_the_past
-        self.assertFalse(job_application.is_waiting_for_employee_record_creation)
-
-        # test application between EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE and today
-        recent_day_in_the_past = (
-            datetime.date.today() - relativedelta(EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date(), today) / 2
-        )
-        job_application.hiring_start_at = recent_day_in_the_past
-        self.assertTrue(job_application.is_waiting_for_employee_record_creation)
-
-        # test application today
-        job_application.hiring_start_at = today
-        self.assertTrue(job_application.is_waiting_for_employee_record_creation)
-
-        # test hiring without approval
-        job_application_without_approval = JobApplicationWithoutApprovalFactory()
-        self.assertFalse(job_application_without_approval.is_waiting_for_employee_record_creation)
-
-        # test state not STATE_ACCEPTED
-        states_transition_not_possible = [
-            JobApplicationWorkflow.STATE_NEW,
-            JobApplicationWorkflow.STATE_PROCESSING,
-            JobApplicationWorkflow.STATE_POSTPONED,
-            JobApplicationWorkflow.STATE_CANCELLED,
-            JobApplicationWorkflow.STATE_REFUSED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
-        ]
-
-        for state in states_transition_not_possible:
-            job_application.state = state
-            self.assertFalse(job_application.is_waiting_for_employee_record_creation)
-
-        # test approval is invalid
-        job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
-        job_application.approval.start_at = timezone.localdate() - relativedelta(year=1)
-        job_application.approval.end_at = timezone.localdate() - relativedelta(month=1)
-        self.assertFalse(job_application.is_waiting_for_employee_record_creation)
-
-        # test SIAE cannot use Employee_Record
-        job_application.hiring_start_at = today
-        for siae_kind in [siae_kind for siae_kind in SiaeKind if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS]:
-            not_eligible_siae = SiaeFactory(kind=siae_kind)
-            job_application.to_siae = not_eligible_siae
-            self.assertFalse(job_application.is_waiting_for_employee_record_creation)
-
-        # test Employee_Record already exists
-        job_application.to_siae = to_siae
-        EmployeeRecordFactory(job_application=job_application)
-        self.assertFalse(job_application.is_waiting_for_employee_record_creation)
-
-        # test Employee_Record doesn't exists,
-        # but an other EmployeeRecord exists for the same Approval and the same Siae
-        job_application1 = JobApplicationFactory(with_approval=True)
-        EmployeeRecordFactory(
-            job_application=job_application1,
-            asp_id=job_application1.to_siae.convention.asp_id,
-            approval_number=job_application1.approval.number,
-        )
-        job_application2 = JobApplicationFactory(
-            with_approval=True, approval=job_application1.approval, to_siae=job_application1.to_siae
-        )
-        self.assertFalse(job_application1.is_waiting_for_employee_record_creation)
-        self.assertFalse(job_application2.is_waiting_for_employee_record_creation)
 
     def test_get_sender_kind_display(self):
         items = [

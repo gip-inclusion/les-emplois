@@ -23,16 +23,10 @@ from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory,
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationSentByJobSeekerFactory,
-    JobApplicationWithoutApprovalFactory,
-)
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
-from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, UserFactory
 from itou.utils import constants as global_constants
 from itou.utils.test import TestCase
@@ -823,41 +817,40 @@ class CustomApprovalAdminViewsTest(TestCase):
         self.assertIn(approval.number_with_spaces, email.body)
 
     def test_employee_record_status(self):
-        # test employee record exists
+        # When an employee record exists
+        employee_record = EmployeeRecordFactory()
+        url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
+        msg = JobApplicationInline.employee_record_status(employee_record.job_application)
+        assert msg == f"<a href='{url}'><b>Nouvelle (ID: {employee_record.pk})</b></a>"
+
+        # When an employee record already exists for the candidate
         job_application = JobApplicationFactory(
-            with_approval=True,
+            to_siae=employee_record.job_application.to_siae,
+            approval=employee_record.job_application.approval,
         )
-        EmployeeRecordFactory(job_application=job_application)
-        employee_record_id = EmployeeRecord.objects.get(job_application_id=job_application.id).id
-        msg = JobApplicationInline.employee_record_status(self, job_application)
-        self.assertIn(f"<a href='/admin/employee_record/employeerecord/{employee_record_id}/change/'>", msg)
+        msg = JobApplicationInline.employee_record_status(job_application)
+        assert msg == "Une fiche salarié existe déjà pour ce candidat"
 
-        # test employee record creation is pending
-        today = datetime.date.today()
-        for siae_kind in Siae.ASP_EMPLOYEE_RECORD_KINDS:
-            eligible_siae = SiaeFactory(kind=siae_kind)
-            job_application = JobApplicationFactory(with_approval=True, to_siae=eligible_siae, hiring_start_at=today)
-            self.assertIn(
-                "Fiche salarié en attente de creation",
-                JobApplicationInline.employee_record_status(self, job_application),
-            )
+        # When the employee record is an orphan
+        employee_record = EmployeeRecordFactory(orphan=True)
+        url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
+        msg = JobApplicationInline.employee_record_status(employee_record.job_application)
+        assert msg == f"<a href='{url}'><b>Nouvelle (ID: {employee_record.pk}, ORPHAN)</b></a>"
 
-        # test no employee record for this application
-        ## cannot have employee record
-        job_application = JobApplicationWithoutApprovalFactory()
-        self.assertIn(
-            "Pas de fiche salarié crée pour cette candidature",
-            JobApplicationInline.employee_record_status(self, job_application),
-        )
+        # When employee record creation is disabled for that job application
+        job_application = JobApplicationFactory(create_employee_record=False)
+        msg = JobApplicationInline.employee_record_status(job_application)
+        assert msg == "Création désactivée"
 
-        ## can_use_employee_record
-        for siae_kind in [siae_kind for siae_kind in SiaeKind if siae_kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS]:
-            not_eligible_siae = SiaeFactory(kind=siae_kind)
-            job_application = JobApplicationFactory(with_approval=True, to_siae=not_eligible_siae)
-            self.assertIn(
-                "Pas de fiche salarié crée pour cette candidature",
-                JobApplicationInline.employee_record_status(self, job_application),
-            )
+        # When employee records are allowed (or not) for the SIAE
+        for kind in SiaeKind:
+            with self.subTest("SIAE doesn't use employee records", kind=kind):
+                job_application = JobApplicationFactory(with_approval=True, to_siae__kind=kind)
+                msg = JobApplicationInline.employee_record_status(job_application)
+                if not job_application.to_siae.can_use_employee_record:
+                    assert msg == "La SIAE n'utilise pas les fiches salariés"
+                else:
+                    assert msg == "-"
 
 
 class SuspensionQuerySetTest(TestCase):

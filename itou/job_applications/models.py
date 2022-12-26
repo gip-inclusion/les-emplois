@@ -749,21 +749,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         ).exists()
 
     @property
-    def is_waiting_for_employee_record_creation(self):
-        """
-        Check if EmployeeRecord does not exist and can be created for this JobApplication.
-        """
-        is_application_valid = (
-            self.hiring_start_at is not None
-            and self.hiring_start_at >= EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
-            and not self.hiring_without_approval
-            and self.state == JobApplicationWorkflow.STATE_ACCEPTED
-            and self.approval.is_valid()
-        )
-
-        return is_application_valid and not self.candidate_has_employee_record and self.to_siae.can_use_employee_record
-
-    @property
     def is_in_transferable_state(self):
         return self.state not in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW]
 
